@@ -37,6 +37,7 @@
 | F | `task_F_compliance.md` | 合规调研 | 高 | 2-3 天 |
 | G | `task_G_skills_github.md` | GitHub Skills 候选搜索 | 低 | 0.5-1 天 |
 | **H** | `task_H_bead_db_full.md` | **全品牌全规格豆系信息库（Phase 1 启动前必须完成）** | **高** | **3-4 天** |
+| **I** | `task_I_bead_china_deep_dive.md` | **中文社区拼豆深度调研（小红书 / 1688 / 上场工具反查 / 实物色差）** | **高** | **4-6 天** |
 
 **推荐执行顺序**：D 先启动 → B / C 并行依赖 D → A / E / F / G 自由穿插 → **H 在 Phase 0 收尾启动**（A-G 已完成）。
 
