@@ -172,6 +172,51 @@
 - 存储位置：`01_research/tech/existing_tools.md`
 - 责任人：Codex
 
+### 拼豆工具站定价页
+- URL / 标识：https://www.pindou.online/pricing
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task E 竞品免费额度、会员价格、微信群激活码模式
+- 数据格式：HTML
+- 许可状态：公开；商用许可未知
+- 存储位置：`01_research/competitor/business_models.md`
+- 责任人：Codex
+
+### App Store 拼豆 / 拼豆豆 / Perlypop
+- URL / 标识：https://apps.apple.com/
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task E 订阅、去广告、评分与评论线索
+- 数据格式：HTML
+- 许可状态：公开；商用许可未知
+- 存储位置：`01_research/competitor/business_models.md`
+- 责任人：Codex
+
+### BeadPattern / Fuse Bead Maker / Beadographer / PerlerBeadPattern pricing
+- URL / 标识：https://beadpattern.net/zh ; https://www.fusebeadmaker.com/zh/pricing ; https://beadographer.com/about/ ; https://www.perlerbeadpattern.com/pricing
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task E 海外拼豆工具定价、免费额度、AI credit 模式参考
+- 数据格式：HTML
+- 许可状态：公开；商用许可未知
+- 存储位置：`01_research/competitor/business_models.md`
+- 责任人：Codex
+
+### 小红书拼豆公开媒体转载样本
+- URL / 标识：https://www.huxiu.com/article/4841619.html ; https://finance.sina.com.cn/jjxw/2026-04-04/doc-inhthwxz9657516.shtml
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task E 小红书拼豆账号 / 内容样本、内容形态归纳
+- 数据格式：HTML
+- 许可状态：公开转载；原小红书数据许可未知
+- 存储位置：`01_research/competitor/xhs_accounts.md`, `08_growth/xhs_playbook.md`
+- 责任人：Codex
+
+### 小红书交易导流规则报道
+- URL / 标识：https://www.ithome.com/0/837/049.htm
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task E 引流合规边界初稿；待 Task F 用平台官方规则交叉验证
+- 数据格式：HTML
+- 许可状态：公开新闻；需官方规则复核
+- 存储位置：`08_growth/xhs_playbook.md`
+- 责任人：Codex
+
 ---
 
 ## 类别建议（Codex 调研时分类）

@@ -1,6 +1,6 @@
 # Task E — 竞品商业模型 + 小红书账号矩阵
 
-**Status**: pending
+**Status**: completed (Codex @ 2026-05-24) — 产出：[business_models.md](../../01_research/competitor/business_models.md), [xhs_accounts.md](../../01_research/competitor/xhs_accounts.md), [xhs_playbook.md](../../08_growth/xhs_playbook.md)
 **Owner**: Codex
 **Priority**: 中
 **Estimated**: 1-2 天
