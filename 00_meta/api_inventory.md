@@ -91,7 +91,7 @@
 ---
 
 ## 四、安全提醒
-- 旧 key `sk-9a0b58014b9f4b35bd9849a6bdfc1d08` 已泄露，禁止使用（参见 `apisell/api_key_audit.md`）
+- 旧 key `<redacted-leaked-key>` 已泄露，禁止使用（参见 `apisell/api_key_audit.md`）
 - 新 key 通过 `.env` 注入，**永远不要 commit**
 - `.env.example` 仅列变量名，不列值
 
