@@ -298,6 +298,15 @@
 - 存储位置：`01_research/compliance/compliance_checklist.md`
 - 责任人：Codex
 
+### P1 OpenAI-compatible image API run
+- URL / 标识：OpenAI-compatible reverse proxy base URL from local `.env`
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task C P1 `gpt-image-2` 图像编辑 PoC，生成 AI 样本后接 Task B 量化流程
+- 数据格式：API JSON / PNG
+- 许可状态：用户提供的本地 API 配置；key 不入库
+- 存储位置：`01_research/tech/poc_results.csv`, `01_research/tech/poc_samples/`
+- 责任人：Codex
+
 ---
 
 ## 类别建议（Codex 调研时分类）

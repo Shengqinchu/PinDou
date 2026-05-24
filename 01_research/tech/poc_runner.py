@@ -29,6 +29,18 @@ INPUT_DIR = ROOT / "01_research" / "tech" / "test_inputs_poc"
 SAMPLE_DIR = ROOT / "01_research" / "tech" / "poc_samples"
 RESULTS_CSV = ROOT / "01_research" / "tech" / "poc_results.csv"
 VOTE_TEMPLATE = ROOT / "01_research" / "tech" / "subjective_vote_template.csv"
+RESULT_FIELDS = [
+    "provider",
+    "style",
+    "input",
+    "sample_id",
+    "ai_output",
+    "quantized_output",
+    "latency_ms",
+    "mean_ciede2000",
+    "ssim",
+    "psnr",
+]
 
 STYLE_PROMPTS = {
     "realistic_portrait": (
@@ -144,12 +156,24 @@ def make_inputs() -> None:
 
 def write_vote_template() -> None:
     rows = []
+    sample_paths: list[tuple[str, Path]] = []
+    if RESULTS_CSV.exists():
+        with RESULTS_CSV.open("r", newline="", encoding="utf-8") as f:
+            for result in csv.DictReader(f):
+                rel_path = result.get("quantized_output", "")
+                if not rel_path:
+                    continue
+                image_path = ROOT / rel_path
+                if image_path.exists():
+                    sample_paths.append((result.get("sample_id") or image_path.stem, image_path))
+    if not sample_paths:
+        sample_paths = [(image_path.stem, image_path) for image_path in sorted(SAMPLE_DIR.glob("*/*_quantized.png"))]
     for subject in [f"voter_{i}" for i in range(1, 6)]:
-        for image_path in sorted(SAMPLE_DIR.glob("*/*_quantized.png")):
+        for sample_id, _image_path in sorted(sample_paths):
             rows.append(
                 {
                     "voter_id": subject,
-                    "sample_id": image_path.stem,
+                    "sample_id": sample_id,
                     "score_1_5": "",
                     "is_worth_paid": "",
                     "notes": "",
@@ -170,6 +194,36 @@ def write_vote_template() -> None:
         writer.writeheader()
         writer.writerows(rows)
     print(f"Wrote vote template to {VOTE_TEMPLATE}")
+
+
+def result_key(row: dict[str, str]) -> tuple[str, str, str]:
+    return row["provider"], row["style"], row["input"]
+
+
+def result_paths_exist(row: dict[str, str]) -> bool:
+    return bool(row.get("ai_output") and row.get("quantized_output")) and (ROOT / row["ai_output"]).exists() and (
+        ROOT / row["quantized_output"]
+    ).exists()
+
+
+def read_existing_results() -> dict[tuple[str, str, str], dict[str, str]]:
+    if not RESULTS_CSV.exists():
+        return {}
+    with RESULTS_CSV.open("r", newline="", encoding="utf-8") as f:
+        rows = []
+        for row in csv.DictReader(f):
+            normalized = {field: row.get(field, "") for field in RESULT_FIELDS}
+            if normalized["provider"] and normalized["style"] and normalized["input"] and result_paths_exist(normalized):
+                rows.append(normalized)
+    return {result_key(row): row for row in rows}
+
+
+def write_results(rows: list[dict[str, str]]) -> None:
+    RESULTS_CSV.parent.mkdir(parents=True, exist_ok=True)
+    with RESULTS_CSV.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=RESULT_FIELDS)
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 def provider1_edit(image_path: Path, prompt: str) -> Image.Image:
@@ -214,25 +268,29 @@ def run_provider1(limit: int | None = None) -> None:
     load_env()
     palette = load_palette()
     SAMPLE_DIR.mkdir(parents=True, exist_ok=True)
-    rows = []
+    existing = read_existing_results()
+    rows = list(existing.values())
     input_paths = sorted(INPUT_DIR.glob("*.png"))
     if limit:
         input_paths = input_paths[:limit]
     for input_path in input_paths:
         if input_path.name.startswith("pet"):
-            styles = ["pet"]
+            styles = ["pet", "cartoon"]
         elif input_path.name.startswith("couple"):
-            styles = ["realistic_portrait", "chibi_portrait"]
+            styles = ["realistic_portrait", "chibi_portrait", "cartoon"]
         else:
-            styles = ["realistic_portrait", "chibi_portrait"]
+            styles = ["realistic_portrait", "chibi_portrait", "cartoon"]
         for style in styles:
             out_dir = SAMPLE_DIR / f"P1_{style}"
             out_dir.mkdir(parents=True, exist_ok=True)
-            seq = input_path.stem.split("_")[-1]
-            original_path = out_dir / f"P1_{style}_{seq}_original.png"
-            ai_path = out_dir / f"P1_{style}_{seq}_ai.png"
-            quant_path = out_dir / f"P1_{style}_{seq}_quantized.png"
+            sample_id = f"P1_{style}_{input_path.stem}"
+            original_path = out_dir / f"{sample_id}_original.png"
+            ai_path = out_dir / f"{sample_id}_ai.png"
+            quant_path = out_dir / f"{sample_id}_quantized.png"
             shutil.copyfile(input_path, original_path)
+            key = ("P1", style, input_path.name)
+            if key in existing:
+                continue
             started = time.perf_counter()
             ai_image = provider1_edit(input_path, STYLE_PROMPTS[style])
             ai_image.save(ai_path)
@@ -245,6 +303,7 @@ def run_provider1(limit: int | None = None) -> None:
                     "provider": "P1",
                     "style": style,
                     "input": input_path.name,
+                    "sample_id": sample_id,
                     "ai_output": str(ai_path.relative_to(ROOT)).replace("\\", "/"),
                     "quantized_output": str(quant_path.relative_to(ROOT)).replace("\\", "/"),
                     "latency_ms": f"{(time.perf_counter() - started) * 1000:.2f}",
@@ -253,11 +312,8 @@ def run_provider1(limit: int | None = None) -> None:
                     "psnr": f"{metrics['psnr']:.4f}",
                 }
             )
+            write_results(rows)
     if rows:
-        with RESULTS_CSV.open("w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
-            writer.writeheader()
-            writer.writerows(rows)
         print(f"Wrote {len(rows)} rows to {RESULTS_CSV}")
     write_vote_template()
 

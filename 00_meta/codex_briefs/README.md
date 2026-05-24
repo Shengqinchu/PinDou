@@ -71,7 +71,8 @@ ADR-005 写过"gpt-image-1"，但实际可用模型是 **gpt-image-2**。所有�
 ## 受阻清单（实时维护）
 （任务受阻时追加，注明原因 + 需要谁帮）
 
-- 2026-05-24 — Task C blocked：本地 `.env` 未检测到 `XIAOCHI_GPT_API_KEY` / 火山 / 通义 key，无法真实跑 gpt-image-2 量化输出 PoC；需要用户补 key 或确认 P2/P3 本阶段跳过。问题已写入 `_questions_for_user.md`。
+- 2026-05-24 — Task C P1 key blocker resolved：用户已在本地 `.env` 补齐 P1 key；P1 `gpt-image-2` 已跑通 40/40 API 样本并产出量化图。
+- 2026-05-24 — Task C still blocked：ADR-005a 的 5 位志愿者主观投票尚未完成；P2 火山即梦 / P3 通义万相 key 未提供；稳定性样本当前 40/50，继续补跑需用户确认 API 消耗。
 
 ---
 
