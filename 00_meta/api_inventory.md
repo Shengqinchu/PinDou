@@ -9,11 +9,32 @@
 
 ## 一、已具备的 API 资源
 
-### 1. 反代网关（OpenAI 兼容协议）
+### 1. 反代网关 — GPT 图像主通道（OpenAI 兼容协议）
+- **服务名**：xiaochisaascn GPT 反代
+- **入口（base_url）**：`https://gpt.xiaochisaascn.org/v1`
+- **管理页**：`https://gpt.xiaochisaascn.org/management.html`
+- **环境变量**：`XIAOCHI_GPT_API_KEY`（key 不入档，已在 `.env.example` 列出变量名）
+- **协议**：OpenAI 原生（`/v1` 路径）
+- **可用模型**：
+
+| 模型 | 用途映射（PinDou） |
+|------|-------------------|
+| `gpt-image-2` | **图像生成主路线**（ADR-005 + ADR-005a，写实/Q版/宠物/通用卡通统一通道）|
+| `gpt-5.2` / `gpt-5.3-codex` / `gpt-5.3-codex-spark` | 备选文本（不计划用） |
+| `gpt-5.4` / `gpt-5.4-mini` | 备选 |
+| `gpt-5.5` / `gpt-5.5-high` / `gpt-5.5-low` / `gpt-5.5-xhigh` / `gpt-5.5-xhigh-fast` | 备选高质量 / 复杂推理 |
+| `codex-auto-review` | 代码评审，Phase 2 后端 PR 可用 |
+| `my-gpt` | 备选 |
+
+- **重要说明**：原 ADR-005 写"反代 gpt-image-1"，实际可用版本为 **gpt-image-2**（更新版，ID 保持据传更强，待 PoC 实测）
+- **用途**：PinDou AI 风格化主图像通道（ADR-005 / 005a）
+
+### 2. 反代网关 — 文本通道（OpenAI 兼容协议）
 - **服务名**：xiaochisaas 私人反代
 - **入口**：`https://api2.xiaochisaas.com`
+- **环境变量**：`XIAOCHI_TEXT_API_KEY`
 - **协议**：OpenAI 兼容（chat completions / image generation 等）
-- **用途**：本项目 AI 风格化 PoC 主入口（ADR-005）
+- **用途**：文本辅助任务（审核、文案、PRD 评审）；图像生成备选（`gemini-3-pro-image`）
 - **可用模型清单**（来自 `apisell/私人api.md`）：
 
 | 模型 | 可用性 | 用途映射（PinDou） |
@@ -44,31 +65,26 @@
 | **火山引擎 API**（即梦图像生成、Doubao） | ADR-005 备选 provider；国产合规通道候选 | **高** | Phase 0 任务 C PoC |
 | **阿里通义 API**（万相图像生成、通义千问） | ADR-005 备选 provider；国产合规通道候选 | **高** | Phase 0 任务 C PoC |
 | **SiliconFlow API** | 调用开源模型（SD / FLUX 等）的低成本通道 | 中 | Phase 0 任务 C PoC（可选） |
-| **gpt-image-1 直接访问**（反代列表里没有，只有 `gemini-3-pro-image`） | ADR-005 主推路线 Q版/宠物/通用卡通 | **高** | Phase 0 任务 C PoC |
 | **微信小程序 AppID + AppSecret** | 小程序开发、登录、分享 | 高 | Phase 2 后端 / Phase 3 提审 |
 | **微信支付商户号 + 支付密钥** | 付费购买 / 月卡 | 中高 | Phase 3 提审前 |
-| **对象存储**（阿里 OSS / 腾讯 COS / 七牛云任一） | 用户上传原图 + 生成图纸存储 | 高 | Phase 2 后端 MVP |
 | **图片审核服务**（绿网 / 阿里内容安全等） | 上传图过滤违禁 | 中 | Phase 3 提审前 |
-| **AutoDL 或同类 GPU 租赁账号** | ADR-005 写实人像路线自部署 ComfyUI | 中 | Phase 0 任务 C PoC（方案 3） |
+
+> **已决策不需要的**：
+> - ❌ **AutoDL / GPU**：纯 API 路线（ADR-005a），不上 GPU
+> - ❌ **对象存储**：MVP 期用日本服务器本地磁盘 + Nginx 静态反代，触发条件见 FUTURE_WORK.md 第 3 条
 
 ---
 
-## 三、关键不确定项 — 请用户确认
+## 三、已确认事项
 
-1. **gpt-image-1 是否真的可用？**
-   反代模型列表里只有 `gemini-3-pro-image`，没有 `gpt-image-1`。
-   ADR-005 主路线（Q 版 / 宠物 / 通用卡通）依赖 gpt-image-1。
-   是否：
-   - (a) 反代另有暗藏的 gpt-image-1 通道？
-   - (b) 用 `gemini-3-pro-image` 替代 gpt-image-1 做 PoC？
-   - (c) 走第三方反代（如 OpenRouter）单独接 gpt-image-1？
+1. **图像生成主模型**：`gpt-image-2`（不是 gpt-image-1），通过 `gpt.xiaochisaascn.org/v1` 反代访问。ID 保持效果待 PoC 实测，验收门槛见 ADR-005a。
+2. **后端托管**：MVP 期日本腾讯云服务器（`43.167.226.239`），跨境合规风险记录在 FUTURE_WORK.md 第 2 条。
+3. **写实人像路线**：先走纯 API，不上 GPU。PoC 验收用量化输出图主观投票（详见 ADR-005a）。
+4. **Key 安全**：用户决定不轮换当前 gpt 反代 key。本仓库 `.env.example` 仅列变量名 `XIAOCHI_GPT_API_KEY`，key 本体走 `.env`（已 gitignore）。
 
-2. **写实人像主路线（SD + IPAdapter + ControlNet）的 GPU 来源**？
-   - (a) AutoDL 租 4090（按小时计费，开发期可控）？
-   - (b) 用户已有本地显卡？
-   - (c) 直接走 ComfyUI 云托管（如 RunComfy / RunPod）？
+## 四、待用户后续确认
 
-3. **小程序主体**：以个人名义申请，还是用户已有公司主体？（影响类目申请、AIGC 备案路径）
+1. **小程序主体**：个人 vs 公司？（影响类目申请、AIGC 备案路径，Phase 3 之前必须明确）
 
 ---
 
