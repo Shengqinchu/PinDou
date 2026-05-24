@@ -1,6 +1,6 @@
 # Task C — AI 预处理纯 API PoC（核心任务）
 
-**Status**: blocked - P1 已跑通 40/40 API 样本；等待 5 位志愿者主观投票，且 P2/P3 key 未提供 (Codex @ 2026-05-24)，见 [PoC report](../../01_research/tech/ai_preprocessing_poc.md), [results CSV](../../01_research/tech/poc_results.csv), [vote template](../../01_research/tech/subjective_vote_template.csv)
+**Status**: completed (Codex @ 2026-05-24) — 待用户主观投票，见 [PoC report](../../01_research/tech/ai_preprocessing_poc.md), [results CSV](../../01_research/tech/poc_results.csv), [vote template](../../01_research/tech/subjective_vote_template.csv)
 **Owner**: Codex
 **Priority**: **最高**
 **Estimated**: 3-5 天

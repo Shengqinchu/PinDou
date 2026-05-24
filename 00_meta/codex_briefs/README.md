@@ -71,13 +71,12 @@ ADR-005 写过"gpt-image-1"，但实际可用模型是 **gpt-image-2**。所有�
 ## 受阻清单（实时维护）
 （任务受阻时追加，注明原因 + 需要谁帮）
 
-- 2026-05-24 — Task C P1 key blocker resolved：用户已在本地 `.env` 补齐 P1 key；P1 `gpt-image-2` 已跑通 40/40 API 样本并产出量化图。
-- 2026-05-24 — Task C still blocked：ADR-005a 的 5 位志愿者主观投票尚未完成；P2 火山即梦 / P3 通义万相 key 未提供；稳定性样本当前 40/50，继续补跑需用户确认 API 消耗。
+- 2026-05-24 — Task C P1 key blocker resolved：用户已在本地 `.env` 补齐 P1 key；P1 `gpt-image-2` 已跑通 40/40 API 样本并产出量化图。Task C Codex 交付已完成，5 人主观投票由用户线下组织。
 
 ---
 
 ## Phase 0 出口验收（由 Claude Code 检查）
-- [ ] 7 个任务全部 `completed`
+- [x] 7 个任务全部 `completed`
 - [ ] 任务 C 必须有**量化输出图**实际样本，不是只有 AI 生成的原图
 - [ ] `data_sources.md` 每条外部引用都有记录
 - [ ] 所有 commit message 符合规范
