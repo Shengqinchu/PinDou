@@ -1,6 +1,6 @@
 # Task C — AI 预处理纯 API PoC（核心任务）
 
-**Status**: pending
+**Status**: blocked - 缺少 P1/P2/P3 API key，无法真实调用 gpt-image-2 / 即梦 / 通义；已产出 [PoC runner](../../01_research/tech/poc_runner.py), [prompts](../../01_research/tech/prompts.md), [blocked report](../../01_research/tech/ai_preprocessing_poc.md)
 **Owner**: Codex
 **Priority**: **最高**
 **Estimated**: 3-5 天
