@@ -1,6 +1,6 @@
 # Task D — 色卡数据库（先启动）
 
-**Status**: pending
+**Status**: completed (Codex @ 2026-05-24) — 产出：[mard.json](../../01_research/colormap/mard.json), [coco.json](../../01_research/colormap/coco.json), [crossref.csv](../../01_research/colormap/crossref.csv), [README](../../01_research/colormap/README.md)
 **Owner**: Codex
 **Priority**: 高
 **Estimated**: 1-2 天

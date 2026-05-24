@@ -19,6 +19,87 @@
 
 （Phase 0 启动时为空，由 Codex 在调研过程中追加）
 
+### abearxiong/get-colors-from-beans
+- URL / 标识：https://git.xiongxiao.me/abearxiong/get-colors-from-beans
+- 抓取 / 拉取日期：2026-05-24
+- 用途：MARD-291、COCO-291 原始 HEX 色卡；生成 `mard.json`、`coco.json`、`crossref.csv`
+- 数据格式：JSON / HTML extraction
+- 许可状态：MIT（仓库 README 标注）
+- 存储位置：`01_research/colormap/_source_get-colors.json`
+- 责任人：Codex
+
+### Pixel Beads MARD color chart
+- URL / 标识：https://www.pixel-beads.com/zh/mard-bead-color-chart
+- 抓取 / 拉取日期：2026-05-24
+- 用途：MARD 291 色号与 HEX 交叉校验
+- 数据格式：HTML
+- 许可状态：公开；商用许可未知
+- 存储位置：`01_research/colormap/README.md`
+- 责任人：Codex
+
+### Bitbead MARD / brand palettes
+- URL / 标识：https://bitbead.pomodiary.com/colors
+- 抓取 / 拉取日期：2026-05-24
+- 用途：MARD 221 / 291 色卡规模、HEX 与跨品牌近似色逻辑交叉参考
+- 数据格式：HTML
+- 许可状态：公开；商用许可未知
+- 存储位置：`01_research/colormap/README.md`
+- 责任人：Codex
+
+### 豆豆工坊 MARD 色卡
+- URL / 标识：https://www.doudougongfang.com/kb/beads/mard-palette
+- 抓取 / 拉取日期：2026-05-24
+- 用途：MARD 221 常用色集合与部分 HEX 交叉校验
+- 数据格式：HTML
+- 许可状态：公开；商用许可未知
+- 存储位置：`01_research/colormap/README.md`
+- 责任人：Codex
+
+### 拼豆工具站 MARD 221 套装价
+- URL / 标识：https://www.pindou.online/shop
+- 抓取 / 拉取日期：2026-05-24
+- 用途：MARD 221 色、每色约 1000 颗、239 元整套的价格估算基准
+- 数据格式：HTML
+- 许可状态：公开；商用许可未知
+- 存储位置：`01_research/colormap/README.md`
+- 责任人：Codex
+
+### 拼豆星球 COCO 色卡支持说明
+- URL / 标识：https://pindou.cn/
+- 抓取 / 拉取日期：2026-05-24
+- 用途：COCO 色卡市场存在性和工具支持交叉参考
+- 数据格式：HTML
+- 许可状态：公开；商用许可未知
+- 存储位置：`01_research/colormap/README.md`
+- 责任人：Codex
+
+### Crapark 拼豆色卡说明书
+- URL / 标识：https://pd.crapark.com/manual-tablet.html
+- 抓取 / 拉取日期：2026-05-24
+- 用途：COCO 色卡工具支持与数据来源说明参考
+- 数据格式：HTML
+- 许可状态：公开；商用许可未知
+- 存储位置：`01_research/colormap/README.md`
+- 责任人：Codex
+
+### 义乌购 MARD / 同规格补充包
+- URL / 标识：https://wap.yiwugo.com/products/985118873
+- 抓取 / 拉取日期：2026-05-24
+- 用途：1000 粒补充包存在性与价格区间参考
+- 数据格式：HTML
+- 许可状态：公开；商用许可未知
+- 存储位置：`01_research/colormap/README.md`
+- 责任人：Codex
+
+### Rakuten COCO 2.6mm 拼豆商品页
+- URL / 标识：https://www.rakuten.com.tw/shop/cwow1/product/1809457/
+- 抓取 / 拉取日期：2026-05-24
+- 用途：COCO 与 MARD 兼容规格、套装存在性参考
+- 数据格式：HTML
+- 许可状态：公开；商用许可未知
+- 存储位置：`01_research/colormap/README.md`
+- 责任人：Codex
+
 ---
 
 ## 类别建议（Codex 调研时分类）
