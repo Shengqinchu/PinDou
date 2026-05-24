@@ -100,6 +100,42 @@
 - 存储位置：`01_research/colormap/README.md`
 - 责任人：Codex
 
+### scikit-learn MiniBatchKMeans documentation
+- URL / 标识：https://sklearn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task B K-means 量化实现参考
+- 数据格式：HTML documentation
+- 许可状态：BSD-3-Clause（scikit-learn 项目许可）
+- 存储位置：`01_research/tech/algorithm_impls/quantize_core.py`
+- 责任人：Codex
+
+### Pillow Image.quantize documentation
+- URL / 标识：https://pillow.readthedocs.io/en/stable/reference/Image.html
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task B Median-cut / Octree 量化实现参考
+- 数据格式：HTML documentation
+- 许可状态：HPND（Pillow 项目许可）
+- 存储位置：`01_research/tech/algorithm_impls/quantize_core.py`
+- 责任人：Codex
+
+### scikit-image metrics documentation
+- URL / 标识：https://scikit-image.org/docs/stable/api/skimage.metrics.html
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task B PSNR / SSIM 指标实现参考
+- 数据格式：HTML documentation
+- 许可状态：BSD-3-Clause（scikit-image 项目许可）
+- 存储位置：`01_research/tech/algorithm_impls/quantize_core.py`
+- 责任人：Codex
+
+### CIEDE2000 implementation notes
+- URL / 标识：https://hajim.rochester.edu/ece/sites/gsharma/ciede2000/
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task B / D CIEDE2000 色差公式实现参考
+- 数据格式：HTML / PDF notes
+- 许可状态：公开学术资料；商用许可未知
+- 存储位置：`01_research/tech/algorithm_impls/quantize_core.py`, `01_research/colormap/build_colormap.py`
+- 责任人：Codex
+
 ---
 
 ## 类别建议（Codex 调研时分类）

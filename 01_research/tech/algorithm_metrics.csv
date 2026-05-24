@@ -1,0 +1,37 @@
+input,combo_id,quantizer,metric,dither,psnr,ssim,mean_ciede2000,runtime_ms,selected_color_count,selected_codes,output
+portrait,C01,kmeans,rgb,none,30.1724,0.9667,3.8375,1796.89,19,G9 P12 G8 C7 M9 H19 M10 M13 G14 ZG5 G7 R13 H10 M7 H9 H6 G12 P9 P1,01_research/tech/algorithm_samples/portrait_C01.png
+portrait,C02,kmeans,ciede2000,none,28.8256,0.9624,3.2773,286.88,21,G3 P12 G8 C7 G21 E16 H11 M13 G14 D16 D24 F6 ZG2 R13 H10 M7 H17 H16 P9 T1 ZG5,01_research/tech/algorithm_samples/portrait_C02.png
+portrait,C03,kmeans,ciede2000,floyd,22.2216,0.6129,5.2908,1841.71,21,G3 P12 G8 C7 G21 E16 H11 M13 G14 D16 D24 F6 ZG2 R13 H10 M7 H17 H16 P9 T1 ZG5,01_research/tech/algorithm_samples/portrait_C03.png
+portrait,C04,median_cut,ciede2000,floyd,21.7742,0.6663,5.4246,1669.76,12,P12 C27 E16 H9 H17 G3 ZG2 H4 C7 D3 G8 H16,01_research/tech/algorithm_samples/portrait_C04.png
+portrait,C05,octree,ciede2000,floyd,21.6379,0.6442,5.8180,1582.09,19,H9 G8 C7 ZG2 G3 M13 G21 R13 P2 P23 ZG5 D24 ZG6 C27 F6 F7 M14 E16 D16,01_research/tech/algorithm_samples/portrait_C05.png
+portrait,C06,kmeans,ciede2000,atkinson,26.4484,0.7402,3.8705,1831.78,21,G3 P12 G8 C7 G21 E16 H11 M13 G14 D16 D24 F6 ZG2 R13 H10 M7 H17 H16 P9 T1 ZG5,01_research/tech/algorithm_samples/portrait_C06.png
+portrait,C07,kmeans,ciede2000,bayer,26.4073,0.6207,3.8398,320.57,21,G3 P12 G8 C7 G21 E16 H11 M13 G14 D16 D24 F6 ZG2 R13 H10 M7 H17 H16 P9 T1 ZG5,01_research/tech/algorithm_samples/portrait_C07.png
+portrait,C08,kmeans,ciede2000,riemersma,24.7999,0.6507,4.3604,1819.85,21,G3 P12 G8 C7 G21 E16 H11 M13 G14 D16 D24 F6 ZG2 R13 H10 M7 H17 H16 P9 T1 ZG5,01_research/tech/algorithm_samples/portrait_C08.png
+portrait,C09,kmeans,cie94,floyd,23.4641,0.7158,5.2481,1056.23,18,G3 P12 H6 C7 G21 H19 H11 M13 G17 ZG5 F6 ZG2 R13 H10 P2 H17 P9 P1,01_research/tech/algorithm_samples/portrait_C09.png
+portrait,C10,kmeans,cie76,floyd,21.7202,0.6197,5.9024,812.68,20,G3 P12 H6 C20 G21 H19 H11 M13 M15 D16 ZG5 F6 ZG2 R13 H10 M7 H17 H16 P9 T1,01_research/tech/algorithm_samples/portrait_C10.png
+portrait,C11,neural,ciede2000,floyd,21.8560,0.6723,5.1753,1966.61,13,C7 E16 R13 A23 H16 G3 ZG2 P12 G8 H17 G21 H9 M12,01_research/tech/algorithm_samples/portrait_C11.png
+portrait,C12,kmeans,ciede2000,none,28.8256,0.9624,3.2773,297.45,21,G3 P12 G8 C7 G21 E16 H11 M13 G14 D16 D24 F6 ZG2 R13 H10 M7 H17 H16 P9 T1 ZG5,01_research/tech/algorithm_samples/portrait_C12.png
+pet,C01,kmeans,rgb,none,31.9199,0.9605,4.3262,158.19,17,R21 H19 P7 F18 H16 G17 ZG3 G15 Y2 M4 G14 C1 H12 G13 M6 M5 G8,01_research/tech/algorithm_samples/pet_C01.png
+pet,C02,kmeans,ciede2000,none,30.4168,0.9536,3.3552,213.15,14,G13 G15 A9 F18 H6 G14 M7 H21 Y2 C1 P11 G10 M5 G8,01_research/tech/algorithm_samples/pet_C02.png
+pet,C03,kmeans,ciede2000,floyd,24.5420,0.6256,5.3692,1673.57,14,G13 G15 A9 F18 H6 G14 M7 H21 Y2 C1 P11 G10 M5 G8,01_research/tech/algorithm_samples/pet_C03.png
+pet,C04,median_cut,ciede2000,floyd,21.6912,0.4530,6.7692,1612.62,24,G15 H21 C1 M4 M13 F18 F10 A1 A10 A11 A12 A13 A14 A15 A16 A17 A18 A19 A2 A20 A21 A22 A23 A24,01_research/tech/algorithm_samples/pet_C04.png
+pet,C05,octree,ciede2000,floyd,25.5460,0.6532,5.0462,1701.21,16,G13 P11 H6 M13 F10 M7 M5 G8 M9 F18 G14 G15 C1 G10 Y2 A9,01_research/tech/algorithm_samples/pet_C05.png
+pet,C06,kmeans,ciede2000,atkinson,28.6458,0.7165,3.9823,1777.78,14,G13 G15 A9 F18 H6 G14 M7 H21 Y2 C1 P11 G10 M5 G8,01_research/tech/algorithm_samples/pet_C06.png
+pet,C07,kmeans,ciede2000,bayer,28.5795,0.7773,3.7805,296.74,14,G13 G15 A9 F18 H6 G14 M7 H21 Y2 C1 P11 G10 M5 G8,01_research/tech/algorithm_samples/pet_C07.png
+pet,C08,kmeans,ciede2000,riemersma,26.9249,0.6335,4.5639,1747.79,14,G13 G15 A9 F18 H6 G14 M7 H21 Y2 C1 P11 G10 M5 G8,01_research/tech/algorithm_samples/pet_C08.png
+pet,C09,kmeans,cie94,floyd,23.9941,0.4940,5.0911,1042.07,14,R21 G15 A9 F18 H6 G14 M7 Y2 C1 M4 G13 G10 M5 G8,01_research/tech/algorithm_samples/pet_C09.png
+pet,C10,kmeans,cie76,floyd,21.6930,0.4322,6.0031,786.81,13,G13 G15 A12 F18 H6 G14 M7 H21 Y2 C1 M4 M5 G8,01_research/tech/algorithm_samples/pet_C10.png
+pet,C11,neural,ciede2000,floyd,23.7301,0.4870,5.0660,2088.39,13,F18 G13 G14 G15 H6 C1 M13 M4 G4 Y2 H21 G10 G8,01_research/tech/algorithm_samples/pet_C11.png
+pet,C12,kmeans,ciede2000,none,30.4168,0.9536,3.3552,212.02,14,G13 G15 A9 F18 H6 G14 M7 H21 Y2 C1 P11 G10 M5 G8,01_research/tech/algorithm_samples/pet_C12.png
+cartoon,C01,kmeans,rgb,none,26.7666,0.9242,6.3369,150.10,22,B7 H5 G5 D6 T1 F13 C18 A17 C6 P16 R17 P6 A22 A24 P14 C29 A19 G14 F12 G15 H22 C12,01_research/tech/algorithm_samples/cartoon_C01.png
+cartoon,C02,kmeans,ciede2000,none,24.8328,0.8901,5.3323,249.89,21,B19 M12 G5 D6 H2 F13 C12 A4 C6 P16 B25 P6 A3 A21 C7 D22 A19 G14 F12 G15 H22,01_research/tech/algorithm_samples/cartoon_C02.png
+cartoon,C03,kmeans,ciede2000,floyd,20.3798,0.6930,7.4677,1826.47,21,B19 M12 G5 D6 H2 F13 C12 A4 C6 P16 B25 P6 A3 A21 C7 D22 A19 G14 F12 G15 H22,01_research/tech/algorithm_samples/cartoon_C03.png
+cartoon,C04,median_cut,ciede2000,floyd,19.3864,0.6524,8.7672,1578.35,15,A1 A15 A4 A26 A17 R18 R26 D6 F13 F2 C6 D2 F25 D10 C12,01_research/tech/algorithm_samples/cartoon_C04.png
+cartoon,C05,octree,ciede2000,floyd,20.2121,0.6543,8.6806,1723.78,23,C12 A17 F2 D6 C6 P1 B19 D10 G14 A16 P6 G5 R8 B25 P4 M6 ZG8 B21 D3 D9 A26 R13 P2,01_research/tech/algorithm_samples/cartoon_C05.png
+cartoon,C06,kmeans,ciede2000,atkinson,23.2021,0.7785,6.1773,1745.94,21,B19 M12 G5 D6 H2 F13 C12 A4 C6 P16 B25 P6 A3 A21 C7 D22 A19 G14 F12 G15 H22,01_research/tech/algorithm_samples/cartoon_C06.png
+cartoon,C07,kmeans,ciede2000,bayer,24.3591,0.8442,5.5870,246.50,21,B19 M12 G5 D6 H2 F13 C12 A4 C6 P16 B25 P6 A3 A21 C7 D22 A19 G14 F12 G15 H22,01_research/tech/algorithm_samples/cartoon_C07.png
+cartoon,C08,kmeans,ciede2000,riemersma,22.6064,0.7468,6.4672,1681.55,21,B19 M12 G5 D6 H2 F13 C12 A4 C6 P16 B25 P6 A3 A21 C7 D22 A19 G14 F12 G15 H22,01_research/tech/algorithm_samples/cartoon_C08.png
+cartoon,C09,kmeans,cie94,floyd,20.2363,0.6885,7.9540,930.71,21,B19 H5 G5 D6 H2 F13 C12 A15 C6 P16 B25 P6 A3 A1 C20 C29 A19 G14 F12 G15 H22,01_research/tech/algorithm_samples/cartoon_C09.png
+cartoon,C10,kmeans,cie76,floyd,18.3859,0.6575,9.0639,763.40,21,B19 M12 P16 D5 H2 F13 C12 A4 C6 C18 B25 P6 A22 A11 C20 C29 A19 G14 F12 G15 H22,01_research/tech/algorithm_samples/cartoon_C10.png
+cartoon,C11,neural,ciede2000,floyd,19.9682,0.6860,8.0036,2097.83,19,C22 R28 A20 P16 A17 F2 C12 M12 F13 C6 B19 H12 A4 H13 R17 D10 F23 D9 D6,01_research/tech/algorithm_samples/cartoon_C11.png
+cartoon,C12,kmeans,ciede2000,none,24.8328,0.8901,5.3323,225.90,21,B19 M12 G5 D6 H2 F13 C12 A4 C6 P16 B25 P6 A3 A21 C7 D22 A19 G14 F12 G15 H22,01_research/tech/algorithm_samples/cartoon_C12.png

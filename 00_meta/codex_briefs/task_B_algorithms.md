@@ -1,6 +1,6 @@
 # Task B — 算法方案横评
 
-**Status**: pending
+**Status**: completed (Codex @ 2026-05-24) — 产出：[algorithms.md](../../01_research/tech/algorithms.md), [algorithm_metrics.csv](../../01_research/tech/algorithm_metrics.csv), [algorithm_impls](../../01_research/tech/algorithm_impls/), [algorithm_samples](../../01_research/tech/algorithm_samples/)
 **Owner**: Codex
 **Priority**: 高
 **Estimated**: 2-3 天
