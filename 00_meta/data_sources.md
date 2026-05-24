@@ -136,6 +136,15 @@
 - 存储位置：`01_research/tech/algorithm_impls/quantize_core.py`, `01_research/colormap/build_colormap.py`
 - 责任人：Codex
 
+### GitHub Skills 候选仓库扫描
+- URL / 标识：GitHub API + 仓库 README；核心仓库包括 alirezarezvani/claude-skills、phuryn/pm-skills、nextlevelbuilder/ui-ux-pro-max-skill、mattpocock/skills、github/spec-kit、assafelovic/gpt-researcher、adr/madr 等
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task G GitHub Skills 候选筛选；记录 license、Star/Fork、最近更新、README 示例、`SKILL.md` 目录结构、Top 3 推荐与避雷清单
+- 数据格式：GitHub REST API JSON / README Markdown / 仓库目录树
+- 许可状态：仅纳入 MIT / Apache-2.0 / MIT-0 / CC0-1.0 / MIT OR CC0-1.0 等宽松协议；license unknown 或 NC/ND/SA 仓库列入避雷
+- 存储位置：`01_research/tech/skills_candidates.md`
+- 责任人：Codex
+
 ---
 
 ## 类别建议（Codex 调研时分类）

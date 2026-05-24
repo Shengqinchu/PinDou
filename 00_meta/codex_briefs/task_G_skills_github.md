@@ -1,6 +1,6 @@
 # Task G — GitHub Skills 候选搜索
 
-**Status**: pending
+**Status**: completed (Codex @ 2026-05-24) — 产出：[skills_candidates.md](../../01_research/tech/skills_candidates.md)
 **Owner**: Codex
 **Priority**: 低
 **Estimated**: 0.5-1 天
