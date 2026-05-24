@@ -1,6 +1,6 @@
 # Task F — 合规调研
 
-**Status**: pending
+**Status**: completed (Codex @ 2026-05-24) — 产出：[compliance_checklist.md](../../01_research/compliance/compliance_checklist.md)
 **Owner**: Codex
 **Priority**: 高
 **Estimated**: 2-3 天

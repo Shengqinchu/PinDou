@@ -217,6 +217,87 @@
 - 存储位置：`08_growth/xhs_playbook.md`
 - 责任人：Codex
 
+### 中华人民共和国个人信息保护法
+- URL / 标识：https://www.cac.gov.cn/2021-08/20/c_1631050028355286.htm
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task F 人像上传、敏感个人信息、单独同意、删除权、跨境提供规则
+- 数据格式：HTML
+- 许可状态：官方公开法律文本
+- 存储位置：`01_research/compliance/compliance_checklist.md`
+- 责任人：Codex
+
+### 促进和规范数据跨境流动规定
+- URL / 标识：https://www.cac.gov.cn/2024-03/22/c_1712776611775634.htm
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task F 日本服务器跨境数据、标准合同 / 认证 / 安全评估阈值判断
+- 数据格式：HTML
+- 许可状态：官方公开部门规章
+- 存储位置：`01_research/compliance/compliance_checklist.md`
+- 责任人：Codex
+
+### 个人信息出境标准合同办法
+- URL / 标识：https://www.cac.gov.cn/2023-02/24/c_1678884831596384.htm
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task F 个人信息出境标准合同适用与备案参考
+- 数据格式：HTML
+- 许可状态：官方公开部门规章
+- 存储位置：`01_research/compliance/compliance_checklist.md`
+- 责任人：Codex
+
+### 生成式人工智能服务管理暂行办法
+- URL / 标识：https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task F AIGC 服务定义、提供者义务、内容标识、安全评估 / 算法备案
+- 数据格式：HTML
+- 许可状态：官方公开部门规章
+- 存储位置：`01_research/compliance/compliance_checklist.md`
+- 责任人：Codex
+
+### 互联网信息服务深度合成管理规定
+- URL / 标识：https://www.gov.cn/zhengce/zhengceku/2022-12/12/content_5731431.htm
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task F AI 生成图片标识、深度合成服务治理参考
+- 数据格式：HTML
+- 许可状态：官方公开部门规章
+- 存储位置：`01_research/compliance/compliance_checklist.md`
+- 责任人：Codex
+
+### 互联网信息服务算法推荐管理规定与算法备案系统
+- URL / 标识：https://www.miit.gov.cn/jgsj/waj/wjfb/art/2022/art_a6ae77ea1f5e401eb8cc6819b869fdfa.html ; https://www.cac.gov.cn/2022-02/25/c_1647395666889023.htm
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task F 算法备案、安全评估触发条件参考
+- 数据格式：HTML
+- 许可状态：官方公开部门规章 / 通告
+- 存储位置：`01_research/compliance/compliance_checklist.md`
+- 责任人：Codex
+
+### 互联网信息服务备案资料
+- URL / 标识：https://www.gov.cn/zhengce/2022-08/23/content_5722707.htm ; https://hunca.miit.gov.cn/bsfw/bszn/art/2024/art_7ef0d8bd3b0d433ba4b9b277f883f74d.html
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task F ICP / 小程序备案与个人主体备案风险参考
+- 数据格式：HTML
+- 许可状态：官方公开法规 / 办事指南
+- 存储位置：`01_research/compliance/compliance_checklist.md`
+- 责任人：Codex
+
+### 商标法与商标侵权判断标准
+- URL / 标识：https://www.cnipa.gov.cn/art/2021/6/9/art_524_171344.html ; https://www.cnipa.gov.cn/art/2020/6/17/art_75_126939.html
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task F MARD / COCO 品牌名描述性使用边界
+- 数据格式：HTML
+- 许可状态：官方公开法律 / 规范性文件
+- 存储位置：`01_research/compliance/compliance_checklist.md`
+- 责任人：Codex
+
+### 小红书蒲公英平台
+- URL / 标识：https://pgy.xiaohongshu.com/
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task F 小红书商业合作官方路径参考
+- 数据格式：HTML
+- 许可状态：公开平台页面；规则细则需登录后台复核
+- 存储位置：`01_research/compliance/compliance_checklist.md`
+- 责任人：Codex
+
 ---
 
 ## 类别建议（Codex 调研时分类）
