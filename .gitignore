@@ -55,3 +55,7 @@ tmp/
 # Generated samples (track via LFS or external storage; commit only curated subset)
 01_research/tech/poc_samples/raw/
 01_research/tech/algorithm_samples/raw/
+
+# Private user assets — ADR-009 hard rule, never commit
+01_research/tech/user_poc_private/
+01_research/tech/user_poc_private/incoming/
