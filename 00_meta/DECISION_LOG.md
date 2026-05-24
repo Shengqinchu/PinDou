@@ -14,6 +14,7 @@
 | ADR-005 | AI 风格化技术方案：多路线 + fallback | Accepted | 2026-05-24 | [文件](../04_architecture/ADRs/ADR-005-ai-stylization.md) |
 | ADR-005a | 写实人像 GPU 决策延后到 PoC 数据驱动 | Accepted | 2026-05-24 | [文件](../04_architecture/ADRs/ADR-005a-poc-driven-gpu-decision.md) |
 | ADR-006 | 小程序主体：个人 | Accepted | 2026-05-24 | [文件](../04_architecture/ADRs/ADR-006-mp-subject-individual.md) |
+| ADR-007 | 不预订国产合规 Provider 应急切换 | Accepted | 2026-05-24 | [文件](../04_architecture/ADRs/ADR-007-no-compliance-provider.md) |
 
 ## ADR 模板
 
