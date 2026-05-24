@@ -1,6 +1,6 @@
 # Task A — 现有拼豆 / 像素化工具技术拆解
 
-**Status**: pending
+**Status**: completed (Codex @ 2026-05-24) — 产出：[existing_tools.md](../../01_research/tech/existing_tools.md), [github_landscape.md](../../01_research/tech/github_landscape.md), [competitor_samples](../../01_research/tech/competitor_samples/)
 **Owner**: Codex
 **Priority**: 中
 **Estimated**: 1-2 天

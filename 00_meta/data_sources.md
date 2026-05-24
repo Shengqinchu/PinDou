@@ -145,6 +145,33 @@
 - 存储位置：`01_research/tech/skills_candidates.md`
 - 责任人：Codex
 
+### Task A GitHub repository metadata
+- URL / 标识：GitHub API + 仓库 README；包括 WuZongWei6/Pixelization、tencent-ailab/IP-Adapter、Comfy-Org/ComfyUI、AUTOMATIC1111/stable-diffusion-webui、lllyasviel/ControlNet、Mikubill/sd-webui-controlnet、cubiq/ComfyUI_IPAdapter_plus、sedthh/pyxelate、Tezumie/Image-to-Pixel、ImageOptim/libimagequant、gametorch/image_to_pixel_art_wasm、maxcleme/beadifier 等
+- 抓取 / 拉取日期：2026-05-24
+- 用途：现有拼豆 / 像素化 / AI 工作流开源生态拆解，记录 Star、协议、更新时间、技术栈
+- 数据格式：GitHub API JSON / GitHub README Markdown
+- 许可状态：各仓库不同，报告内逐项标注；GPL / AGPL / 非商用需商用风险提示
+- 存储位置：`01_research/tech/github_landscape.md`
+- 责任人：Codex
+
+### Task A Web bead/pixel tools
+- URL / 标识：https://makebead.com/ ; https://bitbead.pomodiary.com/ ; https://www.beadmapper.com/ ; https://beadpattern.net/zh ; https://simplepixelart.com/convert ; https://pixel-perler-ai.com/
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Web 端拼豆 / 像素化工具功能、算法、导出、商业化模式拆解
+- 数据格式：公开网页 HTML
+- 许可状态：公开页面；商用复用许可未知，仅作竞品研究引用
+- 存储位置：`01_research/tech/existing_tools.md`
+- 责任人：Codex
+
+### Task A Chinese mini-program/app/product references
+- URL / 标识：https://pindou.cn/ ; https://apps.apple.com/my/app/id6756865487 ; https://www.32r.com/app/143740.html ; https://digi.china.com/articles/20260420/202604201850740.html ; https://www.1004619.com/66750.html ; https://www.dian68.net/portal/article/index/cid/46/id/17362.html ; https://365-tools.cn/detail/40 ; https://dehumaker.cn/
+- 抓取 / 拉取日期：2026-05-24
+- 用途：中文拼豆工具 / 小程序竞品功能、商业化、色卡支持与用户流程拆解
+- 数据格式：公开网页 HTML / App Store 页面
+- 许可状态：公开页面；商用许可未知；仅作竞品研究引用
+- 存储位置：`01_research/tech/existing_tools.md`
+- 责任人：Codex
+
 ---
 
 ## 类别建议（Codex 调研时分类）
