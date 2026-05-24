@@ -1,0 +1,57 @@
+# Secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets/
+keys/
+credentials.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+dist/
+build/
+.next/
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Large binaries / model weights
+*.ckpt
+*.safetensors
+*.bin
+*.onnx
+*.pt
+*.pth
+weights/
+models/checkpoints/
+
+# Logs / temp
+*.log
+logs/
+tmp/
+.tmp/
+*.tmp
+
+# Generated samples (track via LFS or external storage; commit only curated subset)
+01_research/tech/poc_samples/raw/
+01_research/tech/algorithm_samples/raw/
