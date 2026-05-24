@@ -1,0 +1,5618 @@
+[
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P01",
+    "name_cn": "White",
+    "name_en": "White",
+    "hex": "#F1F1F1",
+    "rgb": [
+      241,
+      241,
+      241
+    ],
+    "lab": [
+      95.145,
+      -0.0,
+      0.0
+    ],
+    "category": "白色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P02",
+    "name_cn": "Cream",
+    "name_en": "Cream",
+    "hex": "#E0DEA9",
+    "rgb": [
+      224,
+      222,
+      169
+    ],
+    "lab": [
+      87.4633,
+      -7.6645,
+      26.3273
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P03",
+    "name_cn": "Yellow",
+    "name_en": "Yellow",
+    "hex": "#ECD800",
+    "rgb": [
+      236,
+      216,
+      0
+    ],
+    "lab": [
+      85.4774,
+      -10.5172,
+      85.3116
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P04",
+    "name_cn": "Orange",
+    "name_en": "Orange",
+    "hex": "#ED6120",
+    "rgb": [
+      237,
+      97,
+      32
+    ],
+    "lab": [
+      58.6618,
+      51.1978,
+      59.9149
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P05",
+    "name_cn": "Red",
+    "name_en": "Red",
+    "hex": "#F01820",
+    "rgb": [
+      240,
+      24,
+      32
+    ],
+    "lab": [
+      51.0237,
+      74.6259,
+      54.0563
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P06",
+    "name_cn": "Bubblegum",
+    "name_en": "Bubblegum",
+    "hex": "#DD669B",
+    "rgb": [
+      221,
+      102,
+      155
+    ],
+    "lab": [
+      59.2007,
+      52.072,
+      -6.2035
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P07",
+    "name_cn": "Purple",
+    "name_en": "Purple",
+    "hex": "#604089",
+    "rgb": [
+      96,
+      64,
+      137
+    ],
+    "lab": [
+      33.8988,
+      29.8414,
+      -35.7953
+    ],
+    "category": "紫色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P08",
+    "name_cn": "Dark Blue",
+    "name_en": "Dark Blue",
+    "hex": "#2B3F87",
+    "rgb": [
+      43,
+      63,
+      135
+    ],
+    "lab": [
+      28.9465,
+      17.2898,
+      -42.7513
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P09",
+    "name_cn": "Light Blue",
+    "name_en": "Light Blue",
+    "hex": "#3370C0",
+    "rgb": [
+      51,
+      112,
+      192
+    ],
+    "lab": [
+      47.1003,
+      7.8962,
+      -47.6245
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P10",
+    "name_cn": "Dark Green",
+    "name_en": "Dark Green",
+    "hex": "#1C753E",
+    "rgb": [
+      28,
+      117,
+      62
+    ],
+    "lab": [
+      43.2361,
+      -38.8951,
+      23.0917
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P11",
+    "name_cn": "Light Green",
+    "name_en": "Light Green",
+    "hex": "#56BA9F",
+    "rgb": [
+      86,
+      186,
+      159
+    ],
+    "lab": [
+      69.1815,
+      -35.8535,
+      4.8531
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P12",
+    "name_cn": "Brown",
+    "name_en": "Brown",
+    "hex": "#513931",
+    "rgb": [
+      81,
+      57,
+      49
+    ],
+    "lab": [
+      26.4412,
+      9.41,
+      9.1889
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P17",
+    "name_cn": "Grey",
+    "name_en": "Grey",
+    "hex": "#8A8D91",
+    "rgb": [
+      138,
+      141,
+      145
+    ],
+    "lab": [
+      58.506,
+      -0.2929,
+      -2.5078
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P18",
+    "name_cn": "Black",
+    "name_en": "Black",
+    "hex": "#2E2F32",
+    "rgb": [
+      46,
+      47,
+      50
+    ],
+    "lab": [
+      19.4086,
+      0.2923,
+      -2.0708
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P20",
+    "name_cn": "Rust",
+    "name_en": "Rust",
+    "hex": "#8C372C",
+    "rgb": [
+      140,
+      55,
+      44
+    ],
+    "lab": [
+      34.9859,
+      35.4298,
+      25.2001
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P21",
+    "name_cn": "Light Brown",
+    "name_en": "Light Brown",
+    "hex": "#815D34",
+    "rgb": [
+      129,
+      93,
+      52
+    ],
+    "lab": [
+      42.3761,
+      9.8224,
+      29.0647
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P33",
+    "name_cn": "Peach",
+    "name_en": "Peach",
+    "hex": "#EEBAB2",
+    "rgb": [
+      238,
+      186,
+      178
+    ],
+    "lab": [
+      79.9044,
+      17.5661,
+      11.2444
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P35",
+    "name_cn": "Tan",
+    "name_en": "Tan",
+    "hex": "#BC9371",
+    "rgb": [
+      188,
+      147,
+      113
+    ],
+    "lab": [
+      63.9603,
+      10.8163,
+      23.9038
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P38",
+    "name_cn": "Magenta",
+    "name_en": "Magenta",
+    "hex": "#F22A7B",
+    "rgb": [
+      242,
+      42,
+      123
+    ],
+    "lab": [
+      53.9942,
+      76.1681,
+      5.466
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P47",
+    "name_cn": "Neon Yellow",
+    "name_en": "Neon Yellow",
+    "hex": "#DCE002",
+    "rgb": [
+      220,
+      224,
+      2
+    ],
+    "lab": [
+      86.2723,
+      -21.2035,
+      85.126
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P48",
+    "name_cn": "Neon Orange",
+    "name_en": "Neon Orange",
+    "hex": "#FF7700",
+    "rgb": [
+      255,
+      119,
+      0
+    ],
+    "lab": [
+      65.3261,
+      47.1913,
+      73.007
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P49",
+    "name_cn": "Neon Green",
+    "name_en": "Neon Green",
+    "hex": "#019E43",
+    "rgb": [
+      1,
+      158,
+      67
+    ],
+    "lab": [
+      56.9423,
+      -55.1417,
+      37.3385
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P50",
+    "name_cn": "Neon Pink",
+    "name_en": "Neon Pink",
+    "hex": "#FF3991",
+    "rgb": [
+      255,
+      57,
+      145
+    ],
+    "lab": [
+      58.2613,
+      77.5758,
+      -1.1273
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P52",
+    "name_cn": "Pastel Blue",
+    "name_en": "Pastel Blue",
+    "hex": "#5390D1",
+    "rgb": [
+      83,
+      144,
+      209
+    ],
+    "lab": [
+      58.4023,
+      -0.1481,
+      -39.3263
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P53",
+    "name_cn": "Pastel Green",
+    "name_en": "Pastel Green",
+    "hex": "#76C882",
+    "rgb": [
+      118,
+      200,
+      130
+    ],
+    "lab": [
+      74.0423,
+      -39.7244,
+      27.3875
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P54",
+    "name_cn": "Pastel Lavender",
+    "name_en": "Pastel Lavender",
+    "hex": "#8A72C1",
+    "rgb": [
+      138,
+      114,
+      193
+    ],
+    "lab": [
+      53.2631,
+      26.5334,
+      -38.0798
+    ],
+    "category": "紫色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P56",
+    "name_cn": "Pastel Yellow",
+    "name_en": "Pastel Yellow",
+    "hex": "#FEF875",
+    "rgb": [
+      254,
+      248,
+      117
+    ],
+    "lab": [
+      95.7858,
+      -14.4112,
+      62.5786
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P57",
+    "name_cn": "Cheddar",
+    "name_en": "Cheddar",
+    "hex": "#F1AA0C",
+    "rgb": [
+      241,
+      170,
+      12
+    ],
+    "lab": [
+      74.4966,
+      15.486,
+      76.5184
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P58",
+    "name_cn": "Toothpaste",
+    "name_en": "Toothpaste",
+    "hex": "#93C8D4",
+    "rgb": [
+      147,
+      200,
+      212
+    ],
+    "lab": [
+      77.4377,
+      -14.3056,
+      -11.526
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P59",
+    "name_cn": "Hot Coral",
+    "name_en": "Hot Coral",
+    "hex": "#FF3851",
+    "rgb": [
+      255,
+      56,
+      81
+    ],
+    "lab": [
+      56.7715,
+      73.5422,
+      34.5636
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P60",
+    "name_cn": "Plum",
+    "name_en": "Plum",
+    "hex": "#A24B9C",
+    "rgb": [
+      162,
+      75,
+      156
+    ],
+    "lab": [
+      45.7917,
+      47.1055,
+      -27.9819
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P61",
+    "name_cn": "Kiwi Lime",
+    "name_en": "Kiwi Lime",
+    "hex": "#6CBE13",
+    "rgb": [
+      108,
+      190,
+      19
+    ],
+    "lab": [
+      69.5127,
+      -49.4526,
+      67.1396
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P62",
+    "name_cn": "Turquoise",
+    "name_en": "Turquoise",
+    "hex": "#2B89C6",
+    "rgb": [
+      43,
+      137,
+      198
+    ],
+    "lab": [
+      54.5323,
+      -5.9757,
+      -39.2916
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P63",
+    "name_cn": "Blush",
+    "name_en": "Blush",
+    "hex": "#FF8285",
+    "rgb": [
+      255,
+      130,
+      133
+    ],
+    "lab": [
+      68.6964,
+      47.6597,
+      20.5587
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P70",
+    "name_cn": "Periwinkle Blue",
+    "name_en": "Periwinkle Blue",
+    "hex": "#647CBE",
+    "rgb": [
+      100,
+      124,
+      190
+    ],
+    "lab": [
+      52.7751,
+      9.4045,
+      -37.3327
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P75",
+    "name_cn": "Glow Green",
+    "name_en": "Glow Green",
+    "hex": "#BEC696",
+    "rgb": [
+      190,
+      198,
+      150
+    ],
+    "lab": [
+      78.1913,
+      -10.7948,
+      23.1998
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P79",
+    "name_cn": "Light Pink",
+    "name_en": "Light Pink",
+    "hex": "#F6B3DD",
+    "rgb": [
+      246,
+      179,
+      221
+    ],
+    "lab": [
+      80.2112,
+      30.6762,
+      -11.4263
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P80",
+    "name_cn": "Bright Green",
+    "name_en": "Bright Green",
+    "hex": "#4FAD42",
+    "rgb": [
+      79,
+      173,
+      66
+    ],
+    "lab": [
+      63.2942,
+      -48.6621,
+      45.558
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P81",
+    "name_cn": "Light Gray",
+    "name_en": "Light Gray",
+    "hex": "#EEE3CF",
+    "rgb": [
+      238,
+      227,
+      207
+    ],
+    "lab": [
+      90.6068,
+      0.4435,
+      11.1054
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P82",
+    "name_cn": "Light Lavender",
+    "name_en": "Light Lavender",
+    "hex": "#AD98D4",
+    "rgb": [
+      173,
+      152,
+      212
+    ],
+    "lab": [
+      66.5917,
+      19.7634,
+      -27.8106
+    ],
+    "category": "紫色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P83",
+    "name_cn": "Pink",
+    "name_en": "Pink",
+    "hex": "#E44892",
+    "rgb": [
+      228,
+      72,
+      146
+    ],
+    "lab": [
+      55.2866,
+      65.8662,
+      -6.6354
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P85",
+    "name_cn": "Gold",
+    "name_en": "Gold",
+    "hex": "#BB7634",
+    "rgb": [
+      187,
+      118,
+      52
+    ],
+    "lab": [
+      55.8591,
+      21.3392,
+      46.1997
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P88",
+    "name_cn": "Raspberry",
+    "name_en": "Raspberry",
+    "hex": "#A53061",
+    "rgb": [
+      165,
+      48,
+      97
+    ],
+    "lab": [
+      39.5444,
+      51.5619,
+      -1.2799
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P89",
+    "name_cn": "Neon Blue",
+    "name_en": "Neon Blue",
+    "hex": "#406AE1",
+    "rgb": [
+      64,
+      106,
+      225
+    ],
+    "lab": [
+      48.0478,
+      25.5023,
+      -64.9131
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P90",
+    "name_cn": "Butterscotch",
+    "name_en": "Butterscotch",
+    "hex": "#D48437",
+    "rgb": [
+      212,
+      132,
+      55
+    ],
+    "lab": [
+      62.3206,
+      24.493,
+      52.495
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P91",
+    "name_cn": "Parrot Green",
+    "name_en": "Parrot Green",
+    "hex": "#067C81",
+    "rgb": [
+      6,
+      124,
+      129
+    ],
+    "lab": [
+      47.0237,
+      -26.2077,
+      -10.9098
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P92",
+    "name_cn": "Dark Grey",
+    "name_en": "Dark Grey",
+    "hex": "#4D5156",
+    "rgb": [
+      77,
+      81,
+      86
+    ],
+    "lab": [
+      34.2613,
+      -0.4604,
+      -3.4805
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P93",
+    "name_cn": "Blueberry Cream",
+    "name_en": "Blueberry Cream",
+    "hex": "#8297D9",
+    "rgb": [
+      130,
+      151,
+      217
+    ],
+    "lab": [
+      63.2496,
+      9.0928,
+      -36.0254
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P96",
+    "name_cn": "Cranapple",
+    "name_en": "Cranapple",
+    "hex": "#801922",
+    "rgb": [
+      128,
+      25,
+      34
+    ],
+    "lab": [
+      27.8491,
+      43.3578,
+      22.367
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P97",
+    "name_cn": "Prickly Pear",
+    "name_en": "Prickly Pear",
+    "hex": "#BDDA01",
+    "rgb": [
+      189,
+      218,
+      1
+    ],
+    "lab": [
+      82.3595,
+      -31.2169,
+      81.2884
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P98",
+    "name_cn": "Sand",
+    "name_en": "Sand",
+    "hex": "#E4B690",
+    "rgb": [
+      228,
+      182,
+      144
+    ],
+    "lab": [
+      77.2606,
+      11.5118,
+      25.6702
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P100",
+    "name_cn": "Pearl Coral",
+    "name_en": "Pearl Coral",
+    "hex": "#F97E79",
+    "rgb": [
+      249,
+      126,
+      121
+    ],
+    "lab": [
+      66.8603,
+      46.4239,
+      24.6414
+    ],
+    "category": "红色系",
+    "stock_status": "rare",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P101",
+    "name_cn": "Pearl Light Blue",
+    "name_en": "Pearl Light Blue",
+    "hex": "#7AAEA2",
+    "rgb": [
+      122,
+      174,
+      162
+    ],
+    "lab": [
+      67.2896,
+      -19.7836,
+      0.6545
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P102",
+    "name_cn": "Pearl Green",
+    "name_en": "Pearl Green",
+    "hex": "#84B791",
+    "rgb": [
+      132,
+      183,
+      145
+    ],
+    "lab": [
+      70.0465,
+      -24.6619,
+      14.0159
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P103",
+    "name_cn": "Pearl Yellow",
+    "name_en": "Pearl Yellow",
+    "hex": "#CAC033",
+    "rgb": [
+      202,
+      192,
+      51
+    ],
+    "lab": [
+      76.373,
+      -11.9389,
+      67.3438
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P104",
+    "name_cn": "Pearl Light Pink",
+    "name_en": "Pearl Light Pink",
+    "hex": "#D7A8A2",
+    "rgb": [
+      215,
+      168,
+      162
+    ],
+    "lab": [
+      72.9335,
+      16.3511,
+      9.7175
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P105",
+    "name_cn": "Silver",
+    "name_en": "Silver",
+    "hex": "#777B81",
+    "rgb": [
+      119,
+      123,
+      129
+    ],
+    "lab": [
+      51.4651,
+      -0.2384,
+      -3.7835
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P179",
+    "name_cn": "Evergreen",
+    "name_en": "Evergreen",
+    "hex": "#114938",
+    "rgb": [
+      17,
+      73,
+      56
+    ],
+    "lab": [
+      27.212,
+      -22.6973,
+      5.0338
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P181",
+    "name_cn": "Light Grey",
+    "name_en": "Light Grey",
+    "hex": "#B3BAB8",
+    "rgb": [
+      179,
+      186,
+      184
+    ],
+    "lab": [
+      74.927,
+      -2.8086,
+      0.1657
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P182",
+    "name_cn": "Lavender",
+    "name_en": "Lavender",
+    "hex": "#AF9FCE",
+    "rgb": [
+      175,
+      159,
+      206
+    ],
+    "lab": [
+      68.2898,
+      15.1343,
+      -21.87
+    ],
+    "category": "紫色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P199",
+    "name_cn": "Shamrock",
+    "name_en": "Shamrock",
+    "hex": "#008F53",
+    "rgb": [
+      0,
+      143,
+      83
+    ],
+    "lab": [
+      52.1388,
+      -47.2467,
+      22.9582
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P200",
+    "name_cn": "Cobalt",
+    "name_en": "Cobalt",
+    "hex": "#0065B1",
+    "rgb": [
+      0,
+      101,
+      177
+    ],
+    "lab": [
+      41.969,
+      4.9876,
+      -47.1647
+    ],
+    "category": "蓝色系",
+    "stock_status": "rare",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P201",
+    "name_cn": "Midnight",
+    "name_en": "Midnight",
+    "hex": "#2F3C55",
+    "rgb": [
+      47,
+      60,
+      85
+    ],
+    "lab": [
+      25.2346,
+      2.1675,
+      -16.7512
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P202",
+    "name_cn": "Robin's Egg",
+    "name_en": "Robin's Egg",
+    "hex": "#A9CDD5",
+    "rgb": [
+      169,
+      205,
+      213
+    ],
+    "lab": [
+      80.1234,
+      -10.1591,
+      -7.9264
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P203",
+    "name_cn": "Flamingo",
+    "name_en": "Flamingo",
+    "hex": "#F2AFB7",
+    "rgb": [
+      242,
+      175,
+      183
+    ],
+    "lab": [
+      77.851,
+      25.567,
+      5.6556
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P204",
+    "name_cn": "Salmon",
+    "name_en": "Salmon",
+    "hex": "#E1747A",
+    "rgb": [
+      225,
+      116,
+      122
+    ],
+    "lab": [
+      61.5745,
+      42.8408,
+      16.3329
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P205",
+    "name_cn": "Fawn",
+    "name_en": "Fawn",
+    "hex": "#C9A385",
+    "rgb": [
+      201,
+      163,
+      133
+    ],
+    "lab": [
+      69.6878,
+      9.7302,
+      20.8822
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P206",
+    "name_cn": "Pewter",
+    "name_en": "Pewter",
+    "hex": "#94A19D",
+    "rgb": [
+      148,
+      161,
+      157
+    ],
+    "lab": [
+      65.1365,
+      -5.3966,
+      0.4998
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P207",
+    "name_cn": "Charcoal",
+    "name_en": "Charcoal",
+    "hex": "#4F595A",
+    "rgb": [
+      79,
+      89,
+      90
+    ],
+    "lab": [
+      37.0132,
+      -3.6724,
+      -1.9094
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P208",
+    "name_cn": "Toasted Marshmallow",
+    "name_en": "Toasted Marshmallow",
+    "hex": "#DEDACE",
+    "rgb": [
+      222,
+      218,
+      206
+    ],
+    "lab": [
+      87.0601,
+      -0.7138,
+      6.3826
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P210",
+    "name_cn": "Orchid",
+    "name_en": "Orchid",
+    "hex": "#B1628E",
+    "rgb": [
+      177,
+      98,
+      142
+    ],
+    "lab": [
+      51.8795,
+      37.6433,
+      -10.1666
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P211",
+    "name_cn": "Tomato",
+    "name_en": "Tomato",
+    "hex": "#D14337",
+    "rgb": [
+      209,
+      67,
+      55
+    ],
+    "lab": [
+      49.3133,
+      55.0626,
+      38.533
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P212",
+    "name_cn": "Spice",
+    "name_en": "Spice",
+    "hex": "#D9593A",
+    "rgb": [
+      217,
+      89,
+      58
+    ],
+    "lab": [
+      54.2454,
+      48.4794,
+      42.735
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P213",
+    "name_cn": "Apricot",
+    "name_en": "Apricot",
+    "hex": "#F5A168",
+    "rgb": [
+      245,
+      161,
+      104
+    ],
+    "lab": [
+      73.4847,
+      25.5829,
+      42.1923
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P214",
+    "name_cn": "Sherbet",
+    "name_en": "Sherbet",
+    "hex": "#D8E47C",
+    "rgb": [
+      216,
+      228,
+      124
+    ],
+    "lab": [
+      87.7476,
+      -18.983,
+      49.1266
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P215",
+    "name_cn": "Mist",
+    "name_en": "Mist",
+    "hex": "#93B0BD",
+    "rgb": [
+      147,
+      176,
+      189
+    ],
+    "lab": [
+      70.1245,
+      -6.9985,
+      -9.9151
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P216",
+    "name_cn": "Sky",
+    "name_en": "Sky",
+    "hex": "#4AC0D8",
+    "rgb": [
+      74,
+      192,
+      216
+    ],
+    "lab": [
+      72.3015,
+      -25.4539,
+      -21.733
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P217",
+    "name_cn": "Lagoon",
+    "name_en": "Lagoon",
+    "hex": "#00A4AC",
+    "rgb": [
+      0,
+      164,
+      172
+    ],
+    "lab": [
+      61.2437,
+      -32.0327,
+      -14.2679
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P218",
+    "name_cn": "Teal",
+    "name_en": "Teal",
+    "hex": "#047F8A",
+    "rgb": [
+      4,
+      127,
+      138
+    ],
+    "lab": [
+      48.3077,
+      -24.7992,
+      -14.2833
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P219",
+    "name_cn": "Fern",
+    "name_en": "Fern",
+    "hex": "#7F971A",
+    "rgb": [
+      127,
+      151,
+      26
+    ],
+    "lab": [
+      58.7141,
+      -24.6195,
+      56.8149
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P220",
+    "name_cn": "Olive",
+    "name_en": "Olive",
+    "hex": "#696E31",
+    "rgb": [
+      105,
+      110,
+      49
+    ],
+    "lab": [
+      44.7689,
+      -11.4075,
+      32.9146
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P239",
+    "name_cn": "Mocha",
+    "name_en": "Mocha",
+    "hex": "#C8B693",
+    "rgb": [
+      200,
+      182,
+      147
+    ],
+    "lab": [
+      74.7259,
+      0.9743,
+      20.1819
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P240",
+    "name_cn": "Mint",
+    "name_en": "Mint",
+    "hex": "#B3EED5",
+    "rgb": [
+      179,
+      238,
+      213
+    ],
+    "lab": [
+      89.6427,
+      -23.6649,
+      6.0686
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P241",
+    "name_cn": "Sour Apple",
+    "name_en": "Sour Apple",
+    "hex": "#A3DE6F",
+    "rgb": [
+      163,
+      222,
+      111
+    ],
+    "lab": [
+      82.473,
+      -37.3876,
+      48.1006
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P242",
+    "name_cn": "Cotton Candy",
+    "name_en": "Cotton Candy",
+    "hex": "#F479B0",
+    "rgb": [
+      244,
+      121,
+      176
+    ],
+    "lab": [
+      66.5558,
+      53.0527,
+      -6.9524
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P243",
+    "name_cn": "Grape",
+    "name_en": "Grape",
+    "hex": "#503B9C",
+    "rgb": [
+      80,
+      59,
+      156
+    ],
+    "lab": [
+      32.3321,
+      34.3797,
+      -50.0128
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P244",
+    "name_cn": "Rose",
+    "name_en": "Rose",
+    "hex": "#D25D72",
+    "rgb": [
+      210,
+      93,
+      114
+    ],
+    "lab": [
+      54.8129,
+      48.0732,
+      11.2355
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P245",
+    "name_cn": "Iris",
+    "name_en": "Iris",
+    "hex": "#4E56A3",
+    "rgb": [
+      78,
+      86,
+      163
+    ],
+    "lab": [
+      39.4434,
+      19.1523,
+      -42.7832
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P246",
+    "name_cn": "Tangerine",
+    "name_en": "Tangerine",
+    "hex": "#FD5918",
+    "rgb": [
+      253,
+      89,
+      24
+    ],
+    "lab": [
+      59.979,
+      60.0266,
+      64.7469
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P247",
+    "name_cn": "Forest",
+    "name_en": "Forest",
+    "hex": "#005D57",
+    "rgb": [
+      0,
+      93,
+      87
+    ],
+    "lab": [
+      35.0353,
+      -25.0294,
+      -3.3188
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P248",
+    "name_cn": "Eggplant",
+    "name_en": "Eggplant",
+    "hex": "#6F3255",
+    "rgb": [
+      111,
+      50,
+      85
+    ],
+    "lab": [
+      30.1994,
+      31.5634,
+      -8.4883
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P249",
+    "name_cn": "Honey",
+    "name_en": "Honey",
+    "hex": "#DA8C2C",
+    "rgb": [
+      218,
+      140,
+      44
+    ],
+    "lab": [
+      64.8411,
+      22.2946,
+      59.7413
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P250",
+    "name_cn": "Gingerbread",
+    "name_en": "Gingerbread",
+    "hex": "#7E5446",
+    "rgb": [
+      126,
+      84,
+      70
+    ],
+    "lab": [
+      39.9476,
+      15.6707,
+      15.2855
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P251",
+    "name_cn": "Thistle",
+    "name_en": "Thistle",
+    "hex": "#8C8CA7",
+    "rgb": [
+      140,
+      140,
+      167
+    ],
+    "lab": [
+      59.0865,
+      5.7108,
+      -14.2032
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P252",
+    "name_cn": "Denim",
+    "name_en": "Denim",
+    "hex": "#4C6388",
+    "rgb": [
+      76,
+      99,
+      136
+    ],
+    "lab": [
+      41.5904,
+      1.7931,
+      -23.2127
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P253",
+    "name_cn": "Sage",
+    "name_en": "Sage",
+    "hex": "#9AA98E",
+    "rgb": [
+      154,
+      169,
+      142
+    ],
+    "lab": [
+      67.4259,
+      -10.3296,
+      12.1818
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P254",
+    "name_cn": "Orange Cream",
+    "name_en": "Orange Cream",
+    "hex": "#EFB79B",
+    "rgb": [
+      239,
+      183,
+      155
+    ],
+    "lab": [
+      78.803,
+      16.554,
+      22.074
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P255",
+    "name_cn": "Fruit Punch",
+    "name_en": "Fruit Punch",
+    "hex": "#CA3B65",
+    "rgb": [
+      202,
+      59,
+      101
+    ],
+    "lab": [
+      47.7877,
+      58.8215,
+      8.9611
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P256",
+    "name_cn": "Fuchsia",
+    "name_en": "Fuchsia",
+    "hex": "#CB59B9",
+    "rgb": [
+      203,
+      89,
+      185
+    ],
+    "lab": [
+      55.4277,
+      57.0665,
+      -29.5372
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P257",
+    "name_cn": "Mulberry",
+    "name_en": "Mulberry",
+    "hex": "#714875",
+    "rgb": [
+      113,
+      72,
+      117
+    ],
+    "lab": [
+      36.7998,
+      25.5805,
+      -18.7246
+    ],
+    "category": "紫色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P258",
+    "name_cn": "Slime",
+    "name_en": "Slime",
+    "hex": "#C8C85C",
+    "rgb": [
+      200,
+      200,
+      92
+    ],
+    "lab": [
+      78.6722,
+      -14.3531,
+      53.1147
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P259",
+    "name_cn": "Stone",
+    "name_en": "Stone",
+    "hex": "#988C8C",
+    "rgb": [
+      152,
+      140,
+      140
+    ],
+    "lab": [
+      59.2743,
+      4.4694,
+      1.6166
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P260",
+    "name_cn": "Dark Spruce",
+    "name_en": "Dark Spruce",
+    "hex": "#14313B",
+    "rgb": [
+      20,
+      49,
+      59
+    ],
+    "lab": [
+      18.6312,
+      -7.3,
+      -9.6218
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P261",
+    "name_cn": "Cocoa",
+    "name_en": "Cocoa",
+    "hex": "#392928",
+    "rgb": [
+      57,
+      41,
+      40
+    ],
+    "lab": [
+      18.4049,
+      7.2809,
+      3.5568
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P262",
+    "name_cn": "Slate Blue",
+    "name_en": "Slate Blue",
+    "hex": "#5E6D7B",
+    "rgb": [
+      94,
+      109,
+      123
+    ],
+    "lab": [
+      45.2852,
+      -2.264,
+      -9.6353
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P263",
+    "name_cn": "Celery",
+    "name_en": "Celery",
+    "hex": "#BED4A6",
+    "rgb": [
+      190,
+      212,
+      166
+    ],
+    "lab": [
+      82.2641,
+      -15.505,
+      20.3569
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P265",
+    "name_cn": "Twilight Plum",
+    "name_en": "Twilight Plum",
+    "hex": "#C685B1",
+    "rgb": [
+      198,
+      133,
+      177
+    ],
+    "lab": [
+      63.3074,
+      31.6366,
+      -12.9722
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P266",
+    "name_cn": "Caribbean Sea",
+    "name_en": "Caribbean Sea",
+    "hex": "#6CC8AD",
+    "rgb": [
+      108,
+      200,
+      173
+    ],
+    "lab": [
+      74.5155,
+      -33.9055,
+      5.0332
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P267",
+    "name_cn": "Frosted Lilac",
+    "name_en": "Frosted Lilac",
+    "hex": "#CDB7C3",
+    "rgb": [
+      205,
+      183,
+      195
+    ],
+    "lab": [
+      76.5498,
+      9.911,
+      -3.1929
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P268",
+    "name_cn": "Sunflower",
+    "name_en": "Sunflower",
+    "hex": "#DEBA0B",
+    "rgb": [
+      222,
+      186,
+      11
+    ],
+    "lab": [
+      76.4814,
+      -1.1571,
+      77.1657
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P269",
+    "name_cn": "Lemon",
+    "name_en": "Lemon",
+    "hex": "#F6D901",
+    "rgb": [
+      246,
+      217,
+      1
+    ],
+    "lab": [
+      86.6149,
+      -6.7523,
+      86.4439
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P272",
+    "name_cn": "Coral",
+    "name_en": "Coral",
+    "hex": "#FF9A8B",
+    "rgb": [
+      255,
+      154,
+      139
+    ],
+    "lab": [
+      73.7012,
+      36.1324,
+      24.054
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P273",
+    "name_cn": "Brick",
+    "name_en": "Brick",
+    "hex": "#FC9574",
+    "rgb": [
+      252,
+      149,
+      116
+    ],
+    "lab": [
+      71.8637,
+      35.5165,
+      34.0213
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P274",
+    "name_cn": "Rich Butter",
+    "name_en": "Rich Butter",
+    "hex": "#F6CA69",
+    "rgb": [
+      246,
+      202,
+      105
+    ],
+    "lab": [
+      83.3673,
+      4.5756,
+      53.5281
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P275",
+    "name_cn": "Peacock",
+    "name_en": "Peacock",
+    "hex": "#0090AC",
+    "rgb": [
+      0,
+      144,
+      172
+    ],
+    "lab": [
+      54.9926,
+      -22.0082,
+      -23.7951
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P276",
+    "name_cn": "Carnation Pink",
+    "name_en": "Carnation Pink",
+    "hex": "#F8C7C9",
+    "rgb": [
+      248,
+      199,
+      201
+    ],
+    "lab": [
+      84.4956,
+      17.6687,
+      5.623
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  },
+  {
+    "brand": "Perler",
+    "bead_diameter_mm": 5.0,
+    "code": "P961",
+    "name_cn": "Cherry",
+    "name_en": "Cherry",
+    "hex": "#9D2B3A",
+    "rgb": [
+      157,
+      43,
+      58
+    ],
+    "lab": [
+      36.3733,
+      47.6222,
+      18.8673
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": 3.69,
+    "price_confidence": "medium",
+    "buy_links": [
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/products/1-000-perler-beads-white",
+        "shop_name": "Perler 1,000ct 5mm sample SKU",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Perler official",
+        "url": "https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf",
+        "shop_name": "Perler bead color reference guide",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/perler",
+        "shop_name": "Bitbead Perler HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Perler official pages confirm 5mm classic size and sample SKU prices. Bitbead provides normalized P-codes and HEX; official SKU/HEX crosswalk remains incomplete. Price note: USD benchmark: official 1,000ct classic bead sample at 3.69 USD.",
+    "verified_sources": [
+      "Perler official product/color reference pages",
+      "Bitbead Perler HEX reference"
+    ]
+  }
+]

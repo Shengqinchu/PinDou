@@ -1,11 +1,28 @@
 # Task H — 全品牌全规格豆系信息库
 
-**Status**: pending
+**Status**: completed (Codex @ 2026-05-24) — 产出见下方“完成产出”
 **Owner**: Codex
 **Priority**: 高（Phase 1 启动前必须完成）
 **Estimated**: 3-4 天
 **依赖**: Task D 完成的 MARD + COCO 基线作为起点
 **被依赖**: Phase 1 PRD（PatternBuilder 接口需要全品牌 palette）
+
+---
+
+## 完成产出
+
+- 生成脚本：`01_research/colormap/build_full_bead_db.py`
+- 数据 README / 覆盖矩阵 / schema：`01_research/colormap/README.md`
+- 跨品牌同豆径对照：`01_research/colormap/crossref_full.csv`
+- MARD：`01_research/colormap/mard_2_6mm.json`, `01_research/colormap/mard_5mm.json`, `01_research/colormap/mard_10mm.json`
+- COCO：`01_research/colormap/coco_2_6mm.json`, `01_research/colormap/coco_5mm.json`, `01_research/colormap/coco_10mm.json`
+- Hama：`01_research/colormap/hama_2_5mm.json`, `01_research/colormap/hama_5mm.json`, `01_research/colormap/hama_10mm.json`
+- Perler：`01_research/colormap/perler_5mm.json`
+- Artkal：`01_research/colormap/artkal_2_6mm.json`, `01_research/colormap/artkal_5mm.json`, `01_research/colormap/artkal_10mm.json`
+- 其他国产：`01_research/colormap/other_huangdoudou_5mm.json`, `01_research/colormap/other_mixiaowo_5mm.json`, `01_research/colormap/other_panpan_5mm.json`
+- 可视化：`01_research/colormap/*_palette.png`
+- 数据源留痕：`00_meta/data_sources.md`
+- Phase 1 PRD 衔接建议 / schema 问题：`00_meta/codex_briefs/_questions_for_user.md`
 
 ---
 

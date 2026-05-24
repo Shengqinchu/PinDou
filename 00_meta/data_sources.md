@@ -316,6 +316,60 @@
 - 存储位置：`01_research/tech/perler_bead_domain_notes.md`, `01_research/tech/prompts.md`
 - 责任人：Codex
 
+### Hama official size / colour-code references
+- URL / 标识：https://hama.dk/en/pages/the-foundation-stones-of-hama ; https://www.hama.dk/en/hama-info/colour-chart/
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task H 确认 Hama Mini 2.5mm、Midi 5mm、Maxi 10mm 规格，以及三种规格共用色号体系；为 `hama_*.json` 写入尺寸与来源说明
+- 数据格式：HTML
+- 许可状态：官方公开页面；HEX 未公开
+- 存储位置：`01_research/colormap/build_full_bead_db.py`, `01_research/colormap/hama_*.json`, `01_research/colormap/README.md`
+- 责任人：Codex
+
+### Bitbead Hama / Perler / Artkal structured colour pages
+- URL / 标识：https://bitbead.pomodiary.com/en/colors/hama ; https://bitbead.pomodiary.com/en/colors/perler ; https://bitbead.pomodiary.com/en/colors/artkal ; https://bitbead.pomodiary.com/en/colors/artkal-mini
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task H 提取 Hama、Perler、Artkal Mini 的公开结构化 code / name / HEX，用于生成品牌豆径 JSON 和跨品牌 CIEDE2000 对照
+- 数据格式：HTML
+- 许可状态：公开工具页面；商用复用许可未知；HEX 仅作近似参考
+- 存储位置：`01_research/colormap/build_full_bead_db.py`, `01_research/colormap/hama_*.json`, `01_research/colormap/perler_5mm.json`, `01_research/colormap/artkal_2_6mm.json`
+- 责任人：Codex
+
+### Perler official product and colour references
+- URL / 标识：https://perler.com/products/1-000-perler-beads-white ; https://perler.com/products/6-000-perler-beads-white ; https://perler.com/products/2-000-mini-perler-beads-black ; https://perler.com/products/biggie-beads-bucket ; https://perler.com/content/downloads/perler-bead-color-reference-jan2020.pdf
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task H 确认 Perler classic 5mm、Mini、Biggie 产品规格、SKU、价格样本与官方色卡 PDF 存在性；HEX 仍由第三方工具页补
+- 数据格式：HTML / PDF
+- 许可状态：官方公开页面；商用复用许可未知
+- 存储位置：`01_research/colormap/build_full_bead_db.py`, `01_research/colormap/perler_5mm.json`, `01_research/colormap/README.md`
+- 责任人：Codex
+
+### Artkal official series and size references
+- URL / 标识：https://www.artkalfusebeads.com/blogs/faq/artkal-beads-size ; https://www.artkalfusebeads.com/collections/mini-c-2-6mm-artkal-beads/artkal-beads ; https://www.artkalfusebeads.com/blogs/artkal-color-chart/artkal-color-chart ; https://www.artkalfusebeads.com/pages/a-color-chart ; https://www.artkalfusebeads.com/pages/r-color-chart ; https://www.artkalbead.com/uploads/10mm-X-bead-color-chart-15-Colors.pdf
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task H 确认 Artkal C/A/M 2.6mm、S/R 5mm、X 10mm 系列与官方色数口径；结构化 HEX 由 Pixel Pattern / Bitbead 补
+- 数据格式：HTML / PDF
+- 许可状态：官方公开页面；商用复用许可未知
+- 存储位置：`01_research/colormap/build_full_bead_db.py`, `01_research/colormap/artkal_*.json`, `01_research/colormap/README.md`
+- 责任人：Codex
+
+### Pixel Pattern Color Converter structured tables
+- URL / 标识：https://www.pixel-pattern.com/color-converter
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task H 结构化提取 MARD 英文名、Artkal S 系列、Perler / Hama 交叉参考；生成 palette JSON 与同豆径 CIEDE2000 对照
+- 数据格式：HTML table
+- 许可状态：公开工具页面；页面说明部分数据来自官方 PDF/OCR与社区参考，商用复用许可未知
+- 存储位置：`01_research/colormap/build_full_bead_db.py`, `01_research/colormap/mard_5mm.json`, `01_research/colormap/artkal_5mm.json`
+- 责任人：Codex
+
+### MARD / COCO / other domestic public bead references
+- URL / 标识：https://www.pindou.online/colors ; https://artkalbeads.com/artkal_beads/527.html ; https://apps.apple.com/nz/app/%E6%8B%BC%E8%B1%86%E5%A4%A7%E5%B8%88/id6760127746 ; https://git.xiongxiao.me/abearxiong/get-colors-from-beans
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task H 记录 MARD 291/221、COCO 291/221、黄豆豆、咪小窝、盼盼等国产公开色卡，以及 MARD 2.6mm 221 色商品存在性
+- 数据格式：HTML / App Store 页面 / JSON
+- 许可状态：公开页面；get-colors-from-beans 为 MIT；其他页面商用复用许可未知
+- 存储位置：`01_research/colormap/_source_get-colors.json`, `01_research/colormap/build_full_bead_db.py`, `01_research/colormap/*_5mm.json`, `01_research/colormap/*_2_6mm.json`
+- 责任人：Codex
+
 ---
 
 ## 类别建议（Codex 调研时分类）

@@ -1,0 +1,4274 @@
+[
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H01",
+    "name_cn": "White",
+    "name_en": "White",
+    "hex": "#ECEDED",
+    "rgb": [
+      236,
+      237,
+      237
+    ],
+    "lab": [
+      93.674,
+      -0.3334,
+      -0.1173
+    ],
+    "category": "白色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H02",
+    "name_cn": "Cream",
+    "name_en": "Cream",
+    "hex": "#F0E8B9",
+    "rgb": [
+      240,
+      232,
+      185
+    ],
+    "lab": [
+      91.5692,
+      -4.6222,
+      23.8927
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H03",
+    "name_cn": "Gold",
+    "name_en": "Gold",
+    "hex": "#F0B901",
+    "rgb": [
+      240,
+      185,
+      1
+    ],
+    "lab": [
+      78.0103,
+      7.0849,
+      80.1165
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H04",
+    "name_cn": "Orange",
+    "name_en": "Orange",
+    "hex": "#E64F27",
+    "rgb": [
+      230,
+      79,
+      39
+    ],
+    "lab": [
+      54.6233,
+      56.6798,
+      53.185
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H05",
+    "name_cn": "Red",
+    "name_en": "Red",
+    "hex": "#B63136",
+    "rgb": [
+      182,
+      49,
+      54
+    ],
+    "lab": [
+      41.8624,
+      53.1422,
+      29.2282
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H06",
+    "name_cn": "Pink",
+    "name_en": "Pink",
+    "hex": "#E1889F",
+    "rgb": [
+      225,
+      136,
+      159
+    ],
+    "lab": [
+      66.6134,
+      36.7979,
+      2.4484
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H07",
+    "name_cn": "Purple",
+    "name_en": "Purple",
+    "hex": "#694A82",
+    "rgb": [
+      105,
+      74,
+      130
+    ],
+    "lab": [
+      36.9532,
+      24.6798,
+      -26.5966
+    ],
+    "category": "紫色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H08",
+    "name_cn": "Dark Blue",
+    "name_en": "Dark Blue",
+    "hex": "#2C4690",
+    "rgb": [
+      44,
+      70,
+      144
+    ],
+    "lab": [
+      31.6438,
+      16.1203,
+      -43.9422
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H09",
+    "name_cn": "Blue",
+    "name_en": "Blue",
+    "hex": "#305CB0",
+    "rgb": [
+      48,
+      92,
+      176
+    ],
+    "lab": [
+      40.2723,
+      14.2656,
+      -49.2463
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H10",
+    "name_cn": "Dark Green",
+    "name_en": "Dark Green",
+    "hex": "#256847",
+    "rgb": [
+      37,
+      104,
+      71
+    ],
+    "lab": [
+      39.1531,
+      -29.6537,
+      12.4794
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H11",
+    "name_cn": "Teal",
+    "name_en": "Teal",
+    "hex": "#49AE89",
+    "rgb": [
+      73,
+      174,
+      137
+    ],
+    "lab": [
+      64.5578,
+      -38.4017,
+      10.2924
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H12",
+    "name_cn": "Brown",
+    "name_en": "Brown",
+    "hex": "#534137",
+    "rgb": [
+      83,
+      65,
+      55
+    ],
+    "lab": [
+      29.1478,
+      6.0994,
+      9.0643
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H13",
+    "name_cn": "Transparent Red",
+    "name_en": "Transparent Red",
+    "hex": "#C02435",
+    "rgb": [
+      192,
+      36,
+      53
+    ],
+    "lab": [
+      42.3519,
+      60.1259,
+      30.8866
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H14",
+    "name_cn": "Transparent Yellow",
+    "name_en": "Transparent Yellow",
+    "hex": "#E4AA32",
+    "rgb": [
+      228,
+      170,
+      50
+    ],
+    "lab": [
+      73.2051,
+      10.7386,
+      65.6528
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H15",
+    "name_cn": "Transparent Blue",
+    "name_en": "Transparent Blue",
+    "hex": "#487ED5",
+    "rgb": [
+      72,
+      126,
+      213
+    ],
+    "lab": [
+      53.0602,
+      9.9683,
+      -50.0587
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H16",
+    "name_cn": "Transparent Green",
+    "name_en": "Transparent Green",
+    "hex": "#37B876",
+    "rgb": [
+      55,
+      184,
+      118
+    ],
+    "lab": [
+      66.8235,
+      -50.0771,
+      23.6826
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H17",
+    "name_cn": "Gray",
+    "name_en": "Gray",
+    "hex": "#83888A",
+    "rgb": [
+      131,
+      136,
+      138
+    ],
+    "lab": [
+      56.3556,
+      -1.4291,
+      -1.7096
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H18",
+    "name_cn": "Black",
+    "name_en": "Black",
+    "hex": "#2E2F31",
+    "rgb": [
+      46,
+      47,
+      49
+    ],
+    "lab": [
+      19.3731,
+      0.0441,
+      -1.4334
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H19",
+    "name_cn": "Clear",
+    "name_en": "Clear",
+    "hex": "#D8D2CE",
+    "rgb": [
+      216,
+      210,
+      206
+    ],
+    "lab": [
+      84.5603,
+      1.3552,
+      2.7089
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H20",
+    "name_cn": "Dark Brown",
+    "name_en": "Dark Brown",
+    "hex": "#7F332A",
+    "rgb": [
+      127,
+      51,
+      42
+    ],
+    "lab": [
+      31.9163,
+      32.2684,
+      22.1731
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H21",
+    "name_cn": "Tan",
+    "name_en": "Tan",
+    "hex": "#A5693F",
+    "rgb": [
+      165,
+      105,
+      63
+    ],
+    "lab": [
+      50.0533,
+      19.7845,
+      33.2535
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H22",
+    "name_cn": "Burgundy",
+    "name_en": "Burgundy",
+    "hex": "#A52D36",
+    "rgb": [
+      165,
+      45,
+      54
+    ],
+    "lab": [
+      38.1014,
+      49.1959,
+      23.896
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H24",
+    "name_cn": "Translucent Purple",
+    "name_en": "Translucent Purple",
+    "hex": "#683E9A",
+    "rgb": [
+      104,
+      62,
+      154
+    ],
+    "lab": [
+      35.4422,
+      37.6068,
+      -43.6526
+    ],
+    "category": "紫色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H25",
+    "name_cn": "Translucent Brown",
+    "name_en": "Translucent Brown",
+    "hex": "#87593D",
+    "rgb": [
+      135,
+      89,
+      61
+    ],
+    "lab": [
+      42.2061,
+      15.7055,
+      23.8537
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H26",
+    "name_cn": "Salmon",
+    "name_en": "Salmon",
+    "hex": "#DE9B90",
+    "rgb": [
+      222,
+      155,
+      144
+    ],
+    "lab": [
+      70.1682,
+      23.6396,
+      15.8402
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H27",
+    "name_cn": "Tan Light",
+    "name_en": "Tan Light",
+    "hex": "#DEB48B",
+    "rgb": [
+      222,
+      180,
+      139
+    ],
+    "lab": [
+      76.093,
+      9.632,
+      26.6629
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H28",
+    "name_cn": "Dark Gray",
+    "name_en": "Dark Gray",
+    "hex": "#363F38",
+    "rgb": [
+      54,
+      63,
+      56
+    ],
+    "lab": [
+      25.6377,
+      -5.3746,
+      3.0435
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H29",
+    "name_cn": "Magenta",
+    "name_en": "Magenta",
+    "hex": "#B9395E",
+    "rgb": [
+      185,
+      57,
+      94
+    ],
+    "lab": [
+      44.3071,
+      53.8442,
+      7.9218
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H30",
+    "name_cn": "Maroon",
+    "name_en": "Maroon",
+    "hex": "#592F38",
+    "rgb": [
+      89,
+      47,
+      56
+    ],
+    "lab": [
+      25.0847,
+      20.3283,
+      2.78
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H31",
+    "name_cn": "Steel Blue",
+    "name_en": "Steel Blue",
+    "hex": "#6797AE",
+    "rgb": [
+      103,
+      151,
+      174
+    ],
+    "lab": [
+      59.953,
+      -10.0539,
+      -17.1048
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H32",
+    "name_cn": "Neon Fuchsia",
+    "name_en": "Neon Fuchsia",
+    "hex": "#FF208D",
+    "rgb": [
+      255,
+      32,
+      141
+    ],
+    "lab": [
+      56.31,
+      82.4918,
+      -1.6223
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H33",
+    "name_cn": "Bright Red",
+    "name_en": "Bright Red",
+    "hex": "#FF3956",
+    "rgb": [
+      255,
+      57,
+      86
+    ],
+    "lab": [
+      56.9436,
+      73.5103,
+      31.8761
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H34",
+    "name_cn": "Neon Yellow",
+    "name_en": "Neon Yellow",
+    "hex": "#E5EF13",
+    "rgb": [
+      229,
+      239,
+      19
+    ],
+    "lab": [
+      90.9801,
+      -24.4809,
+      87.4484
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H35",
+    "name_cn": "Neon Red",
+    "name_en": "Neon Red",
+    "hex": "#FF2833",
+    "rgb": [
+      255,
+      40,
+      51
+    ],
+    "lab": [
+      55.0967,
+      76.1966,
+      49.4082
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H36",
+    "name_cn": "Neon Blue",
+    "name_en": "Neon Blue",
+    "hex": "#2353B0",
+    "rgb": [
+      35,
+      83,
+      176
+    ],
+    "lab": [
+      37.2565,
+      18.6032,
+      -54.1371
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H37",
+    "name_cn": "Neon Green",
+    "name_en": "Neon Green",
+    "hex": "#06B73C",
+    "rgb": [
+      6,
+      183,
+      60
+    ],
+    "lab": [
+      65.1444,
+      -63.5738,
+      49.8445
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H38",
+    "name_cn": "Neon Orange",
+    "name_en": "Neon Orange",
+    "hex": "#FD8600",
+    "rgb": [
+      253,
+      134,
+      0
+    ],
+    "lab": [
+      67.9755,
+      39.0586,
+      74.4263
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H39",
+    "name_cn": "Fluorescent Yellow",
+    "name_en": "Fluorescent Yellow",
+    "hex": "#F1F21C",
+    "rgb": [
+      241,
+      242,
+      28
+    ],
+    "lab": [
+      92.7031,
+      -20.8308,
+      87.9681
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H40",
+    "name_cn": "Fluorescent Orange",
+    "name_en": "Fluorescent Orange",
+    "hex": "#FE630B",
+    "rgb": [
+      254,
+      99,
+      11
+    ],
+    "lab": [
+      61.676,
+      56.0402,
+      69.0192
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H41",
+    "name_cn": "Fluorescent Blue",
+    "name_en": "Fluorescent Blue",
+    "hex": "#2659B2",
+    "rgb": [
+      38,
+      89,
+      178
+    ],
+    "lab": [
+      39.1899,
+      15.7338,
+      -52.1867
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H42",
+    "name_cn": "Fluorescent Green",
+    "name_en": "Fluorescent Green",
+    "hex": "#0CBD51",
+    "rgb": [
+      12,
+      189,
+      81
+    ],
+    "lab": [
+      67.3256,
+      -62.5986,
+      42.98
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H43",
+    "name_cn": "Bright Yellow",
+    "name_en": "Bright Yellow",
+    "hex": "#F0EA37",
+    "rgb": [
+      240,
+      234,
+      55
+    ],
+    "lab": [
+      90.6195,
+      -16.6909,
+      80.2533
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H44",
+    "name_cn": "Rose",
+    "name_en": "Rose",
+    "hex": "#EE6972",
+    "rgb": [
+      238,
+      105,
+      114
+    ],
+    "lab": [
+      61.2207,
+      52.0341,
+      20.7386
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H45",
+    "name_cn": "Mauve",
+    "name_en": "Mauve",
+    "hex": "#886DB9",
+    "rgb": [
+      136,
+      109,
+      185
+    ],
+    "lab": [
+      51.4668,
+      26.8703,
+      -36.3174
+    ],
+    "category": "紫色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H46",
+    "name_cn": "Cornflower Blue",
+    "name_en": "Cornflower Blue",
+    "hex": "#629ED7",
+    "rgb": [
+      98,
+      158,
+      215
+    ],
+    "lab": [
+      63.305,
+      -3.2051,
+      -34.9628
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H47",
+    "name_cn": "Green",
+    "name_en": "Green",
+    "hex": "#83CB70",
+    "rgb": [
+      131,
+      203,
+      112
+    ],
+    "lab": [
+      75.2677,
+      -39.7181,
+      38.3251
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H48",
+    "name_cn": "Orchid",
+    "name_en": "Orchid",
+    "hex": "#CF70B7",
+    "rgb": [
+      207,
+      112,
+      183
+    ],
+    "lab": [
+      60.1366,
+      46.7495,
+      -21.0901
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H49",
+    "name_cn": "Ocean Blue",
+    "name_en": "Ocean Blue",
+    "hex": "#4998BC",
+    "rgb": [
+      73,
+      152,
+      188
+    ],
+    "lab": [
+      59.4357,
+      -13.3528,
+      -25.9286
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H60",
+    "name_cn": "Burnt Orange",
+    "name_en": "Burnt Orange",
+    "hex": "#F49422",
+    "rgb": [
+      244,
+      148,
+      34
+    ],
+    "lab": [
+      69.8479,
+      28.6662,
+      68.6678
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H61",
+    "name_cn": "Gold Metallic",
+    "name_en": "Gold Metallic",
+    "hex": "#D99350",
+    "rgb": [
+      217,
+      147,
+      80
+    ],
+    "lab": [
+      66.6738,
+      19.8954,
+      45.4872
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H62",
+    "name_cn": "Silver Metallic",
+    "name_en": "Silver Metallic",
+    "hex": "#48474A",
+    "rgb": [
+      72,
+      71,
+      74
+    ],
+    "lab": [
+      30.3482,
+      1.0801,
+      -1.648
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H63",
+    "name_cn": "Bronze Metallic",
+    "name_en": "Bronze Metallic",
+    "hex": "#42312F",
+    "rgb": [
+      66,
+      49,
+      47
+    ],
+    "lab": [
+      22.161,
+      7.3511,
+      4.2504
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H64",
+    "name_cn": "Pearl",
+    "name_en": "Pearl",
+    "hex": "#EFEBE4",
+    "rgb": [
+      239,
+      235,
+      228
+    ],
+    "lab": [
+      93.1758,
+      0.1319,
+      3.8648
+    ],
+    "category": "白色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H70",
+    "name_cn": "Periwinkle",
+    "name_en": "Periwinkle",
+    "hex": "#B6B6D4",
+    "rgb": [
+      182,
+      182,
+      212
+    ],
+    "lab": [
+      74.9219,
+      5.9918,
+      -15.064
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H71",
+    "name_cn": "Charcoal",
+    "name_en": "Charcoal",
+    "hex": "#464541",
+    "rgb": [
+      70,
+      69,
+      65
+    ],
+    "lab": [
+      29.2606,
+      -0.4374,
+      2.563
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H72",
+    "name_cn": "Translucent Pink",
+    "name_en": "Translucent Pink",
+    "hex": "#F097B0",
+    "rgb": [
+      240,
+      151,
+      176
+    ],
+    "lab": [
+      72.0925,
+      36.5422,
+      1.1297
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H73",
+    "name_cn": "Translucent Aqua",
+    "name_en": "Translucent Aqua",
+    "hex": "#59AEF5",
+    "rgb": [
+      89,
+      174,
+      245
+    ],
+    "lab": [
+      68.7404,
+      -4.3995,
+      -42.9802
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H74",
+    "name_cn": "Translucent Lilac",
+    "name_en": "Translucent Lilac",
+    "hex": "#5B55BD",
+    "rgb": [
+      91,
+      85,
+      189
+    ],
+    "lab": [
+      41.8361,
+      31.0059,
+      -54.216
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H75",
+    "name_cn": "Caramel",
+    "name_en": "Caramel",
+    "hex": "#BF7B4D",
+    "rgb": [
+      191,
+      123,
+      77
+    ],
+    "lab": [
+      57.8284,
+      21.8673,
+      35.807
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H76",
+    "name_cn": "Chocolate",
+    "name_en": "Chocolate",
+    "hex": "#663317",
+    "rgb": [
+      102,
+      51,
+      23
+    ],
+    "lab": [
+      27.4495,
+      20.4746,
+      27.3365
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H77",
+    "name_cn": "Beige",
+    "name_en": "Beige",
+    "hex": "#EDE7DF",
+    "rgb": [
+      237,
+      231,
+      223
+    ],
+    "lab": [
+      91.9018,
+      0.6483,
+      4.6052
+    ],
+    "category": "白色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H78",
+    "name_cn": "Light Orange",
+    "name_en": "Light Orange",
+    "hex": "#FFC99A",
+    "rgb": [
+      255,
+      201,
+      154
+    ],
+    "lab": [
+      84.6741,
+      13.1673,
+      30.8111
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H79",
+    "name_cn": "Apricot",
+    "name_en": "Apricot",
+    "hex": "#F08643",
+    "rgb": [
+      240,
+      134,
+      67
+    ],
+    "lab": [
+      66.5091,
+      35.4286,
+      52.4444
+    ],
+    "category": "橙色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H82",
+    "name_cn": "Wine",
+    "name_en": "Wine",
+    "hex": "#962F5C",
+    "rgb": [
+      150,
+      47,
+      92
+    ],
+    "lab": [
+      36.5397,
+      46.8647,
+      -2.8408
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H83",
+    "name_cn": "Teal Blue",
+    "name_en": "Teal Blue",
+    "hex": "#0178A4",
+    "rgb": [
+      1,
+      120,
+      164
+    ],
+    "lab": [
+      47.1288,
+      -11.701,
+      -31.3709
+    ],
+    "category": "青色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H84",
+    "name_cn": "Olive",
+    "name_en": "Olive",
+    "hex": "#8B924C",
+    "rgb": [
+      139,
+      146,
+      76
+    ],
+    "lab": [
+      58.5731,
+      -13.3693,
+      36.0135
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H95",
+    "name_cn": "Light Pink",
+    "name_en": "Light Pink",
+    "hex": "#F8CCE0",
+    "rgb": [
+      248,
+      204,
+      224
+    ],
+    "lab": [
+      86.2688,
+      18.6593,
+      -4.0308
+    ],
+    "category": "粉色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H96",
+    "name_cn": "Lilac",
+    "name_en": "Lilac",
+    "hex": "#D4B1E3",
+    "rgb": [
+      212,
+      177,
+      227
+    ],
+    "lab": [
+      76.6718,
+      21.5485,
+      -20.3232
+    ],
+    "category": "紫色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H97",
+    "name_cn": "Light Blue",
+    "name_en": "Light Blue",
+    "hex": "#A2D3FE",
+    "rgb": [
+      162,
+      211,
+      254
+    ],
+    "lab": [
+      82.6055,
+      -5.662,
+      -26.0975
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H98",
+    "name_cn": "Mint",
+    "name_en": "Mint",
+    "hex": "#9ADBB1",
+    "rgb": [
+      154,
+      219,
+      177
+    ],
+    "lab": [
+      82.22,
+      -29.1244,
+      14.1764
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H101",
+    "name_cn": "Light Green",
+    "name_en": "Light Green",
+    "hex": "#A9C39B",
+    "rgb": [
+      169,
+      195,
+      155
+    ],
+    "lab": [
+      75.9656,
+      -16.1933,
+      17.2323
+    ],
+    "category": "绿色系",
+    "stock_status": "rare",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H102",
+    "name_cn": "Forest Green",
+    "name_en": "Forest Green",
+    "hex": "#356B2D",
+    "rgb": [
+      53,
+      107,
+      45
+    ],
+    "lab": [
+      40.3467,
+      -31.3206,
+      28.9622
+    ],
+    "category": "绿色系",
+    "stock_status": "rare",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H103",
+    "name_cn": "Yellow",
+    "name_en": "Yellow",
+    "hex": "#FFE660",
+    "rgb": [
+      255,
+      230,
+      96
+    ],
+    "lab": [
+      91.099,
+      -6.5775,
+      66.4454
+    ],
+    "category": "黄色系",
+    "stock_status": "rare",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H104",
+    "name_cn": "Lime Green",
+    "name_en": "Lime Green",
+    "hex": "#BCD122",
+    "rgb": [
+      188,
+      209,
+      34
+    ],
+    "lab": [
+      79.8457,
+      -26.8387,
+      74.7398
+    ],
+    "category": "黄色系",
+    "stock_status": "rare",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H105",
+    "name_cn": "Peach",
+    "name_en": "Peach",
+    "hex": "#FFAC78",
+    "rgb": [
+      255,
+      172,
+      120
+    ],
+    "lab": [
+      77.3561,
+      25.0533,
+      38.9837
+    ],
+    "category": "橙色系",
+    "stock_status": "rare",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H106",
+    "name_cn": "Lavender",
+    "name_en": "Lavender",
+    "hex": "#CCC5ED",
+    "rgb": [
+      204,
+      197,
+      237
+    ],
+    "lab": [
+      81.2277,
+      10.1923,
+      -18.8745
+    ],
+    "category": "蓝色系",
+    "stock_status": "rare",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H107",
+    "name_cn": "Sky Blue",
+    "name_en": "Sky Blue",
+    "hex": "#6A87C1",
+    "rgb": [
+      106,
+      135,
+      193
+    ],
+    "lab": [
+      56.3282,
+      5.2779,
+      -33.4533
+    ],
+    "category": "蓝色系",
+    "stock_status": "rare",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H108",
+    "name_cn": "Aubergine",
+    "name_en": "Aubergine",
+    "hex": "#2A2536",
+    "rgb": [
+      42,
+      37,
+      54
+    ],
+    "lab": [
+      15.9103,
+      6.7014,
+      -10.1738
+    ],
+    "category": "灰色系",
+    "stock_status": "rare",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H109",
+    "name_cn": "Cloudy Grey",
+    "name_en": "Cloudy Grey",
+    "hex": "#8A847F",
+    "rgb": [
+      138,
+      132,
+      127
+    ],
+    "lab": [
+      55.521,
+      1.3109,
+      3.4973
+    ],
+    "category": "灰色系",
+    "stock_status": "rare",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H110",
+    "name_cn": "Matcha",
+    "name_en": "Matcha",
+    "hex": "#838956",
+    "rgb": [
+      131,
+      137,
+      86
+    ],
+    "lab": [
+      55.4705,
+      -10.739,
+      26.6377
+    ],
+    "category": "黄色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H111",
+    "name_cn": "Dark Blush",
+    "name_en": "Dark Blush",
+    "hex": "#835854",
+    "rgb": [
+      131,
+      88,
+      84
+    ],
+    "lab": [
+      41.9161,
+      17.2228,
+      9.5389
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H112",
+    "name_cn": "Blush",
+    "name_en": "Blush",
+    "hex": "#AD8A82",
+    "rgb": [
+      173,
+      138,
+      130
+    ],
+    "lab": [
+      60.493,
+      12.0464,
+      9.3336
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H113",
+    "name_cn": "Aqua",
+    "name_en": "Aqua",
+    "hex": "#5F887B",
+    "rgb": [
+      95,
+      136,
+      123
+    ],
+    "lab": [
+      53.4606,
+      -17.1488,
+      2.4387
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H114",
+    "name_cn": "Cherry Red",
+    "name_en": "Cherry Red",
+    "hex": "#9A2C31",
+    "rgb": [
+      154,
+      44,
+      49
+    ],
+    "lab": [
+      35.7819,
+      45.6945,
+      23.6708
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H115",
+    "name_cn": "Bright Green",
+    "name_en": "Bright Green",
+    "hex": "#6E975F",
+    "rgb": [
+      110,
+      151,
+      95
+    ],
+    "lab": [
+      58.296,
+      -25.0334,
+      25.1139
+    ],
+    "category": "绿色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H116",
+    "name_cn": "Midnight Blue",
+    "name_en": "Midnight Blue",
+    "hex": "#222838",
+    "rgb": [
+      34,
+      40,
+      56
+    ],
+    "lab": [
+      16.221,
+      2.1291,
+      -11.164
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H117",
+    "name_cn": "Taupe Grey",
+    "name_en": "Taupe Grey",
+    "hex": "#777169",
+    "rgb": [
+      119,
+      113,
+      105
+    ],
+    "lab": [
+      47.9464,
+      0.8047,
+      5.2669
+    ],
+    "category": "灰色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H118",
+    "name_cn": "Maroon Red",
+    "name_en": "Maroon Red",
+    "hex": "#612932",
+    "rgb": [
+      97,
+      41,
+      50
+    ],
+    "lab": [
+      24.8221,
+      26.3809,
+      6.6312
+    ],
+    "category": "红色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  },
+  {
+    "brand": "Hama",
+    "bead_diameter_mm": 10.0,
+    "code": "H119",
+    "name_cn": "Sky Blue Clear",
+    "name_en": "Sky Blue Clear",
+    "hex": "#4167B4",
+    "rgb": [
+      65,
+      103,
+      180
+    ],
+    "lab": [
+      44.402,
+      11.4334,
+      -44.9351
+    ],
+    "category": "蓝色系",
+    "stock_status": "common",
+    "price_per_100g": null,
+    "price_per_1000pcs": null,
+    "price_confidence": "missing",
+    "buy_links": [
+      {
+        "platform": "Hama official",
+        "url": "https://hama.dk/en/pages/the-foundation-stones-of-hama",
+        "shop_name": "Hama bead size and range overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Hama official",
+        "url": "https://www.hama.dk/en/hama-info/colour-chart/",
+        "shop_name": "Hama colour chart overview",
+        "captured_at": "2026-05-24"
+      },
+      {
+        "platform": "Bitbead",
+        "url": "https://bitbead.pomodiary.com/en/colors/hama",
+        "shop_name": "Bitbead Hama HEX reference",
+        "captured_at": "2026-05-24"
+      }
+    ],
+    "notes": "Hama official sources confirm Mini/Midi/Maxi sizes and shared colour codes; HEX values are third-party approximations. Per-diameter product availability needs official PDF/SKU extraction before production ordering. Price note: Official pages confirm Maxi range and 10mm size; no normalized per-1000 sample in current schema.",
+    "verified_sources": [
+      "Hama official size/colour-code pages",
+      "Bitbead Hama HEX reference"
+    ]
+  }
+]

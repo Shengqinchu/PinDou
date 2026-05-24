@@ -1,95 +1,120 @@
 # PinDou 色卡数据库
 
-> 抓取 / 整理日期：2026-05-24  
-> 覆盖：MARD 291 色、COCO 291 色  
-> 产物：`mard.json`、`coco.json`、`crossref.csv`、`mard_palette.png`、`coco_palette.png`
+> Phase 0 Task D / H  
+> 更新日期：2026-05-24  
+> 口径：信息库尽量全，产品默认仍按 ADR-002 收敛到 MARD 5mm。
 
 ## 结论
 
-- MARD 与 COCO 都已整理为后端可直接消费的 JSON palette，每个色号包含 `hex`、`rgb`、`lab`、色系、库存状态、价格估算和来源链接。
-- `crossref.csv` 已用 CIEDE2000 为每个 MARD 色号找出 COCO Top 3 近似色，并反向覆盖 COCO -> MARD。
-- 当前版本适合 Phase 0 任务 B / C 做算法与 PoC 基准；进入生产前需要补一次实物色卡校验和电商 SKU 价格校验。
+- Task D 的 `mard.json` / `coco.json` 保留作为旧版基线；Task H 新增 `brand + bead_diameter_mm` 维度，后端应优先消费 `*_5mm.json` / `*_2_6mm.json` 这批新文件。
+- `crossref_full.csv` 已按 CIEDE2000 生成同豆径跨品牌 Top 3 近邻。严格不做 2.5mm、2.6mm、5mm、10mm 之间的跨径匹配。
+- 官方普遍不公开 HEX/RGB。数据库把官方可确认的规格、系列、商品样本和第三方 HEX 工具页拆开记录，进入生产前仍需要实物色卡或授权色卡复核。
+- 品牌名仅作兼容色号描述，不使用品牌 Logo，不写“官方 / 授权 / 联名”。
+
+## 覆盖矩阵
+
+| 品牌 | 2.5mm | 2.6mm | 5mm | 10mm | 说明 |
+|------|-------|-------|-----|------|------|
+| MARD | - | 221 色 | 291 色 | 空文件 | 2.6mm 仅确认 221 色公开商品证据；10mm 未找到可靠公开色卡 |
+| COCO | - | 291 色 | 291 色 | 空文件 | 2.6mm/5mm 使用公开工具色卡；官方完整色卡仍缺 |
+| Hama | 89 色系参考 | - | 89 色 | 89 色系参考 | 官方确认 Mini/Midi/Maxi 共用色号体系，但各尺寸覆盖不同；当前文件是色号体系参考，不等同订货清单 |
+| Perler | - | - | 117 色 | - | 5mm 使用 Bitbead 规范化 P-code + Perler 官方规格/价格样本交叉说明 |
+| Artkal | - | 221 色 | 201 色 | 空文件 | 2.6mm 用 Artkal Mini/M 系列公开 HEX；5mm 用 Pixel Pattern S 系列；10mm X 系列存在但缺结构化 HEX |
+| 黄豆豆 | - | - | 291 色 | - | 其他国产公开色卡，需人工确认品牌和供货 |
+| 咪小窝 | - | - | 287 色 | - | 原始源声称 290，去重后 287 |
+| 盼盼 | - | - | 286 色 | - | 原始源声称 289，去重后 286 |
 
 ## 文件说明
 
-| 文件 | 内容 | 记录数 |
-|------|------|--------|
-| `mard.json` | MARD 291 色结构化色卡 | 291 |
-| `coco.json` | COCO 291 色结构化色卡 | 291 |
-| `crossref.csv` | MARD <-> COCO Top 3 CIEDE2000 近似色 | 1746 |
-| `mard_palette.png` | MARD 色卡可视化 | 291 色 |
-| `coco_palette.png` | COCO 色卡可视化 | 291 色 |
-| `build_colormap.py` | 可复现生成脚本 | Python 3 + Pillow |
-| `_source_get-colors.json` | 原始公开抽取数据缓存 | 31 个色卡集合 |
+| 文件 | 内容 |
+|------|------|
+| `mard_5mm.json` / `coco_5mm.json` | Phase 1 默认候选色卡，带 `bead_diameter_mm` |
+| `mard_2_6mm.json` / `coco_2_6mm.json` | 小豆候选色卡，COCO 置信度低于 MARD |
+| `hama_2_5mm.json` / `hama_5mm.json` / `hama_10mm.json` | Hama 色号体系参考，HEX 为第三方近似 |
+| `perler_5mm.json` | Perler 5mm 色卡参考 |
+| `artkal_2_6mm.json` / `artkal_5mm.json` / `artkal_10mm.json` | Artkal 2.6mm / 5mm / 10mm 数据，10mm 暂为空 |
+| `other_*_5mm.json` | 其他国产公开色卡候选 |
+| `crossref_full.csv` | 同豆径跨品牌 Top 3 CIEDE2000 近邻 |
+| `*_palette.png` | 每个 brand × diameter 的可视化色卡，空数据会生成缺失提示图 |
+| `build_colormap.py` | Task D MARD/COCO 基线生成脚本 |
+| `build_full_bead_db.py` | Task H 全品牌/豆径生成脚本 |
 
 ## Schema
+
+每个 JSON 文件是颜色数组，字段保持 Task D 结构并新增 `bead_diameter_mm`：
 
 ```json
 {
   "brand": "MARD",
+  "bead_diameter_mm": 5.0,
   "code": "A1",
-  "name_cn": "MARD A1",
-  "name_en": "MARD A1",
+  "name_cn": "Light Beige",
+  "name_en": "Light Beige",
   "hex": "#FAF5CD",
   "rgb": [250, 245, 205],
-  "lab": [95.8894, -4.7792, 21.0584],
+  "lab": [96.0124, -4.7145, 19.8987],
   "category": "黄色系",
   "stock_status": "common",
   "price_per_100g": 10.8,
   "price_per_1000pcs": 1.08,
   "price_confidence": "low",
   "buy_links": [],
-  "notes": "HEX from public palette extraction; official color name not confirmed. Price is a same-class public listing benchmark, not a live SKU quote.",
-  "verified_sources": ["get-colors-from-beans", "pixel-beads/Bitbead or public tool pages"]
+  "notes": "HEX/source/price confidence notes...",
+  "verified_sources": []
 }
 ```
 
 字段说明：
 
-- `hex` / `rgb`：来自公开色卡抽取数据；HEX 全部规范化为大写。
-- `lab`：由 sRGB D65 转 CIELAB，供 CIEDE2000 匹配使用。
-- `category`：按 HSV 色相自动归类，供前端分组展示；不是官方分类。
-- `stock_status`：出现在 221 色常用集的标为 `common`，只在 291 扩展集出现的标为 `rare`。
-- `price_per_1000pcs`：挂牌价估算，不代表实时成交价。MARD 基准来自公开 221 色套装价；COCO 暂按同规格拼豆兼容价估算。
-- `price_confidence`：当前均为 `low`，因为缺少可稳定抓取的单色 SKU。
+- `bead_diameter_mm`：物理豆径。2.5mm 与 2.6mm 分开，不能混拼。
+- `hex` / `rgb` / `lab`：屏幕色值，用于算法匹配，不等同实物熨烫后观感。
+- `category`：按 HSV 自动归类，方便前端分组，不是官方分类。
+- `stock_status`：`common` / `rare` / `discontinued`；公开源无法判断时先按来源集合保守标注。
+- `price_per_1000pcs`：保留 Task D 字段，但 Task H 已出现 CNY / USD / EUR 混合来源，生产前建议拆成带币种的 SKU 价格表。
+- `buy_links`：来源或样本页，不代表推荐购买渠道。
 
-## 数据来源与交叉验证
+`crossref_full.csv` 字段：
 
-主源：
+```csv
+source_brand,source_diameter,source_code,target_brand,target_code,ciede2000,rank
+```
 
-- `abearxiong/get-colors-from-beans`：MIT 标注的公开色卡抽取仓库，包含 `Mard-291` 与 `COCO-291`。
+## 数据来源与可信度
 
-MARD 校验源：
+| 来源 | 用途 | 可信度 |
+|------|------|--------|
+| `abearxiong/get-colors-from-beans` | MARD / COCO / 其他国产公开 HEX 源 | 中；MIT 仓库，但非品牌官方 |
+| Pixel Pattern Color Converter | MARD 英文名、Artkal S 表、公开 HEX/RGB 表 | 中；页面说明部分来自官方 PDF/OCR，仍需实物复核 |
+| Bitbead color pages | Hama / Perler / Artkal Mini 结构化 HEX | 中；适合算法 PoC，不应宣称官方 |
+| Hama 官方页面 | Mini 2.5mm、Midi 5mm、Maxi 10mm 与共用色号体系 | 高；但官方未给 HEX |
+| Perler 官方商品页 / 色卡 PDF | 5mm 实际尺寸、SKU、价格样本、官方色卡参考 | 高；但未给机器可读 HEX |
+| Artkal 官方页面/PDF | 系列、尺寸、X 10mm 存在性 | 高；不同页面色数有版本冲突 |
+| 电商/工具页公开提及 | MARD / COCO 2.6mm、其他国产品牌存在性 | 低到中；只能做线索 |
 
-- Pixel Beads MARD 色号页：页面标注 MARD 291 色，并展示色号与 HEX。
-- Bitbead MARD 221 / 291 色卡页：展示 MARD palette、HEX 与跨品牌近似色。
-- 豆豆工坊 MARD 221 色卡：可用于常用色集合与部分 HEX 对照。
+## 已知缺漏
 
-COCO 校验源：
-
-- 拼豆星球、Crapark 手册、BeadPattern 等公开工具均声明支持 COCO 色卡，但未稳定公开完整 HEX 表。
-- 因此 COCO 的 HEX 当前以 `get-colors-from-beans` 为主，后续需用实体色卡或可授权数据源复核。
-
-价格源：
-
-- MARD 221 色套装公开页：221 色、每色约 1000 颗、整套 239 元，可折算约 1.08 元 / 1000 颗。
-- 义乌购和 Rakuten 等页面可证明 1000 颗补充包存在，但价格区间波动大，暂不作为精确价格。
+- MARD / COCO 10mm 未找到可靠公开色卡，已保留空 JSON 和缺失提示图。
+- Hama Mini/Maxi 当前使用共享色号体系参考；每个尺寸的真实在售色号集合还需要从官方 PDF / SKU 页进一步提取。
+- Perler 官方 SKU 与 Bitbead P-code 没有完整交叉表；当前 `perler_5mm.json` 更适合算法匹配，不适合作为最终采购 SKU 表。
+- Artkal 10mm X 系列确认存在 15 色，但没有结构化 HEX 表；`artkal_10mm.json` 暂为空。
+- 价格字段没有币种，Task H 已暴露 schema 问题，见 `00_meta/codex_briefs/_questions_for_user.md`。
 
 ## 更新方式
 
-1. 运行生成脚本：
+1. 生成 Task D 基线：
 
 ```bash
 python 01_research/colormap/build_colormap.py
 ```
 
-2. 如需强制重新拉取源数据，删除 `_source_get-colors.json` 后再运行脚本。
-3. 若新增官方色名或实测价格，优先在脚本里补映射表，不要手改生成后的 JSON。
-4. 价格进入生产前应拆成单独 SKU 表，按 `brand + code + platform + captured_at` 存多条记录。
+2. 生成 Task H 全库：
 
-## 已知缺漏
+```bash
+python 01_research/colormap/build_full_bead_db.py
+```
 
-- MARD / COCO 官方中文色名未在公开源中完整确认，当前 `name_cn/name_en` 仅作色号占位。
-- COCO 291 色缺少第二个完整 HEX 数据源；Phase 1 前建议购买 / 拍摄实体色卡或联系工具作者授权。
-- 价格是 2026-05-24 的公开挂牌估算，不能用于最终商城报价。
-- HEX 来源是屏幕色卡，不等同于实体豆在自然光 / 熨烫后的观感；算法上线前需要实物校色。
+3. 若进入 Phase 1 PRD，优先把价格拆成单独 SKU 表：`brand + bead_diameter_mm + code + platform + currency + captured_at`。
+
+## 商标边界
+
+MARD、COCO、Hama、Perler、Artkal 等名称只用于“兼容色号 / 色卡对照 / 图纸导出”的描述性说明。产品页、Logo、域名、主视觉和广告文案不得使用“官方、授权、联名、旗舰”等容易造成混淆的表达。
