@@ -307,6 +307,15 @@
 - 存储位置：`01_research/tech/poc_results.csv`, `01_research/tech/poc_samples/`
 - 责任人：Codex
 
+### 拼豆尺寸、色卡与图纸交付格式参考
+- URL / 标识：https://www.hama.dk/en/hama-info/colour-chart/ ; https://www.hamabeadsusa.com/pages/hama-bead-sizes-and-categories ; https://perler.com/collections/pegboards ; https://perler.com/content/project_guides/perler-project-guide_color-wheel-and-shapes.pdf ; https://www.artkalfusebeads.com/pages/a-color-chart ; https://www.pixel-pattern.com/color-converter ; https://www.pixel-beads.com/zh/mard-bead-color-chart ; https://bitbead.pomodiary.com/
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task C 补充拼豆领域知识，约束 AI prompt、尺寸、色卡匹配、成品预览与图纸导出
+- 数据格式：HTML / PDF
+- 许可状态：官方公开页面 / 公开工具页面；MARD 非官方资料需后续用实物色卡复核
+- 存储位置：`01_research/tech/perler_bead_domain_notes.md`, `01_research/tech/prompts.md`
+- 责任人：Codex
+
 ---
 
 ## 类别建议（Codex 调研时分类）
