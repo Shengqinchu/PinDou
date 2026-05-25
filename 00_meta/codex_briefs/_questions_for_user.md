@@ -136,3 +136,18 @@ micro-task “脚本路径试试自动去白底”已完成，结论给用户 / 
 1. 前端 `05_frontend/store/artwork.ts` 调用了 `api.generateAIPreview(...)`，但 `05_frontend/api/index.ts` 里实际函数名是 `generatePreview(...)`。后端已支持前端函数内部访问的 `/api/v1/preview/generate`，但 TypeScript 方法名不一致需要 Gemini / 前端侧补 alias 或改调用。
 2. 当前微信登录是 Phase 2 dev stub：用 `code` 派生稳定 openid；正式接微信接口时需要在 task 8 或 Phase 3 接 `jscode2session`。
 3. admin 默认账号密码只在 `APP_ENV=development` 时允许 `admin/admin`；生产必须配置 `ADMIN_USERNAME` + `ADMIN_PASSWORD_HASH`。
+
+## 2026-05-25 — 用户回复：本机局域网 IP（给前端 mobile 适配 + 后端连接任务用）
+
+用户 ipconfig 输出：
+- `IPv4 地址 . . . . . . . . . . . . : 192.168.2.40`（**这是宿主局域网 IP，写入前端 DEV_API**）
+- `自动配置 IPv4 地址  . . . . . . . : 169.254.83.107`（link-local fallback，忽略）
+
+**Codex 前端任务 2 实施时**：
+- `src/utils/request.ts` 的 `DEV_API` 改为 `http://192.168.2.40:8000/api/v1`
+- 后端 `uvicorn` 启动时需要 bind `0.0.0.0`（不能只 `127.0.0.1`，否则局域网访问不通）：
+  - 改为 `uvicorn pindou.main:app --host 0.0.0.0 --port 8000 --reload`
+  - 或者在 `06_backend/pindou/main.py` 的 startup 配置里写死 host=0.0.0.0
+- Windows 防火墙：可能需要允许 8000 端口入站（如果 Codex 改了上面但小程序还是 timeout，让用户加防火墙规则）
+
+**额外提醒**：用户在小红书 / 闲鱼引流后真机扫码测试时，IP 必须是与微信开发者工具同局域网；不在同网就要走域名（FUTURE_WORK 第 2 条备案）。
