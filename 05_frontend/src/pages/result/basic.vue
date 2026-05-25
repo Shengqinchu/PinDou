@@ -34,7 +34,7 @@
         
         <figcaption class="result__pattern-caption">
           <span class="result__pattern-name">{{ patternName }}</span>
-          <span class="result__pattern-meta">{{ pattern.size || '24 × 24' }} 网格</span>
+          <span class="result__pattern-meta">{{ patternSizeLabel }} 网格</span>
         </figcaption>
       </figure>
 
@@ -42,7 +42,7 @@
       <div class="card result__summary">
         <div class="result__summary-row">
           <div class="result__summary-cell">
-            <span class="result__summary-num">{{ pattern.total_beads || 0 }}</span>
+            <span class="result__summary-num">{{ pattern.bead_total || 0 }}</span>
             <span class="result__summary-unit">总颗数</span>
           </div>
           <span class="result__summary-divider" aria-hidden="true"></span>
@@ -52,7 +52,7 @@
           </div>
           <span class="result__summary-divider" aria-hidden="true"></span>
           <div class="result__summary-cell">
-            <span class="result__summary-num result__summary-num--cost">¥{{ pattern.estimated_cost || '0.00' }}</span>
+            <span class="result__summary-num result__summary-num--cost">¥{{ estimatedCostLabel }}</span>
             <span class="result__summary-unit">估算成本</span>
           </div>
         </div>
@@ -74,7 +74,7 @@
             <!-- 动态绑定背景色 -->
             <span class="result__swatch" :style="{ backgroundColor: color.hex }" aria-hidden="true"></span>
             <span class="result__color-name">
-              {{ color.name }} 
+              {{ color.name }}
               <span class="result__color-code">{{ color.code }}</span>
             </span>
             <span class="result__color-bar">
@@ -114,7 +114,7 @@
     <!-- ===== Paywall 遮罩 Modal 组件 ===== -->
     <Paywall 
       v-if="showPaywall" 
-      :artworkId="pattern.pattern_id"
+      :artworkId="artworkStore.currentArtwork?.artwork_id || ''"
       @close="showPaywall = false" 
     />
   </MiniProgramLayout>
@@ -135,6 +135,14 @@ const tier = ref<'quick' | 'premium'>('quick');
 const isFallback = ref(false);
 const isMounted = ref(false);
 const showPaywall = ref(false);
+
+type DisplayColor = {
+  name: string;
+  code: string;
+  count: number;
+  percentage: number;
+  hex: string;
+};
 
 onLoad((options: any) => {
   if (options.tier) {
@@ -178,8 +186,31 @@ const gridPreviewStyle = computed(() => ({
   aspectRatio: gridCols.value && gridRows.value ? `${gridCols.value} / ${gridRows.value}` : '1 / 1'
 }));
 
-const patternColors = computed(() => (pattern.value as any).colors || []);
+const patternSizeLabel = computed(() => {
+  if (!gridCols.value || !gridRows.value) return '0 × 0';
+  return `${gridCols.value} × ${gridRows.value}`;
+});
+
+const patternColors = computed<DisplayColor[]>(() => {
+  const counts = pattern.value.color_counts || {};
+  const maxCount = Math.max(...Object.values(counts), 1);
+  const paletteByCode = new Map(pattern.value.palette_used.map(color => [color.code, color]));
+
+  return Object.entries(counts)
+    .map(([code, count]) => {
+      const color = paletteByCode.get(code);
+      return {
+        name: color?.name_cn || color?.name_en || code,
+        code,
+        count,
+        percentage: Math.max(3, Math.round((count / maxCount) * 100)),
+        hex: color?.hex || '#D9D9D9'
+      };
+    })
+    .sort((a, b) => b.count - a.count);
+});
 const colorsCount = computed(() => patternColors.value.length);
+const estimatedCostLabel = computed(() => Number(pattern.value.estimated_cost_cny || 0).toFixed(2));
 
 const patternName = computed(() => {
   if (tier.value === 'premium' && !isFallback.value) {
