@@ -11,6 +11,11 @@ onLaunch(() => {
   userStore.initDeviceMetrics();
   if (userStore.token) {
     void refreshProfileInBackground(userStore);
+  } else {
+    // 首次启动：自动微信登录拿 JWT，保证 consent / upload 等鉴权接口可用
+    void userStore.login().catch((e) => {
+      console.warn("自动登录失败（可继续浏览，鉴权动作时会再触发）:", e);
+    });
   }
 });
 
