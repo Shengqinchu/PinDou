@@ -1,0 +1,387 @@
+<template>
+  <MiniProgramLayout title="正在生成..." backUrl="/pages/generate/choice" :scroll="false">
+    <section class="loading">
+      <div class="loading__wash" aria-hidden="true"></div>
+
+      <div class="loading__spacer-top"></div>
+
+      <!-- ===== Progress ring + center label ===== -->
+      <div class="loading__ring-wrap">
+        <div class="loading__confetti" aria-hidden="true">
+          <span class="loading__dot loading__dot--1"></span>
+          <span class="loading__dot loading__dot--2"></span>
+          <span class="loading__dot loading__dot--3"></span>
+          <span class="loading__dot loading__dot--4"></span>
+          <span class="loading__dot loading__dot--5"></span>
+        </div>
+
+        <svg class="loading__ring" viewBox="0 0 200 200" width="200" height="200" aria-hidden="true">
+          <defs>
+            <linearGradient id="pd-ring" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FFB088"/>
+              <stop offset="50%" stop-color="#FF8E53"/>
+              <stop offset="100%" stop-color="#FF6B9D"/>
+            </linearGradient>
+            <filter id="pd-ring-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <circle class="loading__ring-track" cx="100" cy="100" r="94"/>
+          <!-- 2πr = 590.62 -->
+          <circle class="loading__ring-progress" cx="100" cy="100" r="94"
+                  transform="rotate(-90 100 100)"
+                  :style="{ strokeDasharray: strokeDashArray }" />
+        </svg>
+
+        <div class="loading__center">
+          <div class="loading__percent text-grad">{{ displayPercent }}%</div>
+          <div class="loading__eta">{{ etaText }}</div>
+        </div>
+      </div>
+
+      <!-- ===== Status copy (rotates) ===== -->
+      <div class="loading__status">
+        <p class="loading__status-line" :class="{ 'loading__status-line--reassure': isOverTime }">
+          {{ statusText }}
+        </p>
+      </div>
+      <p class="loading__desc">生成期间可以离开页面，做好了我们会消息提醒你</p>
+
+      <div class="loading__spacer-bottom"></div>
+
+      <navigator class="loading__examples" url="/pages/index/index" open-type="reLaunch">
+        去看示例作品
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-left: 2px;">
+          <path d="M5 12h14"/>
+          <path d="m12 5 7 7-7 7"/>
+        </svg>
+      </navigator>
+    </section>
+  </MiniProgramLayout>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { onLoad } from '@dcloudio/uni-app';
+import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
+import { useArtworkStore } from '../../store/artwork';
+import { StylePreset, SizePreset } from '../../api';
+
+const artworkStore = useArtworkStore();
+
+const STATUS_LINES = [
+  'AI 正在画你的拼豆…',
+  '正在挑选最美色号…',
+  '马上就好啦~'
+];
+const REASSURE = '还有 30 秒哦，你的作品 99% 完成';
+
+const TOTAL = 30; // 模拟跑满 100% 预计时间 (秒)
+const CIRC = 2 * Math.PI * 94; // 周长
+const ROTATE_MS = 8000; // 文案轮播间隔
+
+// 路由参数
+const tier = ref<'quick' | 'premium'>('quick');
+const stylePreset = ref<StylePreset>('cartoon_fallback');
+const rawImage = ref('');
+
+onLoad((options: any) => {
+  if (options.tier) tier.value = options.tier;
+  if (options.style) stylePreset.value = options.style as StylePreset;
+  if (options.image) rawImage.value = decodeURIComponent(options.image);
+});
+
+const activeIndex = ref(0);
+const startTime = ref(0);
+const percent = ref(0);
+const isOverTime = ref(false);
+const isApiDone = ref(false);
+
+let tickTimer: any = null;
+let rotateTimer: any = null;
+
+const displayPercent = computed(() => Math.floor(percent.value));
+
+const strokeDashArray = computed(() => {
+  const progress = (CIRC * percent.value) / 100;
+  return `${progress.toFixed(2)} ${CIRC.toFixed(2)}`;
+});
+
+const statusText = computed(() => {
+  if (isOverTime.value) return REASSURE;
+  return STATUS_LINES[activeIndex.value];
+});
+
+const etaText = computed(() => {
+  if (isOverTime.value) return '稍等一下下';
+  const elapsed = (Date.now() - startTime.value) / 1000;
+  const remaining = Math.max(1, Math.ceil(TOTAL - elapsed));
+  return `约 ${remaining} 秒`;
+});
+
+// 状态文案循环
+const startStatusRotation = () => {
+  rotateTimer = setInterval(() => {
+    if (isOverTime.value) return;
+    activeIndex.value = (activeIndex.value + 1) % STATUS_LINES.length;
+  }, ROTATE_MS);
+};
+
+// 进度环时钟
+const startProgressTick = () => {
+  startTime.value = Date.now();
+  tickTimer = setInterval(() => {
+    if (isApiDone.value) {
+      // 接口完成了，快速充填到 100% 并清除
+      if (percent.value < 100) {
+        percent.value = Math.min(100, percent.value + 15);
+      } else {
+        clearInterval(tickTimer);
+      }
+      return;
+    }
+    
+    const elapsed = (Date.now() - startTime.value) / 1000;
+    if (elapsed > TOTAL) {
+      isOverTime.value = true;
+      percent.value = 99; // 停留安抚
+    } else {
+      percent.value = (elapsed / TOTAL) * 100;
+    }
+  }, 100);
+};
+
+// 发起核心接口业务请求并管理 Fallback 降级链
+const handleGeneration = async () => {
+  const sizePreset: SizePreset = '80x100'; // 默认中等拼豆尺寸
+  
+  if (tier.value === 'quick') {
+    // 快速生成：直接调 PatternBuilder 本地量化
+    try {
+      await artworkStore.buildPatternSheet({
+        size: sizePreset,
+        rawImageFilePath: rawImage.value,
+        mode: 'script'
+      });
+      completeAndNavigate('quick');
+    } catch (err) {
+      console.error('快速路径生成失败:', err);
+      // 快速路径本就是最底层，再失败跳转错误页
+      uni.redirectTo({ url: '/pages/error/error' });
+    }
+  } else {
+    // AI精品生成：先 AI 风格重塑，再本地图纸量化
+    try {
+      // 1. 调用 PreviewProvider
+      const preview = await artworkStore.generateAIPreview(
+        rawImage.value,
+        stylePreset.value,
+        sizePreset
+      );
+      
+      // 2. 拿到 preview_id 后调用 PatternBuilder
+      await artworkStore.buildPatternSheet({
+        size: sizePreset,
+        preview_id: preview.preview_id,
+        mode: 'ai'
+      });
+      
+      completeAndNavigate('premium');
+    } catch (err) {
+      // ===== ADR-005: 关键 Fallback Chain 优雅降级 =====
+      console.warn('AI 路径超时或不可用，触发普通量化兜底降级...', err);
+      
+      try {
+        // 静默重新调用 script 量化
+        await artworkStore.buildPatternSheet({
+          size: sizePreset,
+          rawImageFilePath: rawImage.value,
+          mode: 'script'
+        });
+        
+        // 成功后导向基础结果页，带上 fallback 参数，不暴露英文细节
+        completeAndNavigate('quick', true);
+      } catch (fallbackErr) {
+        console.error('兜底量化链亦失败:', fallbackErr);
+        uni.redirectTo({ url: '/pages/error/error' });
+      }
+    }
+  }
+};
+
+const completeAndNavigate = (finalTier: 'quick' | 'premium', isFallback = false) => {
+  isApiDone.value = true;
+  
+  // 等待百分比飙升至 100%
+  const checkEnd = setInterval(() => {
+    if (percent.value >= 100) {
+      clearInterval(checkEnd);
+      uni.redirectTo({
+        url: `/pages/result/basic?tier=${finalTier}${isFallback ? '&fallback=true' : ''}`
+      });
+    }
+  }, 100);
+};
+
+onMounted(() => {
+  startProgressTick();
+  startStatusRotation();
+  handleGeneration();
+});
+
+onUnmounted(() => {
+  if (tickTimer) clearInterval(tickTimer);
+  if (rotateTimer) clearInterval(rotateTimer);
+});
+</script>
+
+<style scoped lang="scss">
+.loading {
+  width: 100%;
+  height: 100%;
+  padding: 0 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.loading__wash {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 280px;
+  background: radial-gradient(120% 100% at 50% 0%,
+              #FFF1E8 0%, rgba(255, 241, 232, 0) 75%);
+  pointer-events: none;
+}
+
+.loading__spacer-top    { flex: 1; }
+.loading__spacer-bottom { flex: 1; }
+
+/* ===== Ring container ===== */
+.loading__ring-wrap {
+  width: 220px;
+  height: 220px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading__confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.loading__dot {
+  position: absolute;
+  border-radius: 999px;
+  opacity: 0.75;
+}
+.loading__dot--1 { left: 14%; top: 18%; width: 6px; height: 6px; background: #FFB6C1; }
+.loading__dot--2 { left: 86%; top: 10%; width: 4px; height: 4px; background: #FFB088; }
+.loading__dot--3 { left: 92%; top: 92%; width: 5px; height: 5px; background: #FFE5A0; }
+.loading__dot--4 { left:  8%; top: 86%; width: 4px; height: 4px; background: #B8E6C9; }
+.loading__dot--5 { left: 48%; top:  4%; width: 3px; height: 3px; background: #FF6B9D; }
+
+/* SVG ring */
+.loading__ring {
+  position: absolute;
+  inset: 10px;
+  width: 200px;
+  height: 200px;
+}
+.loading__ring-track {
+  fill: none;
+  stroke: #FFE4EE;
+  stroke-width: 12;
+}
+.loading__ring-progress {
+  fill: none;
+  stroke: url(#pd-ring);
+  stroke-width: 12;
+  stroke-linecap: round;
+  filter: url(#pd-ring-glow);
+  transition: stroke-dasharray 200ms linear; // 让进度流动更加顺滑
+}
+
+/* Centred percent + ETA */
+.loading__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.loading__percent {
+  font-family: var(--pd-font-display);
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.loading__eta {
+  font-size: 12px;
+  color: var(--pd-fg-2);
+  margin-top: 6px;
+}
+
+/* ===== Status line (rotates) ===== */
+.loading__status {
+  margin-top: 28px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loading__status-line {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--pd-fg-1);
+  margin: 0;
+  animation: pd-fade-in 360ms var(--pd-ease-out);
+}
+.loading__status-line--reassure {
+  color: var(--pd-pink-deep);
+}
+
+.loading__desc {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--pd-fg-2);
+  text-align: center;
+  line-height: 1.55;
+  max-width: 260px;
+}
+
+/* ===== Examples link ===== */
+.loading__examples {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--pd-pink-deep);
+  text-decoration: none;
+  cursor: pointer;
+  
+  &:active { 
+    opacity: 0.7; 
+  }
+}
+
+@keyframes pd-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>

@@ -1,0 +1,113 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "PinDou 拼豆",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/upload/upload",
+      "style": {
+        "navigationBarTitleText": "上传照片",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/generate/choice",
+      "style": {
+        "navigationBarTitleText": "选择生成方式",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/preview/loading",
+      "style": {
+        "navigationBarTitleText": "正在生成...",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/result/basic",
+      "style": {
+        "navigationBarTitleText": "图纸预览",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/result/premium",
+      "style": {
+        "navigationBarTitleText": "高级图纸",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/cdk/redeem",
+      "style": {
+        "navigationBarTitleText": "CDK 兑换",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/artwork/list",
+      "style": {
+        "navigationBarTitleText": "我的作品集",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/me",
+      "style": {
+        "navigationBarTitleText": "个人中心",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/consent/consent",
+      "style": {
+        "navigationBarTitleText": "用户授权与隐私协议",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/error/error",
+      "style": {
+        "navigationBarTitleText": "出错了",
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "PinDou",
+    "navigationBarBackgroundColor": "#FFF9F5",
+    "backgroundColor": "#FFF9F5"
+  },
+  "tabBar": {
+    "color": "#8C8C8C",
+    "selectedColor": "#FF6B9D",
+    "borderStyle": "white",
+    "backgroundColor": "#FFF9F5",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/tabbar/home-outline.png",
+        "selectedIconPath": "static/tabbar/home-filled.png"
+      },
+      {
+        "pagePath": "pages/artwork/list",
+        "text": "作品集",
+        "iconPath": "static/tabbar/works-outline.png",
+        "selectedIconPath": "static/tabbar/works-filled.png"
+      },
+      {
+        "pagePath": "pages/user/me",
+        "text": "我的",
+        "iconPath": "static/tabbar/me-outline.png",
+        "selectedIconPath": "static/tabbar/me-filled.png"
+      }
+    ]
+  }
+}

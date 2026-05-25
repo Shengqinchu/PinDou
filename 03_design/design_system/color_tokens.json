@@ -1,0 +1,55 @@
+{
+  "brand": {
+    "pd-pink": { "value": "#FF6B9D", "description": "primary, hi-sat candy pink" },
+    "pd-pink-100": { "value": "#FFE4EE", "description": "pink wash background" },
+    "pd-pink-50": { "value": "#FFF1F6", "description": "faintest pink" },
+    "pd-pink-200": { "value": "#FFC2D8", "description": "hover wash" },
+    "pd-pink-deep": { "value": "#E94B82", "description": "pressed / on-light text" },
+    "pd-orange": { "value": "#FF8E53", "description": "gradient end / coral" },
+    "pd-peach": { "value": "#FFB088", "description": "gradient start" },
+    "pd-peach-50": { "value": "#FFF1E8", "description": "peach wash background" }
+  },
+  "gradients": {
+    "pd-gradient": { "value": "linear-gradient(135deg, #FFB088 0%, #FF8E53 50%, #FF6B9D 100%)", "description": "gradient used on primary CTAs, hero pills, image overlays" },
+    "pd-gradient-warm": { "value": "linear-gradient(135deg, #FFB088 0%, #FF8E53 100%)", "description": "warm accent gradient" },
+    "pd-gradient-pink": { "value": "linear-gradient(135deg, #FF8FB7 0%, #FF6B9D 100%)", "description": "pink accent gradient" }
+  },
+  "surface": {
+    "pd-bg": { "value": "#FFF9F5", "description": "app background, creamy off-white" },
+    "pd-bg-warm": { "value": "#FFF4EC", "description": "slightly warmer panel" },
+    "pd-card": { "value": "#FFFFFF", "description": "card / sheet surface" },
+    "pd-divider": { "value": "#F1ECE6", "description": "hairline on cream" },
+    "pd-stroke": { "value": "#EDE4DA", "description": "secondary-button border" }
+  },
+  "text": {
+    "pd-fg-1": { "value": "#2D2D2D", "description": "primary copy" },
+    "pd-fg-2": { "value": "#8C8C8C", "description": "secondary / captions" },
+    "pd-fg-3": { "value": "#BFBFBF", "description": "tertiary / placeholders" },
+    "pd-fg-on-pink": { "value": "#FFFFFF", "description": "on gradient / on pink" }
+  },
+  "semantic": {
+    "pd-success": { "value": "#34C759", "description": "已保存" },
+    "pd-warn": { "value": "#FFB020", "description": "warning status" },
+    "pd-danger": { "value": "#FF5A5A", "description": "danger status" },
+    "pd-info": { "value": "#4A9EFF", "description": "info status" }
+  },
+  "bead_palette": {
+    "bead-rose": { "value": "#FFB6C1", "description": "soft Perler colour rose" },
+    "bead-coral": { "value": "#FF8E8E", "description": "soft Perler colour coral" },
+    "bead-peach": { "value": "#FFCDA6", "description": "soft Perler colour peach" },
+    "bead-butter": { "value": "#FFE5A0", "description": "soft Perler colour butter" },
+    "bead-mint": { "value": "#B8E6C9", "description": "soft Perler colour mint" },
+    "bead-sky": { "value": "#B6DCFB", "description": "soft Perler colour sky" },
+    "bead-lilac": { "value": "#D9C8F0", "description": "sparing use only lilac" },
+    "bead-cream": { "value": "#FFF4E6", "description": "soft Perler colour cream" },
+    "bead-cocoa": { "value": "#8C6A55", "description": "soft Perler colour cocoa" },
+    "bead-ink": { "value": "#2D2D2D", "description": "soft Perler colour ink" }
+  },
+  "shadows": {
+    "pd-shadow-card": { "value": "0 4px 16px rgba(255, 138, 168, 0.08), 0 1px 2px rgba(45, 45, 45, 0.04)", "description": "soft, slightly pink-tinted — never grey/black" },
+    "pd-shadow-float": { "value": "0 8px 24px rgba(255, 107, 157, 0.16), 0 2px 6px rgba(255, 107, 157, 0.08)", "description": "soft shadow for floats" },
+    "pd-shadow-cta": { "value": "0 8px 20px rgba(255, 142, 83, 0.32), 0 2px 4px rgba(255, 107, 157, 0.18)", "description": "shadow for main CTAs" },
+    "pd-shadow-cta-pressed": { "value": "0 2px 6px rgba(255, 142, 83, 0.28)", "description": "shadow for pressed CTAs" },
+    "pd-shadow-modal": { "value": "0 24px 48px rgba(45, 45, 45, 0.16)", "description": "shadow for modals" }
+  }
+}

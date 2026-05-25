@@ -1,0 +1,10 @@
+{
+  "border_radius": {
+    "pd-r-btn": { "value": "24px", "description": "buttons, pill chips" },
+    "pd-r-card": { "value": "16px", "description": "cards, sheets" },
+    "pd-r-img": { "value": "12px", "description": "photos, thumbnails" },
+    "pd-r-tag": { "value": "8px", "description": "tiny chips, count badges" },
+    "pd-r-input": { "value": "16px", "description": "text fields, dropdowns" },
+    "pd-r-full": { "value": "999px", "description": "fully rounded, pill" }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "font_families": {
+    "pd-font-rounded": {
+      "value": [
+        "M PLUS Rounded 1c",
+        "PingFang SC",
+        "Hiragino Sans GB",
+        "Microsoft YaHei",
+        "-apple-system",
+        "BlinkMacSystemFont",
+        "Helvetica Neue",
+        "sans-serif"
+      ],
+      "description": "soft, slightly-condensed rounded look for brand"
+    },
+    "pd-font-display": { "value": "var(--pd-font-rounded)" },
+    "pd-font-body": { "value": "var(--pd-font-rounded)" },
+    "pd-font-mono": { "value": ["SFMono-Regular", "ui-monospace", "Menlo", "monospace"] }
+  },
+  "font_sizes": {
+    "pd-fs-display": { "value": "32px", "description": "hero numbers, splash" },
+    "pd-fs-h1": { "value": "24px", "description": "screen title" },
+    "pd-fs-h2": { "value": "20px", "description": "section title" },
+    "pd-fs-h3": { "value": "17px", "description": "card title" },
+    "pd-fs-body": { "value": "15px", "description": "default body" },
+    "pd-fs-sub": { "value": "13px", "description": "secondary / metadata" },
+    "pd-fs-cap": { "value": "11px", "description": "caption, badge" }
+  },
+  "line_heights": {
+    "pd-lh-tight": { "value": 1.2, "description": "tight line height" },
+    "pd-lh-snug": { "value": 1.35, "description": "snug line height" },
+    "pd-lh-body": { "value": 1.55, "description": "body line height" }
+  },
+  "letter_spacings": {
+    "pd-tk-tight": { "value": "-0.01em", "description": "tight tracking" },
+    "pd-tk-base": { "value": "0", "description": "base tracking" },
+    "pd-tk-loose": { "value": "0.02em", "description": "loose tracking" }
+  }
+}

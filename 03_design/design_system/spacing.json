@@ -1,0 +1,14 @@
+{
+  "spacing_scale": {
+    "pd-s-1": { "value": "4px", "description": "4px spacing" },
+    "pd-s-2": { "value": "8px", "description": "8px spacing" },
+    "pd-s-3": { "value": "12px", "description": "12px spacing" },
+    "pd-s-4": { "value": "16px", "description": "16px spacing" },
+    "pd-s-5": { "value": "20px", "description": "20px spacing" },
+    "pd-s-6": { "value": "24px", "description": "24px spacing" },
+    "pd-s-7": { "value": "32px", "description": "32px spacing" },
+    "pd-s-8": { "value": "40px", "description": "40px spacing" },
+    "pd-s-9": { "value": "56px", "description": "56px spacing" },
+    "pd-s-10": { "value": "72px", "description": "72px spacing" }
+  }
+}
