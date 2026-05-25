@@ -71,6 +71,18 @@ class Settings(BaseSettings):
         default=True,
         validation_alias="ENABLE_REVERSE_PROXY_HEALTH_MONITOR",
     )
+    expired_original_retention_days: int = Field(
+        default=30,
+        validation_alias="EXPIRED_ORIGINAL_RETENTION_DAYS",
+    )
+    expired_original_delete_interval_seconds: int = Field(
+        default=86400,
+        validation_alias="EXPIRED_ORIGINAL_DELETE_INTERVAL_SECONDS",
+    )
+    enable_expired_original_delete_task: bool = Field(
+        default=True,
+        validation_alias="ENABLE_EXPIRED_ORIGINAL_DELETE_TASK",
+    )
 
     @property
     def is_development(self) -> bool:

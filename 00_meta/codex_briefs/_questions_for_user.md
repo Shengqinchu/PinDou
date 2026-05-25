@@ -97,3 +97,21 @@ micro-task “脚本路径试试自动去白底”已完成，结论给用户 / 
 3. 已实现 `detect_and_remove_white_bg(image, tolerance_delta_e=8.0)`：四角 5x5 均值到纯白的平均 CIEDE2000 小于 8 时，才从四角 flood fill；扩散阈值为 ΔE < 15，连通白底像素 alpha 置 0。
 4. `PatternSheet.metadata` 已增加 `white_bg_detected`（snake_case）和 `auto_remove_white_bg_requested`。前端 / quota 层可用 `white_bg_detected=True` 才扣白底配额；检测失败时返回正常满铺图纸且不扣配额。
 5. 已补测试：白底检测成功、非白底跳过且不修改图像、ΔE≈8 边界、默认 raw 行为不受影响。`pytest` 通过 13/13。
+
+## 2026-05-25 — Phase 2 backend task 4 review
+
+任务 4 已完成 SQLAlchemy 数据模型、Alembic migration、业务 service 与 ADR-009 原图清理任务，结论给用户 / Claude review：
+
+1. 已定义 `User` / `Artwork` / `Order` / `CDK` / `ConsentLog` / `DailyQuota` ORM 模型；内部用户唯一键保留微信 `openid`，对前端输出时映射为 PRD / Pinia 使用的 `user_id`。
+2. 已初始化 Alembic，并新增 `0001_phase2_models` migration，创建核心表、唯一约束和索引：`users.openid`、`orders.order_no`、`cdks.code`、`daily_quotas(user_id,date)`。
+3. 已实现 `UserService`：注册 / 登录、隐私与敏感信息同意留痕、每日额度查询。
+4. 已实现 `ArtworkService`：保存、列表、删除；删除作品时同步删除原图文件，符合 ADR-009 私人素材边界。
+5. 已实现 `CDKService`：18 位安全字符生成、兑换、权益写入；同用户 1 分钟第 4 次兑换阻断，同 IP 10 分钟第 5 次兑换写 warning 告警。
+6. 已实现 `PaymentService`：客服扫码订单创建与状态机（pending_cs_qr → paid_confirmed / cancelled，paid_confirmed → refunded）。
+7. 已实现 `delete_expired_originals_once()` 与 FastAPI lifespan 后台 scheduler：默认 30 天后删除原图并写 `original_deleted_at`，调度间隔默认 86400 秒。
+8. 已补测试：模型 CRUD / 前端字段映射 / CDK 防滥用 / 支付状态机 / 30 天原图清理；`pytest` 通过 20/20，Alembic `upgrade head` 在临时 SQLite DB 验证通过。
+
+需要 Claude / 用户确认的衔接点：
+
+1. PRD §6.1 写明 `bead_skus.json` 是来自 Task I 的独立文件，本次没有把 `bead_skus` 做成 SQL 表。若 task 7 购物清单需要后台管理 SKU，建议再开 migration 增加 `bead_skus` 表。
+2. CDK 频率限制当前是进程内内存实现，足够支撑本地 / 单 worker P0；多 worker 或多机部署前建议改为 Redis / 数据库 attempt log。

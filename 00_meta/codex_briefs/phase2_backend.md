@@ -1,6 +1,6 @@
 # Codex Phase 2 后端 Brief
 
-**Status**: in_progress (Codex @ 2026-05-25) — task 3.1 auto white-bg removal done
+**Status**: in_progress (Codex @ 2026-05-25) — task 4 data models done, waiting Claude review
 **Owner**: Codex
 **Priority**: P0
 **Estimated**: 3-4 周（含 8 个子任务）
