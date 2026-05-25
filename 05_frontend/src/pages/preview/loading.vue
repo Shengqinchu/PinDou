@@ -173,7 +173,7 @@ const handleGeneration = async () => {
     } catch (err) {
       console.error('快速路径生成失败:', err);
       // 快速路径本就是最底层，再失败跳转错误页
-      uni.redirectTo({ url: '/pages/error/error' });
+      redirectToError(err);
     }
   } else {
     // AI精品生成：先 AI 风格重塑，再本地图纸量化
@@ -209,10 +209,24 @@ const handleGeneration = async () => {
         completeAndNavigate('quick', true);
       } catch (fallbackErr) {
         console.error('兜底量化链亦失败:', fallbackErr);
-        uni.redirectTo({ url: '/pages/error/error' });
+        redirectToError(fallbackErr);
       }
     }
   }
+};
+
+const redirectToError = (err: unknown) => {
+  const anyErr = err as any;
+  const code = String(anyErr?.code || '');
+  const message = String(anyErr?.message || '再试一次吧～');
+  const isQuota = code === 'QUOTA_EXCEEDED' || message.includes('额度') || message.includes('次数已用完');
+  const isConsent = code === 'CONSENT_REQUIRED' || message.includes('同意');
+  const variant = isQuota ? 'quota' : 'network';
+  const title = isQuota ? '今天的额度用完啦' : isConsent ? '需要先完成授权' : '生成失败';
+
+  uni.redirectTo({
+    url: `/pages/error/error?variant=${variant}&title=${encodeURIComponent(title)}&message=${encodeURIComponent(message)}`
+  });
 };
 
 const completeAndNavigate = (finalTier: 'quick' | 'premium', isFallback = false) => {

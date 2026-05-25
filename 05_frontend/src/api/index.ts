@@ -5,6 +5,62 @@ import { request, BASE_URL } from '../utils/request';
 const USE_MOCK = false;
 const UPLOAD_TIMEOUT_MS = 120000;
 
+type ApiErrorBody = {
+  error?: string;
+  message_cn?: string;
+  message?: string;
+  details?: unknown;
+};
+
+export class PinDouApiError extends Error {
+  statusCode?: number;
+  code?: string;
+  details?: unknown;
+
+  constructor(message: string, options: { statusCode?: number; code?: string; details?: unknown } = {}) {
+    super(message);
+    this.name = 'PinDouApiError';
+    this.statusCode = options.statusCode;
+    this.code = options.code;
+    this.details = options.details;
+  }
+}
+
+function parseJsonBody(data: unknown): ApiErrorBody | null {
+  if (!data) return null;
+  if (typeof data === 'object') return data as ApiErrorBody;
+  if (typeof data !== 'string') return null;
+  try {
+    return JSON.parse(data) as ApiErrorBody;
+  } catch {
+    return null;
+  }
+}
+
+function uploadResponseError(res: UniApp.UploadFileSuccessCallbackResult, fallbackMessage: string): PinDouApiError {
+  const body = parseJsonBody(res.data);
+  const message = body?.message_cn || body?.message || fallbackMessage;
+  return new PinDouApiError(message, {
+    statusCode: res.statusCode,
+    code: body?.error,
+    details: body?.details
+  });
+}
+
+function uploadFailError(err: any): PinDouApiError {
+  const errMsg = String(err?.errMsg || '');
+  if (errMsg.toLowerCase().includes('timeout')) {
+    return new PinDouApiError('生成时间超过等待上限，请稍后重试。', {
+      code: 'UPLOAD_TIMEOUT',
+      details: err
+    });
+  }
+  return new PinDouApiError('网络连接失败，请检查后重试。', {
+    code: 'NETWORK_ERROR',
+    details: err
+  });
+}
+
 /* ==========================================
    类型定义 (符合 PRD §5 / §6)
    ========================================== */
@@ -245,10 +301,10 @@ export const api = {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             resolve(JSON.parse(res.data) as PreviewResult);
           } else {
-            reject(new Error('上传失败'));
+            reject(uploadResponseError(res, '上传失败'));
           }
         },
-        fail: (err) => reject(err)
+        fail: (err) => reject(uploadFailError(err))
       });
     });
   },
@@ -291,10 +347,10 @@ export const api = {
             if (res.statusCode >= 200 && res.statusCode < 300) {
               resolve(JSON.parse(res.data) as PatternSheet);
             } else {
-              reject(new Error('图纸生成失败'));
+              reject(uploadResponseError(res, '图纸生成失败'));
             }
           },
-          fail: (err) => reject(err)
+          fail: (err) => reject(uploadFailError(err))
         });
       });
     } else {

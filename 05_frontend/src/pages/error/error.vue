@@ -41,6 +41,8 @@ const applyVariant = (v: Variant) => {
 onLoad((options: any = {}) => {
   const v = options?.variant as Variant;
   if (v && ['network', 'fallback', 'quota'].includes(v)) applyVariant(v);
+  if (options?.title) title.value = decodeURIComponent(options.title);
+  if (options?.message) desc.value = decodeURIComponent(options.message);
 });
 
 const onRetry = () => { uni.navigateBack(); };

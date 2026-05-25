@@ -208,3 +208,20 @@ AI 路径 timeout、脚本 fallback 兔子占位图、标题实体转义、统�
 1. 微信开发者工具按 `Ctrl+R` 重新编译。
 2. 用灰猫图重新走：上传 → 快速生成；预期结果页不再出现兔子，统计不再是 0。
 3. 再走 AI 精品生成；若仍 timeout，请截图 Console 第一条红字和 Network 耗时。
+
+## 2026-05-25 — Phase 2 frontend uploadFile error passthrough
+
+用户截图显示 `Build pattern sheet error: Error: 图纸生成失败`，页面误跳“网络有点慢”。进一步排查结论：
+
+1. 这次不是之前的 mock bunny 问题，而是 `api.buildPattern()` 的 `uni.uploadFile.success` 收到了非 2xx 响应后，把后端 `message_cn/error/statusCode` 全部吞掉，只抛固定 `Error("图纸生成失败")`。
+2. 本地 SQLite 实测当前测试用户 `wx_e9b9d5ca2ea2d4ba1092c9d8` 的 `daily_quotas.script_used = 3`，正好达到 `SCRIPT_DAILY_FREE_LIMIT = 3`。因此截图这次大概率是后端返回 `429 QUOTA_EXCEEDED`，但前端误展示成网络慢。
+3. 已新增 `PinDouApiError`：`preview/generate` 和 `pattern/build` 的 `uploadFile` 非 2xx 会解析 JSON body，透传 `statusCode`、`error`、`message_cn`、`details`。
+4. `uploadFile.fail timeout` 现在统一转换为 `UPLOAD_TIMEOUT`，文案为“生成时间超过等待上限，请稍后重试。”，不会再裸露底层 errMsg。
+5. `pages/preview/loading.vue` 已按错误码分流：`QUOTA_EXCEEDED` 跳 `variant=quota`，`CONSENT_REQUIRED` 跳授权提示，其余才作为生成失败 / 网络类错误。
+6. `pages/error/error.vue` 支持 query 中的 `title` / `message`，后续错误页能展示真实后端中文原因。
+7. 验证：`npm run build:mp-weixin` 通过。
+
+需要用户操作：
+
+1. 微信开发者工具按 `Ctrl+R` 重新编译后再测；如果本地额度仍是 3/3，预期现在会显示“今天的额度用完啦”，而不是“网络有点慢”。
+2. 若要继续测试真实灰猫出图，需要重置本地开发库 `daily_quotas.script_used`，或临时增加每日脚本额度；不要在生产环境这样做。
