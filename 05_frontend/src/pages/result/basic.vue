@@ -74,8 +74,8 @@
             <!-- 动态绑定背景色 -->
             <span class="result__swatch" :style="{ backgroundColor: color.hex }" aria-hidden="true"></span>
             <span class="result__color-name">
-              {{ color.name }}
               <span class="result__color-code">{{ color.code }}</span>
+              {{ color.nameCn }}
             </span>
             <span class="result__color-bar">
               <!-- 延迟展开过渡动画 -->
@@ -137,7 +137,7 @@ const isMounted = ref(false);
 const showPaywall = ref(false);
 
 type DisplayColor = {
-  name: string;
+  nameCn: string;
   code: string;
   count: number;
   percentage: number;
@@ -200,7 +200,7 @@ const patternColors = computed<DisplayColor[]>(() => {
     .map(([code, count]) => {
       const color = paletteByCode.get(code);
       return {
-        name: color?.name_cn || color?.name_en || code,
+        nameCn: color?.name_cn || '未命名色',
         code,
         count,
         percentage: Math.max(3, Math.round((count / maxCount) * 100)),
