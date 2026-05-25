@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>PinDou · 你的拼豆图纸</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../shared/colors_and_type.css" />
+  <link rel="stylesheet" href="../shared/components.css" />
+  <link rel="stylesheet" href="result-basic.css" />
+</head>
+<body class="page page--result">
+  <div class="frame" data-variant="inner" data-title="你的拼豆图纸" data-back="../preview-loading/preview-loading.html">
+    <main class="frame__body frame__body--scroll">
+      <section class="result">
+
+        <!-- ===== Pattern preview ===== -->
+        <figure class="result__pattern">
+          <img class="result__pattern-image" src="../shared/assets/bead-cat.svg" alt="生成的拼豆图纸" />
+          <figcaption class="result__pattern-caption">
+            <span class="result__pattern-name">萌宠拼豆 · Q 版小橘</span>
+            <span class="result__pattern-meta">24 × 24 网格</span>
+          </figcaption>
+        </figure>
+
+        <!-- ===== Summary stats ===== -->
+        <div class="card result__summary">
+          <div class="result__summary-row">
+            <div class="result__summary-cell">
+              <span class="result__summary-num">487</span>
+              <span class="result__summary-unit">总颗数</span>
+            </div>
+            <span class="result__summary-divider" aria-hidden="true"></span>
+            <div class="result__summary-cell">
+              <span class="result__summary-num">7</span>
+              <span class="result__summary-unit">色号数</span>
+            </div>
+            <span class="result__summary-divider" aria-hidden="true"></span>
+            <div class="result__summary-cell">
+              <span class="result__summary-num result__summary-num--cost">¥6.5</span>
+              <span class="result__summary-unit">估算成本</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Color list ===== -->
+        <div class="card result__colors-card">
+          <h2 class="result__section-title">
+            色号清单
+            <span class="result__section-sub">按数量排序</span>
+          </h2>
+          <ul class="result__colors" role="list">
+            <li class="result__color">
+              <span class="result__swatch result__swatch--O22" aria-hidden="true"></span>
+              <span class="result__color-name">蜜桃橙 <span class="result__color-code">O-22</span></span>
+              <span class="result__color-bar"><span class="result__color-bar-fill" data-pct="38"></span></span>
+              <span class="result__color-count">187</span>
+            </li>
+            <li class="result__color">
+              <span class="result__swatch result__swatch--o18" aria-hidden="true"></span>
+              <span class="result__color-name">浅蜜桃 <span class="result__color-code">o-18</span></span>
+              <span class="result__color-bar"><span class="result__color-bar-fill" data-pct="32"></span></span>
+              <span class="result__color-count">156</span>
+            </li>
+            <li class="result__color">
+              <span class="result__swatch result__swatch--M01" aria-hidden="true"></span>
+              <span class="result__color-name">奶油白 <span class="result__color-code">M-01</span></span>
+              <span class="result__color-bar"><span class="result__color-bar-fill" data-pct="13"></span></span>
+              <span class="result__color-count">65</span>
+            </li>
+            <li class="result__color">
+              <span class="result__swatch result__swatch--p08" aria-hidden="true"></span>
+              <span class="result__color-name">樱花粉 <span class="result__color-code">p-08</span></span>
+              <span class="result__color-bar"><span class="result__color-bar-fill" data-pct="6"></span></span>
+              <span class="result__color-count">28</span>
+            </li>
+            <li class="result__color">
+              <span class="result__swatch result__swatch--k50" aria-hidden="true"></span>
+              <span class="result__color-name">暖灰 <span class="result__color-code">k-50</span></span>
+              <span class="result__color-bar"><span class="result__color-bar-fill" data-pct="5"></span></span>
+              <span class="result__color-count">22</span>
+            </li>
+            <li class="result__color">
+              <span class="result__swatch result__swatch--K99" aria-hidden="true"></span>
+              <span class="result__color-name">墨色 <span class="result__color-code">K-99</span></span>
+              <span class="result__color-bar"><span class="result__color-bar-fill" data-pct="4"></span></span>
+              <span class="result__color-count">18</span>
+            </li>
+            <li class="result__color">
+              <span class="result__swatch result__swatch--P12" aria-hidden="true"></span>
+              <span class="result__color-name">玫红 <span class="result__color-code">P-12</span></span>
+              <span class="result__color-bar"><span class="result__color-bar-fill" data-pct="2"></span></span>
+              <span class="result__color-count">11</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- ===== CTAs ===== -->
+        <div class="result__actions">
+          <a class="btn btn--pink btn--block btn--lg result__download" href="#download">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12"/>
+              <path d="m7 10 5 5 5-5"/>
+              <path d="M5 21h14"/>
+            </svg>
+            下载图纸
+          </a>
+
+          <a class="btn btn--primary btn--block btn--lg result__upsell" href="../paywall/paywall.html">
+            <span class="result__upsell-text">解锁高级版（PDF / Excel）</span>
+            <span class="result__upsell-badge">月卡</span>
+          </a>
+        </div>
+
+        <!-- ===== Regenerate footnote ===== -->
+        <a class="result__regen" href="../upload/upload.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/>
+            <path d="M21 3v5h-5"/>
+            <path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/>
+            <path d="M3 21v-5h5"/>
+          </svg>
+          <span class="result__regen-label">再生成一次</span>
+          <span class="result__regen-cost">消耗 1 次额度</span>
+        </a>
+
+      </section>
+    </main>
+  </div>
+
+  <script src="../shared/components.js"></script>
+  <script src="result-basic.js"></script>
+</body>
+</html>

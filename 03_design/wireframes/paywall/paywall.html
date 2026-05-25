@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>PinDou · 升级解锁</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../shared/colors_and_type.css" />
+  <link rel="stylesheet" href="../shared/components.css" />
+  <link rel="stylesheet" href="paywall.css" />
+</head>
+<body class="page page--paywall">
+  <div class="frame" data-variant="inner" data-title="升级解锁" data-back="../result-basic/result-basic.html">
+    <main class="frame__body">
+
+      <!-- Dimmed backdrop with a hint of the page underneath -->
+      <div class="paywall__backdrop" aria-hidden="true">
+        <div class="paywall__backdrop-hint"></div>
+      </div>
+
+      <!-- ===== Sheet: plan-selection state ===== -->
+      <section class="paywall__sheet" data-state="plans">
+        <div class="paywall__handle" aria-hidden="true"></div>
+
+        <header class="paywall__head">
+          <h2 class="paywall__title">升级解锁高级图纸</h2>
+          <p class="paywall__subtitle">PDF 图纸 · Excel 色号 · 分区拼接图 · 打印 · 邮件</p>
+        </header>
+
+        <ul class="paywall__plans" role="list">
+
+          <li class="paywall__plan" data-plan="single">
+            <div class="paywall__plan-label">单次</div>
+            <div class="paywall__plan-price">¥9.9</div>
+            <div class="paywall__plan-meta">解锁本张</div>
+          </li>
+
+          <li class="paywall__plan paywall__plan--recommended" data-plan="monthly">
+            <span class="paywall__plan-badge">推荐</span>
+            <div class="paywall__plan-label">月卡</div>
+            <div class="paywall__plan-price text-grad">¥28</div>
+            <div class="paywall__plan-meta">本月无限</div>
+          </li>
+
+          <li class="paywall__plan" data-plan="artisan">
+            <div class="paywall__plan-label">人工精修</div>
+            <div class="paywall__plan-price">¥99<span class="paywall__plan-price-sub">起</span></div>
+            <div class="paywall__plan-meta">设计师调色</div>
+          </li>
+
+        </ul>
+
+        <button type="button" class="btn btn--primary btn--block btn--lg paywall__cta" data-action="show-qr">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <path d="M14 14h3v3h-3z M19 14h2 M14 19h2 M19 17v4"/>
+          </svg>
+          加客服扫码付
+        </button>
+
+        <a class="paywall__cdk" href="../cdk-redeem/cdk-redeem.html">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7"/>
+            <path d="M3 7l9 6 9-6"/>
+            <path d="M3 7l9-4 9 4"/>
+          </svg>
+          我有 CDK 兑换码
+        </a>
+      </section>
+
+      <!-- ===== Sheet: QR-payment state ===== -->
+      <section class="paywall__sheet paywall__sheet--qr" data-state="qr" hidden>
+        <div class="paywall__handle" aria-hidden="true"></div>
+
+        <header class="paywall__head">
+          <h2 class="paywall__title">扫码加客服微信</h2>
+          <p class="paywall__subtitle">付款后我们会在 5 分钟内为你开通</p>
+        </header>
+
+        <div class="paywall__qr-wrap">
+          <img class="paywall__qr-code" src="../shared/assets/qr-placeholder.svg" alt="客服微信二维码" />
+          <div class="paywall__qr-overlay" aria-hidden="true">
+            <div class="paywall__qr-overlay-inner">
+              <span class="paywall__qr-overlay-dot"></span>
+              <span class="paywall__qr-overlay-text">PD</span>
+            </div>
+          </div>
+        </div>
+
+        <dl class="paywall__order">
+          <div class="paywall__order-row">
+            <dt class="paywall__order-label">订单号</dt>
+            <dd class="paywall__order-value">PD-20260524-3F8A1C</dd>
+          </div>
+          <div class="paywall__order-row">
+            <dt class="paywall__order-label">套餐</dt>
+            <dd class="paywall__order-value" data-role="selected-plan">月卡 · ¥28</dd>
+          </div>
+        </dl>
+
+        <p class="paywall__qr-hint">
+          长按二维码可保存到相册，或截屏后在微信里"识别图中二维码"
+        </p>
+
+        <button type="button" class="btn btn--secondary btn--block btn--md paywall__back" data-action="back-to-plans">
+          返回选择套餐
+        </button>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="../shared/components.js"></script>
+  <script src="paywall.js"></script>
+</body>
+</html>

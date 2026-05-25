@@ -1,0 +1,258 @@
+/* paywall/paywall.css — half-screen bottom sheet on a dimmed backdrop. */
+
+.page--paywall { background: var(--pd-bg); }
+
+.frame__body { background: transparent; }
+
+/* ===== Backdrop (suggests a dimmed page behind the sheet) ===== */
+.paywall__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(45, 45, 45, 0.42);
+  z-index: 0;
+}
+.paywall__backdrop-hint {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(255, 228, 238, 0.7) 0%, transparent 60%),
+    radial-gradient(80% 60% at 50% 30%, rgba(255, 176, 136, 0.35) 0%, transparent 70%),
+    var(--pd-bg);
+  filter: blur(8px);
+  opacity: 0.55;
+  z-index: -1;
+}
+
+/* ===== Sheet shell ===== */
+.paywall__sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--pd-card);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 8px 20px 20px;
+  box-shadow: 0 -12px 40px rgba(45, 45, 45, 0.18);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  /* Transition (not @keyframes) so that if JS stalls or rAF is throttled,
+     the sheet renders at its final visible position by default. The
+     `--enter-init` class below is briefly toggled on mount to drive the
+     slide-in. */
+  transition: transform 360ms var(--pd-ease-out),
+              opacity   360ms var(--pd-ease-out);
+}
+.paywall__sheet--enter-init {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.paywall__handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--pd-divider);
+  margin: 4px auto 12px;
+}
+
+/* ===== Sheet head ===== */
+.paywall__head {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.paywall__title {
+  margin: 0 0 6px;
+  font-family: var(--pd-font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--pd-fg-1);
+  letter-spacing: -0.01em;
+}
+.paywall__subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: var(--pd-fg-2);
+  line-height: 1.5;
+}
+
+/* ===== Plans row ===== */
+.paywall__plans {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.paywall__plan {
+  position: relative;
+  border-radius: var(--pd-r-card);
+  background: var(--pd-bg);
+  border: 1.5px solid transparent;
+  padding: 14px 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 180ms var(--pd-ease-out),
+              box-shadow 200ms var(--pd-ease-out);
+}
+.paywall__plan:active { transform: scale(0.98); }
+
+.paywall__plan-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--pd-fg-2);
+  letter-spacing: 0.3px;
+}
+.paywall__plan-price {
+  font-family: var(--pd-font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--pd-fg-1);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.paywall__plan-price-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--pd-fg-2);
+  margin-left: 2px;
+}
+.paywall__plan-meta {
+  font-size: 10px;
+  color: var(--pd-fg-3);
+  letter-spacing: 0.2px;
+}
+
+.paywall__plan--recommended {
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    var(--pd-gradient) border-box;
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(255, 107, 157, 0.18);
+}
+.paywall__plan-badge {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 9px;
+  background: var(--pd-gradient);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  box-shadow: 0 3px 8px rgba(255, 107, 157, 0.3);
+}
+
+.paywall__plan--active {
+  background:
+    linear-gradient(var(--pd-pink-50), var(--pd-pink-50)) padding-box,
+    var(--pd-pink) border-box;
+}
+
+/* ===== CTA + CDK link ===== */
+.paywall__cta {
+  margin-bottom: 12px;
+}
+.paywall__cdk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--pd-fg-2);
+  text-decoration: none;
+  padding: 6px 12px;
+  align-self: center;
+}
+.paywall__cdk:active { opacity: 0.7; }
+
+/* ===== QR sub-state ===== */
+.paywall__sheet--qr { padding-bottom: 24px; }
+
+.paywall__qr-wrap {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 18px;
+  padding: 10px;
+  border-radius: var(--pd-r-card);
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(255, 138, 168, 0.18);
+  border: 1px solid var(--pd-divider);
+  position: relative;
+}
+.paywall__qr-code {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.paywall__qr-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.paywall__qr-overlay-inner {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--pd-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  box-shadow: 0 0 0 4px #fff, 0 6px 14px rgba(255, 107, 157, 0.32);
+  color: #fff;
+}
+.paywall__qr-overlay-text {
+  font-family: var(--pd-font-display);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.paywall__order {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  background: var(--pd-bg-warm);
+  border-radius: var(--pd-r-card);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.paywall__order-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+}
+.paywall__order-label {
+  font-size: 12px;
+  color: var(--pd-fg-2);
+  margin: 0;
+}
+.paywall__order-value {
+  margin: 0;
+  font-family: var(--pd-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pd-fg-1);
+}
+
+.paywall__qr-hint {
+  margin: 0 0 14px;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--pd-fg-2);
+  text-align: center;
+}

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>PinDou · 兑换 CDK</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../shared/colors_and_type.css" />
+  <link rel="stylesheet" href="../shared/components.css" />
+  <link rel="stylesheet" href="cdk-redeem.css" />
+</head>
+<body class="page page--cdk">
+  <div class="frame" data-variant="inner" data-title="兑换 CDK" data-back="../paywall/paywall.html">
+    <main class="frame__body">
+
+      <!-- ===== Entry form ===== -->
+      <section class="cdk" data-state="entry">
+        <p class="cdk__hint">
+          在小红书 / 闲鱼买到的 CDK 码，输入 <strong>18 位</strong>字母数字即可解锁
+        </p>
+
+        <div class="cdk__field">
+          <label class="cdk__label" for="cdk-input">CDK 兑换码</label>
+          <input
+            id="cdk-input"
+            type="text"
+            class="cdk__input"
+            data-role="cdk"
+            placeholder="XXXXXX  XXXXXX  XXXXXX"
+            maxlength="20"
+            autocomplete="off"
+            autocapitalize="characters"
+            spellcheck="false"
+            inputmode="latin"
+          />
+          <span class="cdk__counter" data-role="counter">0 / 18</span>
+        </div>
+
+        <p class="cdk__error" data-role="error" hidden>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v4"/>
+            <path d="M12 16h.01"/>
+          </svg>
+          <span data-role="error-msg">请检查格式（18 位字母数字）</span>
+        </p>
+
+        <button type="button" class="btn btn--primary btn--block btn--lg cdk__submit"
+                data-role="submit" data-action="redeem" disabled>
+          兑换
+        </button>
+
+        <div class="cdk__spacer"></div>
+
+        <a class="help-link cdk__help" href="#buy-cdk">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.5 9.5a2.5 2.5 0 1 1 5 0c0 1.5-2.5 2-2.5 3.5"/>
+            <circle cx="12" cy="17" r="0.5" fill="currentColor"/>
+          </svg>
+          <span class="help-link__label">CDK 在哪买？</span>
+        </a>
+      </section>
+
+      <!-- ===== Success state ===== -->
+      <section class="cdk__success" data-state="success" hidden>
+        <div class="cdk__success-burst" aria-hidden="true">
+          <span class="cdk__dot cdk__dot--1"></span>
+          <span class="cdk__dot cdk__dot--2"></span>
+          <span class="cdk__dot cdk__dot--3"></span>
+          <span class="cdk__dot cdk__dot--4"></span>
+          <span class="cdk__dot cdk__dot--5"></span>
+          <span class="cdk__dot cdk__dot--6"></span>
+
+          <div class="cdk__check-ring">
+            <svg viewBox="0 0 60 60" width="80" height="80" aria-hidden="true">
+              <circle cx="30" cy="30" r="28" fill="none" stroke="#34C759" stroke-width="2.5" opacity="0.25"/>
+              <circle cx="30" cy="30" r="22" fill="#34C759"/>
+              <path d="M19 30l8 8 14-16" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <h2 class="cdk__success-title">兑换成功</h2>
+        <div class="card cdk__success-card">
+          <div class="cdk__success-row">
+            <span class="cdk__success-key">已为你添加</span>
+            <span class="cdk__success-val text-grad">月卡</span>
+          </div>
+          <div class="cdk__success-row">
+            <span class="cdk__success-key">有效期</span>
+            <span class="cdk__success-val">30 天无限解锁</span>
+          </div>
+          <div class="cdk__success-row">
+            <span class="cdk__success-key">兑换码</span>
+            <span class="cdk__success-val cdk__success-val--mono" data-role="used-code">—</span>
+          </div>
+        </div>
+
+        <div class="cdk__success-actions">
+          <a class="btn btn--primary btn--block btn--lg" href="../result-premium/result-premium.html">
+            去看高级图纸
+          </a>
+          <a class="btn btn--secondary btn--block btn--md" href="../home/home.html">
+            回首页
+          </a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="../shared/components.js"></script>
+  <script src="cdk-redeem.js"></script>
+</body>
+</html>

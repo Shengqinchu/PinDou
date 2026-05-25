@@ -210,6 +210,22 @@
   background: var(--pd-pink-50);
 }
 
+/* Solid hot-pink — used for free-tier primary CTAs ("下载图纸") so the
+   pink-orange gradient stays reserved for upsell buttons. */
+.btn--pink {
+  color: #fff;
+  background: var(--pd-pink);
+  box-shadow: 0 6px 16px rgba(255, 107, 157, 0.28);
+}
+.btn--pink:active { box-shadow: 0 2px 6px rgba(255, 107, 157, 0.22); }
+
+/* Solid success-green CTA (used after CDK redeem succeeds). */
+.btn--success {
+  color: #fff;
+  background: var(--pd-success);
+  box-shadow: 0 6px 16px rgba(52, 199, 89, 0.28);
+}
+
 /* ---------------------------------------------------------
    Cards
    --------------------------------------------------------- */

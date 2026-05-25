@@ -124,13 +124,17 @@
 
 /* ===== Theme chips ===== */
 .home__chips {
-  list-style: none;
   margin: 16px 0 0;
   padding: 0 16px;
   display: flex;
   gap: 8px;
   justify-content: center;
 }
+.home__chips .chip {
+  text-decoration: none;
+  transition: transform 180ms var(--pd-ease-out);
+}
+.home__chips .chip:active { transform: scale(0.96); }
 
 /* ===== CTA block ===== */
 .home__cta-wrap {
