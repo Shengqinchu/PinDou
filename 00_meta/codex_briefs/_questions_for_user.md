@@ -185,3 +185,26 @@ UI 多机型适配 + 后端连接配置 + 首页 CTA 半透明 bug 已完成，�
 
 1. 微信开发者工具里按 `Ctrl+R` 或点“编译”，重新跑：首页 → 上传 → 选择生成方式 → 错误页兜底。
 2. 如果仍白屏，请截图 Console 第一条红字和页面路径；重点看是否已经换到其他页面的 dist 行号。
+
+## 2026-05-25 — Phase 2 frontend generation result bugfix review
+
+AI 路径 timeout、脚本 fallback 兔子占位图、标题实体转义、统计字段为 0 四个问题已处理，结论给用户 / Claude review：
+
+1. Bug 1：`uni.uploadFile` 默认 60 秒不够覆盖 `gpt-image-2` 反代 30-60 秒耗时。已在 `generatePreview()` 和 `buildPattern()` 的两个上传请求里显式设置 `timeout: 120000`。
+2. Bug 2：结果页显示兔子不是后端问题，而是 `pages/result/basic.vue` 对 quick / fallback 硬编码使用 `/static/assets/bead-bunny.svg`。已改为读取真实 `PatternSheet.grid` 并在结果页用 CSS grid 渲染拼豆预览；`artwork` store 会把最近一次真实 `PatternSheet` 写入 `pd_current_pattern`，避免跳转或热重载后回落到 mock。
+3. Bug 3：标题前的 `&lt;` 来自返回箭头使用 HTML entity。已改为纯 CSS 箭头，不再渲染实体文本。
+4. Bug 4：统计字段为 0 是因为结果页读旧字段 `total_beads / estimated_cost / colors`，后端实际返回 `bead_total / estimated_cost_cny / color_counts / palette_used`。已按 PRD §5.2 重新映射：总颗数、色号数、成本、色号清单均从真实后端字段计算。
+5. 顺手降低同类白屏风险：`result/basic.vue` 内联 SVG 已替换为 CSS / 文本图标，避免再次触发 uni-app alpha 的 SVG `uid of null` 路径。
+6. 验证：每个代码 commit 后均执行 `npm run build:mp-weixin`，最终 build 通过；`rg` 确认结果页不再含 `bead-bunny`、旧统计字段、`&lt;`、内联 SVG。
+
+剩余风险 / 后续建议：
+
+1. 当前结果页预览是前端根据 `PatternSheet.grid` 现场渲染，能解决“显示错图”和字段 0；但“保存图纸至相册”仍需要后端或前端导出真实 PNG 文件。现在若没有 `image_url`，会提示“图纸已生成，图片导出稍后开放”，不再误报下载失败。
+2. 若产品要求立即保存图片，建议 task 后续补一个 `PatternExporter.to_simple_grid_png` 的 HTTP URL 返回，或在前端用 canvas 生成临时图片文件。
+3. 项目其他页面仍可能残留内联 SVG。若后续又出现 `Cannot read property 'uid' of null`，优先 grep 报错页的 `<svg>/<path>/<circle>/<rect>` 并替换为 CSS/文本图标。
+
+需要用户操作：
+
+1. 微信开发者工具按 `Ctrl+R` 重新编译。
+2. 用灰猫图重新走：上传 → 快速生成；预期结果页不再出现兔子，统计不再是 0。
+3. 再走 AI 精品生成；若仍 timeout，请截图 Console 第一条红字和 Network 耗时。
