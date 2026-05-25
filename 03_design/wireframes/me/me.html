@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>PinDou · 我的</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../shared/colors_and_type.css" />
+  <link rel="stylesheet" href="../shared/components.css" />
+  <link rel="stylesheet" href="me.css" />
+</head>
+<body class="page page--me">
+  <div class="frame" data-variant="home" data-title="我的">
+    <main class="frame__body frame__body--scroll">
+
+      <!-- ===== Profile ===== -->
+      <section class="me__profile">
+        <div class="me__avatar" aria-hidden="true">
+          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+            <circle cx="30" cy="30" r="30" fill="var(--pd-pink-100)"/>
+            <circle cx="30" cy="24" r="10" fill="#fff"/>
+            <path d="M10 56c2-10 11-16 20-16s18 6 20 16" fill="#fff"/>
+          </svg>
+        </div>
+        <div class="me__user">
+          <h2 class="me__nickname">小拼豆</h2>
+          <p class="me__user-meta">微信用户 · 已绑定</p>
+        </div>
+      </section>
+
+      <!-- ===== Credits card ===== -->
+      <section class="card me__credits">
+        <div class="me__credits-head">
+          <h3 class="me__credits-title">我的额度</h3>
+          <a class="me__credits-more" href="../paywall/paywall.html">充值</a>
+        </div>
+        <ul class="me__credits-list" role="list">
+          <li class="me__credits-row">
+            <div class="me__credits-label">
+              <span class="me__credits-name">脚本生成</span>
+              <span class="me__credits-sub">每日 3 次免费</span>
+            </div>
+            <span class="me__credits-value">今日剩 <strong>2</strong> 次</span>
+          </li>
+          <li class="me__credits-row">
+            <div class="me__credits-label">
+              <span class="me__credits-name">AI 精品</span>
+              <span class="me__credits-sub">单张 9.9 / 月卡 28</span>
+            </div>
+            <span class="me__credits-value">剩 <strong>0</strong> 次</span>
+          </li>
+          <li class="me__credits-row">
+            <div class="me__credits-label">
+              <span class="me__credits-name">月卡</span>
+              <span class="me__credits-sub">不限 AI + 高级图纸</span>
+            </div>
+            <span class="me__credits-value me__credits-value--off">未开通</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ===== Menu ===== -->
+      <nav class="me__menu" aria-label="个人中心">
+        <a class="me__menu-item" href="../works/works.html">
+          <span class="me__menu-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3"  y="3"  width="8" height="8" rx="2.5"/>
+              <rect x="13" y="3"  width="8" height="8" rx="2.5"/>
+              <rect x="3"  y="13" width="8" height="8" rx="2.5"/>
+              <rect x="13" y="13" width="8" height="8" rx="2.5"/>
+            </svg>
+          </span>
+          <span class="me__menu-label">我的作品</span>
+          <span class="me__menu-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a class="me__menu-item" href="../cdk-redeem/cdk-redeem.html">
+          <span class="me__menu-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7"/>
+              <path d="M3 7l9 6 9-6"/>
+              <path d="M3 7l9-4 9 4"/>
+            </svg>
+          </span>
+          <span class="me__menu-label">兑换 CDK</span>
+          <span class="me__menu-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <button type="button" class="me__menu-item" data-action="show-cs-qr">
+          <span class="me__menu-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </span>
+          <span class="me__menu-label">加客服微信</span>
+          <span class="me__menu-arrow" aria-hidden="true">›</span>
+        </button>
+
+        <a class="me__menu-item" href="#agreement">
+          <span class="me__menu-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 2v6h6"/>
+              <path d="M9 13h6M9 17h4"/>
+            </svg>
+          </span>
+          <span class="me__menu-label">用户协议 + 隐私政策</span>
+          <span class="me__menu-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a class="me__menu-item" href="#about">
+          <span class="me__menu-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 16v-4"/>
+              <circle cx="12" cy="8" r="0.5" fill="currentColor"/>
+            </svg>
+          </span>
+          <span class="me__menu-label">关于 PinDou</span>
+          <span class="me__menu-arrow" aria-hidden="true">v0.1.0 ›</span>
+        </a>
+      </nav>
+
+      <p class="footnote me__footer">
+        生成的内容均为 AI 辅助 · 上传的图片仅用于生成，30 天后自动删除
+      </p>
+
+      <!-- ===== CS QR sheet ===== -->
+      <div class="me__cs-sheet" data-state="closed" hidden>
+        <button type="button" class="me__cs-backdrop" data-action="close-cs" aria-label="关闭"></button>
+        <div class="me__cs-panel" role="dialog" aria-label="客服二维码">
+          <div class="me__cs-handle" aria-hidden="true"></div>
+          <h3 class="me__cs-title">加客服微信</h3>
+          <p class="me__cs-sub">付款 / CDK 售后 / 人工精修都可以找客服</p>
+          <img class="me__cs-qr" src="../shared/assets/qr-placeholder.svg" alt="客服微信二维码" />
+          <p class="me__cs-hint">长按二维码 → 微信识别</p>
+          <button type="button" class="btn btn--secondary btn--block btn--md me__cs-close" data-action="close-cs">关闭</button>
+        </div>
+      </div>
+
+      <!-- ===== Tab bar ===== -->
+      <nav class="tabbar" aria-label="主导航">
+        <a class="tabbar__item" href="../home/home.html">
+          <svg class="tabbar__icon tabbar__icon--filled" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 11l9-7 9 7v9a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2v-9z" fill="currentColor"/>
+          </svg>
+          <svg class="tabbar__icon tabbar__icon--outline" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M3 11l9-7 9 7v9a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2v-9z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          </svg>
+          <span class="tabbar__label">首页</span>
+        </a>
+        <a class="tabbar__item" href="../works/works.html">
+          <svg class="tabbar__icon tabbar__icon--filled" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3"  y="3"  width="8" height="8" rx="2.5" fill="currentColor"/>
+            <rect x="13" y="3"  width="8" height="8" rx="2.5" fill="currentColor"/>
+            <rect x="3"  y="13" width="8" height="8" rx="2.5" fill="currentColor"/>
+            <rect x="13" y="13" width="8" height="8" rx="2.5" fill="currentColor"/>
+          </svg>
+          <svg class="tabbar__icon tabbar__icon--outline" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3"  y="3"  width="8" height="8" rx="2.5" stroke="currentColor" stroke-width="1.8"/>
+            <rect x="13" y="3"  width="8" height="8" rx="2.5" stroke="currentColor" stroke-width="1.8"/>
+            <rect x="3"  y="13" width="8" height="8" rx="2.5" stroke="currentColor" stroke-width="1.8"/>
+            <rect x="13" y="13" width="8" height="8" rx="2.5" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+          <span class="tabbar__label">我的作品</span>
+        </a>
+        <a class="tabbar__item tabbar__item--active" href="me.html">
+          <svg class="tabbar__icon tabbar__icon--filled" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="4.5" fill="currentColor"/>
+            <path d="M3 21c0-4.5 4-8 9-8s9 3.5 9 8" fill="currentColor"/>
+          </svg>
+          <svg class="tabbar__icon tabbar__icon--outline" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span class="tabbar__label">我的</span>
+        </a>
+      </nav>
+
+    </main>
+  </div>
+
+  <script src="../shared/components.js"></script>
+  <script src="me.js"></script>
+</body>
+</html>

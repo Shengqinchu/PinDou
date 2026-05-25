@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>PinDou · 出了点状况</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../shared/colors_and_type.css" />
+  <link rel="stylesheet" href="../shared/components.css" />
+  <link rel="stylesheet" href="error.css" />
+</head>
+<body class="page page--error">
+  <div class="frame" data-variant="inner" data-title="出了点状况" data-back="../home/home.html">
+    <main class="frame__body frame__body--scroll">
+
+      <!-- ===== Variant switcher (prototype 用，真实小程序通过 query 参数指定) ===== -->
+      <nav class="error__variants" aria-label="状态切换">
+        <button type="button" class="error__variant-btn error__variant-btn--active" data-variant="network">网络</button>
+        <button type="button" class="error__variant-btn" data-variant="fallback">AI 重试</button>
+        <button type="button" class="error__variant-btn" data-variant="quota">额度</button>
+      </nav>
+
+      <!-- ===== Variant A: network ===== -->
+      <section class="error" data-state="network">
+        <div class="error__art" aria-hidden="true">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="48" fill="var(--pd-pink-100)"/>
+            <path d="M40 56q20 -16 40 0" stroke="var(--pd-pink)" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <path d="M48 66q12 -8 24 0" stroke="var(--pd-pink)" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <circle cx="60" cy="76" r="3" fill="var(--pd-pink-deep)"/>
+            <path d="M28 28l64 64" stroke="var(--pd-orange)" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+          </svg>
+        </div>
+        <h2 class="error__title">网络有点慢</h2>
+        <p class="error__desc">检查一下 WiFi 或数据信号，然后再试一次吧 ~</p>
+        <a class="btn btn--primary btn--block btn--lg error__cta" href="../home/home.html">
+          重新试一次
+        </a>
+        <a class="help-link error__help" href="#help">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.5 9.5a2.5 2.5 0 1 1 5 0c0 1.5-2.5 2-2.5 3.5"/>
+            <circle cx="12" cy="17" r="0.5" fill="currentColor"/>
+          </svg>
+          <span class="help-link__label">一直没反应？加客服微信</span>
+        </a>
+      </section>
+
+      <!-- ===== Variant B: fallback (AI 偷懒，自动 fallback 中) ===== -->
+      <section class="error" data-state="fallback" hidden>
+        <div class="error__art" aria-hidden="true">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="48" fill="var(--pd-peach-50)"/>
+            <path d="M40 50q4 -8 12 -8t12 8" stroke="var(--pd-orange)" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <path d="M68 50q4 -8 12 -8t12 8" stroke="var(--pd-orange)" stroke-width="4" stroke-linecap="round" fill="none" transform="translate(-12 0)"/>
+            <path d="M45 76q15 8 30 0" stroke="var(--pd-orange)" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <circle cx="38" cy="44" r="3" fill="var(--pd-orange)" opacity="0.6"/>
+            <circle cx="82" cy="44" r="3" fill="var(--pd-orange)" opacity="0.6"/>
+          </svg>
+        </div>
+        <h2 class="error__title">AI 在偷懒</h2>
+        <p class="error__desc">正在自动切到备用方案，3 秒后再试 ~</p>
+        <div class="error__retry-bar">
+          <span class="error__retry-fill" data-role="retry-fill"></span>
+        </div>
+        <a class="btn btn--secondary btn--block btn--md error__cta error__cta--secondary" href="../home/home.html">
+          取消
+        </a>
+      </section>
+
+      <!-- ===== Variant C: quota (额度用完) ===== -->
+      <section class="error" data-state="quota" hidden>
+        <div class="error__art" aria-hidden="true">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="48" fill="var(--pd-pink-100)"/>
+            <rect x="34" y="50" width="52" height="36" rx="6" fill="#fff"/>
+            <rect x="40" y="58" width="40" height="4" rx="2" fill="var(--pd-pink-deep)"/>
+            <rect x="40" y="66" width="28" height="4" rx="2" fill="var(--pd-divider)"/>
+            <rect x="40" y="74" width="20" height="4" rx="2" fill="var(--pd-divider)"/>
+            <path d="M44 50V40a16 16 0 0 1 32 0v10" stroke="var(--pd-pink-deep)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <h2 class="error__title">今天的额度用完啦</h2>
+        <p class="error__desc">明天会重置 3 次免费 · 也可以现在升级解锁不限次</p>
+        <a class="btn btn--primary btn--block btn--lg error__cta" href="../paywall/paywall.html">
+          升级解锁
+        </a>
+        <a class="btn btn--ghost btn--block btn--md error__cta error__cta--secondary" href="../cdk-redeem/cdk-redeem.html">
+          我有 CDK 兑换码
+        </a>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="../shared/components.js"></script>
+  <script src="error.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+/* error/error.css — 错误兜底页 */
+
+.page--error .frame__body {
+  background: var(--pd-bg);
+}
+
+/* ---- Variant switcher (prototype only, 真实小程序通过 query 参数) ---- */
+.error__variants {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  background: var(--pd-bg-warm);
+  border-radius: 999px;
+  margin: 12px 20px 8px;
+}
+.error__variant-btn {
+  flex: 1;
+  appearance: none;
+  border: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--pd-fg-2);
+  cursor: pointer;
+  transition: background var(--pd-dur-fast) var(--pd-ease-out),
+              color var(--pd-dur-fast) var(--pd-ease-out);
+}
+.error__variant-btn--active {
+  background: #fff;
+  color: var(--pd-pink-deep);
+  box-shadow: 0 1px 3px rgba(255, 107, 157, 0.18);
+}
+
+/* ---- Variant container ---- */
+.error {
+  padding: 32px 28px 20px;
+  text-align: center;
+}
+.error__art {
+  margin: 0 auto 20px;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.error__title {
+  font-family: var(--pd-font-display);
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--pd-fg-1);
+}
+.error__desc {
+  font-size: 14px;
+  color: var(--pd-fg-2);
+  line-height: 1.6;
+  margin: 0 0 28px;
+}
+.error__cta {
+  margin-bottom: 12px;
+}
+.error__cta--secondary {
+  margin-bottom: 0;
+}
+.error__help {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+/* ---- Variant B 进度条 ---- */
+.error__retry-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--pd-divider);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.error__retry-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--pd-gradient-warm);
+  transition: width 3s linear;
+}
