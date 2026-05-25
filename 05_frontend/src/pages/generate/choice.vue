@@ -17,9 +17,7 @@
             <span class="choice__thumb-label">原图</span>
           </div>
           <span class="choice__arrow choice__arrow--basic" aria-hidden="true">
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="display: block;">
-              <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="choice__arrow-symbol">&gt;</span>
           </span>
           <!-- 拼豆图纸样张 -->
           <div class="choice__thumb choice__thumb--basic" aria-hidden="true">
@@ -29,17 +27,11 @@
 
         <ul class="choice__bullets" role="list">
           <li class="choice__bullet">
-            <svg class="choice__check choice__check--basic" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display: block;">
-              <circle cx="12" cy="12" r="10" fill="#F4EFE9"/>
-              <path d="M8 12.5l2.5 2.5L16 9" stroke="var(--pd-fg-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="choice__check choice__check--basic" aria-hidden="true">✓</span>
             直接量化原图，最快 5 秒出图
           </li>
           <li class="choice__bullet">
-            <svg class="choice__check choice__check--basic" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display: block;">
-              <circle cx="12" cy="12" r="10" fill="#F4EFE9"/>
-              <path d="M8 12.5l2.5 2.5L16 9" stroke="var(--pd-fg-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="choice__check choice__check--basic" aria-hidden="true">✓</span>
             保留照片本来的样子
           </li>
         </ul>
@@ -56,9 +48,7 @@
       <!-- ===== Card B — Premium (recommended, paid) ===== -->
       <div class="card card--recommended choice__card choice__card--recommended choice__card--last" @click="handleSelect('premium')">
         <span class="tag tag--recommended choice__badge" aria-label="推荐">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; margin-right: 2px;">
-            <path d="M9.94 14.06 2 12l7.94-2.06L12 2l2.06 7.94L22 12l-7.94 2.06L12 22z"/>
-          </svg>
+          <span class="choice__badge-star" aria-hidden="true">*</span>
           推荐
         </span>
 
@@ -74,9 +64,7 @@
             <span class="choice__thumb-label">原图</span>
           </div>
           <span class="choice__arrow choice__arrow--premium" aria-hidden="true">
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="display: block;">
-              <path d="M2 6h8M7 3l3 3-3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="choice__arrow-symbol">&gt;</span>
           </span>
           <!-- Q版萌宠/自拍 SVG 样张 -->
           <div class="choice__thumb choice__thumb--premium" aria-hidden="true">
@@ -86,24 +74,15 @@
 
         <ul class="choice__bullets" role="list">
           <li class="choice__bullet">
-            <svg class="choice__check choice__check--premium" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display: block;">
-              <circle cx="12" cy="12" r="10" fill="#FFE4EE"/>
-              <path d="M8 12.5l2.5 2.5L16 9" stroke="var(--pd-pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="choice__check choice__check--premium" aria-hidden="true">✓</span>
             AI 重绘 Q 版形象，更可爱
           </li>
           <li class="choice__bullet">
-            <svg class="choice__check choice__check--premium" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display: block;">
-              <circle cx="12" cy="12" r="10" fill="#FFE4EE"/>
-              <path d="M8 12.5l2.5 2.5L16 9" stroke="var(--pd-pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="choice__check choice__check--premium" aria-hidden="true">✓</span>
             智能配色，限定调色板更精致
           </li>
           <li class="choice__bullet">
-            <svg class="choice__check choice__check--premium" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display: block;">
-              <circle cx="12" cy="12" r="10" fill="#FFE4EE"/>
-              <path d="M8 12.5l2.5 2.5L16 9" stroke="var(--pd-pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="choice__check choice__check--premium" aria-hidden="true">✓</span>
             可调网格大小（60x80/80x100/100x120）
           </li>
         </ul>
@@ -118,22 +97,13 @@
           </div>
           <button class="btn btn--primary btn--sm choice__action">
             选这个
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-left: 2px; display: block;">
-              <path d="M5 12h14"/>
-              <path d="m12 5 7 7-7 7"/>
-            </svg>
+            <span class="choice__button-arrow" aria-hidden="true">&gt;</span>
           </button>
         </div>
       </div>
 
       <div class="help-link choice__help" @click="handleHelp">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block;">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M9.5 9.5a2.5 2.5 0 1 1 5 0c0 1.5-2.5 2-2.5 3.5"/>
-          <circle cx="12" cy="17" r="0.5" fill="currentColor"/>
-        </svg>
+        <span class="choice__help-icon" aria-hidden="true">?</span>
         <span class="help-link__label">这两种有什么区别？</span>
       </div>
     </div>
@@ -215,6 +185,11 @@ const handleHelp = () => {
   top: -10px;
   right: 16px;
   z-index: 2;
+}
+.choice__badge-star {
+  margin-right: 2px;
+  font-size: 11px;
+  line-height: 1;
 }
 
 .choice__head {
@@ -300,6 +275,11 @@ const handleHelp = () => {
 .choice__arrow--premium { 
   background: var(--pd-gradient-warm); 
 }
+.choice__arrow-symbol {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+}
 
 /* ===== Bullets ===== */
 .choice__bullets {
@@ -325,6 +305,20 @@ const handleHelp = () => {
   height: 14px;
   flex-shrink: 0;
   margin-top: 3px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+}
+.choice__check--basic {
+  background: #F4EFE9;
+  color: var(--pd-fg-2);
+}
+.choice__check--premium {
+  background: #FFE4EE;
+  color: var(--pd-pink);
 }
 
 /* ===== Footer (price + CTA) ===== */
@@ -360,12 +354,30 @@ const handleHelp = () => {
   color: var(--pd-pink-deep);
   font-weight: 700;
 }
+.choice__button-arrow {
+  margin-left: 2px;
+  font-size: 14px;
+  font-weight: 800;
+}
 
 /* ===== Help link ===== */
 .choice__help {
   display: flex;
+  align-items: center;
+  gap: 6px;
   justify-content: center;
   margin-top: 20px;
   cursor: pointer;
+}
+.choice__help-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
 }
 </style>

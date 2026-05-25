@@ -2,10 +2,8 @@
   <MiniProgramLayout title="出错了" backUrl="/pages/index/index" :scroll="true">
     <div class="error">
       <div class="error__art" aria-hidden="true">
-        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-          <circle cx="60" cy="60" r="50" fill="#FFEDD5" />
-          <path d="M48 50l24 24M72 50L48 74" stroke="#FF6B9D" stroke-width="3.5" stroke-linecap="round" />
-        </svg>
+        <span class="error__art-x error__art-x--a"></span>
+        <span class="error__art-x error__art-x--b"></span>
       </div>
       <h2 class="error__title">{{ title }}</h2>
       <p class="error__desc">{{ desc }}</p>
@@ -16,7 +14,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
+import { onLoad } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 
 type Variant = 'network' | 'fallback' | 'quota';
@@ -39,10 +38,8 @@ const applyVariant = (v: Variant) => {
   ctaText.value = variantMap[v].cta;
 };
 
-onMounted(() => {
-  const pages = getCurrentPages();
-  const cur = pages[pages.length - 1] as any;
-  const v = cur?.options?.variant as Variant;
+onLoad((options: any = {}) => {
+  const v = options?.variant as Variant;
   if (v && ['network', 'fallback', 'quota'].includes(v)) applyVariant(v);
 });
 
@@ -52,7 +49,25 @@ const onHelp = () => { uni.showToast({ title: '联系客服微信 pindou_help', 
 
 <style lang="scss" scoped>
 .error { padding: 64px 32px 32px; text-align: center; }
-.error__art { margin: 0 auto 24px; width: 120px; height: 120px; }
+.error__art {
+  margin: 0 auto 24px;
+  width: 120px;
+  height: 120px;
+  border-radius: 999px;
+  background: #FFEDD5;
+  position: relative;
+}
+.error__art-x {
+  position: absolute;
+  left: 40px;
+  top: 58px;
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: #FF6B9D;
+}
+.error__art-x--a { transform: rotate(45deg); }
+.error__art-x--b { transform: rotate(-45deg); }
 .error__title { font-size: 22px; font-weight: 600; color: #2D1E1F; margin-bottom: 8px; }
 .error__desc { font-size: 14px; color: #8C8C8C; margin-bottom: 32px; }
 .error__cta { background: linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%); color: #fff; border: none; border-radius: 28px; padding: 14px 48px; font-size: 16px; font-weight: 600; }

@@ -59,7 +59,85 @@
   gap: 5px;
   align-items: center;
 }
-.frame__indicators svg { display: block; }
+.frame__signal {
+  width: 17px;
+  height: 11px;
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5px;
+}
+.frame__signal-bar {
+  width: 3px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.frame__signal-bar--1 { height: 4px; }
+.frame__signal-bar--2 { height: 6px; }
+.frame__signal-bar--3 { height: 8.5px; }
+.frame__signal-bar--4 { height: 11px; }
+.frame__wifi {
+  width: 15px;
+  height: 11px;
+  position: relative;
+  display: inline-block;
+}
+.frame__wifi-arc {
+  position: absolute;
+  left: 50%;
+  border: 1.5px solid currentColor;
+  border-top: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  transform: translateX(-50%);
+}
+.frame__wifi-arc--outer {
+  top: 1px;
+  width: 13px;
+  height: 7px;
+  border-radius: 0 0 12px 12px;
+}
+.frame__wifi-arc--inner {
+  top: 4px;
+  width: 8px;
+  height: 5px;
+  border-radius: 0 0 8px 8px;
+}
+.frame__wifi-dot {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 3px;
+  height: 3px;
+  margin-left: -1.5px;
+  border-radius: 999px;
+  background: currentColor;
+}
+.frame__battery {
+  width: 25px;
+  height: 12px;
+  position: relative;
+  display: inline-block;
+  border: 1px solid rgba(45, 45, 45, 0.4);
+  border-radius: 3px;
+}
+.frame__battery-fill {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 18px;
+  height: 6px;
+  border-radius: 1.5px;
+  background: currentColor;
+}
+.frame__battery-tip {
+  position: absolute;
+  right: -3px;
+  top: 4px;
+  width: 2px;
+  height: 4px;
+  border-radius: 0 2px 2px 0;
+  background: rgba(45, 45, 45, 0.4);
+}
 
 /* ---- Header (44px) ---- */
 .frame__header {
@@ -119,6 +197,11 @@
   text-decoration: none;
 }
 .frame__back:active { opacity: 0.6; }
+.frame__back-icon {
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 600;
+}
 
 .frame__title {
   position: absolute;
@@ -159,10 +242,22 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 5px;
   height: var(--pd-menu-height);
 }
 .frame__capsule-btn--menu { width: 44px; }
 .frame__capsule-btn--close { width: 36px; }
+.frame__menu-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: currentColor;
+}
+.frame__close {
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 600;
+}
 .frame__capsule-divider {
   width: 0.5px;
   height: 16px;

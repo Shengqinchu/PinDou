@@ -170,3 +170,18 @@ UI 多机型适配 + 后端连接配置 + 首页 CTA 半透明 bug 已完成，�
 1. 真机联调如果仍 timeout，先确认后端不是只监听 `127.0.0.1`，需要用 `uvicorn pindou.main:app --host 0.0.0.0 --port 8000 --reload`；Windows 防火墙也可能需要允许 8000 入站。
 2. 多机型适配已按运行时 API 实现，但仍建议用户在微信开发者工具里切 iPhone SE / iPhone 12-13 / iPhone 14 Pro Max 各点一次首页、上传页、作品页截图确认。
 3. 当前使用微信原生 tabbar，不能直接给 tabbar 本身写 safe-area 样式；本次只保证页面正文内容不贴底。若未来改自定义 tabbar，需要复用同一套 `safeAreaBottom`。
+
+## 2026-05-25 — Phase 2 frontend white screen / uid null fix
+
+白屏连环崩溃已定位并修复，结论给用户 / Claude review：
+
+1. `pages/generate/choice.vue` 和 `pages/error/error.vue` 的 dist 行号并不是指向 `image_id` / `variant` query 空值，而是指向 uni-app 编译出的内联 SVG 组件 props 调用。当前 alpha 版本在这些 SVG 虚拟组件路径里触发 `renderProps()`，`getCurrentInstance()` 偶发为 null，导致 `Cannot read property 'uid' of null`。
+2. 已移除 `choice.vue`、`error.vue`、`MiniProgramLayout.vue` 里的内联 `<svg>/<path>/<circle>/<rect>`，改为 CSS 与文本符号渲染，避免再次走该编译路径。
+3. `error.vue` 已从 `onMounted + getCurrentPages()` 改为 `onLoad(options)` 读取 `variant`，让错误兜底页即使在异常跳转链路里也不依赖 mounted 时机。
+4. 验证：`npm run build:mp-weixin` 通过；`npm run dev:mp-weixin` 已重新生成 `dist/dev/mp-weixin`；三个现场文件的 dev dist 中不再出现 `resolveComponent("svg"/"path"/"circle")`，`choice.js` / `error.js` 仅保留 `MiniProgramLayout` 正常 props。
+5. 剩余风险：项目其他页面若仍含内联 SVG，在 uni-app alpha 版本下可能遇到同类 `uid of null`。本次只处理报错现场和共用布局，若用户在其他页面看到同样堆栈，建议继续做一次全局 SVG 清扫。
+
+需要用户操作：
+
+1. 微信开发者工具里按 `Ctrl+R` 或点“编译”，重新跑：首页 → 上传 → 选择生成方式 → 错误页兜底。
+2. 如果仍白屏，请截图 Console 第一条红字和页面路径；重点看是否已经换到其他页面的 dist 行号。

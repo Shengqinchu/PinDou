@@ -4,25 +4,21 @@
     <div class="frame__status">
       <span class="frame__time">9:41</span>
       <span class="frame__indicators">
-        <!-- 信号 SVG -->
-        <svg width="17" height="11" viewBox="0 0 17 11" aria-hidden="true" style="display: block;">
-          <rect x="0" y="7" width="3" height="4" rx="0.5" fill="currentColor"/>
-          <rect x="4.5" y="5" width="3" height="6" rx="0.5" fill="currentColor"/>
-          <rect x="9" y="2.5" width="3" height="8.5" rx="0.5" fill="currentColor"/>
-          <rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="currentColor"/>
-        </svg>
-        <!-- WIFI SVG -->
-        <svg width="15" height="11" viewBox="0 0 15 11" aria-hidden="true" style="display: block;">
-          <path d="M7.5 2.8C9.6 2.8 11.5 3.6 12.8 5L13.8 4C12.2 2.3 9.9 1.2 7.5 1.2 5.1 1.2 2.8 2.3 1.2 4L2.2 5C3.5 3.6 5.4 2.8 7.5 2.8Z" fill="currentColor"/>
-          <path d="M7.5 6C8.7 6 9.8 6.5 10.6 7.3L11.6 6.3C10.5 5.2 9 4.4 7.5 4.4 6 4.4 4.5 5.2 3.4 6.3L4.4 7.3C5.2 6.5 6.3 6 7.5 6Z" fill="currentColor"/>
-          <circle cx="7.5" cy="9.5" r="1.3" fill="currentColor"/>
-        </svg>
-        <!-- 电池 SVG -->
-        <svg width="25" height="12" viewBox="0 0 25 12" aria-hidden="true" style="display: block;">
-          <rect x="0.5" y="0.5" width="21" height="11" rx="2.8" stroke="currentColor" stroke-opacity="0.4" fill="none"/>
-          <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
-          <path d="M22.7 4.3v3.4c.8-.2 1.3-.9 1.3-1.7 0-.8-.5-1.5-1.3-1.7Z" fill="currentColor" fill-opacity="0.4"/>
-        </svg>
+        <span class="frame__signal" aria-hidden="true">
+          <span class="frame__signal-bar frame__signal-bar--1"></span>
+          <span class="frame__signal-bar frame__signal-bar--2"></span>
+          <span class="frame__signal-bar frame__signal-bar--3"></span>
+          <span class="frame__signal-bar frame__signal-bar--4"></span>
+        </span>
+        <span class="frame__wifi" aria-hidden="true">
+          <span class="frame__wifi-arc frame__wifi-arc--outer"></span>
+          <span class="frame__wifi-arc frame__wifi-arc--inner"></span>
+          <span class="frame__wifi-dot"></span>
+        </span>
+        <span class="frame__battery" aria-hidden="true">
+          <span class="frame__battery-fill"></span>
+          <span class="frame__battery-tip"></span>
+        </span>
       </span>
     </div>
 
@@ -38,17 +34,13 @@
       <span class="frame__right">
         <span class="frame__capsule" aria-hidden="true">
           <span class="frame__capsule-btn frame__capsule-btn--menu">
-            <svg width="20" height="6" viewBox="0 0 20 6" aria-hidden="true" style="display: block;">
-              <circle cx="3" cy="3" r="1.6" fill="currentColor"/>
-              <circle cx="10" cy="3" r="1.6" fill="currentColor"/>
-              <circle cx="17" cy="3" r="1.6" fill="currentColor"/>
-            </svg>
+            <span class="frame__menu-dot"></span>
+            <span class="frame__menu-dot"></span>
+            <span class="frame__menu-dot"></span>
           </span>
           <span class="frame__capsule-divider"></span>
           <span class="frame__capsule-btn frame__capsule-btn--close" @click="handleExit">
-            <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" style="display: block;">
-              <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-            </svg>
+            <span class="frame__close">x</span>
           </span>
         </span>
       </span>
@@ -57,27 +49,19 @@
     <!-- 内页样式：返回箭头 + 居中标题 -->
     <header v-else class="frame__header frame__header--inner">
       <div class="frame__back" aria-label="返回" @click="handleBack">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block;">
-          <path d="M15 18l-6-6 6-6"/>
-        </svg>
+        <span class="frame__back-icon">&lt;</span>
       </div>
       <span class="frame__title">{{ title }}</span>
       <span class="frame__right">
         <span class="frame__capsule" aria-hidden="true">
           <span class="frame__capsule-btn frame__capsule-btn--menu">
-            <svg width="20" height="6" viewBox="0 0 20 6" aria-hidden="true" style="display: block;">
-              <circle cx="3" cy="3" r="1.6" fill="currentColor"/>
-              <circle cx="10" cy="3" r="1.6" fill="currentColor"/>
-              <circle cx="17" cy="3" r="1.6" fill="currentColor"/>
-            </svg>
+            <span class="frame__menu-dot"></span>
+            <span class="frame__menu-dot"></span>
+            <span class="frame__menu-dot"></span>
           </span>
           <span class="frame__capsule-divider"></span>
           <span class="frame__capsule-btn frame__capsule-btn--close" @click="handleExit">
-            <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" style="display: block;">
-              <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-            </svg>
+            <span class="frame__close">x</span>
           </span>
         </span>
       </span>
