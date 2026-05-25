@@ -198,9 +198,11 @@
 }
 .frame__back:active { opacity: 0.6; }
 .frame__back-icon {
-  font-size: 24px;
-  line-height: 1;
-  font-weight: 600;
+  width: 10px;
+  height: 10px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
 }
 
 .frame__title {

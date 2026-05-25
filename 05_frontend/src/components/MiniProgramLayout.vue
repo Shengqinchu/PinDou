@@ -49,7 +49,7 @@
     <!-- 内页样式：返回箭头 + 居中标题 -->
     <header v-else class="frame__header frame__header--inner">
       <div class="frame__back" aria-label="返回" @click="handleBack">
-        <span class="frame__back-icon">&lt;</span>
+        <span class="frame__back-icon" aria-hidden="true"></span>
       </div>
       <span class="frame__title">{{ title }}</span>
       <span class="frame__right">
