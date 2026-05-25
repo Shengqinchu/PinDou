@@ -1,6 +1,21 @@
 // PinDou 统一请求库封装 (uni.request)
 
-const BASE_URL = 'http://127.0.0.1:8000/api/v1'; // 联调时指向真后端，线上预留则见 process.env
+declare const process: {
+  env?: {
+    NODE_ENV?: string;
+    VITE_PINDOU_DEV_API?: string;
+    VITE_PINDOU_PROD_API?: string;
+  };
+};
+
+const runtimeEnv = typeof process !== 'undefined' && process.env ? process.env : {};
+const DEV_API = runtimeEnv.VITE_PINDOU_DEV_API || 'http://192.168.2.40:8000/api/v1';
+const PROD_API = runtimeEnv.VITE_PINDOU_PROD_API || 'https://api.pindou.cn/api/v1';
+const isDev = runtimeEnv.NODE_ENV !== 'production';
+
+export const BASE_URL = normalizeBaseUrl(
+  uni.getStorageSync('pd_api_base_url') || (isDev ? DEV_API : PROD_API)
+);
 
 interface RequestOptions {
   url: string;
@@ -108,4 +123,8 @@ function translateError(errorData: any, statusCode: number): string {
   }
 
   return '系统开了一会儿小差，请重新再试一次哦~';
+}
+
+function normalizeBaseUrl(url: string): string {
+  return url.replace(/\/+$/, '');
 }
