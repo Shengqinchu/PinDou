@@ -158,10 +158,16 @@ prompt 来自 `01_research/tech/prompts.md` + Task C 拼豆约束（"不新增�
 **待定**（Phase 2+）：写实人像（"忠于原貌"模式）/ 多人合影（≥3 人）
 
 ### §4.4 尺寸预设（两路径共用，P0 必做）
-三档（按 Task C 拼豆领域调研）：
+四档（按 Task C 拼豆领域调研 + Phase 2 产品调优）：
+- **40×40**（Q 版主推，适合小红书轻量图纸 / 单宠物头像 / 小白对牌）
 - **60×80**（小，~30 元材料成本，宠物 / 单人头像）
 - **80×100**（中，~80 元材料成本，单人半身 / 双宠物）
 - **100×120**（大，~150 元材料成本，情侣 / 全身像）
+
+#### §4.4.1 Phase 2 默认尺寸调优
+
+Phase 2 质量评审发现 `80×100` 对 Q 版宠物 / 头像过密，容易保留照片级细节和毛发纹理，不像小红书常见的可执行拼豆图纸。
+产品默认生成尺寸调整为 `40×40`，优先得到粗黑边、少色数、强概括的小图纸；`60×80`、`80×100`、`100×120` 保留为高级版 / 大尺寸预设。
 
 **待定**（Phase 2+）：自定义任意尺寸 / 超大尺寸
 
@@ -324,7 +330,7 @@ class PreviewProvider:
         self,
         image: bytes,                    # 用户原图（原始字节）
         style_preset: StylePreset,       # Q版人像 / Q版宠物 / Q版情侣 / 通用卡通
-        size_preset: SizePreset,         # 60x80 / 80x100 / 100x120
+        size_preset: SizePreset,         # 40x40 / 60x80 / 80x100 / 100x120
         seed: int | None = None,         # 可选随机种子，重生成时用
     ) -> PreviewResult:
         ...
@@ -389,7 +395,7 @@ class PatternBuilder:
 
     def build(
         self,
-        size: SizePreset,                # 60x80 / 80x100 / 100x120
+        size: SizePreset,                # 40x40 / 60x80 / 80x100 / 100x120
         # 两种输入二选一：
         preview: bytes | None = None,    # AI 路径：FinishedPreview PNG with alpha
         raw_image: bytes | None = None,  # 脚本路径：用户原图（jpg/png）

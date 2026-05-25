@@ -22,6 +22,7 @@ class StylePreset(StrEnum):
 
 
 class SizePreset(StrEnum):
+    CHIBI_40X40 = "40x40"
     SMALL_60X80 = "60x80"
     MEDIUM_80X100 = "80x100"
     LARGE_100X120 = "100x120"

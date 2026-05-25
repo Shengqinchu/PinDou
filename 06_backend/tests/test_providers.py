@@ -51,7 +51,7 @@ def test_style_and_size_presets_match_frontend_contract() -> None:
         "q_couple",
         "cartoon_fallback",
     }
-    assert {size.value for size in SizePreset} == {"60x80", "80x100", "100x120"}
+    assert {size.value for size in SizePreset} == {"40x40", "60x80", "80x100", "100x120"}
 
 
 def test_xiaochi_provider_retries_once_with_new_seed_hint() -> None:

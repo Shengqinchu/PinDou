@@ -41,7 +41,7 @@ async def generate_script(request: Request, current_user: CurrentUser, db: DbSes
     require_sensitive_consent(current_user)
     payload, raw_upload = await parse_payload_or_upload(request, upload_field="raw_image")
     raw_image, original_path = await resolve_raw_image(payload, raw_upload)
-    size = parse_size(payload.get("size_preset") or payload.get("size") or "60x80")
+    size = parse_size(payload.get("size_preset") or payload.get("size") or "40x40")
     auto_remove_white_bg = bool(payload.get("auto_remove_white_bg", False))
 
     try:
@@ -86,7 +86,7 @@ async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession
     require_ai_credit_available(current_user)
     payload, upload = await parse_payload_or_upload(request, upload_field="image")
     raw_image, original_path = await resolve_raw_image(payload, upload)
-    size = parse_size(payload.get("size_preset") or payload.get("size") or "60x80")
+    size = parse_size(payload.get("size_preset") or payload.get("size") or "40x40")
     style = parse_style(payload.get("style_preset") or payload.get("style") or "q_portrait")
     seed = int(payload["seed"]) if payload.get("seed") not in (None, "") else None
 
@@ -131,7 +131,7 @@ async def generate_preview(request: Request, current_user: CurrentUser, db: DbSe
         raw_image = normalized_upload_png_bytes(upload.filename or "upload.png", await upload.read())
     else:
         raw_image, _path = await resolve_raw_image(payload, None)
-    size = parse_size(payload.get("size_preset") or payload.get("size") or "60x80")
+    size = parse_size(payload.get("size_preset") or payload.get("size") or "40x40")
     style = parse_style(payload.get("style_preset") or payload.get("style") or "q_portrait")
     seed = int(payload["seed"]) if payload.get("seed") not in (None, "") else None
 

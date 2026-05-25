@@ -159,7 +159,7 @@ const startProgressTick = () => {
 
 // 发起核心接口业务请求并管理 Fallback 降级链
 const handleGeneration = async () => {
-  const sizePreset: SizePreset = '80x100'; // 默认中等拼豆尺寸
+  const sizePreset: SizePreset = '40x40'; // Q版主推小尺寸，接近小红书轻量图纸
   
   if (tier.value === 'quick') {
     // 快速生成：直接调 PatternBuilder 本地量化

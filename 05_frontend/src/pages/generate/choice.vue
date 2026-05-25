@@ -83,7 +83,7 @@
           </li>
           <li class="choice__bullet">
             <span class="choice__check choice__check--premium" aria-hidden="true">✓</span>
-            可调网格大小（60x80/80x100/100x120）
+            默认 40x40 Q 版小图，高级版可调大尺寸
           </li>
         </ul>
 

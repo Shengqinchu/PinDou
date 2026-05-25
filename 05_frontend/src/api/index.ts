@@ -65,7 +65,7 @@ function uploadFailError(err: any): PinDouApiError {
    类型定义 (符合 PRD §5 / §6)
    ========================================== */
 export type StylePreset = 'q_portrait' | 'q_pet' | 'q_couple' | 'cartoon_fallback';
-export type SizePreset = '60x80' | '80x100' | '100x120';
+export type SizePreset = '40x40' | '60x80' | '80x100' | '100x120';
 export type CDKType = 'single_use' | 'monthly_card' | 'credit_pack_5' | 'credit_pack_10';
 
 export interface User {
@@ -162,7 +162,7 @@ const mockColorPalette: ColorRef[] = [
 ];
 
 function generateMockPatternSheet(size: SizePreset): PatternSheet {
-  const [cols, rows] = size === '60x80' ? [60, 80] : size === '80x100' ? [80, 100] : [100, 120];
+  const [cols, rows] = size === '40x40' ? [40, 40] : size === '60x80' ? [60, 80] : size === '80x100' ? [80, 100] : [100, 120];
   const grid: (ColorRef | null)[][] = [];
   const color_counts: Record<string, number> = {};
   const coords: [number, number, string][] = [];
