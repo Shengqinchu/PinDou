@@ -225,3 +225,31 @@ AI 路径 timeout、脚本 fallback 兔子占位图、标题实体转义、统�
 
 1. 微信开发者工具按 `Ctrl+R` 重新编译后再测；如果本地额度仍是 3/3，预期现在会显示“今天的额度用完啦”，而不是“网络有点慢”。
 2. 若要继续测试真实灰猫出图，需要重置本地开发库 `daily_quotas.script_used`，或临时增加每日脚本额度；不要在生产环境这样做。
+
+## 2026-05-25 — Phase 2 product quality tuning review
+
+对比小红书拼豆图纸参考后，本轮 5 个产品质量调优点已完成，结论给用户 / Claude review：
+
+1. AI prompt 已从“照片转绘”收紧为“拼豆用 Q 版线稿”：强制儿童涂色书 / hand-drawn perler bead pattern 风格、3-5px 粗黑边、5-8 个纯色块，并加入 no fur texture / no realistic shading / no gradient / no anti-aliasing 等 negative 约束。
+2. 默认尺寸已从偏密的大图转为 `40x40` Q 版小图；`60x80` / `80x100` / `100x120` 保留为更高阶预设。
+3. 后端 PNG exporter 已新增带网格和色号 overlay 的导出能力：1x1 灰网格、10x10 红色大格、每格中心显示色号，底部 legend 输出 `code (count)`。
+4. 结果页色卡 legend 已改为使用后端 `palette_used` 里的真实色号 + 中文名，不再显示英文 hex 名。
+5. 结果页色号统计已改为行业更熟悉的格式：`色号 (数量 颗 · 中文色名)`，并按数量降序。
+
+私有素材实测（文件均在 `01_research/tech/user_poc_private/`，不入 git）：
+
+1. `incoming/kitten_gray_photo.png` 走 raw PatternBuilder `40x40`：输出 40x40、1600 颗、8 色；生成了 simple preview 和 labeled grid 两张私有验证图。
+2. 同一张灰猫走调优后的 AI prompt：调用耗时约 56.3 秒，输出 40x40、1600 颗、7 色；主观观感明显更接近 Q 版拼豆，猫毛照片纹理已经被压掉很多。
+3. before / after 摘要：before 更像照片量化或 mock 图，尺寸偏密、色号展示不专业；after 已变成 40x40 小图、低色数、可读网格、色号 + 中文名 legend。
+
+剩余风险 / 建议下一步：
+
+1. AI preview 目前仍可能返回白底 PNG 而不是 alpha 透明背景，导致白色背景被 PatternBuilder 计为真实豆子。建议下一个 micro-task 做“AI 预览白底自动转 NoBead”，或在 provider 后处理阶段强制把连通白底置 alpha。
+2. 当前 MARD 数据库里的真实色号并不全部是 `M01` 这种格式，也会出现 `H2` / `R13` 等历史色号。前端已按后端真实 code 展示；如果产品侧要求统一成包装上的 `M01` 风格，需要 Task H/I 再补一层 canonical display code。
+3. 带 overlay 的 PNG exporter 已有内部能力，但 API 还没有新增 labeled PNG URL 返回；本轮遵守“不新增 endpoint”，所以前端下载图纸仍需后续 task 接入。
+
+验证记录：
+
+1. `06_backend/.venv/Scripts/python.exe -m pytest tests/test_providers.py tests/test_pattern.py tests/test_api.py` 通过。
+2. `05_frontend npm run build:mp-weixin` 通过。
+3. 私有灰猫 raw / AI 两条链路均已生成验证图；验证图未纳入 git。
