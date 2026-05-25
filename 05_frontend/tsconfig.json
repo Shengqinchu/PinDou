@@ -14,7 +14,7 @@
       "@dcloudio/types"
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
