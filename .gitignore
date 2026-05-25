@@ -67,3 +67,5 @@ tmp/
 # Private user assets — ADR-009 hard rule, never commit
 01_research/tech/user_poc_private/
 01_research/tech/user_poc_private/incoming/
+dist/
+unpackage/
