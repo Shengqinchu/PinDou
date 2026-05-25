@@ -452,6 +452,13 @@ class PatternExporter:
 
 ### §6.1 色卡 / 豆系（来自 Task D / H / I）
 
+**数据存储策略**（Phase 2 task 4 review 落档）：
+- **bead_skus / 色卡 palette 保持文件型**，不进 SQL：
+  - 数据相对静态（月度更新频率），写入由 Codex 数据更新任务批量执行
+  - 业务运行时只读，`colormap/loader.py` 缓存内存（启动时一次加载）
+  - 进 SQL 反而增加 migration / 数据同步负担
+- **迁 SQL 的触发条件**（Phase 4+）：① 需要"实时库存 / 实时价格"展示 ② 多品牌 SKU 总数 > 5000 行导致内存压力 ③ 后台需要动态增删 SKU 不重启服务
+
 延用 `01_research/colormap/<brand>_<size>mm.json` schema，**新增字段**（Task I 建议）：
 
 ```json
