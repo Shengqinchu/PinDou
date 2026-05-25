@@ -16,7 +16,7 @@ from pindou.config import get_settings
 from pindou.providers.base import PreviewProvider, PreviewProviderError, PreviewResult, SizePreset, StylePreset
 
 
-TARGET_COLOR_COUNT = 18
+TARGET_COLOR_COUNT = 8
 IMAGE_SIZE = "1024x1024"
 
 STYLE_PROMPTS: dict[StylePreset, str] = {
@@ -36,13 +36,14 @@ Preserve identity and key details:
 - Remove background clutter, license plates, text, and watermarks.
 
 Perler bead design style:
-- Thick black outline.
-- Large clean color blocks.
-- Minimal shadows and gradients.
+- Hand-drawn perler bead pattern style, like children's coloring book line art.
+- Thick 3-5 pixel solid black outline on every subject edge and major internal feature.
+- Large clean flat solid color blocks.
 - Simple cute facial features.
+- Use ONLY 5-8 solid colors total.
+- No fur texture, no realistic shading, no photo realism, no gradients, no anti-aliasing, no soft shadows.
 - Plain white or transparent-looking background; background should not be part of the bead design.
-- Suitable for later conversion into a 60x80, 80x100, or 100x120 bead grid.
-- Target 12-18 solid colors, maximum 24 colors.
+- Suitable for later conversion into a small chibi bead grid.
 """.strip(),
     StylePreset.Q_COUPLE: """
 Transform the uploaded couple/group photo into a cute Q-version chibi illustration for a perler bead finished-product preview.
@@ -59,13 +60,14 @@ Preserve identity and key details:
 - Remove background clutter, cars, license plates, text, and watermarks.
 
 Perler bead design style:
-- Thick black outline.
-- Large clean color blocks.
-- Minimal shadows and gradients.
+- Hand-drawn perler bead pattern style, like children's coloring book line art.
+- Thick 3-5 pixel solid black outline on every subject edge and major internal feature.
+- Large clean flat solid color blocks.
 - Simple cute facial features.
+- Use ONLY 5-8 solid colors total.
+- No fur texture, no realistic shading, no photo realism, no gradients, no anti-aliasing, no soft shadows.
 - Plain white or transparent-looking background; background should not be part of the bead design.
-- Suitable for later conversion into a 60x80, 80x100, or 100x120 bead grid.
-- Target 12-18 solid colors, maximum 24 colors.
+- Suitable for later conversion into a small chibi bead grid.
 """.strip(),
     StylePreset.Q_PET: """
 Transform the uploaded pet photo into a cute Q-version chibi pet illustration for a perler bead finished-product preview.
@@ -77,13 +79,14 @@ Strict composition rules:
 - Remove background clutter, text, logos, and watermarks.
 
 Perler bead design style:
-- Thick black outline.
-- Large clean color blocks.
-- Minimal shadows and gradients.
+- Hand-drawn perler bead pattern style, like children's coloring book line art.
+- Thick 3-5 pixel solid black outline on every subject edge and major internal feature.
+- Large clean flat solid color blocks.
 - Simple cute facial features while keeping the pet recognizable.
+- Use ONLY 5-8 solid colors total.
+- No fur texture, no realistic shading, no photo realism, no gradients, no anti-aliasing, no soft shadows.
 - Plain white or transparent-looking background; background should not be part of the bead design.
-- Suitable for later conversion into a 60x80, 80x100, or 100x120 bead grid.
-- Target 12-18 solid colors, maximum 24 colors.
+- Suitable for later conversion into a small chibi bead grid.
 """.strip(),
     StylePreset.CARTOON_FALLBACK: """
 Create a perler bead finished-product preview based on the uploaded image.
@@ -91,10 +94,22 @@ Create a perler bead finished-product preview based on the uploaded image.
 Keep the original subject count, visible body range, pose, main silhouette, and key accessories.
 Do not invent missing body parts, extra props, text, logos, decorative objects, fake legends, or fake coordinates.
 Use round bead-like dots, clean black outlines, large readable color blocks, and a plain white or transparent-looking background.
-Keep the design centered and suitable for a 60x80 or 80x100 grid.
-Target 12-18 solid colors, maximum 24 colors.
+Use hand-drawn perler bead pattern style, like children's coloring book line art.
+Use ONLY 5-8 solid colors total.
+Use thick 3-5 pixel solid black outlines.
+No fur texture, no realistic shading, no photo realism, no gradients, no anti-aliasing, no soft shadows.
+Keep the design centered and suitable for a small chibi bead grid.
 """.strip(),
 }
+
+PERLER_NEGATIVE_CONSTRAINTS = """
+Hard negative constraints:
+- Do not preserve photographic fur strands, skin pores, fabric texture, bokeh, lens blur, realistic highlights, or tonal gradients.
+- Do not use painterly shading, airbrush lighting, semi-transparent shadows, tiny texture strokes, or anti-aliased fuzzy edges.
+- Do not create extra colors for shadows; if a shadow is unavoidable, replace it with one flat darker solid color.
+- Every colored region must be simple enough to become one or more perler bead cells.
+- Output should look like a finished bead-pattern preview, not a realistic cartoon portrait.
+""".strip()
 
 
 class XiaochiGptProvider(PreviewProvider):
@@ -174,6 +189,7 @@ class XiaochiGptProvider(PreviewProvider):
         return "\n\n".join(
             [
                 prompt,
+                PERLER_NEGATIVE_CONSTRAINTS,
                 f"Output canvas: {IMAGE_SIZE}. Target bead grid preset: {size_preset.value}.",
                 "Return only the final finished-preview image, no text overlays.",
                 f"Seed hint: {seed}" if seed is not None else "Seed hint: provider default.",
