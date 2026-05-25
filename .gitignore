@@ -8,23 +8,30 @@ secrets/
 keys/
 credentials.json
 
-# Python
-__pycache__/
+# Python — 用 ** 双星 pattern 确保任意深度都 ignore
+**/__pycache__/
 *.pyc
 *.pyo
-.venv/
-venv/
-.pytest_cache/
-.mypy_cache/
+**/.venv/
+**/venv/
+**/.pytest_cache/
+**/.mypy_cache/
+**/*.egg-info/
 
 # Node
-node_modules/
+**/node_modules/
 npm-debug.log
 yarn-error.log
 pnpm-debug.log
-dist/
-build/
-.next/
+**/dist/
+**/build/
+**/.next/
+**/.nuxt/
+
+# uni-app / Vue 构建产物
+**/unpackage/
+**/.uni/
+**/.hbuilderx/
 
 # IDE / OS
 .vscode/
