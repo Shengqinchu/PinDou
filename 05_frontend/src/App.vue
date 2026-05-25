@@ -8,6 +8,7 @@ onLaunch(() => {
   // Keep launch synchronous for WeChat runtime. A slow profile request must not
   // block the first page render or WAService can report a launch timeout.
   const userStore = useUserStore();
+  userStore.initDeviceMetrics();
   if (userStore.token) {
     void refreshProfileInBackground(userStore);
   }

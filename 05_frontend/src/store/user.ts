@@ -1,10 +1,45 @@
 import { defineStore } from 'pinia';
 import { api, User } from '../api';
 
+export interface UiMetrics {
+  statusBarHeight: number;
+  menuButtonTop: number;
+  menuButtonHeight: number;
+  menuButtonWidth: number;
+  menuButtonRight: number;
+  topChromeHeight: number;
+  capsuleReserveRight: number;
+  safeAreaBottom: number;
+  screenWidth: number;
+  screenHeight: number;
+  pixelRatio: number;
+}
+
+interface UserState {
+  userInfo: User | null;
+  token: string;
+  uiMetrics: UiMetrics;
+}
+
+const defaultUiMetrics = (): UiMetrics => ({
+  statusBarHeight: 20,
+  menuButtonTop: 24,
+  menuButtonHeight: 32,
+  menuButtonWidth: 87,
+  menuButtonRight: 8,
+  topChromeHeight: 64,
+  capsuleReserveRight: 107,
+  safeAreaBottom: 0,
+  screenWidth: 375,
+  screenHeight: 667,
+  pixelRatio: 2,
+});
+
 export const useUserStore = defineStore('user', {
-  state: () => ({
+  state: (): UserState => ({
     userInfo: null as User | null,
     token: uni.getStorageSync('pd_token') || '',
+    uiMetrics: defaultUiMetrics(),
   }),
   getters: {
     isLoggedIn: (state): boolean => !!state.token,
@@ -18,6 +53,60 @@ export const useUserStore = defineStore('user', {
     }
   },
   actions: {
+    initDeviceMetrics() {
+      try {
+        const systemInfo = uni.getSystemInfoSync();
+        const screenWidth = systemInfo.screenWidth || systemInfo.windowWidth || 375;
+        const screenHeight = systemInfo.screenHeight || systemInfo.windowHeight || 667;
+        const statusBarHeight = systemInfo.statusBarHeight || 20;
+        const pixelRatio = systemInfo.pixelRatio || 2;
+
+        let menuButton = {
+          top: statusBarHeight + 4,
+          height: 32,
+          width: 87,
+          right: screenWidth - 8,
+          bottom: statusBarHeight + 36,
+        };
+
+        try {
+          const getMenuButton = (uni as any).getMenuButtonBoundingClientRect;
+          const rect = typeof getMenuButton === 'function' ? getMenuButton() : null;
+          if (rect && rect.height && rect.width) {
+            menuButton = {
+              top: rect.top,
+              height: rect.height,
+              width: rect.width,
+              right: rect.right,
+              bottom: rect.bottom,
+            };
+          }
+        } catch (e) {
+          console.warn('读取微信胶囊位置失败，使用默认导航尺寸:', e);
+        }
+
+        const safeAreaBottom = systemInfo.safeArea
+          ? Math.max(0, screenHeight - systemInfo.safeArea.bottom)
+          : ((systemInfo as any).safeAreaInsets?.bottom || 0);
+
+        this.uiMetrics = {
+          statusBarHeight,
+          menuButtonTop: menuButton.top,
+          menuButtonHeight: menuButton.height,
+          menuButtonWidth: menuButton.width,
+          menuButtonRight: Math.max(0, screenWidth - menuButton.right),
+          topChromeHeight: Math.max(statusBarHeight + menuButton.height + 8, menuButton.bottom + 8),
+          capsuleReserveRight: Math.max(screenWidth - (menuButton.right - menuButton.width) + 12, 104),
+          safeAreaBottom,
+          screenWidth,
+          screenHeight,
+          pixelRatio,
+        };
+      } catch (error) {
+        console.warn('初始化设备安全区失败，使用默认导航尺寸:', error);
+        this.uiMetrics = defaultUiMetrics();
+      }
+    },
     async login() {
       try {
         // 小程序获取 code

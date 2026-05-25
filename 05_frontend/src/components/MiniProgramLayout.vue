@@ -1,5 +1,5 @@
 <template>
-  <div class="frame">
+  <div class="frame" :style="frameStyle">
     <!-- 微信系统状态栏 -->
     <div class="frame__status">
       <span class="frame__time">9:41</span>
@@ -91,6 +91,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useUserStore } from '../store/user';
+
 interface Props {
   variant?: 'home' | 'inner';
   title?: string;
@@ -104,6 +107,19 @@ const props = withDefaults(defineProps<Props>(), {
   backUrl: '',
   scroll: true
 });
+
+const userStore = useUserStore();
+const uiMetrics = computed(() => userStore.uiMetrics);
+
+const frameStyle = computed(() => ({
+  '--pd-status-height': `${uiMetrics.value.statusBarHeight}px`,
+  '--pd-menu-top': `${uiMetrics.value.menuButtonTop}px`,
+  '--pd-menu-height': `${uiMetrics.value.menuButtonHeight}px`,
+  '--pd-top-chrome-height': `${uiMetrics.value.topChromeHeight}px`,
+  '--pd-safe-bottom': `${uiMetrics.value.safeAreaBottom}px`,
+  '--pd-capsule-reserve': `${uiMetrics.value.capsuleReserveRight}px`,
+  '--pd-capsule-width': `${uiMetrics.value.menuButtonWidth}px`,
+}));
 
 const handleBack = () => {
   if (props.backUrl) {
