@@ -88,8 +88,7 @@
   justify-content: center;
   box-shadow: 0 2px 6px rgba(255, 107, 157, 0.35);
 }
-.frame__logo-dot::after {
-  content: "";
+.frame__logo-dot-core {
   width: 8px;
   height: 8px;
   border-radius: 999px;
@@ -150,8 +149,8 @@
   justify-content: center;
   height: 32px;
 }
-.frame__capsule-btn:first-child { width: 44px; }
-.frame__capsule-btn:last-child  { width: 36px; }
+.frame__capsule-btn--menu { width: 44px; }
+.frame__capsule-btn--close { width: 36px; }
 .frame__capsule-divider {
   width: 0.5px;
   height: 16px;

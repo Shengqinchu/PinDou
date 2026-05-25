@@ -29,7 +29,7 @@
         <div class="premium__format" @click="handleDownloadFormat('PDF图纸', 'pdf')">
           <div class="premium__format-thumb premium__format-thumb--pdf">
             <span class="premium__format-corner">PDF</span>
-            <span class="premium__format-line premium__format-line--w8"></span>
+            <span class="premium__format-line premium__format-line--primary premium__format-line--w8"></span>
             <span class="premium__format-line premium__format-line--w6"></span>
             <span class="premium__format-line premium__format-line--w9"></span>
             <span class="premium__format-line premium__format-line--w7"></span>
@@ -43,12 +43,30 @@
           <div class="premium__format-thumb premium__format-thumb--xlsx">
             <span class="premium__format-corner premium__format-corner--xlsx">XLSX</span>
             <div class="premium__format-grid" aria-hidden="true">
-              <span></span><span></span><span></span><span></span>
-              <span></span><span></span><span></span><span></span>
-              <span></span><span></span><span></span><span></span>
-              <span></span><span></span><span></span><span></span>
-              <span></span><span></span><span></span><span></span>
-              <span></span><span></span><span></span><span></span>
+              <span class="premium__format-cell premium__format-cell--peach"></span>
+              <span class="premium__format-cell premium__format-cell--light-peach"></span>
+              <span class="premium__format-cell"></span>
+              <span class="premium__format-cell"></span>
+              <span class="premium__format-cell premium__format-cell--cream"></span>
+              <span class="premium__format-cell premium__format-cell--peach"></span>
+              <span class="premium__format-cell premium__format-cell--pink"></span>
+              <span class="premium__format-cell"></span>
+              <span class="premium__format-cell"></span>
+              <span class="premium__format-cell premium__format-cell--black"></span>
+              <span class="premium__format-cell"></span>
+              <span class="premium__format-cell"></span>
+              <span class="premium__format-cell premium__format-cell--brown"></span>
+              <span class="premium__format-cell"></span>
+              <span class="premium__format-cell premium__format-cell--light-peach"></span>
+              <span class="premium__format-cell"></span>
+              <span class="premium__format-cell"></span>
+              <span class="premium__format-cell premium__format-cell--hot-pink"></span>
+              <span class="premium__format-cell"></span>
+              <span class="premium__format-cell"></span>
+              <span class="premium__format-cell premium__format-cell--peach"></span>
+              <span class="premium__format-cell"></span>
+              <span class="premium__format-cell premium__format-cell--pink"></span>
+              <span class="premium__format-cell"></span>
             </div>
           </div>
           <div class="premium__format-name">Excel 色号</div>
@@ -357,7 +375,7 @@ const handleEmail = () => {
 .premium__format-line--w7  { width: 72%; }
 .premium__format-line--w8  { width: 88%; }
 .premium__format-line--w9  { width: 92%; }
-.premium__format-line:first-of-type {
+.premium__format-line--primary {
   background: var(--pd-pink);
   height: 5px;
 }
@@ -374,22 +392,17 @@ const handleEmail = () => {
   gap: 2px;
   height: 100%;
 }
-.premium__format-grid > span {
+.premium__format-cell {
   border-radius: 1.5px;
   background: var(--pd-divider);
 }
-/* Color a handful of cells to suggest a real spreadsheet */
-.premium__format-grid > *:nth-child(1)  { background: #FFB088; }
-.premium__format-grid > *:nth-child(2)  { background: #FFCDA6; }
-.premium__format-grid > *:nth-child(5)  { background: #FFF4E6; }
-.premium__format-grid > *:nth-child(6)  { background: #FFB088; }
-.premium__format-grid > *:nth-child(7)  { background: #FFB6C1; }
-.premium__format-grid > *:nth-child(10) { background: #2D2D2D; }
-.premium__format-grid > *:nth-child(13) { background: #8C6A55; }
-.premium__format-grid > *:nth-child(15) { background: #FFCDA6; }
-.premium__format-grid > *:nth-child(18) { background: #FF6B9D; }
-.premium__format-grid > *:nth-child(21) { background: #FFB088; }
-.premium__format-grid > *:nth-child(23) { background: #FFB6C1; }
+.premium__format-cell--peach { background: #FFB088; }
+.premium__format-cell--light-peach { background: #FFCDA6; }
+.premium__format-cell--cream { background: #FFF4E6; }
+.premium__format-cell--pink { background: #FFB6C1; }
+.premium__format-cell--black { background: #2D2D2D; }
+.premium__format-cell--brown { background: #8C6A55; }
+.premium__format-cell--hot-pink { background: #FF6B9D; }
 
 /* Tiles thumb — 2x2 numbered quadrants */
 .premium__format-thumb--tiles {

@@ -54,7 +54,7 @@
       </div>
 
       <!-- ===== Card B — Premium (recommended, paid) ===== -->
-      <div class="card card--recommended choice__card choice__card--recommended" @click="handleSelect('premium')">
+      <div class="card card--recommended choice__card choice__card--recommended choice__card--last" @click="handleSelect('premium')">
         <span class="tag tag--recommended choice__badge" aria-label="推荐">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; margin-right: 2px;">
             <path d="M9.94 14.06 2 12l7.94-2.06L12 2l2.06 7.94L22 12l-7.94 2.06L12 22z"/>
@@ -200,9 +200,9 @@ const handleHelp = () => {
   &:active { 
     transform: scale(0.99); 
   }
-  &:last-of-type { 
-    margin-bottom: 0; 
-  }
+}
+.choice__card--last { 
+  margin-bottom: 0; 
 }
 
 .choice__card--recommended { 

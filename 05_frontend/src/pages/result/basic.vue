@@ -49,7 +49,12 @@
           <span class="result__section-sub">按数量排序</span>
         </h2>
         <ul class="result__colors" role="list">
-          <li v-for="(color, index) in patternColors" :key="index" class="result__color">
+          <li
+            v-for="(color, index) in patternColors"
+            :key="index"
+            class="result__color"
+            :class="{ 'result__color--last': index === patternColors.length - 1 }"
+          >
             <!-- 动态绑定背景色 -->
             <span class="result__swatch" :style="{ backgroundColor: color.hex }" aria-hidden="true"></span>
             <span class="result__color-name">
@@ -347,10 +352,9 @@ onMounted(() => {
   gap: 10px;
   padding: 8px 4px;
   border-bottom: 1px solid var(--pd-divider);
-  
-  &:last-child { 
-    border-bottom: 0; 
-  }
+}
+.result__color--last {
+  border-bottom: 0;
 }
 
 .result__swatch {

@@ -30,12 +30,14 @@
     <!-- 首页样式：Logo + 标题左对齐 -->
     <header v-if="variant === 'home'" class="frame__header frame__header--home">
       <span class="frame__logo">
-        <span class="frame__logo-dot"></span>
+        <span class="frame__logo-dot">
+          <span class="frame__logo-dot-core"></span>
+        </span>
         <span>{{ title }}</span>
       </span>
       <span class="frame__right">
         <span class="frame__capsule" aria-hidden="true">
-          <span class="frame__capsule-btn">
+          <span class="frame__capsule-btn frame__capsule-btn--menu">
             <svg width="20" height="6" viewBox="0 0 20 6" aria-hidden="true" style="display: block;">
               <circle cx="3" cy="3" r="1.6" fill="currentColor"/>
               <circle cx="10" cy="3" r="1.6" fill="currentColor"/>
@@ -43,7 +45,7 @@
             </svg>
           </span>
           <span class="frame__capsule-divider"></span>
-          <span class="frame__capsule-btn" @click="handleExit">
+          <span class="frame__capsule-btn frame__capsule-btn--close" @click="handleExit">
             <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" style="display: block;">
               <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
             </svg>
@@ -64,7 +66,7 @@
       <span class="frame__title">{{ title }}</span>
       <span class="frame__right">
         <span class="frame__capsule" aria-hidden="true">
-          <span class="frame__capsule-btn">
+          <span class="frame__capsule-btn frame__capsule-btn--menu">
             <svg width="20" height="6" viewBox="0 0 20 6" aria-hidden="true" style="display: block;">
               <circle cx="3" cy="3" r="1.6" fill="currentColor"/>
               <circle cx="10" cy="3" r="1.6" fill="currentColor"/>
@@ -72,7 +74,7 @@
             </svg>
           </span>
           <span class="frame__capsule-divider"></span>
-          <span class="frame__capsule-btn" @click="handleExit">
+          <span class="frame__capsule-btn frame__capsule-btn--close" @click="handleExit">
             <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" style="display: block;">
               <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
             </svg>
