@@ -31,3 +31,13 @@
 3. Schema 建议新增：`bead_skus`（平台 SKU 表）、`china_market_status`（active / low_stock / discontinued_cn / new_release / unknown）、`aliases_cn`（中文别名）、`source_confidence`（每字段置信度）。不要把这些硬塞进现有 palette row。
 4. 小红书 ≥200 篇完整样本需要用户 App 内人工补采；Codex 已交付 `xhs_manual_collection_template.csv`。未登录公开 Web 只适合入口和少量卡片线索，不应为凑量绕平台限制。
 5. UI 色号搜索建议支持“奶白、腮红粉、描边黑、透色、黑白补充包”等中文口语词；材料清单仍显示品牌官方 code，别名只作为辅助搜索/展示。
+
+## 2026-05-24 — Phase 2 backend task 0 review
+
+任务 0 已完成服务器硬件盘点与低风险安全加固，结论给用户 / Claude review：
+
+1. 上海生产机实测为 Ubuntu 22.04.5 LTS，8 vCPU，15 GiB RAM，系统盘 80G；`/dev/sda1` 与 `/var` 同盘，当前 79G total / 22G used / 54G available。
+2. 硬盘低于 brief 的 100GB 阈值。建议立即二选一：A. 上线前接对象存储（OSS/COS/七牛）；B. 先扩容到 ≥200GB 再允许用户原图/Preview 落本地盘。若不处理，用户上传图和生成图很容易触发 FUTURE_WORK 第 3 条对象存储迁移。
+3. 已完成 SSH key 认证：本地 `.env` 已切到 `PINDOU_PROD_SSH_USER=pindou` + `PINDOU_PROD_SSH_KEY_PATH`，旧 `PINDOU_PROD_SSH_PASS` 已移除；服务器已禁用密码登录，root 仅保留 key 登录应急。
+4. 已创建 `pindou` 部署用户并启用 fail2ban。
+5. UFW 尚未启用：服务器当前有 `3001`、`8092`、`111` 等对外监听端口。请用户确认这些是否为既有业务必须端口；确认后再决定 UFW 只放行 `22/80/443`，还是额外保留某些端口 / 先迁到 Nginx 反代。

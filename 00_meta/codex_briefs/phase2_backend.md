@@ -1,6 +1,6 @@
 # Codex Phase 2 后端 Brief
 
-**Status**: pending
+**Status**: in_progress (Codex @ 2026-05-24) — task 0 hardware/security pass done, UFW port review pending
 **Owner**: Codex
 **Priority**: P0
 **Estimated**: 3-4 周（含 8 个子任务）

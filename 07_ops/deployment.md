@@ -2,7 +2,7 @@
 
 > **目标环境**：生产（上海 8C16G 20Mbps）
 > **撰写**：Claude Code 2026-05-24（初版骨架）
-> **状态**：🟡 待 Codex Phase 2 任务 0 完成后填实硬件 / 网络 / 软件版本字段
+> **状态**：🟢 Codex Phase 2 任务 0 已完成硬件盘点；SSH key / 部署用户 / fail2ban 已落地，UFW 端口策略待用户 review
 > **更新策略**：Codex / 用户 / 我 任何人改服务器配置必须同步更新本文件
 
 ---
@@ -13,12 +13,17 @@
 | 字段 | 值 |
 |------|----|
 | 区域 | 华东-上海1（国内云） |
-| 操作系统 | Ubuntu 22.04 64-bit |
-| 配置 | 8 核 / 16 GB RAM / 20 Mbps |
-| 硬盘 | **待 Codex 任务 0 查（`df -h` + `lsblk`）** |
+| 操作系统 | Ubuntu 22.04.5 LTS（kernel `5.15.0-119-generic`） |
+| 配置 | 8 vCPU / 15 GiB RAM / 20 Mbps |
+| CPU | Intel Xeon Processor，8 cores reported by `nproc` |
+| 内存 | 15 GiB RAM，2.0 GiB swap |
+| 硬盘 | 80G system disk；`/dev/sda1` mounted on `/`，79G total / 22G used / 54G available / 29% used |
+| `/var` 分区 | 与根分区同盘，79G total / 54G available；用户图片落本地盘会很快触发对象存储/扩容风险 |
 | 公网 IP | 见 `.env` `PINDOU_PROD_SSH_HOST` |
-| SSH 用户 | 见 `.env` `PINDOU_PROD_SSH_USER` |
-| SSH 凭证 | 见 `.env` `PINDOU_PROD_SSH_PASS`（**P0 待改 SSH key 认证**） |
+| SSH 用户 | 见 `.env` `PINDOU_PROD_SSH_USER`（当前已切到 `pindou`） |
+| SSH 凭证 | 见 `.env` `PINDOU_PROD_SSH_KEY_PATH`；密码登录已禁用，旧 `PINDOU_PROD_SSH_PASS` 已从本地 `.env` 移除 |
+| 网络接口 | `eth0` private network + `docker0`；公网 IP 不入文档 |
+| 已监听端口 | `22` / `80` / `3001` / `8092` / `111`，另有 localhost/cloudflared/containerd 端口；UFW 尚未启用 |
 | 到期日期 | 2026-09-25 22:41:52（**P1 提前 7 天提醒续费**） |
 
 ### 1.2 备份策略
@@ -30,6 +35,15 @@
 ## 2. P0 安全 TODO（Phase 2 部署前必须做）
 
 ### 2.1 改 SSH key 认证 + 禁 root 密码登录
+**状态（2026-05-24 Codex 执行）**：✅ 已完成。
+
+- 本机生成 `~/.ssh/pindou_prod_ed25519`（私钥不入 git）。
+- 公钥已加入 root 与 `pindou` 用户的 `authorized_keys`。
+- 已验证 root / `pindou` key 登录成功。
+- 已设置 `PasswordAuthentication no`、`PermitRootLogin prohibit-password`、`KbdInteractiveAuthentication no` 并 reload SSH。
+- 已验证 root 密码登录失败。
+- 本地 `.env` 已从 `PINDOU_PROD_SSH_PASS` 切换到 `PINDOU_PROD_SSH_KEY_PATH`。
+
 **为什么**：root + 密码 + 公网 IP = 最常见被爆破的攻击面。
 **操作**（10 分钟）：
 ```bash
@@ -37,17 +51,24 @@
 ssh-keygen -t ed25519 -C "pindou-prod"
 
 # 把公钥推到服务器
-ssh-copy-id -i ~/.ssh/id_ed25519.pub root@36.137.177.135
+ssh-copy-id -i ~/.ssh/id_ed25519.pub root@$PINDOU_PROD_SSH_HOST
 
 # 测试 key 登录成功后，禁用密码登录
-ssh root@36.137.177.135 "sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config && systemctl reload sshd"
+ssh root@$PINDOU_PROD_SSH_HOST "sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config && systemctl reload sshd"
 
 # 验证密码登录已禁
-ssh -o PreferredAuthentications=password root@36.137.177.135   # 应该报错
+ssh -o PreferredAuthentications=password root@$PINDOU_PROD_SSH_HOST   # 应该报错
 ```
 **完成后**：从 `.env` 删除 `PINDOU_PROD_SSH_PASS`，添加 `PINDOU_PROD_SSH_KEY_PATH`。
 
 ### 2.2 改 root 改成普通用户 + sudo
+**状态（2026-05-24 Codex 执行）**：✅ 已完成。
+
+- 已创建 `pindou` 用户。
+- 已加入 `sudo` 组。
+- 已配置 key 登录。
+- 已配置 `/etc/sudoers.d/pindou`，部署自动化可无交互执行 sudo。
+
 **为什么**：所有部署 / 应用都用 root 运行，被入侵就是 root 权限。
 **操作**：
 ```bash
@@ -59,6 +80,12 @@ mkdir -p /home/pindou/.ssh && cp /root/.ssh/authorized_keys /home/pindou/.ssh/ &
 ```
 
 ### 2.3 防火墙 + fail2ban
+**状态（2026-05-24 Codex 执行）**：🟡 部分完成。
+
+- `ufw` 已安装，但当前保持 inactive。
+- `fail2ban` 已安装并 `enable --now`，当前 active。
+- 暂未启用 UFW 的原因：服务器已有 `3001`、`8092`、`111` 等对外监听端口。直接执行默认拒绝只放行 `22/80/443` 可能误伤现有服务。待用户确认这些端口是否可关闭/仅内网访问后再启用。
+
 ```bash
 apt update && apt install -y ufw fail2ban
 ufw default deny incoming
@@ -103,19 +130,22 @@ systemctl enable --now fail2ban
 
 ## 4. 软件栈（Codex Phase 2 任务 1 确认 / 安装）
 
-| 组件 | 版本目标 | 备注 |
-|------|---------|------|
-| Python | 3.11+ | FastAPI 性能最优 |
-| FastAPI | 最新稳定 | 后端框架 |
-| Uvicorn | 最新稳定 | ASGI server |
-| SQLite or PostgreSQL | — | Codex 选型；MVP 期 SQLite 够，1 万用户后切 PG |
-| Nginx | apt 默认 | 反代 + 静态文件 |
-| systemd | 自带 | 服务管理 |
-| Let's Encrypt（certbot） | apt 默认 | HTTPS 证书 |
-| Pillow + numpy + scikit-learn | 最新 | PatternBuilder 算法依赖 |
-| colormath | 最新 | CIEDE2000 |
-| openai SDK | 最新 | 反代调用 |
-| python-dotenv | 最新 | 读 .env |
+| 组件 | 版本目标 | 生产机当前状态（2026-05-24） | 备注 |
+|------|---------|-----------------------------|------|
+| Python | 3.11+ | 已有 `/usr/bin/python3` = Python 3.10.12；未发现 `python3.11` | 任务 1/8 需安装 3.11+ 或用 `pyenv`/deadsnakes |
+| FastAPI | 最新稳定 | 未部署 PinDou app | 任务 1 安装 |
+| Uvicorn | 最新稳定 | 未部署 PinDou app | 任务 1 安装 |
+| SQLite or PostgreSQL | — | SQLite runtime 3.37.2 + `/usr/bin/sqlite3` 已有；PostgreSQL CLI 未发现 | MVP 期 SQLite 够，1 万用户后切 PG |
+| Nginx | apt 默认 | 已安装 `/usr/sbin/nginx`，版本 1.18.0，监听 `:80` | 反代 + 静态文件 |
+| systemd | 自带 | 已有 | 服务管理 |
+| Let's Encrypt（certbot） | apt 默认 | 已安装 `/usr/bin/certbot`，版本 1.21.0 | 域名备案后申请证书 |
+| Docker | 非 PinDou 必需 | 已安装 Docker 28.2.2；当前有 Docker 相关监听 | 可能是服务器既有服务，部署前需确认边界 |
+| UFW | apt 默认 | 已安装，inactive | 端口策略待 review |
+| fail2ban | apt 默认 | 已安装并 active，版本 0.11.2 | 已启用 |
+| Pillow + numpy + scikit-learn | 最新 | 未部署 PinDou app | PatternBuilder 算法依赖 |
+| colormath | 最新 | 未部署 PinDou app | CIEDE2000 |
+| openai SDK | 最新 | 未部署 PinDou app | 反代调用 |
+| python-dotenv | 最新 | 未部署 PinDou app | 读 `.env` |
 
 ---
 
@@ -124,7 +154,7 @@ systemctl enable --now fail2ban
 ### 5.1 首次部署
 ```bash
 # 1. SSH 进服务器（已改 SSH key）
-ssh pindou@36.137.177.135
+ssh pindou@$PINDOU_PROD_SSH_HOST
 
 # 2. 拉代码
 git clone <repo> /opt/pindou
@@ -136,7 +166,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 # 4. 配置 .env（从本地 scp 上去，永远不入 git）
-scp .env.production pindou@36.137.177.135:/opt/pindou/.env
+scp .env.production pindou@$PINDOU_PROD_SSH_HOST:/opt/pindou/.env
 
 # 5. 启动 systemd 服务
 sudo cp deploy/pindou.service /etc/systemd/system/
