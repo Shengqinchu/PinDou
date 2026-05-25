@@ -2,18 +2,14 @@
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
 import { useUserStore } from "./store/user";
 
-onLaunch(async () => {
+onLaunch(() => {
   console.log("PinDou App Launching...");
-  
-  // 校验本地缓存登录态并拉取最新 profile
+
+  // Keep launch synchronous for WeChat runtime. A slow profile request must not
+  // block the first page render or WAService can report a launch timeout.
   const userStore = useUserStore();
   if (userStore.token) {
-    try {
-      await userStore.fetchProfile();
-    } catch (e) {
-      console.warn("自动登录拉取 Profile 失败，可能登录态已失效:", e);
-      userStore.logout();
-    }
+    void refreshProfileInBackground(userStore);
   }
 });
 
@@ -24,6 +20,15 @@ onShow(() => {
 onHide(() => {
   console.log("PinDou App Hide");
 });
+
+async function refreshProfileInBackground(userStore: ReturnType<typeof useUserStore>) {
+  try {
+    await userStore.fetchProfile();
+  } catch (e) {
+    console.warn("自动登录拉取 Profile 失败，可能登录态已失效:", e);
+    userStore.logout();
+  }
+}
 </script>
 
 <style lang="scss">
