@@ -129,13 +129,19 @@ class Order(Base):
     user: Mapped[User] = relationship(back_populates="orders")
 
     def to_frontend_dict(self) -> dict[str, Any]:
+        frontend_status = {
+            "pending_cs_qr": "pending",
+            "paid_confirmed": "paid_confirmed",
+            "cancelled": "failed",
+            "refunded": "failed",
+        }.get(self.status, self.status)
         return {
             "order_id": self.order_id,
             "user_id": self.user_id,
             "created_at": iso_or_none(self.created_at),
             "sku": self.sku,
             "amount_cny": float(self.amount_cny),
-            "status": self.status,
+            "status": frontend_status,
             "payment_method": self.payment_method,
             "artwork_id": self.artwork_id,
         }

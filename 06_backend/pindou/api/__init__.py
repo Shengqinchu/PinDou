@@ -9,6 +9,7 @@ api_router = APIRouter()
 for router in (
     upload.router,
     generate.router,
+    generate.preview_router,
     pattern.router,
     artwork.router,
     user.router,

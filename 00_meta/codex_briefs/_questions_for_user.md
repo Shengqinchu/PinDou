@@ -115,3 +115,24 @@ micro-task “脚本路径试试自动去白底”已完成，结论给用户 / 
 
 1. PRD §6.1 写明 `bead_skus.json` 是来自 Task I 的独立文件，本次没有把 `bead_skus` 做成 SQL 表。若 task 7 购物清单需要后台管理 SKU，建议再开 migration 增加 `bead_skus` 表。
 2. CDK 频率限制当前是进程内内存实现，足够支撑本地 / 单 worker P0；多 worker 或多机部署前建议改为 Redis / 数据库 attempt log。
+
+## 2026-05-25 — Phase 2 backend task 5 review
+
+任务 5 已完成后端 MVP API 主体闭环，结论给用户 / Claude review：
+
+1. 已实现统一错误格式 `{error, message_cn, details?}`，并新增错误码字典：鉴权、合规同意、额度、上传、图纸、Preview、CDK、订单、校验错误等均走同一响应结构。
+2. 已实现 JWT 鉴权：小程序用户 token 与 admin token 分开；普通路由从 `Authorization: Bearer` 注入当前用户，`/api/admin/*` 只能用 admin token。
+3. 已实现上传端点：`POST /api/upload`，校验敏感信息同意、10MB 限制、jpg/png/webp、EXIF 旋正，保存到 `PINDOU_UPLOAD_DIR`，返回 `image_id` / `image_url`。
+4. 已实现生成端点：`POST /api/generate/script` 走 `PatternBuilder(raw_image=...)`；`POST /api/generate/ai` 走 `PreviewProviderChain → PatternBuilder → Artwork`；另补前端兼容 `POST /api/v1/preview/generate`，返回纯 `PreviewResult`。
+5. 已实现图纸端点：`POST /api/pattern/build` 支持前端 multipart raw_image 和 JSON preview_id；`GET /api/pattern/{artwork_id}` 返回保存的 PatternSheet JSON。
+6. 已实现作品集端点：列表、详情、删除；删除沿用 task 4 `ArtworkService` 同步删原图。
+7. 已实现用户、支付、CDK、admin 端点：`/user/login`、`/user/profile`/`/user/me`、`/user/consent`、`/payment/order/create`、`/payment/order/{id}`、`/payment/customer-service`、`/cdk/redeem`、`/admin/login`、`/admin/orders`、`/admin/payment/confirm`、`/admin/cdk/batch_generate`、`/admin/users`。
+8. 已兼容前端当前 `BASE_URL=/api/v1`：同一套 router 同时挂载 `/api` 和 `/api/v1`；`/payment/order/create`、`/payment/customer-service`、`/user/profile` 均可直接对接前端现有调用。
+9. 已补 `python-multipart` 依赖，并将 `06_backend/var/` 加入 `.gitignore`，避免上传图、preview、pattern JSON 误入 git。
+10. 已补 API 测试：用户 / 上传 / pattern / generate script / generate AI preview / artwork / payment / admin / CDK 的 happy path 与错误路径；`pytest` 通过 27/27。
+
+需要 Claude / 用户确认的衔接点：
+
+1. 前端 `05_frontend/store/artwork.ts` 调用了 `api.generateAIPreview(...)`，但 `05_frontend/api/index.ts` 里实际函数名是 `generatePreview(...)`。后端已支持前端函数内部访问的 `/api/v1/preview/generate`，但 TypeScript 方法名不一致需要 Gemini / 前端侧补 alias 或改调用。
+2. 当前微信登录是 Phase 2 dev stub：用 `code` 派生稳定 openid；正式接微信接口时需要在 task 8 或 Phase 3 接 `jscode2session`。
+3. admin 默认账号密码只在 `APP_ENV=development` 时允许 `admin/admin`；生产必须配置 `ADMIN_USERNAME` + `ADMIN_PASSWORD_HASH`。

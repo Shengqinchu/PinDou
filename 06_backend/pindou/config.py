@@ -54,6 +54,11 @@ class Settings(BaseSettings):
     jwt_secret: SecretStr | None = Field(default=None, validation_alias="JWT_SECRET")
     admin_username: str | None = Field(default=None, validation_alias="ADMIN_USERNAME")
     admin_password_hash: SecretStr | None = Field(default=None, validation_alias="ADMIN_PASSWORD_HASH")
+    customer_service_qr_url: str = Field(
+        default="/static/assets/qr-placeholder.svg",
+        validation_alias="CUSTOMER_SERVICE_QR_URL",
+    )
+    customer_service_wx_id: str = Field(default="pindou_cs_01", validation_alias="CUSTOMER_SERVICE_WX_ID")
 
     reverse_proxy_health_url: str = Field(
         default="https://gpt.xiaochisaascn.org/v1/models",

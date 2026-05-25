@@ -6,10 +6,14 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from pindou import __version__
 from pindou.api import api_router
+from pindou.api.errors import install_exception_handlers
+from pindou.api.storage import ensure_storage_dirs
 from pindou.config import get_settings
+from pindou.db.session import init_db
 from pindou.tasks.delete_expired_originals import ExpiredOriginalsDeleteScheduler
 from pindou.tasks.reverse_proxy_health_check import ReverseProxyHealthMonitor
 
@@ -28,6 +32,8 @@ def create_app() -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        ensure_storage_dirs()
+        init_db()
         app.state.reverse_proxy_health_monitor = monitor
         app.state.expired_originals_delete_scheduler = expired_originals_scheduler
         if settings.enable_reverse_proxy_health_monitor:
@@ -55,6 +61,11 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    install_exception_handlers(app)
+    ensure_storage_dirs()
+    app.mount("/static/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")
+    app.mount("/static/previews", StaticFiles(directory=settings.preview_dir), name="previews")
+    app.mount("/static/patterns", StaticFiles(directory=settings.pattern_dir), name="patterns")
 
     @app.get("/health", tags=["system"])
     async def health() -> dict[str, str]:
@@ -64,6 +75,7 @@ def create_app() -> FastAPI:
     app.state.expired_originals_delete_scheduler = expired_originals_scheduler
 
     app.include_router(api_router, prefix="/api")
+    app.include_router(api_router, prefix="/api/v1")
     return app
 
 
