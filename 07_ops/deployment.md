@@ -2,7 +2,7 @@
 
 > **目标环境**：生产（上海 8C16G 20Mbps）
 > **撰写**：Claude Code 2026-05-24（初版骨架）
-> **状态**：🟢 Codex Phase 2 任务 0 已完成硬件盘点；SSH key / 部署用户 / fail2ban / UFW 端口收敛已落地
+> **状态**：🟢 Codex Phase 2 任务 0 已完成硬件盘点；旧服务/旧数据已清理，SSH key / 部署用户 / fail2ban / UFW 已落地
 > **更新策略**：Codex / 用户 / 我 任何人改服务器配置必须同步更新本文件
 
 ---
@@ -17,14 +17,14 @@
 | 配置 | 8 vCPU / 15 GiB RAM / 20 Mbps |
 | CPU | Intel Xeon Processor，8 cores reported by `nproc` |
 | 内存 | 15 GiB RAM，2.0 GiB swap |
-| 硬盘 | 80G system disk；`/dev/sda1` mounted on `/`，79G total / 22G used / 54G available / 29% used |
-| `/var` 分区 | 与根分区同盘，79G total / 54G available；用户图片落本地盘会很快触发对象存储/扩容风险 |
+| 硬盘 | 80G system disk；`/dev/sda1` mounted on `/`，79G total / 6.9G used / 69G available / 10% used（2026-05-25 清理旧服务后） |
+| `/var` 分区 | 与根分区同盘；清理后 `/var` 约 525M。用户图片落本地盘仍需关注容量上限 |
 | 公网 IP | 见 `.env` `PINDOU_PROD_SSH_HOST` |
 | SSH 用户 | 见 `.env` `PINDOU_PROD_SSH_USER`（当前已切到 `pindou`） |
 | SSH 凭证 | 见 `.env` `PINDOU_PROD_SSH_KEY_PATH`；密码登录已禁用，旧 `PINDOU_PROD_SSH_PASS` 已从本地 `.env` 移除 |
 | 网络接口 | `eth0` private network + `docker0`；公网 IP 不入文档 |
-| 已监听端口 | `22` / `80` / `3001` / `8092`，另有 localhost/cloudflared/containerd 端口；UFW 仅允许公网入站 `22/80/443` |
-| 已清理端口 | `111 rpcbind` 已停用并禁止自启动 |
+| 已监听端口 | 公网仅 `22`；本地 `127.0.0.1:31088` 为云探针 |
+| 已清理端口 | `80` / `3001` / `8092` / `111` / cloudflared UDP 均已停止；UFW 仍预放行 `22/80/443` 供后续 PinDou 部署 |
 | 到期日期 | 2026-09-25 22:41:52（**P1 提前 7 天提醒续费**） |
 
 ### 1.2 备份策略
@@ -36,7 +36,7 @@
 ## 2. P0 安全 TODO（Phase 2 部署前必须做）
 
 ### 2.1 改 SSH key 认证 + 禁 root 密码登录
-**状态（2026-05-24 Codex 执行）**：✅ 已完成。
+**状态（2026-05-24/25 Codex 执行）**：✅ 已完成。
 
 - 本机生成 `~/.ssh/pindou_prod_ed25519`（私钥不入 git）。
 - 公钥已加入 root 与 `pindou` 用户的 `authorized_keys`。
@@ -87,8 +87,10 @@ mkdir -p /home/pindou/.ssh && cp /root/.ssh/authorized_keys /home/pindou/.ssh/ &
 - 入站只允许 `22/tcp`、`80/tcp`、`443/tcp`。
 - `fail2ban` 已安装并 `enable --now`，当前 active。
 - `111 rpcbind` 未发现 NFS 挂载依赖，已 `disable --now`。
-- `3001`（`claude-shop.service`）和 `8092`（Docker `wxhm`）保留给 Nginx 本机反代使用，但公网直连已被 UFW 阻断。
-- 本机验证：SSH key 登录可用；Nginx / `claude-shop` / Docker / cloudflared / fail2ban 均 active；rpcbind inactive。
+- `3001`（`claude-shop.service`）和 `8092`（Docker `wxhm`）已停用并清理。
+- cloudflared 已停用并移除旧 unit。
+- 旧 Nginx 站点配置已下线，Nginx 当前 inactive，后续 PinDou 部署时重新启用。
+- 本机验证：SSH key 登录可用；fail2ban active；UFW active；旧服务 inactive。
 
 ```bash
 apt update && apt install -y ufw fail2ban
@@ -140,10 +142,10 @@ systemctl enable --now fail2ban
 | FastAPI | 最新稳定 | 未部署 PinDou app | 任务 1 安装 |
 | Uvicorn | 最新稳定 | 未部署 PinDou app | 任务 1 安装 |
 | SQLite or PostgreSQL | — | SQLite runtime 3.37.2 + `/usr/bin/sqlite3` 已有；PostgreSQL CLI 未发现 | MVP 期 SQLite 够，1 万用户后切 PG |
-| Nginx | apt 默认 | 已安装 `/usr/sbin/nginx`，版本 1.18.0，监听 `:80` | 反代 + 静态文件 |
+| Nginx | apt 默认 | 已安装 `/usr/sbin/nginx`，版本 1.18.0；旧站点已下线，当前 inactive | 任务 8 配置 PinDou 站点后重新 enable |
 | systemd | 自带 | 已有 | 服务管理 |
 | Let's Encrypt（certbot） | apt 默认 | 已安装 `/usr/bin/certbot`，版本 1.21.0 | 域名备案后申请证书 |
-| Docker | 非 PinDou 必需 | 已安装 Docker 28.2.2；当前有 Docker 相关监听 | 可能是服务器既有服务，部署前需确认边界 |
+| Docker | 非 PinDou 必需 | 旧容器/镜像/`/var/lib/docker` 已清理；docker/containerd 当前 inactive | PinDou 计划走 systemd，不依赖 Docker |
 | UFW | apt 默认 | 已安装并 active，只允许 `22/80/443` 入站 | 服务器本机已放行 80/443；若公网仍不可达，检查云厂商安全组 / Cloudflare Tunnel |
 | fail2ban | apt 默认 | 已安装并 active，版本 0.11.2 | 已启用 |
 | Pillow + numpy + scikit-learn | 最新 | 未部署 PinDou app | PatternBuilder 算法依赖 |
