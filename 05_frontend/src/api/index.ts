@@ -3,6 +3,7 @@ import { request, BASE_URL } from '../utils/request';
 
 // 是否开启 Mock 模式 (联调前默认开启)
 const USE_MOCK = false;
+const UPLOAD_TIMEOUT_MS = 120000;
 
 /* ==========================================
    类型定义 (符合 PRD §5 / §6)
@@ -231,6 +232,7 @@ export const api = {
         url: `${BASE_URL}/preview/generate`, // uni.uploadFile 必须完整 URL（不走 request 拦截器）
         filePath: filePath,
         name: 'image',
+        timeout: UPLOAD_TIMEOUT_MS,
         formData: {
           style_preset: style,
           size_preset: size,
@@ -277,6 +279,7 @@ export const api = {
           url: `${BASE_URL}/pattern/build`, // uni.uploadFile 必须完整 URL（不走 request 拦截器）
           filePath: params.rawImageFilePath!,
           name: 'raw_image',
+          timeout: UPLOAD_TIMEOUT_MS,
           formData: {
             size: params.size,
             brand: params.brand || 'MARD',
