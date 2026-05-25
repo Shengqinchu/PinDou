@@ -1,5 +1,5 @@
 // PinDou API 封装 (符合 PRD §5 接口契约)
-import { request } from '../utils/request';
+import { request, BASE_URL } from '../utils/request';
 
 // 是否开启 Mock 模式 (联调前默认开启)
 const USE_MOCK = false;
@@ -228,7 +228,7 @@ export const api = {
     return new Promise((resolve, reject) => {
       const token = uni.getStorageSync('pd_token') || '';
       uni.uploadFile({
-        url: '/preview/generate', // 使用相对路径，由 request 自动补全 BASE_URL
+        url: `${BASE_URL}/preview/generate`, // uni.uploadFile 必须完整 URL（不走 request 拦截器）
         filePath: filePath,
         name: 'image',
         formData: {
@@ -274,7 +274,7 @@ export const api = {
       return new Promise((resolve, reject) => {
         const token = uni.getStorageSync('pd_token') || '';
         uni.uploadFile({
-          url: '/pattern/build', // 使用相对路径
+          url: `${BASE_URL}/pattern/build`, // uni.uploadFile 必须完整 URL（不走 request 拦截器）
           filePath: params.rawImageFilePath!,
           name: 'raw_image',
           formData: {
