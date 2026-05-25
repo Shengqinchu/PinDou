@@ -10,7 +10,7 @@
    match to the soft, slightly-condensed rounded look the
    brand calls for. Drop in PingFang/Rounded M+ TTFs in
    /fonts/ on a real device deploy. */
-@import url("https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap");
+/* 小程序 WXSS 不支持 @import url() web 字体；统一用系统圆润字体 (PingFang) + font-family fallback stack 在下方 --pd-font-display 变量里声明 */
 
 page {
   /* ---- Color: brand --------------------------------------- */

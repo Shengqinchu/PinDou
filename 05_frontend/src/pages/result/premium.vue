@@ -379,17 +379,17 @@ const handleEmail = () => {
   background: var(--pd-divider);
 }
 /* Color a handful of cells to suggest a real spreadsheet */
-.premium__format-grid > :nth-child(1)  { background: #FFB088; }
-.premium__format-grid > :nth-child(2)  { background: #FFCDA6; }
-.premium__format-grid > :nth-child(5)  { background: #FFF4E6; }
-.premium__format-grid > :nth-child(6)  { background: #FFB088; }
-.premium__format-grid > :nth-child(7)  { background: #FFB6C1; }
-.premium__format-grid > :nth-child(10) { background: #2D2D2D; }
-.premium__format-grid > :nth-child(13) { background: #8C6A55; }
-.premium__format-grid > :nth-child(15) { background: #FFCDA6; }
-.premium__format-grid > :nth-child(18) { background: #FF6B9D; }
-.premium__format-grid > :nth-child(21) { background: #FFB088; }
-.premium__format-grid > :nth-child(23) { background: #FFB6C1; }
+.premium__format-grid > *:nth-child(1)  { background: #FFB088; }
+.premium__format-grid > *:nth-child(2)  { background: #FFCDA6; }
+.premium__format-grid > *:nth-child(5)  { background: #FFF4E6; }
+.premium__format-grid > *:nth-child(6)  { background: #FFB088; }
+.premium__format-grid > *:nth-child(7)  { background: #FFB6C1; }
+.premium__format-grid > *:nth-child(10) { background: #2D2D2D; }
+.premium__format-grid > *:nth-child(13) { background: #8C6A55; }
+.premium__format-grid > *:nth-child(15) { background: #FFCDA6; }
+.premium__format-grid > *:nth-child(18) { background: #FF6B9D; }
+.premium__format-grid > *:nth-child(21) { background: #FFB088; }
+.premium__format-grid > *:nth-child(23) { background: #FFB6C1; }
 
 /* Tiles thumb — 2x2 numbered quadrants */
 .premium__format-thumb--tiles {
