@@ -2,7 +2,7 @@
 
 > **目标环境**：生产（上海 8C16G 20Mbps）
 > **撰写**：Claude Code 2026-05-24（初版骨架）
-> **状态**：🟢 Codex Phase 2 任务 0 已完成硬件盘点；SSH key / 部署用户 / fail2ban 已落地，UFW 端口策略待用户 review
+> **状态**：🟢 Codex Phase 2 任务 0 已完成硬件盘点；SSH key / 部署用户 / fail2ban / UFW 端口收敛已落地
 > **更新策略**：Codex / 用户 / 我 任何人改服务器配置必须同步更新本文件
 
 ---
@@ -23,7 +23,8 @@
 | SSH 用户 | 见 `.env` `PINDOU_PROD_SSH_USER`（当前已切到 `pindou`） |
 | SSH 凭证 | 见 `.env` `PINDOU_PROD_SSH_KEY_PATH`；密码登录已禁用，旧 `PINDOU_PROD_SSH_PASS` 已从本地 `.env` 移除 |
 | 网络接口 | `eth0` private network + `docker0`；公网 IP 不入文档 |
-| 已监听端口 | `22` / `80` / `3001` / `8092` / `111`，另有 localhost/cloudflared/containerd 端口；UFW 尚未启用 |
+| 已监听端口 | `22` / `80` / `3001` / `8092`，另有 localhost/cloudflared/containerd 端口；UFW 仅允许公网入站 `22/80/443` |
+| 已清理端口 | `111 rpcbind` 已停用并禁止自启动 |
 | 到期日期 | 2026-09-25 22:41:52（**P1 提前 7 天提醒续费**） |
 
 ### 1.2 备份策略
@@ -80,11 +81,14 @@ mkdir -p /home/pindou/.ssh && cp /root/.ssh/authorized_keys /home/pindou/.ssh/ &
 ```
 
 ### 2.3 防火墙 + fail2ban
-**状态（2026-05-24 Codex 执行）**：🟡 部分完成。
+**状态（2026-05-24 Codex 执行）**：✅ 已完成。
 
-- `ufw` 已安装，但当前保持 inactive。
+- `ufw` 已安装并启用。
+- 入站只允许 `22/tcp`、`80/tcp`、`443/tcp`。
 - `fail2ban` 已安装并 `enable --now`，当前 active。
-- 暂未启用 UFW 的原因：服务器已有 `3001`、`8092`、`111` 等对外监听端口。直接执行默认拒绝只放行 `22/80/443` 可能误伤现有服务。待用户确认这些端口是否可关闭/仅内网访问后再启用。
+- `111 rpcbind` 未发现 NFS 挂载依赖，已 `disable --now`。
+- `3001`（`claude-shop.service`）和 `8092`（Docker `wxhm`）保留给 Nginx 本机反代使用，但公网直连已被 UFW 阻断。
+- 本机验证：SSH key 登录可用；Nginx / `claude-shop` / Docker / cloudflared / fail2ban 均 active；rpcbind inactive。
 
 ```bash
 apt update && apt install -y ufw fail2ban
@@ -140,7 +144,7 @@ systemctl enable --now fail2ban
 | systemd | 自带 | 已有 | 服务管理 |
 | Let's Encrypt（certbot） | apt 默认 | 已安装 `/usr/bin/certbot`，版本 1.21.0 | 域名备案后申请证书 |
 | Docker | 非 PinDou 必需 | 已安装 Docker 28.2.2；当前有 Docker 相关监听 | 可能是服务器既有服务，部署前需确认边界 |
-| UFW | apt 默认 | 已安装，inactive | 端口策略待 review |
+| UFW | apt 默认 | 已安装并 active，只允许 `22/80/443` 入站 | 服务器本机已放行 80/443；若公网仍不可达，检查云厂商安全组 / Cloudflare Tunnel |
 | fail2ban | apt 默认 | 已安装并 active，版本 0.11.2 | 已启用 |
 | Pillow + numpy + scikit-learn | 最新 | 未部署 PinDou app | PatternBuilder 算法依赖 |
 | colormath | 最新 | 未部署 PinDou app | CIEDE2000 |
