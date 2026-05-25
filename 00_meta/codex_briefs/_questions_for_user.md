@@ -53,3 +53,19 @@
 4. 本地 `.venv` 已安装核心依赖；`pytest` 通过；`uvicorn pindou.main:app --host 127.0.0.1 --port 8000` 已验证 `/health` 返回 `{"status":"ok"}`。
 5. 服务器 UFW 已重新执行放行并启用：`22/80/443` allow，`ufw status verbose` 为 active；实际监听仍只有公网 SSH 与本地云探针。
 6. 待 review 后进入任务 2：实现 `XiaochiGptProvider` + fallback chain，并开始接 PRD §5.1 的真实 PreviewProvider。
+
+## 2026-05-25 — Phase 2 backend task 2 review
+
+任务 2 已完成 PreviewProvider 实现，结论给用户 / Claude review：
+
+1. `StylePreset` 已按 Gemini 前端 `05_frontend/api/index.ts` 对齐为 `q_portrait` / `q_pet` / `q_couple` / `cartoon_fallback`；`SizePreset` 保持 `60x80` / `80x100` / `100x120`。
+2. 已实现 `XiaochiGptProvider`：通过 openai SDK 调反代 `gpt-image-2`，单次 90 秒超时，失败重试 1 次，第二次带不同 seed hint；prompt 采用 Task C 的 Q 版拼豆约束，重点限制“不补腿脚 / 不补身体 / 不加额外物体 / 去水印和背景杂物”。
+3. 已实现 `PreviewProviderChain`：主 provider 失败后走 backup，最后走 `FallbackProvider`；chain 会累计 `fallback_count` 并记录失败 provider。
+4. 已实现 `FallbackProvider`：调用 `PatternBuilder.build(raw_image=...)`，并把 `PatternSheet.grid` 渲染为 PNG preview。注意：真实 `PatternBuilder` 仍在任务 3 实现，本任务测试里用 fake builder 验证 fallback 逻辑。
+5. 已实现 ADR-007 反代健康检查：FastAPI lifespan 启动后台 monitor，每 `REVERSE_PROXY_CHECK_INTERVAL_SECONDS` 检查 `REVERSE_PROXY_HEALTH_URL`，连续 3 次失败且累计超过 `REVERSE_PROXY_ALERT_AFTER_SECONDS`（默认 21600 秒 / 6 小时）写 error 日志告警。
+6. 已补测试：mock OpenAI 调用验证重试；验证 primary success、backup success、quantize fallback 三条路径；验证 ADR-007 三次失败触发告警。`pytest` 通过 7/7。
+
+需要 Claude / 用户确认的接口衔接点：
+
+1. PRD §5.1 原始 `PreviewResult` 写的是 `image: bytes`，Gemini 前端类型写的是 `preview_id + image_url`。当前实现兼容两边：provider 内部保留 `image` bytes，`to_frontend_dict()` 只输出前端 7 个字段。任务 5 API 落地时建议保存 PNG 到 `PINDOU_PREVIEW_DIR`，再返回真实 `image_url`。
+2. `cost_estimate` 目前为 `0.0`，因为反代实际计费单价未进入配置。若产品页要展示成本或后台要统计毛利，建议任务 5/7 增加 `XIAOCHI_GPT_IMAGE_COST_CNY` 配置项。

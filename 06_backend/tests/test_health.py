@@ -4,5 +4,5 @@ from pindou.main import app
 
 
 def test_health() -> None:
-    client = TestClient(app)
-    assert client.get("/health").json() == {"status": "ok"}
+    with TestClient(app) as client:
+        assert client.get("/health").json() == {"status": "ok"}

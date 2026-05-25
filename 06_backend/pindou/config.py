@@ -66,6 +66,10 @@ class Settings(BaseSettings):
         default=21600,
         validation_alias="REVERSE_PROXY_ALERT_AFTER_SECONDS",
     )
+    enable_reverse_proxy_health_monitor: bool = Field(
+        default=True,
+        validation_alias="ENABLE_REVERSE_PROXY_HEALTH_MONITOR",
+    )
 
     @property
     def is_development(self) -> bool:
