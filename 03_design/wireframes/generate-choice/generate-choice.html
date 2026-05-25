@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>PinDou · 选择生成方式</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../shared/colors_and_type.css" />
+  <link rel="stylesheet" href="../shared/components.css" />
+  <link rel="stylesheet" href="generate-choice.css" />
+</head>
+<body class="page page--choice">
+  <div class="frame" data-variant="inner" data-title="选择生成方式" data-back="../upload/upload.html">
+    <main class="frame__body frame__body--scroll">
+      <div class="choice">
+        <p class="choice__hint">选一种生成方式</p>
+
+        <!-- ===== Card A — Quick (free, basic quality) ===== -->
+        <a class="card choice__card" href="../preview-loading/preview-loading.html?tier=quick">
+          <div class="choice__head">
+            <h2 class="choice__title">快速生成</h2>
+            <span class="tag">基础质量</span>
+          </div>
+
+          <div class="choice__preview">
+            <div class="choice__thumb choice__thumb--original" aria-hidden="true">
+              <span class="choice__thumb-label">原图</span>
+            </div>
+            <span class="choice__arrow choice__arrow--basic" aria-hidden="true">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <div class="choice__thumb choice__thumb--basic" aria-hidden="true">
+              <img src="../shared/assets/bead-bunny.svg" alt="" />
+            </div>
+          </div>
+
+          <ul class="choice__bullets" role="list">
+            <li class="choice__bullet">
+              <svg class="choice__check choice__check--basic" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" fill="#F4EFE9"/>
+                <path d="M8 12.5l2.5 2.5L16 9" stroke="var(--pd-fg-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              直接量化原图，最快 5 秒出图
+            </li>
+            <li class="choice__bullet">
+              <svg class="choice__check choice__check--basic" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" fill="#F4EFE9"/>
+                <path d="M8 12.5l2.5 2.5L16 9" stroke="var(--pd-fg-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              保留照片本来的样子
+            </li>
+          </ul>
+
+          <div class="choice__footer">
+            <div class="choice__price">
+              <span class="choice__price-major">免费</span>
+              <span class="choice__price-minor">每日 3 次 · 看广告可加次</span>
+            </div>
+            <span class="btn btn--ghost btn--sm choice__action">选这个</span>
+          </div>
+        </a>
+
+        <!-- ===== Card B — Premium (recommended, paid) ===== -->
+        <a class="card card--recommended choice__card choice__card--recommended" href="../preview-loading/preview-loading.html?tier=premium">
+          <span class="tag tag--recommended choice__badge" aria-label="推荐">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9.94 14.06 2 12l7.94-2.06L12 2l2.06 7.94L22 12l-7.94 2.06L12 22z"/>
+            </svg>
+            推荐
+          </span>
+
+          <div class="choice__head">
+            <h2 class="choice__title">AI 精品生成</h2>
+            <span class="tag tag--warm">限时体验</span>
+          </div>
+
+          <div class="choice__preview">
+            <div class="choice__thumb choice__thumb--original" aria-hidden="true">
+              <span class="choice__thumb-label">原图</span>
+            </div>
+            <span class="choice__arrow choice__arrow--premium" aria-hidden="true">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6h8M7 3l3 3-3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <div class="choice__thumb choice__thumb--premium" aria-hidden="true">
+              <img src="../shared/assets/bead-cat.svg" alt="" />
+            </div>
+          </div>
+
+          <ul class="choice__bullets" role="list">
+            <li class="choice__bullet">
+              <svg class="choice__check choice__check--premium" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" fill="#FFE4EE"/>
+                <path d="M8 12.5l2.5 2.5L16 9" stroke="var(--pd-pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              AI 重绘 Q 版形象，更可爱
+            </li>
+            <li class="choice__bullet">
+              <svg class="choice__check choice__check--premium" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" fill="#FFE4EE"/>
+                <path d="M8 12.5l2.5 2.5L16 9" stroke="var(--pd-pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              智能配色，限定调色板更精致
+            </li>
+            <li class="choice__bullet">
+              <svg class="choice__check choice__check--premium" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" fill="#FFE4EE"/>
+                <path d="M8 12.5l2.5 2.5L16 9" stroke="var(--pd-pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              可调网格大小（16/24/32）
+            </li>
+          </ul>
+
+          <div class="choice__footer">
+            <div class="choice__price">
+              <span class="choice__price-major text-grad">首次免费</span>
+              <span class="choice__price-minor">
+                下次 <s class="choice__price-strike">¥19.9</s>
+                <strong class="choice__price-now">¥9.9 起</strong>
+              </span>
+            </div>
+            <span class="btn btn--primary btn--sm choice__action">
+              选这个
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14"/>
+                <path d="m12 5 7 7-7 7"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+
+        <a class="help-link choice__help" href="#explain-difference">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.5 9.5a2.5 2.5 0 1 1 5 0c0 1.5-2.5 2-2.5 3.5"/>
+            <circle cx="12" cy="17" r="0.5" fill="currentColor"/>
+          </svg>
+          <span class="help-link__label">这两种有什么区别？</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../shared/components.js"></script>
+</body>
+</html>

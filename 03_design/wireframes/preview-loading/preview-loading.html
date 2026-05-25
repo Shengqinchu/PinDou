@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>PinDou · 生成中</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../shared/colors_and_type.css" />
+  <link rel="stylesheet" href="../shared/components.css" />
+  <link rel="stylesheet" href="preview-loading.css" />
+</head>
+<body class="page page--loading">
+  <div class="frame" data-variant="inner" data-title="生成中" data-back="../generate-choice/generate-choice.html">
+    <main class="frame__body">
+      <section class="loading">
+        <div class="loading__wash" aria-hidden="true"></div>
+
+        <div class="loading__spacer-top"></div>
+
+        <!-- ===== Progress ring + center label ===== -->
+        <div class="loading__ring-wrap">
+          <div class="loading__confetti" aria-hidden="true">
+            <span class="loading__dot loading__dot--1"></span>
+            <span class="loading__dot loading__dot--2"></span>
+            <span class="loading__dot loading__dot--3"></span>
+            <span class="loading__dot loading__dot--4"></span>
+            <span class="loading__dot loading__dot--5"></span>
+          </div>
+
+          <svg class="loading__ring" viewBox="0 0 200 200" width="200" height="200" aria-hidden="true">
+            <defs>
+              <linearGradient id="pd-ring" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%"   stop-color="#FFB088"/>
+                <stop offset="50%"  stop-color="#FF8E53"/>
+                <stop offset="100%" stop-color="#FF6B9D"/>
+              </linearGradient>
+              <filter id="pd-ring-glow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="3" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <circle class="loading__ring-track"  cx="100" cy="100" r="94"/>
+            <circle class="loading__ring-progress" cx="100" cy="100" r="94"
+                    transform="rotate(-90 100 100)"
+                    data-role="ring-progress"/>
+          </svg>
+
+          <div class="loading__center">
+            <div class="loading__percent text-grad" data-role="percent">0%</div>
+            <div class="loading__eta" data-role="eta">约 30 秒</div>
+          </div>
+        </div>
+
+        <!-- ===== Status copy (rotates) ===== -->
+        <div class="loading__status">
+          <p class="loading__status-line" data-role="status">AI 正在画你的拼豆…</p>
+        </div>
+        <p class="loading__desc">生成期间可以离开页面，做好了我们会消息提醒你</p>
+
+        <div class="loading__spacer-bottom"></div>
+
+        <a class="loading__examples" href="../home/home.html">
+          去看示例作品
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14"/>
+            <path d="m12 5 7 7-7 7"/>
+          </svg>
+        </a>
+      </section>
+    </main>
+  </div>
+
+  <script src="../shared/components.js"></script>
+  <script src="preview-loading.js"></script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+/* upload/upload.css — empty + selected states for the upload page. */
+
+.page--upload { background: var(--pd-bg); }
+
+/* ===== Empty state container ===== */
+.upload__empty {
+  width: 100%;
+  height: 100%;
+  padding: 28px 20px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.upload__hint {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--pd-fg-2);
+  line-height: 1.4;
+  margin: 0 0 24px;
+}
+
+/* ===== Two parallel entry cards ===== */
+.upload__entries {
+  display: flex;
+  gap: 12px;
+}
+
+.upload__entry {
+  flex: 1;
+  height: 168px;
+  appearance: none;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--pd-fg-1);
+  border-radius: var(--pd-r-card);
+  background: rgba(255, 241, 246, 0.5);
+  border: 1.5px dashed var(--pd-pink-200);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 180ms var(--pd-ease-out),
+              background 220ms var(--pd-ease-out);
+}
+.upload__entry:active {
+  transform: scale(0.97);
+  background: rgba(255, 241, 246, 0.8);
+}
+.upload__entry-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: var(--pd-gradient-warm);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(255, 142, 83, 0.28);
+}
+.upload__entry-label {
+  font-size: 15px;
+  font-weight: 600;
+}
+.upload__entry-sub {
+  font-size: 11px;
+  color: var(--pd-fg-2);
+}
+
+/* ===== "What works best" tip card ===== */
+.upload__tip {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border-radius: var(--pd-r-card);
+  background: #FFF1E8;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.upload__tip-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--pd-gradient-warm);
+  color: #fff;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+.upload__tip-body {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--pd-fg-1);
+}
+.upload__tip-title {
+  display: block;
+  font-weight: 600;
+}
+.upload__tip-text { color: var(--pd-fg-2); }
+
+.upload__spacer { flex: 1; }
+
+.upload__footnote { margin: 0; }
+
+/* ===== Selected state ===== */
+.upload__selected {
+  width: 100%;
+  height: 100%;
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.upload__preview {
+  flex: 1;
+  border-radius: var(--pd-r-card);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: var(--pd-shadow-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.upload__preview-image {
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 35% 30%, #FFCDA6 0%, #FF8E53 60%, transparent 90%),
+    radial-gradient(circle at 40% 35%, #FFE4EE 0%, #FFCDA6 50%, #FFB088 100%);
+}
+
+.upload__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+.upload__retry { flex: 1; }
+.upload__next  { flex: 2; }

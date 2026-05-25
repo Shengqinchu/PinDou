@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>PinDou · 页面索引</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="shared/colors_and_type.css" />
+  <link rel="stylesheet" href="shared/components.css" />
+  <style>
+    html, body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(60% 50% at 30% 20%, #FFE4EE 0%, transparent 70%),
+        radial-gradient(50% 50% at 80% 80%, #FFF1E8 0%, transparent 70%),
+        var(--pd-bg);
+    }
+    .launcher {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 56px 32px;
+    }
+    .launcher__head { margin-bottom: 32px; }
+    .launcher__brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--pd-font-display);
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--pd-fg-1);
+    }
+    .launcher__brand-dot {
+      width: 28px; height: 28px;
+      border-radius: 999px;
+      background: var(--pd-gradient);
+      display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 8px rgba(255, 107, 157, 0.35);
+    }
+    .launcher__brand-dot::after {
+      content: ""; width: 10px; height: 10px; border-radius: 999px; background: #fff;
+    }
+    .launcher__title {
+      margin: 16px 0 4px;
+      font-family: var(--pd-font-display);
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--pd-fg-1);
+      letter-spacing: -0.01em;
+    }
+    .launcher__subtitle {
+      margin: 0;
+      color: var(--pd-fg-2);
+      font-size: 15px;
+    }
+    .launcher__grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 640px) {
+      .launcher__grid { grid-template-columns: 1fr; }
+    }
+    .launcher__card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 22px 22px 20px;
+      border-radius: var(--pd-r-card);
+      background: var(--pd-card);
+      box-shadow: var(--pd-shadow-card);
+      text-decoration: none;
+      color: var(--pd-fg-1);
+      transition: transform 200ms var(--pd-ease-out),
+                  box-shadow 200ms var(--pd-ease-out);
+    }
+    .launcher__card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--pd-shadow-float);
+    }
+    .launcher__card-step {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      color: var(--pd-pink-deep);
+      text-transform: uppercase;
+    }
+    .launcher__card-step-num {
+      width: 22px; height: 22px;
+      border-radius: 999px;
+      background: var(--pd-pink-50);
+      color: var(--pd-pink-deep);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 12px;
+    }
+    .launcher__card-name {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .launcher__card-path {
+      font-family: var(--pd-font-mono);
+      font-size: 12px;
+      color: var(--pd-fg-2);
+      background: var(--pd-bg-warm);
+      padding: 4px 8px;
+      border-radius: 6px;
+      align-self: flex-start;
+    }
+    .launcher__card-desc {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--pd-fg-2);
+    }
+    .launcher__shared {
+      margin-top: 28px;
+      padding: 18px 22px;
+      border-radius: var(--pd-r-card);
+      background: var(--pd-bg-warm);
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--pd-fg-2);
+    }
+    .launcher__shared strong { color: var(--pd-fg-1); }
+    .launcher__shared code {
+      font-family: var(--pd-font-mono);
+      font-size: 12px;
+      background: #fff;
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--pd-fg-1);
+    }
+  </style>
+</head>
+<body>
+  <div class="launcher">
+    <header class="launcher__head">
+      <span class="launcher__brand">
+        <span class="launcher__brand-dot"></span>
+        PinDou
+      </span>
+      <h1 class="launcher__title">页面索引</h1>
+      <p class="launcher__subtitle">微信小程序 · 高保真原型 · vanilla HTML/CSS/JS</p>
+    </header>
+
+    <div class="launcher__grid">
+      <a class="launcher__card" href="home/home.html">
+        <span class="launcher__card-step"><span class="launcher__card-step-num">1</span>首页</span>
+        <h2 class="launcher__card-name">Home</h2>
+        <span class="launcher__card-path">home/home.html</span>
+        <p class="launcher__card-desc">3 张拼豆样张轮播 + 主标语 + 主 CTA + 底部 Tab</p>
+      </a>
+
+      <a class="launcher__card" href="upload/upload.html">
+        <span class="launcher__card-step"><span class="launcher__card-step-num">2</span>上传照片</span>
+        <h2 class="launcher__card-name">Upload</h2>
+        <span class="launcher__card-path">upload/upload.html</span>
+        <p class="launcher__card-desc">两入口（拍一张 / 从相册选），空态与已选态可切换</p>
+      </a>
+
+      <a class="launcher__card" href="generate-choice/generate-choice.html">
+        <span class="launcher__card-step"><span class="launcher__card-step-num">3</span>选择生成方式</span>
+        <h2 class="launcher__card-name">Generate Choice</h2>
+        <span class="launcher__card-path">generate-choice/generate-choice.html</span>
+        <p class="launcher__card-desc">快速生成 vs AI 精品生成 对比，推荐卡渐变描边 + 限时体验徽章</p>
+      </a>
+
+      <a class="launcher__card" href="preview-loading/preview-loading.html">
+        <span class="launcher__card-step"><span class="launcher__card-step-num">4</span>生成中</span>
+        <h2 class="launcher__card-name">Preview Loading</h2>
+        <span class="launcher__card-path">preview-loading/preview-loading.html</span>
+        <p class="launcher__card-desc">粉橙渐变进度环 + 三句轮播文案 + 30s 后切到 99% 安抚态</p>
+      </a>
+    </div>
+
+    <div class="launcher__shared">
+      <strong>共享文件：</strong>
+      <code>shared/colors_and_type.css</code> 设计 token 与字体栈 ·
+      <code>shared/components.css</code> 按钮 / 卡片 / 标签 / 框架等共用样式 ·
+      <code>shared/components.js</code> 注入 WeChat 顶部状态栏 + 胶囊 + 页头 ·
+      <code>shared/assets/</code> 拼豆样张 SVG（bead-cat / bead-heart / bead-bunny）
+    </div>
+  </div>
+</body>
+</html>

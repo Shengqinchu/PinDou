@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>PinDou · 上传照片</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../shared/colors_and_type.css" />
+  <link rel="stylesheet" href="../shared/components.css" />
+  <link rel="stylesheet" href="upload.css" />
+</head>
+<body class="page page--upload">
+  <div class="frame" data-variant="inner" data-title="上传你的照片" data-back="../home/home.html">
+    <main class="frame__body">
+
+      <!-- ===== Empty state ===== -->
+      <section class="upload__empty" data-state="empty">
+        <p class="upload__hint">选一张照片，30 秒生成专属拼豆图纸</p>
+
+        <div class="upload__entries">
+          <button type="button" class="upload__entry" data-action="pick">
+            <span class="upload__entry-icon" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/>
+                <circle cx="12" cy="13" r="3"/>
+              </svg>
+            </span>
+            <span class="upload__entry-label">拍一张</span>
+            <span class="upload__entry-sub">启用相机</span>
+          </button>
+
+          <button type="button" class="upload__entry" data-action="pick">
+            <span class="upload__entry-icon" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="6" width="16" height="14" rx="2"/>
+                <path d="M6 2h14a2 2 0 0 1 2 2v14"/>
+                <circle cx="6.5" cy="11" r="1.2" fill="currentColor"/>
+                <path d="m18 14-4-4-8 8"/>
+              </svg>
+            </span>
+            <span class="upload__entry-label">从相册选</span>
+            <span class="upload__entry-sub">本地图库</span>
+          </button>
+        </div>
+
+        <aside class="upload__tip">
+          <span class="upload__tip-icon" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.4"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.94 14.06 2 12l7.94-2.06L12 2l2.06 7.94L22 12l-7.94 2.06L12 22z"/>
+            </svg>
+          </span>
+          <div class="upload__tip-body">
+            <strong class="upload__tip-title">怎样的图效果最好？</strong>
+            <span class="upload__tip-text">主体清晰、光线均匀、背景简单的近距离正脸照</span>
+          </div>
+        </aside>
+
+        <div class="upload__spacer"></div>
+
+        <p class="footnote upload__footnote">
+          上传即同意 <a href="#policy-content">《内容审核规范》</a><br />
+          与 <a href="#policy-privacy">《隐私政策》</a>，请勿上传他人肖像
+        </p>
+      </section>
+
+      <!-- ===== Selected state ===== -->
+      <section class="upload__selected" data-state="selected" hidden>
+        <div class="upload__preview">
+          <div class="upload__preview-image" aria-label="已选择的照片预览"></div>
+        </div>
+        <div class="upload__actions">
+          <button type="button" class="btn btn--secondary btn--md upload__retry" data-action="retry">
+            重新选择
+          </button>
+          <a class="btn btn--primary btn--md upload__next" href="../generate-choice/generate-choice.html">
+            下一步
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14"/>
+              <path d="m12 5 7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="../shared/components.js"></script>
+  <script src="upload.js"></script>
+</body>
+</html>
