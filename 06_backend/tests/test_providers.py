@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import io
 import logging
 from dataclasses import dataclass
 from types import SimpleNamespace
 
 import pytest
+from PIL import Image
 
-from pindou.pattern.builder import ColorRef, PatternSheet
+from pindou.pattern.builder import PatternBuilder
 from pindou.providers.base import PreviewProvider, PreviewProviderError, PreviewResult, SizePreset, StylePreset
 from pindou.providers.chain import PreviewProviderChain
 from pindou.providers.fallback_quantize import FallbackProvider
@@ -16,10 +18,13 @@ from pindou.providers.xiaochi_gpt import XiaochiGptProvider
 from pindou.tasks.reverse_proxy_health_check import ReverseProxyHealthMonitor
 
 
-PNG_1X1 = base64.b64decode(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAFgwJ/"
-    "l6j3NwAAAABJRU5ErkJggg=="
-)
+def make_png_1x1() -> bytes:
+    output = io.BytesIO()
+    Image.new("RGBA", (1, 1), (255, 255, 255, 255)).save(output, format="PNG")
+    return output.getvalue()
+
+
+PNG_1X1 = make_png_1x1()
 
 
 class FakeImages:
@@ -120,41 +125,17 @@ def test_provider_chain_uses_backup_after_primary_failure() -> None:
     assert result.metadata["fallback_chain_failures"][0]["provider"] == "primary"
 
 
-class FakePatternBuilder:
-    def build(self, **kwargs: object) -> PatternSheet:
-        color = ColorRef(
-            brand="MARD",
-            code="01",
-            name_cn="黑色",
-            name_en="Black",
-            hex="#000000",
-            rgb=(0, 0, 0),
-            bead_diameter_mm=5.0,
-        )
-        return PatternSheet(
-            grid=[[color]],
-            color_counts={"MARD-01": 1},
-            bead_total=1,
-            coords=[(0, 0, "MARD-01")],
-            no_bead_mask=[[False]],
-            palette_used=[color],
-            estimated_cost_cny=0.01,
-            brand="MARD",
-            bead_diameter_mm=5.0,
-        )
-
-
 def test_provider_chain_uses_quantize_fallback_after_all_ai_failures() -> None:
     chain = PreviewProviderChain(
         providers=[StaticProvider("primary", should_fail=True), StaticProvider("backup", should_fail=True)],
-        fallback_provider=FallbackProvider(pattern_builder=FakePatternBuilder()),
+        fallback_provider=FallbackProvider(pattern_builder=PatternBuilder(target_colors=8)),
     )
 
-    result = chain.generate(PNG_1X1, StylePreset.CARTOON_FALLBACK, SizePreset.LARGE_100X120)
+    result = chain.generate(PNG_1X1, StylePreset.CARTOON_FALLBACK, SizePreset.SMALL_60X80)
 
     assert result.provider_used == "fallback_quantize"
     assert result.fallback_count == 2
-    assert result.target_color_count == 1
+    assert result.target_color_count >= 1
     assert result.image.startswith(b"\x89PNG")
 
 

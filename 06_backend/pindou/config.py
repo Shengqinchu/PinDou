@@ -41,6 +41,7 @@ class Settings(BaseSettings):
         validation_alias="XIAOCHI_GPT_BASE_URL",
     )
     xiaochi_gpt_api_key: SecretStr | None = Field(default=None, validation_alias="XIAOCHI_GPT_API_KEY")
+    xiaochi_gpt_image_cost_cny: float = Field(default=0.0, validation_alias="XIAOCHI_GPT_IMAGE_COST_CNY")
     xiaochi_text_base_url: str = Field(
         default="https://api2.xiaochisaas.com",
         validation_alias="XIAOCHI_TEXT_BASE_URL",

@@ -13,7 +13,6 @@ from typing import Iterable
 import numpy as np
 from PIL import Image
 from sklearn.cluster import MiniBatchKMeans
-from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -281,6 +280,8 @@ def quantize_image(image: Image.Image, palette: Palette, quantizer: str, metric:
 
 
 def metric_values(original: Image.Image, output: Image.Image) -> dict[str, float]:
+    from skimage.metrics import peak_signal_noise_ratio, structural_similarity
+
     orig = np.array(original, dtype=np.uint8)
     out = np.array(output, dtype=np.uint8)
     psnr = peak_signal_noise_ratio(orig, out, data_range=255)

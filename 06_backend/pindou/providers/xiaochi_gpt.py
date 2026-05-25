@@ -118,6 +118,7 @@ class XiaochiGptProvider(PreviewProvider):
         self.base_url = (base_url or settings.xiaochi_gpt_base_url).rstrip("/")
         self.timeout_seconds = timeout_seconds
         self.retry_count = retry_count
+        self.image_cost_cny = settings.xiaochi_gpt_image_cost_cny
         self.seed_factory = seed_factory or (lambda: random.SystemRandom().randint(1, 2_147_483_647))
 
         if client is not None:
@@ -151,7 +152,7 @@ class XiaochiGptProvider(PreviewProvider):
                     target_color_count=TARGET_COLOR_COUNT,
                     provider_used=self.name,
                     fallback_count=0,
-                    cost_estimate=0.0,
+                    cost_estimate=self.image_cost_cny,
                     latency_ms=round((time.perf_counter() - started) * 1000),
                     metadata={
                         "model": "gpt-image-2",

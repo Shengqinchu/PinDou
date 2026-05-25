@@ -69,3 +69,21 @@
 
 1. PRD §5.1 原始 `PreviewResult` 写的是 `image: bytes`，Gemini 前端类型写的是 `preview_id + image_url`。当前实现兼容两边：provider 内部保留 `image` bytes，`to_frontend_dict()` 只输出前端 7 个字段。任务 5 API 落地时建议保存 PNG 到 `PINDOU_PREVIEW_DIR`，再返回真实 `image_url`。
 2. `cost_estimate` 目前为 `0.0`，因为反代实际计费单价未进入配置。若产品页要展示成本或后台要统计毛利，建议任务 5/7 增加 `XIAOCHI_GPT_IMAGE_COST_CNY` 配置项。
+
+## 2026-05-25 — Phase 2 backend task 3 review
+
+任务 3 已完成 PatternBuilder 核心算法，结论给用户 / Claude review：
+
+1. 已实现 `PatternBuilder.build(...)` 双路径：`raw_image` 走脚本量化，`preview` 走 alpha 透明背景识别后量化；输出 `grid` / `color_counts` / `bead_total` / `coords` / `no_bead_mask` / `palette_used` / `estimated_cost_cny` / `brand` / `bead_diameter_mm`，并提供 `to_frontend_dict()` 转换为前端 `ColorRef | null` grid。
+2. 已实现默认 MARD 5mm 色卡加载：`01_research/colormap/{brand}_{diameter}mm.json` → `ColorRef`，并用 `lru_cache` 避免重复 IO；价格估算暂用色卡里的 `price_per_1000pcs` 字段。
+3. 已复用 Task B 的 `algorithm_impls/quantize_core.py`：生产量化路线为 K-means + CIEDE2000 + 无抖动；仅把 `skimage` 指标统计 import 延后到 `metric_values()` 内部，避免后端运行时引入不需要的离线 benchmark 依赖。
+4. 已实现拼豆后处理：小于 3 格的孤立色块合并到色差最近的相邻颜色；黑色/近黑色轮廓受保护，不被合并；preview alpha < 0.5 标记为 `NoBead`。
+5. 已实现基础 PNG exporter：把 `PatternSheet` 渲染为圆点状网格图；PDF / Excel / 分区图保留 stub，等高级包任务继续做。
+6. 已回归 task 2 fallback：`FallbackProvider` 现在用真实 `PatternBuilder` 端到端出 PNG，不再依赖 fake builder。
+7. 已补 `XIAOCHI_GPT_IMAGE_COST_CNY` 配置项，默认 0.0；`XiaochiGptProvider` 的 `cost_estimate` 改为读取该配置。
+8. 已补测试：Task B 三张合成图回归、preview alpha NoBead、100x120 热路径性能、fallback chain 真实 PatternBuilder。`pytest` 通过 10/10。
+
+需要 Claude / 用户确认的衔接点：
+
+1. `raw_image` 路径当前不自动抠背景，默认整张图都转成豆子；`preview` 路径通过 alpha 做 NoBead。若脚本免费路径也要“白底自动不铺豆”，建议 task 5 前补一个明确规则：按边缘连通白/近白背景 flood-fill 成 NoBead，或要求用户先走裁切/去背景。
+2. 当前 `estimated_cost_cny` 依赖 Task H 的 `price_per_1000pcs`，但该字段没有币种和 SKU 来源精度。Phase 1 可用作粗估，正式购物清单仍建议等 Task I 建议的 `bead_skus` schema。
