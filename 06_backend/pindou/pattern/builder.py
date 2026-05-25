@@ -84,6 +84,7 @@ class PatternBuilder:
         brand: str = "MARD",
         bead_diameter_mm: float = 5.0,
         mode: str = "auto",
+        auto_remove_white_bg: bool = False,
     ) -> PatternSheet:
         from pindou.colormap.loader import estimate_cost_cny, load_palette
         from pindou.pattern.exporter import PatternExporter
@@ -96,7 +97,12 @@ class PatternBuilder:
             raise ValueError("PatternBuilder requires preview or raw_image bytes.")
 
         palette = list(load_palette(brand, bead_diameter_mm))
-        prepared_image, no_bead_mask = prepare_input_image(image_bytes, size, input_mode=input_mode)
+        prepared_image, no_bead_mask, white_bg_detected = prepare_input_image(
+            image_bytes,
+            size,
+            input_mode=input_mode,
+            auto_remove_white_bg=auto_remove_white_bg,
+        )
         quantized = quantize_to_codes(
             prepared_image,
             palette,
@@ -124,6 +130,8 @@ class PatternBuilder:
                 "algorithm": "kmeans+ciede2000+none",
                 "target_colors": self.target_colors,
                 "quantize_runtime_ms": round(quantized.runtime_ms, 2),
+                "white_bg_detected": white_bg_detected,
+                "auto_remove_white_bg_requested": bool(auto_remove_white_bg and input_mode == "script"),
             },
         )
         preview_png = PatternExporter().to_simple_grid_png(sheet)
@@ -150,17 +158,30 @@ def resolve_mode(*, preview: bytes | None, raw_image: bytes | None, mode: str) -
     raise ValueError(f"Unsupported PatternBuilder mode: {mode}")
 
 
-def prepare_input_image(image_bytes: bytes, size: SizePreset, *, input_mode: str) -> tuple[Image.Image, list[list[bool]]]:
+def prepare_input_image(
+    image_bytes: bytes,
+    size: SizePreset,
+    *,
+    input_mode: str,
+    auto_remove_white_bg: bool = False,
+) -> tuple[Image.Image, list[list[bool]], bool]:
+    from pindou.pattern.postprocess import detect_and_remove_white_bg
+
     source = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
     width, height = parse_size(size)
-    background = (255, 255, 255, 0 if input_mode == "ai" else 255)
+    white_bg_detected = False
+    if input_mode == "script" and auto_remove_white_bg:
+        source, white_bg_detected = detect_and_remove_white_bg(source)
+        source = source.convert("RGBA")
+    background_alpha = 0 if input_mode == "ai" or white_bg_detected else 255
+    background = (255, 255, 255, background_alpha)
     fitted = fit_to_canvas(source, width, height, background)
     alpha = np.array(fitted.getchannel("A"), dtype=np.uint8)
-    if input_mode == "ai":
+    if input_mode == "ai" or white_bg_detected:
         no_bead_mask = (alpha < 128).tolist()
     else:
         no_bead_mask = [[False for _ in range(width)] for _ in range(height)]
-    return fitted, no_bead_mask
+    return fitted, no_bead_mask, white_bg_detected
 
 
 def fit_to_canvas(image: Image.Image, width: int, height: int, background: tuple[int, int, int, int]) -> Image.Image:

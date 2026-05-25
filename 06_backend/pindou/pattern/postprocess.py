@@ -4,11 +4,17 @@ from __future__ import annotations
 
 from collections import deque
 
+import numpy as np
+from PIL import Image
+
+from pindou.colormap.matcher import ciede2000_distance
 from pindou.colormap.matcher import nearest_color_code
 from pindou.pattern.builder import ColorRef
 
 
 GridCodes = list[list[str | None]]
+WHITE_RGB = (255, 255, 255)
+FLOOD_FILL_WHITE_DELTA_E = 15.0
 
 
 def merge_small_components(
@@ -39,6 +45,72 @@ def merge_small_components(
             for y, x in component:
                 result[y][x] = replacement
     return result
+
+
+def detect_and_remove_white_bg(
+    image: Image.Image,
+    tolerance_delta_e: float = 8.0,
+) -> tuple[Image.Image, bool]:
+    rgba = image.convert("RGBA")
+    corner_delta = average_corner_delta_e_to_white(rgba)
+    if corner_delta >= tolerance_delta_e:
+        return image, False
+
+    arr = np.array(rgba, dtype=np.uint8)
+    height, width = arr.shape[:2]
+    visited = np.zeros((height, width), dtype=bool)
+    queue: deque[tuple[int, int]] = deque(
+        [
+            (0, 0),
+            (width - 1, 0),
+            (0, height - 1),
+            (width - 1, height - 1),
+        ]
+    )
+
+    while queue:
+        x, y = queue.popleft()
+        if visited[y, x]:
+            continue
+        visited[y, x] = True
+        rgb = (int(arr[y, x, 0]), int(arr[y, x, 1]), int(arr[y, x, 2]))
+        if ciede2000_distance(rgb, WHITE_RGB) >= FLOOD_FILL_WHITE_DELTA_E:
+            continue
+        arr[y, x, 3] = 0
+        for next_x, next_y in pixel_neighbors(x, y, width, height):
+            if not visited[next_y, next_x]:
+                queue.append((next_x, next_y))
+
+    return Image.fromarray(arr), True
+
+
+def average_corner_delta_e_to_white(image: Image.Image, sample_size: int = 5) -> float:
+    rgba = image.convert("RGBA")
+    arr = np.array(rgba, dtype=np.uint8)
+    height, width = arr.shape[:2]
+    box = min(sample_size, width, height)
+    regions = (
+        arr[:box, :box, :3],
+        arr[:box, width - box : width, :3],
+        arr[height - box : height, :box, :3],
+        arr[height - box : height, width - box : width, :3],
+    )
+    distances = []
+    for region in regions:
+        mean = region.reshape(-1, 3).mean(axis=0)
+        rgb = (int(round(mean[0])), int(round(mean[1])), int(round(mean[2])))
+        distances.append(ciede2000_distance(rgb, WHITE_RGB))
+    return float(sum(distances) / len(distances))
+
+
+def pixel_neighbors(x: int, y: int, width: int, height: int) -> list[tuple[int, int]]:
+    out: list[tuple[int, int]] = []
+    for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+        nx = x + dx
+        ny = y + dy
+        if 0 <= nx < width and 0 <= ny < height:
+            out.append((nx, ny))
+    return out
 
 
 def collect_component(

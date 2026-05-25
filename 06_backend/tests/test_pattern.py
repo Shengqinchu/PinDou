@@ -7,6 +7,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 from pindou.pattern.builder import NoBead, PatternBuilder
+from pindou.pattern.postprocess import detect_and_remove_white_bg
 from pindou.providers.base import SizePreset
 
 
@@ -54,6 +55,56 @@ def test_preview_alpha_path_marks_transparent_cells_as_no_bead() -> None:
     assert any(cell is None for row in sheet.to_frontend_dict()["grid"] for cell in row)
 
 
+def test_white_bg_detect_success() -> None:
+    builder = PatternBuilder(target_colors=8)
+    raw = white_bg_raw_image_bytes()
+
+    sheet = builder.build(
+        SizePreset.SMALL_60X80,
+        raw_image=raw,
+        mode="script",
+        auto_remove_white_bg=True,
+    )
+
+    no_bead_count = sum(sum(row) for row in sheet.no_bead_mask)
+    assert sheet.metadata["white_bg_detected"] is True
+    assert no_bead_count > 60 * 80 * 0.3
+    assert sheet.bead_total + no_bead_count == 60 * 80
+
+
+def test_white_bg_detect_skip() -> None:
+    image = Image.new("RGB", (40, 40), (90, 130, 180))
+    draw = ImageDraw.Draw(image)
+    draw.rectangle([12, 12, 28, 28], fill=(240, 240, 240))
+    processed, detected = detect_and_remove_white_bg(image)
+
+    builder = PatternBuilder(target_colors=8)
+    sheet = builder.build(
+        SizePreset.SMALL_60X80,
+        raw_image=image_bytes(image),
+        mode="script",
+        auto_remove_white_bg=True,
+    )
+
+    assert detected is False
+    assert list(processed.getdata()) == list(image.getdata())
+    assert sheet.metadata["white_bg_detected"] is False
+    assert not any(any(row) for row in sheet.no_bead_mask)
+
+
+def test_white_bg_detect_threshold_boundary() -> None:
+    near_white = Image.new("RGB", (20, 20), (218, 218, 218))
+    just_over = Image.new("RGB", (20, 20), (217, 217, 217))
+
+    processed_near, detected_near = detect_and_remove_white_bg(near_white)
+    processed_over, detected_over = detect_and_remove_white_bg(just_over)
+
+    assert detected_near is True
+    assert processed_near.convert("RGBA").getpixel((0, 0))[3] == 0
+    assert detected_over is False
+    assert list(processed_over.getdata()) == list(just_over.getdata())
+
+
 def test_large_pattern_build_stays_under_two_seconds_after_warmup() -> None:
     builder = PatternBuilder()
     raw = read_input("cartoon_synthetic.png")
@@ -67,11 +118,25 @@ def test_large_pattern_build_stays_under_two_seconds_after_warmup() -> None:
     assert elapsed < 2.0
 
 
+def white_bg_raw_image_bytes() -> bytes:
+    image = Image.new("RGB", (90, 90), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    draw.ellipse([20, 14, 70, 64], fill=(255, 180, 120), outline=(25, 25, 25), width=4)
+    draw.rectangle([32, 58, 58, 86], fill=(80, 120, 220), outline=(25, 25, 25), width=4)
+    return image_bytes(image)
+
+
 def transparent_preview_bytes() -> bytes:
     image = Image.new("RGBA", (80, 80), (255, 255, 255, 0))
     draw = ImageDraw.Draw(image)
     draw.ellipse([16, 12, 64, 62], fill=(255, 180, 120, 255), outline=(30, 30, 30, 255), width=4)
     draw.rectangle([28, 55, 52, 76], fill=(60, 120, 220, 255), outline=(30, 30, 30, 255), width=3)
+    output = io.BytesIO()
+    image.save(output, format="PNG")
+    return output.getvalue()
+
+
+def image_bytes(image: Image.Image) -> bytes:
     output = io.BytesIO()
     image.save(output, format="PNG")
     return output.getvalue()
