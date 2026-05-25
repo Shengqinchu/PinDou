@@ -1,11 +1,33 @@
 # Task I — 中文社区拼豆深度调研（色卡 / 供应链 / 用户认知 / 上场工具反查）
 
-**Status**: pending
+**Status**: completed (Codex @ 2026-05-24) — public-web pass completed; XHS App / physical-card follow-up required
 **Owner**: Codex
 **Priority**: 高（Phase 1 PRD 数据契约填实之前完成）
 **Estimated**: 4-6 天
 **依赖**: Task H 全品牌色卡基线（作为对照基准）
 **被依赖**: Phase 1 PRD 的"色卡数据契约"章节、ADR-002 默认色卡选择复核
+
+---
+
+## 完成产出
+
+- 总入口：`01_research/colormap_china/README.md`
+- 小红书公开入口 / 手工补采队列：`01_research/colormap_china/xhs_color_mentions.csv`
+- 小红书 App 人工补采模板：`01_research/colormap_china/xhs_manual_collection_template.csv`
+- KOL / 内容偏好：`01_research/colormap_china/xhs_kol_preferences.md`
+- 国内 SKU 表：`01_research/colormap_china/bead_skus_cn.csv`
+- 国内品牌热度排序：`01_research/colormap_china/brand_popularity_cn.md`
+- 中文社区认知：`01_research/colormap_china/community_insights.md`
+- 竞品工具色卡反查：`01_research/colormap_china/competitor_palette_reverse.md`
+- 实物 vs 屏幕色差风险：`01_research/colormap_china/physical_vs_screen_delta.md`
+- 国内供应链状态：`01_research/colormap_china/cn_supply_status.md`
+- 供应链覆盖层：`01_research/colormap_china/china_market_status_overrides.json`
+- 中文别名映射建议：`01_research/colormap_china/chinese_color_aliases.json`
+- 可复现生成脚本：`01_research/colormap_china/build_china_deep_dive_outputs.py`
+- 数据源留痕：`00_meta/data_sources.md`
+- Phase 1 PRD 影响建议：`00_meta/codex_briefs/_questions_for_user.md`
+
+合规说明：未登录小红书 / 淘宝 / 1688；未保存 KOL 图片、实物色卡照片、竞品输出图、商家联系方式或用户个人信息。小红书 200 篇完整样本与实物色卡 ΔE 需要用户 App 内人工补采和实物拍摄后继续填充。
 
 ---
 

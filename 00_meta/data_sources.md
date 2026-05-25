@@ -370,6 +370,51 @@
 - 存储位置：`01_research/colormap/_source_get-colors.json`, `01_research/colormap/build_full_bead_db.py`, `01_research/colormap/*_5mm.json`, `01_research/colormap/*_2_6mm.json`
 - 责任人：Codex
 
+### Task I 小红书公开搜索入口与公开主页样本
+- URL / 标识：https://www.xiaohongshu.com/search_result?keyword=%E6%8B%BC%E8%B1%86%E8%89%B2%E5%8D%A1 ; https://www.xiaohongshu.com/search_result?keyword=MARD%E8%89%B2%E5%8D%A1 ; https://www.xiaohongshu.com/search_result?keyword=%E7%86%A8%E7%83%AB%E7%BF%BB%E8%BD%A6%20%E6%8B%BC%E8%B1%86 ; https://www.xiaohongshu.com/user/profile/65f420e30000000005008498
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task I 小红书公开 Web 可访问性验证、关键词队列、KOL/工具型内容线索；不登录、不保存笔记正文/图片/评论
+- 数据格式：HTML / 搜索入口 URL / 人工采样模板
+- 许可状态：公开页面；平台 ToS 限制，不做大规模自动爬取
+- 存储位置：`01_research/colormap_china/xhs_color_mentions.csv`, `01_research/colormap_china/xhs_manual_collection_template.csv`, `01_research/colormap_china/xhs_kol_preferences.md`
+- 责任人：Codex
+
+### Task I 京东公开价格 / 型号页 SKU 样本
+- URL / 标识：https://www.jd.com/jiage/6233979f9d4bdf6e2ee7.html ; https://www.jd.com/jiage/69946c1c367310327021.html ; https://www.jd.com/xinghao/69946c1c367310327021.html
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task I 采集公开拼豆 SKU 名称、品牌/规格线索、评论数热度信号、商品 URL；未抓价格接口、联系方式或用户评论
+- 数据格式：HTML 商品卡片
+- 许可状态：公开页面；商用复用许可未知；价格和库存需实时复核
+- 存储位置：`01_research/colormap_china/bead_skus_cn.csv`, `01_research/colormap_china/build_china_deep_dive_outputs.py`
+- 责任人：Codex
+
+### Task I 拼多多 / 淘宝 / 1688 公开镜像 SKU 线索
+- URL / 标识：https://mobile.yangkeduo.com/poros/h5?_dr_sku_id=1792760587528&goods_id=826919357447 ; https://mobile.yangkeduo.com/poros/h5?_dr_sku_id=1787113130706&goods_id=819597985495 ; https://mobile.yangkeduo.com/poros/h5?_dr_sku_id=1806961892863&goods_id=846035460137 ; https://tao.hooos.com/goods_g3wWVBGh3t2WX7QgVgTooVCatr-PNzeejCOoZKrP5yCG.html ; https://tao.hooos.com/goods_523138769220.html ; https://www.btomejp.com/alibaba/product/992073082662
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task I 补充 PDD / 淘宝 / 1688 登录限制下的公开 SKU、价格、月销/Top 排名线索；不采联系方式
+- 数据格式：公开 H5 / 镜像页摘要
+- 许可状态：公开或镜像页面；低到中置信，仅作市场线索
+- 存储位置：`01_research/colormap_china/bead_skus_cn.csv`, `01_research/colormap_china/brand_popularity_cn.md`
+- 责任人：Codex
+
+### Task I 中文拼豆工具 / 竞品 palette 公开页
+- URL / 标识：https://pindou.cn/ ; https://www.pindou.online/colors ; https://pindou.skin/colors.html ; https://pindou.top/ ; https://mxbraisedfish.github.io/pindou-draw/manual.html ; https://zwpyyds.com/ ; https://pindou.metamo.cn/ ; https://dehumaker.cn/ ; https://365-tools.cn/detail/40 ; https://makebead.com/ ; https://bitbead.pomodiary.com/en ; https://www.beadmapper.com/ ; https://beadpattern.net/about
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task I 已上场工具公开反查：默认/支持品牌、色数口径、导出格式、国产色卡覆盖
+- 数据格式：HTML / 公开说明页
+- 许可状态：公开页面；不反编译、不抓后端、不保存竞品输出图
+- 存储位置：`01_research/colormap_china/competitor_palette_reverse.md`, `01_research/colormap_china/community_insights.md`
+- 责任人：Codex
+
+### Task I 中文社区 / 教程 / 新闻公开样本
+- URL / 标识：https://tieba.baidu.com/p/5857134458 ; https://www.bilibili.com/video/BV1vY4y1M7uo/ ; https://www.bilibili.com/video/BV1hV411S7GJ/ ; https://www.bilibili.com/video/BV1tjyPBPEiz/ ; https://tinybead.com/tutorial/how-to-use-iron/ ; https://www.huxiu.com/article/4841619.html ; https://www.news.cn/fashion/20260225/241777a19d884756b8a1769c4475db02/c.html
+- 抓取 / 拉取日期：2026-05-24
+- 用途：Task I 中文社区认知、色号分享、熨烫翻车、供应链热度与价格区间线索
+- 数据格式：HTML / 视频公开元数据 / 新闻页面
+- 许可状态：公开页面；仅摘要和 URL 入库，不复制长文
+- 存储位置：`01_research/colormap_china/community_insights.md`, `01_research/colormap_china/physical_vs_screen_delta.md`, `01_research/colormap_china/cn_supply_status.md`
+- 责任人：Codex
+
 ---
 
 ## 类别建议（Codex 调研时分类）

@@ -1,0 +1,2042 @@
+[
+  {
+    "brand": "MARD",
+    "code": "A1",
+    "official_name": "Light Beige",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD A1",
+      "A1号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A2",
+    "official_name": "Very Light Yellow",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD A2",
+      "A2号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A3",
+    "official_name": "Lemon Yellow",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD A3",
+      "A3号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A4",
+    "official_name": "Bright Yellow",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD A4",
+      "A4号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A5",
+    "official_name": "Golden Yellow",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD A5",
+      "A5号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A6",
+    "official_name": "Light Orange",
+    "aliases_cn": [
+      "橙色",
+      "橘色",
+      "MARD A6",
+      "A6号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A7",
+    "official_name": "Orange Yellow",
+    "aliases_cn": [
+      "橙色",
+      "橘色",
+      "MARD A7",
+      "A7号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A8",
+    "official_name": "Vivid Yellow",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD A8",
+      "A8号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A9",
+    "official_name": "Apricot Orange",
+    "aliases_cn": [
+      "橙色",
+      "橘色",
+      "MARD A9",
+      "A9号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A10",
+    "official_name": "Deep Orange",
+    "aliases_cn": [
+      "橙色",
+      "橘色",
+      "MARD A10",
+      "A10号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A11",
+    "official_name": "Cream Yellow",
+    "aliases_cn": [
+      "橙色",
+      "橘色",
+      "MARD A11",
+      "A11号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A12",
+    "official_name": "Peach Orange",
+    "aliases_cn": [
+      "红色",
+      "正红",
+      "MARD A12",
+      "A12号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A13",
+    "official_name": "Light Golden Yellow",
+    "aliases_cn": [
+      "橙色",
+      "橘色",
+      "MARD A13",
+      "A13号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A14",
+    "official_name": "Orange Red",
+    "aliases_cn": [
+      "红色",
+      "正红",
+      "MARD A14",
+      "A14号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A15",
+    "official_name": "Tender Yellow",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD A15",
+      "A15号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A16",
+    "official_name": "Goose Yellow",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD A16",
+      "A16号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A17",
+    "official_name": "Corn Yellow",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD A17",
+      "A17号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A18",
+    "official_name": "Light Apricot",
+    "aliases_cn": [
+      "橙色",
+      "橘色",
+      "MARD A18",
+      "A18号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A19",
+    "official_name": "Coral Orange",
+    "aliases_cn": [
+      "红色",
+      "正红",
+      "MARD A19",
+      "A19号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A20",
+    "official_name": "Earth Yellow",
+    "aliases_cn": [
+      "橙色",
+      "橘色",
+      "MARD A20",
+      "A20号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A21",
+    "official_name": "Beige",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD A21",
+      "A21号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A22",
+    "official_name": "Yellow Green",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD A22",
+      "A22号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A23",
+    "official_name": "Light Skin",
+    "aliases_cn": [
+      "橙色",
+      "橘色",
+      "MARD A23",
+      "A23号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A24",
+    "official_name": "Pale Yellow Green",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD A24",
+      "A24号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A25",
+    "official_name": "Pale Yellow",
+    "aliases_cn": [
+      "橙色",
+      "橘色",
+      "MARD A25",
+      "A25号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "A26",
+    "official_name": "Deep Golden Yellow",
+    "aliases_cn": [
+      "橙色",
+      "橘色",
+      "MARD A26",
+      "A26号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B1",
+    "official_name": "Yellow Green",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD B1",
+      "B1号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B2",
+    "official_name": "Bright Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B2",
+      "B2号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B3",
+    "official_name": "Light Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B3",
+      "B3号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B4",
+    "official_name": "Vivid Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B4",
+      "B4号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B5",
+    "official_name": "Grass Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B5",
+      "B5号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B6",
+    "official_name": "Mint Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B6",
+      "B6号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B7",
+    "official_name": "Deep Mint",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B7",
+      "B7号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B8",
+    "official_name": "Deep Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B8",
+      "B8号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B9",
+    "official_name": "Dark Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B9",
+      "B9号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B10",
+    "official_name": "Light Blue Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B10",
+      "B10号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B11",
+    "official_name": "Olive Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B11",
+      "B11号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B12",
+    "official_name": "Forest Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B12",
+      "B12号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B13",
+    "official_name": "Pale Yellow Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B13",
+      "B13号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B14",
+    "official_name": "Apple Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B14",
+      "B14号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B15",
+    "official_name": "Deep Dark Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B15",
+      "B15号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B16",
+    "official_name": "Fresh Grass Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B16",
+      "B16号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B17",
+    "official_name": "Olive Yellow",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B17",
+      "B17号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B18",
+    "official_name": "Bright Yellow Green",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD B18",
+      "B18号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B19",
+    "official_name": "Turquoise",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B19",
+      "B19号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B20",
+    "official_name": "Very Light Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B20",
+      "B20号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B21",
+    "official_name": "Deep Cyan",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD B21",
+      "B21号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B22",
+    "official_name": "Dark Cyan",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD B22",
+      "B22号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B23",
+    "official_name": "Deep Olive",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B23",
+      "B23号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B24",
+    "official_name": "Light Yellow Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B24",
+      "B24号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B25",
+    "official_name": "Gray Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B25",
+      "B25号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B26",
+    "official_name": "Olive Brown",
+    "aliases_cn": [
+      "黄色",
+      "奶黄",
+      "MARD B26",
+      "B26号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B27",
+    "official_name": "Gray Yellow Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B27",
+      "B27号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B28",
+    "official_name": "Light Mint",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B28",
+      "B28号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B29",
+    "official_name": "Yellow Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B29",
+      "B29号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B30",
+    "official_name": "Very Light Yellow Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B30",
+      "B30号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B31",
+    "official_name": "Pale Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B31",
+      "B31号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "B32",
+    "official_name": "Olive Gray",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD B32",
+      "B32号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C1",
+    "official_name": "Very Light Blue Green",
+    "aliases_cn": [
+      "绿色",
+      "草绿",
+      "MARD C1",
+      "C1号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C2",
+    "official_name": "Light Sky Blue",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C2",
+      "C2号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C3",
+    "official_name": "Pale Sky Blue",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C3",
+      "C3号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C4",
+    "official_name": "Sky Blue",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C4",
+      "C4号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C5",
+    "official_name": "Deep Sky Blue",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C5",
+      "C5号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C6",
+    "official_name": "Light Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C6",
+      "C6号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C7",
+    "official_name": "Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C7",
+      "C7号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C8",
+    "official_name": "Deep Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C8",
+      "C8号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C9",
+    "official_name": "Royal Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C9",
+      "C9号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C10",
+    "official_name": "Cyan Blue",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C10",
+      "C10号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C11",
+    "official_name": "Cyan",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C11",
+      "C11号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C12",
+    "official_name": "Navy Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C12",
+      "C12号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C13",
+    "official_name": "Very Light Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C13",
+      "C13号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C14",
+    "official_name": "Light Cyan",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C14",
+      "C14号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C15",
+    "official_name": "Deep Cyan",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C15",
+      "C15号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C16",
+    "official_name": "Navy",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C16",
+      "C16号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C17",
+    "official_name": "Bright Cyan",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C17",
+      "C17号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C18",
+    "official_name": "Deep Navy",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C18",
+      "C18号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C19",
+    "official_name": "Blue Green",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C19",
+      "C19号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C20",
+    "official_name": "Steel Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C20",
+      "C20号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C21",
+    "official_name": "Pale Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C21",
+      "C21号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C22",
+    "official_name": "Gray Blue",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C22",
+      "C22号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C23",
+    "official_name": "Light Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C23",
+      "C23号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C24",
+    "official_name": "Sky Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C24",
+      "C24号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C25",
+    "official_name": "Light Cyan Blue",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C25",
+      "C25号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C26",
+    "official_name": "Medium Blue",
+    "aliases_cn": [
+      "青色",
+      "湖蓝",
+      "MARD C26",
+      "C26号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C27",
+    "official_name": "Very Light Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C27",
+      "C27号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C28",
+    "official_name": "Gray Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C28",
+      "C28号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "C29",
+    "official_name": "Indigo",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD C29",
+      "C29号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D1",
+    "official_name": "Light Violet Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD D1",
+      "D1号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D2",
+    "official_name": "Violet Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD D2",
+      "D2号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D3",
+    "official_name": "Deep Violet Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD D3",
+      "D3号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D4",
+    "official_name": "Navy Purple",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD D4",
+      "D4号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D5",
+    "official_name": "Purple",
+    "aliases_cn": [
+      "紫色",
+      "薰衣草紫",
+      "MARD D5",
+      "D5号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D6",
+    "official_name": "Light Purple",
+    "aliases_cn": [
+      "紫色",
+      "薰衣草紫",
+      "MARD D6",
+      "D6号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D7",
+    "official_name": "Deep Purple",
+    "aliases_cn": [
+      "紫色",
+      "薰衣草紫",
+      "MARD D7",
+      "D7号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D8",
+    "official_name": "Very Light Purple",
+    "aliases_cn": [
+      "紫色",
+      "薰衣草紫",
+      "MARD D8",
+      "D8号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D9",
+    "official_name": "Pale Purple",
+    "aliases_cn": [
+      "紫色",
+      "薰衣草紫",
+      "MARD D9",
+      "D9号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D10",
+    "official_name": "Deep Purple Black",
+    "aliases_cn": [
+      "紫色",
+      "薰衣草紫",
+      "MARD D10",
+      "D10号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D11",
+    "official_name": "Gray Purple",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD D11",
+      "D11号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D12",
+    "official_name": "Pink Purple",
+    "aliases_cn": [
+      "粉色",
+      "浅粉",
+      "MARD D12",
+      "D12号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D13",
+    "official_name": "Deep Rose Purple",
+    "aliases_cn": [
+      "粉色",
+      "浅粉",
+      "MARD D13",
+      "D13号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D14",
+    "official_name": "Dark Purple",
+    "aliases_cn": [
+      "紫色",
+      "薰衣草紫",
+      "MARD D14",
+      "D14号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D15",
+    "official_name": "Indigo Purple",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD D15",
+      "D15号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D16",
+    "official_name": "Very Light Gray Purple",
+    "aliases_cn": [
+      "白色",
+      "奶白",
+      "MARD D16",
+      "D16号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D17",
+    "official_name": "Light Blue Purple",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD D17",
+      "D17号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D18",
+    "official_name": "Medium Purple",
+    "aliases_cn": [
+      "紫色",
+      "薰衣草紫",
+      "MARD D18",
+      "D18号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D19",
+    "official_name": "Gray Pink Purple",
+    "aliases_cn": [
+      "紫色",
+      "薰衣草紫",
+      "MARD D19",
+      "D19号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D20",
+    "official_name": "Deep Purple",
+    "aliases_cn": [
+      "紫色",
+      "薰衣草紫",
+      "MARD D20",
+      "D20号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D21",
+    "official_name": "Dark Purple",
+    "aliases_cn": [
+      "紫色",
+      "薰衣草紫",
+      "MARD D21",
+      "D21号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D22",
+    "official_name": "Blue Purple",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD D22",
+      "D22号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D23",
+    "official_name": "Very Light Purple",
+    "aliases_cn": [
+      "粉色",
+      "浅粉",
+      "MARD D23",
+      "D23号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D24",
+    "official_name": "Blue Purple",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD D24",
+      "D24号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D25",
+    "official_name": "Deep Violet Blue",
+    "aliases_cn": [
+      "蓝色",
+      "天蓝",
+      "MARD D25",
+      "D25号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "D26",
+    "official_name": "Pale Purple",
+    "aliases_cn": [
+      "紫色",
+      "薰衣草紫",
+      "MARD D26",
+      "D26号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "E1",
+    "official_name": "Light Pink",
+    "aliases_cn": [
+      "红色",
+      "正红",
+      "MARD E1",
+      "E1号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "E2",
+    "official_name": "Pale Pink",
+    "aliases_cn": [
+      "粉色",
+      "浅粉",
+      "MARD E2",
+      "E2号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "E3",
+    "official_name": "Light Rose Pink",
+    "aliases_cn": [
+      "粉色",
+      "浅粉",
+      "MARD E3",
+      "E3号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "E4",
+    "official_name": "Rose Pink",
+    "aliases_cn": [
+      "粉色",
+      "浅粉",
+      "MARD E4",
+      "E4号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "E5",
+    "official_name": "Deep Rose Pink",
+    "aliases_cn": [
+      "粉色",
+      "浅粉",
+      "MARD E5",
+      "E5号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "E6",
+    "official_name": "Rose Red",
+    "aliases_cn": [
+      "粉色",
+      "浅粉",
+      "MARD E6",
+      "E6号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  },
+  {
+    "brand": "MARD",
+    "code": "E7",
+    "official_name": "Deep Rose Red",
+    "aliases_cn": [
+      "粉色",
+      "浅粉",
+      "MARD E7",
+      "E7号"
+    ],
+    "alias_sources": [
+      "https://www.pindou.online/colors",
+      "https://www.pixel-pattern.com/color-converter",
+      "xhs_manual_collection_template.csv"
+    ],
+    "confidence": "proposal_pending_cn_community_validation"
+  }
+]
