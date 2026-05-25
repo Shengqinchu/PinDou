@@ -182,6 +182,22 @@ prompt 来自 `01_research/tech/prompts.md` + Task C 拼豆约束（"不新增�
 
 **质量特征**：基础可用，但对人像 / 宠物效果一般（这是设计意图——让用户感受到 AI 路径的差异）。
 
+**默认行为：整张铺豆**（无背景识别，材料贵），但提供"试试自动去白底"功能：
+
+#### §4.5.1 试试自动去白底（2026-05-25 review 加入）
+- 用户在 PatternSheet 结果页可点 `[试试自动去白底]` 按钮
+- 触发 `PatternBuilder.build(raw_image=..., auto_remove_white_bg=True)`
+- 算法：检测四角颜色 → 若与纯白 ΔE < 8 则 flood fill 标记为 NoBead；否则 toast "未检测到白底" 不消耗配额
+- 配额规则（详见 ADR-003 修订）：
+  - 每日免费 1 次
+  - 用完看激励视频续 1 次（每日上限 5 次）
+  - **AI 路径无此按钮**——AI 自动识别背景是付费版差异化护城河
+- 前端 UX（Gemini Phase 2 后期补）：
+  - 按钮位于 `result-basic.vue` 主 CTA 区上方
+  - 点击后 toast："正在分析背景…" + spinner
+  - 成功 → PatternSheet 区域柔和淡入新结果 + toast "已去白底，预计省 N 颗豆"
+  - 失败（未检测到）→ toast 红色提示，**不消耗配额**
+
 ### §4.6 AI 精品生成路径 — FinishedPreview（P0 必做）
 
 **用户视角**：上传图 → 选风格 + 尺寸 → 等待 30-60 秒 → 看 Preview → 决定要不要 PatternSheet。
