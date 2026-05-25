@@ -7,6 +7,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 from pindou.pattern.builder import NoBead, PatternBuilder
+from pindou.pattern.exporter import PatternExporter, labeled_grid_filename
 from pindou.pattern.postprocess import detect_and_remove_white_bg
 from pindou.providers.base import SizePreset
 
@@ -116,6 +117,19 @@ def test_large_pattern_build_stays_under_two_seconds_after_warmup() -> None:
 
     assert_grid_size(sheet, width=100, height=120)
     assert elapsed < 2.0
+
+
+def test_labeled_grid_exporter_adds_readable_png_overlay() -> None:
+    builder = PatternBuilder(target_colors=8)
+    sheet = builder.build(SizePreset.CHIBI_40X40, raw_image=read_input("pet_synthetic.png"), mode="script")
+
+    png = PatternExporter().to_labeled_grid_png(sheet)
+    image = Image.open(io.BytesIO(png))
+
+    assert image.format == "PNG"
+    assert image.width >= 40 * 18
+    assert image.height > 40 * 18
+    assert labeled_grid_filename("art_123") == "pattern_art_123_with_grid.png"
 
 
 def white_bg_raw_image_bytes() -> bytes:
