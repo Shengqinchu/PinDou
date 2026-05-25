@@ -5,13 +5,29 @@
       <!-- ===== Pattern preview ===== -->
       <figure class="result__pattern">
         <div class="result__pattern-img-wrap">
-          <image class="result__pattern-image" :src="patternImage" mode="widthFix" />
+          <div
+            v-if="hasPatternGrid"
+            class="result__grid-preview"
+            :style="gridPreviewStyle"
+            aria-label="拼豆图纸预览"
+          >
+            <span
+              v-for="(cell, index) in patternCells"
+              :key="index"
+              class="result__grid-cell"
+              :class="{ 'result__grid-cell--empty': !cell }"
+              :style="{ backgroundColor: cell?.hex || 'transparent' }"
+              aria-hidden="true"
+            ></span>
+          </div>
+          <div v-else class="result__empty-preview">
+            <span class="result__empty-dot"></span>
+            <span>暂无图纸预览</span>
+          </div>
           
           <!-- ===== AIGC 标识 (PRD §8.1 - FinishedPreview 可见) ===== -->
           <span v-if="tier === 'premium' && !isFallback" class="tag tag--ai result__pattern-badge">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 2px;">
-              <path d="M9.94 14.06 2 12l7.94-2.06L12 2l2.06 7.94L22 12l-7.94 2.06L12 22z"/>
-            </svg>
+            <span class="result__badge-star" aria-hidden="true">*</span>
             AI 智能生成
           </span>
         </div>
@@ -76,13 +92,7 @@
       <!-- ===== CTAs ===== -->
       <div class="result__actions">
         <button class="btn btn--pink btn--block btn--lg result__download" @click="handleDownload">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 4px; display: block;">
-            <path d="M12 3v12"/>
-            <path d="m7 10 5 5 5-5"/>
-            <path d="M5 21h14"/>
-          </svg>
+          <span class="result__download-icon" aria-hidden="true"></span>
           保存图纸至相册
         </button>
 
@@ -94,14 +104,7 @@
 
       <!-- ===== Regenerate footnote ===== -->
       <navigator class="result__regen" url="/pages/upload/upload" open-type="redirect">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 4px; display: block;">
-          <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/>
-          <path d="M21 3v5h-5"/>
-          <path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/>
-          <path d="M3 21v-5h5"/>
-        </svg>
+        <span class="result__regen-icon" aria-hidden="true"></span>
         <span class="result__regen-label">再生成一次</span>
         <span class="result__regen-cost">消耗 1 次额度</span>
       </navigator>
@@ -123,8 +126,10 @@ import { onLoad } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import Paywall from '../../components/Paywall.vue';
 import { useArtworkStore } from '../../store/artwork';
+import { PatternSheet, ColorRef } from '../../api';
 
 const artworkStore = useArtworkStore();
+const CURRENT_PATTERN_KEY = 'pd_current_pattern';
 
 const tier = ref<'quick' | 'premium'>('quick');
 const isFallback = ref(false);
@@ -140,37 +145,41 @@ onLoad((options: any) => {
   }
 });
 
-// 从 Pinia 状态中获取当前的图纸，如果为空则使用 Mock 降级兜底展示
+const readStoredPattern = (): PatternSheet | null => {
+  const stored = uni.getStorageSync(CURRENT_PATTERN_KEY);
+  if (!stored) return null;
+  return stored as PatternSheet;
+};
+
+const emptyPattern: PatternSheet = {
+  grid: [],
+  color_counts: {},
+  bead_total: 0,
+  coords: [],
+  no_bead_mask: [],
+  palette_used: [],
+  estimated_cost_cny: 0,
+  suggested_buffer_pct: 10,
+  brand: 'MARD',
+  bead_diameter_mm: 5
+};
+
+// 从 Pinia 状态中获取当前图纸；热重载或跳转导致 Pinia 丢失时，读取最近一次真实 PatternSheet。
 const pattern = computed(() => {
-  return artworkStore.currentPattern || {
-    pattern_id: 'pattern_mock_fallback',
-    image_url: '/static/assets/bead-cat.svg',
-    size: '24 × 24',
-    total_beads: 487,
-    colors_count: 7,
-    estimated_cost: 6.5,
-    colors: [
-      { name: '蜜桃橙', code: 'O-22', count: 187, percentage: 38, hex: '#FFB088' },
-      { name: '浅蜜桃', code: 'o-18', count: 156, percentage: 32, hex: '#FFCDA6' },
-      { name: '奶油白', code: 'M-01', count: 65, percentage: 13, hex: '#FFF4E6' },
-      { name: '樱花粉', code: 'p-08', count: 28, percentage: 6, hex: '#FFB6C1' },
-      { name: '暖灰', code: 'k-50', count: 22, percentage: 5, hex: '#8C6A55' },
-      { name: '墨色', code: 'K-99', count: 18, percentage: 4, hex: '#2D2D2D' },
-      { name: '玫红', code: 'P-12', count: 11, percentage: 2, hex: '#FF6B9D' }
-    ]
-  };
+  return artworkStore.currentPattern || readStoredPattern() || emptyPattern;
 });
 
-const patternColors = computed(() => pattern.value.colors || []);
+const hasPatternGrid = computed(() => Array.isArray(pattern.value.grid) && pattern.value.grid.length > 0);
+const gridRows = computed(() => pattern.value.grid.length);
+const gridCols = computed(() => pattern.value.grid[0]?.length || 0);
+const patternCells = computed(() => pattern.value.grid.flat() as (ColorRef | null)[]);
+const gridPreviewStyle = computed(() => ({
+  gridTemplateColumns: `repeat(${Math.max(gridCols.value, 1)}, minmax(0, 1fr))`,
+  aspectRatio: gridCols.value && gridRows.value ? `${gridCols.value} / ${gridRows.value}` : '1 / 1'
+}));
+
+const patternColors = computed(() => (pattern.value as any).colors || []);
 const colorsCount = computed(() => patternColors.value.length);
-
-const patternImage = computed(() => {
-  // 如果是 fallback 或 quick, 使用 bead-bunny; 如果是 premium 且成功, 使用 bead-cat
-  if (isFallback.value || tier.value === 'quick') {
-    return '/static/assets/bead-bunny.svg';
-  }
-  return pattern.value.image_url || '/static/assets/bead-cat.svg';
-});
 
 const patternName = computed(() => {
   if (tier.value === 'premium' && !isFallback.value) {
@@ -181,11 +190,19 @@ const patternName = computed(() => {
 
 // 一键保存拼豆图纸到系统相册
 const handleDownload = () => {
+  const imageUrl = (pattern.value as any).image_url;
+  if (!imageUrl) {
+    uni.showToast({
+      title: '图纸已生成，图片导出稍后开放',
+      icon: 'none'
+    });
+    return;
+  }
   uni.showLoading({ title: '正在保存图纸...' });
   
   // 小程序端长按保存或调用原生接口保存
   uni.downloadFile({
-    url: patternImage.value,
+    url: imageUrl,
     success: (res) => {
       uni.saveImageToPhotosAlbum({
         filePath: res.tempFilePath,
@@ -257,12 +274,62 @@ onMounted(() => {
   display: block;
 }
 
+.result__grid-preview {
+  width: 100%;
+  max-height: 320px;
+  display: grid;
+  gap: 1px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid var(--pd-divider);
+  border-radius: var(--pd-r-img);
+  overflow: hidden;
+}
+
+.result__grid-cell {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 0.5px rgba(45, 45, 45, 0.05);
+}
+
+.result__grid-cell--empty {
+  box-shadow: none;
+}
+
+.result__empty-preview {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--pd-fg-2);
+  background: #fff;
+  border: 1px dashed var(--pd-divider);
+  border-radius: var(--pd-r-img);
+  font-size: 13px;
+}
+
+.result__empty-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--pd-gradient-warm);
+  opacity: 0.72;
+}
+
 .result__pattern-badge {
   position: absolute;
   top: 10px;
   left: 10px;
   z-index: 2;
   box-shadow: 0 4px 10px rgba(255, 107, 157, 0.4);
+}
+.result__badge-star {
+  margin-right: 2px;
+  font-size: 11px;
+  line-height: 1;
 }
 
 .result__pattern-caption {
@@ -416,6 +483,34 @@ onMounted(() => {
 .result__download {
   cursor: pointer;
 }
+.result__download-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
+  border-bottom: 2px solid currentColor;
+  position: relative;
+}
+.result__download-icon::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 0;
+  width: 2px;
+  height: 10px;
+  border-radius: 999px;
+  background: currentColor;
+}
+.result__download-icon::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 6px;
+  width: 7px;
+  height: 7px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+}
 
 .result__upsell {
   position: relative;
@@ -454,6 +549,14 @@ onMounted(() => {
   width: 100%;
   justify-content: center;
   cursor: pointer;
+}
+.result__regen-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
 }
 .result__regen-cost {
   font-size: 11px;

@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia';
 import { api, Artwork, SizePreset, StylePreset, PatternSheet, PreviewResult } from '../api';
 
+const CURRENT_PATTERN_KEY = 'pd_current_pattern';
+const CURRENT_PREVIEW_KEY = 'pd_current_preview';
+
 export const useArtworkStore = defineStore('artwork', {
   state: () => ({
     artworks: [] as Artwork[],
@@ -24,6 +27,7 @@ export const useArtworkStore = defineStore('artwork', {
         const detail = await api.getArtworkDetail(id);
         this.currentArtwork = detail;
         this.currentPattern = detail.pattern_data;
+        uni.setStorageSync(CURRENT_PATTERN_KEY, detail.pattern_data);
         return detail;
       } catch (error) {
         console.error('Fetch artwork detail error:', error);
@@ -34,6 +38,7 @@ export const useArtworkStore = defineStore('artwork', {
       try {
         const preview = await api.generatePreview(filePath, style, size);
         this.currentPreview = preview;
+        uni.setStorageSync(CURRENT_PREVIEW_KEY, preview);
         return preview;
       } catch (error) {
         console.error('Generate AI preview error:', error);
@@ -49,6 +54,7 @@ export const useArtworkStore = defineStore('artwork', {
       try {
         const sheet = await api.buildPattern(params);
         this.currentPattern = sheet;
+        uni.setStorageSync(CURRENT_PATTERN_KEY, sheet);
         return sheet;
       } catch (error) {
         console.error('Build pattern sheet error:', error);
