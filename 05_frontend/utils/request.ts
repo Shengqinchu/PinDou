@@ -1,6 +1,6 @@
 // PinDou 统一请求库封装 (uni.request)
 
-const BASE_URL = process.env.VITE_API_BASE_URL || 'https://api.pindou.online/api/v1'; // 线上 API 预留
+const BASE_URL = 'http://127.0.0.1:8000/api/v1'; // 联调时指向真后端，线上预留则见 process.env
 
 interface RequestOptions {
   url: string;
@@ -12,10 +12,10 @@ interface RequestOptions {
 
 export function request<T = any>(options: RequestOptions): Promise<T> {
   const token = uni.getStorageSync('pd_token') || '';
-  
+
   // 组装完整 URL
-  const fullUrl = options.url.startsWith('http') 
-    ? options.url 
+  const fullUrl = options.url.startsWith('http')
+    ? options.url
     : `${BASE_URL}${options.url.startsWith('/') ? '' : '/'}${options.url}`;
 
   const header = {
@@ -78,12 +78,12 @@ function translateError(errorData: any, statusCode: number): string {
   if (statusCode === 429) {
     return '您点击得太快啦，休息一下再试试吧~';
   }
-  
-  // 从后端返回数据中尝试查找 message
-  const msg = typeof errorData === 'string' 
-    ? errorData 
-    : (errorData?.message || errorData?.error || '');
-    
+
+  // 从后端返回数据中尝试查找 message (优先读取 PRD §6 指定的 message_cn)
+  const msg = typeof errorData === 'string'
+    ? errorData
+    : (errorData?.message_cn || errorData?.message || errorData?.error || '');
+
   if (msg) {
     // 处理特定业务字段的翻译，不把原始英文暴露给用户
     const msgLower = msg.toLowerCase();

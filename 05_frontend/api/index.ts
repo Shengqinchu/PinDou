@@ -2,7 +2,7 @@
 import { request } from '../utils/request';
 
 // 是否开启 Mock 模式 (联调前默认开启)
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 /* ==========================================
    类型定义 (符合 PRD §5 / §6)
@@ -223,12 +223,12 @@ export const api = {
         }, 3000); // Mock 耗时设为 3s (方便演示)
       });
     }
-    
+
     // 真机上传使用 uni.uploadFile 包装
     return new Promise((resolve, reject) => {
       const token = uni.getStorageSync('pd_token') || '';
       uni.uploadFile({
-        url: 'https://api.pindou.online/api/v1/preview/generate',
+        url: '/preview/generate', // 使用相对路径，由 request 自动补全 BASE_URL
         filePath: filePath,
         name: 'image',
         formData: {
@@ -274,7 +274,7 @@ export const api = {
       return new Promise((resolve, reject) => {
         const token = uni.getStorageSync('pd_token') || '';
         uni.uploadFile({
-          url: 'https://api.pindou.online/api/v1/pattern/build',
+          url: '/pattern/build', // 使用相对路径
           filePath: params.rawImageFilePath!,
           name: 'raw_image',
           formData: {
