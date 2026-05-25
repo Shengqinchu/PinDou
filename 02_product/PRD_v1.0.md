@@ -332,6 +332,31 @@ class PreviewResult:
 # 兜底逻辑：调 PatternBuilder 直接量化原图，输出当 Preview（视觉差，但不报错）
 ```
 
+#### §5.1.1 Internal `PreviewResult` vs HTTP API 返回（Phase 2 task 2 review 落档）
+上面的 `PreviewResult` 是**后端内部 dataclass**（provider 接口传递），`image: bytes` 留给 provider 内部。
+**HTTP API 返回前端的不是 bytes**，而是 `to_frontend_dict()` 转换后的精简字段：
+
+```typescript
+// 前端消费的字段（与 05_frontend/api/index.ts 对齐）
+interface PreviewResultDTO {
+  preview_id: string          // 后端保存 PNG 到 PINDOU_PREVIEW_DIR 后生成的 ID
+  image_url: string           // 静态访问 URL（/static/previews/<id>.png）
+  image_format: string
+  target_resolution: [w, h]
+  target_color_count: int
+  provider_used: string
+  fallback_count: int
+  cost_estimate: float
+  latency_ms: int
+  metadata: dict              // 含 fallback_chain_failures 等监控信息
+}
+```
+
+**桥接约定**：
+- Provider 内部：保留 `image: bytes`（chain 计算 / fallback 转 PatternBuilder 用）
+- API 端点（task 5 实现）：调 `result.to_frontend_dict()` + 落盘 PNG + 返回 URL
+- 前端通过 `image_url` 异步加载图片，不阻塞 JSON 响应
+
 ### §5.2 `PatternBuilder` 接口
 
 ```python
