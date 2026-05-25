@@ -32,7 +32,7 @@ export const useArtworkStore = defineStore('artwork', {
     },
     async generateAIPreview(filePath: string, style: StylePreset, size: SizePreset) {
       try {
-        const preview = await api.generateAIPreview(filePath, style, size);
+        const preview = await api.generatePreview(filePath, style, size);
         this.currentPreview = preview;
         return preview;
       } catch (error) {
