@@ -151,3 +151,22 @@ micro-task “脚本路径试试自动去白底”已完成，结论给用户 / 
 - Windows 防火墙：可能需要允许 8000 端口入站（如果 Codex 改了上面但小程序还是 timeout，让用户加防火墙规则）
 
 **额外提醒**：用户在小红书 / 闲鱼引流后真机扫码测试时，IP 必须是与微信开发者工具同局域网；不在同网就要走域名（FUTURE_WORK 第 2 条备案）。
+
+## 2026-05-25 — Phase 2 frontend emergency task review
+
+UI 多机型适配 + 后端连接配置 + 首页 CTA 半透明 bug 已完成，结论给用户 / Claude review：
+
+1. 已新增 `03_design/wireframes/MOBILE_ADAPTATION.md`，落档状态栏 / 微信胶囊 / 底部安全区三层模型、iPhone SE / 12-13 / 14 Pro Max 尺寸检查点、rpx 换算和推荐 API。
+2. `App.vue` 启动时已调用 `userStore.initDeviceMetrics()`，读取 `uni.getSystemInfoSync()` 与 `uni.getMenuButtonBoundingClientRect()`；失败时使用保守默认值，不阻塞首屏。
+3. `MiniProgramLayout.vue` 已通过 CSS variables 接收运行时指标；标题栏按真实胶囊 `top/height` 对齐，并为右侧原生胶囊预留宽度，避免“上传你的照片”等标题压到 `...` 胶囊。
+4. `components.css` 已去掉固定 375x667 frame，改为 `100vw/100vh`；正文高度按 `topChromeHeight` 与 `safeAreaBottom` 计算，并补 `env(safe-area-inset-bottom)`。
+5. 后端 BASE_URL 已从 `127.0.0.1` 改为 dev/prod 可切换：dev 默认 `http://192.168.2.40:8000/api/v1`，prod 默认 `https://api.pindou.cn/api/v1`；也支持 `pd_api_base_url` storage override。
+6. `src/manifest.json` 仍保持 `mp-weixin.setting.urlCheck=false`；同时已把微信工具实际读取的 `project.private.config.json` 里的 `urlCheck` 改为 `false`。
+7. 首页 CTA 半透明修复：`navigator` 已设置 `hover-class="none"`，并在 `.home__cta` 显式保持 `opacity: 1` 和 `background: var(--pd-gradient)`。
+8. 验证：`npm run build:mp-weixin` 通过；`npm run dev:mp-weixin` 已重新生成 `dist/dev/mp-weixin`。dev 产物确认包含 `http://192.168.2.40:8000/api/v1`，首页 CTA WXML 确认包含 `hover-class="none"`。
+
+剩余风险 / 需要用户配合：
+
+1. 真机联调如果仍 timeout，先确认后端不是只监听 `127.0.0.1`，需要用 `uvicorn pindou.main:app --host 0.0.0.0 --port 8000 --reload`；Windows 防火墙也可能需要允许 8000 入站。
+2. 多机型适配已按运行时 API 实现，但仍建议用户在微信开发者工具里切 iPhone SE / iPhone 12-13 / iPhone 14 Pro Max 各点一次首页、上传页、作品页截图确认。
+3. 当前使用微信原生 tabbar，不能直接给 tabbar 本身写 safe-area 样式；本次只保证页面正文内容不贴底。若未来改自定义 tabbar，需要复用同一套 `safeAreaBottom`。
