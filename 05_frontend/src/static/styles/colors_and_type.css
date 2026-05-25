@@ -132,7 +132,22 @@ page {
 /* =========================================================
    Reset
    ========================================================= */
-*, *::before, *::after { box-sizing: border-box; }
+page,
+view,
+scroll-view,
+swiper,
+swiper-item,
+image,
+text,
+button,
+input,
+textarea,
+navigator,
+label,
+form,
+block {
+  box-sizing: border-box;
+}
 /* Promote the [hidden] attribute above any class-based display rule —
    we toggle visibility via [hidden] in several pages (e.g. upload's empty
    vs. selected state) and need it to win against .upload__selected { display: flex }. */
@@ -151,7 +166,7 @@ page {
   text-rendering: optimizeLegibility;
 }
 
-h1 {
+.pd-h1 {
   font-family: var(--pd-font-display);
   font-size: var(--pd-fs-h1);
   font-weight: 700;
@@ -160,7 +175,7 @@ h1 {
   color: var(--pd-fg-1);
   margin: 0;
 }
-h2 {
+.pd-h2 {
   font-family: var(--pd-font-display);
   font-size: var(--pd-fs-h2);
   font-weight: 700;
@@ -168,7 +183,7 @@ h2 {
   color: var(--pd-fg-1);
   margin: 0;
 }
-h3 {
+.pd-h3 {
   font-family: var(--pd-font-display);
   font-size: var(--pd-fs-h3);
   font-weight: 500;
@@ -176,13 +191,14 @@ h3 {
   color: var(--pd-fg-1);
   margin: 0;
 }
-p {
+.pd-text {
   font-size: var(--pd-fs-body);
   line-height: var(--pd-lh-body);
   color: var(--pd-fg-1);
   margin: 0;
 }
-small, .pd-sub {
+.pd-small,
+.pd-sub {
   font-size: var(--pd-fs-sub);
   color: var(--pd-fg-2);
 }

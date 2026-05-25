@@ -47,9 +47,9 @@
 
       <!-- ===== Hero copy ===== -->
       <section class="home__hero">
-        <h1 class="home__headline">
+        <view class="home__headline">
           30 秒生成你的<span class="text-grad">拼豆图纸</span>
-        </h1>
+        </view>
         <p class="home__subtitle">上传一张照片，AI 自动转 Q 版输出图纸</p>
       </section>
 

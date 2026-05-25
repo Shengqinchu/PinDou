@@ -10,7 +10,7 @@
       <h2 class="error__title">{{ title }}</h2>
       <p class="error__desc">{{ desc }}</p>
       <button class="error__cta" @click="onRetry">{{ ctaText }}</button>
-      <a class="error__help" href="javascript:void(0)" @click="onHelp">需要帮助？</a>
+      <view class="error__help" @click="onHelp">需要帮助？</view>
     </div>
   </MiniProgramLayout>
 </template>
