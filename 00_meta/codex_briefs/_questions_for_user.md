@@ -42,3 +42,14 @@
 4. 已创建 `pindou` 部署用户，启用 fail2ban，并启用 UFW：公网入站只允许 `22/80/443`。
 5. 旧服务清理：已停用并移除 `claude-shop`、`cloudflared`、Docker `wxhm/new-api`、旧 Nginx 站点、`rpcbind`；已删除 `/opt/claude-shop`、`/root/new-api-data`、`/root/apisell`、`/root/wxhm-data`、`/var/lib/docker`、旧静态站点和缓存日志。
 6. 当前端口：公网仅 SSH `22` 在监听；`80/443` 在 UFW 预放行但 Nginx 当前 inactive，等 PinDou 部署时重新启用。另有 `127.0.0.1:31088` 云探针，仅本机监听。
+
+## 2026-05-25 — Phase 2 backend task 1 review
+
+任务 1 已完成后端骨架与本地验证，结论给用户 / Claude review：
+
+1. 已创建 `06_backend/` FastAPI 项目骨架，包含 `pyproject.toml`、`requirements.txt`、后端 `.env.example`、`pindou/` 包结构和 `tests/`。
+2. 已按 PRD §5 保留 `PreviewProvider.generate(...)`、`PatternBuilder.build(...)`、`PatternSheet`、`ColorRef` 等契约轮廓；本任务只做占位，不实现业务逻辑，不改字段名。
+3. 已用 `pydantic-settings` 实现配置加载，读取根目录 `.env` + `06_backend/.env`，密钥字段使用 `SecretStr`，没有把 key 写进 commit。
+4. 本地 `.venv` 已安装核心依赖；`pytest` 通过；`uvicorn pindou.main:app --host 127.0.0.1 --port 8000` 已验证 `/health` 返回 `{"status":"ok"}`。
+5. 服务器 UFW 已重新执行放行并启用：`22/80/443` allow，`ufw status verbose` 为 active；实际监听仍只有公网 SSH 与本地云探针。
+6. 待 review 后进入任务 2：实现 `XiaochiGptProvider` + fallback chain，并开始接 PRD §5.1 的真实 PreviewProvider。

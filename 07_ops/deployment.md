@@ -63,7 +63,7 @@ ssh -o PreferredAuthentications=password root@$PINDOU_PROD_SSH_HOST   # 应该�
 **完成后**：从 `.env` 删除 `PINDOU_PROD_SSH_PASS`，添加 `PINDOU_PROD_SSH_KEY_PATH`。
 
 ### 2.2 改 root 改成普通用户 + sudo
-**状态（2026-05-24 Codex 执行）**：✅ 已完成。
+**状态（2026-05-25 Codex 复核）**：✅ 已完成。
 
 - 已创建 `pindou` 用户。
 - 已加入 `sudo` 组。
@@ -91,6 +91,7 @@ mkdir -p /home/pindou/.ssh && cp /root/.ssh/authorized_keys /home/pindou/.ssh/ &
 - cloudflared 已停用并移除旧 unit。
 - 旧 Nginx 站点配置已下线，Nginx 当前 inactive，后续 PinDou 部署时重新启用。
 - 本机验证：SSH key 登录可用；fail2ban active；UFW active；旧服务 inactive。
+- Task 1 复核：已重新执行 `ufw allow 22/80/443` + `ufw --force enable`，`ufw status verbose` 显示 active。
 
 ```bash
 apt update && apt install -y ufw fail2ban

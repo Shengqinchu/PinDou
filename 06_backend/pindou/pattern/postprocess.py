@@ -1,0 +1,1 @@
+"""Pattern post-processing placeholder."""

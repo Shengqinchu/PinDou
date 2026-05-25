@@ -1,0 +1,1 @@
+"""Color map loader placeholder."""
