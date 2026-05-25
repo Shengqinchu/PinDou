@@ -74,8 +74,7 @@
             <!-- 动态绑定背景色 -->
             <span class="result__swatch" :style="{ backgroundColor: color.hex }" aria-hidden="true"></span>
             <span class="result__color-name">
-              <span class="result__color-code">{{ color.code }}</span>
-              {{ color.nameCn }}
+              {{ color.legend }}
             </span>
             <span class="result__color-bar">
               <!-- 延迟展开过渡动画 -->
@@ -84,7 +83,6 @@
                 :style="{ width: isMounted ? color.percentage + '%' : '0%' }"
               ></span>
             </span>
-            <span class="result__color-count">{{ color.count }}</span>
           </li>
         </ul>
       </div>
@@ -142,6 +140,7 @@ type DisplayColor = {
   count: number;
   percentage: number;
   hex: string;
+  legend: string;
 };
 
 onLoad((options: any) => {
@@ -204,7 +203,8 @@ const patternColors = computed<DisplayColor[]>(() => {
         code,
         count,
         percentage: Math.max(3, Math.round((count / maxCount) * 100)),
-        hex: color?.hex || '#D9D9D9'
+        hex: color?.hex || '#D9D9D9',
+        legend: `${code} (${count} 颗 · ${color?.name_cn || '未命名色'})`
       };
     })
     .sort((a, b) => b.count - a.count);
