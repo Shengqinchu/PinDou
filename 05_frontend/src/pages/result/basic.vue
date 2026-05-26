@@ -14,7 +14,15 @@
             @error="handlePatternImageError"
           />
           <div
-            v-else-if="hasPatternGrid"
+            v-else-if="isPatternImagePreparing"
+            class="result__loading-preview"
+            aria-label="拼豆图纸载入中"
+          >
+            <span class="result__loading-dot"></span>
+            <span>图纸载入中...</span>
+          </div>
+          <div
+            v-else-if="shouldUseFallbackGrid"
             class="result__grid-preview"
             :style="gridPreviewStyle"
             aria-label="拼豆图纸预览"
@@ -152,6 +160,7 @@ const isMounted = ref(false);
 const showPaywall = ref(false);
 const showZoomHint = ref(false);
 const imageLoadFailed = ref(false);
+const isPatternImagePreparing = ref(false);
 const displayPatternImageUrl = ref('');
 
 type DisplayColor = {
@@ -203,12 +212,35 @@ const patternImageUrl = computed(() => {
   return normalizeAssetUrl(url);
 });
 const shouldUsePatternImage = computed(() => !!displayPatternImageUrl.value && !imageLoadFailed.value);
+const shouldUseFallbackGrid = computed(() => hasPatternGrid.value && (!patternImageUrl.value || imageLoadFailed.value));
 const artworkId = computed(() => {
   return String(pattern.value.metadata?.artwork_id || artworkStore.currentArtwork?.artwork_id || '');
 });
-const patternCells = computed<DisplayCell[]>(() => {
+const fallbackPreviewRows = computed(() => {
   const rows = pattern.value.grid || [];
-  const maxDim = Math.max(gridCols.value, gridRows.value);
+  const rowCount = rows.length;
+  const colCount = rows[0]?.length || 0;
+  const maxPreviewDim = 52;
+  if (!rowCount || !colCount) return [];
+  const rowStep = Math.max(1, Math.ceil(rowCount / maxPreviewDim));
+  const colStep = Math.max(1, Math.ceil(colCount / maxPreviewDim));
+  const sampled: (ColorRef | null)[][] = [];
+
+  for (let rowIndex = 0; rowIndex < rowCount; rowIndex += rowStep) {
+    const row = rows[rowIndex] || [];
+    const sampledRow: (ColorRef | null)[] = [];
+    for (let colIndex = 0; colIndex < colCount; colIndex += colStep) {
+      sampledRow.push(row[colIndex] || null);
+    }
+    sampled.push(sampledRow);
+  }
+  return sampled;
+});
+const previewRows = computed(() => fallbackPreviewRows.value.length);
+const previewCols = computed(() => fallbackPreviewRows.value[0]?.length || 0);
+const patternCells = computed<DisplayCell[]>(() => {
+  const rows = fallbackPreviewRows.value;
+  const maxDim = Math.max(previewCols.value, previewRows.value);
   const shouldShowAllCodes = maxDim <= 26;
   const cells: DisplayCell[] = [];
   rows.forEach((row, rowIndex) => {
@@ -226,15 +258,15 @@ const patternCells = computed<DisplayCell[]>(() => {
 });
 
 const resultLabelSize = computed(() => {
-  const maxDim = Math.max(gridCols.value, gridRows.value);
+  const maxDim = Math.max(previewCols.value, previewRows.value);
   if (maxDim <= 26) return 10;
   if (maxDim <= 52) return 7;
   return 6;
 });
 const gridPreviewStyle = computed(() => ({
-  gridTemplateColumns: `repeat(${Math.max(gridCols.value, 1)}, minmax(0, 1fr))`,
+  gridTemplateColumns: `repeat(${Math.max(previewCols.value, 1)}, minmax(0, 1fr))`,
   gridAutoRows: '1fr',
-  aspectRatio: `${Math.max(gridCols.value, 1)} / ${Math.max(gridRows.value, 1)}`,
+  aspectRatio: `${Math.max(previewCols.value, 1)} / ${Math.max(previewRows.value, 1)}`,
   '--pd-result-label-size': `${resultLabelSize.value}px`
 }));
 
@@ -284,15 +316,18 @@ const patternName = computed(() => {
 
 function prepareDisplayPatternImage(url: string) {
   imageLoadFailed.value = false;
+  isPatternImagePreparing.value = false;
   displayPatternImageUrl.value = '';
   if (!url) return;
   if (!/^https?:\/\//.test(url)) {
     displayPatternImageUrl.value = url;
     return;
   }
+  isPatternImagePreparing.value = true;
   uni.downloadFile({
     url,
     success: (res) => {
+      isPatternImagePreparing.value = false;
       if (res.statusCode && res.statusCode >= 400) {
         imageLoadFailed.value = true;
         console.warn('图纸预览下载失败:', url, res.statusCode);
@@ -302,6 +337,7 @@ function prepareDisplayPatternImage(url: string) {
       imageLoadFailed.value = false;
     },
     fail: (error) => {
+      isPatternImagePreparing.value = false;
       imageLoadFailed.value = true;
       console.warn('图纸预览下载失败，已切换为本地网格预览:', url, error);
     }
@@ -315,6 +351,12 @@ watch(
   },
   { immediate: true }
 );
+
+watch(shouldUsePatternImage, (ready) => {
+  if (ready && !uni.getStorageSync(ZOOM_HINT_KEY)) {
+    showZoomHint.value = true;
+  }
+});
 
 const handlePatternImageLoad = () => {
   imageLoadFailed.value = false;
@@ -540,6 +582,33 @@ onMounted(() => {
   border-radius: 999px;
   background: var(--pd-gradient-warm);
   opacity: 0.72;
+}
+
+.result__loading-preview {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--pd-fg-2);
+  background: #fff;
+  border: 1px solid var(--pd-divider);
+  border-radius: var(--pd-r-img);
+  font-size: 13px;
+}
+
+.result__loading-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--pd-gradient-warm);
+  animation: result-preview-pulse 900ms var(--pd-ease-soft) infinite alternate;
+}
+
+@keyframes result-preview-pulse {
+  from { transform: scale(0.9); opacity: 0.62; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .result__pattern-badge {
