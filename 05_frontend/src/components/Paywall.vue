@@ -173,23 +173,33 @@ const handleShowQR = async () => {
 <style scoped lang="scss">
 .paywall-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(45, 45, 45, 0.42);
-  z-index: 999;
-  display: flex;
-  align-items: flex-end;
+  z-index: 998;
+  display: block;
   backdrop-filter: blur(4px);
   box-sizing: border-box;
-  padding-top: 64px;
+  padding: 0;
 }
 
 /* ===== Sheet shell ===== */
 .paywall__sheet {
-  width: 100%;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+  width: 100vw;
+  max-width: 100vw;
   max-height: calc(100vh - 64px);
+  margin: 0;
   background: var(--pd-card);
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
+  border-radius: 24px 24px 0 0;
   padding: 8px 20px calc(24px + constant(safe-area-inset-bottom));
   padding: 8px 20px calc(24px + env(safe-area-inset-bottom));
   box-shadow: 0 -12px 40px rgba(45, 45, 45, 0.18);
@@ -198,6 +208,7 @@ const handleShowQR = async () => {
   overflow-y: auto;
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
+  transform: translateY(0);
 }
 
 .paywall__handle {
