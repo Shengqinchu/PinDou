@@ -5,6 +5,16 @@
       <!-- ===== Pattern preview ===== -->
       <figure class="result__pattern">
         <div class="result__pattern-img-wrap" @click="previewFullScreen">
+          <button
+            v-if="artworkId"
+            class="result__partition-fab"
+            :class="{ 'result__partition-fab--pulse': showPartitionHint }"
+            type="button"
+            @click.stop="openPartitions"
+          >
+            <span aria-hidden="true">📋</span>
+            <span>分区图</span>
+          </button>
           <image
             v-if="shouldUsePatternImage"
             class="result__pattern-image"
@@ -117,10 +127,6 @@
           <span class="result__upsell-text">解锁高级版（PDF / Excel）</span>
           <span class="result__upsell-badge">月卡</span>
         </button>
-
-        <button class="btn btn--secondary btn--block btn--md result__partition" @click="openPartitions">
-          📋 查看分区图
-        </button>
       </div>
 
       <!-- ===== Regenerate footnote ===== -->
@@ -152,6 +158,7 @@ import { BASE_URL } from '../../utils/request';
 
 const artworkStore = useArtworkStore();
 const ZOOM_HINT_KEY = 'pd_pattern_zoom_hint_seen';
+const PARTITION_HINT_KEY = 'pd_partition_fab_hint_seen';
 const API_ORIGIN = BASE_URL.replace(/\/api\/v\d+$/, '');
 
 const tier = ref<'quick' | 'premium'>('quick');
@@ -159,6 +166,7 @@ const isFallback = ref(false);
 const isMounted = ref(false);
 const showPaywall = ref(false);
 const showZoomHint = ref(false);
+const showPartitionHint = ref(false);
 const imageLoadFailed = ref(false);
 const isPatternImagePreparing = ref(false);
 const displayPatternImageUrl = ref('');
@@ -442,6 +450,13 @@ const handleDownload = () => {
 
 onMounted(() => {
   showZoomHint.value = shouldUsePatternImage.value && !uni.getStorageSync(ZOOM_HINT_KEY);
+  showPartitionHint.value = !uni.getStorageSync(PARTITION_HINT_KEY);
+  if (showPartitionHint.value) {
+    uni.setStorageSync(PARTITION_HINT_KEY, true);
+    setTimeout(() => {
+      showPartitionHint.value = false;
+    }, 2200);
+  }
   // 延迟赋予 Mounted 状态，促使色条百分比伸长动画顺利在页面触发
   setTimeout(() => {
     isMounted.value = true;
@@ -475,6 +490,45 @@ onMounted(() => {
   position: relative;
   border-radius: var(--pd-r-img);
   overflow: hidden;
+}
+
+.result__partition-fab {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 4;
+  min-width: 76px;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pd-gradient);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(255, 107, 157, 0.34);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.result__partition-fab::after {
+  border: 0;
+}
+
+.result__partition-fab--pulse {
+  animation: result-partition-fab-pulse 1.1s var(--pd-ease-soft) 2;
+}
+
+@keyframes result-partition-fab-pulse {
+  0%, 100% { transform: scale(1); }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 8px 22px rgba(255, 107, 157, 0.48);
+  }
 }
 
 .result__pattern-image {
@@ -828,10 +882,6 @@ onMounted(() => {
   letter-spacing: 0.6px;
   color: #fff;
   border: 0.5px solid rgba(255, 255, 255, 0.4);
-}
-
-.result__partition {
-  cursor: pointer;
 }
 
 /* ===== Regen text link ===== */

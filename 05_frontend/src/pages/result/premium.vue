@@ -16,6 +16,16 @@
       <!-- ===== Pattern preview ===== -->
       <figure class="premium__pattern">
         <div class="premium__pattern-wrap" @click="previewFullScreen">
+          <button
+            v-if="artworkId"
+            class="premium__partition-fab"
+            :class="{ 'premium__partition-fab--pulse': showPartitionHint }"
+            type="button"
+            @click.stop="openPartitions"
+          >
+            <span aria-hidden="true">📋</span>
+            <span>分区图</span>
+          </button>
           <image class="premium__pattern-image" :src="premiumPatternImage" mode="widthFix" />
           <span v-if="showZoomHint" class="premium__zoom-hint" aria-hidden="true">
             <span class="premium__zoom-hint-icon"></span>
@@ -147,8 +157,10 @@ import { BASE_URL } from '../../utils/request';
 
 const artworkStore = useArtworkStore();
 const ZOOM_HINT_KEY = 'pd_pattern_zoom_hint_seen';
+const PARTITION_HINT_KEY = 'pd_partition_fab_hint_seen';
 const API_ORIGIN = BASE_URL.replace(/\/api\/v\d+$/, '');
 const showZoomHint = ref(false);
+const showPartitionHint = ref(false);
 
 const pattern = computed(() => {
   return artworkStore.currentPattern || {
@@ -196,17 +208,28 @@ const markZoomHintSeen = () => {
 
 onMounted(() => {
   showZoomHint.value = !uni.getStorageSync(ZOOM_HINT_KEY);
+  showPartitionHint.value = !uni.getStorageSync(PARTITION_HINT_KEY);
+  if (showPartitionHint.value) {
+    uni.setStorageSync(PARTITION_HINT_KEY, true);
+    setTimeout(() => {
+      showPartitionHint.value = false;
+    }, 2200);
+  }
 });
+
+const openPartitions = () => {
+  if (!artworkId.value) {
+    uni.showToast({ title: '重新生成后可查看分区图', icon: 'none' });
+    return;
+  }
+  uni.navigateTo({
+    url: `/pages/result/partitions?artwork_id=${encodeURIComponent(artworkId.value)}`
+  });
+};
 
 const handleDownloadFormat = (name: string, ext: string) => {
   if (ext === 'tiles') {
-    if (!artworkId.value) {
-      uni.showToast({ title: '重新生成后可查看分区图', icon: 'none' });
-      return;
-    }
-    uni.navigateTo({
-      url: `/pages/result/partitions?artwork_id=${encodeURIComponent(artworkId.value)}`
-    });
+    openPartitions();
     return;
   }
   uni.showActionSheet({
@@ -331,6 +354,45 @@ const handleEmail = () => {
   width: 100%;
   max-width: 260px;
   position: relative;
+}
+
+.premium__partition-fab {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  z-index: 4;
+  min-width: 76px;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pd-gradient);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(255, 107, 157, 0.34);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.premium__partition-fab::after {
+  border: 0;
+}
+
+.premium__partition-fab--pulse {
+  animation: premium-partition-fab-pulse 1.1s var(--pd-ease-soft) 2;
+}
+
+@keyframes premium-partition-fab-pulse {
+  0%, 100% { transform: scale(1); }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 8px 22px rgba(255, 107, 157, 0.48);
+  }
 }
 
 .premium__pattern-image {
