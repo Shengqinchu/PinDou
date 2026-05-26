@@ -51,7 +51,7 @@ def test_style_and_size_presets_match_frontend_contract() -> None:
         "q_couple",
         "cartoon_fallback",
     }
-    assert {size.value for size in SizePreset} == {"40x40", "60x80", "80x100", "100x120"}
+    assert {size.value for size in SizePreset} == {"26x26", "52x52", "78x78", "104x104"}
 
 
 def test_xiaochi_provider_retries_once_with_new_seed_hint() -> None:
@@ -64,7 +64,7 @@ def test_xiaochi_provider_retries_once_with_new_seed_hint() -> None:
         seed_factory=lambda: 99,
     )
 
-    result = provider.generate(PNG_1X1, StylePreset.Q_PORTRAIT, SizePreset.SMALL_60X80, seed=1)
+    result = provider.generate(PNG_1X1, StylePreset.Q_PORTRAIT, SizePreset.DOUBLE_BOARD_52X52, seed=1)
 
     assert result.image == PNG_1X1
     assert result.provider_used == "xiaochi_gpt_image_2"
@@ -105,7 +105,7 @@ def test_provider_chain_returns_primary_success_without_fallback_count() -> None
         fallback_provider=StaticProvider("fallback"),
     )
 
-    result = chain.generate(PNG_1X1, StylePreset.Q_PET, SizePreset.MEDIUM_80X100)
+    result = chain.generate(PNG_1X1, StylePreset.Q_PET, SizePreset.TRIPLE_BOARD_78X78)
 
     assert result.provider_used == "primary"
     assert result.fallback_count == 0
@@ -118,7 +118,7 @@ def test_provider_chain_uses_backup_after_primary_failure() -> None:
         fallback_provider=StaticProvider("fallback"),
     )
 
-    result = chain.generate(PNG_1X1, StylePreset.Q_COUPLE, SizePreset.MEDIUM_80X100)
+    result = chain.generate(PNG_1X1, StylePreset.Q_COUPLE, SizePreset.TRIPLE_BOARD_78X78)
 
     assert result.provider_used == "backup"
     assert result.fallback_count == 1
@@ -131,7 +131,7 @@ def test_provider_chain_uses_quantize_fallback_after_all_ai_failures() -> None:
         fallback_provider=FallbackProvider(pattern_builder=PatternBuilder(target_colors=8)),
     )
 
-    result = chain.generate(PNG_1X1, StylePreset.CARTOON_FALLBACK, SizePreset.SMALL_60X80)
+    result = chain.generate(PNG_1X1, StylePreset.CARTOON_FALLBACK, SizePreset.DOUBLE_BOARD_52X52)
 
     assert result.provider_used == "fallback_quantize"
     assert result.fallback_count == 2

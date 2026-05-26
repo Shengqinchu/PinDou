@@ -22,10 +22,10 @@ class StylePreset(StrEnum):
 
 
 class SizePreset(StrEnum):
-    CHIBI_40X40 = "40x40"
-    SMALL_60X80 = "60x80"
-    MEDIUM_80X100 = "80x100"
-    LARGE_100X120 = "100x120"
+    SINGLE_BOARD_26X26 = "26x26"
+    DOUBLE_BOARD_52X52 = "52x52"
+    TRIPLE_BOARD_78X78 = "78x78"
+    FOUR_BOARD_104X104 = "104x104"
 
 
 @dataclass(frozen=True)

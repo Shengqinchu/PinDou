@@ -20,7 +20,7 @@ def test_phase2_models_crud_and_frontend_mapping(db_session: Session) -> None:
         preview_path="/tmp/preview.png",
         pattern_json={"grid": [["01"]], "counts": {"01": 1}},
         style_preset="chibi",
-        size_preset="small_60x80",
+        size_preset="26x26",
         title="test pattern",
     )
     order = Order(

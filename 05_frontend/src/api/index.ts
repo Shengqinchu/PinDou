@@ -65,7 +65,7 @@ function uploadFailError(err: any): PinDouApiError {
    类型定义 (符合 PRD §5 / §6)
    ========================================== */
 export type StylePreset = 'q_portrait' | 'q_pet' | 'q_couple' | 'cartoon_fallback';
-export type SizePreset = '40x40' | '60x80' | '80x100' | '100x120';
+export type SizePreset = '26x26' | '52x52' | '78x78' | '104x104';
 export type CDKType = 'single_use' | 'monthly_card' | 'credit_pack_5' | 'credit_pack_10';
 
 export interface User {
@@ -162,7 +162,7 @@ const mockColorPalette: ColorRef[] = [
 ];
 
 function generateMockPatternSheet(size: SizePreset): PatternSheet {
-  const [cols, rows] = size === '40x40' ? [40, 40] : size === '60x80' ? [60, 80] : size === '80x100' ? [80, 100] : [100, 120];
+  const [cols, rows] = size === '26x26' ? [26, 26] : size === '52x52' ? [52, 52] : size === '78x78' ? [78, 78] : [104, 104];
   const grid: (ColorRef | null)[][] = [];
   const color_counts: Record<string, number> = {};
   const coords: [number, number, string][] = [];
@@ -381,9 +381,9 @@ export const api = {
           original_image_url: null,
           original_image_deleted_at: '2026-05-24T10:15:00Z',
           style_preset: 'q_portrait',
-          size_preset: '60x80',
+          size_preset: '52x52',
           preview_url: '/static/assets/bead-cat.svg',
-          pattern_data: generateMockPatternSheet('60x80'),
+          pattern_data: generateMockPatternSheet('52x52'),
           title: '可爱小猫拼豆',
           is_paid_unlocked: false
         },
@@ -394,9 +394,9 @@ export const api = {
           original_image_url: null,
           original_image_deleted_at: '2026-05-23T16:40:00Z',
           style_preset: 'q_couple',
-          size_preset: '100x120',
+          size_preset: '104x104',
           preview_url: '/static/assets/bead-heart.svg',
-          pattern_data: generateMockPatternSheet('100x120'),
+          pattern_data: generateMockPatternSheet('104x104'),
           title: '浪漫爱心拼豆',
           is_paid_unlocked: true // 已解锁高级
         }
@@ -415,9 +415,9 @@ export const api = {
         original_image_url: null,
         original_image_deleted_at: '2026-05-24T10:15:00Z',
         style_preset: 'q_portrait',
-        size_preset: '80x100',
+        size_preset: '78x78',
         preview_url: '/static/assets/bead-cat.svg',
-        pattern_data: generateMockPatternSheet('80x100'),
+        pattern_data: generateMockPatternSheet('78x78'),
         title: '我的精品拼豆图纸',
         is_paid_unlocked: id === 'art_102'
       });

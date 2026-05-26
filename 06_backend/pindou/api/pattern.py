@@ -20,7 +20,7 @@ async def build_pattern(request: Request, current_user: CurrentUser, db: DbSessi
     """独立调用 PatternBuilder；前端“再生成一次”和脚本上传路径复用。"""
     require_sensitive_consent(current_user)
     payload, upload = await parse_payload_or_upload(request, upload_field="raw_image")
-    size = parse_size(payload.get("size") or payload.get("size_preset") or "40x40")
+    size = parse_size(payload.get("size") or payload.get("size_preset") or "26x26")
     brand = str(payload.get("brand") or "MARD")
     bead_diameter_mm = float(payload.get("bead_diameter_mm") or 5.0)
     mode = str(payload.get("mode") or "auto")

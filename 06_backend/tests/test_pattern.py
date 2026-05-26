@@ -31,10 +31,10 @@ def test_raw_image_path_builds_expected_grid_for_task_b_inputs() -> None:
     builder = PatternBuilder()
 
     for filename in ("portrait_synthetic.png", "pet_synthetic.png", "cartoon_synthetic.png"):
-        sheet = builder.build(SizePreset.SMALL_60X80, raw_image=read_input(filename), mode="script")
+        sheet = builder.build(SizePreset.DOUBLE_BOARD_52X52, raw_image=read_input(filename), mode="script")
 
-        assert_grid_size(sheet, width=60, height=80)
-        assert sheet.bead_total == 60 * 80
+        assert_grid_size(sheet, width=52, height=52)
+        assert sheet.bead_total == 52 * 52
         assert 1 <= len(sheet.palette_used) <= 24
         assert set(sheet.color_counts) == {color.code for color in sheet.palette_used}
         assert len(sheet.coords) == sheet.bead_total
@@ -46,12 +46,12 @@ def test_preview_alpha_path_marks_transparent_cells_as_no_bead() -> None:
     builder = PatternBuilder(target_colors=8)
     preview = transparent_preview_bytes()
 
-    sheet = builder.build(SizePreset.SMALL_60X80, preview=preview, mode="ai")
+    sheet = builder.build(SizePreset.DOUBLE_BOARD_52X52, preview=preview, mode="ai")
 
-    assert_grid_size(sheet, width=60, height=80)
+    assert_grid_size(sheet, width=52, height=52)
     no_bead_count = sum(sum(row) for row in sheet.no_bead_mask)
     assert no_bead_count > 0
-    assert sheet.bead_total + no_bead_count == 60 * 80
+    assert sheet.bead_total + no_bead_count == 52 * 52
     assert any(isinstance(cell, NoBead) for row in sheet.grid for cell in row)
     assert any(cell is None for row in sheet.to_frontend_dict()["grid"] for cell in row)
 
@@ -61,7 +61,7 @@ def test_white_bg_detect_success() -> None:
     raw = white_bg_raw_image_bytes()
 
     sheet = builder.build(
-        SizePreset.SMALL_60X80,
+        SizePreset.DOUBLE_BOARD_52X52,
         raw_image=raw,
         mode="script",
         auto_remove_white_bg=True,
@@ -69,8 +69,8 @@ def test_white_bg_detect_success() -> None:
 
     no_bead_count = sum(sum(row) for row in sheet.no_bead_mask)
     assert sheet.metadata["white_bg_detected"] is True
-    assert no_bead_count > 60 * 80 * 0.3
-    assert sheet.bead_total + no_bead_count == 60 * 80
+    assert no_bead_count > 52 * 52 * 0.3
+    assert sheet.bead_total + no_bead_count == 52 * 52
 
 
 def test_white_bg_detect_skip() -> None:
@@ -81,7 +81,7 @@ def test_white_bg_detect_skip() -> None:
 
     builder = PatternBuilder(target_colors=8)
     sheet = builder.build(
-        SizePreset.SMALL_60X80,
+        SizePreset.DOUBLE_BOARD_52X52,
         raw_image=image_bytes(image),
         mode="script",
         auto_remove_white_bg=True,
@@ -109,26 +109,26 @@ def test_white_bg_detect_threshold_boundary() -> None:
 def test_large_pattern_build_stays_under_two_seconds_after_warmup() -> None:
     builder = PatternBuilder()
     raw = read_input("cartoon_synthetic.png")
-    builder.build(SizePreset.LARGE_100X120, raw_image=raw, mode="script")
+    builder.build(SizePreset.FOUR_BOARD_104X104, raw_image=raw, mode="script")
 
     started = time.perf_counter()
-    sheet = builder.build(SizePreset.LARGE_100X120, raw_image=raw, mode="script")
+    sheet = builder.build(SizePreset.FOUR_BOARD_104X104, raw_image=raw, mode="script")
     elapsed = time.perf_counter() - started
 
-    assert_grid_size(sheet, width=100, height=120)
+    assert_grid_size(sheet, width=104, height=104)
     assert elapsed < 2.0
 
 
 def test_labeled_grid_exporter_adds_readable_png_overlay() -> None:
     builder = PatternBuilder(target_colors=8)
-    sheet = builder.build(SizePreset.CHIBI_40X40, raw_image=read_input("pet_synthetic.png"), mode="script")
+    sheet = builder.build(SizePreset.SINGLE_BOARD_26X26, raw_image=read_input("pet_synthetic.png"), mode="script")
 
     png = PatternExporter().to_labeled_grid_png(sheet)
     image = Image.open(io.BytesIO(png))
 
     assert image.format == "PNG"
-    assert image.width >= 40 * 18
-    assert image.height > 40 * 18
+    assert image.width >= 26 * 18
+    assert image.height > 26 * 18
     assert labeled_grid_filename("art_123") == "pattern_art_123_with_grid.png"
 
 

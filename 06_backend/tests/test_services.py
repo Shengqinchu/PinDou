@@ -56,7 +56,7 @@ def test_artwork_service_save_list_delete_removes_original_file(db_session: Sess
         preview_path="/preview.png",
         pattern_json={"grid": [["01"]]},
         style_preset="chibi",
-        size_preset="small_60x80",
+        size_preset="26x26",
         title="Kept pattern",
     )
 
@@ -137,7 +137,7 @@ def test_delete_expired_originals_once_marks_only_old_uploads(db_session: Sessio
         preview_path="/preview-old.png",
         pattern_json={"grid": [["01"]]},
         style_preset="chibi",
-        size_preset="small_60x80",
+        size_preset="26x26",
         created_at=now - timedelta(days=31),
     )
     fresh_artwork = Artwork(
@@ -146,7 +146,7 @@ def test_delete_expired_originals_once_marks_only_old_uploads(db_session: Sessio
         preview_path="/preview-fresh.png",
         pattern_json={"grid": [["02"]]},
         style_preset="chibi",
-        size_preset="small_60x80",
+        size_preset="26x26",
         created_at=now - timedelta(days=2),
     )
     db_session.add_all([old_artwork, fresh_artwork])

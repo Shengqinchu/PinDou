@@ -119,12 +119,12 @@ def test_pattern_build_happy_path_and_error(api_client) -> None:
     client, _session_factory = api_client
     headers = auth_headers(client)
 
-    bad = client.post("/api/pattern/build", json={"size": "60x80"}, headers=headers)
+    bad = client.post("/api/pattern/build", json={"size": "40x40"}, headers=headers)
     assert bad.status_code == 422
 
     response = client.post(
         "/api/pattern/build",
-        data={"size": "60x80", "mode": "script"},
+        data={"size": "26x26", "mode": "script"},
         files={"raw_image": ("sample.png", png_bytes((240, 240, 240)), "image/png")},
         headers=headers,
     )
@@ -137,10 +137,10 @@ def test_generate_script_artwork_pattern_and_delete_flow(api_client) -> None:
     headers = auth_headers(client)
     image_id = upload_image(client, headers)
 
-    missing = client.post("/api/generate/script", json={"image_id": "missing", "size": "60x80"}, headers=headers)
+    missing = client.post("/api/generate/script", json={"image_id": "missing", "size": "26x26"}, headers=headers)
     assert missing.status_code == 404
 
-    generated = client.post("/api/generate/script", json={"image_id": image_id, "size": "60x80"}, headers=headers)
+    generated = client.post("/api/generate/script", json={"image_id": image_id, "size": "26x26"}, headers=headers)
     assert generated.status_code == 200
     artwork_id = generated.json()["artwork_id"]
 
@@ -169,7 +169,7 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
     monkeypatch.setattr("pindou.api.generate.build_preview_chain", lambda: FakeChain())
     response = client.post(
         "/api/generate/ai",
-        json={"image_id": image_id, "style_preset": "q_portrait", "size_preset": "60x80"},
+        json={"image_id": image_id, "style_preset": "q_portrait", "size_preset": "26x26"},
         headers=headers,
     )
     assert response.status_code == 200
@@ -177,7 +177,7 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
 
     preview_only = client.post(
         "/api/v1/preview/generate",
-        data={"style_preset": "q_portrait", "size_preset": "60x80"},
+        data={"style_preset": "q_portrait", "size_preset": "26x26"},
         files={"image": ("sample.png", png_bytes((255, 255, 255)), "image/png")},
         headers=headers,
     )

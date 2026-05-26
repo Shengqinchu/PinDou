@@ -3,6 +3,20 @@
     <div class="choice">
       <p class="choice__hint">选一种生成方式</p>
 
+      <div class="choice__size" aria-label="选择拼豆板尺寸">
+        <button
+          v-for="option in SIZE_OPTIONS"
+          :key="option.value"
+          class="choice__size-option"
+          :class="{ 'choice__size-option--active': selectedSize === option.value }"
+          type="button"
+          @click.stop="selectedSize = option.value"
+        >
+          <span class="choice__size-title">{{ option.label }}</span>
+          <span class="choice__size-sub">{{ option.sub }}</span>
+        </button>
+      </div>
+
       <!-- ===== Card A — Quick (free, basic quality) ===== -->
       <div class="card choice__card" @click="handleSelect('quick')">
         <div class="choice__head">
@@ -83,7 +97,7 @@
           </li>
           <li class="choice__bullet">
             <span class="choice__check choice__check--premium" aria-hidden="true">✓</span>
-            默认 40x40 Q 版小图，高级版可调大尺寸
+            默认单板尺寸，大图按拼豆板倍数扩展
           </li>
         </ul>
 
@@ -114,9 +128,17 @@
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
+import { SizePreset } from '../../api';
 
 const rawImage = ref('');
 const stylePreset = ref('cartoon_fallback');
+const selectedSize = ref<SizePreset>('26x26');
+const SIZE_OPTIONS: Array<{ value: SizePreset; label: string; sub: string }> = [
+  { value: '26x26', label: '单板', sub: '26格' },
+  { value: '52x52', label: '双板', sub: '52格' },
+  { value: '78x78', label: '三板', sub: '78格' },
+  { value: '104x104', label: '四板', sub: '104格' }
+];
 
 onLoad((options: any) => {
   if (options.image) {
@@ -129,7 +151,7 @@ onLoad((options: any) => {
 
 const handleSelect = (tier: 'quick' | 'premium') => {
   uni.navigateTo({
-    url: `/pages/preview/loading?tier=${tier}&style=${stylePreset.value}&image=${encodeURIComponent(rawImage.value)}`
+    url: `/pages/preview/loading?tier=${tier}&style=${stylePreset.value}&size=${selectedSize.value}&image=${encodeURIComponent(rawImage.value)}`
   });
 };
 
@@ -154,6 +176,43 @@ const handleHelp = () => {
   font-size: 12px;
   color: var(--pd-fg-2);
   margin: 0 0 16px;
+}
+
+.choice__size {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.choice__size-option {
+  min-width: 0;
+  border: 1px solid var(--pd-divider);
+  border-radius: 8px;
+  padding: 8px 4px 7px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--pd-fg-2);
+  text-align: center;
+  line-height: 1.15;
+}
+
+.choice__size-option--active {
+  border-color: var(--pd-pink);
+  background: #FFE4EE;
+  color: var(--pd-pink-deep);
+}
+
+.choice__size-title {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.choice__size-sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 10px;
+  font-weight: 600;
 }
 
 /* ===== Card layout (used by both quick + premium) ===== */

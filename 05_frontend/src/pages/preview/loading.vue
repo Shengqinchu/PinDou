@@ -89,11 +89,13 @@ const ROTATE_MS = 8000; // 文案轮播间隔
 // 路由参数
 const tier = ref<'quick' | 'premium'>('quick');
 const stylePreset = ref<StylePreset>('cartoon_fallback');
+const sizePreset = ref<SizePreset>('26x26');
 const rawImage = ref('');
 
 onLoad((options: any) => {
   if (options.tier) tier.value = options.tier;
   if (options.style) stylePreset.value = options.style as StylePreset;
+  if (options.size) sizePreset.value = options.size as SizePreset;
   if (options.image) rawImage.value = decodeURIComponent(options.image);
 });
 
@@ -159,13 +161,13 @@ const startProgressTick = () => {
 
 // 发起核心接口业务请求并管理 Fallback 降级链
 const handleGeneration = async () => {
-  const sizePreset: SizePreset = '40x40'; // Q版主推小尺寸，接近小红书轻量图纸
+  const selectedSize = sizePreset.value || '26x26'; // 默认单板尺寸，对齐国产 26 格拼豆板
   
   if (tier.value === 'quick') {
     // 快速生成：直接调 PatternBuilder 本地量化
     try {
       await artworkStore.buildPatternSheet({
-        size: sizePreset,
+        size: selectedSize,
         rawImageFilePath: rawImage.value,
         mode: 'script'
       });
@@ -182,12 +184,12 @@ const handleGeneration = async () => {
       const preview = await artworkStore.generateAIPreview(
         rawImage.value,
         stylePreset.value,
-        sizePreset
+        selectedSize
       );
       
       // 2. 拿到 preview_id 后调用 PatternBuilder
       await artworkStore.buildPatternSheet({
-        size: sizePreset,
+        size: selectedSize,
         preview_id: preview.preview_id,
         mode: 'ai'
       });
@@ -200,7 +202,7 @@ const handleGeneration = async () => {
       try {
         // 静默重新调用 script 量化
         await artworkStore.buildPatternSheet({
-          size: sizePreset,
+          size: selectedSize,
           rawImageFilePath: rawImage.value,
           mode: 'script'
         });
