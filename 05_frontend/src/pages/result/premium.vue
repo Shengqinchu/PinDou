@@ -17,10 +17,10 @@
       <figure class="premium__pattern">
         <div class="premium__pattern-wrap" @click="previewFullScreen">
           <image class="premium__pattern-image" :src="premiumPatternImage" mode="widthFix" />
-          <button type="button" class="premium__zoom" @click.stop="previewFullScreen">
-            <span class="premium__zoom-icon" aria-hidden="true"></span>
-            点击放大
-          </button>
+          <span v-if="showZoomHint" class="premium__zoom-hint" aria-hidden="true">
+            <span class="premium__zoom-hint-icon"></span>
+            轻点放大
+          </span>
         </div>
         <figcaption class="premium__pattern-caption">
           <span class="premium__pattern-name">萌宠拼豆 · AI 精致橘橘</span>
@@ -89,7 +89,7 @@
               <span class="premium__format-tile">4</span>
             </div>
           </div>
-          <div class="premium__format-name">分区拼接图</div>
+          <div class="premium__format-name">📋 查看分区图</div>
           <div class="premium__format-meta">4 块 · 大尺寸易拼</div>
         </div>
 
@@ -140,13 +140,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import { useArtworkStore } from '../../store/artwork';
 import { BASE_URL } from '../../utils/request';
 
 const artworkStore = useArtworkStore();
+const ZOOM_HINT_KEY = 'pd_pattern_zoom_hint_seen';
 const API_ORIGIN = BASE_URL.replace(/\/api\/v\d+$/, '');
+const showZoomHint = ref(false);
 
 const pattern = computed(() => {
   return artworkStore.currentPattern || {
@@ -179,11 +181,22 @@ const normalizeAssetUrl = (url: string) => {
 };
 
 const previewFullScreen = () => {
+  markZoomHintSeen();
   uni.previewImage({
     current: premiumPatternImage.value,
     urls: [premiumPatternImage.value]
   });
 };
+
+const markZoomHintSeen = () => {
+  if (!showZoomHint.value) return;
+  showZoomHint.value = false;
+  uni.setStorageSync(ZOOM_HINT_KEY, true);
+};
+
+onMounted(() => {
+  showZoomHint.value = !uni.getStorageSync(ZOOM_HINT_KEY);
+});
 
 const handleDownloadFormat = (name: string, ext: string) => {
   if (ext === 'tiles') {
@@ -329,25 +342,26 @@ const handleEmail = () => {
   background: #fff;
 }
 
-.premium__zoom {
+.premium__zoom-hint {
   position: absolute;
-  top: 8px;
   right: 8px;
+  bottom: 8px;
   height: 28px;
   padding: 0 9px;
-  border: 0;
   border-radius: 999px;
-  background: rgba(255, 107, 157, 0.94);
+  background: rgba(31, 31, 31, 0.72);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.32);
+  box-shadow: 0 4px 12px rgba(31, 31, 31, 0.18);
+  pointer-events: none;
+  animation: premium-zoom-hint 1.4s var(--pd-ease-soft) infinite alternate;
 }
 
-.premium__zoom-icon {
+.premium__zoom-hint-icon {
   width: 11px;
   height: 11px;
   border: 2px solid currentColor;
@@ -355,7 +369,7 @@ const handleEmail = () => {
   position: relative;
 }
 
-.premium__zoom-icon::after {
+.premium__zoom-hint-icon::after {
   content: "";
   position: absolute;
   right: -5px;
@@ -365,6 +379,11 @@ const handleEmail = () => {
   border-radius: 999px;
   background: currentColor;
   transform: rotate(45deg);
+}
+
+@keyframes premium-zoom-hint {
+  from { transform: translateY(0); opacity: 0.86; }
+  to { transform: translateY(-2px); opacity: 1; }
 }
 
 .premium__pattern-caption {

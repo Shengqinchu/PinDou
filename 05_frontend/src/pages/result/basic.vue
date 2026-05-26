@@ -30,15 +30,10 @@
             <span class="result__empty-dot"></span>
             <span>暂无图纸预览</span>
           </div>
-          <button
-            v-if="patternImageUrl"
-            type="button"
-            class="result__zoom"
-            @click.stop="previewFullScreen"
-          >
-            <span class="result__zoom-icon" aria-hidden="true"></span>
-            点击放大
-          </button>
+          <span v-if="showZoomHint && patternImageUrl" class="result__zoom-hint" aria-hidden="true">
+            <span class="result__zoom-hint-icon"></span>
+            轻点放大
+          </span>
           
           <!-- ===== AIGC 标识 (PRD §8.1 - FinishedPreview 可见) ===== -->
           <span v-if="tier === 'premium' && !isFallback" class="tag tag--ai result__pattern-badge">
@@ -115,7 +110,7 @@
         </button>
 
         <button class="btn btn--secondary btn--block btn--md result__partition" @click="openPartitions">
-          分区查看
+          📋 查看分区图
         </button>
       </div>
 
@@ -148,12 +143,14 @@ import { BASE_URL } from '../../utils/request';
 
 const artworkStore = useArtworkStore();
 const CURRENT_PATTERN_KEY = 'pd_current_pattern';
+const ZOOM_HINT_KEY = 'pd_pattern_zoom_hint_seen';
 const API_ORIGIN = BASE_URL.replace(/\/api\/v\d+$/, '');
 
 const tier = ref<'quick' | 'premium'>('quick');
 const isFallback = ref(false);
 const isMounted = ref(false);
 const showPaywall = ref(false);
+const showZoomHint = ref(false);
 
 type DisplayColor = {
   nameCn: string;
@@ -303,10 +300,17 @@ const previewFullScreen = () => {
     uni.showToast({ title: '高清图生成后可放大查看', icon: 'none' });
     return;
   }
+  markZoomHintSeen();
   uni.previewImage({
     current: patternImageUrl.value,
     urls: [patternImageUrl.value]
   });
+};
+
+const markZoomHintSeen = () => {
+  if (!showZoomHint.value) return;
+  showZoomHint.value = false;
+  uni.setStorageSync(ZOOM_HINT_KEY, true);
 };
 
 const openPartitions = () => {
@@ -365,6 +369,7 @@ const handleDownload = () => {
 };
 
 onMounted(() => {
+  showZoomHint.value = !!patternImageUrl.value && !uni.getStorageSync(ZOOM_HINT_KEY);
   // 延迟赋予 Mounted 状态，促使色条百分比伸长动画顺利在页面触发
   setTimeout(() => {
     isMounted.value = true;
@@ -410,25 +415,26 @@ onMounted(() => {
   background: #fff;
 }
 
-.result__zoom {
+.result__zoom-hint {
   position: absolute;
-  top: 10px;
   right: 10px;
-  height: 30px;
-  padding: 0 10px;
-  border: 0;
+  bottom: 10px;
+  height: 28px;
+  padding: 0 9px;
   border-radius: 999px;
-  background: rgba(255, 107, 157, 0.94);
+  background: rgba(31, 31, 31, 0.72);
   color: #fff;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.32);
+  box-shadow: 0 4px 12px rgba(31, 31, 31, 0.18);
+  pointer-events: none;
+  animation: result-zoom-hint 1.4s var(--pd-ease-soft) infinite alternate;
 }
 
-.result__zoom-icon {
+.result__zoom-hint-icon {
   width: 12px;
   height: 12px;
   border: 2px solid currentColor;
@@ -436,7 +442,7 @@ onMounted(() => {
   position: relative;
 }
 
-.result__zoom-icon::after {
+.result__zoom-hint-icon::after {
   content: "";
   position: absolute;
   right: -5px;
@@ -446,6 +452,11 @@ onMounted(() => {
   border-radius: 999px;
   background: currentColor;
   transform: rotate(45deg);
+}
+
+@keyframes result-zoom-hint {
+  from { transform: translateY(0); opacity: 0.86; }
+  to { transform: translateY(-2px); opacity: 1; }
 }
 
 .result__grid-preview {
