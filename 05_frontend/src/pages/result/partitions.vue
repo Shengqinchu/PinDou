@@ -52,7 +52,29 @@
           @click="previewPartition(item.index - 1)"
         >
           <span class="partitions__card-title">{{ item.title }}</span>
-          <image class="partitions__thumb" :src="item.imageUrl" mode="aspectFit" />
+          <image
+            v-if="!item.imageFailed"
+            class="partitions__thumb"
+            :src="item.imageUrl"
+            mode="aspectFit"
+            @load="handlePartitionImageLoad(item.imageUrl)"
+            @error="handlePartitionImageError(item.imageUrl, $event)"
+          />
+          <div
+            v-else-if="item.cells.length"
+            class="partitions__thumb-grid"
+            :style="item.gridStyle"
+          >
+            <span
+              v-for="cell in item.cells"
+              :key="cell.key"
+              class="partitions__thumb-cell"
+              :style="{ backgroundColor: cell.hex }"
+            ></span>
+          </div>
+          <div v-else class="partitions__thumb-placeholder">
+            <span>预览加载失败</span>
+          </div>
           <span class="partitions__card-meta">{{ item.cols }}×{{ item.rows }} · 轻点放大</span>
         </button>
       </div>
@@ -77,9 +99,15 @@ const isLoading = ref(false);
 const errorMsg = ref('');
 const activeIndex = ref(0);
 const partitions = ref<PartitionItem[]>([]);
+const failedImageUrls = ref<string[]>([]);
 const rows = ref(0);
 const cols = ref(0);
 const storedPattern = ref<PatternSheet | null>(null);
+
+type FallbackCell = {
+  key: string;
+  hex: string;
+};
 
 onLoad((options: any) => {
   artworkId.value = String(options?.artwork_id || '');
@@ -104,7 +132,12 @@ const quadrantItems = computed(() => {
   return partitions.value.slice(0, 4).map((item, index) => ({
     ...item,
     title: item.label || QUADRANT_TITLES[index] || `第 ${index + 1} 区`,
-    imageUrl: normalizeAssetUrl(item.url)
+    imageUrl: normalizeAssetUrl(item.url),
+    imageFailed: failedImageUrls.value.includes(normalizeAssetUrl(item.url)),
+    cells: partitionFallbackCells(item),
+    gridStyle: {
+      gridTemplateColumns: `repeat(${Math.max(item.cols, 1)}, 1fr)`
+    }
   }));
 });
 
@@ -135,6 +168,7 @@ const loadPartitions = async () => {
   try {
     const sheet = await api.getPatternPartitions(artworkId.value);
     partitions.value = sheet.items.slice(0, 4);
+    failedImageUrls.value = [];
     rows.value = sheet.rows;
     cols.value = sheet.cols;
     activeIndex.value = 0;
@@ -153,9 +187,39 @@ const previewFullPattern = () => {
 
 const previewPartition = (index: number) => {
   const urls = quadrantItems.value.map((item) => item.imageUrl).filter(Boolean);
-  if (!urls.length || !urls[index]) return;
   activeIndex.value = index;
+  if (!urls.length || !urls[index] || failedImageUrls.value.includes(urls[index])) {
+    uni.showToast({ title: '图片加载失败，已显示页面预览', icon: 'none' });
+    return;
+  }
   uni.previewImage({ current: urls[index], urls });
+};
+
+const handlePartitionImageLoad = (url: string) => {
+  failedImageUrls.value = failedImageUrls.value.filter((item) => item !== url);
+};
+
+const handlePartitionImageError = (url: string, event: any) => {
+  if (!failedImageUrls.value.includes(url)) {
+    failedImageUrls.value = [...failedImageUrls.value, url];
+  }
+  console.warn('分区图图片加载失败，已切换为本地缩略预览:', url, event);
+};
+
+const partitionFallbackCells = (partition: PartitionItem): FallbackCell[] => {
+  const grid = storedPattern.value?.grid || [];
+  const cells: FallbackCell[] = [];
+  for (let rowIndex = partition.row_start; rowIndex < partition.row_end; rowIndex += 1) {
+    const row = grid[rowIndex] || [];
+    for (let colIndex = partition.col_start; colIndex < partition.col_end; colIndex += 1) {
+      const color = row[colIndex] || null;
+      cells.push({
+        key: `${rowIndex}-${colIndex}`,
+        hex: color?.hex || 'transparent'
+      });
+    }
+  }
+  return cells;
 };
 </script>
 
@@ -314,12 +378,41 @@ const previewPartition = (index: number) => {
   color: var(--pd-fg-1);
 }
 
-.partitions__thumb {
+.partitions__thumb,
+.partitions__thumb-grid,
+.partitions__thumb-placeholder {
   width: 100%;
   height: 160px;
-  display: block;
   border-radius: var(--pd-r-img);
   background: #fff;
+}
+
+.partitions__thumb {
+  display: block;
+}
+
+.partitions__thumb-grid {
+  display: grid;
+  gap: 1px;
+  padding: 6px;
+  border: 1px solid var(--pd-divider);
+  overflow: hidden;
+}
+
+.partitions__thumb-cell {
+  min-width: 0;
+  min-height: 0;
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 0.5px rgba(45, 45, 45, 0.12);
+}
+
+.partitions__thumb-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--pd-divider);
+  color: var(--pd-fg-2);
+  font-size: 12px;
 }
 
 .partitions__card-meta {

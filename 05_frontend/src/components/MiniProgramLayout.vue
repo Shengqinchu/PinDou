@@ -1,27 +1,5 @@
 <template>
   <div class="frame" :style="frameStyle">
-    <!-- 微信系统状态栏 -->
-    <div class="frame__status">
-      <span class="frame__time">9:41</span>
-      <span class="frame__indicators">
-        <span class="frame__signal" aria-hidden="true">
-          <span class="frame__signal-bar frame__signal-bar--1"></span>
-          <span class="frame__signal-bar frame__signal-bar--2"></span>
-          <span class="frame__signal-bar frame__signal-bar--3"></span>
-          <span class="frame__signal-bar frame__signal-bar--4"></span>
-        </span>
-        <span class="frame__wifi" aria-hidden="true">
-          <span class="frame__wifi-arc frame__wifi-arc--outer"></span>
-          <span class="frame__wifi-arc frame__wifi-arc--inner"></span>
-          <span class="frame__wifi-dot"></span>
-        </span>
-        <span class="frame__battery" aria-hidden="true">
-          <span class="frame__battery-fill"></span>
-          <span class="frame__battery-tip"></span>
-        </span>
-      </span>
-    </div>
-
     <!-- 页面导航栏 -->
     <!-- 首页样式：Logo + 标题左对齐 -->
     <header v-if="variant === 'home'" class="frame__header frame__header--home">
@@ -31,19 +9,6 @@
         </span>
         <span>{{ title }}</span>
       </span>
-      <span class="frame__right">
-        <span class="frame__capsule" aria-hidden="true">
-          <span class="frame__capsule-btn frame__capsule-btn--menu">
-            <span class="frame__menu-dot"></span>
-            <span class="frame__menu-dot"></span>
-            <span class="frame__menu-dot"></span>
-          </span>
-          <span class="frame__capsule-divider"></span>
-          <span class="frame__capsule-btn frame__capsule-btn--close" @click="handleExit">
-            <span class="frame__close">x</span>
-          </span>
-        </span>
-      </span>
     </header>
 
     <!-- 内页样式：返回箭头 + 居中标题 -->
@@ -52,19 +17,6 @@
         <span class="frame__back-icon" aria-hidden="true"></span>
       </div>
       <span class="frame__title">{{ title }}</span>
-      <span class="frame__right">
-        <span class="frame__capsule" aria-hidden="true">
-          <span class="frame__capsule-btn frame__capsule-btn--menu">
-            <span class="frame__menu-dot"></span>
-            <span class="frame__menu-dot"></span>
-            <span class="frame__menu-dot"></span>
-          </span>
-          <span class="frame__capsule-divider"></span>
-          <span class="frame__capsule-btn frame__capsule-btn--close" @click="handleExit">
-            <span class="frame__close">x</span>
-          </span>
-        </span>
-      </span>
     </header>
 
     <!-- 主体区域 -->
@@ -103,6 +55,7 @@ const frameStyle = computed(() => ({
   '--pd-safe-bottom': `${uiMetrics.value.safeAreaBottom}px`,
   '--pd-capsule-reserve': `${uiMetrics.value.capsuleReserveRight}px`,
   '--pd-capsule-width': `${uiMetrics.value.menuButtonWidth}px`,
+  '--pd-title-side-inset': `${Math.max(52, uiMetrics.value.capsuleReserveRight)}px`,
 }));
 
 const handleBack = () => {
@@ -123,10 +76,4 @@ const handleBack = () => {
   }
 };
 
-const handleExit = () => {
-  // 微信小程序退出模拟，或者直接跳转首页
-  uni.reLaunch({
-    url: '/pages/index/index'
-  });
-};
 </script>

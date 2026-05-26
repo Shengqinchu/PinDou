@@ -6,10 +6,12 @@
       <figure class="result__pattern">
         <div class="result__pattern-img-wrap" @click="previewFullScreen">
           <image
-            v-if="patternImageUrl"
+            v-if="shouldUsePatternImage"
             class="result__pattern-image"
             :src="patternImageUrl"
             mode="widthFix"
+            @load="handlePatternImageLoad"
+            @error="handlePatternImageError"
           />
           <div
             v-else-if="hasPatternGrid"
@@ -133,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import Paywall from '../../components/Paywall.vue';
@@ -151,6 +153,7 @@ const isFallback = ref(false);
 const isMounted = ref(false);
 const showPaywall = ref(false);
 const showZoomHint = ref(false);
+const imageLoadFailed = ref(false);
 
 type DisplayColor = {
   nameCn: string;
@@ -208,6 +211,7 @@ const patternImageUrl = computed(() => {
   const url = (pattern.value as any).image_url || pattern.value.metadata?.labeled_image_url || '';
   return normalizeAssetUrl(url);
 });
+const shouldUsePatternImage = computed(() => !!patternImageUrl.value && !imageLoadFailed.value);
 const artworkId = computed(() => {
   return String(pattern.value.metadata?.artwork_id || artworkStore.currentArtwork?.artwork_id || '');
 });
@@ -295,8 +299,21 @@ const patternName = computed(() => {
   return '自拍拼豆 · 基础版';
 });
 
+watch(patternImageUrl, () => {
+  imageLoadFailed.value = false;
+});
+
+const handlePatternImageLoad = () => {
+  imageLoadFailed.value = false;
+};
+
+const handlePatternImageError = (event: any) => {
+  imageLoadFailed.value = true;
+  console.warn('图纸预览图片加载失败，已切换为本地网格预览:', patternImageUrl.value, event);
+};
+
 const previewFullScreen = () => {
-  if (!patternImageUrl.value) {
+  if (!shouldUsePatternImage.value) {
     uni.showToast({ title: '高清图生成后可放大查看', icon: 'none' });
     return;
   }
@@ -369,7 +386,7 @@ const handleDownload = () => {
 };
 
 onMounted(() => {
-  showZoomHint.value = !!patternImageUrl.value && !uni.getStorageSync(ZOOM_HINT_KEY);
+  showZoomHint.value = shouldUsePatternImage.value && !uni.getStorageSync(ZOOM_HINT_KEY);
   // 延迟赋予 Mounted 状态，促使色条百分比伸长动画顺利在页面触发
   setTimeout(() => {
     isMounted.value = true;
