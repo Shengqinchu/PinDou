@@ -8,7 +8,7 @@
           <image
             v-if="shouldUsePatternImage"
             class="result__pattern-image"
-            :src="patternImageUrl"
+            :src="displayPatternImageUrl"
             mode="widthFix"
             @load="handlePatternImageLoad"
             @error="handlePatternImageError"
@@ -85,9 +85,8 @@
           >
             <!-- 动态绑定背景色 -->
             <span class="result__swatch" :style="{ backgroundColor: color.hex }" aria-hidden="true"></span>
-            <span class="result__color-name">
-              {{ color.legend }}
-            </span>
+            <span class="result__color-code">{{ color.code }}</span>
+            <span class="result__color-count">{{ color.count }} 颗</span>
             <span class="result__color-bar">
               <!-- 延迟展开过渡动画 -->
               <span 
@@ -154,14 +153,13 @@ const isMounted = ref(false);
 const showPaywall = ref(false);
 const showZoomHint = ref(false);
 const imageLoadFailed = ref(false);
+const displayPatternImageUrl = ref('');
 
 type DisplayColor = {
-  nameCn: string;
   code: string;
   count: number;
   percentage: number;
   hex: string;
-  legend: string;
 };
 
 type DisplayCell = {
@@ -211,14 +209,14 @@ const patternImageUrl = computed(() => {
   const url = (pattern.value as any).image_url || pattern.value.metadata?.labeled_image_url || '';
   return normalizeAssetUrl(url);
 });
-const shouldUsePatternImage = computed(() => !!patternImageUrl.value && !imageLoadFailed.value);
+const shouldUsePatternImage = computed(() => !!displayPatternImageUrl.value && !imageLoadFailed.value);
 const artworkId = computed(() => {
   return String(pattern.value.metadata?.artwork_id || artworkStore.currentArtwork?.artwork_id || '');
 });
 const patternCells = computed<DisplayCell[]>(() => {
   const rows = pattern.value.grid || [];
   const maxDim = Math.max(gridCols.value, gridRows.value);
-  const shouldShowAllCodes = maxDim <= 52;
+  const shouldShowAllCodes = maxDim <= 26;
   const cells: DisplayCell[] = [];
   rows.forEach((row, rowIndex) => {
     row.forEach((color, colIndex) => {
@@ -234,22 +232,16 @@ const patternCells = computed<DisplayCell[]>(() => {
   return cells;
 });
 
-const resultCellSize = computed(() => {
-  const maxDim = Math.max(gridCols.value, gridRows.value);
-  if (maxDim <= 52) return 24;
-  return 18;
-});
-
 const resultLabelSize = computed(() => {
   const maxDim = Math.max(gridCols.value, gridRows.value);
-  if (maxDim <= 26) return 11;
-  if (maxDim <= 52) return 8;
-  return 7;
+  if (maxDim <= 26) return 10;
+  if (maxDim <= 52) return 7;
+  return 6;
 });
 const gridPreviewStyle = computed(() => ({
-  gridTemplateColumns: `repeat(${Math.max(gridCols.value, 1)}, ${resultCellSize.value}px)`,
-  gridAutoRows: `${resultCellSize.value}px`,
-  '--pd-result-cell-size': `${resultCellSize.value}px`,
+  gridTemplateColumns: `repeat(${Math.max(gridCols.value, 1)}, minmax(0, 1fr))`,
+  gridAutoRows: '1fr',
+  aspectRatio: `${Math.max(gridCols.value, 1)} / ${Math.max(gridRows.value, 1)}`,
   '--pd-result-label-size': `${resultLabelSize.value}px`
 }));
 
@@ -267,12 +259,10 @@ const patternColors = computed<DisplayColor[]>(() => {
     .map(([code, count]) => {
       const color = paletteByCode.get(code);
       return {
-        nameCn: color?.name_cn || '未命名色',
         code,
         count,
         percentage: Math.max(3, Math.round((count / maxCount) * 100)),
-        hex: color?.hex || '#D9D9D9',
-        legend: `${code} (${count} 颗 · ${color?.name_cn || '未命名色'})`
+        hex: color?.hex || '#D9D9D9'
       };
     })
     .sort((a, b) => b.count - a.count);
@@ -299,9 +289,39 @@ const patternName = computed(() => {
   return '自拍拼豆 · 基础版';
 });
 
-watch(patternImageUrl, () => {
+function prepareDisplayPatternImage(url: string) {
   imageLoadFailed.value = false;
-});
+  displayPatternImageUrl.value = '';
+  if (!url) return;
+  if (!/^https?:\/\//.test(url)) {
+    displayPatternImageUrl.value = url;
+    return;
+  }
+  uni.downloadFile({
+    url,
+    success: (res) => {
+      if (res.statusCode && res.statusCode >= 400) {
+        imageLoadFailed.value = true;
+        console.warn('图纸预览下载失败:', url, res.statusCode);
+        return;
+      }
+      displayPatternImageUrl.value = res.tempFilePath;
+      imageLoadFailed.value = false;
+    },
+    fail: (error) => {
+      imageLoadFailed.value = true;
+      console.warn('图纸预览下载失败，已切换为本地网格预览:', url, error);
+    }
+  });
+}
+
+watch(
+  patternImageUrl,
+  (url) => {
+    prepareDisplayPatternImage(url);
+  },
+  { immediate: true }
+);
 
 const handlePatternImageLoad = () => {
   imageLoadFailed.value = false;
@@ -314,13 +334,13 @@ const handlePatternImageError = (event: any) => {
 
 const previewFullScreen = () => {
   if (!shouldUsePatternImage.value) {
-    uni.showToast({ title: '高清图生成后可放大查看', icon: 'none' });
+    uni.showToast({ title: '当前是页面预览，高清图加载后可放大', icon: 'none' });
     return;
   }
   markZoomHintSeen();
   uni.previewImage({
-    current: patternImageUrl.value,
-    urls: [patternImageUrl.value]
+    current: displayPatternImageUrl.value,
+    urls: [displayPatternImageUrl.value]
   });
 };
 
@@ -419,9 +439,7 @@ onMounted(() => {
   max-width: 100%;
   position: relative;
   border-radius: var(--pd-r-img);
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
 }
 
 .result__pattern-image {
@@ -477,8 +495,8 @@ onMounted(() => {
 }
 
 .result__grid-preview {
-  width: max-content;
-  max-width: none;
+  width: 100%;
+  max-width: 100%;
   display: grid;
   gap: 1px;
   padding: 6px;
@@ -489,8 +507,8 @@ onMounted(() => {
 }
 
 .result__grid-cell {
-  width: var(--pd-result-cell-size);
-  height: var(--pd-result-cell-size);
+  min-width: 0;
+  min-height: 0;
   border-radius: 2px;
   display: inline-flex;
   align-items: center;
@@ -626,9 +644,10 @@ onMounted(() => {
   padding: 0;
 }
 .result__color {
-  display: flex;
+  display: grid;
+  grid-template-columns: 24px 46px 76px minmax(72px, 1fr);
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 8px 4px;
   border-bottom: 1px solid var(--pd-divider);
 }
@@ -652,10 +671,10 @@ onMounted(() => {
 }
 .result__color-code {
   font-family: var(--pd-font-mono);
-  font-size: 11px;
+  font-size: 14px;
   color: var(--pd-fg-2);
-  font-weight: 400;
-  margin-left: 2px;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .result__color-bar {
@@ -676,12 +695,13 @@ onMounted(() => {
 }
 
 .result__color-count {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
-  min-width: 32px;
   text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 /* ===== CTAs ===== */

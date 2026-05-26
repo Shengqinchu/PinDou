@@ -173,16 +173,16 @@ def export_partitions(pattern: PatternSheet, partition_size: int | None = None) 
     partitions: list[PartitionImage] = []
 
     quadrants = [
-        (1, "top_left", "左上区", "Top Left", 0, row_mid, 0, col_mid),
-        (2, "top_right", "右上区", "Top Right", 0, row_mid, col_mid, cols),
-        (3, "bottom_left", "左下区", "Bottom Left", row_mid, rows, 0, col_mid),
-        (4, "bottom_right", "右下区", "Bottom Right", row_mid, rows, col_mid, cols),
+        (1, "top_left", "左上区", 0, row_mid, 0, col_mid),
+        (2, "top_right", "右上区", 0, row_mid, col_mid, cols),
+        (3, "bottom_left", "左下区", row_mid, rows, 0, col_mid),
+        (4, "bottom_right", "右下区", row_mid, rows, col_mid, cols),
     ]
-    for index, key, label, title, row_start, row_end, col_start, col_end in quadrants:
+    for index, key, label, row_start, row_end, col_start, col_end in quadrants:
         image = render_partition_image(
             pattern,
             index=index,
-            title=title,
+            title=label,
             total=total,
             row_start=row_start,
             row_end=row_end,
@@ -233,10 +233,10 @@ def render_partition_image(
 
     title_font = load_font(24)
     subtitle_font = load_font(14)
-    draw.text((padding, 14), f"{title} / Part {index} of {total}", font=title_font, fill=(31, 31, 31, 255))
+    draw.text((padding, 14), f"{title} · 第 {index}/{total} 区", font=title_font, fill=(31, 31, 31, 255))
     draw.text(
         (padding, 42),
-        f"Rows {row_start + 1}-{row_end} / Cols {col_start + 1}-{col_end}",
+        f"行 {row_start + 1}-{row_end} / 列 {col_start + 1}-{col_end}",
         font=subtitle_font,
         fill=(118, 118, 118, 255),
     )
@@ -308,7 +308,7 @@ def render_partition_image(
         overlay_draw.line([(grid_left, y), (grid_left + grid_width, y)], fill=(96, 96, 96, 80), width=1)
     image.alpha_composite(overlay)
 
-    footer = f"{cols}x{rows} cells in this quadrant. Tap image to zoom."
+    footer = f"{cols}x{rows} 格 · 点击图片可放大查看"
     draw.text((padding, grid_top + grid_height + 10), footer, font=subtitle_font, fill=(90, 90, 90, 255))
 
     output = io.BytesIO()
@@ -485,7 +485,7 @@ def legend_text_lines(pattern: PatternSheet, *, max_chars: int) -> list[str]:
     counts = sorted(pattern.color_counts.items(), key=lambda item: item[1], reverse=True)
     chunks = [f"{code} ({count})" for code, count in counts]
     if not chunks:
-        return ["No beads"]
+        return ["无豆"]
     lines: list[str] = []
     current = ""
     for chunk in chunks:

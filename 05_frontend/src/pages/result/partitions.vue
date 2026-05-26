@@ -3,9 +3,9 @@
     <section class="partitions">
       <div class="partitions__overview">
         <image
-          v-if="patternImageUrl"
+          v-if="displayPatternImageUrl && !patternImageFailed"
           class="partitions__overview-image"
-          :src="patternImageUrl"
+          :src="displayPatternImageUrl"
           mode="aspectFit"
           @click="previewFullPattern"
         />
@@ -53,12 +53,12 @@
         >
           <span class="partitions__card-title">{{ item.title }}</span>
           <image
-            v-if="!item.imageFailed"
+            v-if="item.canZoom"
             class="partitions__thumb"
             :src="item.imageUrl"
             mode="aspectFit"
-            @load="handlePartitionImageLoad(item.imageUrl)"
-            @error="handlePartitionImageError(item.imageUrl, $event)"
+            @load="handlePartitionImageLoad(item.sourceUrl)"
+            @error="handlePartitionImageError(item.sourceUrl, $event)"
           />
           <div
             v-else-if="item.cells.length"
@@ -75,7 +75,9 @@
           <div v-else class="partitions__thumb-placeholder">
             <span>预览加载失败</span>
           </div>
-          <span class="partitions__card-meta">{{ item.cols }}×{{ item.rows }} · 轻点放大</span>
+          <span class="partitions__card-meta">
+            {{ item.cols }}×{{ item.rows }} · {{ item.canZoom ? '轻点放大' : '页面预览' }}
+          </span>
         </button>
       </div>
     </section>
@@ -83,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import { api, PartitionItem, PatternSheet } from '../../api';
@@ -100,6 +102,10 @@ const errorMsg = ref('');
 const activeIndex = ref(0);
 const partitions = ref<PartitionItem[]>([]);
 const failedImageUrls = ref<string[]>([]);
+const localPartitionUrls = ref<Record<string, string>>({});
+const downloadingPartitionUrls = ref<string[]>([]);
+const displayPatternImageUrl = ref('');
+const patternImageFailed = ref(false);
 const rows = ref(0);
 const cols = ref(0);
 const storedPattern = ref<PatternSheet | null>(null);
@@ -129,16 +135,24 @@ const patternImageUrl = computed(() => {
 });
 
 const quadrantItems = computed(() => {
-  return partitions.value.slice(0, 4).map((item, index) => ({
-    ...item,
-    title: item.label || QUADRANT_TITLES[index] || `第 ${index + 1} 区`,
-    imageUrl: normalizeAssetUrl(item.url),
-    imageFailed: failedImageUrls.value.includes(normalizeAssetUrl(item.url)),
-    cells: partitionFallbackCells(item),
-    gridStyle: {
-      gridTemplateColumns: `repeat(${Math.max(item.cols, 1)}, 1fr)`
-    }
-  }));
+  return partitions.value.slice(0, 4).map((item, index) => {
+    const sourceUrl = normalizeAssetUrl(item.url);
+    const isRemote = /^https?:\/\//.test(sourceUrl);
+    const localUrl = localPartitionUrls.value[sourceUrl];
+    const imageUrl = isRemote ? localUrl || '' : sourceUrl;
+    const canZoom = !!imageUrl && !failedImageUrls.value.includes(sourceUrl);
+    return {
+      ...item,
+      title: item.label || QUADRANT_TITLES[index] || `第 ${index + 1} 区`,
+      sourceUrl,
+      imageUrl,
+      canZoom,
+      cells: partitionFallbackCells(item),
+      gridStyle: {
+        gridTemplateColumns: `repeat(${Math.max(item.cols, 1)}, minmax(0, 1fr))`
+      }
+    };
+  });
 });
 
 const overviewCells = computed(() => {
@@ -169,9 +183,12 @@ const loadPartitions = async () => {
     const sheet = await api.getPatternPartitions(artworkId.value);
     partitions.value = sheet.items.slice(0, 4);
     failedImageUrls.value = [];
+    localPartitionUrls.value = {};
+    downloadingPartitionUrls.value = [];
     rows.value = sheet.rows;
     cols.value = sheet.cols;
     activeIndex.value = 0;
+    preloadPartitionImages(partitions.value);
   } catch (error: any) {
     console.error('加载分区图失败:', error);
     errorMsg.value = error?.message || '网络有点慢，请稍后再试。';
@@ -181,18 +198,18 @@ const loadPartitions = async () => {
 };
 
 const previewFullPattern = () => {
-  if (!patternImageUrl.value) return;
-  uni.previewImage({ current: patternImageUrl.value, urls: [patternImageUrl.value] });
+  if (!displayPatternImageUrl.value || patternImageFailed.value) return;
+  uni.previewImage({ current: displayPatternImageUrl.value, urls: [displayPatternImageUrl.value] });
 };
 
 const previewPartition = (index: number) => {
-  const urls = quadrantItems.value.map((item) => item.imageUrl).filter(Boolean);
+  const urls = quadrantItems.value.filter((item) => item.canZoom).map((item) => item.imageUrl);
+  const currentItem = quadrantItems.value[index];
   activeIndex.value = index;
-  if (!urls.length || !urls[index] || failedImageUrls.value.includes(urls[index])) {
-    uni.showToast({ title: '图片加载失败，已显示页面预览', icon: 'none' });
+  if (!currentItem?.canZoom) {
     return;
   }
-  uni.previewImage({ current: urls[index], urls });
+  uni.previewImage({ current: currentItem.imageUrl, urls });
 };
 
 const handlePartitionImageLoad = (url: string) => {
@@ -204,6 +221,78 @@ const handlePartitionImageError = (url: string, event: any) => {
     failedImageUrls.value = [...failedImageUrls.value, url];
   }
   console.warn('分区图图片加载失败，已切换为本地缩略预览:', url, event);
+};
+
+function prepareDisplayPatternImage(url: string) {
+  patternImageFailed.value = false;
+  displayPatternImageUrl.value = '';
+  if (!url) return;
+  if (!/^https?:\/\//.test(url)) {
+    displayPatternImageUrl.value = url;
+    return;
+  }
+  uni.downloadFile({
+    url,
+    success: (res) => {
+      if (res.statusCode && res.statusCode >= 400) {
+        patternImageFailed.value = true;
+        console.warn('全图预览下载失败:', url, res.statusCode);
+        return;
+      }
+      displayPatternImageUrl.value = res.tempFilePath;
+      patternImageFailed.value = false;
+    },
+    fail: (error) => {
+      patternImageFailed.value = true;
+      console.warn('全图预览下载失败:', url, error);
+    }
+  });
+}
+
+watch(
+  patternImageUrl,
+  (url) => {
+    prepareDisplayPatternImage(url);
+  },
+  { immediate: true }
+);
+
+const preloadPartitionImages = (items: PartitionItem[]) => {
+  items.forEach((item) => {
+    const url = normalizeAssetUrl(item.url);
+    if (!/^https?:\/\//.test(url)) return;
+    downloadPartitionImage(url);
+  });
+};
+
+const downloadPartitionImage = (url: string) => {
+  if (localPartitionUrls.value[url] || downloadingPartitionUrls.value.includes(url)) return;
+  downloadingPartitionUrls.value = [...downloadingPartitionUrls.value, url];
+  uni.downloadFile({
+    url,
+    success: (res) => {
+      downloadingPartitionUrls.value = downloadingPartitionUrls.value.filter((item) => item !== url);
+      if (res.statusCode && res.statusCode >= 400) {
+        if (!failedImageUrls.value.includes(url)) {
+          failedImageUrls.value = [...failedImageUrls.value, url];
+        }
+        console.warn('分区图下载失败:', url, res.statusCode);
+        return;
+      }
+      localPartitionUrls.value = {
+        ...localPartitionUrls.value,
+        [url]: res.tempFilePath
+      };
+      failedImageUrls.value = failedImageUrls.value.filter((item) => item !== url);
+    },
+    fail: (error) => {
+      downloadingPartitionUrls.value = downloadingPartitionUrls.value.filter((item) => item !== url);
+      if (!failedImageUrls.value.includes(url)) {
+        failedImageUrls.value = [...failedImageUrls.value, url];
+      }
+      console.warn('分区图下载失败，已保留页面缩略预览:', url, error);
+    }
+  });
 };
 
 const partitionFallbackCells = (partition: PartitionItem): FallbackCell[] => {
@@ -382,7 +471,7 @@ const partitionFallbackCells = (partition: PartitionItem): FallbackCell[] => {
 .partitions__thumb-grid,
 .partitions__thumb-placeholder {
   width: 100%;
-  height: 160px;
+  aspect-ratio: 1 / 1;
   border-radius: var(--pd-r-img);
   background: #fff;
 }
