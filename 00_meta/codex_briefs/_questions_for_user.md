@@ -283,3 +283,26 @@ AI 路径 timeout、脚本 fallback 兔子占位图、标题实体转义、统�
 1. 国际品牌板（Hama / Perler / Artkal）常见是 `29×29`，而本轮默认是国产 `26` 格。Phase 3 若开放国际品牌，建议新增 `board_profile`，不要用同一套尺寸硬套所有品牌。
 2. raw 脚本路径默认仍会保留照片背景并量化成豆，这符合“保留原图”的当前语义；若产品希望 raw 路径也能一键去白底，需要把 `auto_remove_white_bg` 暴露到前端。
 3. `ENABLE_AI_PREVIEW_WHITE_BG_AUTO_NOBEED` 环境变量沿用了任务 prompt 的拼写 `NOBEED`。如果后续统一命名，可兼容新增 `NOBEAD` alias。
+
+## 2026-05-26 — Phase 2 product quality tuning v3 review
+
+本轮 v3 调优已完成，结论给用户 / Claude review：
+
+1. “圆点改方格没生效”的根因不是后端 exporter，而是结果页主图没有用后端 PNG exporter，而是前端直接渲染 `PatternSheet.grid`，且 CSS 写了 `border-radius: 999px`。已把结果页主图改为方格豆，26/52 小尺寸逐格显示色号，78/104 大尺寸只在 10 格锚点显示色号，避免手机端糊成一片。
+2. 后端 labeled PNG 也已复查并加固：26/52 尺寸用更大 cell 和更清晰字号，78/104 自动降低标注密度；方格半径收紧到 1px，视觉上不再接近圆点。
+3. 已实现自定义画板尺寸：后端 `SizePreset` 支持 `30x30` / `45x45` 等字符串，校验范围为 20-200、长宽比 0.5-2、整数尺寸；非 26 倍数会在 `PatternSheet.metadata.warning` 返回“不对齐拼豆板”的提示，但仍允许生成。
+4. 前端生成方式页已保留 26/52/78/104 四档推荐预设，并新增“自定义”输入区，实时显示绿色“对齐拼豆板”或黄色“不对齐”提示。
+5. PRD §4.4 已新增 §4.4.2 自定义尺寸规则；ADR-010 已追加修订，明确推荐尺寸优先，但高级用户可自定义。
+6. 作品集页面已从 stub 替换为真实实现：调用 `artworkStore.fetchArtworks()` / `api.getArtworks()`，两列作品网格、统计卡、空态 CTA、点开作品详情、长按或更多按钮弹分享 / 删除操作。
+7. 我的页面已从 stub 替换为真实实现：调用 `userStore.fetchProfile()` / `api.getProfile()`，展示微信头像昵称、脚本 / AI / 月卡额度卡，以及我的作品、兑换 CDK、加客服微信、用户协议、关于入口。
+
+验证记录：
+
+1. `06_backend/.venv/Scripts/python.exe -m pytest` 通过 31/31。
+2. `05_frontend npm run build:mp-weixin` 通过。
+3. 本轮所有改动均未触碰 PRD §5 接口字段；私人素材目录未入 git。
+
+需要用户操作：
+
+1. 微信开发者工具按 `Ctrl+R` 重新编译后，重新生成一张 26×26 或 52×52 图纸，重点看主图是否已经是方格豆并显示色号。
+2. 切到底部 tab 的“作品集”和“我的”，确认两个页面不再显示 Phase 2 占位文案。
