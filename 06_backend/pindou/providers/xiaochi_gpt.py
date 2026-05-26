@@ -125,7 +125,7 @@ class XiaochiGptProvider(PreviewProvider):
         api_key: str | None = None,
         base_url: str | None = None,
         client: Any | None = None,
-        timeout_seconds: float = 90.0,
+        timeout_seconds: float = 300.0,
         retry_count: int = 1,
         seed_factory: Callable[[], int] | None = None,
         enable_white_bg_auto_nobead: bool | None = None,
