@@ -12,13 +12,13 @@
             aria-label="拼豆图纸预览"
           >
             <span
-              v-for="(cell, index) in patternCells"
-              :key="index"
+              v-for="cell in patternCells"
+              :key="cell.key"
               class="result__grid-cell"
-              :class="{ 'result__grid-cell--empty': !cell }"
-              :style="{ backgroundColor: cell?.hex || 'transparent' }"
+              :class="{ 'result__grid-cell--empty': !cell.color }"
+              :style="{ backgroundColor: cell.color?.hex || 'transparent', color: cell.textColor }"
               aria-hidden="true"
-            ></span>
+            >{{ cell.showCode ? cell.color?.code : '' }}</span>
           </div>
           <div v-else class="result__empty-preview">
             <span class="result__empty-dot"></span>
@@ -143,6 +143,13 @@ type DisplayColor = {
   legend: string;
 };
 
+type DisplayCell = {
+  key: string;
+  color: ColorRef | null;
+  showCode: boolean;
+  textColor: string;
+};
+
 onLoad((options: any) => {
   if (options.tier) {
     tier.value = options.tier;
@@ -179,10 +186,42 @@ const pattern = computed(() => {
 const hasPatternGrid = computed(() => Array.isArray(pattern.value.grid) && pattern.value.grid.length > 0);
 const gridRows = computed(() => pattern.value.grid.length);
 const gridCols = computed(() => pattern.value.grid[0]?.length || 0);
-const patternCells = computed(() => pattern.value.grid.flat() as (ColorRef | null)[]);
+const patternCells = computed<DisplayCell[]>(() => {
+  const rows = pattern.value.grid || [];
+  const maxDim = Math.max(gridCols.value, gridRows.value);
+  const shouldShowAllCodes = maxDim <= 52;
+  const cells: DisplayCell[] = [];
+  rows.forEach((row, rowIndex) => {
+    row.forEach((color, colIndex) => {
+      const showCode = !!color && (shouldShowAllCodes || (rowIndex % 10 === 0 && colIndex % 10 === 0));
+      cells.push({
+        key: `${rowIndex}-${colIndex}`,
+        color,
+        showCode,
+        textColor: color ? contrastText(color.rgb) : 'transparent'
+      });
+    });
+  });
+  return cells;
+});
+
+const resultCellSize = computed(() => {
+  const maxDim = Math.max(gridCols.value, gridRows.value);
+  if (maxDim <= 52) return 24;
+  return 18;
+});
+
+const resultLabelSize = computed(() => {
+  const maxDim = Math.max(gridCols.value, gridRows.value);
+  if (maxDim <= 26) return 11;
+  if (maxDim <= 52) return 8;
+  return 7;
+});
 const gridPreviewStyle = computed(() => ({
-  gridTemplateColumns: `repeat(${Math.max(gridCols.value, 1)}, minmax(0, 1fr))`,
-  aspectRatio: gridCols.value && gridRows.value ? `${gridCols.value} / ${gridRows.value}` : '1 / 1'
+  gridTemplateColumns: `repeat(${Math.max(gridCols.value, 1)}, ${resultCellSize.value}px)`,
+  gridAutoRows: `${resultCellSize.value}px`,
+  '--pd-result-cell-size': `${resultCellSize.value}px`,
+  '--pd-result-label-size': `${resultLabelSize.value}px`
 }));
 
 const patternSizeLabel = computed(() => {
@@ -211,6 +250,11 @@ const patternColors = computed<DisplayColor[]>(() => {
 });
 const colorsCount = computed(() => patternColors.value.length);
 const estimatedCostLabel = computed(() => Number(pattern.value.estimated_cost_cny || 0).toFixed(2));
+
+const contrastText = (rgb: [number, number, number]) => {
+  const luminance = 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+  return luminance < 140 ? '#FFFFFF' : '#1F1F1F';
+};
 
 const patternName = computed(() => {
   if (tier.value === 'premium' && !isFallback.value) {
@@ -294,10 +338,12 @@ onMounted(() => {
 
 .result__pattern-img-wrap {
   width: 100%;
-  max-width: 280px;
+  max-width: 100%;
   position: relative;
   border-radius: var(--pd-r-img);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .result__pattern-image {
@@ -306,8 +352,8 @@ onMounted(() => {
 }
 
 .result__grid-preview {
-  width: 100%;
-  max-height: 320px;
+  width: max-content;
+  max-width: none;
   display: grid;
   gap: 1px;
   padding: 6px;
@@ -318,13 +364,23 @@ onMounted(() => {
 }
 
 .result__grid-cell {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 0.5px rgba(45, 45, 45, 0.05);
+  width: var(--pd-result-cell-size);
+  height: var(--pd-result-cell-size);
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--pd-font-mono);
+  font-size: var(--pd-result-label-size);
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  box-shadow: inset 0 0 0 0.7px rgba(45, 45, 45, 0.18);
+  overflow: hidden;
 }
 
 .result__grid-cell--empty {
+  background-image: radial-gradient(circle, rgba(150, 150, 150, 0.22) 0 18%, transparent 20%);
   box-shadow: none;
 }
 

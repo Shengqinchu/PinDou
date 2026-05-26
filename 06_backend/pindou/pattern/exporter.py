@@ -47,9 +47,9 @@ class PatternExporter:
             return empty_png()
         rows = len(grid)
         cols = max(len(row) for row in grid)
-        cell_size = max(self.cell_size, 22)
+        cell_size = labeled_cell_size(cols, rows)
         legend_lines = legend_text_lines(pattern, max_chars=max(30, cols * cell_size // 7))
-        cell_font = load_font(11)
+        cell_font = load_font(labeled_font_size(cols, rows))
         legend_font = load_font(15)
         legend_line_height = font_line_height(legend_font) + 8
         legend_height = legend_line_height * max(1, len(legend_lines)) + 16
@@ -92,7 +92,7 @@ class PatternExporter:
                     draw.rectangle([x0, y0, x1, y1], fill=fill)
                 else:
                     draw_bead_square(draw, x0, y0, x1, y1, fill=fill, outline=darken(bead.rgb, factor=0.72))
-                if code:
+                if code and should_draw_cell_code(row_idx, col_idx, cols, rows):
                     text_box = draw.textbbox((0, 0), code, font=cell_font)
                     text_w = text_box[2] - text_box[0]
                     text_h = text_box[3] - text_box[1]
@@ -153,9 +153,31 @@ def draw_bead_square(
     outline: tuple[int, int, int, int],
 ) -> None:
     inset = 1
-    radius = 2 if (x1 - x0) >= 12 else 1
+    radius = 1
     box = [x0 + inset, y0 + inset, x1 - inset, y1 - inset]
     draw.rounded_rectangle(box, radius=radius, fill=fill, outline=outline)
+
+
+def labeled_cell_size(cols: int, rows: int) -> int:
+    max_dim = max(cols, rows)
+    if max_dim <= 52:
+        return 24
+    return 18
+
+
+def labeled_font_size(cols: int, rows: int) -> int:
+    max_dim = max(cols, rows)
+    if max_dim <= 26:
+        return 15
+    if max_dim <= 52:
+        return 12
+    return 9
+
+
+def should_draw_cell_code(row_idx: int, col_idx: int, cols: int, rows: int) -> bool:
+    if max(cols, rows) <= 52:
+        return True
+    return row_idx % 10 == 0 and col_idx % 10 == 0
 
 
 def draw_pegboard_background(
