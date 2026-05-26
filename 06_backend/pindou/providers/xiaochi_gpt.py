@@ -11,8 +11,10 @@ from collections.abc import Callable
 from typing import Any
 
 from openai import OpenAI
+from PIL import Image
 
 from pindou.config import get_settings
+from pindou.pattern.postprocess import detect_and_remove_white_bg
 from pindou.providers.base import PreviewProvider, PreviewProviderError, PreviewResult, SizePreset, StylePreset
 
 
@@ -126,6 +128,7 @@ class XiaochiGptProvider(PreviewProvider):
         timeout_seconds: float = 90.0,
         retry_count: int = 1,
         seed_factory: Callable[[], int] | None = None,
+        enable_white_bg_auto_nobead: bool | None = None,
     ) -> None:
         settings = get_settings()
         secret = settings.xiaochi_gpt_api_key
@@ -134,6 +137,11 @@ class XiaochiGptProvider(PreviewProvider):
         self.timeout_seconds = timeout_seconds
         self.retry_count = retry_count
         self.image_cost_cny = settings.xiaochi_gpt_image_cost_cny
+        self.enable_white_bg_auto_nobead = (
+            settings.enable_ai_preview_white_bg_auto_nobead
+            if enable_white_bg_auto_nobead is None
+            else enable_white_bg_auto_nobead
+        )
         self.seed_factory = seed_factory or (lambda: random.SystemRandom().randint(1, 2_147_483_647))
 
         if client is not None:
@@ -162,6 +170,7 @@ class XiaochiGptProvider(PreviewProvider):
             prompt = self._build_prompt(style_preset, size_preset, attempt_seed)
             try:
                 preview = self._edit_image(image, prompt)
+                preview, white_bg_detected = self._auto_strip_white_bg(preview)
                 return PreviewResult.from_image_bytes(
                     preview,
                     target_color_count=TARGET_COLOR_COUNT,
@@ -175,6 +184,8 @@ class XiaochiGptProvider(PreviewProvider):
                         "size_preset": size_preset.value,
                         "attempts": attempt_index + 1,
                         "seed": attempt_seed,
+                        "white_bg_auto_nobead_enabled": self.enable_white_bg_auto_nobead,
+                        "white_bg_detected": white_bg_detected,
                     },
                 )
             except Exception as exc:  # noqa: BLE001 - provider boundary normalizes failures.
@@ -222,6 +233,22 @@ class XiaochiGptProvider(PreviewProvider):
             with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
                 return response.read()
         raise PreviewProviderError("Image API response has neither b64_json nor url.")
+
+    def _auto_strip_white_bg(self, image: bytes) -> tuple[bytes, bool]:
+        if not self.enable_white_bg_auto_nobead:
+            return image, False
+        try:
+            source = Image.open(io.BytesIO(image)).convert("RGBA")
+            if min(source.size) < 8:
+                return image, False
+            processed, detected = detect_and_remove_white_bg(source)
+            if not detected:
+                return image, False
+            output = io.BytesIO()
+            processed.save(output, format="PNG")
+            return output.getvalue(), True
+        except Exception:
+            return image, False
 
     @staticmethod
     def _get(value: Any, key: str) -> Any:

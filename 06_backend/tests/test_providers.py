@@ -27,6 +27,16 @@ def make_png_1x1() -> bytes:
 PNG_1X1 = make_png_1x1()
 
 
+def white_bg_preview_png() -> bytes:
+    output = io.BytesIO()
+    image = Image.new("RGBA", (32, 32), (255, 255, 255, 255))
+    for x in range(10, 22):
+        for y in range(10, 22):
+            image.putpixel((x, y), (255, 120, 120, 255))
+    image.save(output, format="PNG")
+    return output.getvalue()
+
+
 class FakeImages:
     def __init__(self, outcomes: list[object]) -> None:
         self.outcomes = outcomes
@@ -73,6 +83,25 @@ def test_xiaochi_provider_retries_once_with_new_seed_hint() -> None:
     assert "Seed hint: 1" in str(fake_images.calls[0]["prompt"])
     assert "Seed hint: 99" in str(fake_images.calls[1]["prompt"])
     assert fake_images.calls[1]["response_format"] == "b64_json"
+
+
+def test_xiaochi_provider_strips_ai_white_background_to_alpha() -> None:
+    fake_images = FakeImages([api_response(white_bg_preview_png())])
+    fake_client = SimpleNamespace(images=fake_images)
+    provider = XiaochiGptProvider(
+        api_key="test-key",
+        base_url="https://example.test/v1",
+        client=fake_client,
+        retry_count=0,
+        enable_white_bg_auto_nobead=True,
+    )
+
+    result = provider.generate(PNG_1X1, StylePreset.Q_PET, SizePreset.SINGLE_BOARD_26X26)
+    image = Image.open(io.BytesIO(result.image)).convert("RGBA")
+
+    assert result.metadata["white_bg_detected"] is True
+    assert image.getpixel((0, 0))[3] == 0
+    assert image.getpixel((16, 16))[3] == 255
 
 
 @dataclass
