@@ -253,3 +253,33 @@ AI 路径 timeout、脚本 fallback 兔子占位图、标题实体转义、统�
 1. `06_backend/.venv/Scripts/python.exe -m pytest tests/test_providers.py tests/test_pattern.py tests/test_api.py` 通过。
 2. `05_frontend npm run build:mp-weixin` 通过。
 3. 私有灰猫 raw / AI 两条链路均已生成验证图；验证图未纳入 git。
+
+## 2026-05-25 — Phase 2 product quality tuning v2 review
+
+对比真拼豆图纸 + 实物拼豆板后，本轮 v2 调优已完成，结论给用户 / Claude review：
+
+1. 已新增 `01_research/colormap/pegboard_sizes.md` 和 ADR-010。调研结论：Hama/Perler/Artkal 常见国际 5mm 大方板更接近 `29×29`；本轮按用户实物反馈和国内 MVP 目标，默认采用国产 `26` 格板序列。
+2. 尺寸预设已从视觉尺寸 `40×40 / 60×80 / 80×100 / 100×120` 改成物理板尺寸 `26×26 / 52×52 / 78×78 / 104×104`，默认 `26×26` 单板。
+3. 前端生成方式页已增加四档尺寸选择：单板 / 双板 / 三板 / 四板，并把选择传给 loading → API。
+4. PNG exporter 已把圆点改为带 1px 间距的圆角方块，更接近实际 5mm 方形拼豆颗粒。
+5. labeled PNG 已增加拼豆板背景层：浅色板底、空心钉位、按 26 格推断的板边界线，再叠 1×1 灰网格和 10×10 红辅助线。
+6. labeled PNG 每格提升到 22px，并放大格内色号与底部 legend，解决“看不太清楚”的问题。
+7. AI Preview 已复用 `detect_and_remove_white_bg()` 做白底 flood-fill 去背景，配置开关为 `ENABLE_AI_PREVIEW_WHITE_BG_AUTO_NOBEED=true`。AI 路径去白底后再交给 PatternBuilder，避免白底误算成白豆。
+
+私有灰猫实测（文件均在 `01_research/tech/user_poc_private/`，不入 git）：
+
+1. raw 路径 `kitten_gray_photo.png` → `26×26`：676 颗 / 6 色，输出 `outgoing/kitten_gray_26x26_pegboard_labeled.png`。
+2. AI 路径 `kitten_gray_photo.png` → `26×26`：反代耗时约 189 秒，`white_bg_detected=True`，输出 285 颗 / 7 色，输出 `outgoing/kitten_gray_ai_26x26_preview_stripped.png` 与 `outgoing/kitten_gray_ai_26x26_pegboard_labeled.png`。
+3. before / after 摘要：before 是圆点/纯像素感、无物理板语义、白底会被算成豆；after 是方格豆、拼豆板底、26 板边界、字号更大、AI 白底变 NoBead。
+
+验证记录：
+
+1. `06_backend/.venv/Scripts/python.exe -m pytest tests/test_providers.py tests/test_pattern.py tests/test_api.py tests/test_models.py tests/test_services.py` 通过 28/28。
+2. `05_frontend npm run build:mp-weixin` 通过。
+3. `05_frontend npm run dev:mp-weixin` 已重新生成 dev 产物；`dist/dev/mp-weixin` 已确认包含 `26x26 / 52x52 / 78x78 / 104x104`。
+
+剩余风险 / 建议下一步：
+
+1. 国际品牌板（Hama / Perler / Artkal）常见是 `29×29`，而本轮默认是国产 `26` 格。Phase 3 若开放国际品牌，建议新增 `board_profile`，不要用同一套尺寸硬套所有品牌。
+2. raw 脚本路径默认仍会保留照片背景并量化成豆，这符合“保留原图”的当前语义；若产品希望 raw 路径也能一键去白底，需要把 `auto_remove_white_bg` 暴露到前端。
+3. `ENABLE_AI_PREVIEW_WHITE_BG_AUTO_NOBEED` 环境变量沿用了任务 prompt 的拼写 `NOBEED`。如果后续统一命名，可兼容新增 `NOBEAD` alias。
