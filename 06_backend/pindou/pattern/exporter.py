@@ -35,7 +35,7 @@ class PatternExporter:
                     continue
                 fill = (*bead.rgb, 255)
                 outline = darken(bead.rgb, factor=0.65)
-                draw.ellipse([x0 + 1, y0 + 1, x1 - 1, y1 - 1], fill=fill, outline=outline)
+                draw_bead_square(draw, x0, y0, x1, y1, fill=fill, outline=outline)
 
         output = io.BytesIO()
         image.save(output, format="PNG")
@@ -75,7 +75,10 @@ class PatternExporter:
                     fill = (*bead.rgb, 255)
                     code = bead.code
                     text_fill = contrast_text(bead.rgb)
-                draw.rectangle([x0, y0, x1, y1], fill=fill)
+                if isinstance(bead, NoBead):
+                    draw.rectangle([x0, y0, x1, y1], fill=fill)
+                else:
+                    draw_bead_square(draw, x0, y0, x1, y1, fill=fill, outline=darken(bead.rgb, factor=0.72))
                 if code:
                     text_box = draw.textbbox((0, 0), code, font=font)
                     text_w = text_box[2] - text_box[0]
@@ -124,6 +127,22 @@ class PatternExporter:
 
 def darken(rgb: tuple[int, int, int], factor: float) -> tuple[int, int, int, int]:
     return (int(rgb[0] * factor), int(rgb[1] * factor), int(rgb[2] * factor), 255)
+
+
+def draw_bead_square(
+    draw: ImageDraw.ImageDraw,
+    x0: int,
+    y0: int,
+    x1: int,
+    y1: int,
+    *,
+    fill: tuple[int, int, int, int],
+    outline: tuple[int, int, int, int],
+) -> None:
+    inset = 1
+    radius = 2 if (x1 - x0) >= 12 else 1
+    box = [x0 + inset, y0 + inset, x1 - inset, y1 - inset]
+    draw.rounded_rectangle(box, radius=radius, fill=fill, outline=outline)
 
 
 def contrast_text(rgb: tuple[int, int, int]) -> tuple[int, int, int, int]:
