@@ -4,9 +4,15 @@
 
       <!-- ===== Pattern preview ===== -->
       <figure class="result__pattern">
-        <div class="result__pattern-img-wrap">
+        <div class="result__pattern-img-wrap" @click="previewFullScreen">
+          <image
+            v-if="patternImageUrl"
+            class="result__pattern-image"
+            :src="patternImageUrl"
+            mode="widthFix"
+          />
           <div
-            v-if="hasPatternGrid"
+            v-else-if="hasPatternGrid"
             class="result__grid-preview"
             :style="gridPreviewStyle"
             aria-label="拼豆图纸预览"
@@ -24,6 +30,15 @@
             <span class="result__empty-dot"></span>
             <span>暂无图纸预览</span>
           </div>
+          <button
+            v-if="patternImageUrl"
+            type="button"
+            class="result__zoom"
+            @click.stop="previewFullScreen"
+          >
+            <span class="result__zoom-icon" aria-hidden="true"></span>
+            点击放大
+          </button>
           
           <!-- ===== AIGC 标识 (PRD §8.1 - FinishedPreview 可见) ===== -->
           <span v-if="tier === 'premium' && !isFallback" class="tag tag--ai result__pattern-badge">
@@ -98,6 +113,10 @@
           <span class="result__upsell-text">解锁高级版（PDF / Excel）</span>
           <span class="result__upsell-badge">月卡</span>
         </button>
+
+        <button class="btn btn--secondary btn--block btn--md result__partition" @click="openPartitions">
+          分区查看
+        </button>
       </div>
 
       <!-- ===== Regenerate footnote ===== -->
@@ -125,9 +144,11 @@ import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import Paywall from '../../components/Paywall.vue';
 import { useArtworkStore } from '../../store/artwork';
 import { PatternSheet, ColorRef } from '../../api';
+import { BASE_URL } from '../../utils/request';
 
 const artworkStore = useArtworkStore();
 const CURRENT_PATTERN_KEY = 'pd_current_pattern';
+const API_ORIGIN = BASE_URL.replace(/\/api\/v\d+$/, '');
 
 const tier = ref<'quick' | 'premium'>('quick');
 const isFallback = ref(false);
@@ -186,6 +207,13 @@ const pattern = computed(() => {
 const hasPatternGrid = computed(() => Array.isArray(pattern.value.grid) && pattern.value.grid.length > 0);
 const gridRows = computed(() => pattern.value.grid.length);
 const gridCols = computed(() => pattern.value.grid[0]?.length || 0);
+const patternImageUrl = computed(() => {
+  const url = (pattern.value as any).image_url || pattern.value.metadata?.labeled_image_url || '';
+  return normalizeAssetUrl(url);
+});
+const artworkId = computed(() => {
+  return String(pattern.value.metadata?.artwork_id || artworkStore.currentArtwork?.artwork_id || '');
+});
 const patternCells = computed<DisplayCell[]>(() => {
   const rows = pattern.value.grid || [];
   const maxDim = Math.max(gridCols.value, gridRows.value);
@@ -251,6 +279,13 @@ const patternColors = computed<DisplayColor[]>(() => {
 const colorsCount = computed(() => patternColors.value.length);
 const estimatedCostLabel = computed(() => Number(pattern.value.estimated_cost_cny || 0).toFixed(2));
 
+const normalizeAssetUrl = (url: string) => {
+  if (!url) return '';
+  if (/^https?:\/\//.test(url)) return url;
+  if (url.startsWith('/static/')) return `${API_ORIGIN}${url}`;
+  return url;
+};
+
 const contrastText = (rgb: [number, number, number]) => {
   const luminance = 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
   return luminance < 140 ? '#FFFFFF' : '#1F1F1F';
@@ -263,9 +298,30 @@ const patternName = computed(() => {
   return '自拍拼豆 · 基础版';
 });
 
+const previewFullScreen = () => {
+  if (!patternImageUrl.value) {
+    uni.showToast({ title: '高清图生成后可放大查看', icon: 'none' });
+    return;
+  }
+  uni.previewImage({
+    current: patternImageUrl.value,
+    urls: [patternImageUrl.value]
+  });
+};
+
+const openPartitions = () => {
+  if (!artworkId.value) {
+    uni.showToast({ title: '重新生成后可查看分区图', icon: 'none' });
+    return;
+  }
+  uni.navigateTo({
+    url: `/pages/result/partitions?artwork_id=${encodeURIComponent(artworkId.value)}`
+  });
+};
+
 // 一键保存拼豆图纸到系统相册
 const handleDownload = () => {
-  const imageUrl = (pattern.value as any).image_url;
+  const imageUrl = patternImageUrl.value;
   if (!imageUrl) {
     uni.showToast({
       title: '图纸已生成，图片导出稍后开放',
@@ -348,7 +404,48 @@ onMounted(() => {
 
 .result__pattern-image {
   width: 100%;
+  max-width: 100%;
   display: block;
+  border-radius: var(--pd-r-img);
+  background: #fff;
+}
+
+.result__zoom {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 107, 157, 0.94);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.32);
+}
+
+.result__zoom-icon {
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  position: relative;
+}
+
+.result__zoom-icon::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  bottom: -4px;
+  width: 7px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transform: rotate(45deg);
 }
 
 .result__grid-preview {
@@ -621,6 +718,10 @@ onMounted(() => {
   letter-spacing: 0.6px;
   color: #fff;
   border: 0.5px solid rgba(255, 255, 255, 0.4);
+}
+
+.result__partition {
+  cursor: pointer;
 }
 
 /* ===== Regen text link ===== */

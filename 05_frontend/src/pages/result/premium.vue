@@ -15,7 +15,13 @@
 
       <!-- ===== Pattern preview ===== -->
       <figure class="premium__pattern">
-        <image class="premium__pattern-image" :src="pattern.image_url || '/static/assets/bead-cat.svg'" mode="widthFix" />
+        <div class="premium__pattern-wrap" @click="previewFullScreen">
+          <image class="premium__pattern-image" :src="premiumPatternImage" mode="widthFix" />
+          <button type="button" class="premium__zoom" @click.stop="previewFullScreen">
+            <span class="premium__zoom-icon" aria-hidden="true"></span>
+            点击放大
+          </button>
+        </div>
         <figcaption class="premium__pattern-caption">
           <span class="premium__pattern-name">萌宠拼豆 · AI 精致橘橘</span>
           <span class="premium__pattern-meta">{{ pattern.size || '32 × 32' }} · {{ pattern.total_beads || 487 }} 颗 · {{ colorsCount }} 色</span>
@@ -137,8 +143,10 @@
 import { computed } from 'vue';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import { useArtworkStore } from '../../store/artwork';
+import { BASE_URL } from '../../utils/request';
 
 const artworkStore = useArtworkStore();
+const API_ORIGIN = BASE_URL.replace(/\/api\/v\d+$/, '');
 
 const pattern = computed(() => {
   return artworkStore.currentPattern || {
@@ -157,8 +165,37 @@ const pattern = computed(() => {
 });
 
 const colorsCount = computed(() => (pattern.value.colors || []).length);
+const artworkId = computed(() => String(pattern.value.metadata?.artwork_id || artworkStore.currentArtwork?.artwork_id || ''));
+const premiumPatternImage = computed(() => {
+  const url = pattern.value.image_url || pattern.value.metadata?.labeled_image_url || '/static/assets/bead-cat.svg';
+  return normalizeAssetUrl(url);
+});
+
+const normalizeAssetUrl = (url: string) => {
+  if (!url) return '';
+  if (/^https?:\/\//.test(url)) return url;
+  if (url.startsWith('/static/') && !url.startsWith('/static/assets/')) return `${API_ORIGIN}${url}`;
+  return url;
+};
+
+const previewFullScreen = () => {
+  uni.previewImage({
+    current: premiumPatternImage.value,
+    urls: [premiumPatternImage.value]
+  });
+};
 
 const handleDownloadFormat = (name: string, ext: string) => {
+  if (ext === 'tiles') {
+    if (!artworkId.value) {
+      uni.showToast({ title: '重新生成后可查看分区图', icon: 'none' });
+      return;
+    }
+    uni.navigateTo({
+      url: `/pages/result/partitions?artwork_id=${encodeURIComponent(artworkId.value)}`
+    });
+    return;
+  }
   uni.showActionSheet({
     itemList: [`保存本地 ${ext.toUpperCase()}`, '复制浏览器下载链接', '发送至指定邮箱'],
     success: (res) => {
@@ -276,12 +313,60 @@ const handleEmail = () => {
   align-items: center;
   gap: 6px;
 }
+
+.premium__pattern-wrap {
+  width: 100%;
+  max-width: 260px;
+  position: relative;
+}
+
 .premium__pattern-image {
   width: 100%;
   max-width: 220px;
   border-radius: var(--pd-r-img);
   display: block;
+  margin: 0 auto;
+  background: #fff;
 }
+
+.premium__zoom {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  height: 28px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 107, 157, 0.94);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.32);
+}
+
+.premium__zoom-icon {
+  width: 11px;
+  height: 11px;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  position: relative;
+}
+
+.premium__zoom-icon::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  bottom: -4px;
+  width: 7px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transform: rotate(45deg);
+}
+
 .premium__pattern-caption {
   text-align: center;
   display: flex;

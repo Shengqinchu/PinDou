@@ -43,6 +43,13 @@
       }
     },
     {
+      "path": "pages/result/partitions",
+      "style": {
+        "navigationBarTitleText": "分区图",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/cdk/redeem",
       "style": {
         "navigationBarTitleText": "CDK 兑换",

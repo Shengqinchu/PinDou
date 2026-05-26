@@ -105,6 +105,28 @@ export interface PatternSheet {
   brand: string;
   bead_diameter_mm: number;
   metadata?: Record<string, any>;
+  image_url?: string;
+}
+
+export interface PartitionItem {
+  index: number;
+  label: string;
+  row_start: number;
+  row_end: number;
+  col_start: number;
+  col_end: number;
+  rows: number;
+  cols: number;
+  url: string;
+}
+
+export interface PartitionSheet {
+  artwork_id: string;
+  partition_size: number;
+  rows: number;
+  cols: number;
+  total: number;
+  items: PartitionItem[];
 }
 
 export interface PreviewResult {
@@ -436,6 +458,10 @@ export const api = {
       });
     }
     return request({ url: `/artwork/${id}`, method: 'GET' });
+  },
+
+  getPatternPartitions(artworkId: string): Promise<PartitionSheet> {
+    return request({ url: `/pattern/${artworkId}/partitions`, method: 'GET' });
   },
 
   // 删除作品 (PRD §4.10)
