@@ -306,3 +306,27 @@ AI 路径 timeout、脚本 fallback 兔子占位图、标题实体转义、统�
 
 1. 微信开发者工具按 `Ctrl+R` 重新编译后，重新生成一张 26×26 或 52×52 图纸，重点看主图是否已经是方格豆并显示色号。
 2. 切到底部 tab 的“作品集”和“我的”，确认两个页面不再显示 Phase 2 占位文案。
+
+## 2026-05-26 — Phase 2 product quality tuning v4 review
+
+本轮 v4 调优已完成，结论给用户 / Claude review：
+
+1. 结果页完整图纸改为两层展示：页面内只显示高清 PNG 缩略图 + 关键信息，点击主图或右上角“点击放大”按钮调用微信原生 `uni.previewImage()`，支持双指缩放、平移和保存到相册。
+2. `result/basic.vue` 与 `result/premium.vue` 均已接入全屏预览；旧缓存没有 `metadata.labeled_image_url` 时仍保留前端 grid 兜底，不会白屏。
+3. 后端生成 PatternSheet 时会保存带网格 / 色号的 PNG 到 `/static/patterns/`，并通过 `PatternSheet.metadata.labeled_image_url` 与可选 `image_url` 返回。`pattern/build` 同时保存 Artwork，让刚生成的作品也能进入作品集和分区查看。
+4. 已实现分区图 API：`GET /api/v1/pattern/{artwork_id}/partitions`。默认 `partition_size=13`，`26×26` 拆 4 张，`52×52` 拆 16 张，更大尺寸继续按 13 格切分。
+5. 分区图每张子图包含“第 N 区 / 共 M 区”、行列范围、全图位置缩略图、30px 单格和清晰色号。
+6. 前端新增 `pages/result/partitions`：顶部全图缩略 + 当前区块高亮，主体 swiper 查看分区大图，底部上一/下一分页，并支持本地 `已拼完` 标记。
+7. PRD §4.7 已新增 §4.7.1，落档“屏幕缩略 + 原生放大 + 分区查看”的实现规则。
+
+验证记录：
+
+1. `06_backend/.venv/Scripts/python.exe -m pytest` 通过 32/32。
+2. `05_frontend npm run build:mp-weixin` 通过。
+3. 当前分区图入口免费可见；月卡/高级版拦截还未接支付状态，后续可在 `pages/result/partitions` 加一层 `isMonthlyMember` 判断。
+
+需要用户操作：
+
+1. 重启/刷新后端后，在微信开发者工具按 `Ctrl+R`，重新生成一张图纸。
+2. 点击结果页主图或“点击放大”，确认微信原生全屏预览可双指缩放。
+3. 点击“分区查看”，用 `52×52` 重点验证是否拆成 16 张、每张 13×13 子图色号可读。
