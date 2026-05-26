@@ -72,6 +72,46 @@ class PatternSheet:
         }
 
 
+def pattern_sheet_from_frontend_dict(data: dict[str, Any]) -> PatternSheet:
+    grid: list[list[ColorRef | NoBead]] = []
+    palette_used = [color_ref_from_frontend_dict(item) for item in data.get("palette_used", [])]
+
+    for row in data.get("grid", []):
+        grid_row: list[ColorRef | NoBead] = []
+        for cell in row:
+            if cell is None:
+                grid_row.append(NoBead())
+            else:
+                grid_row.append(color_ref_from_frontend_dict(cell))
+        grid.append(grid_row)
+
+    return PatternSheet(
+        grid=grid,
+        color_counts={str(key): int(value) for key, value in data.get("color_counts", {}).items()},
+        bead_total=int(data.get("bead_total", 0)),
+        coords=[tuple(coord) for coord in data.get("coords", [])],
+        no_bead_mask=data.get("no_bead_mask", []),
+        palette_used=palette_used,
+        estimated_cost_cny=float(data.get("estimated_cost_cny", 0)),
+        suggested_buffer_pct=int(data.get("suggested_buffer_pct", 10)),
+        brand=str(data.get("brand", "MARD")),
+        bead_diameter_mm=float(data.get("bead_diameter_mm", 5.0)),
+        metadata=dict(data.get("metadata", {})),
+    )
+
+
+def color_ref_from_frontend_dict(data: dict[str, Any]) -> ColorRef:
+    return ColorRef(
+        brand=str(data.get("brand", "MARD")),
+        code=str(data["code"]),
+        name_cn=str(data.get("name_cn", data["code"])),
+        name_en=data.get("name_en"),
+        hex=str(data.get("hex", "#000000")),
+        rgb=tuple(data.get("rgb", (0, 0, 0))),
+        bead_diameter_mm=float(data.get("bead_diameter_mm", 5.0)),
+    )
+
+
 class PatternBuilder:
     def __init__(self, *, target_colors: int = 24, min_component_size: int = 3) -> None:
         self.target_colors = target_colors

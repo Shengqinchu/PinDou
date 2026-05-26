@@ -7,9 +7,11 @@ from fastapi import APIRouter, Request
 from pindou.api.deps import CurrentUser, DbSession
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.api.generate import parse_payload_or_upload, parse_size
+from pindou.api.pattern_assets import finalize_artwork_pattern_assets
 from pindou.api.quota import consume_script_quota, consume_white_bg_quota, require_sensitive_consent
-from pindou.api.storage import load_preview_image
-from pindou.pattern.builder import PatternBuilder
+from pindou.api.storage import load_preview_image, load_uploaded_image, save_pattern_png, save_uploaded_image, static_url
+from pindou.pattern.builder import PatternBuilder, pattern_sheet_from_frontend_dict
+from pindou.pattern.exporter import PatternExporter, partition_filename
 from pindou.services.artwork_service import ArtworkService
 
 router = APIRouter(prefix="/pattern", tags=["pattern"])
@@ -27,7 +29,8 @@ async def build_pattern(request: Request, current_user: CurrentUser, db: DbSessi
 
     try:
         if upload is not None:
-            raw_image = await upload.read()
+            saved = save_uploaded_image(upload.filename or "upload.png", await upload.read())
+            raw_image, _raw_path = load_uploaded_image(saved["image_id"])
             sheet = PatternBuilder().build(
                 size=size,
                 raw_image=raw_image,
@@ -39,10 +42,13 @@ async def build_pattern(request: Request, current_user: CurrentUser, db: DbSessi
             consume_script_quota(db, current_user)
             if sheet.metadata.get("white_bg_detected"):
                 consume_white_bg_quota(db, current_user)
+            original_path = saved["path"]
+            preview_path = ""
+            style_preset = "cartoon_fallback"
         else:
             preview_id = payload.get("preview_id")
             if preview_id:
-                preview, _path = load_preview_image(str(preview_id))
+                preview, preview_path_obj = load_preview_image(str(preview_id))
                 sheet = PatternBuilder().build(
                     size=size,
                     preview=preview,
@@ -50,6 +56,9 @@ async def build_pattern(request: Request, current_user: CurrentUser, db: DbSessi
                     bead_diameter_mm=bead_diameter_mm,
                     mode="ai",
                 )
+                original_path = None
+                preview_path = static_url("previews", preview_path_obj.name)
+                style_preset = "q_portrait"
             else:
                 raise ApiException(422, ErrorCode.IMAGE_NOT_FOUND, "缺少 preview_id 或 raw_image。")
     except ApiException:
@@ -57,7 +66,57 @@ async def build_pattern(request: Request, current_user: CurrentUser, db: DbSessi
     except Exception as exc:  # noqa: BLE001 - pattern builder errors become API errors.
         raise ApiException(500, ErrorCode.PATTERN_BUILD_FAILED, "图纸生成失败，请重新试一次。") from exc
 
-    return sheet.to_frontend_dict()
+    pattern_data = sheet.to_frontend_dict()
+    artwork = ArtworkService(db).save_artwork(
+        user_id=current_user.user_id,
+        original_path=original_path,
+        preview_path=preview_path,
+        pattern_json=pattern_data,
+        style_preset=style_preset,
+        size_preset=size.value,
+        title=payload.get("title"),
+    )
+    finalize_artwork_pattern_assets(db, artwork=artwork, sheet=sheet, pattern_data=pattern_data, preview_path=preview_path)
+    return pattern_data
+
+
+@router.get("/{artwork_id}/partitions")
+def get_pattern_partitions(
+    artwork_id: str,
+    current_user: CurrentUser,
+    db: DbSession,
+    partition_size: int = 13,
+) -> dict:
+    """返回高级分区图 URL 列表；前端用于 13x13 子图查看。"""
+    artwork = ArtworkService(db).get_artwork(artwork_id)
+    if artwork is None or artwork.user_id != current_user.user_id:
+        raise ApiException(404, ErrorCode.ARTWORK_NOT_FOUND, "没有找到这个作品。")
+    sheet = pattern_sheet_from_frontend_dict(artwork.pattern_json)
+    partitions = PatternExporter().export_partitions(sheet, partition_size=partition_size)
+    items: list[dict] = []
+    for partition in partitions:
+        _path, url = save_pattern_png(partition_filename(artwork_id, partition.index), partition.image)
+        items.append(
+            {
+                "index": partition.index,
+                "label": f"第 {partition.index} 区 / 共 {partition.total} 区",
+                "row_start": partition.row_start,
+                "row_end": partition.row_end,
+                "col_start": partition.col_start,
+                "col_end": partition.col_end,
+                "rows": partition.rows,
+                "cols": partition.cols,
+                "url": url,
+            }
+        )
+    return {
+        "artwork_id": artwork_id,
+        "partition_size": partition_size,
+        "rows": len(sheet.grid),
+        "cols": max((len(row) for row in sheet.grid), default=0),
+        "total": len(items),
+        "items": items,
+    }
 
 
 @router.get("/{artwork_id}")

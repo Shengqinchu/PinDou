@@ -70,6 +70,15 @@ def save_pattern_json(pattern_id: str, pattern_data: dict[str, Any]) -> tuple[Pa
     return path, static_url("patterns", path.name)
 
 
+def save_pattern_png(filename: str, data: bytes) -> tuple[Path, str]:
+    safe_name = Path(filename).name
+    if not safe_name.lower().endswith(".png"):
+        safe_name = f"{Path(safe_name).stem}.png"
+    path = get_settings().pattern_dir / safe_name
+    path.write_bytes(data)
+    return path, static_url("patterns", path.name)
+
+
 def load_uploaded_image(image_id: str) -> tuple[bytes, Path]:
     path = resolve_stored_file(get_settings().upload_dir, image_id, ALLOWED_EXTENSIONS)
     if path is None:

@@ -10,6 +10,7 @@ from starlette.datastructures import UploadFile
 
 from pindou.api.deps import CurrentUser, DbSession
 from pindou.api.errors import ApiException, ErrorCode
+from pindou.api.pattern_assets import finalize_artwork_pattern_assets
 from pindou.api.quota import (
     consume_ai_credit,
     consume_script_quota,
@@ -20,7 +21,6 @@ from pindou.api.quota import (
 from pindou.api.storage import (
     load_uploaded_image,
     normalized_upload_png_bytes,
-    save_pattern_json,
     save_preview_png,
     save_uploaded_image,
 )
@@ -61,20 +61,19 @@ async def generate_script(request: Request, current_user: CurrentUser, db: DbSes
         consume_white_bg_quota(db, current_user)
 
     pattern_data = sheet.to_frontend_dict()
-    pattern_path, pattern_url = save_pattern_json(make_id("pattern"), pattern_data)
     artwork = ArtworkService(db).save_artwork(
         user_id=current_user.user_id,
         original_path=str(original_path) if original_path else None,
-        preview_path=pattern_url,
+        preview_path="",
         pattern_json=pattern_data,
         style_preset="cartoon_fallback",
         size_preset=size.value,
         title=payload.get("title"),
     )
+    pattern_url, _labeled_url = finalize_artwork_pattern_assets(db, artwork=artwork, sheet=sheet, pattern_data=pattern_data)
     return {
         "artwork_id": artwork.artwork_id,
         "pattern_url": pattern_url,
-        "pattern_path": str(pattern_path),
         "pattern": pattern_data,
     }
 
@@ -101,7 +100,6 @@ async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession
     consume_ai_credit(db, current_user)
 
     pattern_data = sheet.to_frontend_dict()
-    _pattern_path, pattern_url = save_pattern_json(make_id("pattern"), pattern_data)
     artwork = ArtworkService(db).save_artwork(
         user_id=current_user.user_id,
         original_path=str(original_path) if original_path else None,
@@ -110,6 +108,13 @@ async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession
         style_preset=style.value,
         size_preset=size.value,
         title=payload.get("title"),
+    )
+    pattern_url, _labeled_url = finalize_artwork_pattern_assets(
+        db,
+        artwork=artwork,
+        sheet=sheet,
+        pattern_data=pattern_data,
+        preview_path=preview_url,
     )
     return {
         "artwork_id": artwork.artwork_id,
@@ -189,9 +194,3 @@ def build_preview_chain() -> PreviewProviderChain:
     except Exception:  # noqa: BLE001 - local dev/test may not have image API key.
         primary = fallback
     return PreviewProviderChain(providers=[primary], fallback_provider=fallback)
-
-
-def make_id(prefix: str) -> str:
-    import uuid
-
-    return f"{prefix}_{uuid.uuid4().hex}"

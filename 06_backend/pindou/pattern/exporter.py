@@ -3,10 +3,24 @@
 from __future__ import annotations
 
 import io
+from dataclasses import dataclass
 
 from PIL import Image, ImageDraw, ImageFont
 
 from pindou.pattern.builder import NoBead, PatternSheet
+
+
+@dataclass(frozen=True)
+class PartitionImage:
+    index: int
+    total: int
+    row_start: int
+    row_end: int
+    col_start: int
+    col_end: int
+    rows: int
+    cols: int
+    image: bytes
 
 
 class PatternExporter:
@@ -135,7 +149,180 @@ class PatternExporter:
         raise NotImplementedError("Excel export is reserved for the advanced package task.")
 
     def to_partition_images(self, pattern: PatternSheet, block_size: int = 20) -> list[bytes]:
-        raise NotImplementedError("Partition image export is reserved for the advanced package task.")
+        return [partition.image for partition in self.export_partitions(pattern, partition_size=block_size)]
+
+    def export_partitions(self, pattern: PatternSheet, partition_size: int = 13) -> list[PartitionImage]:
+        return export_partitions(pattern, partition_size=partition_size)
+
+
+def export_partitions(pattern: PatternSheet, partition_size: int = 13) -> list[PartitionImage]:
+    grid = pattern.grid
+    if not grid or not grid[0]:
+        return []
+
+    rows = len(grid)
+    cols = max(len(row) for row in grid)
+    row_blocks = (rows + partition_size - 1) // partition_size
+    col_blocks = (cols + partition_size - 1) // partition_size
+    total = row_blocks * col_blocks
+    partitions: list[PartitionImage] = []
+
+    index = 1
+    for block_row in range(row_blocks):
+        row_start = block_row * partition_size
+        row_end = min(rows, row_start + partition_size)
+        for block_col in range(col_blocks):
+            col_start = block_col * partition_size
+            col_end = min(cols, col_start + partition_size)
+            image = render_partition_image(
+                pattern,
+                index=index,
+                total=total,
+                row_start=row_start,
+                row_end=row_end,
+                col_start=col_start,
+                col_end=col_end,
+                partition_size=partition_size,
+            )
+            partitions.append(
+                PartitionImage(
+                    index=index,
+                    total=total,
+                    row_start=row_start,
+                    row_end=row_end,
+                    col_start=col_start,
+                    col_end=col_end,
+                    rows=row_end - row_start,
+                    cols=col_end - col_start,
+                    image=image,
+                )
+            )
+            index += 1
+    return partitions
+
+
+def render_partition_image(
+    pattern: PatternSheet,
+    *,
+    index: int,
+    total: int,
+    row_start: int,
+    row_end: int,
+    col_start: int,
+    col_end: int,
+    partition_size: int,
+) -> bytes:
+    cell_size = 30
+    padding = 18
+    title_height = 58
+    legend_height = 34
+    rows = row_end - row_start
+    cols = col_end - col_start
+    grid_width = cols * cell_size
+    grid_height = rows * cell_size
+    width = max(grid_width + padding * 2, 430)
+    height = title_height + grid_height + legend_height + padding
+    image = Image.new("RGBA", (width, height), (255, 255, 255, 255))
+    draw = ImageDraw.Draw(image)
+
+    title_font = load_font(24)
+    subtitle_font = load_font(14)
+    code_font = load_font(16)
+    draw.text((padding, 14), f"第 {index} 区 / 共 {total} 区", font=title_font, fill=(31, 31, 31, 255))
+    draw.text(
+        (padding, 42),
+        f"行 {row_start + 1}-{row_end} / 列 {col_start + 1}-{col_end}",
+        font=subtitle_font,
+        fill=(118, 118, 118, 255),
+    )
+
+    draw_partition_minimap(
+        draw,
+        width - padding - 84,
+        12,
+        84,
+        38,
+        rows_total=len(pattern.grid),
+        cols_total=max(len(row) for row in pattern.grid),
+        row_start=row_start,
+        row_end=row_end,
+        col_start=col_start,
+        col_end=col_end,
+    )
+
+    grid_left = padding
+    grid_top = title_height
+    draw_pegboard_background(
+        draw,
+        grid_left,
+        grid_top,
+        cols,
+        rows,
+        cell_size,
+        board_interval=None,
+    )
+
+    for local_row, source_row in enumerate(range(row_start, row_end)):
+        row = pattern.grid[source_row]
+        for local_col, source_col in enumerate(range(col_start, col_end)):
+            bead = row[source_col] if source_col < len(row) else NoBead()
+            x0 = grid_left + local_col * cell_size
+            y0 = grid_top + local_row * cell_size
+            x1 = x0 + cell_size
+            y1 = y0 + cell_size
+            if isinstance(bead, NoBead):
+                draw.rectangle([x0, y0, x1, y1], fill=(255, 255, 255, 255))
+                continue
+            draw_bead_square(draw, x0, y0, x1, y1, fill=(*bead.rgb, 255), outline=darken(bead.rgb, factor=0.72))
+            code = bead.code
+            text_box = draw.textbbox((0, 0), code, font=code_font)
+            text_w = text_box[2] - text_box[0]
+            text_h = text_box[3] - text_box[1]
+            draw.text(
+                (x0 + (cell_size - text_w) / 2, y0 + (cell_size - text_h) / 2 - 1),
+                code,
+                font=code_font,
+                fill=contrast_text(bead.rgb),
+            )
+
+    overlay = Image.new("RGBA", image.size, (255, 255, 255, 0))
+    overlay_draw = ImageDraw.Draw(overlay)
+    for col in range(cols + 1):
+        x = grid_left + col * cell_size
+        overlay_draw.line([(x, grid_top), (x, grid_top + grid_height)], fill=(96, 96, 96, 80), width=1)
+    for row in range(rows + 1):
+        y = grid_top + row * cell_size
+        overlay_draw.line([(grid_left, y), (grid_left + grid_width, y)], fill=(96, 96, 96, 80), width=1)
+    image.alpha_composite(overlay)
+
+    footer = f"每区 {partition_size}x{partition_size}；按编号拼完后再拼下一区。"
+    draw.text((padding, grid_top + grid_height + 10), footer, font=subtitle_font, fill=(90, 90, 90, 255))
+
+    output = io.BytesIO()
+    image.save(output, format="PNG")
+    return output.getvalue()
+
+
+def draw_partition_minimap(
+    draw: ImageDraw.ImageDraw,
+    x: int,
+    y: int,
+    width: int,
+    height: int,
+    *,
+    rows_total: int,
+    cols_total: int,
+    row_start: int,
+    row_end: int,
+    col_start: int,
+    col_end: int,
+) -> None:
+    draw.rounded_rectangle([x, y, x + width, y + height], radius=5, fill=(248, 249, 250, 255), outline=(190, 190, 190, 255))
+    hx0 = x + int((col_start / cols_total) * width)
+    hx1 = x + max(2, int((col_end / cols_total) * width))
+    hy0 = y + int((row_start / rows_total) * height)
+    hy1 = y + max(2, int((row_end / rows_total) * height))
+    draw.rectangle([hx0, hy0, hx1, hy1], fill=(255, 107, 157, 130), outline=(255, 107, 157, 255), width=2)
 
 
 def darken(rgb: tuple[int, int, int], factor: float) -> tuple[int, int, int, int]:
@@ -266,6 +453,11 @@ def legend_text_lines(pattern: PatternSheet, *, max_chars: int) -> list[str]:
 def labeled_grid_filename(artwork_id: str) -> str:
     safe_id = "".join(ch for ch in artwork_id if ch.isalnum() or ch in {"_", "-"})
     return f"pattern_{safe_id}_with_grid.png"
+
+
+def partition_filename(artwork_id: str, index: int) -> str:
+    safe_id = "".join(ch for ch in artwork_id if ch.isalnum() or ch in {"_", "-"})
+    return f"pattern_{safe_id}_partition_{index:02d}.png"
 
 
 def empty_png() -> bytes:

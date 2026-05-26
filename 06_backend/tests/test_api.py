@@ -130,7 +130,15 @@ def test_pattern_build_happy_path_and_error(api_client) -> None:
         headers=headers,
     )
     assert response.status_code == 200
-    assert response.json()["bead_total"] > 0
+    payload = response.json()
+    assert payload["bead_total"] > 0
+    assert payload["metadata"]["artwork_id"]
+    assert payload["metadata"]["labeled_image_url"].endswith("_with_grid.png")
+
+    partitions = client.get(f"/api/pattern/{payload['metadata']['artwork_id']}/partitions", headers=headers)
+    assert partitions.status_code == 200
+    assert partitions.json()["total"] == 4
+    assert partitions.json()["items"][0]["url"].endswith("_partition_01.png")
 
 
 def test_generate_script_artwork_pattern_and_delete_flow(api_client) -> None:
@@ -144,6 +152,8 @@ def test_generate_script_artwork_pattern_and_delete_flow(api_client) -> None:
     generated = client.post("/api/generate/script", json={"image_id": image_id, "size": "26x26"}, headers=headers)
     assert generated.status_code == 200
     artwork_id = generated.json()["artwork_id"]
+    assert generated.json()["pattern"]["metadata"]["artwork_id"] == artwork_id
+    assert generated.json()["pattern"]["metadata"]["labeled_image_url"].endswith("_with_grid.png")
 
     assert client.get("/api/artwork/list", headers=headers).json()[0]["artwork_id"] == artwork_id
     assert client.get(f"/api/artwork/{artwork_id}", headers=headers).status_code == 200

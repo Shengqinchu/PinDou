@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 from pindou.pattern.builder import NoBead, PatternBuilder
-from pindou.pattern.exporter import PatternExporter, labeled_grid_filename
+from pindou.pattern.exporter import PatternExporter, labeled_grid_filename, partition_filename
 from pindou.pattern.postprocess import detect_and_remove_white_bg
 from pindou.providers.base import SizePreset
 
@@ -141,6 +141,22 @@ def test_labeled_grid_exporter_adds_readable_png_overlay() -> None:
     assert image.width >= 26 * 24
     assert image.height > 26 * 24
     assert labeled_grid_filename("art_123") == "pattern_art_123_with_grid.png"
+
+
+def test_partition_exporter_splits_26_board_into_four_readable_images() -> None:
+    builder = PatternBuilder(target_colors=8)
+    sheet = builder.build(SizePreset.SINGLE_BOARD_26X26, raw_image=read_input("pet_synthetic.png"), mode="script")
+
+    partitions = PatternExporter().export_partitions(sheet, partition_size=13)
+    first = Image.open(io.BytesIO(partitions[0].image))
+
+    assert len(partitions) == 4
+    assert partitions[0].rows == 13
+    assert partitions[0].cols == 13
+    assert first.format == "PNG"
+    assert first.width >= 13 * 30
+    assert first.height > 13 * 30
+    assert partition_filename("art_123", 1) == "pattern_art_123_partition_01.png"
 
 
 def white_bg_raw_image_bytes() -> bytes:
