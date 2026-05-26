@@ -13,6 +13,8 @@ from pindou.pattern.builder import NoBead, PatternSheet
 @dataclass(frozen=True)
 class PartitionImage:
     index: int
+    key: str
+    label: str
     total: int
     row_start: int
     row_end: int
@@ -149,55 +151,59 @@ class PatternExporter:
         raise NotImplementedError("Excel export is reserved for the advanced package task.")
 
     def to_partition_images(self, pattern: PatternSheet, block_size: int = 20) -> list[bytes]:
-        return [partition.image for partition in self.export_partitions(pattern, partition_size=block_size)]
+        _ = block_size
+        return [partition.image for partition in self.export_partitions(pattern)]
 
-    def export_partitions(self, pattern: PatternSheet, partition_size: int = 13) -> list[PartitionImage]:
-        return export_partitions(pattern, partition_size=partition_size)
+    def export_partitions(self, pattern: PatternSheet, partition_size: int | None = None) -> list[PartitionImage]:
+        _ = partition_size
+        return export_partitions(pattern)
 
 
-def export_partitions(pattern: PatternSheet, partition_size: int = 13) -> list[PartitionImage]:
+def export_partitions(pattern: PatternSheet, partition_size: int | None = None) -> list[PartitionImage]:
+    _ = partition_size
     grid = pattern.grid
     if not grid or not grid[0]:
         return []
 
     rows = len(grid)
     cols = max(len(row) for row in grid)
-    row_blocks = (rows + partition_size - 1) // partition_size
-    col_blocks = (cols + partition_size - 1) // partition_size
-    total = row_blocks * col_blocks
+    row_mid = (rows + 1) // 2
+    col_mid = (cols + 1) // 2
+    total = 4
     partitions: list[PartitionImage] = []
 
-    index = 1
-    for block_row in range(row_blocks):
-        row_start = block_row * partition_size
-        row_end = min(rows, row_start + partition_size)
-        for block_col in range(col_blocks):
-            col_start = block_col * partition_size
-            col_end = min(cols, col_start + partition_size)
-            image = render_partition_image(
-                pattern,
+    quadrants = [
+        (1, "top_left", "左上区", "Top Left", 0, row_mid, 0, col_mid),
+        (2, "top_right", "右上区", "Top Right", 0, row_mid, col_mid, cols),
+        (3, "bottom_left", "左下区", "Bottom Left", row_mid, rows, 0, col_mid),
+        (4, "bottom_right", "右下区", "Bottom Right", row_mid, rows, col_mid, cols),
+    ]
+    for index, key, label, title, row_start, row_end, col_start, col_end in quadrants:
+        image = render_partition_image(
+            pattern,
+            index=index,
+            title=title,
+            total=total,
+            row_start=row_start,
+            row_end=row_end,
+            col_start=col_start,
+            col_end=col_end,
+        )
+        partitions.append(
+            PartitionImage(
                 index=index,
+                key=key,
+                label=label,
                 total=total,
                 row_start=row_start,
                 row_end=row_end,
                 col_start=col_start,
                 col_end=col_end,
-                partition_size=partition_size,
+                rows=row_end - row_start,
+                cols=col_end - col_start,
+                image=image,
             )
-            partitions.append(
-                PartitionImage(
-                    index=index,
-                    total=total,
-                    row_start=row_start,
-                    row_end=row_end,
-                    col_start=col_start,
-                    col_end=col_end,
-                    rows=row_end - row_start,
-                    cols=col_end - col_start,
-                    image=image,
-                )
-            )
-            index += 1
+        )
     return partitions
 
 
@@ -205,19 +211,19 @@ def render_partition_image(
     pattern: PatternSheet,
     *,
     index: int,
+    title: str,
     total: int,
     row_start: int,
     row_end: int,
     col_start: int,
     col_end: int,
-    partition_size: int,
 ) -> bytes:
-    cell_size = 30
     padding = 18
     title_height = 58
     legend_height = 34
     rows = row_end - row_start
     cols = col_end - col_start
+    cell_size = partition_cell_size(rows, cols)
     grid_width = cols * cell_size
     grid_height = rows * cell_size
     width = max(grid_width + padding * 2, 430)
@@ -227,7 +233,7 @@ def render_partition_image(
 
     title_font = load_font(24)
     subtitle_font = load_font(14)
-    draw.text((padding, 14), f"Part {index} / {total}", font=title_font, fill=(31, 31, 31, 255))
+    draw.text((padding, 14), f"{title} / Part {index} of {total}", font=title_font, fill=(31, 31, 31, 255))
     draw.text(
         (padding, 42),
         f"Rows {row_start + 1}-{row_end} / Cols {col_start + 1}-{col_end}",
@@ -274,7 +280,11 @@ def render_partition_image(
                 continue
             draw_bead_square(draw, x0, y0, x1, y1, fill=(*bead.rgb, 255), outline=darken(bead.rgb, factor=0.72))
             code = bead.code
+            if not should_draw_partition_code(code, cell_size):
+                continue
             code_font = fit_cell_code_font(draw, code, cell_size)
+            if code_font is None:
+                continue
             text_box = draw.textbbox((0, 0), code, font=code_font)
             text_w = text_box[2] - text_box[0]
             text_h = text_box[3] - text_box[1]
@@ -298,12 +308,17 @@ def render_partition_image(
         overlay_draw.line([(grid_left, y), (grid_left + grid_width, y)], fill=(96, 96, 96, 80), width=1)
     image.alpha_composite(overlay)
 
-    footer = f"{partition_size}x{partition_size} cells per part. Finish parts in order."
+    footer = f"{cols}x{rows} cells in this quadrant. Tap image to zoom."
     draw.text((padding, grid_top + grid_height + 10), footer, font=subtitle_font, fill=(90, 90, 90, 255))
 
     output = io.BytesIO()
     image.save(output, format="PNG")
     return output.getvalue()
+
+
+def partition_cell_size(rows: int, cols: int) -> int:
+    max_dim = max(rows, cols, 1)
+    return max(7, min(30, 390 // max_dim))
 
 
 def draw_partition_minimap(
@@ -433,7 +448,15 @@ def load_monospace_font(size: int) -> ImageFont.ImageFont:
     return load_font(size)
 
 
-def fit_cell_code_font(draw: ImageDraw.ImageDraw, code: str, cell_size: int) -> ImageFont.ImageFont:
+def should_draw_partition_code(code: str, cell_size: int) -> bool:
+    if not code or cell_size < 10:
+        return False
+    if len(code) >= 3 and cell_size < 13:
+        return False
+    return True
+
+
+def fit_cell_code_font(draw: ImageDraw.ImageDraw, code: str, cell_size: int) -> ImageFont.ImageFont | None:
     max_width = int(cell_size * 0.7)
     font_size = max(8, int(round(cell_size * 0.32)))
     if len(code) >= 3:
@@ -445,7 +468,7 @@ def fit_cell_code_font(draw: ImageDraw.ImageDraw, code: str, cell_size: int) -> 
         if text_box[2] - text_box[0] <= max_width:
             return font
         font_size -= 1
-    return load_monospace_font(8)
+    return None
 
 
 def font_line_height(font: ImageFont.ImageFont) -> int:

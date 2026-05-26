@@ -137,8 +137,12 @@ def test_pattern_build_happy_path_and_error(api_client) -> None:
 
     partitions = client.get(f"/api/pattern/{payload['metadata']['artwork_id']}/partitions", headers=headers)
     assert partitions.status_code == 200
-    assert partitions.json()["total"] == 4
-    assert partitions.json()["items"][0]["url"].endswith("_partition_01.png")
+    partition_payload = partitions.json()
+    assert partition_payload["total"] == 4
+    assert partition_payload["partition_layout"] == "2x2"
+    assert partition_payload["items"][0]["label"] == "左上区"
+    assert partition_payload["items"][0]["grid_offset"] == {"row": 0, "col": 0}
+    assert partition_payload["items"][0]["url"].endswith("_partition_01.png")
 
 
 def test_generate_script_artwork_pattern_and_delete_flow(api_client) -> None:

@@ -85,33 +85,38 @@ def get_pattern_partitions(
     artwork_id: str,
     current_user: CurrentUser,
     db: DbSession,
-    partition_size: int = 13,
+    partition_size: int | None = None,
 ) -> dict:
-    """返回高级分区图 URL 列表；前端用于 13x13 子图查看。"""
+    """返回高级分区图 URL 列表；固定为 2x2 四象限。"""
+    _ = partition_size
     artwork = ArtworkService(db).get_artwork(artwork_id)
     if artwork is None or artwork.user_id != current_user.user_id:
         raise ApiException(404, ErrorCode.ARTWORK_NOT_FOUND, "没有找到这个作品。")
     sheet = pattern_sheet_from_frontend_dict(artwork.pattern_json)
-    partitions = PatternExporter().export_partitions(sheet, partition_size=partition_size)
+    partitions = PatternExporter().export_partitions(sheet)
     items: list[dict] = []
     for partition in partitions:
         _path, url = save_pattern_png(partition_filename(artwork_id, partition.index), partition.image)
         items.append(
             {
                 "index": partition.index,
-                "label": f"第 {partition.index} 区 / 共 {partition.total} 区",
+                "key": partition.key,
+                "label": partition.label,
                 "row_start": partition.row_start,
                 "row_end": partition.row_end,
                 "col_start": partition.col_start,
                 "col_end": partition.col_end,
+                "grid_offset": {"row": partition.row_start, "col": partition.col_start},
                 "rows": partition.rows,
                 "cols": partition.cols,
                 "url": url,
             }
         )
+    max_partition_dim = max((max(partition.rows, partition.cols) for partition in partitions), default=0)
     return {
         "artwork_id": artwork_id,
-        "partition_size": partition_size,
+        "partition_size": max_partition_dim,
+        "partition_layout": "2x2",
         "rows": len(sheet.grid),
         "cols": max((len(row) for row in sheet.grid), default=0),
         "total": len(items),

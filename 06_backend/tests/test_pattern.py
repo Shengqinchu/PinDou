@@ -143,19 +143,28 @@ def test_labeled_grid_exporter_adds_readable_png_overlay() -> None:
     assert labeled_grid_filename("art_123") == "pattern_art_123_with_grid.png"
 
 
-def test_partition_exporter_splits_26_board_into_four_readable_images() -> None:
+def test_partition_exporter_splits_standard_boards_into_four_quadrants() -> None:
     builder = PatternBuilder(target_colors=8)
-    sheet = builder.build(SizePreset.SINGLE_BOARD_26X26, raw_image=read_input("pet_synthetic.png"), mode="script")
+    expected = {
+        SizePreset.SINGLE_BOARD_26X26: 13,
+        SizePreset.DOUBLE_BOARD_52X52: 26,
+        SizePreset.TRIPLE_BOARD_78X78: 39,
+        SizePreset.FOUR_BOARD_104X104: 52,
+    }
 
-    partitions = PatternExporter().export_partitions(sheet, partition_size=13)
-    first = Image.open(io.BytesIO(partitions[0].image))
+    for size, quadrant_dim in expected.items():
+        sheet = builder.build(size, raw_image=read_input("pet_synthetic.png"), mode="script")
+        partitions = PatternExporter().export_partitions(sheet, partition_size=13)
+        first = Image.open(io.BytesIO(partitions[0].image))
 
-    assert len(partitions) == 4
-    assert partitions[0].rows == 13
-    assert partitions[0].cols == 13
-    assert first.format == "PNG"
-    assert first.width >= 13 * 30
-    assert first.height > 13 * 30
+        assert len(partitions) == 4
+        assert [partition.key for partition in partitions] == ["top_left", "top_right", "bottom_left", "bottom_right"]
+        assert [partition.label for partition in partitions] == ["左上区", "右上区", "左下区", "右下区"]
+        assert partitions[0].rows == quadrant_dim
+        assert partitions[0].cols == quadrant_dim
+        assert first.format == "PNG"
+        assert first.width >= quadrant_dim * 7
+        assert first.height > quadrant_dim * 7
     assert partition_filename("art_123", 1) == "pattern_art_123_partition_01.png"
 
 
@@ -163,6 +172,7 @@ def test_partition_cell_code_font_fits_multi_character_codes() -> None:
     image = Image.new("RGBA", (60, 60), (255, 255, 255, 255))
     draw = ImageDraw.Draw(image)
     font = fit_cell_code_font(draw, "R12", 30)
+    assert font is not None
     bbox = draw.textbbox((0, 0), "R12", font=font)
 
     assert bbox[2] - bbox[0] <= 21
