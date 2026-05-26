@@ -105,6 +105,23 @@
 
 ---
 
+## 10. 拼豆板 board_profile 多规格支持
+- **当前决策**（ADR-010 + quality_review_v2）：MVP 默认 26×26（国内拼豆板规格，单板/双板/三板/四板 = 26/52/78/104）
+- **Codex 调研发现**：Hama / Perler / Artkal 等国际品牌偏 **29×29** 大方板（Hama 841 pins / Perler 5.7 inch / Artkal 14.5cm）
+- **当前不支持国际板**：所有 26-倍数尺寸预设没考虑 29-倍数
+- **触发条件 = 必须升级**：
+  - [ ] PinDou 月活 ≥ 5000 且海外用户占比 ≥ 5%
+  - [ ] 用户在小红书反馈 "我用的是 Hama 板" 频次 > 月 30 次
+  - [ ] 国际品牌色卡 UI 暴露（FUTURE_WORK 第 7 条触发）
+- **回头要做**：
+  - 设计 `board_profile` schema（含 board_size / unit_mm / pin_count_per_board）
+  - SizePreset 与 board_profile 关联，按用户选的 board 动态生成尺寸预设
+  - 后端 PatternBuilder.build 加 board_profile 参数
+  - 前端选择 board 时尺寸预设联动
+- **预计阶段**：Phase 4+
+- **风险等级**：低（数据已就绪，国内 MVP 不阻塞）
+- **记录日期**：2026-05-25（v2 调优 Codex 调研发现）
+
 ## 9. CDK 频控升级（Redis / DB attempt log）
 - **当前决策**：CDK 兑换频控用单进程内存 dict 存"用户最近 N 次尝试时间"（task 4 实现）
 - **MVP 期 OK**：Phase 2 / 3 单 worker 部署（uvicorn 默认）足够，无并发问题
