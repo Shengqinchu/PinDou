@@ -153,14 +153,10 @@ const handleShowQR = async () => {
     if (selectedPlan.value === 'single') sku = 'single_9.9';
     else if (selectedPlan.value === 'artisan') sku = 'custom_99';
     
-    // 1. 创建订单
-    const order = await paymentStore.createOrder(sku, props.artworkId);
+    // 1. 创建订单并获取客服二维码
+    const { order, qrInfo } = await paymentStore.createPayOrder(sku, props.artworkId);
     orderId.value = order.order_id;
-    
-    // 2. 获取客服二维码
-    const qrData = await paymentStore.getCustomerServiceQR(order.order_id);
-    // 强制使用本地的高保真 placeholder 保证演示效果
-    qrUrl.value = qrData.qr_url || '/static/assets/qr-placeholder.svg';
+    qrUrl.value = qrInfo.qr_url || '/static/assets/qr-placeholder.svg';
     
     currentState.value = 'qr';
   } catch (e) {
@@ -183,18 +179,25 @@ const handleShowQR = async () => {
   display: flex;
   align-items: flex-end;
   backdrop-filter: blur(4px);
+  box-sizing: border-box;
+  padding-top: 64px;
 }
 
 /* ===== Sheet shell ===== */
 .paywall__sheet {
   width: 100%;
+  max-height: calc(100vh - 64px);
   background: var(--pd-card);
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
-  padding: 8px 20px 24px;
+  padding: 8px 20px calc(24px + constant(safe-area-inset-bottom));
+  padding: 8px 20px calc(24px + env(safe-area-inset-bottom));
   box-shadow: 0 -12px 40px rgba(45, 45, 45, 0.18);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
 
 .paywall__handle {
@@ -238,6 +241,7 @@ const handleShowQR = async () => {
 
 .paywall__plan {
   position: relative;
+  min-width: 0;
   border-radius: var(--pd-r-card);
   background: var(--pd-bg);
   border: 1.5px solid transparent;
@@ -338,7 +342,8 @@ const handleShowQR = async () => {
 
 /* ===== QR sub-state ===== */
 .paywall__sheet--qr { 
-  padding-bottom: 24px; 
+  padding-bottom: calc(24px + constant(safe-area-inset-bottom));
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
 }
 
 .paywall__qr-wrap {
@@ -410,6 +415,10 @@ const handleShowQR = async () => {
   font-size: 12px;
   font-weight: 600;
   color: var(--pd-fg-1);
+  min-width: 0;
+  max-width: 70%;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .paywall__qr-hint {
@@ -427,5 +436,32 @@ const handleShowQR = async () => {
 .sheet-enter-from, .sheet-leave-to {
   transform: translateY(100%);
   opacity: 0;
+}
+
+@media (max-width: 360px) {
+  .paywall__sheet {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .paywall__plans {
+    gap: 6px;
+  }
+
+  .paywall__plan {
+    padding: 12px 6px 10px;
+  }
+
+  .paywall__plan-price {
+    font-size: 20px;
+  }
+
+  .paywall__plan-meta {
+    font-size: 9px;
+  }
+
+  .paywall__subtitle {
+    font-size: 11px;
+  }
 }
 </style>

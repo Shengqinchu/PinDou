@@ -90,8 +90,8 @@ import { onLoad } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import { api, PartitionItem, PatternSheet } from '../../api';
 import { BASE_URL } from '../../utils/request';
+import { readStoredPattern } from '../../store/artwork';
 
-const CURRENT_PATTERN_KEY = 'pd_current_pattern';
 const API_ORIGIN = BASE_URL.replace(/\/api\/v\d+$/, '');
 const QUADRANT_TITLES = ['左上区', '右上区', '左下区', '右下区'];
 const QUADRANT_SHORT_TITLES = ['左上', '右上', '左下', '右下'];
@@ -122,12 +122,6 @@ onLoad((options: any) => {
   cols.value = storedPattern.value?.grid[0]?.length || 0;
   loadPartitions();
 });
-
-const readStoredPattern = (): PatternSheet | null => {
-  const stored = uni.getStorageSync(CURRENT_PATTERN_KEY);
-  if (!stored) return null;
-  return stored as PatternSheet;
-};
 
 const patternImageUrl = computed(() => {
   const url = storedPattern.value?.image_url || storedPattern.value?.metadata?.labeled_image_url || '';

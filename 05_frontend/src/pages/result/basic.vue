@@ -138,12 +138,11 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import Paywall from '../../components/Paywall.vue';
-import { useArtworkStore } from '../../store/artwork';
+import { readStoredPattern, useArtworkStore } from '../../store/artwork';
 import { PatternSheet, ColorRef } from '../../api';
 import { BASE_URL } from '../../utils/request';
 
 const artworkStore = useArtworkStore();
-const CURRENT_PATTERN_KEY = 'pd_current_pattern';
 const ZOOM_HINT_KEY = 'pd_pattern_zoom_hint_seen';
 const API_ORIGIN = BASE_URL.replace(/\/api\/v\d+$/, '');
 
@@ -177,12 +176,6 @@ onLoad((options: any) => {
     isFallback.value = true;
   }
 });
-
-const readStoredPattern = (): PatternSheet | null => {
-  const stored = uni.getStorageSync(CURRENT_PATTERN_KEY);
-  if (!stored) return null;
-  return stored as PatternSheet;
-};
 
 const emptyPattern: PatternSheet = {
   grid: [],

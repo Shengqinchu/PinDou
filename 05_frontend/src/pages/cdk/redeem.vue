@@ -191,10 +191,12 @@ const handleGoHome = () => {
 
 <style scoped lang="scss">
 .cdk {
-  padding: 24px 24px;
+  padding: 22px 22px calc(24px + constant(safe-area-inset-bottom));
+  padding: 22px 22px calc(24px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 120px); /* 让布局完美撑满 */
+  min-height: calc(100vh - 120px);
+  box-sizing: border-box;
 }
 
 .cdk__hint {
@@ -226,12 +228,12 @@ const handleGoHome = () => {
 .cdk__input {
   width: 100%;
   font-family: var(--pd-font-mono);
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  letter-spacing: 2px;
+  letter-spacing: 1.2px;
   text-align: center;
   color: var(--pd-fg-1);
-  padding: 18px 16px;
+  padding: 17px 12px;
   border-radius: var(--pd-r-input);
   border: 1.5px solid var(--pd-divider);
   background: #fff;
@@ -311,16 +313,18 @@ const handleGoHome = () => {
 .cdk__help {
   align-self: center;
   cursor: pointer;
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 
 /* ===== Success state ===== */
 .cdk__success {
-  padding: 28px 24px 24px;
+  padding: 28px 22px calc(24px + constant(safe-area-inset-bottom));
+  padding: 28px 22px calc(24px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: calc(100vh - 120px);
+  min-height: calc(100vh - 120px);
+  box-sizing: border-box;
 }
 
 .cdk__success-burst {
@@ -396,6 +400,9 @@ const handleGoHome = () => {
   font-size: 12px;
   font-weight: 500;
   color: var(--pd-fg-2);
+  max-width: 62%;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .cdk__success-actions {
@@ -405,5 +412,28 @@ const handleGoHome = () => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+@media (max-width: 360px) {
+  .cdk,
+  .cdk__success {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .cdk__hint {
+    font-size: 12px;
+  }
+
+  .cdk__input {
+    font-size: 16px;
+    letter-spacing: 0.8px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .cdk__success-row {
+    gap: 12px;
+  }
 }
 </style>
