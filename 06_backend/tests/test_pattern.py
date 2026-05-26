@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 from pindou.pattern.builder import NoBead, PatternBuilder
-from pindou.pattern.exporter import PatternExporter, labeled_grid_filename, partition_filename
+from pindou.pattern.exporter import PatternExporter, fit_cell_code_font, labeled_grid_filename, partition_filename
 from pindou.pattern.postprocess import detect_and_remove_white_bg
 from pindou.providers.base import SizePreset
 
@@ -157,6 +157,15 @@ def test_partition_exporter_splits_26_board_into_four_readable_images() -> None:
     assert first.width >= 13 * 30
     assert first.height > 13 * 30
     assert partition_filename("art_123", 1) == "pattern_art_123_partition_01.png"
+
+
+def test_partition_cell_code_font_fits_multi_character_codes() -> None:
+    image = Image.new("RGBA", (60, 60), (255, 255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    font = fit_cell_code_font(draw, "R12", 30)
+    bbox = draw.textbbox((0, 0), "R12", font=font)
+
+    assert bbox[2] - bbox[0] <= 21
 
 
 def white_bg_raw_image_bytes() -> bytes:

@@ -227,11 +227,10 @@ def render_partition_image(
 
     title_font = load_font(24)
     subtitle_font = load_font(14)
-    code_font = load_font(16)
-    draw.text((padding, 14), f"第 {index} 区 / 共 {total} 区", font=title_font, fill=(31, 31, 31, 255))
+    draw.text((padding, 14), f"Part {index} / {total}", font=title_font, fill=(31, 31, 31, 255))
     draw.text(
         (padding, 42),
-        f"行 {row_start + 1}-{row_end} / 列 {col_start + 1}-{col_end}",
+        f"Rows {row_start + 1}-{row_end} / Cols {col_start + 1}-{col_end}",
         font=subtitle_font,
         fill=(118, 118, 118, 255),
     )
@@ -275,11 +274,15 @@ def render_partition_image(
                 continue
             draw_bead_square(draw, x0, y0, x1, y1, fill=(*bead.rgb, 255), outline=darken(bead.rgb, factor=0.72))
             code = bead.code
+            code_font = fit_cell_code_font(draw, code, cell_size)
             text_box = draw.textbbox((0, 0), code, font=code_font)
             text_w = text_box[2] - text_box[0]
             text_h = text_box[3] - text_box[1]
+            cell_padding = max(3, int(cell_size * 0.15))
+            text_x = x0 + max(cell_padding, (cell_size - text_w) / 2)
+            text_x = min(text_x, x1 - cell_padding - text_w)
             draw.text(
-                (x0 + (cell_size - text_w) / 2, y0 + (cell_size - text_h) / 2 - 1),
+                (text_x, y0 + (cell_size - text_h) / 2 - 1),
                 code,
                 font=code_font,
                 fill=contrast_text(bead.rgb),
@@ -295,7 +298,7 @@ def render_partition_image(
         overlay_draw.line([(grid_left, y), (grid_left + grid_width, y)], fill=(96, 96, 96, 80), width=1)
     image.alpha_composite(overlay)
 
-    footer = f"每区 {partition_size}x{partition_size}；按编号拼完后再拼下一区。"
+    footer = f"{partition_size}x{partition_size} cells per part. Finish parts in order."
     draw.text((padding, grid_top + grid_height + 10), footer, font=subtitle_font, fill=(90, 90, 90, 255))
 
     output = io.BytesIO()
@@ -419,6 +422,30 @@ def load_font(size: int) -> ImageFont.ImageFont:
         except OSError:
             continue
     return ImageFont.load_default()
+
+
+def load_monospace_font(size: int) -> ImageFont.ImageFont:
+    for name in ("DejaVuSansMono.ttf", "consola.ttf", "Consolas.ttf", "cour.ttf"):
+        try:
+            return ImageFont.truetype(name, size=size)
+        except OSError:
+            continue
+    return load_font(size)
+
+
+def fit_cell_code_font(draw: ImageDraw.ImageDraw, code: str, cell_size: int) -> ImageFont.ImageFont:
+    max_width = int(cell_size * 0.7)
+    font_size = max(8, int(round(cell_size * 0.32)))
+    if len(code) >= 3:
+        font_size = max(8, int(font_size * 0.9))
+
+    while font_size >= 8:
+        font = load_monospace_font(font_size)
+        text_box = draw.textbbox((0, 0), code, font=font)
+        if text_box[2] - text_box[0] <= max_width:
+            return font
+        font_size -= 1
+    return load_monospace_font(8)
 
 
 def font_line_height(font: ImageFont.ImageFont) -> int:
