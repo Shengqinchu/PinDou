@@ -60,6 +60,17 @@ class PatternExporter:
         grid_top = self.padding
         grid_right = grid_left + cols * cell_size
         grid_bottom = grid_top + rows * cell_size
+        board_interval = infer_board_interval(cols, rows)
+
+        draw_pegboard_background(
+            draw,
+            grid_left,
+            grid_top,
+            cols,
+            rows,
+            cell_size,
+            board_interval=board_interval,
+        )
 
         for row_idx, row in enumerate(grid):
             for col_idx, bead in enumerate(row):
@@ -143,6 +154,51 @@ def draw_bead_square(
     radius = 2 if (x1 - x0) >= 12 else 1
     box = [x0 + inset, y0 + inset, x1 - inset, y1 - inset]
     draw.rounded_rectangle(box, radius=radius, fill=fill, outline=outline)
+
+
+def draw_pegboard_background(
+    draw: ImageDraw.ImageDraw,
+    grid_left: int,
+    grid_top: int,
+    cols: int,
+    rows: int,
+    cell_size: int,
+    *,
+    board_interval: int | None,
+) -> None:
+    grid_right = grid_left + cols * cell_size
+    grid_bottom = grid_top + rows * cell_size
+    draw.rectangle([grid_left, grid_top, grid_right, grid_bottom], fill=(248, 249, 250, 255))
+
+    peg_radius = max(2, cell_size // 7)
+    peg_outline = (194, 199, 204, 150)
+    peg_fill = (255, 255, 255, 180)
+    for row in range(rows):
+        cy = grid_top + row * cell_size + cell_size / 2
+        for col in range(cols):
+            cx = grid_left + col * cell_size + cell_size / 2
+            draw.ellipse(
+                [cx - peg_radius, cy - peg_radius, cx + peg_radius, cy + peg_radius],
+                fill=peg_fill,
+                outline=peg_outline,
+            )
+
+    if board_interval:
+        boundary = (126, 134, 142, 180)
+        for col in range(board_interval, cols, board_interval):
+            x = grid_left + col * cell_size
+            draw.line([(x, grid_top), (x, grid_bottom)], fill=boundary, width=3)
+        for row in range(board_interval, rows, board_interval):
+            y = grid_top + row * cell_size
+            draw.line([(grid_left, y), (grid_right, y)], fill=boundary, width=3)
+    draw.rectangle([grid_left, grid_top, grid_right, grid_bottom], outline=(160, 166, 173, 180), width=2)
+
+
+def infer_board_interval(cols: int, rows: int) -> int | None:
+    for interval in (26, 29, 27):
+        if cols >= interval and rows >= interval and cols % interval == 0 and rows % interval == 0:
+            return interval
+    return None
 
 
 def contrast_text(rgb: tuple[int, int, int]) -> tuple[int, int, int, int]:
