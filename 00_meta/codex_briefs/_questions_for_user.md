@@ -330,3 +330,23 @@ AI 路径 timeout、脚本 fallback 兔子占位图、标题实体转义、统�
 1. 重启/刷新后端后，在微信开发者工具按 `Ctrl+R`，重新生成一张图纸。
 2. 点击结果页主图或“点击放大”，确认微信原生全屏预览可双指缩放。
 3. 点击“分区查看”，用 `52×52` 重点验证是否拆成 16 张、每张 13×13 子图色号可读。
+
+## 2026-05-26 — Phase 2 product quality tuning v4.1 bugfix review
+
+本轮 v4.1 修复 2 个用户实测 bug：
+
+1. `generate/choice.vue` 的 `&gt;` HTML 实体在小程序里不会自动解码，导致按钮显示“选这个 &gt;”。已全局 `rg "&gt;|&lt;|&amp;|&quot;" 05_frontend/src` 检查，残留只在生成方式页 3 处；已统一替换为 `›`，二次 grep 零命中。
+2. 分区图色号重叠已修：`PatternExporter.render_partition_image()` 改为每个 cell 动态计算色号字体，公式为 `max(8, round(cell_px * 0.32))`，3 字符及以上色号再缩小 10%，并用等宽字体优先、每格左右保留 15% padding。
+3. 分区图色号颜色仍按背景亮度自动黑 / 白；本次同时把分区图内嵌标题改成 ASCII 文案，避免服务器 Pillow 缺中文字体时出现方框乱码。
+
+验证记录：
+
+1. `05_frontend npm run build:mp-weixin` 通过。
+2. `06_backend/.venv/Scripts/python.exe -m pytest tests/test_pattern.py` 通过 10/10；最终全量 pytest 也通过。
+3. 私有灰猫 `user_poc_private/incoming/kitten_gray_photo.png` 已实测：`26×26` 拆 4 张，`52×52` 拆 16 张，样张输出到 `user_poc_private/outgoing/v4_1_partition_font/`（不入 git）。`52×52` 第 1 张分区图色号 H2/H14/H11 清晰、不重叠。
+
+需要用户操作：
+
+1. 微信开发者工具按 `Ctrl+R` 重新编译。
+2. 重新走 AI / 快速生成到选择页，确认“选这个 ›”正常显示。
+3. 重新生成图纸后进入分区查看，确认色号不再贴边或重叠。
