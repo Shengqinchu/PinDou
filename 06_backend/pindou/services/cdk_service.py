@@ -11,7 +11,7 @@ from typing import ClassVar
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from pindou.db.models import CDK, User, utc_now
+from pindou.db.models import CDK, User, as_aware_utc, utc_now
 
 
 logger = logging.getLogger(__name__)
@@ -87,7 +87,7 @@ class CDKService:
         ip: str | None = None,
         now: datetime | None = None,
     ) -> CDK:
-        timestamp = now or utc_now()
+        timestamp = as_aware_utc(now) or utc_now()
         self._record_attempt(user_id=user_id, ip=ip, now=timestamp)
 
         user = self.session.scalar(select(User).where(User.openid == user_id))
@@ -101,7 +101,8 @@ class CDKService:
             raise CDKAlreadyRedeemedError("CDK has already been redeemed.")
         if cdk.status != "active":
             raise CDKInvalidError(f"CDK is not active: {cdk.status}")
-        if cdk.expires_at is not None and cdk.expires_at <= timestamp:
+        cdk_expires_at = as_aware_utc(cdk.expires_at)
+        if cdk_expires_at is not None and cdk_expires_at <= timestamp:
             cdk.status = "expired"
             self.session.commit()
             raise CDKInvalidError("CDK has expired.")
@@ -146,9 +147,11 @@ class CDKService:
 
     @staticmethod
     def _apply_entitlement(*, user: User, cdk: CDK, now: datetime) -> None:
+        timestamp = as_aware_utc(now) or utc_now()
         if cdk.type == "monthly_card":
             days = cdk.value if cdk.value > 1 else 30
-            base = user.monthly_card_expires_at if user.monthly_card_expires_at and user.monthly_card_expires_at > now else now
+            current_expiry = as_aware_utc(user.monthly_card_expires_at)
+            base = current_expiry if current_expiry and current_expiry > timestamp else timestamp
             user.monthly_card_expires_at = base + timedelta(days=days)
             return
 

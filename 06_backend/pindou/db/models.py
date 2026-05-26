@@ -16,6 +16,14 @@ def utc_now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def as_aware_utc(value: datetime | None) -> datetime | None:
+    if value is None:
+        return None
+    if value.tzinfo is None or value.tzinfo.utcoffset(value) is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
+
+
 def uuid_hex() -> str:
     return uuid.uuid4().hex
 

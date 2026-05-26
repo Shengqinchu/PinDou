@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from pindou.api.errors import ApiException, ErrorCode
-from pindou.db.models import DailyQuota, User, utc_now
+from pindou.db.models import DailyQuota, User, as_aware_utc, utc_now
 
 
 SCRIPT_DAILY_FREE_LIMIT = 3
@@ -56,7 +56,8 @@ def consume_white_bg_quota(session: Session, user: User) -> None:
 def consume_ai_credit(session: Session, user: User) -> None:
     now = utc_now()
     if has_ai_credit(user, now=now):
-        if user.monthly_card_expires_at is not None and user.monthly_card_expires_at > now:
+        monthly_card_expires_at = as_aware_utc(user.monthly_card_expires_at)
+        if monthly_card_expires_at is not None and monthly_card_expires_at > now:
             return
         if user.paid_credits > 0:
             user.paid_credits -= 1
@@ -75,8 +76,9 @@ def require_ai_credit_available(user: User) -> None:
 
 
 def has_ai_credit(user: User, *, now=None) -> bool:
-    now = now or utc_now()
-    if user.monthly_card_expires_at is not None and user.monthly_card_expires_at > now:
+    now = as_aware_utc(now) or utc_now()
+    monthly_card_expires_at = as_aware_utc(user.monthly_card_expires_at)
+    if monthly_card_expires_at is not None and monthly_card_expires_at > now:
         return True
     if user.paid_credits > 0:
         return True

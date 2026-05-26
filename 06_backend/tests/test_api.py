@@ -1,18 +1,19 @@
 from __future__ import annotations
 
 import io
+from datetime import datetime
 from collections.abc import Iterator
 
 import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from pindou.api.deps import get_db
 from pindou.config import get_settings
-from pindou.db.models import Base
+from pindou.db.models import Base, User
 from pindou.main import create_app
 from pindou.providers.base import PreviewResult
 from pindou.services.cdk_service import CDKService
@@ -185,6 +186,39 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
     assert preview_only.json()["provider_used"] == "fake"
     assert "preview_id" in preview_only.json()
     assert "pattern" not in preview_only.json()
+
+
+def test_preview_generate_accepts_sqlite_naive_monthly_card(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, session_factory = api_client
+    headers = auth_headers(client)
+
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid.like("wx_%")))
+        assert user is not None
+        user.free_credits_remaining = 0
+        user.paid_credits = 0
+        user.monthly_card_expires_at = datetime(2099, 1, 1, 0, 0, 0)
+        session.commit()
+
+    class FakeChain:
+        def generate(self, image: bytes, style_preset, size_preset, seed=None) -> PreviewResult:
+            return PreviewResult.from_image_bytes(
+                png_bytes((255, 255, 255)),
+                target_color_count=8,
+                provider_used="fake",
+                cost_estimate=0.0,
+                latency_ms=10,
+            )
+
+    monkeypatch.setattr("pindou.api.generate.build_preview_chain", lambda: FakeChain())
+    response = client.post(
+        "/api/v1/preview/generate",
+        data={"style_preset": "q_portrait", "size_preset": "26x26"},
+        files={"image": ("sample.png", png_bytes((255, 255, 255)), "image/png")},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    assert response.json()["provider_used"] == "fake"
 
 
 def test_payment_and_admin_confirm_flow(api_client) -> None:
