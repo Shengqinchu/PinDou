@@ -110,11 +110,13 @@ export interface PatternSheet {
 
 export interface PartitionItem {
   index: number;
+  key?: string;
   label: string;
   row_start: number;
   row_end: number;
   col_start: number;
   col_end: number;
+  grid_offset?: { row: number; col: number };
   rows: number;
   cols: number;
   url: string;
@@ -126,6 +128,7 @@ export interface PartitionSheet {
   rows: number;
   cols: number;
   total: number;
+  partition_layout?: string;
   items: PartitionItem[];
 }
 

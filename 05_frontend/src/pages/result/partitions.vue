@@ -9,19 +9,24 @@
           mode="aspectFit"
           @click="previewFullPattern"
         />
+        <div v-else class="partitions__overview-placeholder">
+          <span></span>
+        </div>
+
         <div class="partitions__overview-info">
           <span class="partitions__overview-title">全图位置</span>
           <span class="partitions__overview-sub">{{ sheetSizeLabel }} · {{ totalLabel }}</span>
-          <div class="partitions__map" :style="overviewMapStyle">
-            <span
+          <div class="partitions__map" aria-label="四区位置">
+            <button
               v-for="cell in overviewCells"
               :key="cell.index"
+              type="button"
               class="partitions__map-cell"
-              :class="{
-                'partitions__map-cell--active': cell.index === currentIndex,
-                'partitions__map-cell--done': doneIndexes.includes(cell.index)
-              }"
-            ></span>
+              :class="{ 'partitions__map-cell--active': cell.index === activeIndex }"
+              @click="previewPartition(cell.index)"
+            >
+              {{ cell.shortLabel }}
+            </button>
           </div>
         </div>
       </div>
@@ -37,41 +42,20 @@
         <button type="button" class="btn btn--primary btn--md" @click="loadPartitions">重试</button>
       </div>
 
-      <template v-else>
-        <swiper
-          class="partitions__swiper"
-          :current="currentIndex"
-          @change="handleSwiperChange"
-        >
-          <swiper-item
-            v-for="item in partitions"
-            :key="item.index"
-            class="partitions__slide"
-          >
-            <image
-              class="partitions__image"
-              :src="normalizeAssetUrl(item.url)"
-              mode="widthFix"
-              @click="previewPartition(item.index - 1)"
-            />
-          </swiper-item>
-        </swiper>
-
-        <div class="partitions__pager">
-          <button type="button" class="partitions__nav" :disabled="currentIndex === 0" @click="goPrev">上一 区</button>
-          <span class="partitions__counter">{{ currentIndex + 1 }} / {{ partitions.length }}</span>
-          <button type="button" class="partitions__nav" :disabled="currentIndex >= partitions.length - 1" @click="goNext">下一 区</button>
-        </div>
-
+      <div v-else class="partitions__grid">
         <button
+          v-for="item in quadrantItems"
+          :key="item.index"
           type="button"
-          class="partitions__done"
-          :class="{ 'partitions__done--active': isCurrentDone }"
-          @click="toggleCurrentDone"
+          class="partitions__card"
+          :class="{ 'partitions__card--active': item.index - 1 === activeIndex }"
+          @click="previewPartition(item.index - 1)"
         >
-          {{ isCurrentDone ? '已拼完 · 点此取消' : '标记这一区已拼完' }}
+          <span class="partitions__card-title">{{ item.title }}</span>
+          <image class="partitions__thumb" :src="item.imageUrl" mode="aspectFit" />
+          <span class="partitions__card-meta">{{ item.cols }}×{{ item.rows }} · 轻点放大</span>
         </button>
-      </template>
+      </div>
     </section>
   </MiniProgramLayout>
 </template>
@@ -85,17 +69,16 @@ import { BASE_URL } from '../../utils/request';
 
 const CURRENT_PATTERN_KEY = 'pd_current_pattern';
 const API_ORIGIN = BASE_URL.replace(/\/api\/v\d+$/, '');
+const QUADRANT_TITLES = ['左上区', '右上区', '左下区', '右下区'];
+const QUADRANT_SHORT_TITLES = ['左上', '右上', '左下', '右下'];
 
 const artworkId = ref('');
 const isLoading = ref(false);
 const errorMsg = ref('');
-const currentIndex = ref(0);
+const activeIndex = ref(0);
 const partitions = ref<PartitionItem[]>([]);
-const partitionSize = ref(13);
 const rows = ref(0);
 const cols = ref(0);
-const doneIndexes = ref<number[]>([]);
-
 const storedPattern = ref<PatternSheet | null>(null);
 
 onLoad((options: any) => {
@@ -103,7 +86,6 @@ onLoad((options: any) => {
   storedPattern.value = readStoredPattern();
   rows.value = storedPattern.value?.grid.length || 0;
   cols.value = storedPattern.value?.grid[0]?.length || 0;
-  loadDoneState();
   loadPartitions();
 });
 
@@ -118,17 +100,23 @@ const patternImageUrl = computed(() => {
   return normalizeAssetUrl(url);
 });
 
-const overviewCols = computed(() => Math.max(1, Math.ceil(cols.value / partitionSize.value)));
-const overviewRows = computed(() => Math.max(1, Math.ceil(rows.value / partitionSize.value)));
-const overviewCells = computed(() => {
-  return Array.from({ length: overviewCols.value * overviewRows.value }, (_item, index) => ({ index }));
+const quadrantItems = computed(() => {
+  return partitions.value.slice(0, 4).map((item, index) => ({
+    ...item,
+    title: item.label || QUADRANT_TITLES[index] || `第 ${index + 1} 区`,
+    imageUrl: normalizeAssetUrl(item.url)
+  }));
 });
-const overviewMapStyle = computed(() => ({
-  gridTemplateColumns: `repeat(${overviewCols.value}, 1fr)`
-}));
+
+const overviewCells = computed(() => {
+  return Array.from({ length: 4 }, (_item, index) => ({
+    index,
+    shortLabel: QUADRANT_SHORT_TITLES[index]
+  }));
+});
+
 const sheetSizeLabel = computed(() => `${cols.value || '-'} × ${rows.value || '-'}`);
-const totalLabel = computed(() => partitions.value.length ? `${partitions.value.length} 区` : '待生成');
-const isCurrentDone = computed(() => doneIndexes.value.includes(currentIndex.value));
+const totalLabel = computed(() => quadrantItems.value.length ? `${quadrantItems.value.length} 区` : '待生成');
 
 const normalizeAssetUrl = (url: string) => {
   if (!url) return '';
@@ -146,11 +134,10 @@ const loadPartitions = async () => {
   errorMsg.value = '';
   try {
     const sheet = await api.getPatternPartitions(artworkId.value);
-    partitions.value = sheet.items;
-    partitionSize.value = sheet.partition_size;
+    partitions.value = sheet.items.slice(0, 4);
     rows.value = sheet.rows;
     cols.value = sheet.cols;
-    currentIndex.value = Math.min(currentIndex.value, Math.max(0, sheet.items.length - 1));
+    activeIndex.value = 0;
   } catch (error: any) {
     console.error('加载分区图失败:', error);
     errorMsg.value = error?.message || '网络有点慢，请稍后再试。';
@@ -159,48 +146,15 @@ const loadPartitions = async () => {
   }
 };
 
-const handleSwiperChange = (event: any) => {
-  currentIndex.value = Number(event.detail?.current || 0);
-};
-
-const goPrev = () => {
-  currentIndex.value = Math.max(0, currentIndex.value - 1);
-};
-
-const goNext = () => {
-  currentIndex.value = Math.min(partitions.value.length - 1, currentIndex.value + 1);
-};
-
-const loadDoneState = () => {
-  if (!artworkId.value) return;
-  const stored = uni.getStorageSync(doneStorageKey());
-  doneIndexes.value = Array.isArray(stored) ? stored : [];
-};
-
-const persistDoneState = () => {
-  if (!artworkId.value) return;
-  uni.setStorageSync(doneStorageKey(), doneIndexes.value);
-};
-
-const doneStorageKey = () => `pd_partition_done_${artworkId.value}`;
-
-const toggleCurrentDone = () => {
-  if (isCurrentDone.value) {
-    doneIndexes.value = doneIndexes.value.filter((index) => index !== currentIndex.value);
-  } else {
-    doneIndexes.value = [...doneIndexes.value, currentIndex.value].sort((a, b) => a - b);
-  }
-  persistDoneState();
-};
-
 const previewFullPattern = () => {
   if (!patternImageUrl.value) return;
   uni.previewImage({ current: patternImageUrl.value, urls: [patternImageUrl.value] });
 };
 
 const previewPartition = (index: number) => {
-  const urls = partitions.value.map((item) => normalizeAssetUrl(item.url));
-  if (!urls.length) return;
+  const urls = quadrantItems.value.map((item) => item.imageUrl).filter(Boolean);
+  if (!urls.length || !urls[index]) return;
+  activeIndex.value = index;
   uni.previewImage({ current: urls[index], urls });
 };
 </script>
@@ -221,12 +175,28 @@ const previewPartition = (index: number) => {
   margin-bottom: 14px;
 }
 
-.partitions__overview-image {
+.partitions__overview-image,
+.partitions__overview-placeholder {
   width: 96px;
   height: 96px;
   border-radius: var(--pd-r-img);
   background: #fff;
   flex-shrink: 0;
+}
+
+.partitions__overview-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--pd-divider);
+}
+
+.partitions__overview-placeholder span {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--pd-gradient-warm);
+  opacity: 0.72;
 }
 
 .partitions__overview-info {
@@ -249,26 +219,32 @@ const previewPartition = (index: number) => {
 }
 
 .partitions__map {
+  width: 118px;
   display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 4px;
-  max-width: 150px;
 }
 
 .partitions__map-cell {
-  min-height: 16px;
-  border-radius: 4px;
-  background: var(--pd-bg-warm);
+  min-height: 28px;
   border: 1px solid var(--pd-divider);
+  border-radius: 6px;
+  background: var(--pd-bg-warm);
+  color: var(--pd-fg-2);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 0;
+}
+
+.partitions__map-cell::after,
+.partitions__card::after {
+  border: 0;
 }
 
 .partitions__map-cell--active {
   border-color: var(--pd-pink);
   background: var(--pd-pink-100);
-}
-
-.partitions__map-cell--done {
-  background: #DDF7E6;
-  border-color: #72D99B;
+  color: var(--pd-pink-deep);
 }
 
 .partitions__loading,
@@ -307,73 +283,49 @@ const previewPartition = (index: number) => {
   color: var(--pd-fg-2);
 }
 
-.partitions__swiper {
-  height: 560px;
-  border-radius: var(--pd-r-card);
-  background: var(--pd-card);
-  box-shadow: var(--pd-shadow-card);
-  overflow: hidden;
-}
-
-.partitions__slide {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  overflow-y: auto;
-}
-
-.partitions__image {
-  width: 100%;
-  display: block;
-  background: #fff;
-}
-
-.partitions__pager {
-  margin: 14px 0 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.partitions__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-.partitions__nav {
-  flex: 1;
-  height: 42px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--pd-pink-50);
-  color: var(--pd-pink-deep);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.partitions__nav:disabled {
-  opacity: 0.45;
-}
-
-.partitions__counter {
-  min-width: 64px;
-  text-align: center;
-  font-family: var(--pd-font-display);
-  font-size: 16px;
-  font-weight: 800;
+.partitions__card {
+  min-width: 0;
+  border: 1px solid var(--pd-divider);
+  border-radius: var(--pd-r-card);
+  background: var(--pd-card);
+  box-shadow: var(--pd-shadow-card);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   color: var(--pd-fg-1);
+  text-align: left;
 }
 
-.partitions__done {
-  width: 100%;
-  height: 48px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--pd-bg-warm);
-  color: var(--pd-fg-1);
+.partitions__card--active {
+  border-color: var(--pd-pink);
+  box-shadow: 0 8px 18px rgba(255, 107, 157, 0.16);
+}
+
+.partitions__card-title {
   font-size: 14px;
   font-weight: 800;
+  color: var(--pd-fg-1);
 }
 
-.partitions__done--active {
-  background: #DDF7E6;
-  color: #168C45;
+.partitions__thumb {
+  width: 100%;
+  height: 160px;
+  display: block;
+  border-radius: var(--pd-r-img);
+  background: #fff;
+}
+
+.partitions__card-meta {
+  font-size: 11px;
+  color: var(--pd-fg-2);
+  line-height: 1.4;
 }
 
 @keyframes partitions-pulse {
