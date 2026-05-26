@@ -55,7 +55,7 @@
             <span class="choice__thumb-label">原图</span>
           </div>
           <span class="choice__arrow choice__arrow--basic" aria-hidden="true">
-            <span class="choice__arrow-symbol">&gt;</span>
+            <span class="choice__arrow-symbol">›</span>
           </span>
           <!-- 拼豆图纸样张 -->
           <div class="choice__thumb choice__thumb--basic" aria-hidden="true">
@@ -102,7 +102,7 @@
             <span class="choice__thumb-label">原图</span>
           </div>
           <span class="choice__arrow choice__arrow--premium" aria-hidden="true">
-            <span class="choice__arrow-symbol">&gt;</span>
+            <span class="choice__arrow-symbol">›</span>
           </span>
           <!-- Q版萌宠/自拍 SVG 样张 -->
           <div class="choice__thumb choice__thumb--premium" aria-hidden="true">
@@ -135,7 +135,7 @@
           </div>
           <button class="btn btn--primary btn--sm choice__action">
             选这个
-            <span class="choice__button-arrow" aria-hidden="true">&gt;</span>
+            <span class="choice__button-arrow" aria-hidden="true">›</span>
           </button>
         </div>
       </div>
