@@ -862,16 +862,23 @@ onMounted(() => {
 
 .result__upsell {
   position: relative;
-  justify-content: space-between;
+  justify-content: center;
   padding-left: 22px;
   padding-right: 22px;
   cursor: pointer;
 }
 .result__upsell-text {
-  flex: 1;
-  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 52px;
+  text-align: center;
+  white-space: nowrap;
 }
 .result__upsell-badge {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   padding: 3px 10px;
