@@ -127,8 +127,8 @@ def test_labeled_grid_exporter_adds_readable_png_overlay() -> None:
     image = Image.open(io.BytesIO(png))
 
     assert image.format == "PNG"
-    assert image.width >= 26 * 18
-    assert image.height > 26 * 18
+    assert image.width >= 26 * 22
+    assert image.height > 26 * 22
     assert labeled_grid_filename("art_123") == "pattern_art_123_with_grid.png"
 
 

@@ -47,14 +47,16 @@ class PatternExporter:
             return empty_png()
         rows = len(grid)
         cols = max(len(row) for row in grid)
-        cell_size = max(self.cell_size, 18)
+        cell_size = max(self.cell_size, 22)
         legend_lines = legend_text_lines(pattern, max_chars=max(30, cols * cell_size // 7))
-        legend_height = 18 * max(1, len(legend_lines)) + 12
+        cell_font = load_font(11)
+        legend_font = load_font(15)
+        legend_line_height = font_line_height(legend_font) + 8
+        legend_height = legend_line_height * max(1, len(legend_lines)) + 16
         width = cols * cell_size + self.padding * 2
         height = rows * cell_size + self.padding * 2 + legend_height
         image = Image.new("RGBA", (width, height), (255, 255, 255, 255))
         draw = ImageDraw.Draw(image)
-        font = ImageFont.load_default()
 
         grid_left = self.padding
         grid_top = self.padding
@@ -91,13 +93,13 @@ class PatternExporter:
                 else:
                     draw_bead_square(draw, x0, y0, x1, y1, fill=fill, outline=darken(bead.rgb, factor=0.72))
                 if code:
-                    text_box = draw.textbbox((0, 0), code, font=font)
+                    text_box = draw.textbbox((0, 0), code, font=cell_font)
                     text_w = text_box[2] - text_box[0]
                     text_h = text_box[3] - text_box[1]
                     draw.text(
                         (x0 + (cell_size - text_w) / 2, y0 + (cell_size - text_h) / 2 - 1),
                         code,
-                        font=font,
+                        font=cell_font,
                         fill=text_fill,
                     )
 
@@ -119,8 +121,8 @@ class PatternExporter:
 
         legend_y = grid_bottom + 8
         for line in legend_lines:
-            draw.text((self.padding, legend_y), line, font=font, fill=(45, 45, 45, 255))
-            legend_y += 18
+            draw.text((self.padding, legend_y), line, font=legend_font, fill=(45, 45, 45, 255))
+            legend_y += legend_line_height
 
         output = io.BytesIO()
         image.save(output, format="PNG")
@@ -199,6 +201,20 @@ def infer_board_interval(cols: int, rows: int) -> int | None:
         if cols >= interval and rows >= interval and cols % interval == 0 and rows % interval == 0:
             return interval
     return None
+
+
+def load_font(size: int) -> ImageFont.ImageFont:
+    for name in ("arial.ttf", "DejaVuSans.ttf"):
+        try:
+            return ImageFont.truetype(name, size=size)
+        except OSError:
+            continue
+    return ImageFont.load_default()
+
+
+def font_line_height(font: ImageFont.ImageFont) -> int:
+    bbox = font.getbbox("Hg")
+    return bbox[3] - bbox[1]
 
 
 def contrast_text(rgb: tuple[int, int, int]) -> tuple[int, int, int, int]:
