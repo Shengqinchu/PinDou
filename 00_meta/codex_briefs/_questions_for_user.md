@@ -350,3 +350,26 @@ AI 路径 timeout、脚本 fallback 兔子占位图、标题实体转义、统�
 1. 微信开发者工具按 `Ctrl+R` 重新编译。
 2. 重新走 AI / 快速生成到选择页，确认“选这个 ›”正常显示。
 3. 重新生成图纸后进入分区查看，确认色号不再贴边或重叠。
+
+## 2026-05-26 — Phase 2 product quality tuning v5 review
+
+本轮 v5 按用户最新产品决策完成了分区交互简化：
+
+1. 后端分区算法从“按 13×13 自动拆 N 张”改为固定 `2×2` 四象限，顺序固定为 `左上区 / 右上区 / 左下区 / 右下区`。
+2. `/api/v1/pattern/{artwork_id}/partitions` 保留原有字段，并新增 `key`、`partition_layout=2x2`、`grid_offset`，方便前端画高亮区域；旧 `partition_size` 字段现在表示单个象限的最大边长。
+3. `26×26 / 52×52 / 78×78 / 104×104` 均固定返回 4 张分区图，对应子图尺寸为 `13×13 / 26×26 / 39×39 / 52×52`。
+4. `result/basic.vue` 和 `result/premium.vue` 已移除独立“点击放大”按钮，主图本身可点击调用 `uni.previewImage()`；首次显示轻量“轻点放大”提示，点击后本地记忆不再提示。
+5. 主图旁分区入口文案统一为“📋 查看分区图”。
+6. `pages/result/partitions.vue` 已从 swiper 翻页改为 2×2 象限网格，点击任意象限直接进入原生大图预览，可双指缩放。
+
+验证记录：
+
+1. `06_backend/.venv/Scripts/python.exe -m pytest` 通过 33/33。
+2. `05_frontend npm run build:mp-weixin` 通过。
+3. 私有灰猫 `user_poc_private/incoming/kitten_gray_photo.png` 已实测 `26×26 / 52×52 / 78×78 / 104×104`，均返回 4 张分区图；样张输出到 `user_poc_private/outgoing/v5_2x2_partitions/`（不入 git）。
+
+需要用户操作：
+
+1. 微信开发者工具按 `Ctrl+R` 重新编译。
+2. 重新生成一张 `52×52` 或 `78×78` 图纸，确认结果页主图可直接点击放大。
+3. 点击“📋 查看分区图”，确认页面只显示四个象限卡片，任意卡片点击后可全屏缩放查看。
