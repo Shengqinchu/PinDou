@@ -56,6 +56,17 @@ def test_preview_alpha_path_marks_transparent_cells_as_no_bead() -> None:
     assert any(cell is None for row in sheet.to_frontend_dict()["grid"] for cell in row)
 
 
+def test_custom_size_builds_and_reports_board_alignment_warning() -> None:
+    builder = PatternBuilder(target_colors=8)
+    sheet = builder.build("45x30", raw_image=read_input("cartoon_synthetic.png"), mode="script")
+    frontend = sheet.to_frontend_dict()
+
+    assert_grid_size(sheet, width=45, height=30)
+    assert sheet.metadata["board_aligned"] is False
+    assert "不对齐" in sheet.metadata["warning"]
+    assert frontend["metadata"]["warning"] == sheet.metadata["warning"]
+
+
 def test_white_bg_detect_success() -> None:
     builder = PatternBuilder(target_colors=8)
     raw = white_bg_raw_image_bytes()

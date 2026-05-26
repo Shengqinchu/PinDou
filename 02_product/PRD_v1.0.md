@@ -175,7 +175,14 @@ Phase 2 v1 质量评审曾把默认尺寸从 `80×100` 调整为 `40×40`，解�
 
 公开资料显示 Hama / Perler / Artkal 常见 5mm 大方板更接近 `29×29`。Phase 2 暂不暴露国际板型选择；未来若支持这些品牌，需要新增 `board_profile` 而不是复用当前国产 26 格默认。
 
-**待定**（Phase 2+）：自定义任意尺寸 / 超大尺寸
+#### §4.4.2 自定义尺寸规则（2026-05-26 v3 调优加入）
+
+Phase 2 支持用户在四个推荐预设之外输入自定义 `宽×高`：
+- 格式：整数 `WIDTHxHEIGHT`，例如 `30x30` / `45x45`
+- 范围：最小 `20×20`，最大 `200×200`
+- 长宽比：`0.5-2.0`
+- 预设 `26×26` / `52×52` / `78×78` / `104×104` 保持推荐位
+- 若宽高不是 26 的整数倍，后端仍允许生成，但 `metadata.warning` 返回“不对齐 26 格拼豆板，建议准备约 N 块板后裁边”；前端用黄色提示展示
 
 ### §4.5 脚本快速生成路径（P0 必做，v0.2 新增）
 
@@ -336,7 +343,7 @@ class PreviewProvider:
         self,
         image: bytes,                    # 用户原图（原始字节）
         style_preset: StylePreset,       # Q版人像 / Q版宠物 / Q版情侣 / 通用卡通
-        size_preset: SizePreset,         # 26x26 / 52x52 / 78x78 / 104x104
+        size_preset: SizePreset,         # 26x26 / 52x52 / 78x78 / 104x104 / custom WIDTHxHEIGHT
         seed: int | None = None,         # 可选随机种子，重生成时用
     ) -> PreviewResult:
         ...
@@ -401,7 +408,7 @@ class PatternBuilder:
 
     def build(
         self,
-        size: SizePreset,                # 26x26 / 52x52 / 78x78 / 104x104
+        size: SizePreset,                # 26x26 / 52x52 / 78x78 / 104x104 / custom WIDTHxHEIGHT
         # 两种输入二选一：
         preview: bytes | None = None,    # AI 路径：FinishedPreview PNG with alpha
         raw_image: bytes | None = None,  # 脚本路径：用户原图（jpg/png）

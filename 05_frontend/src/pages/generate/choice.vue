@@ -8,13 +8,37 @@
           v-for="option in SIZE_OPTIONS"
           :key="option.value"
           class="choice__size-option"
-          :class="{ 'choice__size-option--active': selectedSize === option.value }"
+          :class="{ 'choice__size-option--active': !isCustomSize && selectedPresetSize === option.value }"
           type="button"
-          @click.stop="selectedSize = option.value"
+          @click.stop="selectPreset(option.value)"
         >
           <span class="choice__size-title">{{ option.label }}</span>
           <span class="choice__size-sub">{{ option.sub }}</span>
         </button>
+        <button
+          class="choice__size-option"
+          :class="{ 'choice__size-option--active': isCustomSize }"
+          type="button"
+          @click.stop="isCustomSize = true"
+        >
+          <span class="choice__size-title">自定义</span>
+          <span class="choice__size-sub">{{ customSizeLabel }}</span>
+        </button>
+      </div>
+
+      <div v-if="isCustomSize" class="choice__custom-size">
+        <label class="choice__custom-field">
+          <span>宽</span>
+          <input v-model="customWidth" type="number" maxlength="3" inputmode="numeric" />
+        </label>
+        <span class="choice__custom-times">×</span>
+        <label class="choice__custom-field">
+          <span>高</span>
+          <input v-model="customHeight" type="number" maxlength="3" inputmode="numeric" />
+        </label>
+        <p class="choice__custom-hint" :class="`choice__custom-hint--${customSizeHint.tone}`">
+          {{ customSizeHint.text }}
+        </p>
       </div>
 
       <!-- ===== Card A — Quick (free, basic quality) ===== -->
@@ -97,7 +121,7 @@
           </li>
           <li class="choice__bullet">
             <span class="choice__check choice__check--premium" aria-hidden="true">✓</span>
-            默认单板尺寸，大图按拼豆板倍数扩展
+            推荐拼豆板尺寸，也可自定义格数
           </li>
         </ul>
 
@@ -125,20 +149,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import { SizePreset } from '../../api';
 
 const rawImage = ref('');
 const stylePreset = ref('cartoon_fallback');
-const selectedSize = ref<SizePreset>('26x26');
+const selectedPresetSize = ref<SizePreset>('26x26');
+const isCustomSize = ref(false);
+const customWidth = ref('30');
+const customHeight = ref('30');
 const SIZE_OPTIONS: Array<{ value: SizePreset; label: string; sub: string }> = [
   { value: '26x26', label: '单板', sub: '26格' },
   { value: '52x52', label: '双板', sub: '52格' },
   { value: '78x78', label: '三板', sub: '78格' },
   { value: '104x104', label: '四板', sub: '104格' }
 ];
+
+const selectedSize = computed<SizePreset>(() => {
+  if (!isCustomSize.value) return selectedPresetSize.value;
+  return `${Number(customWidth.value || 0)}x${Number(customHeight.value || 0)}` as SizePreset;
+});
+
+const customSizeLabel = computed(() => {
+  const width = Number(customWidth.value || 0);
+  const height = Number(customHeight.value || 0);
+  return width && height ? `${width}×${height}` : '输入';
+});
+
+const customSizeHint = computed(() => {
+  const validation = validateSize(Number(customWidth.value), Number(customHeight.value));
+  if (!validation.valid) {
+    return { tone: 'bad', text: validation.message };
+  }
+  const width = Number(customWidth.value);
+  const height = Number(customHeight.value);
+  if (width % 26 === 0 && height % 26 === 0) {
+    return { tone: 'good', text: `对齐 26 格拼豆板：${width / 26}×${height / 26} 块板` };
+  }
+  const boardsW = Math.ceil(width / 26);
+  const boardsH = Math.ceil(height / 26);
+  return { tone: 'warn', text: `不对齐拼豆板：约需 ${boardsW}×${boardsH} 块板，边缘需裁切` };
+});
 
 onLoad((options: any) => {
   if (options.image) {
@@ -150,9 +203,38 @@ onLoad((options: any) => {
 });
 
 const handleSelect = (tier: 'quick' | 'premium') => {
+  if (isCustomSize.value) {
+    const validation = validateSize(Number(customWidth.value), Number(customHeight.value));
+    if (!validation.valid) {
+      uni.showToast({ title: validation.message, icon: 'none' });
+      return;
+    }
+  }
   uni.navigateTo({
     url: `/pages/preview/loading?tier=${tier}&style=${stylePreset.value}&size=${selectedSize.value}&image=${encodeURIComponent(rawImage.value)}`
   });
+};
+
+const selectPreset = (value: SizePreset) => {
+  selectedPresetSize.value = value;
+  isCustomSize.value = false;
+};
+
+const validateSize = (width: number, height: number): { valid: boolean; message: string } => {
+  if (!Number.isInteger(width) || !Number.isInteger(height)) {
+    return { valid: false, message: '尺寸必须是整数' };
+  }
+  if (width < 20 || height < 20) {
+    return { valid: false, message: '最小 20×20 格' };
+  }
+  if (width > 200 || height > 200) {
+    return { valid: false, message: '最大 200×200 格' };
+  }
+  const ratio = width / height;
+  if (ratio < 0.5 || ratio > 2) {
+    return { valid: false, message: '长宽比需在 0.5-2 之间' };
+  }
+  return { valid: true, message: '' };
 };
 
 const handleHelp = () => {
@@ -180,7 +262,7 @@ const handleHelp = () => {
 
 .choice__size {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   margin: 0 0 16px;
 }
@@ -214,6 +296,56 @@ const handleHelp = () => {
   font-size: 10px;
   font-weight: 600;
 }
+
+.choice__custom-size {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  margin: -6px 0 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid var(--pd-divider);
+}
+
+.choice__custom-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--pd-fg-2);
+}
+
+.choice__custom-field input {
+  width: 100%;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--pd-divider);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--pd-fg-1);
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.choice__custom-times {
+  color: var(--pd-fg-3);
+  font-weight: 800;
+}
+
+.choice__custom-hint {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.choice__custom-hint--good { color: #2E8B57; }
+.choice__custom-hint--warn { color: #B7791F; }
+.choice__custom-hint--bad { color: var(--pd-danger); }
 
 /* ===== Card layout (used by both quick + premium) ===== */
 .choice__card {

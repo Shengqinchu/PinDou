@@ -120,7 +120,7 @@ def test_pattern_build_happy_path_and_error(api_client) -> None:
     client, _session_factory = api_client
     headers = auth_headers(client)
 
-    bad = client.post("/api/pattern/build", json={"size": "40x40"}, headers=headers)
+    bad = client.post("/api/pattern/build", json={"size": "10x10"}, headers=headers)
     assert bad.status_code == 422
 
     response = client.post(

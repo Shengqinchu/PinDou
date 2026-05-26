@@ -68,6 +68,7 @@ class PatternSheet:
             "suggested_buffer_pct": self.suggested_buffer_pct,
             "brand": self.brand,
             "bead_diameter_mm": self.bead_diameter_mm,
+            "metadata": frontend_metadata(self.metadata),
         }
 
 
@@ -91,6 +92,7 @@ class PatternBuilder:
         from pindou.pattern.postprocess import merge_small_components
         from pindou.pattern.quantize import quantize_to_codes
 
+        size = size if isinstance(size, SizePreset) else SizePreset(str(size))
         input_mode = resolve_mode(preview=preview, raw_image=raw_image, mode=mode)
         image_bytes = preview if input_mode == "ai" else raw_image
         if image_bytes is None:
@@ -127,6 +129,8 @@ class PatternBuilder:
             metadata={
                 "mode": input_mode,
                 "size_preset": size.value,
+                "warning": size.warning,
+                "board_aligned": size.warning is None,
                 "algorithm": "kmeans+ciede2000+none",
                 "target_colors": self.target_colors,
                 "quantize_runtime_ms": round(quantized.runtime_ms, 2),
@@ -205,6 +209,14 @@ def color_counts(codes: list[list[str | None]]) -> dict[str, int]:
             if code is not None:
                 counts[code] = counts.get(code, 0) + 1
     return counts
+
+
+def frontend_metadata(metadata: dict) -> dict[str, Any]:
+    return {
+        key: value
+        for key, value in metadata.items()
+        if key != "preview_png" and not isinstance(value, bytes | bytearray | memoryview)
+    }
 
 
 def build_pattern_sheet(

@@ -61,7 +61,14 @@ def test_style_and_size_presets_match_frontend_contract() -> None:
         "q_couple",
         "cartoon_fallback",
     }
-    assert {size.value for size in SizePreset} == {"26x26", "52x52", "78x78", "104x104"}
+    preset_values = {
+        SizePreset.SINGLE_BOARD_26X26.value,
+        SizePreset.DOUBLE_BOARD_52X52.value,
+        SizePreset.TRIPLE_BOARD_78X78.value,
+        SizePreset.FOUR_BOARD_104X104.value,
+    }
+    assert preset_values == {"26x26", "52x52", "78x78", "104x104"}
+    assert SizePreset("45x30").warning is not None
 
 
 def test_xiaochi_provider_retries_once_with_new_seed_hint() -> None:

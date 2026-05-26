@@ -66,7 +66,7 @@ function uploadFailError(err: any): PinDouApiError {
    类型定义 (符合 PRD §5 / §6)
    ========================================== */
 export type StylePreset = 'q_portrait' | 'q_pet' | 'q_couple' | 'cartoon_fallback';
-export type SizePreset = '26x26' | '52x52' | '78x78' | '104x104';
+export type SizePreset = '26x26' | '52x52' | '78x78' | '104x104' | `${number}x${number}`;
 export type CDKType = 'single_use' | 'monthly_card' | 'credit_pack_5' | 'credit_pack_10';
 
 export interface User {
@@ -104,6 +104,7 @@ export interface PatternSheet {
   suggested_buffer_pct: number;
   brand: string;
   bead_diameter_mm: number;
+  metadata?: Record<string, any>;
 }
 
 export interface PreviewResult {
@@ -162,8 +163,14 @@ const mockColorPalette: ColorRef[] = [
   { brand: 'MARD', code: 'M10', name_cn: '极光黑', name_en: 'Ink Black', hex: '#2D2D2D', rgb: [45, 45, 45], bead_diameter_mm: 5.0, aliases_cn: ['黑色'] }
 ];
 
+function parseSizePreset(size: SizePreset): [number, number] {
+  const match = String(size).match(/^(\d+)x(\d+)$/);
+  if (!match) return [26, 26];
+  return [Number(match[1]), Number(match[2])];
+}
+
 function generateMockPatternSheet(size: SizePreset): PatternSheet {
-  const [cols, rows] = size === '26x26' ? [26, 26] : size === '52x52' ? [52, 52] : size === '78x78' ? [78, 78] : [104, 104];
+  const [cols, rows] = parseSizePreset(size);
   const grid: (ColorRef | null)[][] = [];
   const color_counts: Record<string, number> = {};
   const coords: [number, number, string][] = [];
@@ -203,7 +210,12 @@ function generateMockPatternSheet(size: SizePreset): PatternSheet {
     estimated_cost_cny: Number((bead_total * 0.0065).toFixed(2)), // 1000 颗 6.5 元平均
     suggested_buffer_pct: 10,
     brand: 'MARD',
-    bead_diameter_mm: 5.0
+    bead_diameter_mm: 5.0,
+    metadata: {
+      size_preset: size,
+      board_aligned: cols % 26 === 0 && rows % 26 === 0,
+      warning: cols % 26 === 0 && rows % 26 === 0 ? null : '不对齐 26 格拼豆板，建议准备额外板材后裁边。'
+    }
   };
 }
 
