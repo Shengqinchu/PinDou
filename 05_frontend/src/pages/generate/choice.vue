@@ -804,8 +804,9 @@ const handleHelp = () => {
 }
 
 .choice__cdk-link {
-  display: block;
-  width: fit-content;
+  display: flex;
+  justify-content: center;
+  width: 100%;
   margin: 0 auto 12px;
   padding: 4px 10px;
   border: 0;
