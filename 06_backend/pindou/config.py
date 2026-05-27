@@ -64,6 +64,17 @@ class Settings(BaseSettings):
         validation_alias="CUSTOMER_SERVICE_QR_URL",
     )
     customer_service_wx_id: str = Field(default="pindou_cs_01", validation_alias="CUSTOMER_SERVICE_WX_ID")
+    hupijiao_app_id: str | None = Field(default=None, validation_alias="HUPIJIAO_APP_ID")
+    hupijiao_app_secret: SecretStr | None = Field(default=None, validation_alias="HUPIJIAO_APP_SECRET")
+    hupijiao_webhook_secret: SecretStr | None = Field(default=None, validation_alias="HUPIJIAO_WEBHOOK_SECRET")
+    hupijiao_callback_url: str = Field(
+        default="http://192.168.2.40:8000/api/v1/webhook/hupijiao",
+        validation_alias="HUPIJIAO_CALLBACK_URL",
+    )
+    hupijiao_api_base_url: str = Field(
+        default="https://api.xunhupay.com",
+        validation_alias="HUPIJIAO_API_BASE_URL",
+    )
 
     reverse_proxy_health_url: str = Field(
         default="https://gpt.xiaochisaascn.org/v1/models",
