@@ -1,5 +1,6 @@
 # Secrets
 .env
+cloudrun_env*.json
 .env.*
 !.env.example
 *.key
