@@ -280,23 +280,23 @@ Phase 2 当前交付 PNG 主图 + 2×2 分区预览，先解决手机查看和�
 
 ### §4.8 付费 / 变现（P0 必做，v0.2 大改）
 
-按 ADR-003 修订版：
+按 ADR-003 + ADR-011 修订版：
 
 | 档位 | 价格 | 包含 | 实现方式 |
 |------|------|------|---------|
 | 脚本免费 | 0 | 每日 3 次脚本生成 | 注册即享 |
 | 激励视频续次 | 0（看广告） | 1 次脚本生成 | 流量主开通后（UV ≥ 1000） |
 | AI 体验 | 0 | 1 次 AI 生成（生命周期 1 次） | 注册即享 |
-| AI 单次购 | 9.9 | 1 次 AI 生成 + 基础 PatternSheet | **加客服微信扫码付** |
-| 月卡 | 28 | 不限 AI 生成 + 高级 PatternSheet（PDF + Excel + 分区） | 加客服微信扫码付 |
+| AI 单次购 | 9.9 | 1 次 AI 生成 + 基础 PatternSheet | **虎皮椒支付码**，客服扫码兜底 |
+| 月卡 | 28 | 不限 AI 生成 + 高级 PatternSheet（PDF + Excel + 分区） | **虎皮椒支付码**，客服扫码兜底 |
 | **CDK 兑换** | 由 CDK 类型决定 | 按 CDK 类型解锁额度 / 月卡 | 见 §4.9 |
-| 人工精修 | 99 起 | 人工兜底高难度 | 加客服微信，外部接单 |
+| 人工精修 | 99 起 | 人工兜底高难度 | 虎皮椒支付码 / 加客服微信，外部接单 |
 
-**为什么不用官方微信支付**：ADR-006 个人主体不能开通商户号。"加客服扫码"具体实现：
-- 小程序内付费按钮 → 弹窗显示客服微信二维码（你 / 女朋友的号）+ 订单号
-- 用户长按二维码加好友 → 私下转账 → 客服后台手动开通额度
-- 优点：合规、零成本
-- 缺点：转化率打折 30-50%；客服人工成本
+**为什么不用官方微信支付**：ADR-006 个人主体不能开通商户号。Phase 2 采用 ADR-011 的虎皮椒支付码方案：
+- 小程序内付费按钮 → 弹窗显示虎皮椒微信支付二维码 + 订单号
+- 用户长按二维码识别付款 → 虎皮椒 webhook 通知后端 → 自动开通额度 / 月卡
+- Paywall 保留“换种付款方式”，可创建客服扫码兜底订单
+- 金额由后端 SKU 表决定，webhook 必须验签并校验金额
 
 **待 Phase 4 评估升级到个体工商户 + 微信支付**（FUTURE_WORK 第 6 条）
 
@@ -597,7 +597,10 @@ class Order:
     sku: OrderSKU                      # 9.9 单次 / 28 月卡 / 99 人工精修
     amount_cny: float
     status: str                        # pending / paid_confirmed / refunded / failed
-    payment_method: str                # "wechat_qr_via_cs" / "cdk_redemption"
+    payment_method: str                # "hupijiao_qr" / "wechat_qr_via_cs" / "cdk_redemption"
+    payment_provider: str              # "hupijiao" / "customer_service"
+    qr_code_url: str | None            # 虎皮椒支付码或客服二维码
+    order_no: str                      # 支付平台回调与人工核对用订单号
     customer_service_handler: str | None  # 哪个客服处理的（你 / 女朋友）
     artwork_id: str | None             # 关联的作品（如果是按次购买）
     cdk_code: str | None               # 如果通过 CDK 兑换

@@ -373,3 +373,14 @@ AI 路径 timeout、脚本 fallback 兔子占位图、标题实体转义、统�
 1. 微信开发者工具按 `Ctrl+R` 重新编译。
 2. 重新生成一张 `52×52` 或 `78×78` 图纸，确认结果页主图可直接点击放大。
 3. 点击“📋 查看分区图”，确认页面只显示四个象限卡片，任意卡片点击后可全屏缩放查看。
+
+## 2026-05-26 — Phase 2 v8.5 Hupijiao payment handoff
+
+虎皮椒支付码方案已按 ADR-011 接入，开发期可无真实账号跑通 UI 和 webhook：
+
+1. 后端已实现虎皮椒下单 / 查单 / webhook 验签；未配置真实虎皮椒密钥时返回本地 placeholder 二维码。
+2. 前端 Paywall 已改为默认展示“虎皮椒微信支付”二维码，每 3 秒轮询订单状态；“换种付款方式”会创建客服扫码兜底订单。
+3. 开发期可用 `python scripts/mock_hupijiao_webhook.py <order_no> --amount 28.00` 模拟支付成功。金额必须与订单 SKU 一致：单次 9.90，月卡 28.00，人工精修 99.00。
+4. 上线前请用户提供并只写入生产 `.env`：`HUPIJIAO_APP_ID`、`HUPIJIAO_APP_SECRET`、`HUPIJIAO_WEBHOOK_SECRET`。
+5. 上线前需要在虎皮椒后台配置 webhook URL：`https://api.pindou.cn/api/v1/webhook/hupijiao`，并确认虎皮椒当前是否支持个人主体注册和稳定收款。
+6. 我从 `Desktop/apisell` 只复用了虎皮椒签名 / 参数 / 回调处理模式，没有复制任何密钥；发现的旧 `github-research` skill 当前 Codex 已有同等能力，未重复搬运。
