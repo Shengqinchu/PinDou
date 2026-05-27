@@ -36,6 +36,12 @@ class Settings(BaseSettings):
     preview_dir: Path = Field(default=Path("./var/data/previews"), validation_alias="PINDOU_PREVIEW_DIR")
     pattern_dir: Path = Field(default=Path("./var/data/patterns"), validation_alias="PINDOU_PATTERN_DIR")
     thumbnail_dir: Path = Field(default=Path("./var/data/thumbnails"), validation_alias="PINDOU_THUMBNAIL_DIR")
+    storage_backend: str = Field(default="local", validation_alias="STORAGE_BACKEND")
+    cos_secret_id: SecretStr | None = Field(default=None, validation_alias="COS_SECRET_ID")
+    cos_secret_key: SecretStr | None = Field(default=None, validation_alias="COS_SECRET_KEY")
+    cos_bucket: str | None = Field(default=None, validation_alias="COS_BUCKET")
+    cos_region: str | None = Field(default=None, validation_alias="COS_REGION")
+    cos_public_base_url: str | None = Field(default=None, validation_alias="COS_PUBLIC_BASE_URL")
 
     xiaochi_gpt_base_url: str = Field(
         default="https://gpt.xiaochisaascn.org/v1",

@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import json
 import uuid
+from io import BytesIO
 from pathlib import Path
 from typing import Any
 
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 from pindou.api.errors import ApiException, ErrorCode
-from pindou.config import get_settings
-from pindou.services.storage_util import ensure_storage_dirs, static_url
+from pindou.services.storage_util import ensure_storage_dirs, get_storage_backend, static_url
 
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
@@ -22,11 +22,17 @@ def save_uploaded_image(filename: str, data: bytes) -> dict[str, str]:
     image, extension = validate_uploaded_image(filename, data)
     image_id = uuid.uuid4().hex
     output_format = _format_for_extension(extension)
-    path = get_settings().upload_dir / f"{image_id}{extension}"
+    key = f"uploads/{image_id}{extension}"
     if output_format == "JPEG":
         image = image.convert("RGB")
-    image.save(path, format=output_format)
-    return {"image_id": image_id, "path": str(path), "image_url": static_url("uploads", path.name)}
+    output = BytesIO()
+    image.save(output, format=output_format)
+    get_storage_backend().upload(key, output.getvalue(), content_type=_content_type_for_extension(extension))
+    return {
+        "image_id": image_id,
+        "path": key,
+        "image_url": get_storage_backend().get_url(key),
+    }
 
 
 def normalized_upload_png_bytes(filename: str, data: bytes) -> bytes:
@@ -54,47 +60,46 @@ def validate_uploaded_image(filename: str, data: bytes) -> tuple[Image.Image, st
 
 
 def save_preview_png(preview_id: str, data: bytes) -> tuple[Path, str]:
-    path = get_settings().preview_dir / f"{preview_id}.png"
-    path.write_bytes(data)
-    return path, static_url("previews", path.name)
+    key = f"previews/{preview_id}.png"
+    get_storage_backend().upload(key, data, content_type="image/png")
+    return Path(key), get_storage_backend().get_url(key)
 
 
 def save_pattern_json(pattern_id: str, pattern_data: dict[str, Any]) -> tuple[Path, str]:
-    path = get_settings().pattern_dir / f"{pattern_id}.json"
-    path.write_text(json.dumps(pattern_data, ensure_ascii=False), encoding="utf-8")
-    return path, static_url("patterns", path.name)
+    key = f"patterns/{Path(pattern_id).stem}.json"
+    get_storage_backend().upload(
+        key,
+        json.dumps(pattern_data, ensure_ascii=False).encode("utf-8"),
+        content_type="application/json",
+    )
+    return Path(key), get_storage_backend().get_url(key)
 
 
 def save_pattern_png(filename: str, data: bytes) -> tuple[Path, str]:
     safe_name = Path(filename).name
     if not safe_name.lower().endswith(".png"):
         safe_name = f"{Path(safe_name).stem}.png"
-    path = get_settings().pattern_dir / safe_name
-    path.write_bytes(data)
-    return path, static_url("patterns", path.name)
+    key = f"patterns/{safe_name}"
+    get_storage_backend().upload(key, data, content_type="image/png")
+    return Path(key), get_storage_backend().get_url(key)
 
 
 def load_uploaded_image(image_id: str) -> tuple[bytes, Path]:
-    path = resolve_stored_file(get_settings().upload_dir, image_id, ALLOWED_EXTENSIONS)
-    if path is None:
-        raise ApiException(404, ErrorCode.IMAGE_NOT_FOUND, "没有找到这张上传图片，请重新上传。")
-    return path.read_bytes(), path
+    return load_stored_image("uploads", image_id, ALLOWED_EXTENSIONS, "没有找到这张上传图片，请重新上传。")
 
 
 def load_preview_image(preview_id: str) -> tuple[bytes, Path]:
-    path = resolve_stored_file(get_settings().preview_dir, preview_id, {".png"})
-    if path is None:
-        raise ApiException(404, ErrorCode.IMAGE_NOT_FOUND, "没有找到这张预览图，请重新生成。")
-    return path.read_bytes(), path
+    return load_stored_image("previews", preview_id, {".png"}, "没有找到这张预览图，请重新生成。")
 
 
-def resolve_stored_file(directory: Path, file_id: str, extensions: set[str]) -> Path | None:
+def load_stored_image(kind: str, file_id: str, extensions: set[str], message: str) -> tuple[bytes, Path]:
     safe_id = Path(file_id).stem
+    backend = get_storage_backend()
     for extension in extensions:
-        candidate = directory / f"{safe_id}{extension}"
-        if candidate.exists() and candidate.is_file():
-            return candidate
-    return None
+        key = f"{kind}/{safe_id}{extension}"
+        if backend.exists(key):
+            return backend.download(key), Path(key)
+    raise ApiException(404, ErrorCode.IMAGE_NOT_FOUND, message)
 
 
 def _normalize_extension(extension: str) -> str:
@@ -104,6 +109,10 @@ def _normalize_extension(extension: str) -> str:
 
 def _format_for_extension(extension: str) -> str:
     return {".jpg": "JPEG", ".png": "PNG", ".webp": "WEBP"}[extension]
+
+
+def _content_type_for_extension(extension: str) -> str:
+    return {".jpg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}[extension]
 
 
 def _bytes_path(data: bytes):

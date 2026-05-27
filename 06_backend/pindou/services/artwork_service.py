@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from pindou.config import get_settings
 from pindou.db.models import Artwork
-from pindou.services.storage_util import static_asset_path, static_url
+from pindou.services.storage_util import get_storage_backend, static_asset_path, static_url, storage_key_from_url_or_path
 
 THUMBNAIL_SIZE = 200
 
@@ -126,6 +126,9 @@ class ArtworkService:
 def delete_file_if_exists(path: str | Path | None) -> bool:
     if not path:
         return False
+    storage_key = storage_key_from_url_or_path(path)
+    if storage_key:
+        return get_storage_backend().delete(storage_key)
     target = Path(path)
     if target.exists() and target.is_file():
         target.unlink()

@@ -9,10 +9,11 @@ from pindou.api.errors import ApiException, ErrorCode
 from pindou.api.generate import parse_payload_or_upload, parse_size
 from pindou.api.pattern_assets import finalize_artwork_pattern_assets
 from pindou.api.quota import consume_script_quota, consume_white_bg_quota, require_sensitive_consent
-from pindou.api.storage import load_preview_image, load_uploaded_image, save_pattern_png, save_uploaded_image, static_url
+from pindou.api.storage import load_preview_image, load_uploaded_image, save_pattern_png, save_uploaded_image
 from pindou.pattern.builder import PatternBuilder, pattern_sheet_from_frontend_dict
 from pindou.pattern.exporter import PatternExporter, partition_filename
 from pindou.services.artwork_service import ArtworkService
+from pindou.services.storage_util import storage_url
 
 router = APIRouter(prefix="/pattern", tags=["pattern"])
 
@@ -57,7 +58,7 @@ async def build_pattern(request: Request, current_user: CurrentUser, db: DbSessi
                     mode="ai",
                 )
                 original_path = None
-                preview_path = static_url("previews", preview_path_obj.name)
+                preview_path = storage_url(f"previews/{preview_path_obj.name}")
                 style_preset = "q_portrait"
             else:
                 raise ApiException(422, ErrorCode.IMAGE_NOT_FOUND, "缺少 preview_id 或 raw_image。")
