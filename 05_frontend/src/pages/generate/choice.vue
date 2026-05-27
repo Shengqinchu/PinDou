@@ -79,7 +79,7 @@
             <span class="choice__price-major">免费</span>
             <span class="choice__price-minor">每日 3 次 · 看广告可加次</span>
           </div>
-          <button class="btn btn--ghost btn--sm choice__action">选这个</button>
+          <button class="btn btn--ghost btn--sm choice__action" @click.stop="handleSelect('quick')">选这个</button>
         </div>
       </div>
 
@@ -133,7 +133,7 @@
               <strong class="choice__price-now">¥9.9 起</strong>
             </span>
           </div>
-          <button class="btn btn--primary btn--sm choice__action">
+          <button class="btn btn--primary btn--sm choice__action" @click.stop="handleSelect('premium')">
             选这个
             <span class="choice__button-arrow" aria-hidden="true">›</span>
           </button>
@@ -144,6 +144,52 @@
         <span class="choice__help-icon" aria-hidden="true">?</span>
         <span class="help-link__label">这两种有什么区别？</span>
       </div>
+
+      <div v-if="showConfirmSheet" class="choice__confirm" @click.self="closeConfirm">
+        <section class="choice__confirm-sheet" role="dialog" aria-label="确认生成">
+          <div class="choice__confirm-handle" aria-hidden="true"></div>
+          <h2 class="choice__confirm-title">确认生成？</h2>
+          <p class="choice__confirm-summary">{{ confirmSummary }}</p>
+
+          <div class="choice__confirm-stats">
+            <div class="choice__confirm-stat">
+              <span class="choice__confirm-num">{{ estimatedBeads }}</span>
+              <span class="choice__confirm-label">预计颗数</span>
+            </div>
+            <div class="choice__confirm-stat">
+              <span class="choice__confirm-num">{{ estimatedColors }}</span>
+              <span class="choice__confirm-label">预计色号</span>
+            </div>
+            <div class="choice__confirm-stat">
+              <span class="choice__confirm-num">{{ estimatedDuration }}</span>
+              <span class="choice__confirm-label">预计时长</span>
+            </div>
+          </div>
+
+          <div class="choice__consume-card">
+            <span class="choice__consume-label">消耗说明</span>
+            <span class="choice__consume-text">{{ consumeText }}</span>
+          </div>
+
+          <button
+            v-if="pendingTier === 'premium' && !isPremiumUser"
+            type="button"
+            class="choice__cdk-link"
+            @click="goCdk"
+          >
+            我有 CDK 兑换码
+          </button>
+
+          <div class="choice__confirm-actions">
+            <button type="button" class="btn btn--secondary btn--md choice__confirm-cancel" @click="closeConfirm">
+              取消
+            </button>
+            <button type="button" class="btn btn--primary btn--md choice__confirm-ok" @click="confirmGeneration">
+              ✓ 确认生成
+            </button>
+          </div>
+        </section>
+      </div>
     </div>
   </MiniProgramLayout>
 </template>
@@ -153,13 +199,18 @@ import { computed, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import { SizePreset } from '../../api';
+import { useUserStore } from '../../store/user';
 
+const userStore = useUserStore();
 const rawImage = ref('');
 const stylePreset = ref('cartoon_fallback');
 const selectedPresetSize = ref<SizePreset>('26x26');
 const isCustomSize = ref(false);
 const customWidth = ref('30');
 const customHeight = ref('30');
+const showConfirmSheet = ref(false);
+const pendingTier = ref<'quick' | 'premium' | null>(null);
+const SKIP_CONFIRM_FOR_PREMIUM = true;
 const SIZE_OPTIONS: Array<{ value: SizePreset; label: string; sub: string }> = [
   { value: '26x26', label: '单板', sub: '26格' },
   { value: '52x52', label: '双板', sub: '52格' },
@@ -170,6 +221,46 @@ const SIZE_OPTIONS: Array<{ value: SizePreset; label: string; sub: string }> = [
 const selectedSize = computed<SizePreset>(() => {
   if (!isCustomSize.value) return selectedPresetSize.value;
   return `${Number(customWidth.value || 0)}x${Number(customHeight.value || 0)}` as SizePreset;
+});
+
+const sizeNumbers = computed(() => parseSize(selectedSize.value));
+
+const isPremiumUser = computed(() => userStore.isMonthlyMember || userStore.credits >= 9999);
+
+const selectedSizeLabel = computed(() => {
+  const [width, height] = sizeNumbers.value;
+  const presetLabel: Record<string, string> = {
+    '26x26': '单板',
+    '52x52': '双板',
+    '78x78': '三板',
+    '104x104': '四板'
+  };
+  return `${width}×${height} ${presetLabel[selectedSize.value] || '自定义'}`;
+});
+
+const confirmSummary = computed(() => {
+  const prefix = pendingTier.value === 'premium' ? '✨ AI 精品' : '⚡ 快速生成';
+  return `${prefix} · ${selectedSizeLabel.value}`;
+});
+
+const estimatedBeads = computed(() => {
+  const [width, height] = sizeNumbers.value;
+  return Math.round(width * height * (pendingTier.value === 'premium' ? 0.72 : 0.82));
+});
+
+const estimatedColors = computed(() => pendingTier.value === 'premium' ? '5-8' : '8-16');
+const estimatedDuration = computed(() => pendingTier.value === 'premium' ? '30-60秒' : '5-10秒');
+
+const consumeText = computed(() => {
+  const freeCredits = userStore.userInfo?.free_credits_remaining || 0;
+  const paidCredits = userStore.userInfo?.paid_credits || 0;
+  const totalCredits = freeCredits + paidCredits;
+  if (isPremiumUser.value) return '月卡 / 测试额度已生效，本次不额外提示消耗。';
+  if (pendingTier.value === 'quick') {
+    return freeCredits > 0 ? `今日剩 ${Math.min(freeCredits, 3)}/3 次` : '今日免费次数已用完，需要看 1 次广告续次';
+  }
+  if (totalCredits > 0) return `可用 AI 额度 ${totalCredits} 次`;
+  return 'AI 首次体验免费；已体验后可选 9.9 元 / 月卡 / CDK 兑换';
 });
 
 const customSizeLabel = computed(() => {
@@ -203,16 +294,41 @@ onLoad((options: any) => {
 });
 
 const handleSelect = (tier: 'quick' | 'premium') => {
-  if (isCustomSize.value) {
-    const validation = validateSize(Number(customWidth.value), Number(customHeight.value));
-    if (!validation.valid) {
-      uni.showToast({ title: validation.message, icon: 'none' });
-      return;
-    }
+  if (!ensureValidSize()) return;
+  if (SKIP_CONFIRM_FOR_PREMIUM && isPremiumUser.value) {
+    startGeneration(tier);
+    return;
   }
+  pendingTier.value = tier;
+  showConfirmSheet.value = true;
+};
+
+const confirmGeneration = () => {
+  if (!pendingTier.value) return;
+  const tier = pendingTier.value;
+  closeConfirm();
+  startGeneration(tier);
+};
+
+const closeConfirm = () => {
+  showConfirmSheet.value = false;
+  pendingTier.value = null;
+};
+
+const startGeneration = (tier: 'quick' | 'premium') => {
   uni.navigateTo({
     url: `/pages/preview/loading?tier=${tier}&style=${stylePreset.value}&size=${selectedSize.value}&image=${encodeURIComponent(rawImage.value)}`
   });
+};
+
+const ensureValidSize = () => {
+  if (!isCustomSize.value) return true;
+  const validation = validateSize(Number(customWidth.value), Number(customHeight.value));
+  if (!validation.valid) {
+    uni.showToast({ title: validation.message, icon: 'none' });
+    return false;
+  }
+  return true;
 };
 
 const selectPreset = (value: SizePreset) => {
@@ -235,6 +351,16 @@ const validateSize = (width: number, height: number): { valid: boolean; message:
     return { valid: false, message: '长宽比需在 0.5-2 之间' };
   }
   return { valid: true, message: '' };
+};
+
+const parseSize = (size: SizePreset): [number, number] => {
+  const match = String(size).match(/^(\d+)x(\d+)$/);
+  if (!match) return [26, 26];
+  return [Number(match[1]), Number(match[2])];
+};
+
+const goCdk = () => {
+  uni.navigateTo({ url: '/pages/cdk/redeem' });
 };
 
 const handleHelp = () => {
@@ -570,5 +696,149 @@ const handleHelp = () => {
   justify-content: center;
   font-size: 11px;
   font-weight: 700;
+}
+
+.choice__confirm {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 998;
+  background: rgba(45, 45, 45, 0.38);
+  backdrop-filter: blur(4px);
+}
+
+.choice__confirm-sheet {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+  margin: 0;
+  padding: 10px 20px calc(22px + env(safe-area-inset-bottom));
+  border-radius: 24px 24px 0 0;
+  background: var(--pd-card);
+  box-shadow: 0 -12px 40px rgba(45, 45, 45, 0.18);
+  box-sizing: border-box;
+  animation: choice-confirm-up 220ms var(--pd-ease-soft);
+}
+
+.choice__confirm-handle {
+  width: 36px;
+  height: 4px;
+  margin: 2px auto 14px;
+  border-radius: 999px;
+  background: var(--pd-divider);
+}
+
+.choice__confirm-title {
+  margin: 0 0 6px;
+  text-align: center;
+  font-family: var(--pd-font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--pd-fg-1);
+}
+
+.choice__confirm-summary {
+  margin: 0 0 14px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--pd-fg-2);
+}
+
+.choice__confirm-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.choice__confirm-stat {
+  min-width: 0;
+  padding: 12px 6px;
+  border-radius: 12px;
+  background: var(--pd-bg-warm);
+  text-align: center;
+}
+
+.choice__confirm-num {
+  display: block;
+  font-family: var(--pd-font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--pd-fg-1);
+  white-space: nowrap;
+}
+
+.choice__confirm-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--pd-fg-2);
+  white-space: nowrap;
+}
+
+.choice__consume-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  background: #FFF7F2;
+  border: 1px solid rgba(255, 176, 136, 0.32);
+}
+
+.choice__consume-label {
+  font-size: 11px;
+  color: var(--pd-fg-3);
+}
+
+.choice__consume-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pd-fg-1);
+  line-height: 1.45;
+}
+
+.choice__cdk-link {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 12px;
+  padding: 4px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--pd-pink-deep);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.choice__confirm-actions {
+  display: grid;
+  grid-template-columns: 0.78fr 1.22fr;
+  gap: 10px;
+}
+
+.choice__confirm-cancel,
+.choice__confirm-ok {
+  min-width: 0;
+}
+
+@keyframes choice-confirm-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (max-width: 360px) {
+  .choice__confirm-sheet {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .choice__confirm-num {
+    font-size: 16px;
+  }
 }
 </style>
