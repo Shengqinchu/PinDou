@@ -280,19 +280,16 @@ def render_partition_image(
                 continue
             draw_bead_square(draw, x0, y0, x1, y1, fill=(*bead.rgb, 255), outline=darken(bead.rgb, factor=0.72))
             code = bead.code
-            if not should_draw_partition_code(code, cell_size):
-                continue
             code_font = fit_cell_code_font(draw, code, cell_size)
             if code_font is None:
                 continue
             text_box = draw.textbbox((0, 0), code, font=code_font)
             text_w = text_box[2] - text_box[0]
             text_h = text_box[3] - text_box[1]
-            cell_padding = max(3, int(cell_size * 0.15))
-            text_x = x0 + max(cell_padding, (cell_size - text_w) / 2)
-            text_x = min(text_x, x1 - cell_padding - text_w)
+            text_x = x0 + (cell_size - text_w) / 2 - text_box[0]
+            text_y = y0 + (cell_size - text_h) / 2 - text_box[1]
             draw.text(
-                (text_x, y0 + (cell_size - text_h) / 2 - 1),
+                (text_x, text_y),
                 code,
                 font=code_font,
                 fill=contrast_text(bead.rgb),
@@ -318,7 +315,15 @@ def render_partition_image(
 
 def partition_cell_size(rows: int, cols: int) -> int:
     max_dim = max(rows, cols, 1)
-    return max(7, min(30, 390 // max_dim))
+    if max_dim <= 13:
+        return 30
+    if max_dim <= 26:
+        return 24
+    if max_dim <= 39:
+        return 20
+    if max_dim <= 52:
+        return 18
+    return max(14, min(30, 900 // max_dim))
 
 
 def draw_partition_minimap(
@@ -448,21 +453,14 @@ def load_monospace_font(size: int) -> ImageFont.ImageFont:
     return load_font(size)
 
 
-def should_draw_partition_code(code: str, cell_size: int) -> bool:
-    if not code or cell_size < 10:
-        return False
-    if len(code) >= 3 and cell_size < 13:
-        return False
-    return True
-
-
 def fit_cell_code_font(draw: ImageDraw.ImageDraw, code: str, cell_size: int) -> ImageFont.ImageFont | None:
-    max_width = int(cell_size * 0.7)
-    font_size = max(8, int(round(cell_size * 0.32)))
+    cell_padding = max(1, int(cell_size * 0.10))
+    max_width = max(4, cell_size - cell_padding * 2)
+    font_size = max(7, int(cell_size * 0.30))
     if len(code) >= 3:
-        font_size = max(8, int(font_size * 0.9))
+        font_size = max(7, int(font_size * 0.85))
 
-    while font_size >= 8:
+    while font_size >= 7:
         font = load_monospace_font(font_size)
         text_box = draw.textbbox((0, 0), code, font=font)
         if text_box[2] - text_box[0] <= max_width:
@@ -477,8 +475,8 @@ def font_line_height(font: ImageFont.ImageFont) -> int:
 
 
 def contrast_text(rgb: tuple[int, int, int]) -> tuple[int, int, int, int]:
-    luminance = 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]
-    return (255, 255, 255, 255) if luminance < 140 else (0, 0, 0, 255)
+    luminance = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]
+    return (0, 0, 0, 255) if luminance > 128 else (255, 255, 255, 255)
 
 
 def legend_text_lines(pattern: PatternSheet, *, max_chars: int) -> list[str]:
