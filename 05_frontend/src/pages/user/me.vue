@@ -16,7 +16,7 @@
       <section class="card me__credits">
         <div class="me__credits-head">
           <h3 class="me__credits-title">我的额度</h3>
-          <button type="button" class="me__credits-more" @click="goCdk">兑换</button>
+          <button type="button" class="me__credits-more" @click="goCdk">去兑换 ›</button>
         </div>
         <div class="me__credits-list">
           <div class="me__credits-row">
@@ -31,9 +31,7 @@
               <span class="me__credits-name">AI 精品</span>
               <span class="me__credits-sub">Q版预览 + 图纸</span>
             </div>
-            <span class="me__credits-value">
-              剩 <strong>{{ aiCreditsLabel }}</strong> 次
-            </span>
+            <span class="me__credits-value">{{ aiCreditsLabel }}</span>
           </div>
           <div class="me__credits-row">
             <div class="me__credits-label">
@@ -132,15 +130,15 @@ const profileStatus = computed(() => {
 
 const scriptQuotaLabel = computed(() => {
   const total = freeCredits.value + paidCredits.value;
-  if (total >= 9999) return '测试不限量';
+  if (total >= 9999) return '不限';
   return '每日免费';
 });
 
 const aiCreditsLabel = computed(() => {
-  if (isMonthlyMember.value) return '无限';
+  if (isMonthlyMember.value) return '不限';
   const total = freeCredits.value + paidCredits.value;
-  if (total >= 9999) return '无限';
-  return `${total}`;
+  if (total >= 9999) return '不限';
+  return `剩 ${total} 次`;
 });
 
 const monthlyLabel = computed(() => {
@@ -297,9 +295,10 @@ onShow(() => {
   border: 0;
   background: transparent;
   color: var(--pd-pink-deep);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   padding: 4px 0;
+  line-height: 1.2;
 }
 
 .me__credits-list {
@@ -323,6 +322,9 @@ onShow(() => {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1;
+  min-width: 0;
+  max-width: 190px;
 }
 
 .me__credits-name {
@@ -339,6 +341,9 @@ onShow(() => {
 .me__credits-value {
   font-size: 13px;
   color: var(--pd-fg-1);
+  flex-shrink: 0;
+  white-space: nowrap;
+  text-align: right;
 }
 
 .me__credits-value strong {
