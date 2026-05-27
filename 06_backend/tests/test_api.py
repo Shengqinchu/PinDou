@@ -16,6 +16,7 @@ from pindou.config import get_settings
 from pindou.db.models import Base, User
 from pindou.main import create_app
 from pindou.providers.base import PreviewResult
+from pindou.services.hupijiao_service import sign_params
 from pindou.services.cdk_service import CDKService
 
 
@@ -259,6 +260,39 @@ def test_payment_and_admin_confirm_flow(api_client) -> None:
     assert client.get(f"/api/payment/order/{order_id}", headers=headers).json() == {"status": "paid_confirmed"}
     assert client.get("/api/admin/orders", headers=admin_headers).status_code == 200
     assert client.get("/api/admin/users", headers=admin_headers).status_code == 200
+
+
+def test_hupijiao_webhook_marks_order_paid_and_grants_monthly_card(api_client) -> None:
+    client, session_factory = api_client
+    headers = auth_headers(client)
+    order = client.post("/api/payment/order/create", json={"sku_id": "monthly_28"}, headers=headers)
+    assert order.status_code == 200
+    payload = order.json()
+    assert payload["payment_provider"] == "hupijiao"
+    assert payload["qr_code_url"]
+
+    webhook_payload = {
+        "trade_order_id": payload["order_no"],
+        "total_fee": "28.00",
+        "transaction_id": "MOCKTXN001",
+        "open_order_id": "OPEN001",
+        "order_title": "PinDou 月卡",
+        "status": "OD",
+        "appid": "mock",
+        "time": "1760000000",
+        "nonce_str": "mocknonce",
+    }
+    webhook_payload["hash"] = sign_params(webhook_payload, "pindou-dev-hupijiao-mock-secret")
+    callback = client.post("/api/v1/webhook/hupijiao", data=webhook_payload)
+    assert callback.status_code == 200
+    assert callback.text == "success"
+    assert client.get(f"/api/payment/order/{payload['order_id']}", headers=headers).json() == {
+        "status": "paid_confirmed"
+    }
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid.like("wx_%")))
+        assert user is not None
+        assert user.monthly_card_expires_at is not None
 
 
 def test_cdk_redeem_and_admin_batch_generate(api_client) -> None:

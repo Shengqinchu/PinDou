@@ -14,6 +14,7 @@ for router in (
     artwork.router,
     user.router,
     payment.router,
+    payment.webhook_router,
     cdk.router,
     admin.router,
 ):

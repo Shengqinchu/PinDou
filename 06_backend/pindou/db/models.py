@@ -129,6 +129,7 @@ class Order(Base):
     amount_cny: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     status: Mapped[str] = mapped_column(String(32), default="pending", index=True, nullable=False)
     payment_method: Mapped[str] = mapped_column(String(64), default="wechat_qr_via_cs", nullable=False)
+    payment_provider: Mapped[str] = mapped_column(String(64), default="customer_service", nullable=False)
     qr_code_path: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -141,7 +142,9 @@ class Order(Base):
     def to_frontend_dict(self) -> dict[str, Any]:
         frontend_status = {
             "pending_cs_qr": "pending",
+            "pending_qr": "pending",
             "paid_confirmed": "paid_confirmed",
+            "paid_via_hupijiao": "paid_confirmed",
             "cancelled": "failed",
             "refunded": "failed",
         }.get(self.status, self.status)
@@ -153,6 +156,9 @@ class Order(Base):
             "amount_cny": float(self.amount_cny),
             "status": frontend_status,
             "payment_method": self.payment_method,
+            "payment_provider": self.payment_provider,
+            "order_no": self.order_no,
+            "qr_code_url": self.qr_code_path,
             "artwork_id": self.artwork_id,
         }
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -93,3 +93,26 @@ class UserService:
             if user.monthly_card_expires_at
             else None,
         }
+
+    def grant_credits(self, *, user_id: str, credits: int) -> User:
+        user = self.get_user(user_id)
+        if user is None:
+            raise ValueError(f"User does not exist: {user_id}")
+        user.paid_credits += credits
+        self.session.commit()
+        self.session.refresh(user)
+        return user
+
+    def extend_monthly_card(self, *, user_id: str, days: int = 30, now: datetime | None = None) -> User:
+        user = self.get_user(user_id)
+        if user is None:
+            raise ValueError(f"User does not exist: {user_id}")
+        timestamp = now or utc_now()
+        current_expires = user.monthly_card_expires_at
+        if current_expires and current_expires.tzinfo is None:
+            current_expires = current_expires.replace(tzinfo=timestamp.tzinfo)
+        base = current_expires if current_expires and current_expires > timestamp else timestamp
+        user.monthly_card_expires_at = base + timedelta(days=days)
+        self.session.commit()
+        self.session.refresh(user)
+        return user
