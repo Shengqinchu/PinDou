@@ -27,6 +27,9 @@ def api_client(monkeypatch: pytest.MonkeyPatch, tmp_path) -> Iterator[tuple[Test
     monkeypatch.setenv("PINDOU_PATTERN_DIR", str(tmp_path / "patterns"))
     monkeypatch.setenv("ENABLE_REVERSE_PROXY_HEALTH_MONITOR", "false")
     monkeypatch.setenv("ENABLE_EXPIRED_ORIGINAL_DELETE_TASK", "false")
+    monkeypatch.setenv("HUPIJIAO_APP_ID", "")
+    monkeypatch.setenv("HUPIJIAO_APP_SECRET", "")
+    monkeypatch.setenv("HUPIJIAO_WEBHOOK_SECRET", "")
     get_settings.cache_clear()
 
     engine = create_engine(
