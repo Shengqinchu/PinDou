@@ -384,3 +384,37 @@ AI 路径 timeout、脚本 fallback 兔子占位图、标题实体转义、统�
 4. 上线前请用户提供并只写入生产 `.env`：`HUPIJIAO_APP_ID`、`HUPIJIAO_APP_SECRET`、`HUPIJIAO_WEBHOOK_SECRET`。
 5. 上线前需要在虎皮椒后台配置 webhook URL：`https://api.pindou.cn/api/v1/webhook/hupijiao`，并确认虎皮椒当前是否支持个人主体注册和稳定收款。
 6. 我从 `Desktop/apisell` 只复用了虎皮椒签名 / 参数 / 回调处理模式，没有复制任何密钥；发现的旧 `github-research` skill 当前 Codex 已有同等能力，未重复搬运。
+
+## 2026-05-27 — Phase 2 wxcloud migration handoff
+
+本轮已按 ADR-012 把 PinDou MVP 部署主路线迁到微信云托管：
+
+1. 后端已 Docker 化，云托管容器入口为 `uvicorn pindou.main:app --host 0.0.0.0 --port 8000`。
+2. 数据库支持 `DATABASE_URL` 双模式：本地默认 SQLite，生产用 `mysql+pymysql://...` 云托管 MySQL。
+3. 文件存储已抽象为 `StorageBackend`：本地开发走 `local`，生产走腾讯云 COS。
+4. 前端默认走 `wx.cloud.callContainer`，小程序图片上传从 `uni.uploadFile` 改成 base64 JSON；本地 HTTP fallback 仍可用。
+5. 虎皮椒 webhook URL 改为云托管默认 HTTPS 域名下的 `/api/v1/webhook/hupijiao`。
+6. 旧上海机 + Nginx + systemd 部署文档已保留到 `07_ops/deployment_legacy.md`，作为回退方案。
+
+### 部署到微信云托管步骤（用户做）
+
+1. 微信公众平台 → 开通“微信云托管”（需要小程序管理员）。
+2. 创建环境（推荐上海地域）→ 记录 env ID。
+3. 创建云托管服务，服务名建议 `pindou-backend`。
+4. 创建 MySQL 数据库实例 → 拿到连接信息，拼出 `DATABASE_URL`。
+5. 创建 COS bucket → 拿到 `COS_SECRET_ID` / `COS_SECRET_KEY` / `COS_BUCKET` / `COS_REGION`。
+6. 云托管环境变量页配置 `.env.example` 中全部生产变量：虎皮椒密钥、反代密钥、`DATABASE_URL`、COS 信息、JWT、微信 AppSecret 等。
+7. 关联 GitHub repo 或上传 Docker 镜像，部署后确认 `/health` 返回 `{"status":"ok"}`。
+8. 在云托管环境执行 `alembic upgrade head` 初始化 MySQL。
+9. 如已有本地 SQLite 数据，跑 `06_backend/scripts/sqlite_to_mysql.py` 做一次迁移。
+10. 拿到云托管 HTTPS URL 后，到虎皮椒后台把 webhook 改为 `https://<云托管默认域名>/api/v1/webhook/hupijiao`。
+11. 前端配置 `VITE_WX_CLOUD_ENV=<env ID>`、`VITE_WX_CLOUD_SERVICE=pindou-backend` 后重新编译小程序。
+12. 真机完整回归：登录 / 同意协议 / 上传 / 快速生成 / AI 精品 / 作品集 / 支付二维码 / mock 或真实 webhook。
+
+### 需要用户准备 / 确认
+
+1. 微信云托管 env ID 和 service name。
+2. 云托管 MySQL 连接串。
+3. COS bucket 与密钥。
+4. 虎皮椒生产密钥与后台 webhook URL 配置。
+5. 是否保留当前上海机作为临时 fallback；如果保留，只做备份，不再作为 MVP 主路径。

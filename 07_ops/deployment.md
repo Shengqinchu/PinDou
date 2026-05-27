@@ -1,255 +1,259 @@
-# PinDou 部署运维文档
+# PinDou 微信云托管部署运维文档
 
-> **目标环境**：生产（上海 8C16G 20Mbps）
-> **撰写**：Claude Code 2026-05-24（初版骨架）
-> **状态**：🟢 Codex Phase 2 任务 0 已完成硬件盘点；旧服务/旧数据已清理，SSH key / 部署用户 / fail2ban / UFW 已落地
-> **更新策略**：Codex / 用户 / 我 任何人改服务器配置必须同步更新本文件
-
----
-
-## 1. 服务器信息
-
-### 1.1 上海生产机
-| 字段 | 值 |
-|------|----|
-| 区域 | 华东-上海1（国内云） |
-| 操作系统 | Ubuntu 22.04.5 LTS（kernel `5.15.0-119-generic`） |
-| 配置 | 8 vCPU / 15 GiB RAM / 20 Mbps |
-| CPU | Intel Xeon Processor，8 cores reported by `nproc` |
-| 内存 | 15 GiB RAM，2.0 GiB swap |
-| 硬盘 | 80G system disk；`/dev/sda1` mounted on `/`，79G total / 6.9G used / 69G available / 10% used（2026-05-25 清理旧服务后） |
-| `/var` 分区 | 与根分区同盘；清理后 `/var` 约 525M。用户图片落本地盘仍需关注容量上限 |
-| 公网 IP | 见 `.env` `PINDOU_PROD_SSH_HOST` |
-| SSH 用户 | 见 `.env` `PINDOU_PROD_SSH_USER`（当前已切到 `pindou`） |
-| SSH 凭证 | 见 `.env` `PINDOU_PROD_SSH_KEY_PATH`；密码登录已禁用，旧 `PINDOU_PROD_SSH_PASS` 已从本地 `.env` 移除 |
-| 网络接口 | `eth0` private network + `docker0`；公网 IP 不入文档 |
-| 已监听端口 | 公网仅 `22`；本地 `127.0.0.1:31088` 为云探针 |
-| 已清理端口 | `80` / `3001` / `8092` / `111` / cloudflared UDP 均已停止；UFW 仍预放行 `22/80/443` 供后续 PinDou 部署 |
-| 到期日期 | 2026-09-25 22:41:52（**P1 提前 7 天提醒续费**） |
-
-### 1.2 备份策略
-- 当前：无（Phase 2 任务 0 后补）
-- 目标：每日 PatternSheet 数据库快照 + 每周完整 backup
+> **目标环境**：微信云托管（上海地域优先）  
+> **状态**：Phase 2 已迁移为 Docker + MySQL + COS + `wx.cloud.callContainer` 主路径  
+> **旧部署 fallback**：见 `07_ops/deployment_legacy.md`
 
 ---
 
-## 2. P0 安全 TODO（Phase 2 部署前必须做）
+## 1. 架构
 
-### 2.1 改 SSH key 认证 + 禁 root 密码登录
-**状态（2026-05-24/25 Codex 执行）**：✅ 已完成。
-
-- 本机生成 `~/.ssh/pindou_prod_ed25519`（私钥不入 git）。
-- 公钥已加入 root 与 `pindou` 用户的 `authorized_keys`。
-- 已验证 root / `pindou` key 登录成功。
-- 已设置 `PasswordAuthentication no`、`PermitRootLogin prohibit-password`、`KbdInteractiveAuthentication no` 并 reload SSH。
-- 已验证 root 密码登录失败。
-- 本地 `.env` 已从 `PINDOU_PROD_SSH_PASS` 切换到 `PINDOU_PROD_SSH_KEY_PATH`。
-
-**为什么**：root + 密码 + 公网 IP = 最常见被爆破的攻击面。
-**操作**（10 分钟）：
-```bash
-# 在本机生成 SSH key pair（如果还没有）
-ssh-keygen -t ed25519 -C "pindou-prod"
-
-# 把公钥推到服务器
-ssh-copy-id -i ~/.ssh/id_ed25519.pub root@$PINDOU_PROD_SSH_HOST
-
-# 测试 key 登录成功后，禁用密码登录
-ssh root@$PINDOU_PROD_SSH_HOST "sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config && systemctl reload sshd"
-
-# 验证密码登录已禁
-ssh -o PreferredAuthentications=password root@$PINDOU_PROD_SSH_HOST   # 应该报错
-```
-**完成后**：从 `.env` 删除 `PINDOU_PROD_SSH_PASS`，添加 `PINDOU_PROD_SSH_KEY_PATH`。
-
-### 2.2 改 root 改成普通用户 + sudo
-**状态（2026-05-25 Codex 复核）**：✅ 已完成。
-
-- 已创建 `pindou` 用户。
-- 已加入 `sudo` 组。
-- 已配置 key 登录。
-- 已配置 `/etc/sudoers.d/pindou`，部署自动化可无交互执行 sudo。
-
-**为什么**：所有部署 / 应用都用 root 运行，被入侵就是 root 权限。
-**操作**：
-```bash
-# 创建 pindou 用户
-adduser pindou
-usermod -aG sudo pindou
-# 把公钥也加到 pindou 账号
-mkdir -p /home/pindou/.ssh && cp /root/.ssh/authorized_keys /home/pindou/.ssh/ && chown -R pindou:pindou /home/pindou/.ssh
+```text
+[微信小程序]
+    |
+    | wx.cloud.callContainer
+    v
+[微信云托管 FastAPI Docker]
+    |
+    | SQLAlchemy / Alembic
+    v
+[云托管 MySQL]
+    |
+    | StorageBackend
+    v
+[腾讯云 COS]
+    |
+    | payment/create + webhook
+    v
+[虎皮椒]
 ```
 
-### 2.3 防火墙 + fail2ban
-**状态（2026-05-24 Codex 执行）**：✅ 已完成。
+### 1.1 关键差异
 
-- `ufw` 已安装并启用。
-- 入站只允许 `22/tcp`、`80/tcp`、`443/tcp`。
-- `fail2ban` 已安装并 `enable --now`，当前 active。
-- `111 rpcbind` 未发现 NFS 挂载依赖，已 `disable --now`。
-- `3001`（`claude-shop.service`）和 `8092`（Docker `wxhm`）已停用并清理。
-- cloudflared 已停用并移除旧 unit。
-- 旧 Nginx 站点配置已下线，Nginx 当前 inactive，后续 PinDou 部署时重新启用。
-- 本机验证：SSH key 登录可用；fail2ban active；UFW active；旧服务 inactive。
-- Task 1 复核：已重新执行 `ufw allow 22/80/443` + `ufw --force enable`，`ufw status verbose` 显示 active。
+| 项目 | 传统部署 | 云托管部署 |
+| --- | --- | --- |
+| 小程序访问 | `https://api.pindou.cn/api/v1` | `wx.cloud.callContainer` |
+| 域名 / ICP | 需要自有域名备案 | MVP 期使用微信云托管默认域名 |
+| 运行方式 | systemd + Uvicorn + Nginx | Docker 容器 |
+| 数据库 | SQLite / 未来 PG | 云托管 MySQL |
+| 文件存储 | 本地 `var/` | 腾讯云 COS |
+| webhook | 自有域名 | 云托管 HTTPS 域名 |
+
+---
+
+## 2. 后端容器
+
+后端目录：`06_backend/`
+
+### 2.1 本地构建
 
 ```bash
-apt update && apt install -y ufw fail2ban
-ufw default deny incoming
-ufw allow 22/tcp     # SSH
-ufw allow 80/tcp     # HTTP（Nginx）
-ufw allow 443/tcp    # HTTPS
-ufw enable
-systemctl enable --now fail2ban
+cd 06_backend
+docker build -t pindou-backend .
+docker run --rm -p 8000:8000 --env-file .env pindou-backend
+curl http://localhost:8000/health
 ```
 
----
+预期返回：
 
-## 3. 部署架构（Phase 2 目标）
-
-```
-公网用户
-    │
-    ↓  HTTPS
-[Nginx :443]  ← Let's Encrypt 证书（待域名备案后申请）
-    │
-    ├─→ /api/*   → [FastAPI :8000]  (后端业务)
-    ├─→ /static/* → 本地磁盘 + Nginx 静态服务（用户作品图）
-    └─→ /admin/* → [FastAPI :8000] (CDK 管理后台 + 客服面板)
-                          │
-                          ↓
-                  [SQLite or PostgreSQL]
-                  (Phase 2 选型，Codex 推荐)
-                          │
-                          ↓
-                  [本地磁盘 /var/pindou/data/]
-                  - 用户原图（30 天后定时删除，ADR-009）
-                  - AI Preview 图（永久保存）
-                  - PatternSheet JSON（永久保存）
-                          │
-                          ↓
-                  [反代 gpt-image-2 调用]
-                  https://gpt.xiaochisaascn.org/v1
-                  （ADR-007 用户已接受风险）
+```json
+{"status":"ok"}
 ```
 
----
+### 2.2 Dockerfile
 
-## 4. 软件栈（Codex Phase 2 任务 1 确认 / 安装）
+当前容器入口为：
 
-| 组件 | 版本目标 | 生产机当前状态（2026-05-24） | 备注 |
-|------|---------|-----------------------------|------|
-| Python | 3.11+ | 已有 `/usr/bin/python3` = Python 3.10.12；未发现 `python3.11` | 任务 1/8 需安装 3.11+ 或用 `pyenv`/deadsnakes |
-| FastAPI | 最新稳定 | 未部署 PinDou app | 任务 1 安装 |
-| Uvicorn | 最新稳定 | 未部署 PinDou app | 任务 1 安装 |
-| SQLite or PostgreSQL | — | SQLite runtime 3.37.2 + `/usr/bin/sqlite3` 已有；PostgreSQL CLI 未发现 | MVP 期 SQLite 够，1 万用户后切 PG |
-| Nginx | apt 默认 | 已安装 `/usr/sbin/nginx`，版本 1.18.0；旧站点已下线，当前 inactive | 任务 8 配置 PinDou 站点后重新 enable |
-| systemd | 自带 | 已有 | 服务管理 |
-| Let's Encrypt（certbot） | apt 默认 | 已安装 `/usr/bin/certbot`，版本 1.21.0 | 域名备案后申请证书 |
-| Docker | 非 PinDou 必需 | 旧容器/镜像/`/var/lib/docker` 已清理；docker/containerd 当前 inactive | PinDou 计划走 systemd，不依赖 Docker |
-| UFW | apt 默认 | 已安装并 active，只允许 `22/80/443` 入站 | 服务器本机已放行 80/443；若公网仍不可达，检查云厂商安全组 / Cloudflare Tunnel |
-| fail2ban | apt 默认 | 已安装并 active，版本 0.11.2 | 已启用 |
-| Pillow + numpy + scikit-learn | 最新 | 未部署 PinDou app | PatternBuilder 算法依赖 |
-| colormath | 最新 | 未部署 PinDou app | CIEDE2000 |
-| openai SDK | 最新 | 未部署 PinDou app | 反代调用 |
-| python-dotenv | 最新 | 未部署 PinDou app | 读 `.env` |
-
----
-
-## 5. 部署流程（Phase 2 末执行）
-
-### 5.1 首次部署
 ```bash
-# 1. SSH 进服务器（已改 SSH key）
-ssh pindou@$PINDOU_PROD_SSH_HOST
-
-# 2. 拉代码
-git clone <repo> /opt/pindou
-cd /opt/pindou
-
-# 3. 装依赖
-python3.11 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-
-# 4. 配置 .env（从本地 scp 上去，永远不入 git）
-scp .env.production pindou@$PINDOU_PROD_SSH_HOST:/opt/pindou/.env
-
-# 5. 启动 systemd 服务
-sudo cp deploy/pindou.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now pindou
-
-# 6. 配置 Nginx
-sudo cp deploy/nginx.conf /etc/nginx/sites-available/pindou
-sudo ln -s /etc/nginx/sites-available/pindou /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-
-# 7. 申请 HTTPS 证书（域名备案完成后）
-sudo certbot --nginx -d pindou.cn -d www.pindou.cn
+uvicorn pindou.main:app --host 0.0.0.0 --port 8000
 ```
 
-### 5.2 滚动更新
+云托管部署时只需要暴露容器端口 `8000`。
+
+---
+
+## 3. 环境变量
+
+生产环境变量在微信云托管控制台配置，严禁写入 git。
+
+### 3.1 必填
+
+| 变量 | 说明 |
+| --- | --- |
+| `APP_ENV=production` | 生产模式 |
+| `DATABASE_URL` | 云托管 MySQL 连接串，格式见 `.env.example` |
+| `STORAGE_BACKEND=cos` | 生产使用 COS |
+| `COS_SECRET_ID` / `COS_SECRET_KEY` | COS 密钥 |
+| `COS_BUCKET` / `COS_REGION` | COS bucket 与地域 |
+| `JWT_SECRET` | JWT 签名密钥 |
+| `WECHAT_MP_APPID` / `WECHAT_MP_APPSECRET` | 小程序登录 |
+| `XIAOCHI_GPT_API_KEY` | AI 反代调用 |
+| `HUPIJIAO_APP_ID` / `HUPIJIAO_APP_SECRET` / `HUPIJIAO_WEBHOOK_SECRET` | 虎皮椒 |
+| `HUPIJIAO_CALLBACK_URL` | 云托管 HTTPS URL + `/api/v1/webhook/hupijiao` |
+
+### 3.2 推荐
+
+| 变量 | 推荐值 |
+| --- | --- |
+| `APP_CORS_ALLOW_ORIGINS` | 云托管私有协议为主，保留本地调试域 |
+| `COS_PUBLIC_BASE_URL` | 如开 CDN 或自定义访问域则填写 |
+| `ENABLE_REVERSE_PROXY_HEALTH_MONITOR` | `true` |
+| `ENABLE_EXPIRED_ORIGINAL_DELETE_TASK` | `true` |
+
+---
+
+## 4. 数据库
+
+### 4.1 MySQL 初始化
+
+1. 微信云托管控制台创建 MySQL。
+2. 创建数据库 `pindou`，字符集建议 `utf8mb4`。
+3. 配置 `DATABASE_URL=mysql+pymysql://user:password@host:3306/pindou?charset=utf8mb4`。
+4. 容器启动后执行 Alembic：
+
 ```bash
-cd /opt/pindou
-git pull
-source .venv/bin/activate
-pip install -r requirements.txt
-sudo systemctl restart pindou
+cd 06_backend
+alembic upgrade head
+```
+
+### 4.2 SQLite 迁移到 MySQL
+
+如本地已有 SQLite 数据：
+
+```bash
+cd 06_backend
+python scripts/sqlite_to_mysql.py \
+  --sqlite sqlite:///./var/pindou.db \
+  --mysql "mysql+pymysql://user:password@host:3306/pindou?charset=utf8mb4" \
+  --dry-run
+
+python scripts/sqlite_to_mysql.py \
+  --sqlite sqlite:///./var/pindou.db \
+  --mysql "mysql+pymysql://user:password@host:3306/pindou?charset=utf8mb4"
+```
+
+先跑 `--dry-run` 看行数，再执行真实迁移。
+
+---
+
+## 5. COS 存储
+
+### 5.1 创建 bucket
+
+1. 腾讯云 COS 创建 bucket，地域建议与云托管一致（上海）。
+2. 配置最小权限密钥，只允许当前 bucket 的对象读写删除。
+3. 环境变量设置：
+
+```env
+STORAGE_BACKEND=cos
+COS_SECRET_ID=...
+COS_SECRET_KEY=...
+COS_BUCKET=...
+COS_REGION=ap-shanghai
+COS_PUBLIC_BASE_URL=
+```
+
+### 5.2 路径约定
+
+| 类型 | key 前缀 |
+| --- | --- |
+| 用户原图 | `uploads/` |
+| AI preview | `previews/` |
+| 图纸 PNG / JSON | `patterns/` |
+| 缩略图 | `thumbnails/` |
+
+ADR-009 仍然生效：用户原图 30 天后删除，PatternSheet 和成品图保留。
+
+---
+
+## 6. 前端云托管配置
+
+前端目录：`05_frontend/`
+
+### 6.1 环境变量
+
+```env
+VITE_USE_WX_CLOUD=true
+VITE_WX_CLOUD_ENV=<微信云托管环境 ID>
+VITE_WX_CLOUD_SERVICE=pindou-backend
+VITE_WX_CLOUD_API_PREFIX=/api/v1
+```
+
+本地联调老 HTTP 路径时可临时设置：
+
+```env
+VITE_USE_WX_CLOUD=false
+VITE_PINDOU_DEV_API=http://192.168.2.40:8000/api/v1
+```
+
+### 6.2 图片上传
+
+云托管路径不再使用 `uni.uploadFile`。前端读取本地图片为 base64，通过 JSON 发送：
+
+- AI preview：`POST /api/v1/preview/generate`
+- 脚本图纸：`POST /api/v1/pattern/build`
+
+后端负责 base64 解码、格式校验和存储抽象落盘 / 上传 COS。
+
+---
+
+## 7. 虎皮椒 webhook
+
+部署成功后，从微信云托管控制台复制默认 HTTPS URL，并在虎皮椒后台设置：
+
+```text
+https://<云托管默认域名>/api/v1/webhook/hupijiao
+```
+
+同步更新生产环境变量：
+
+```env
+HUPIJIAO_CALLBACK_URL=https://<云托管默认域名>/api/v1/webhook/hupijiao
+```
+
+开发期可继续用：
+
+```bash
+cd 06_backend
+python scripts/mock_hupijiao_webhook.py <order_no> --amount 28.00
 ```
 
 ---
 
-## 6. 备案流程（Phase 2 末同步启动）
+## 8. 部署步骤（用户执行）
 
-### 6.1 ICP 个人备案
-- **耗时**：申请到下证 7-15 工作日（运气好 7 天，运气差 15+）
-- **要求**：身份证 + 手持照 + 域名（30 元/年）+《信息安全承诺书》
-- **平台**：所选云服务商的备案系统（用上海机的云厂商）
-
-### 6.2 小程序备案
-- 个人主体（ADR-006）
-- 类目：**工具 > 图像处理**（**不**选 AIGC，Task F 建议）
-- 与 ICP 备案可并行启动
-
-### 6.3 域名准备
-- 候选：`pindou.cn`（用户去查可用性）
-- 避开关键词：ai / gpt / chat / gen
-
----
-
-## 7. 监控（Phase 2 任务 7 落地）
-
-### 7.1 反代健康检查（ADR-007 触发条件）
-- 每 5 分钟检查 `https://gpt.xiaochisaascn.org/v1/models`（轻量端点）
-- 连续 3 次失败 → 触发告警（Telegram / 邮件 / 微信通知）
-- 故障 > 6 小时 → FUTURE_WORK 第 8 条命中 → Claude Code 下次对话强制顶上来提醒
-
-### 7.2 业务指标
-- API 调用成功率 / 延迟（Provider 维度）
-- 用户漏斗：进入 → 上传 → Preview → PatternSheet → 付费
-- 错误率 / 错误类型
-
-### 7.3 系统指标
-- CPU / 内存 / 磁盘 / 带宽（Prometheus + node_exporter 或简单 `vnstat`）
-- 关键阈值：磁盘 > 80% / 内存 > 90% / 带宽峰值持续 > 80% 告警
+1. 微信公众平台开通“微信云托管”。
+2. 创建环境，推荐上海地域，记录 env ID。
+3. 创建云托管服务，服务名建议 `pindou-backend`。
+4. 创建 MySQL，并配置 `DATABASE_URL`。
+5. 创建 COS bucket，并配置 `STORAGE_BACKEND=cos` 与 COS 密钥。
+6. 在云托管服务环境变量页录入 `.env.example` 中的生产变量。
+7. 关联 GitHub repo 或上传 Docker 镜像。
+8. 部署后访问 `/health`，确认返回 `{"status":"ok"}`。
+9. 执行 `alembic upgrade head` 初始化 MySQL 表。
+10. 如已有 SQLite 数据，执行 `scripts/sqlite_to_mysql.py` 迁移。
+11. 修改虎皮椒后台 webhook URL。
+12. 前端配置 `VITE_WX_CLOUD_ENV` 后重新编译小程序，真机测试登录、上传、生成、支付和作品集。
 
 ---
 
-## 8. ADR-007 监控触发条件（Claude Code 持续盯）
+## 9. 监控与回退
 
-发生以下任一情况，下次对话立刻顶上来：
-- [ ] PinDou 月活 ≥ 1 万
-- [ ] 任何 PinDou 违规投诉 / 举报
-- [ ] 微信小程序审核被拒
-- [ ] **反代故障 > 6 小时**（依赖本文件 §7.1 健康检查）
-- [ ] 法规 / 平台规则关于境外大模型 / AIGC 口径变化
-- [ ] 服务器到期前 30 天未续费
+### 9.1 云托管监控
 
----
+- 容器启动失败 / 重启次数
+- API 错误率和 P95 延迟
+- MySQL 连接数与慢查询
+- COS 读写失败率
+- 虎皮椒 webhook 验签失败率
+- 反代健康检查失败次数（ADR-007）
 
-## 9. 跨境合规状态（FUTURE_WORK 第 2 条更新）
+### 9.2 回退条件
 
-✅ **已解决**：上海机已就位，用户人像上传不再走跨境路径。Phase 3 提审前 FUTURE_WORK 第 2 条可关闭。
+见 ADR-012：
 
-⚠️ **仍有跨境风险**：反代调用 `gpt.xiaochisaascn.org` → OpenAI 美国服务器，用户原图经过反代节点。这是 ADR-007 用户接受的剩余风险，不属于服务器选址问题。
+1. 云托管月成本连续 2 个月超过 200 元且高于传统部署。
+2. 云托管限流、冷启动或不可用影响生成链路。
+3. 用户量超过 5 万，需要重新核算资源和架构。
+
+触发后恢复 `deployment_legacy.md` 的传统服务器路径，或拆分为小程序云托管 + 独立后端混合部署。
