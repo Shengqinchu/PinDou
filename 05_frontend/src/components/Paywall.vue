@@ -2,7 +2,7 @@
   <div class="paywall-overlay" @click.self="handleClose">
     <transition name="sheet">
       <!-- ===== Sheet: plan-selection state ===== -->
-      <section v-if="currentState === 'plans'" class="paywall__sheet" data-state="plans">
+      <section v-if="currentState === 'plans'" class="paywall__sheet" data-state="plans" @click.stop>
         <div class="paywall__handle" @click="handleClose" aria-hidden="true"></div>
 
         <header class="paywall__head">
@@ -14,7 +14,7 @@
           <li 
             class="paywall__plan" 
             :class="{ 'paywall__plan--active': selectedPlan === 'single' }"
-            @click="selectedPlan = 'single'"
+            @click.stop="selectSku('single')"
           >
             <div class="paywall__plan-label">单次</div>
             <div class="paywall__plan-price">¥9.9</div>
@@ -24,7 +24,7 @@
           <li 
             class="paywall__plan paywall__plan--recommended" 
             :class="{ 'paywall__plan--active': selectedPlan === 'monthly' }"
-            @click="selectedPlan = 'monthly'"
+            @click.stop="selectSku('monthly')"
           >
             <span class="paywall__plan-badge">推荐</span>
             <div class="paywall__plan-label">月卡</div>
@@ -35,7 +35,7 @@
           <li 
             class="paywall__plan" 
             :class="{ 'paywall__plan--active': selectedPlan === 'artisan' }"
-            @click="selectedPlan = 'artisan'"
+            @click.stop="selectSku('artisan')"
           >
             <div class="paywall__plan-label">人工精修</div>
             <div class="paywall__plan-price">¥99<span class="paywall__plan-price-sub">起</span></div>
@@ -47,7 +47,7 @@
           type="button" 
           class="btn btn--primary btn--block btn--lg paywall__cta" 
           :disabled="isLoading"
-          @click="handleShowQR"
+          @click.stop="handleShowQR"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                stroke="currentColor" stroke-width="2"
@@ -57,10 +57,10 @@
             <rect x="3" y="14" width="7" height="7" rx="1"/>
             <path d="M14 14h3v3h-3z M19 14h2 M14 19h2 M19 17v4"/>
           </svg>
-          {{ isLoading ? '正在生成订单...' : '加客服扫码付' }}
+          {{ isLoading ? '正在生成订单...' : ctaText }}
         </button>
 
-        <navigator class="paywall__cdk" url="/pages/cdk/redeem">
+        <navigator class="paywall__cdk" url="/pages/cdk/redeem" @click.stop>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                stroke="currentColor" stroke-width="1.8"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 4px; display: block;">
@@ -73,7 +73,7 @@
       </section>
 
       <!-- ===== Sheet: QR-payment state ===== -->
-      <section v-else class="paywall__sheet paywall__sheet--qr" data-state="qr">
+      <section v-else class="paywall__sheet paywall__sheet--qr" data-state="qr" @click.stop>
         <div class="paywall__handle" aria-hidden="true"></div>
 
         <header class="paywall__head">
@@ -106,7 +106,7 @@
           长按二维码可保存到相册，或截屏后在微信里“识别图中二维码”
         </p>
 
-        <button type="button" class="btn btn--secondary btn--block btn--md paywall__back" @click="currentState = 'plans'">
+        <button type="button" class="btn btn--secondary btn--block btn--md paywall__back" @click.stop="currentState = 'plans'">
           返回选择套餐
         </button>
       </section>
@@ -141,6 +141,12 @@ const planNameText = computed(() => {
   if (selectedPlan.value === 'monthly') return '月卡 · ¥28';
   return '人工精修 · ¥99 起';
 });
+
+const ctaText = computed(() => `加客服扫码付 · ${planNameText.value}`);
+
+const selectSku = (plan: 'single' | 'monthly' | 'artisan') => {
+  selectedPlan.value = plan;
+};
 
 const handleClose = () => {
   emit('close');
