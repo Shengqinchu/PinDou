@@ -418,3 +418,11 @@ AI 路径 timeout、脚本 fallback 兔子占位图、标题实体转义、统�
 3. COS bucket 与密钥。
 4. 虎皮椒生产密钥与后台 webhook URL 配置。
 5. 是否保留当前上海机作为临时 fallback；如果保留，只做备份，不再作为 MVP 主路径。
+
+### 本地回归结果
+
+1. 后端全量测试：`06_backend/.venv/Scripts/python.exe -m pytest` 通过 `42 passed`。
+2. Alembic 本地 SQLite 验证：临时 `sqlite:///./var/wxcloud_regression.db` 执行 `alembic upgrade head` 成功。
+3. 前端小程序构建：`05_frontend npm run build:mp-weixin` 成功。
+4. Docker 本地验证未执行：当前 Windows 环境没有安装 `docker` CLI，需在已安装 Docker Desktop 或云托管构建环境验证 `docker build -t pindou-backend .`。
+5. MySQL / COS / `wx.cloud.callContainer` 真实链路仍需上微信云托管后验证；本地已保留 `VITE_USE_WX_CLOUD=false` 和传统 HTTP fallback 方便排错。
