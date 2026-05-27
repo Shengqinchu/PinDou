@@ -24,6 +24,7 @@
             v-for="artwork in artworks"
             :key="artwork.artwork_id"
             class="works__card"
+            :class="{ 'works__card--paid': artwork.is_paid_unlocked }"
             @click="openArtwork(artwork)"
             @longpress.stop="showArtworkActions(artwork)"
           >
@@ -35,7 +36,10 @@
             />
             <h3 class="works__title">{{ artworkTitle(artwork) }}</h3>
             <p class="works__meta">{{ artworkMeta(artwork) }}</p>
-            <span v-if="isAiArtwork(artwork)" class="works__premium-tag tag tag--ai">
+            <span v-if="artwork.is_paid_unlocked" class="works__premium-tag works__premium-tag--paid">
+              ✨ 月卡
+            </span>
+            <span v-else-if="isAiArtwork(artwork)" class="works__premium-tag tag tag--ai">
               AI
             </span>
             <button
@@ -64,10 +68,10 @@
             <span class="works__empty-check"></span>
           </span>
         </div>
-        <h2 class="works__empty-title">还没有作品哦</h2>
+        <h2 class="works__empty-title">还没作品哦</h2>
         <p class="works__empty-sub">上传一张照片，生成你的第一张拼豆图纸</p>
         <button type="button" class="btn btn--primary btn--lg works__empty-cta" @click="goCreate">
-          立即生成
+          立即生成 →
         </button>
       </section>
 
@@ -113,7 +117,7 @@ const normalizeAssetUrl = (url?: string | null) => {
 
 const artworkThumb = (artwork: Artwork) => {
   if (brokenThumbIds.value.includes(artwork.artwork_id)) return FALLBACK_THUMB;
-  return normalizeAssetUrl(artwork.preview_url || artwork.original_image_url);
+  return normalizeAssetUrl(artwork.thumbnail_url || artwork.preview_url || artwork.original_image_url);
 };
 
 const styleLabel = (style: Artwork['style_preset']) => {
@@ -306,6 +310,10 @@ onShow(() => {
   overflow: hidden;
 }
 
+.works__card--paid {
+  background: rgba(255, 192, 128, 0.05);
+}
+
 .works__card:active {
   transform: scale(0.98);
 }
@@ -342,6 +350,19 @@ onShow(() => {
   left: 14px;
 }
 
+.works__premium-tag--paid {
+  right: 14px;
+  left: auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--pd-gradient-warm);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(255, 138, 128, 0.28);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
 .works__more {
   position: absolute;
   top: 6px;
@@ -357,6 +378,10 @@ onShow(() => {
   justify-content: center;
   gap: 2px;
   padding: 0;
+}
+
+.works__card--paid .works__more {
+  top: 42px;
 }
 
 .works__more-dot {

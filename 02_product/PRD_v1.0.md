@@ -568,6 +568,7 @@ class Artwork:
     style_preset: StylePreset
     size_preset: SizePreset
     preview_url: str                   # FinishedPreview URL（永久）
+    thumbnail_url: str | None          # 作品集 200×200 缩略图 URL；可由后端从图纸 PNG 懒生成
     pattern_data: PatternSheet         # 完整图纸数据（永久）
     title: str | None
     is_paid_unlocked: bool = False     # 用户是否已付费解锁高级图纸

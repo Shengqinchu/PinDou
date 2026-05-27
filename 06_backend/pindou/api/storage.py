@@ -19,7 +19,7 @@ ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
 def ensure_storage_dirs() -> None:
     settings = get_settings()
-    for directory in (settings.upload_dir, settings.preview_dir, settings.pattern_dir):
+    for directory in (settings.upload_dir, settings.preview_dir, settings.pattern_dir, settings.thumbnail_dir):
         directory.mkdir(parents=True, exist_ok=True)
 
 

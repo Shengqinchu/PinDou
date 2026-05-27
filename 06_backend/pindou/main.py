@@ -66,6 +66,7 @@ def create_app() -> FastAPI:
     app.mount("/static/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")
     app.mount("/static/previews", StaticFiles(directory=settings.preview_dir), name="previews")
     app.mount("/static/patterns", StaticFiles(directory=settings.pattern_dir), name="patterns")
+    app.mount("/static/thumbnails", StaticFiles(directory=settings.thumbnail_dir), name="thumbnails")
 
     @app.get("/health", tags=["system"])
     async def health() -> dict[str, str]:

@@ -151,6 +151,7 @@ export interface Artwork {
   style_preset: StylePreset;
   size_preset: SizePreset;
   preview_url: string;
+  thumbnail_url?: string | null;
   pattern_data: PatternSheet;
   title: string | null;
   is_paid_unlocked: boolean;
@@ -421,6 +422,7 @@ export const api = {
           style_preset: 'q_portrait',
           size_preset: '52x52',
           preview_url: '/static/assets/bead-cat.svg',
+          thumbnail_url: '/static/assets/bead-cat.svg',
           pattern_data: generateMockPatternSheet('52x52'),
           title: '可爱小猫拼豆',
           is_paid_unlocked: false
@@ -434,6 +436,7 @@ export const api = {
           style_preset: 'q_couple',
           size_preset: '104x104',
           preview_url: '/static/assets/bead-heart.svg',
+          thumbnail_url: '/static/assets/bead-heart.svg',
           pattern_data: generateMockPatternSheet('104x104'),
           title: '浪漫爱心拼豆',
           is_paid_unlocked: true // 已解锁高级
@@ -455,6 +458,7 @@ export const api = {
         style_preset: 'q_portrait',
         size_preset: '78x78',
         preview_url: '/static/assets/bead-cat.svg',
+        thumbnail_url: '/static/assets/bead-cat.svg',
         pattern_data: generateMockPatternSheet('78x78'),
         title: '我的精品拼豆图纸',
         is_paid_unlocked: id === 'art_102'

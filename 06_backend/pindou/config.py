@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     upload_dir: Path = Field(default=Path("./var/data/uploads"), validation_alias="PINDOU_UPLOAD_DIR")
     preview_dir: Path = Field(default=Path("./var/data/previews"), validation_alias="PINDOU_PREVIEW_DIR")
     pattern_dir: Path = Field(default=Path("./var/data/patterns"), validation_alias="PINDOU_PATTERN_DIR")
+    thumbnail_dir: Path = Field(default=Path("./var/data/thumbnails"), validation_alias="PINDOU_THUMBNAIL_DIR")
 
     xiaochi_gpt_base_url: str = Field(
         default="https://gpt.xiaochisaascn.org/v1",

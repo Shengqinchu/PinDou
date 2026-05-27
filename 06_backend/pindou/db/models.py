@@ -102,6 +102,7 @@ class Artwork(Base):
         return self.pattern_json
 
     def to_frontend_dict(self) -> dict[str, Any]:
+        metadata = self.pattern_data.get("metadata", {}) if isinstance(self.pattern_data, dict) else {}
         return {
             "artwork_id": self.artwork_id,
             "user_id": self.user_id,
@@ -111,6 +112,7 @@ class Artwork(Base):
             "style_preset": self.style_preset,
             "size_preset": self.size_preset,
             "preview_url": self.preview_url,
+            "thumbnail_url": metadata.get("thumbnail_url") or self.preview_url,
             "pattern_data": self.pattern_data,
             "title": self.title,
             "is_paid_unlocked": self.is_paid_unlocked,
