@@ -11,16 +11,11 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.config import get_settings
+from pindou.services.storage_util import ensure_storage_dirs, static_url
 
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
-
-
-def ensure_storage_dirs() -> None:
-    settings = get_settings()
-    for directory in (settings.upload_dir, settings.preview_dir, settings.pattern_dir, settings.thumbnail_dir):
-        directory.mkdir(parents=True, exist_ok=True)
 
 
 def save_uploaded_image(filename: str, data: bytes) -> dict[str, str]:
@@ -100,10 +95,6 @@ def resolve_stored_file(directory: Path, file_id: str, extensions: set[str]) -> 
         if candidate.exists() and candidate.is_file():
             return candidate
     return None
-
-
-def static_url(kind: str, filename: str) -> str:
-    return f"/static/{kind}/{filename}"
 
 
 def _normalize_extension(extension: str) -> str:

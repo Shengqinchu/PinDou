@@ -9,9 +9,9 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from pindou.api.storage import static_url
 from pindou.config import get_settings
 from pindou.db.models import Artwork
+from pindou.services.storage_util import static_asset_path, static_url
 
 THUMBNAIL_SIZE = 200
 
@@ -141,20 +141,3 @@ def create_square_thumbnail(source: Path, destination: Path) -> None:
         offset = ((THUMBNAIL_SIZE - image.width) // 2, (THUMBNAIL_SIZE - image.height) // 2)
         canvas.alpha_composite(image, offset)
         canvas.convert("RGB").save(destination, format="PNG", optimize=True)
-
-
-def static_asset_path(url: str | None) -> Path | None:
-    if not url:
-        return None
-    settings = get_settings()
-    static_roots = {
-        "/static/uploads/": settings.upload_dir,
-        "/static/previews/": settings.preview_dir,
-        "/static/patterns/": settings.pattern_dir,
-        "/static/thumbnails/": settings.thumbnail_dir,
-    }
-    for prefix, directory in static_roots.items():
-        if url.startswith(prefix):
-            return directory / Path(url).name
-    path = Path(url)
-    return path if path.is_absolute() else None

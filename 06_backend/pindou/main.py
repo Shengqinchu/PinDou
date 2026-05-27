@@ -11,9 +11,9 @@ from fastapi.staticfiles import StaticFiles
 from pindou import __version__
 from pindou.api import api_router
 from pindou.api.errors import install_exception_handlers
-from pindou.api.storage import ensure_storage_dirs
 from pindou.config import get_settings
 from pindou.db.session import init_db
+from pindou.services.storage_util import ensure_storage_dirs
 from pindou.tasks.delete_expired_originals import ExpiredOriginalsDeleteScheduler
 from pindou.tasks.reverse_proxy_health_check import ReverseProxyHealthMonitor
 
