@@ -11,7 +11,8 @@ from pindou.pattern.builder import ColorRef
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-COLORMAP_DIR = PROJECT_ROOT / "01_research" / "colormap"
+PACKAGE_COLORMAP_DIR = Path(__file__).resolve().parent / "data"
+RESEARCH_COLORMAP_DIR = PROJECT_ROOT / "01_research" / "colormap"
 
 
 def palette_filename(brand: str, bead_diameter_mm: float) -> str:
@@ -26,11 +27,13 @@ def palette_filename(brand: str, bead_diameter_mm: float) -> str:
 
 @lru_cache(maxsize=32)
 def load_palette_rows(brand: str = "MARD", bead_diameter_mm: float = 5.0) -> tuple[dict[str, Any], ...]:
-    path = COLORMAP_DIR / palette_filename(brand, float(bead_diameter_mm))
-    if not path.exists() and brand.strip().lower() == "mard" and float(bead_diameter_mm) == 5.0:
-        path = COLORMAP_DIR / "mard.json"
-    if not path.exists():
-        raise FileNotFoundError(f"Palette file not found for {brand} {bead_diameter_mm}mm: {path}")
+    filename = palette_filename(brand, float(bead_diameter_mm))
+    candidate_dirs = (PACKAGE_COLORMAP_DIR, RESEARCH_COLORMAP_DIR)
+    path = next((directory / filename for directory in candidate_dirs if (directory / filename).exists()), None)
+    if path is None and brand.strip().lower() == "mard" and float(bead_diameter_mm) == 5.0:
+        path = next((directory / "mard.json" for directory in candidate_dirs if (directory / "mard.json").exists()), None)
+    if path is None:
+        raise FileNotFoundError(f"Palette file not found for {brand} {bead_diameter_mm}mm: {filename}")
     rows = json.loads(path.read_text(encoding="utf-8"))
     return tuple(rows)
 

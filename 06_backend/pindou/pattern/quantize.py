@@ -2,24 +2,15 @@
 
 from __future__ import annotations
 
-import sys
 import time
 from dataclasses import dataclass
-from pathlib import Path
 
 import numpy as np
 from PIL import Image
 
 from pindou.pattern.builder import ColorRef
+from pindou.pattern.quantize_core import Palette, dither, nearest_indices, rgb_to_lab, select_palette_colors
 from pindou.providers.base import SizePreset
-
-
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-ALGORITHM_IMPLS_DIR = PROJECT_ROOT / "01_research" / "tech" / "algorithm_impls"
-if str(ALGORITHM_IMPLS_DIR) not in sys.path:
-    sys.path.append(str(ALGORITHM_IMPLS_DIR))
-
-from quantize_core import Palette, dither, nearest_indices, rgb_to_lab, select_palette_colors  # noqa: E402
 
 
 DEFAULT_TARGET_COLORS = 24
