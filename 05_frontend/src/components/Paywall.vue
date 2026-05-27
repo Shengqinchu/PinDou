@@ -77,8 +77,8 @@
         <div class="paywall__handle" aria-hidden="true"></div>
 
         <header class="paywall__head">
-          <h2 class="paywall__title">扫码加客服微信</h2>
-          <p class="paywall__subtitle">付款后我们会在 5 分钟内为你开通</p>
+          <h2 class="paywall__title">{{ qrTitle }}</h2>
+          <p class="paywall__subtitle">{{ qrSubtitle }}</p>
         </header>
 
         <div class="paywall__qr-wrap">
@@ -100,13 +100,27 @@
             <dt class="paywall__order-label">套餐</dt>
             <dd class="paywall__order-value">{{ planNameText }}</dd>
           </div>
+          <div v-if="currentState === 'hupijiao_qr'" class="paywall__order-row">
+            <dt class="paywall__order-label">状态</dt>
+            <dd class="paywall__order-value">{{ pollingText }}</dd>
+          </div>
         </dl>
 
         <p class="paywall__qr-hint">
-          长按二维码可保存到相册，或截屏后在微信里“识别图中二维码”
+          {{ qrHint }}
         </p>
 
-        <button type="button" class="btn btn--secondary btn--block btn--md paywall__back" @click.stop="currentState = 'plans'">
+        <button
+          v-if="currentState === 'hupijiao_qr'"
+          type="button"
+          class="btn btn--secondary btn--block btn--md paywall__back"
+          :disabled="isLoading"
+          @click.stop="handleCustomerServiceFallback"
+        >
+          换种付款方式
+        </button>
+
+        <button type="button" class="btn btn--secondary btn--block btn--md paywall__back" @click.stop="backToPlans">
           返回选择套餐
         </button>
       </section>
@@ -115,8 +129,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onUnmounted } from 'vue';
 import { usePaymentStore } from '../store/payment';
+import { useUserStore } from '../store/user';
 
 const props = defineProps({
   artworkId: {
@@ -128,13 +143,17 @@ const props = defineProps({
 const emit = defineEmits(['close']);
 
 const paymentStore = usePaymentStore();
+const userStore = useUserStore();
 
-const currentState = ref<'plans' | 'qr'>('plans');
+const currentState = ref<'plans' | 'hupijiao_qr' | 'customer_service_qr'>('plans');
 const selectedPlan = ref<'single' | 'monthly' | 'artisan'>('monthly'); // 推荐月卡默认
 const isLoading = ref(false);
 
 const orderId = ref('');
 const qrUrl = ref('/static/assets/qr-placeholder.svg'); // fallback placeholder
+const pollingText = ref('等待付款中');
+let pollTimer: ReturnType<typeof setInterval> | null = null;
+let pollAttempts = 0;
 
 const planNameText = computed(() => {
   if (selectedPlan.value === 'single') return '单次 · ¥9.9';
@@ -142,29 +161,50 @@ const planNameText = computed(() => {
   return '人工精修 · ¥99 起';
 });
 
-const ctaText = computed(() => `加客服扫码付 · ${planNameText.value}`);
+const ctaText = computed(() => `立即付款 · ${planNameText.value}`);
+const qrTitle = computed(() => (
+  currentState.value === 'hupijiao_qr' ? '虎皮椒微信支付' : '扫码加客服微信'
+));
+const qrSubtitle = computed(() => (
+  currentState.value === 'hupijiao_qr'
+    ? '通过虎皮椒安全付款，支付成功后自动开通'
+    : '付款后我们会在 5 分钟内为你开通'
+));
+const qrHint = computed(() => (
+  currentState.value === 'hupijiao_qr'
+    ? '长按二维码识别付款；本页会自动刷新支付结果'
+    : '长按二维码可保存到相册，或截屏后在微信里“识别图中二维码”'
+));
 
 const selectSku = (plan: 'single' | 'monthly' | 'artisan') => {
   selectedPlan.value = plan;
 };
 
 const handleClose = () => {
+  stopPolling();
   emit('close');
+};
+
+const backToPlans = () => {
+  stopPolling();
+  currentState.value = 'plans';
 };
 
 const handleShowQR = async () => {
   isLoading.value = true;
+  stopPolling();
   try {
     let sku: 'single_9.9' | 'monthly_28' | 'custom_99' = 'monthly_28';
     if (selectedPlan.value === 'single') sku = 'single_9.9';
     else if (selectedPlan.value === 'artisan') sku = 'custom_99';
     
-    // 1. 创建订单并获取客服二维码
     const { order, qrInfo } = await paymentStore.createPayOrder(sku, props.artworkId);
     orderId.value = order.order_id;
     qrUrl.value = qrInfo.qr_url || '/static/assets/qr-placeholder.svg';
-    
-    currentState.value = 'qr';
+    pollingText.value = '等待付款中';
+
+    currentState.value = 'hupijiao_qr';
+    startPolling(order.order_id);
   } catch (e) {
     uni.showToast({
       title: '创建订单失败，请稍后重试',
@@ -174,6 +214,78 @@ const handleShowQR = async () => {
     isLoading.value = false;
   }
 };
+
+const handleCustomerServiceFallback = async () => {
+  isLoading.value = true;
+  stopPolling();
+  try {
+    let sku: 'single_9.9' | 'monthly_28' | 'custom_99' = 'monthly_28';
+    if (selectedPlan.value === 'single') sku = 'single_9.9';
+    else if (selectedPlan.value === 'artisan') sku = 'custom_99';
+
+    const { order, qrInfo } = await paymentStore.createCustomerServiceOrder(sku, props.artworkId);
+    orderId.value = order.order_id;
+    qrUrl.value = qrInfo.qr_url || '/static/assets/qr-placeholder.svg';
+    currentState.value = 'customer_service_qr';
+  } catch (e) {
+    uni.showToast({
+      title: '客服付款入口暂时不可用',
+      icon: 'none'
+    });
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const startPolling = (targetOrderId: string) => {
+  pollAttempts = 0;
+  pollTimer = setInterval(async () => {
+    pollAttempts += 1;
+    try {
+      const result = await paymentStore.checkOrderStatus(targetOrderId);
+      if (result.status === 'paid_confirmed') {
+        stopPolling();
+        pollingText.value = '支付成功';
+        try {
+          await userStore.fetchProfile();
+        } catch (e) {
+          console.warn('刷新用户额度失败:', e);
+        }
+        uni.showToast({ title: '支付成功', icon: 'success' });
+        emit('close');
+        setTimeout(() => {
+          uni.switchTab({ url: '/pages/artwork/list' });
+        }, 500);
+      } else if (result.status === 'failed') {
+        stopPolling();
+        pollingText.value = '订单已失效';
+        uni.showToast({ title: '订单已失效，请重新下单', icon: 'none' });
+        currentState.value = 'plans';
+      } else {
+        pollingText.value = `等待付款中 ${pollAttempts * 3}s`;
+      }
+    } catch (e) {
+      console.warn('轮询订单状态失败:', e);
+      pollingText.value = '网络波动，继续等待';
+    }
+
+    if (pollAttempts >= 100) {
+      stopPolling();
+      pollingText.value = '订单超时';
+      uni.showToast({ title: '支付超时，请重新下单', icon: 'none' });
+      currentState.value = 'plans';
+    }
+  }, 3000);
+};
+
+const stopPolling = () => {
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
+};
+
+onUnmounted(stopPolling);
 </script>
 
 <style scoped lang="scss">

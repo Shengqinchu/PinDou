@@ -11,12 +11,26 @@ export const usePaymentStore = defineStore('payment', {
       try {
         const order = await api.createOrder(sku, artworkId);
         this.currentOrder = order;
-        // 创建订单后立马获取客服二维码
+        const qrInfo = {
+          qr_url: order.qr_code_url || '/static/assets/qr-placeholder.svg',
+          wx_id: '',
+          order_id: order.order_id
+        };
+        return { order, qrInfo };
+      } catch (error) {
+        console.error('Create payment order error:', error);
+        throw error;
+      }
+    },
+    async createCustomerServiceOrder(sku: 'single_9.9' | 'monthly_28' | 'custom_99', artworkId?: string) {
+      try {
+        const order = await api.createCustomerServiceOrder(sku, artworkId);
+        this.currentOrder = order;
         const qrInfo = await api.getCustomerServiceQR(order.order_id);
         this.customerServiceQR = qrInfo;
         return { order, qrInfo };
       } catch (error) {
-        console.error('Create payment order error:', error);
+        console.error('Create customer service payment order error:', error);
         throw error;
       }
     },

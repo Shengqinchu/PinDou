@@ -166,12 +166,17 @@ export interface CDKRedeemResult {
 
 export interface Order {
   order_id: string;
+  order_no?: string;
   user_id: string;
   created_at: string;
   sku: string; // 'single' | 'monthly' | 'custom'
   amount_cny: number;
   status: 'pending' | 'paid_confirmed' | 'failed';
-  payment_method: 'wechat_qr_via_cs' | 'cdk_redemption';
+  payment_method: 'wechat_qr_via_cs' | 'cdk_redemption' | 'hupijiao_qr';
+  payment_provider?: 'customer_service' | 'hupijiao';
+  qr_code_url?: string | null;
+  expires_at?: string | null;
+  is_mock_payment?: boolean;
   artwork_id: string | null;
 }
 
@@ -522,11 +527,38 @@ export const api = {
         sku: sku,
         amount_cny: sku === 'single_9.9' ? 9.9 : sku === 'monthly_28' ? 28.0 : 99.0,
         status: 'pending',
-        payment_method: 'wechat_qr_via_cs',
+        payment_method: 'hupijiao_qr',
+        payment_provider: 'hupijiao',
+        qr_code_url: '/static/assets/qr-placeholder.svg',
+        expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        is_mock_payment: true,
         artwork_id: artworkId || null
       });
     }
     return request({ url: '/payment/order/create', method: 'POST', data: { sku_id: sku, artwork_id: artworkId } });
+  },
+
+  createCustomerServiceOrder(sku: 'single_9.9' | 'monthly_28' | 'custom_99', artworkId?: string): Promise<Order> {
+    if (USE_MOCK) {
+      return Promise.resolve({
+        order_id: 'order_cs_mock_' + Math.random().toString(36).substr(2, 9),
+        order_no: 'PDCSMOCK',
+        user_id: 'mock_openid_123',
+        created_at: new Date().toISOString(),
+        sku,
+        amount_cny: sku === 'single_9.9' ? 9.9 : sku === 'monthly_28' ? 28.0 : 99.0,
+        status: 'pending',
+        payment_method: 'wechat_qr_via_cs',
+        payment_provider: 'customer_service',
+        qr_code_url: '/static/assets/qr-placeholder.svg',
+        artwork_id: artworkId || null
+      });
+    }
+    return request({
+      url: '/payment/customer-service/order/create',
+      method: 'POST',
+      data: { sku_id: sku, artwork_id: artworkId }
+    });
   },
 
   // 获取订单状态
