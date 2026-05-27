@@ -2,8 +2,12 @@
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
 import { useUserStore } from "./store/user";
 
+declare const wx: any;
+declare const process: { env?: { VITE_WX_CLOUD_ENV?: string } };
+
 onLaunch(() => {
   console.log("PinDou App Launching...");
+  initWxCloud();
 
   // Keep launch synchronous for WeChat runtime. A slow profile request must not
   // block the first page render or WAService can report a launch timeout.
@@ -34,6 +38,21 @@ async function refreshProfileInBackground(userStore: ReturnType<typeof useUserSt
     console.warn("自动登录拉取 Profile 失败，可能登录态已失效:", e);
     userStore.logout();
   }
+}
+
+function initWxCloud() {
+  if (typeof wx === "undefined" || !wx.cloud) {
+    return;
+  }
+  const viteEnv = (import.meta as any).env || {};
+  const wxCloudEnv =
+    viteEnv.VITE_WX_CLOUD_ENV ||
+    (typeof process !== "undefined" && process.env?.VITE_WX_CLOUD_ENV ? process.env.VITE_WX_CLOUD_ENV : "") ||
+    "prod-01";
+  wx.cloud.init({
+    env: wxCloudEnv,
+    traceUser: true,
+  });
 }
 </script>
 

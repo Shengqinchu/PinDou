@@ -1,5 +1,5 @@
 // PinDou API 封装 (符合 PRD §5 接口契约)
-import { request, BASE_URL } from '../utils/request';
+import { request, BASE_URL, USE_WX_CLOUD } from '../utils/request';
 
 // 是否开启 Mock 模式 (联调前默认开启)
 const USE_MOCK = false;
@@ -60,6 +60,23 @@ function uploadFailError(err: any): PinDouApiError {
     code: 'NETWORK_ERROR',
     details: err
   });
+}
+
+function readFileAsBase64(filePath: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    uni.getFileSystemManager().readFile({
+      filePath,
+      encoding: 'base64',
+      success: (res) => resolve(String(res.data || '')),
+      fail: reject
+    });
+  });
+}
+
+function filenameFromPath(filePath: string, fallback: string): string {
+  const cleanPath = filePath.split('?')[0] || '';
+  const parts = cleanPath.split(/[\\/]/);
+  return parts[parts.length - 1] || fallback;
 }
 
 /* ==========================================
@@ -325,7 +342,21 @@ export const api = {
       });
     }
 
-    // 真机上传使用 uni.uploadFile 包装
+    if (USE_WX_CLOUD) {
+      return readFileAsBase64(filePath).then((image_base64) => request({
+        url: '/preview/generate',
+        method: 'POST',
+        data: {
+          image_base64,
+          filename: filenameFromPath(filePath, 'upload.png'),
+          style_preset: style,
+          size_preset: size,
+          seed: seed ? String(seed) : ''
+        }
+      }));
+    }
+
+    // 传统 HTTP fallback：真机上传使用 uni.uploadFile 包装
     return new Promise((resolve, reject) => {
       const token = uni.getStorageSync('pd_token') || '';
       uni.uploadFile({
@@ -372,7 +403,22 @@ export const api = {
     }
 
     if (params.rawImageFilePath) {
-      // 脚本路径，使用 uploadFile 上传原图直接生成
+      if (USE_WX_CLOUD) {
+        return readFileAsBase64(params.rawImageFilePath).then((raw_image_base64) => request({
+          url: '/pattern/build',
+          method: 'POST',
+          data: {
+            raw_image_base64,
+            filename: filenameFromPath(params.rawImageFilePath!, 'upload.png'),
+            size: params.size,
+            brand: params.brand || 'MARD',
+            bead_diameter_mm: params.bead_diameter_mm || 5.0,
+            mode: params.mode
+          }
+        }));
+      }
+
+      // 传统 HTTP fallback：脚本路径使用 uploadFile 上传原图直接生成
       return new Promise((resolve, reject) => {
         const token = uni.getStorageSync('pd_token') || '';
         uni.uploadFile({

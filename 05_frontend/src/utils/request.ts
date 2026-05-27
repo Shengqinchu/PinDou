@@ -1,21 +1,38 @@
-// PinDou 统一请求库封装 (uni.request)
+// PinDou 统一请求库封装 (微信云托管 callContainer + 传统 HTTP fallback)
 
 declare const process: {
   env?: {
     NODE_ENV?: string;
     VITE_PINDOU_DEV_API?: string;
     VITE_PINDOU_PROD_API?: string;
+    VITE_USE_WX_CLOUD?: string;
+    VITE_WX_CLOUD_ENV?: string;
+    VITE_WX_CLOUD_SERVICE?: string;
+    VITE_WX_CLOUD_API_PREFIX?: string;
   };
 };
 
-const runtimeEnv = typeof process !== 'undefined' && process.env ? process.env : {};
+declare const wx: any;
+
+const viteEnv = (import.meta as any).env || {};
+const runtimeEnv = {
+  ...viteEnv,
+  ...(typeof process !== 'undefined' && process.env ? process.env : {})
+};
 const DEV_API = runtimeEnv.VITE_PINDOU_DEV_API || 'http://192.168.2.40:8000/api/v1';
 const PROD_API = runtimeEnv.VITE_PINDOU_PROD_API || 'https://api.pindou.cn/api/v1';
 const isDev = runtimeEnv.NODE_ENV !== 'production';
+const storageWxCloudFlag = uni.getStorageSync('pd_use_wx_cloud');
 
 export const BASE_URL = normalizeBaseUrl(
   uni.getStorageSync('pd_api_base_url') || (isDev ? DEV_API : PROD_API)
 );
+export const USE_WX_CLOUD = storageWxCloudFlag
+  ? storageWxCloudFlag !== 'false'
+  : runtimeEnv.VITE_USE_WX_CLOUD !== 'false';
+export const WX_CLOUD_ENV = runtimeEnv.VITE_WX_CLOUD_ENV || 'prod-01';
+export const WX_CLOUD_SERVICE = runtimeEnv.VITE_WX_CLOUD_SERVICE || 'pindou-backend';
+const WX_CLOUD_API_PREFIX = normalizeApiPrefix(runtimeEnv.VITE_WX_CLOUD_API_PREFIX || '/api/v1');
 
 interface RequestOptions {
   url: string;
@@ -26,6 +43,13 @@ interface RequestOptions {
 }
 
 export function request<T = any>(options: RequestOptions): Promise<T> {
+  if (USE_WX_CLOUD && canUseWxCloud()) {
+    return wxCloudRequest<T>(options);
+  }
+  return legacyHttpRequest<T>(options);
+}
+
+function legacyHttpRequest<T = any>(options: RequestOptions): Promise<T> {
   const token = uni.getStorageSync('pd_token') || '';
 
   // 组装完整 URL
@@ -63,6 +87,53 @@ export function request<T = any>(options: RequestOptions): Promise<T> {
       },
       fail: (err) => {
         // 网络不通、超时等底层错误
+        const friendlyMessage = '网络有点不给力，请稍后再试哦~';
+        if (!options.hideErrorToast) {
+          uni.showToast({
+            title: friendlyMessage,
+            icon: 'none',
+            duration: 3000
+          });
+        }
+        reject(err);
+      }
+    });
+  });
+}
+
+function wxCloudRequest<T = any>(options: RequestOptions): Promise<T> {
+  const token = uni.getStorageSync('pd_token') || '';
+  const header = {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : '',
+    'X-WX-SERVICE': WX_CLOUD_SERVICE,
+    ...options.headers,
+  };
+
+  return new Promise((resolve, reject) => {
+    wx.cloud.callContainer({
+      config: { env: WX_CLOUD_ENV },
+      path: cloudPath(options.url),
+      method: options.method || 'GET',
+      header,
+      data: options.data,
+      success: (res: any) => {
+        const statusCode = Number(res?.statusCode || 0);
+        if (statusCode >= 200 && statusCode < 300) {
+          resolve(res.data as T);
+          return;
+        }
+        const friendlyMessage = translateError(res?.data, statusCode);
+        if (!options.hideErrorToast) {
+          uni.showToast({
+            title: friendlyMessage,
+            icon: 'none',
+            duration: 3000
+          });
+        }
+        reject(new Error(friendlyMessage));
+      },
+      fail: (err: any) => {
         const friendlyMessage = '网络有点不给力，请稍后再试哦~';
         if (!options.hideErrorToast) {
           uni.showToast({
@@ -127,4 +198,24 @@ function translateError(errorData: any, statusCode: number): string {
 
 function normalizeBaseUrl(url: string): string {
   return url.replace(/\/+$/, '');
+}
+
+function normalizeApiPrefix(prefix: string): string {
+  const normalized = prefix.trim() || '/api/v1';
+  return normalized.startsWith('/') ? normalized.replace(/\/+$/, '') : `/${normalized.replace(/\/+$/, '')}`;
+}
+
+function cloudPath(url: string): string {
+  if (url.startsWith('http')) {
+    return url;
+  }
+  const path = url.startsWith('/') ? url : `/${url}`;
+  if (path.startsWith(WX_CLOUD_API_PREFIX + '/') || path === WX_CLOUD_API_PREFIX) {
+    return path;
+  }
+  return `${WX_CLOUD_API_PREFIX}${path}`;
+}
+
+function canUseWxCloud(): boolean {
+  return typeof wx !== 'undefined' && !!wx.cloud && typeof wx.cloud.callContainer === 'function';
 }

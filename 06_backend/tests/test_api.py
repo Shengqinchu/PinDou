@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import base64
 from datetime import datetime
 from collections.abc import Iterator
 
@@ -147,6 +148,27 @@ def test_pattern_build_happy_path_and_error(api_client) -> None:
     assert partition_payload["items"][0]["label"] == "左上区"
     assert partition_payload["items"][0]["grid_offset"] == {"row": 0, "col": 0}
     assert partition_payload["items"][0]["url"].endswith("_partition_01.png")
+
+
+def test_pattern_build_accepts_base64_payload(api_client) -> None:
+    client, _session_factory = api_client
+    headers = auth_headers(client)
+    encoded = base64.b64encode(png_bytes((230, 230, 230))).decode("ascii")
+
+    response = client.post(
+        "/api/pattern/build",
+        json={
+            "size": "26x26",
+            "mode": "script",
+            "raw_image_base64": encoded,
+            "filename": "sample.png",
+        },
+        headers=headers,
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["bead_total"] > 0
+    assert payload["metadata"]["artwork_id"]
 
 
 def test_generate_script_artwork_pattern_and_delete_flow(api_client) -> None:

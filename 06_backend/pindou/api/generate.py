@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import base64
+import binascii
 from dataclasses import replace
 from typing import Any
 
@@ -166,11 +168,26 @@ async def resolve_raw_image(payload: dict[str, Any], upload: UploadFile | None) 
         data = await upload.read()
         saved = save_uploaded_image(upload.filename or "upload.png", data)
         return load_uploaded_image(saved["image_id"])[0], saved["path"]
+    image_base64 = payload.get("image_base64") or payload.get("raw_image_base64")
+    if image_base64:
+        filename = str(payload.get("filename") or payload.get("image_filename") or "upload.png")
+        data = decode_base64_image(str(image_base64))
+        saved = save_uploaded_image(filename, data)
+        return load_uploaded_image(saved["image_id"])[0], saved["path"]
     image_id = str(payload.get("image_id") or "")
     if not image_id:
         raise ApiException(422, ErrorCode.IMAGE_NOT_FOUND, "缺少图片，请先上传照片。")
     data, path = load_uploaded_image(image_id)
     return data, str(path)
+
+
+def decode_base64_image(value: str) -> bytes:
+    """Decode a mini-program callContainer JSON image payload."""
+    encoded = value.split(",", 1)[1] if "," in value and value.lstrip().startswith("data:") else value
+    try:
+        return base64.b64decode(encoded, validate=True)
+    except (binascii.Error, ValueError) as exc:
+        raise ApiException(422, ErrorCode.VALIDATION_ERROR, "图片数据格式不正确。") from exc
 
 
 def parse_size(value: Any) -> SizePreset:

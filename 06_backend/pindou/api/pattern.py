@@ -6,7 +6,7 @@ from fastapi import APIRouter, Request
 
 from pindou.api.deps import CurrentUser, DbSession
 from pindou.api.errors import ApiException, ErrorCode
-from pindou.api.generate import parse_payload_or_upload, parse_size
+from pindou.api.generate import parse_payload_or_upload, parse_size, resolve_raw_image
 from pindou.api.pattern_assets import finalize_artwork_pattern_assets
 from pindou.api.quota import consume_script_quota, consume_white_bg_quota, require_sensitive_consent
 from pindou.api.storage import load_preview_image, load_uploaded_image, save_pattern_png, save_uploaded_image
@@ -29,9 +29,13 @@ async def build_pattern(request: Request, current_user: CurrentUser, db: DbSessi
     mode = str(payload.get("mode") or "auto")
 
     try:
-        if upload is not None:
-            saved = save_uploaded_image(upload.filename or "upload.png", await upload.read())
-            raw_image, _raw_path = load_uploaded_image(saved["image_id"])
+        if upload is not None or payload.get("raw_image_base64") or payload.get("image_base64"):
+            if upload is not None:
+                saved = save_uploaded_image(upload.filename or "upload.png", await upload.read())
+                raw_image, _raw_path = load_uploaded_image(saved["image_id"])
+                original_path = saved["path"]
+            else:
+                raw_image, original_path = await resolve_raw_image(payload, None)
             sheet = PatternBuilder().build(
                 size=size,
                 raw_image=raw_image,
@@ -43,7 +47,6 @@ async def build_pattern(request: Request, current_user: CurrentUser, db: DbSessi
             consume_script_quota(db, current_user)
             if sheet.metadata.get("white_bg_detected"):
                 consume_white_bg_quota(db, current_user)
-            original_path = saved["path"]
             preview_path = ""
             style_preset = "cartoon_fallback"
         else:
