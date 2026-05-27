@@ -110,9 +110,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
-import { useCdkStore } from '../../store/cdk';
+import { useCDKStore } from '../../store/cdk';
 
-const cdkStore = useCdkStore();
+const cdkStore = useCDKStore();
 
 const currentState = ref<'entry' | 'success'>('entry');
 const cleanCode = ref('');
@@ -147,9 +147,9 @@ const handleRedeem = async () => {
   errorMsg.value = '';
   
   try {
-    const result = await cdkStore.redeemCDK(cleanCode.value);
+    const result = await cdkStore.redeem(cleanCode.value);
     if (result.success) {
-      rewardType.value = result.type === 'monthly' ? '月卡高级特权' : '单次付费图纸';
+      rewardType.value = result.cdk_type === 'monthly_card' ? '月卡高级特权' : '单次付费图纸';
       rewardExpires.value = result.expires_at 
         ? `到期日: ${result.expires_at.slice(0, 10)}` 
         : '永久有效';
