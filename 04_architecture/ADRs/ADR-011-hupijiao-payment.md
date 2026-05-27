@@ -73,12 +73,13 @@ Phase 2 接入虎皮椒支付码方案，但不走 H5 跳转。
 - `HUPIJIAO_APP_ID`
 - `HUPIJIAO_APP_SECRET`
 - `HUPIJIAO_WEBHOOK_SECRET`
-- 虎皮椒后台 webhook URL：`https://api.pindou.cn/api/v1/webhook/hupijiao`
+- 虎皮椒后台 webhook URL：`https://<微信云托管默认域名>/api/v1/webhook/hupijiao`
 - 确认虎皮椒当前是否支持个人主体注册和稳定收款
 
 ## 关联
 
 - ADR-003：MVP 变现路径仍保留客服扫码兜底。
 - ADR-006：个人主体官方微信支付限制仍成立；虎皮椒是自动化过渡方案。
+- ADR-012：MVP 期 webhook URL 使用微信云托管默认 HTTPS 域名。
 - PRD §4.8：Paywall 与支付订单流程。
 - FUTURE_WORK #6：长期升级为个体工商户 + 官方微信支付。
