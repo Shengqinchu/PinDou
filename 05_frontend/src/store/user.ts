@@ -21,6 +21,8 @@ interface UserState {
   uiMetrics: UiMetrics;
 }
 
+let activeLoginPromise: Promise<any> | null = null;
+
 const defaultUiMetrics = (): UiMetrics => ({
   statusBarHeight: 20,
   menuButtonTop: 24,
@@ -34,6 +36,21 @@ const defaultUiMetrics = (): UiMetrics => ({
   screenHeight: 667,
   pixelRatio: 2,
 });
+
+function isAuthExpiredError(error: unknown): boolean {
+  const message = String((error as Error)?.message || error || '');
+  return message.includes('登录已过期') || message.includes('请先登录');
+}
+
+function applyConsentToUser(user: User | null, type: 'privacy' | 'sensitive', consentAt: string) {
+  if (!user) return;
+  if (type === 'privacy') {
+    user.privacy_consent_at = consentAt;
+  } else {
+    user.sensitive_consent_at = consentAt;
+  }
+  uni.setStorageSync('pd_user', JSON.stringify(user));
+}
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
@@ -109,8 +126,11 @@ export const useUserStore = defineStore('user', {
     },
     async login() {
       try {
+        if (activeLoginPromise) {
+          return activeLoginPromise;
+        }
         // 小程序获取 code
-        return new Promise<any>((resolve, reject) => {
+        activeLoginPromise = new Promise<any>((resolve, reject) => {
           uni.login({
             provider: 'weixin',
             success: async (loginRes) => {
@@ -132,9 +152,12 @@ export const useUserStore = defineStore('user', {
             fail: (err) => reject(err)
           });
         });
+        return await activeLoginPromise;
       } catch (error) {
         console.error('Login action error:', error);
         throw error;
+      } finally {
+        activeLoginPromise = null;
       }
     },
     async fetchProfile() {
@@ -144,6 +167,11 @@ export const useUserStore = defineStore('user', {
         uni.setStorageSync('pd_user', JSON.stringify(user));
         return user;
       } catch (error) {
+        if (isAuthExpiredError(error)) {
+          this.logout();
+          const data = await this.login();
+          return data.user as User;
+        }
         console.error('Fetch profile action error:', error);
         throw error;
       }
@@ -151,16 +179,20 @@ export const useUserStore = defineStore('user', {
     async giveConsent(type: 'privacy' | 'sensitive') {
       try {
         const res = await api.submitConsent(type);
-        if (res.success && this.userInfo) {
-          if (type === 'privacy') {
-            this.userInfo.privacy_consent_at = res.consent_at;
-          } else {
-            this.userInfo.sensitive_consent_at = res.consent_at;
-          }
-          uni.setStorageSync('pd_user', JSON.stringify(this.userInfo));
+        if (res.success) {
+          applyConsentToUser(this.userInfo, type, res.consent_at);
         }
         return res;
       } catch (error) {
+        if (isAuthExpiredError(error)) {
+          this.logout();
+          await this.login();
+          const res = await api.submitConsent(type);
+          if (res.success) {
+            applyConsentToUser(this.userInfo, type, res.consent_at);
+          }
+          return res;
+        }
         console.error('Give consent action error:', error);
         throw error;
       }
