@@ -2,16 +2,17 @@
 
 from __future__ import annotations
 
+from io import BytesIO
 from pathlib import Path
 from typing import Any
 
 from PIL import Image, ImageOps, UnidentifiedImageError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import flag_modified
 
-from pindou.config import get_settings
 from pindou.db.models import Artwork
-from pindou.services.storage_util import get_storage_backend, static_asset_path, static_url, storage_key_from_url_or_path
+from pindou.services.storage_util import get_storage_backend, storage_key_from_url_or_path
 
 THUMBNAIL_SIZE = 200
 
@@ -79,8 +80,9 @@ class ArtworkService:
         pattern_json = artwork.pattern_json if isinstance(artwork.pattern_json, dict) else {}
         metadata = pattern_json.setdefault("metadata", {})
         existing_url = metadata.get("thumbnail_url")
-        existing_path = static_asset_path(existing_url) if existing_url else None
-        if existing_url and existing_path is not None and existing_path.exists():
+        backend = get_storage_backend()
+        existing_key = storage_key_from_url_or_path(existing_url) if existing_url else None
+        if existing_url and existing_key and backend.exists(existing_key):
             return existing_url
 
         source_url = (
@@ -88,21 +90,22 @@ class ArtworkService:
             or pattern_json.get("image_url")
             or artwork.preview_path
         )
-        source_path = static_asset_path(source_url)
-        if source_path is None or not source_path.exists():
+        source_key = storage_key_from_url_or_path(source_url)
+        if source_key is None:
             return existing_url or source_url
 
-        settings = get_settings()
-        settings.thumbnail_dir.mkdir(parents=True, exist_ok=True)
-        output_path = settings.thumbnail_dir / f"thumb_{artwork.artwork_id}.png"
+        thumbnail_key = f"thumbnails/thumb_{artwork.artwork_id}.png"
         try:
-            create_square_thumbnail(source_path, output_path)
-        except (OSError, UnidentifiedImageError):
+            source_bytes = backend.download(source_key)
+            thumbnail_bytes = create_square_thumbnail_bytes(source_bytes)
+            backend.upload(thumbnail_key, thumbnail_bytes, content_type="image/png")
+        except Exception:
             return existing_url or source_url
 
-        thumbnail_url = static_url("thumbnails", output_path.name)
-        metadata["thumbnail_url"] = thumbnail_url
-        artwork.pattern_json = {**pattern_json, "metadata": dict(metadata)}
+        thumbnail_url = backend.get_url(thumbnail_key)
+        metadata = {**metadata, "thumbnail_url": thumbnail_url}
+        artwork.pattern_json = {**pattern_json, "metadata": metadata}
+        flag_modified(artwork, "pattern_json")
         self.session.add(artwork)
         self.session.commit()
         self.session.refresh(artwork)
@@ -117,7 +120,7 @@ class ArtworkService:
 
         delete_file_if_exists(artwork.original_path)
         metadata = artwork.pattern_json.get("metadata", {}) if isinstance(artwork.pattern_json, dict) else {}
-        delete_file_if_exists(static_asset_path(metadata.get("thumbnail_url")))
+        delete_file_if_exists(metadata.get("thumbnail_url"))
         self.session.delete(artwork)
         self.session.commit()
         return True
@@ -136,11 +139,17 @@ def delete_file_if_exists(path: str | Path | None) -> bool:
     return False
 
 
-def create_square_thumbnail(source: Path, destination: Path) -> None:
-    with Image.open(source) as image:
+def create_square_thumbnail_bytes(source: bytes) -> bytes:
+    with Image.open(BytesIO(source)) as image:
         image = ImageOps.exif_transpose(image).convert("RGBA")
         image.thumbnail((THUMBNAIL_SIZE, THUMBNAIL_SIZE), Image.Resampling.LANCZOS)
         canvas = Image.new("RGBA", (THUMBNAIL_SIZE, THUMBNAIL_SIZE), (255, 255, 255, 255))
         offset = ((THUMBNAIL_SIZE - image.width) // 2, (THUMBNAIL_SIZE - image.height) // 2)
         canvas.alpha_composite(image, offset)
-        canvas.convert("RGB").save(destination, format="PNG", optimize=True)
+        output = BytesIO()
+        canvas.convert("RGB").save(output, format="PNG", optimize=True)
+        return output.getvalue()
+
+
+def create_square_thumbnail(source: Path, destination: Path) -> None:
+    destination.write_bytes(create_square_thumbnail_bytes(source.read_bytes()))

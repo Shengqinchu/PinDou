@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import logging
+from io import BytesIO
 from datetime import date, datetime, timedelta, timezone
 
 import pytest
+from PIL import Image
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -25,6 +27,35 @@ def add_user(db_session: Session, openid: str = "openid_user") -> User:
     db_session.add(user)
     db_session.commit()
     return user
+
+
+class FakeStorageBackend:
+    def __init__(self) -> None:
+        self.files: dict[str, bytes] = {}
+        self.uploads: list[tuple[str, str | None]] = []
+
+    def upload(self, path: str, content: bytes, *, content_type: str | None = None) -> str:
+        self.files[path] = content
+        self.uploads.append((path, content_type))
+        return path
+
+    def download(self, path: str) -> bytes:
+        return self.files[path]
+
+    def delete(self, path: str) -> bool:
+        return self.files.pop(path, None) is not None
+
+    def exists(self, path: str) -> bool:
+        return path in self.files
+
+    def get_url(self, path: str) -> str:
+        return f"https://cos.example.test/{path}"
+
+
+def png_bytes(color: tuple[int, int, int] = (255, 128, 64)) -> bytes:
+    output = BytesIO()
+    Image.new("RGB", (64, 48), color).save(output, format="PNG")
+    return output.getvalue()
 
 
 def test_user_service_register_consent_and_quota(db_session: Session) -> None:
@@ -64,6 +95,35 @@ def test_artwork_service_save_list_delete_removes_original_file(db_session: Sess
     assert service.delete_artwork(artwork_id=artwork.artwork_id, user_id=user.openid) is True
     assert not original.exists()
     assert service.get_artwork(artwork.artwork_id) is None
+
+
+def test_artwork_thumbnail_uses_storage_backend_url(db_session: Session, monkeypatch: pytest.MonkeyPatch) -> None:
+    backend = FakeStorageBackend()
+    monkeypatch.setattr("pindou.services.artwork_service.get_storage_backend", lambda: backend)
+
+    source_key = "patterns/pattern_artwork_with_grid.png"
+    backend.upload(source_key, png_bytes(), content_type="image/png")
+
+    user = add_user(db_session)
+    service = ArtworkService(db_session)
+    artwork = service.save_artwork(
+        user_id=user.openid,
+        original_path="uploads/source.png",
+        preview_path="",
+        pattern_json={"metadata": {"labeled_image_url": backend.get_url(source_key)}},
+        style_preset="script",
+        size_preset="26x26",
+        title="Storage thumbnail",
+    )
+
+    frontend_artwork = service.to_frontend_dict(artwork)
+    expected_key = f"thumbnails/thumb_{artwork.artwork_id}.png"
+    expected_url = backend.get_url(expected_key)
+
+    assert frontend_artwork["thumbnail_url"] == expected_url
+    assert not frontend_artwork["thumbnail_url"].startswith("/static/")
+    assert (expected_key, "image/png") in backend.uploads
+    assert backend.files[expected_key].startswith(b"\x89PNG")
 
 
 def test_cdk_redeem_grants_credits_and_rate_limits(db_session: Session) -> None:

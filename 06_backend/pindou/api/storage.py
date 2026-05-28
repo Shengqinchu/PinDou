@@ -11,7 +11,7 @@ from typing import Any
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 from pindou.api.errors import ApiException, ErrorCode
-from pindou.services.storage_util import ensure_storage_dirs, get_storage_backend, static_url
+from pindou.services.storage_util import ensure_storage_dirs, get_storage_backend
 
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
