@@ -5,6 +5,8 @@ import { request, BASE_URL, USE_WX_CLOUD } from '../utils/request';
 const USE_MOCK = false;
 const PATTERN_UPLOAD_TIMEOUT_MS = 120000;
 const AI_UPLOAD_TIMEOUT_MS = 300000;
+const CLOUD_IMAGE_COMPRESSION_QUALITY = 55;
+const CLOUD_IMAGE_MAX_BASE64_CHARS = 2500000;
 
 type ApiErrorBody = {
   error?: string;
@@ -77,6 +79,87 @@ function filenameFromPath(filePath: string, fallback: string): string {
   const cleanPath = filePath.split('?')[0] || '';
   const parts = cleanPath.split(/[\\/]/);
   return parts[parts.length - 1] || fallback;
+}
+
+function apiRouteUrl(route: string): string {
+  return `${BASE_URL}${route.startsWith('/') ? '' : '/'}${route}`;
+}
+
+function shouldUseHttpImageUpload(): boolean {
+  return USE_WX_CLOUD && BASE_URL.startsWith('https://');
+}
+
+function uploadImageRequest<T>(options: {
+  route: string;
+  filePath: string;
+  fileField: string;
+  timeout: number;
+  formData: Record<string, string>;
+  fallbackMessage: string;
+}): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const token = uni.getStorageSync('pd_token') || '';
+    uni.uploadFile({
+      url: apiRouteUrl(options.route),
+      filePath: options.filePath,
+      name: options.fileField,
+      timeout: options.timeout,
+      formData: options.formData,
+      header: {
+        'Authorization': token ? `Bearer ${token}` : ''
+      },
+      success: (res) => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            resolve(JSON.parse(res.data) as T);
+          } catch {
+            reject(new PinDouApiError('服务器返回格式异常，请稍后重试。', {
+              code: 'UPLOAD_PARSE_ERROR',
+              details: res.data
+            }));
+          }
+        } else {
+          reject(uploadResponseError(res, options.fallbackMessage));
+        }
+      },
+      fail: (err) => reject(uploadFailError(err))
+    });
+  });
+}
+
+function compressImageForCloud(filePath: string): Promise<string> {
+  return new Promise((resolve) => {
+    const compressImage = (uni as any).compressImage;
+    if (typeof compressImage !== 'function') {
+      resolve(filePath);
+      return;
+    }
+    compressImage({
+      src: filePath,
+      quality: CLOUD_IMAGE_COMPRESSION_QUALITY,
+      success: (res: any) => resolve(res?.tempFilePath || filePath),
+      fail: () => resolve(filePath)
+    });
+  });
+}
+
+async function readCloudImagePayload(filePath: string, fallbackFilename: string): Promise<{ image_base64: string; filename: string }> {
+  const compressedPath = await compressImageForCloud(filePath);
+  const image_base64 = await readFileAsBase64(compressedPath);
+  if (image_base64.length > CLOUD_IMAGE_MAX_BASE64_CHARS) {
+    throw new PinDouApiError('照片太大了，请先裁剪一下或换一张更小的照片。', {
+      code: 'IMAGE_TOO_LARGE_FOR_CLOUD',
+      details: { base64_chars: image_base64.length }
+    });
+  }
+  return {
+    image_base64,
+    filename: filenameFromPath(filePath, fallbackFilename)
+  };
+}
+
+function shouldFallbackToCloudBase64(err: unknown): boolean {
+  return !(err instanceof PinDouApiError && typeof err.statusCode === 'number' && err.statusCode >= 400);
 }
 
 /* ==========================================
@@ -343,44 +426,52 @@ export const api = {
     }
 
     if (USE_WX_CLOUD) {
-      return readFileAsBase64(filePath).then((image_base64) => request({
+      const cloudBase64Preview = () => readCloudImagePayload(filePath, 'upload.png').then(({ image_base64, filename }) => request<PreviewResult>({
         url: '/preview/generate',
         method: 'POST',
         data: {
           image_base64,
-          filename: filenameFromPath(filePath, 'upload.png'),
+          filename,
           style_preset: style,
           size_preset: size,
           seed: seed ? String(seed) : ''
         }
       }));
+
+      if (shouldUseHttpImageUpload()) {
+        return uploadImageRequest<PreviewResult>({
+          route: '/preview/generate',
+          filePath,
+          fileField: 'image',
+          timeout: AI_UPLOAD_TIMEOUT_MS,
+          formData: {
+            style_preset: style,
+            size_preset: size,
+            seed: seed ? String(seed) : ''
+          },
+          fallbackMessage: '上传失败'
+        }).catch((err) => {
+          if (!shouldFallbackToCloudBase64(err)) throw err;
+          console.warn('公网图片上传失败，降级为 callContainer 压缩图传输:', err);
+          return cloudBase64Preview();
+        });
+      }
+
+      return cloudBase64Preview();
     }
 
     // 传统 HTTP fallback：真机上传使用 uni.uploadFile 包装
-    return new Promise((resolve, reject) => {
-      const token = uni.getStorageSync('pd_token') || '';
-      uni.uploadFile({
-        url: `${BASE_URL}/preview/generate`, // uni.uploadFile 必须完整 URL（不走 request 拦截器）
-        filePath: filePath,
-        name: 'image',
-        timeout: AI_UPLOAD_TIMEOUT_MS,
-        formData: {
-          style_preset: style,
-          size_preset: size,
-          seed: seed ? String(seed) : ''
-        },
-        header: {
-          'Authorization': token ? `Bearer ${token}` : ''
-        },
-        success: (res) => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            resolve(JSON.parse(res.data) as PreviewResult);
-          } else {
-            reject(uploadResponseError(res, '上传失败'));
-          }
-        },
-        fail: (err) => reject(uploadFailError(err))
-      });
+    return uploadImageRequest<PreviewResult>({
+      route: '/preview/generate',
+      filePath,
+      fileField: 'image',
+      timeout: AI_UPLOAD_TIMEOUT_MS,
+      formData: {
+        style_preset: style,
+        size_preset: size,
+        seed: seed ? String(seed) : ''
+      },
+      fallbackMessage: '上传失败'
     });
   },
 
@@ -404,44 +495,55 @@ export const api = {
 
     if (params.rawImageFilePath) {
       if (USE_WX_CLOUD) {
-        return readFileAsBase64(params.rawImageFilePath).then((raw_image_base64) => request({
+        const cloudBase64Pattern = () => readCloudImagePayload(params.rawImageFilePath!, 'upload.png').then(({ image_base64, filename }) => request<PatternSheet>({
           url: '/pattern/build',
           method: 'POST',
           data: {
-            raw_image_base64,
-            filename: filenameFromPath(params.rawImageFilePath!, 'upload.png'),
+            raw_image_base64: image_base64,
+            filename,
             size: params.size,
             brand: params.brand || 'MARD',
             bead_diameter_mm: params.bead_diameter_mm || 5.0,
             mode: params.mode
           }
         }));
+
+        if (shouldUseHttpImageUpload()) {
+          return uploadImageRequest<PatternSheet>({
+            route: '/pattern/build',
+            filePath: params.rawImageFilePath,
+            fileField: 'raw_image',
+            timeout: PATTERN_UPLOAD_TIMEOUT_MS,
+            formData: {
+              size: params.size,
+              brand: params.brand || 'MARD',
+              bead_diameter_mm: String(params.bead_diameter_mm || 5.0),
+              mode: params.mode
+            },
+            fallbackMessage: '图纸生成失败'
+          }).catch((err) => {
+            if (!shouldFallbackToCloudBase64(err)) throw err;
+            console.warn('公网图片上传失败，降级为 callContainer 压缩图传输:', err);
+            return cloudBase64Pattern();
+          });
+        }
+
+        return cloudBase64Pattern();
       }
 
       // 传统 HTTP fallback：脚本路径使用 uploadFile 上传原图直接生成
-      return new Promise((resolve, reject) => {
-        const token = uni.getStorageSync('pd_token') || '';
-        uni.uploadFile({
-          url: `${BASE_URL}/pattern/build`, // uni.uploadFile 必须完整 URL（不走 request 拦截器）
-          filePath: params.rawImageFilePath!,
-          name: 'raw_image',
-          timeout: PATTERN_UPLOAD_TIMEOUT_MS,
-          formData: {
-            size: params.size,
-            brand: params.brand || 'MARD',
-            bead_diameter_mm: String(params.bead_diameter_mm || 5.0),
-            mode: params.mode
-          },
-          header: { 'Authorization': token ? `Bearer ${token}` : '' },
-          success: (res) => {
-            if (res.statusCode >= 200 && res.statusCode < 300) {
-              resolve(JSON.parse(res.data) as PatternSheet);
-            } else {
-              reject(uploadResponseError(res, '图纸生成失败'));
-            }
-          },
-          fail: (err) => reject(uploadFailError(err))
-        });
+      return uploadImageRequest<PatternSheet>({
+        route: '/pattern/build',
+        filePath: params.rawImageFilePath,
+        fileField: 'raw_image',
+        timeout: PATTERN_UPLOAD_TIMEOUT_MS,
+        formData: {
+          size: params.size,
+          brand: params.brand || 'MARD',
+          bead_diameter_mm: String(params.bead_diameter_mm || 5.0),
+          mode: params.mode
+        },
+        fallbackMessage: '图纸生成失败'
       });
     } else {
       // AI 路径，使用 preview_id 纯 JSON 呼叫

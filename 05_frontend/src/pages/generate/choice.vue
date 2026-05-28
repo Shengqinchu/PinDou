@@ -59,7 +59,7 @@
           </span>
           <!-- 拼豆图纸样张 -->
           <div class="choice__thumb choice__thumb--basic" aria-hidden="true">
-            <image class="choice__thumb-real-img" src="/static/assets/bead-bunny.svg" mode="aspectFit" />
+            <image class="choice__thumb-real-img" src="/static/assets/choice-script-target.png" mode="aspectFit" />
           </div>
         </div>
 
@@ -106,7 +106,7 @@
           </span>
           <!-- Q版萌宠/自拍 SVG 样张 -->
           <div class="choice__thumb choice__thumb--premium" aria-hidden="true">
-            <image class="choice__thumb-real-img" src="/static/assets/bead-cat.svg" mode="aspectFit" />
+            <image class="choice__thumb-real-img" src="/static/assets/choice-ai-target.png" mode="aspectFit" />
           </div>
         </div>
 
