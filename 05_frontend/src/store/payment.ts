@@ -1,5 +1,22 @@
 import { defineStore } from 'pinia';
 import { api, Order } from '../api';
+import { BASE_URL } from '../utils/request';
+
+const QR_PLACEHOLDER = '/static/assets/qr-placeholder.svg';
+
+function resolveQrUrl(url?: string | null): string {
+  if (!url) return QR_PLACEHOLDER;
+  if (url.startsWith('/payment/')) return `${BASE_URL}${url}`;
+  if (url.startsWith('/api/')) return `${BASE_URL.replace(/\/api\/v\d+$/, '')}${url}`;
+  return url;
+}
+
+function resolveHupijiaoQrUrl(order: Order): string {
+  if (order.payment_provider === 'hupijiao' && order.order_no) {
+    return `${BASE_URL}/payment/order/${order.order_no}/qr.png`;
+  }
+  return resolveQrUrl(order.qr_code_url);
+}
 
 export const usePaymentStore = defineStore('payment', {
   state: () => ({
@@ -12,7 +29,7 @@ export const usePaymentStore = defineStore('payment', {
         const order = await api.createOrder(sku, artworkId);
         this.currentOrder = order;
         const qrInfo = {
-          qr_url: order.qr_code_url || '/static/assets/qr-placeholder.svg',
+          qr_url: resolveHupijiaoQrUrl(order),
           wx_id: '',
           order_id: order.order_id
         };

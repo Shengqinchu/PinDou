@@ -83,7 +83,7 @@
 
         <div class="paywall__qr-wrap">
           <image class="paywall__qr-code" :src="qrUrl" mode="aspectFit" :show-menu-by-longpress="true" />
-          <div class="paywall__qr-overlay" aria-hidden="true">
+          <div v-if="showQrOverlay" class="paywall__qr-overlay" aria-hidden="true">
             <div class="paywall__qr-overlay-inner">
               <span class="paywall__qr-overlay-dot"></span>
               <span class="paywall__qr-overlay-text">PD</span>
@@ -175,6 +175,7 @@ const qrHint = computed(() => (
     ? '长按二维码识别付款；本页会自动刷新支付结果'
     : '长按二维码可保存到相册，或截屏后在微信里“识别图中二维码”'
 ));
+const showQrOverlay = computed(() => qrUrl.value.includes('qr-placeholder'));
 
 const selectSku = (plan: 'single' | 'monthly' | 'artisan') => {
   selectedPlan.value = plan;

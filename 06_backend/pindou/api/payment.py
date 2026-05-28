@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any
+from urllib.parse import urlparse
 
+import requests
 from fastapi import APIRouter, Query, Request
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, Response
 from pydantic import BaseModel
 
 from pindou.api.deps import CurrentUser, DbSession
@@ -26,6 +29,7 @@ from pindou.services.user_service import UserService
 
 router = APIRouter(prefix="/payment", tags=["payment"])
 webhook_router = APIRouter(prefix="/webhook", tags=["webhook"])
+logger = logging.getLogger(__name__)
 
 
 DEV_MOCK_WEBHOOK_SECRET = "pindou-dev-hupijiao-mock-secret"
@@ -106,11 +110,12 @@ def create_order(payload: CreateOrderRequest, current_user: CurrentUser, db: DbS
     order.qr_code_path = payment.qr_code_url
     db.commit()
     db.refresh(order)
+    frontend_qr_url = payment.qr_code_url if payment.is_mock else f"/payment/order/{order.order_no}/qr.png"
     response = order.to_frontend_dict()
     response.update(
         {
             "order_no": order.order_no,
-            "qr_code_url": payment.qr_code_url,
+            "qr_code_url": frontend_qr_url,
             "expires_at": payment.expires_at.isoformat(),
             "payment_provider": "hupijiao",
             "is_mock_payment": payment.is_mock,
@@ -135,6 +140,37 @@ def create_customer_service_order(payload: CreateOrderRequest, current_user: Cur
     response = order.to_frontend_dict()
     response["payment_provider"] = "customer_service"
     return response
+
+
+@router.get("/order/{order_ref}/qr.png")
+def get_hupijiao_order_qr(order_ref: str, db: DbSession) -> Response:
+    """Proxy Hupijiao QR images through our domain so Mini Program devices can load them."""
+    order = _find_order(order_ref, db)
+    if order.payment_provider != "hupijiao":
+        raise ApiException(404, ErrorCode.ORDER_NOT_FOUND, "没有找到这个支付二维码。")
+
+    qr_url = order.qr_code_path or ""
+    parsed = urlparse(qr_url)
+    if parsed.scheme not in {"http", "https"}:
+        raise ApiException(404, ErrorCode.ORDER_NOT_FOUND, "这个订单还没有可用的支付二维码。")
+
+    try:
+        upstream = requests.get(qr_url, timeout=15)
+        upstream.raise_for_status()
+    except requests.RequestException as exc:
+        logger.exception(
+            "Failed to proxy Hupijiao QR image order_no=%s host=%s",
+            order.order_no,
+            parsed.netloc,
+        )
+        raise ApiException(502, ErrorCode.ORDER_PAID_TIMEOUT, "二维码加载失败，请重新打开支付页。") from exc
+
+    media_type = upstream.headers.get("content-type") or "image/png"
+    return Response(
+        content=upstream.content,
+        media_type=media_type,
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 @router.get("/order/{order_ref}")
