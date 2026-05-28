@@ -426,3 +426,19 @@ AI 路径 timeout、脚本 fallback 兔子占位图、标题实体转义、统�
 3. 前端小程序构建：`05_frontend npm run build:mp-weixin` 成功。
 4. Docker 本地验证未执行：当前 Windows 环境没有安装 `docker` CLI，需在已安装 Docker Desktop 或云托管构建环境验证 `docker build -t pindou-backend .`。
 5. MySQL / COS / `wx.cloud.callContainer` 真实链路仍需上微信云托管后验证；本地已保留 `VITE_USE_WX_CLOUD=false` 和传统 HTTP fallback 方便排错。
+
+## 2026-05-28 — Phase 2 wxcloud CDK / Hupijiao P0 handoff
+
+本轮处理两个真机 P0 问题：
+
+1. CDK “没有找到相关资源”的根因是云托管数据库缺测试 CDK 数据。已在云端临时生成 3 个 `monthly_card` 测试 CDK，兑换码只在本次对话里给用户，不写入 git；后续可用 `06_backend/scripts/seed_test_cdks.py` 通过 admin API 生成新测试码。
+2. 发现云托管环境的 `JWT_SECRET` 仍可能使用默认开发值或未配置。上线前必须在微信云托管服务设置里配置强随机 `JWT_SECRET`，并配置 `ADMIN_USERNAME` + `ADMIN_PASSWORD_HASH`，然后重新部署；否则 admin token 有被伪造风险。
+3. 虎皮椒下单在云端实测已返回真实 `api.xunhupay.com` 二维码地址，`is_mock_payment=False`。真机仍显示 PD placeholder 的主要风险是小程序 `<image>` 加载外部 `api.xunhupay.com` 域名失败，或 Paywall 的 PD overlay 造成误判。
+4. 已改为后端代理虎皮椒二维码：前端加载 `https://<云托管服务>/api/v1/payment/order/{order_no}/qr.png`，后端再去拉虎皮椒原始二维码，避开小程序外部图片域名限制。
+5. 已给 `hupijiao_service.py` 增加脱敏日志：调用前记录不含签名/密钥的 payload，调用后记录 status/body，异常时写完整 stack trace。若仍出现 placeholder，请先查云托管“运行日志”里的 `Hupijiao` 关键字。
+
+需要用户 / Claude 做：
+
+1. 把云托管服务设置里的最小实例数改为 `1`（当前 0 会 30 分钟无请求自动暂停，真机首次请求容易慢/失败；确认成本后再评估是否改回）。
+2. 设置生产安全环境变量：`JWT_SECRET`、`ADMIN_USERNAME`、`ADMIN_PASSWORD_HASH`。
+3. 确认虎皮椒后台 webhook URL 已改为：`https://pindou-backend-263102-4-1437642655.sh.run.tcloudbase.com/api/v1/webhook/hupijiao`。
