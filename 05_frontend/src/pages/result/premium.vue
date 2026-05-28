@@ -5,9 +5,7 @@
       <!-- ===== Pro badge ===== -->
       <div class="premium__pro-bar">
         <span class="premium__pro-tag">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 2px;">
-            <path d="M9.94 14.06 2 12l7.94-2.06L12 2l2.06 7.94L22 12l-7.94 2.06L12 22z"/>
-          </svg>
+          <span class="premium__pro-mark" aria-hidden="true">月</span>
           月卡解锁中
         </span>
         <span class="premium__pro-expires">23 天到期</span>
@@ -124,23 +122,11 @@
       <!-- ===== CTAs ===== -->
       <div class="premium__actions">
         <button class="btn btn--primary btn--block btn--lg" @click="handleSaveAll">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 4px; display: block;">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <path d="m3 16 5-5 4 4 3-3 6 6"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-          </svg>
+          <span class="premium__action-icon" aria-hidden="true">存</span>
           保存全部到相册
         </button>
         <button class="btn btn--secondary btn--block btn--md" @click="handleEmail">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="1.8"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 4px; display: block;">
-            <path d="M6 9V3h12v6"/>
-            <rect x="3" y="9" width="18" height="9" rx="2"/>
-            <path d="M6 14h12v7H6z"/>
-          </svg>
+          <span class="premium__action-icon premium__action-icon--secondary" aria-hidden="true">印</span>
           打印 / 邮件发送
         </button>
       </div>
@@ -329,6 +315,19 @@ const handleEmail = () => {
   font-weight: 700;
   letter-spacing: 0.3px;
   box-shadow: 0 4px 10px rgba(255, 107, 157, 0.28);
+}
+
+.premium__pro-mark {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.24);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
 }
 .premium__pro-expires {
   font-size: 11px;
@@ -642,5 +641,23 @@ const handleEmail = () => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.premium__action-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  border-radius: 6px;
+  border: 2px solid currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.premium__action-icon--secondary {
+  border-width: 1.5px;
 }
 </style>

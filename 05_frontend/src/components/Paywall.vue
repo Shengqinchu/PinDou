@@ -49,25 +49,12 @@
           :disabled="isLoading"
           @click.stop="handleShowQR"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 4px; display: block;">
-            <rect x="3" y="3" width="7" height="7" rx="1"/>
-            <rect x="14" y="3" width="7" height="7" rx="1"/>
-            <rect x="3" y="14" width="7" height="7" rx="1"/>
-            <path d="M14 14h3v3h-3z M19 14h2 M14 19h2 M19 17v4"/>
-          </svg>
+          <span class="paywall__cta-icon" aria-hidden="true">码</span>
           {{ isLoading ? '正在生成订单...' : ctaText }}
         </button>
 
         <navigator class="paywall__cdk" url="/pages/cdk/redeem" @click.stop>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="1.8"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 4px; display: block;">
-            <path d="M21 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7"/>
-            <path d="M3 7l9 6 9-6"/>
-            <path d="M3 7l9-4 9 4"/>
-          </svg>
+          <span class="paywall__cdk-icon" aria-hidden="true">券</span>
           我有 CDK 兑换码
         </navigator>
       </section>
@@ -453,6 +440,34 @@ onUnmounted(stopPolling);
     background: var(--pd-pink-200);
   }
 }
+
+.paywall__cta-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  border-radius: 6px;
+  border: 2px solid currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.paywall__cdk-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  border: 1px solid currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+}
+
 .paywall__cdk {
   display: inline-flex;
   align-items: center;

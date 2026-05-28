@@ -7,12 +7,7 @@
       <div class="upload__entries">
         <button type="button" class="upload__entry" @click="handlePick('camera')">
           <span class="upload__entry-icon" aria-hidden="true">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2"
-                 stroke-linecap="round" stroke-linejoin="round" style="display: block;">
-              <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/>
-              <circle cx="12" cy="13" r="3"/>
-            </svg>
+            拍
           </span>
           <span class="upload__entry-label">拍一张</span>
           <span class="upload__entry-sub">启用相机</span>
@@ -20,14 +15,7 @@
 
         <button type="button" class="upload__entry" @click="handlePick('album')">
           <span class="upload__entry-icon" aria-hidden="true">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2"
-                 stroke-linecap="round" stroke-linejoin="round" style="display: block;">
-              <rect x="2" y="6" width="16" height="14" rx="2"/>
-              <path d="M6 2h14a2 2 0 0 1 2 2v14"/>
-              <circle cx="6.5" cy="11" r="1.2" fill="currentColor"/>
-              <path d="m18 14-4-4-8 8"/>
-            </svg>
+            图
           </span>
           <span class="upload__entry-label">从相册选</span>
           <span class="upload__entry-sub">本地图库</span>
@@ -36,11 +24,7 @@
 
       <aside class="upload__tip">
         <span class="upload__tip-icon" aria-hidden="true">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2.4"
-               stroke-linecap="round" stroke-linejoin="round" style="display: block;">
-            <path d="M9.94 14.06 2 12l7.94-2.06L12 2l2.06 7.94L22 12l-7.94 2.06L12 22z"/>
-          </svg>
+          i
         </span>
         <div class="upload__tip-body">
           <strong class="upload__tip-title">怎样的图效果最好？</strong>
@@ -67,12 +51,7 @@
         </button>
         <button type="button" class="btn btn--primary btn--md upload__next" @click="handleNext">
           下一步
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2.2"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-left: 4px; display: block;">
-            <path d="M5 12h14"/>
-            <path d="m12 5 7 7-7 7"/>
-          </svg>
+          <span class="upload__next-mark" aria-hidden="true">›</span>
         </button>
       </div>
     </section>
@@ -252,6 +231,9 @@ const openContract = (type: 'agreement' | 'privacy') => {
   align-items: center;
   justify-content: center;
   box-shadow: 0 6px 16px rgba(255, 142, 83, 0.28);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .upload__entry-label {
@@ -286,6 +268,9 @@ const openContract = (type: 'agreement' | 'privacy') => {
   align-items: center;
   justify-content: center;
   margin-top: 1px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .upload__tip-body {
@@ -356,6 +341,13 @@ const openContract = (type: 'agreement' | 'privacy') => {
 
 .upload__next  { 
   flex: 2; 
+}
+
+.upload__next-mark {
+  margin-left: 4px;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 /* ===== Consent Modal ===== */

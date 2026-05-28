@@ -15,27 +15,9 @@
           <span class="loading__dot loading__dot--5"></span>
         </div>
 
-        <svg class="loading__ring" viewBox="0 0 200 200" width="200" height="200" aria-hidden="true">
-          <defs>
-            <linearGradient id="pd-ring" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#FFB088"/>
-              <stop offset="50%" stop-color="#FF8E53"/>
-              <stop offset="100%" stop-color="#FF6B9D"/>
-            </linearGradient>
-            <filter id="pd-ring-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur"/>
-              <feMerge>
-                <feMergeNode in="blur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-          <circle class="loading__ring-track" cx="100" cy="100" r="94"/>
-          <!-- 2πr = 590.62 -->
-          <circle class="loading__ring-progress" cx="100" cy="100" r="94"
-                  transform="rotate(-90 100 100)"
-                  :style="{ strokeDasharray: strokeDashArray }" />
-        </svg>
+        <div class="loading__ring" :style="ringStyle" aria-hidden="true">
+          <div class="loading__ring-hole"></div>
+        </div>
 
         <div class="loading__center">
           <div class="loading__percent text-grad">{{ displayPercent }}%</div>
@@ -55,12 +37,7 @@
 
       <navigator class="loading__examples" url="/pages/index/index" open-type="reLaunch">
         去看示例作品
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2.2"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-left: 2px;">
-          <path d="M5 12h14"/>
-          <path d="m12 5 7 7-7 7"/>
-        </svg>
+        <span class="loading__examples-arrow" aria-hidden="true">›</span>
       </navigator>
     </section>
   </MiniProgramLayout>
@@ -83,7 +60,6 @@ const STATUS_LINES = [
 const REASSURE = '还有 30 秒哦，你的作品 99% 完成';
 
 const TOTAL = 30; // 模拟跑满 100% 预计时间 (秒)
-const CIRC = 2 * Math.PI * 94; // 周长
 const ROTATE_MS = 8000; // 文案轮播间隔
 
 // 路由参数
@@ -110,10 +86,9 @@ let rotateTimer: any = null;
 
 const displayPercent = computed(() => Math.floor(percent.value));
 
-const strokeDashArray = computed(() => {
-  const progress = (CIRC * percent.value) / 100;
-  return `${progress.toFixed(2)} ${CIRC.toFixed(2)}`;
-});
+const ringStyle = computed(() => ({
+  background: `conic-gradient(#FF8E53 0%, #FF6B9D ${displayPercent.value}%, #FFE4EE ${displayPercent.value}% 100%)`
+}));
 
 const statusText = computed(() => {
   if (isOverTime.value) return REASSURE;
@@ -307,25 +282,23 @@ onUnmounted(() => {
 .loading__dot--4 { left:  8%; top: 86%; width: 4px; height: 4px; background: #B8E6C9; }
 .loading__dot--5 { left: 48%; top:  4%; width: 3px; height: 3px; background: #FF6B9D; }
 
-/* SVG ring */
+/* CSS ring: keep mp-weixin away from inline svg/path parsing */
 .loading__ring {
   position: absolute;
-  inset: 10px;
   width: 200px;
   height: 200px;
+  border-radius: 999px;
+  box-shadow: 0 0 18px rgba(255, 107, 157, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.loading__ring-track {
-  fill: none;
-  stroke: #FFE4EE;
-  stroke-width: 12;
-}
-.loading__ring-progress {
-  fill: none;
-  stroke: url(#pd-ring);
-  stroke-width: 12;
-  stroke-linecap: round;
-  filter: url(#pd-ring-glow);
-  transition: stroke-dasharray 200ms linear; // 让进度流动更加顺滑
+
+.loading__ring-hole {
+  width: 176px;
+  height: 176px;
+  border-radius: 999px;
+  background: var(--pd-bg);
 }
 
 /* Centred percent + ETA */
@@ -394,6 +367,13 @@ onUnmounted(() => {
   &:active { 
     opacity: 0.7; 
   }
+}
+
+.loading__examples-arrow {
+  margin-left: 2px;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 @keyframes pd-fade-in {

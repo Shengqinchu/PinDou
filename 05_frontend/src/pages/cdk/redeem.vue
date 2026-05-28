@@ -33,13 +33,7 @@
       </div>
 
       <p v-if="errorMsg" class="cdk__error">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 4px; display: block;">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M12 8v4"/>
-          <path d="M12 16h.01"/>
-        </svg>
+        <span class="cdk__error-icon" aria-hidden="true">!</span>
         <span>{{ errorMsg }}</span>
       </p>
 
@@ -53,13 +47,7 @@
       </button>
 
       <div class="help-link cdk__help" @click="handleHelp">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block;">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M9.5 9.5a2.5 2.5 0 1 1 5 0c0 1.5-2.5 2-2.5 3.5"/>
-          <circle cx="12" cy="17" r="0.5" fill="currentColor"/>
-        </svg>
+        <span class="cdk__help-icon" aria-hidden="true">?</span>
         <span class="help-link__label">CDK 在哪买？</span>
       </div>
     </section>
@@ -76,11 +64,7 @@
         <span class="cdk__dot cdk__dot--6"></span>
 
         <div class="cdk__check-ring">
-          <svg viewBox="0 0 60 60" width="80" height="80" aria-hidden="true">
-            <circle cx="30" cy="30" r="28" fill="none" stroke="#34C759" stroke-width="2.5" opacity="0.25"/>
-            <circle cx="30" cy="30" r="22" fill="#34C759"/>
-            <path d="M19 30l8 8 14-16" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="cdk__check-mark" aria-hidden="true">✓</span>
         </div>
       </div>
 
@@ -322,6 +306,25 @@ const handleGoHome = () => {
   justify-content: center;
 }
 
+.cdk__error-icon,
+.cdk__help-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.cdk__help-icon {
+  color: var(--pd-fg-2);
+}
+
 @keyframes cdk-shake {
   0%, 100% { transform: translateX(0); }
   20%      { transform: translateX(-4px); }
@@ -367,8 +370,29 @@ const handleGoHome = () => {
   margin-bottom: 6px;
 }
 
-.cdk__check-ring svg {
+.cdk__check-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 999px;
+  background: rgba(52, 199, 89, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   animation: cdk-pop 480ms var(--pd-ease-soft);
+}
+
+.cdk__check-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: #34C759;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 @keyframes cdk-pop {

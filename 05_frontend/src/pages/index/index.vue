@@ -18,9 +18,7 @@
             <div class="home__banner">
               <image class="home__banner-image" :src="banner.image" mode="aspectFit" />
               <span class="tag tag--ai home__banner-badge">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 2px;">
-                  <path d="M9.94 14.06 2 12l7.94-2.06L12 2l2.06 7.94L22 12l-7.94 2.06L12 22z"/>
-                </svg>
+                <span class="home__badge-mark" aria-hidden="true">AI</span>
                 AI 生成
               </span>
               <div class="home__banner-caption">
@@ -57,26 +55,17 @@
       <nav class="home__chips" aria-label="热门玩法">
         <navigator class="chip" url="/pages/upload/upload?style=q_pet">
           <span class="chip__icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
-              <path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/>
-              <path d="M8 14v.5"/><path d="M16 14v.5"/>
-              <path d="M11.25 16.25h1.5L12 17l-.75-.75Z"/>
-            </svg>
+            宠
           </span>萌宠
         </navigator>
         <navigator class="chip" url="/pages/upload/upload?style=q_couple">
           <span class="chip__icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/>
-            </svg>
+            心
           </span>情侣
         </navigator>
         <navigator class="chip" url="/pages/upload/upload?style=q_portrait">
           <span class="chip__icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
-              <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/>
-              <circle cx="12" cy="13" r="3"/>
-            </svg>
+            拍
           </span>自拍
         </navigator>
       </nav>
@@ -88,10 +77,7 @@
           url="/pages/upload/upload"
           hover-class="none"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 4px; display: block;">
-            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/>
-            <circle cx="12" cy="13" r="3"/>
-          </svg>
+          <span class="home__cta-icon" aria-hidden="true">+</span>
           立即上传照片
         </navigator>
         <p class="home__cta-hint">支持 JPG / PNG · 单张图片 ≤ 10MB</p>
@@ -181,6 +167,20 @@ const startAutoplay = () => {
   top: 10px;
   left: 10px;
   z-index: 2;
+}
+
+.home__badge-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .home__banner-caption {
@@ -275,6 +275,12 @@ const startAutoplay = () => {
   transform: scale(0.96); 
 }
 
+.chip__icon {
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
 /* ===== CTA block ===== */
 .home__cta-wrap {
   padding: 24px 24px 0;
@@ -288,6 +294,20 @@ const startAutoplay = () => {
   letter-spacing: 0.5px; 
   opacity: 1;
   background: var(--pd-gradient);
+}
+
+.home__cta-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 800;
 }
 
 .home__cta-hint {
