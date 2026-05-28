@@ -3,26 +3,33 @@
     <!-- ===== Entry form ===== -->
     <section v-if="currentState === 'entry'" class="cdk" data-state="entry">
       <p class="cdk__hint">
-        在小红书 / 闲鱼买到的 CDK 码，输入 <strong>18 位</strong>字母数字即可解锁
+        输入 18 位 CDK 码即可解锁
       </p>
 
       <div class="cdk__field">
         <label class="cdk__label" for="cdk-input">CDK 兑换码</label>
-        <input
-          id="cdk-input"
-          type="text"
-          class="cdk__input"
-          :class="{ 'cdk__input--error': errorMsg, 'cdk__input--valid': isCodeValid }"
-          :value="formattedCode"
-          @input="handleInput"
-          placeholder="XXXXXX  XXXXXX  XXXXXX"
-          maxlength="22"
-          autocomplete="off"
-          autocapitalize="characters"
-          spellcheck="false"
-          inputmode="latin"
-        />
-        <span class="cdk__counter">{{ cleanCode.length }} / 18</span>
+        <div
+          class="cdk__input-shell"
+          :class="{ 'cdk__input-shell--error': errorMsg, 'cdk__input-shell--valid': isCodeValid }"
+        >
+          <input
+            id="cdk-input"
+            type="text"
+            class="cdk__input"
+            :value="cleanCode"
+            @input="handleInput"
+            placeholder="请输入 18 位兑换码"
+            placeholder-class="cdk__input-placeholder"
+            maxlength="18"
+            confirm-type="done"
+            :adjust-position="true"
+            :cursor-spacing="28"
+          />
+        </div>
+        <div class="cdk__field-meta">
+          <span class="cdk__format-preview">{{ formattedCode || 'XXXXXX XXXXXX XXXXXX' }}</span>
+          <span class="cdk__counter">{{ cleanCode.length }} / 18</span>
+        </div>
       </div>
 
       <p v-if="errorMsg" class="cdk__error">
@@ -44,8 +51,6 @@
       >
         {{ isLoading ? '兑换中...' : '兑换' }}
       </button>
-
-      <div class="cdk__spacer"></div>
 
       <div class="help-link cdk__help" @click="handleHelp">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -191,20 +196,22 @@ const handleGoHome = () => {
 
 <style scoped lang="scss">
 .cdk {
-  padding: 22px 22px calc(24px + constant(safe-area-inset-bottom));
-  padding: 22px 22px calc(24px + env(safe-area-inset-bottom));
+  padding: 20px 22px calc(28px + constant(safe-area-inset-bottom));
+  padding: 20px 22px calc(28px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 120px);
+  min-height: calc(100vh - 112px);
   box-sizing: border-box;
 }
 
 .cdk__hint {
-  margin: 0 0 24px;
-  font-size: 13px;
-  line-height: 1.6;
+  width: 100%;
+  margin: 0 0 22px;
+  font-size: 14px;
+  line-height: 1.45;
   color: var(--pd-fg-2);
   text-align: center;
+  white-space: normal;
   
   strong {
     color: var(--pd-fg-1);
@@ -213,8 +220,8 @@ const handleGoHome = () => {
 }
 
 .cdk__field {
-  position: relative;
-  margin-bottom: 6px;
+  width: 100%;
+  margin-bottom: 0;
 }
 .cdk__label {
   display: block;
@@ -223,63 +230,89 @@ const handleGoHome = () => {
   color: var(--pd-fg-2);
   letter-spacing: 0.5px;
   margin-bottom: 6px;
-  text-transform: uppercase;
 }
-.cdk__input {
+
+.cdk__input-shell {
   width: 100%;
-  font-family: var(--pd-font-mono);
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: 1.2px;
-  text-align: center;
-  color: var(--pd-fg-1);
-  padding: 17px 12px;
+  height: 48px;
+  min-height: 48px;
   border-radius: var(--pd-r-input);
   border: 1.5px solid var(--pd-divider);
   background: #fff;
   transition: border-color 200ms var(--pd-ease-out),
               box-shadow 200ms var(--pd-ease-out);
-  outline: none;
   box-sizing: border-box;
-  
-  &::placeholder {
-    color: var(--pd-fg-3);
-    font-weight: 400;
-    letter-spacing: 1.5px;
-  }
-  &:focus {
-    border-color: var(--pd-pink);
-    box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.12);
-  }
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
 }
 
-.cdk__input--error {
+.cdk__input-shell--error {
   border-color: var(--pd-danger);
-  
-  &:focus {
-    box-shadow: 0 0 0 4px rgba(255, 90, 90, 0.14);
-  }
 }
 
-.cdk__input--valid {
+.cdk__input-shell--valid {
   border-color: var(--pd-success);
-  
-  &:focus {
-    box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.14);
-  }
+}
+
+.cdk__input {
+  width: 100%;
+  height: 46px;
+  line-height: 46px;
+  min-height: 46px;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: center;
+  color: var(--pd-fg-1);
+  background: transparent;
+  border: 0;
+  outline: none;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:global(.cdk__input-placeholder) {
+  color: #B7B0B5;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.cdk__field-meta {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 2px 0;
+  box-sizing: border-box;
+}
+
+.cdk__format-preview {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--pd-fg-3);
+  letter-spacing: 0.6px;
 }
 
 .cdk__counter {
-  position: absolute;
-  right: 12px;
-  bottom: -22px;
-  font-family: var(--pd-font-mono);
+  flex: 0 0 auto;
+  font-family: Menlo, Consolas, monospace;
   font-size: 11px;
   color: var(--pd-fg-3);
+  white-space: nowrap;
 }
 
 .cdk__error {
-  margin: 24px 0 0;
+  margin: 14px 0 0;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -298,7 +331,7 @@ const handleGoHome = () => {
 }
 
 .cdk__submit {
-  margin-top: 28px;
+  margin-top: 18px;
   
   &:disabled {
     opacity: 0.55;
@@ -306,13 +339,10 @@ const handleGoHome = () => {
   }
 }
 
-.cdk__spacer { 
-  flex: 1; 
-}
-
 .cdk__help {
   align-self: center;
   cursor: pointer;
+  margin-top: 28px;
   margin-bottom: 0;
 }
 
@@ -427,9 +457,12 @@ const handleGoHome = () => {
 
   .cdk__input {
     font-size: 16px;
-    letter-spacing: 0.8px;
-    padding-left: 10px;
-    padding-right: 10px;
+    letter-spacing: 0.4px;
+  }
+
+  .cdk__format-preview {
+    font-size: 10px;
+    letter-spacing: 0.2px;
   }
 
   .cdk__success-row {
