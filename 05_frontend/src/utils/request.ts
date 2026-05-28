@@ -103,6 +103,7 @@ function legacyHttpRequest<T = any>(options: RequestOptions): Promise<T> {
 
 function wxCloudRequest<T = any>(options: RequestOptions): Promise<T> {
   const token = uni.getStorageSync('pd_token') || '';
+  const requestPath = cloudPath(options.url);
   const header = {
     'Content-Type': 'application/json',
     'Authorization': token ? `Bearer ${token}` : '',
@@ -113,7 +114,7 @@ function wxCloudRequest<T = any>(options: RequestOptions): Promise<T> {
   return new Promise((resolve, reject) => {
     wx.cloud.callContainer({
       config: { env: WX_CLOUD_ENV },
-      path: cloudPath(options.url),
+      path: requestPath,
       method: options.method || 'GET',
       header,
       data: options.data,
@@ -134,6 +135,19 @@ function wxCloudRequest<T = any>(options: RequestOptions): Promise<T> {
         reject(new Error(friendlyMessage));
       },
       fail: (err: any) => {
+        if (shouldFallbackToLegacyHttp(err)) {
+          console.warn('wx.cloud.callContainer failed, fallback to HTTPS API', {
+            errCode: err?.errCode || err?.code,
+            errMsg: err?.errMsg || err?.message,
+            env: WX_CLOUD_ENV,
+            service: WX_CLOUD_SERVICE,
+            path: requestPath,
+            baseUrl: BASE_URL,
+          });
+          legacyHttpRequest<T>(options).then(resolve).catch(reject);
+          return;
+        }
+
         const friendlyMessage = '网络有点不给力，请稍后再试哦~';
         if (!options.hideErrorToast) {
           uni.showToast({
@@ -214,6 +228,20 @@ function cloudPath(url: string): string {
     return path;
   }
   return `${WX_CLOUD_API_PREFIX}${path}`;
+}
+
+function shouldFallbackToLegacyHttp(err: any): boolean {
+  if (!BASE_URL.startsWith('https://')) {
+    return false;
+  }
+
+  const errCode = String(err?.errCode || err?.code || '');
+  const errMsg = String(err?.errMsg || err?.message || '');
+  return errCode === '102002'
+    || errCode === '-606001'
+    || errMsg.includes('102002')
+    || errMsg.includes('-606001')
+    || errMsg.includes('cloud.callContainer:fail system error');
 }
 
 function canUseWxCloud(): boolean {
