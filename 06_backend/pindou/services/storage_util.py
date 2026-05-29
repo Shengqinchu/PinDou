@@ -102,9 +102,14 @@ class TencentCosBackend:
 
 def ensure_storage_dirs() -> None:
     settings = get_settings()
-    if settings.storage_backend.lower() == "local":
-        for directory in (settings.upload_dir, settings.preview_dir, settings.pattern_dir, settings.thumbnail_dir):
-            directory.mkdir(parents=True, exist_ok=True)
+    for directory in (
+        settings.data_dir,
+        settings.upload_dir,
+        settings.preview_dir,
+        settings.pattern_dir,
+        settings.thumbnail_dir,
+    ):
+        directory.mkdir(parents=True, exist_ok=True)
 
 
 def static_url(kind: str, filename: str) -> str:
