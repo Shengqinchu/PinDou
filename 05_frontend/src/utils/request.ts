@@ -40,9 +40,46 @@ interface RequestOptions {
   data?: any;
   headers?: Record<string, string>;
   hideErrorToast?: boolean;
+  _retried?: boolean;
+  _skipAuthRefresh?: boolean;
 }
 
-export function request<T = any>(options: RequestOptions): Promise<T> {
+type LoginResponse = {
+  token: string;
+  user: any;
+};
+
+class RequestError extends Error {
+  statusCode: number;
+  data: any;
+
+  constructor(message: string, statusCode: number, data: any) {
+    super(message);
+    this.name = 'RequestError';
+    this.statusCode = statusCode;
+    this.data = data;
+  }
+}
+
+let authRefreshPromise: Promise<void> | null = null;
+
+export async function request<T = any>(options: RequestOptions): Promise<T> {
+  try {
+    return await sendRequest<T>(options);
+  } catch (error) {
+    if (!shouldRefreshAuth(error, options)) {
+      throw error;
+    }
+
+    await refreshAuthOnce();
+    return sendRequest<T>({
+      ...options,
+      _retried: true
+    });
+  }
+}
+
+function sendRequest<T = any>(options: RequestOptions): Promise<T> {
   if (USE_WX_CLOUD && canUseWxCloud()) {
     return wxCloudRequest<T>(options);
   }
@@ -75,14 +112,14 @@ function legacyHttpRequest<T = any>(options: RequestOptions): Promise<T> {
         } else {
           // 处理 4xx/500 等 HTTP 错误
           const friendlyMessage = translateError(res.data, res.statusCode);
-          if (!options.hideErrorToast) {
+          if (shouldShowErrorToast(options, res.statusCode)) {
             uni.showToast({
               title: friendlyMessage,
               icon: 'none',
               duration: 3000
             });
           }
-          reject(new Error(friendlyMessage));
+          reject(new RequestError(friendlyMessage, res.statusCode, res.data));
         }
       },
       fail: (err) => {
@@ -125,14 +162,14 @@ function wxCloudRequest<T = any>(options: RequestOptions): Promise<T> {
           return;
         }
         const friendlyMessage = translateError(res?.data, statusCode);
-        if (!options.hideErrorToast) {
+        if (shouldShowErrorToast(options, statusCode)) {
           uni.showToast({
             title: friendlyMessage,
             icon: 'none',
             duration: 3000
           });
         }
-        reject(new Error(friendlyMessage));
+        reject(new RequestError(friendlyMessage, statusCode, res?.data));
       },
       fail: (err: any) => {
         if (shouldFallbackToLegacyHttp(err)) {
@@ -160,6 +197,93 @@ function wxCloudRequest<T = any>(options: RequestOptions): Promise<T> {
       }
     });
   });
+}
+
+function shouldShowErrorToast(options: RequestOptions, statusCode: number): boolean {
+  return !options.hideErrorToast && !(statusCode === 401 && canRefreshAuth(options));
+}
+
+function canRefreshAuth(options: RequestOptions): boolean {
+  return !options._retried && !options._skipAuthRefresh && !isLoginRequest(options.url);
+}
+
+function shouldRefreshAuth(error: unknown, options: RequestOptions): boolean {
+  if (!canRefreshAuth(options)) {
+    return false;
+  }
+  return isUnauthorizedError(error);
+}
+
+function isUnauthorizedError(error: unknown): boolean {
+  const statusCode = Number((error as any)?.statusCode || 0);
+  if (statusCode === 401) {
+    return true;
+  }
+
+  const message = String((error as Error)?.message || error || '');
+  return message.includes('登录已过期') || message.includes('请先登录');
+}
+
+function isLoginRequest(url: string): boolean {
+  return cloudPath(url).includes('/user/login');
+}
+
+function refreshAuthOnce(): Promise<void> {
+  if (!authRefreshPromise) {
+    authRefreshPromise = performWxLogin().finally(() => {
+      authRefreshPromise = null;
+    });
+  }
+  return authRefreshPromise;
+}
+
+async function performWxLogin(): Promise<void> {
+  clearStoredAuth();
+  const code = await getWxLoginCode();
+  const data = await sendRequest<LoginResponse>({
+    url: '/user/login',
+    method: 'POST',
+    data: { code },
+    hideErrorToast: true,
+    _retried: true,
+    _skipAuthRefresh: true
+  });
+
+  uni.setStorageSync('pd_token', data.token);
+  uni.setStorageSync('pd_user', JSON.stringify(data.user));
+  await syncUserStore(data);
+}
+
+function clearStoredAuth() {
+  uni.removeStorageSync('pd_token');
+  uni.removeStorageSync('pd_user');
+}
+
+function getWxLoginCode(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    uni.login({
+      provider: 'weixin',
+      success: (loginRes) => {
+        if (loginRes.code) {
+          resolve(loginRes.code);
+        } else {
+          reject(new Error('微信登录失败：未获取到 code'));
+        }
+      },
+      fail: reject
+    });
+  });
+}
+
+async function syncUserStore(data: LoginResponse): Promise<void> {
+  try {
+    const userModule = await import('../store/user');
+    const userStore = userModule.useUserStore();
+    userStore.token = data.token;
+    userStore.userInfo = data.user;
+  } catch (error) {
+    console.warn('同步登录态到 userStore 失败，已写入本地缓存:', error);
+  }
 }
 
 /**
