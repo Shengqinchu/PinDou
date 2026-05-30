@@ -107,8 +107,12 @@ def admin_login(payload: AdminLoginRequest, request: Request, db: DbSession) -> 
 def get_dashboard(_actor: AdminReadActor, db: DbSession) -> dict:
     """后台 Dashboard 只读汇总。"""
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    series_start = today_start - timedelta(days=6)
+    day_labels = [(series_start + timedelta(days=index)).date().isoformat() for index in range(7)]
     total_users = int(db.scalar(select(func.count()).select_from(User)) or 0)
     total_orders = int(db.scalar(select(func.count()).select_from(Order)) or 0)
+    total_cdks = int(db.scalar(select(func.count()).select_from(CDK)) or 0)
+    redeemed_cdks = int(db.scalar(select(func.count()).select_from(CDK).where(CDK.status == "redeemed")) or 0)
     today_orders = int(db.scalar(select(func.count()).select_from(Order).where(Order.created_at >= today_start)) or 0)
     paid_orders = int(db.scalar(select(func.count()).select_from(Order).where(Order.status.in_(PAID_STATUSES))) or 0)
     failed_orders = int(
@@ -149,12 +153,18 @@ def get_dashboard(_actor: AdminReadActor, db: DbSession) -> dict:
         or 0
     )
     success_rate = round(paid_orders / total_orders, 4) if total_orders else 0.0
+    user_counts = counts_by_day(db.scalars(select(User.created_at).where(User.created_at >= series_start)), day_labels)
+    order_counts = counts_by_day(db.scalars(select(Order.created_at).where(Order.created_at >= series_start)), day_labels)
     return {
         "total_users": total_users,
         "today_orders": today_orders,
         "payment_success_rate": success_rate,
         "abnormal_orders": failed_orders + webhook_anomalies,
         "recent_dangerous_actions": recent_dangerous_actions,
+        "total_cdks": total_cdks,
+        "redeemed_cdks": redeemed_cdks,
+        "daily_new_users": [{"date": label, "count": user_counts[label]} for label in day_labels],
+        "daily_orders": [{"date": label, "count": order_counts[label]} for label in day_labels],
         "links": {
             "abnormal_order_statuses": ["cancelled", "refunded", MANUAL_PAYMENT_CONFIRMED_STATUS],
         },
@@ -913,6 +923,15 @@ def audit_payload(log: AdminAuditLog) -> dict[str, Any]:
 
 def paged_response(items: list[dict[str, Any]], total: int, page: int, size: int) -> dict:
     return {"items": items, "total": total, "page": page, "size": size}
+
+
+def counts_by_day(values: Any, day_labels: list[str]) -> dict[str, int]:
+    counts = {label: 0 for label in day_labels}
+    for value in values:
+        label = value.date().isoformat()
+        if label in counts:
+            counts[label] += 1
+    return counts
 
 
 def offset_for(page: int, size: int) -> int:

@@ -4,7 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PinDou Admin Console</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <style>
     :root {
       --bg: #f6f7f9;
@@ -594,6 +598,471 @@
       .form-grid { grid-template-columns: 1fr; }
       .drawer { top: 0; }
     }
+
+    /* Batch 5 visual system: T-Check inspired Bootstrap shell */
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #6366f1;
+      --primary-bg: #eef2ff;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --sidebar-width: 260px;
+      --bg: var(--gray-50);
+      --panel: #fff;
+      --line: var(--gray-200);
+      --muted: var(--gray-500);
+      --text: var(--gray-800);
+      --brand: var(--primary);
+      --brand-soft: var(--primary-bg);
+      --ok: var(--success);
+      --warn: var(--warning);
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+    }
+    body {
+      background: var(--gray-50);
+      color: var(--gray-800);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei", sans-serif;
+    }
+    button { height: auto; }
+    .login-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .login-panel {
+      width: min(420px, calc(100% - 32px));
+      border: 0;
+      border-radius: 16px;
+      padding: 46px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .login-title {
+      color: var(--gray-900);
+      font-size: 24px;
+      margin-bottom: 24px;
+    }
+    .field { margin-bottom: 16px; }
+    .label {
+      color: var(--gray-700);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    input, select, textarea,
+    .form-control, .form-select {
+      border-color: var(--gray-300);
+      border-radius: 10px;
+      color: var(--gray-800);
+    }
+    input:focus, select:focus, textarea:focus,
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-bg);
+    }
+    .primary,
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .primary:hover,
+    .btn-primary:hover {
+      background: var(--primary-light);
+      border-color: var(--primary-light);
+      color: #fff;
+    }
+    .danger,
+    .btn-danger {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: #fff;
+    }
+    .ghost-danger,
+    .btn-outline-danger {
+      color: var(--danger);
+      border-color: #fecaca;
+      background: #fff;
+    }
+    .app-shell {
+      display: block;
+      min-height: 100vh;
+    }
+    .topbar { display: none; }
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-right: 1px solid var(--gray-200);
+      padding: 0;
+      z-index: 100;
+    }
+    .sidebar-brand {
+      padding: 24px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .sidebar-brand h1 {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 0;
+      color: var(--primary);
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .sidebar-brand .brand-badge {
+      display: inline-flex;
+      margin-top: 8px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--primary-bg);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 12px;
+    }
+    .nav-section { margin-bottom: 24px; }
+    .nav-section-title {
+      padding: 0 12px;
+      margin-bottom: 8px;
+      color: var(--gray-400);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .tab-button {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      min-height: 40px;
+      height: auto;
+      margin-bottom: 2px;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 10px;
+      color: var(--gray-600);
+      background: transparent;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .tab-button i {
+      width: 20px;
+      color: inherit;
+      font-size: 16px;
+      text-align: center;
+    }
+    .tab-button:hover {
+      background: var(--gray-100);
+      color: var(--gray-900);
+    }
+    .tab-button.active {
+      background: var(--primary-bg);
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--gray-200);
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--gray-50);
+    }
+    .user-avatar {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+    }
+    .user-info { min-width: 0; flex: 1; }
+    .user-info .name {
+      color: var(--gray-800);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .user-info .role {
+      color: var(--gray-500);
+      font-size: 12px;
+    }
+    .btn-logout {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 8px;
+      color: var(--gray-400);
+      background: transparent;
+    }
+    .btn-logout:hover {
+      color: var(--danger);
+      background: var(--gray-200);
+    }
+    .main {
+      min-height: 100vh;
+      margin-left: var(--sidebar-width);
+      padding: 0;
+      overflow: visible;
+    }
+    .section-title {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0;
+      padding: 20px 32px;
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .section-title h1 {
+      color: var(--gray-900);
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .breadcrumb-line {
+      margin-top: 4px;
+      color: var(--gray-500);
+      font-size: 13px;
+    }
+    .content-body {
+      padding: 32px;
+    }
+    .feedback {
+      min-height: 0;
+      margin-bottom: 18px;
+    }
+    .alert {
+      display: inline-flex;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 600;
+    }
+    .alert.ok {
+      border-color: #bbf7d0;
+      background: #ecfdf5;
+      color: #059669;
+    }
+    .alert.bad {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: var(--danger);
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(150px, 1fr));
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+    .metric {
+      position: relative;
+      min-height: 142px;
+      padding: 22px;
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .metric-icon {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      border-radius: 14px;
+      font-size: 20px;
+    }
+    .metric-icon.blue { background: #dbeafe; color: #2563eb; }
+    .metric-icon.green { background: #d1fae5; color: #059669; }
+    .metric-icon.purple { background: #ede9fe; color: #7c3aed; }
+    .metric-icon.orange { background: #ffedd5; color: #ea580c; }
+    .metric-icon.red { background: #fee2e2; color: #dc2626; }
+    .metric-icon.gray { background: var(--gray-100); color: var(--gray-600); }
+    .metric-label {
+      margin: 0 0 4px;
+      color: var(--gray-500);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .metric-value {
+      color: var(--gray-900);
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .chart-card {
+      min-height: 330px;
+      padding: 22px;
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .chart-card h3 {
+      margin: 0 0 18px;
+      color: var(--gray-800);
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .toolbar,
+    .panel,
+    .detail-box,
+    .drawer-section {
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .toolbar {
+      gap: 12px;
+      margin-bottom: 18px;
+      padding: 16px;
+    }
+    .toolbar .field { width: 210px; }
+    .panel { overflow: hidden; }
+    .table {
+      margin-bottom: 0;
+      color: var(--gray-800);
+    }
+    .table > :not(caption) > * > * {
+      padding: 14px 16px;
+      border-bottom-color: var(--gray-100);
+      vertical-align: middle;
+    }
+    .table thead th {
+      background: var(--gray-50);
+      color: var(--gray-500);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .status-pill,
+    .badge {
+      border-radius: 8px;
+      font-weight: 700;
+    }
+    .detail-grid {
+      gap: 16px;
+      padding: 16px;
+    }
+    .log-item {
+      border-color: var(--gray-200);
+      border-radius: 12px;
+    }
+    details {
+      border-color: var(--gray-200);
+      border-radius: 12px;
+      background: var(--gray-50);
+    }
+    .drawer {
+      top: 0;
+      width: min(560px, 100%);
+      border-left: 1px solid var(--gray-200);
+      box-shadow: -24px 0 60px rgba(15, 23, 42, 0.16);
+      z-index: 1041;
+    }
+    .drawer-head,
+    .modal-head,
+    .modal-foot {
+      border-color: var(--gray-200);
+    }
+    .drawer-section { box-shadow: none; }
+    .modal-backdrop {
+      background: rgba(15, 23, 42, 0.45);
+      opacity: 1;
+      z-index: 1050;
+    }
+    .modal-backdrop .modal {
+      position: relative;
+      display: block;
+      width: min(560px, 100%);
+      height: auto;
+      overflow: visible;
+      border: 0;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+    }
+    .modal-head h2 {
+      color: var(--gray-900);
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .impact {
+      border-color: var(--gray-200);
+      border-radius: 12px;
+      background: var(--gray-50);
+    }
+    .thumb {
+      border-radius: 12px;
+      border-color: var(--gray-200);
+    }
+    .placeholder {
+      border-radius: 16px;
+      background: #fff;
+    }
+    @media (max-width: 1280px) {
+      .metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 920px) {
+      .sidebar {
+        position: static;
+        width: auto;
+        min-height: auto;
+      }
+      .sidebar-nav {
+        display: flex;
+        gap: 10px;
+        padding: 12px;
+      }
+      .nav-section { margin-bottom: 0; }
+      .nav-section-title { display: none; }
+      .sidebar-footer { display: none; }
+      .main { margin-left: 0; }
+      .section-title { padding: 16px; }
+      .content-body { padding: 16px; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      .login-panel { padding: 28px; }
+      .metrics { grid-template-columns: 1fr; }
+      .toolbar .field { width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -623,6 +1092,7 @@
           feedback: null,
           dashboard: null,
           dashboardLoading: false,
+          charts: { users: null, orders: null },
           orders: { items: [], total: 0, page: 1, size: 20 },
           orderFilters: { status: "", search: "" },
           orderLoading: false,
@@ -660,6 +1130,27 @@
         activeTabLabel() {
           const found = this.tabs.find(([key]) => key === this.activeTab);
           return found ? found[1] : "";
+        },
+        navGroups() {
+          return [
+            { title: "概览", items: [["dashboard", "Dashboard", "fa-solid fa-chart-line"]] },
+            {
+              title: "管理",
+              items: [
+                ["orders", "订单", "fa-solid fa-receipt"],
+                ["cdks", "CDK", "fa-solid fa-ticket"],
+                ["users", "用户", "fa-solid fa-users"],
+                ["artworks", "作品", "fa-solid fa-images"]
+              ]
+            },
+            {
+              title: "系统",
+              items: [
+                ["config", "配置", "fa-solid fa-sliders"],
+                ["audit", "审计", "fa-solid fa-shield-halved"]
+              ]
+            }
+          ];
         }
       },
       mounted() {
@@ -754,11 +1245,61 @@
           this.dashboardLoading = true;
           try {
             this.dashboard = await this.api("/dashboard");
+            this.$nextTick(() => this.renderDashboardCharts());
           } catch (error) {
             if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
           } finally {
             this.dashboardLoading = false;
           }
+        },
+        renderDashboardCharts() {
+          if (!this.dashboard || typeof Chart === "undefined") return;
+          const userCanvas = document.getElementById("dailyUsersChart");
+          const orderCanvas = document.getElementById("dailyOrdersChart");
+          if (!userCanvas || !orderCanvas) return;
+          const userSeries = this.dashboard.daily_new_users || [];
+          const orderSeries = this.dashboard.daily_orders || [];
+          const labels = userSeries.map((item) => item.date.slice(5));
+          if (this.charts.users) this.charts.users.destroy();
+          if (this.charts.orders) this.charts.orders.destroy();
+          const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: "#6b7280" } },
+              y: { beginAtZero: true, ticks: { precision: 0, color: "#6b7280" }, grid: { color: "#f3f4f6" } }
+            }
+          };
+          this.charts.users = new Chart(userCanvas, {
+            type: "line",
+            data: {
+              labels,
+              datasets: [{
+                data: userSeries.map((item) => item.count),
+                borderColor: "#4f46e5",
+                backgroundColor: "rgba(79, 70, 229, 0.12)",
+                borderWidth: 3,
+                pointRadius: 4,
+                tension: 0.36,
+                fill: true
+              }]
+            },
+            options: commonOptions
+          });
+          this.charts.orders = new Chart(orderCanvas, {
+            type: "bar",
+            data: {
+              labels: orderSeries.map((item) => item.date.slice(5)),
+              datasets: [{
+                data: orderSeries.map((item) => item.count),
+                backgroundColor: "#10b981",
+                borderRadius: 8,
+                maxBarThickness: 34
+              }]
+            },
+            options: commonOptions
+          });
         },
         async loadOrders(page = this.orders.page || 1) {
           if (!this.token) return;
@@ -1230,80 +1771,117 @@
             </div>
             <label class="field">
               <span class="label">用户名</span>
-              <input v-model.trim="loginForm.username" autocomplete="username" required>
+              <input class="form-control" v-model.trim="loginForm.username" autocomplete="username" required>
             </label>
             <label class="field">
               <span class="label">密码</span>
-              <input v-model="loginForm.password" type="password" autocomplete="current-password" required>
+              <input class="form-control" v-model="loginForm.password" type="password" autocomplete="current-password" required>
             </label>
-            <button class="primary" type="submit" style="width:100%" :disabled="loginLoading">
+            <button class="btn btn-primary" type="submit" style="width:100%" :disabled="loginLoading">
               {{ loginLoading ? "登录中" : "登录" }}
             </button>
           </form>
         </div>
 
         <div v-else class="app-shell">
-          <header class="topbar">
-            <div class="topbar-title">
-              <span>PinDou Admin Console</span>
-              <span class="role-pill">{{ role || "admin" }}</span>
-            </div>
-            <button @click="logout()">退出</button>
-          </header>
-
           <aside class="sidebar">
-            <button
-              v-for="[key, label, tag] in tabs"
-              :key="key"
-              class="tab-button"
-              :class="{ active: activeTab === key }"
-              @click="switchTab(key)"
-            >
-              <span>{{ label }}</span>
-              <span v-if="tag" class="batch-tag">{{ tag }}</span>
-            </button>
+            <div class="sidebar-brand">
+              <h1><i class="fa-solid fa-gem"></i> PinDou Admin</h1>
+              <span class="brand-badge">Console</span>
+            </div>
+            <nav class="sidebar-nav">
+              <div class="nav-section" v-for="group in navGroups" :key="group.title">
+                <div class="nav-section-title">{{ group.title }}</div>
+                <button
+                  v-for="[key, label, icon] in group.items"
+                  :key="key"
+                  class="tab-button"
+                  :class="{ active: activeTab === key }"
+                  @click="switchTab(key)"
+                >
+                  <i :class="icon"></i>
+                  <span>{{ label }}</span>
+                </button>
+              </div>
+            </nav>
+            <div class="sidebar-footer">
+              <div class="user-profile">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                  <div class="name">admin</div>
+                  <div class="role">{{ role || "admin" }}</div>
+                </div>
+                <button class="btn-logout" title="退出" @click="logout()">
+                  <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+              </div>
+            </div>
           </aside>
 
           <main class="main">
             <div class="section-title">
-              <h1>{{ activeTabLabel }}</h1>
-              <button @click="refreshActiveTab">刷新</button>
+              <div>
+                <h1>{{ activeTabLabel }}</h1>
+                <div class="breadcrumb-line">PinDou Admin / {{ activeTabLabel }}</div>
+              </div>
+              <button class="btn btn-secondary btn-sm" @click="refreshActiveTab">
+                <i class="fa-solid fa-rotate"></i> 刷新
+              </button>
             </div>
 
-            <div class="feedback" v-if="feedback">
-              <div class="alert" :class="feedback.type">{{ feedback.message }}</div>
-            </div>
+            <div class="content-body">
+              <div class="feedback" v-if="feedback">
+                <div class="alert" :class="feedback.type">{{ feedback.message }}</div>
+              </div>
 
             <section v-if="activeTab === 'dashboard'" :class="{ loading: dashboardLoading }">
               <div class="metrics">
                 <div class="metric">
+                  <div class="metric-icon blue"><i class="fa-solid fa-users"></i></div>
                   <div class="metric-label">总用户数</div>
                   <div class="metric-value">{{ dashboard ? dashboard.total_users : "-" }}</div>
                 </div>
                 <div class="metric">
+                  <div class="metric-icon green"><i class="fa-solid fa-calendar-day"></i></div>
                   <div class="metric-label">今日订单数</div>
                   <div class="metric-value">{{ dashboard ? dashboard.today_orders : "-" }}</div>
                 </div>
                 <div class="metric">
+                  <div class="metric-icon purple"><i class="fa-solid fa-chart-pie"></i></div>
                   <div class="metric-label">支付成功率</div>
                   <div class="metric-value">{{ dashboard ? formatPercent(dashboard.payment_success_rate) : "-" }}</div>
                 </div>
                 <div class="metric clickable" @click="jumpToAbnormalOrders">
+                  <div class="metric-icon red"><i class="fa-solid fa-triangle-exclamation"></i></div>
                   <div class="metric-label">异常订单数</div>
                   <div class="metric-value">{{ dashboard ? dashboard.abnormal_orders : "-" }}</div>
                 </div>
                 <div class="metric">
-                  <div class="metric-label">最近危险操作</div>
-                  <div class="metric-value">{{ dashboard ? dashboard.recent_dangerous_actions : "-" }}</div>
+                  <div class="metric-icon orange"><i class="fa-solid fa-ticket"></i></div>
+                  <div class="metric-label">CDK 总量</div>
+                  <div class="metric-value">{{ dashboard ? dashboard.total_cdks : "-" }}</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-icon gray"><i class="fa-solid fa-circle-check"></i></div>
+                  <div class="metric-label">已用 CDK</div>
+                  <div class="metric-value">{{ dashboard ? dashboard.redeemed_cdks : "-" }}</div>
+                </div>
+              </div>
+              <div class="charts-grid">
+                <div class="chart-card">
+                  <h3>近 7 天用户增长</h3>
+                  <div style="height:250px"><canvas id="dailyUsersChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                  <h3>近 7 天订单数</h3>
+                  <div style="height:250px"><canvas id="dailyOrdersChart"></canvas></div>
                 </div>
               </div>
               <div class="panel">
                 <div class="empty" v-if="!dashboard">暂无 Dashboard 数据</div>
                 <div class="detail-box" v-else>
-                  <details open>
-                    <summary>Dashboard JSON</summary>
-                    <pre>{{ jsonText(dashboard) }}</pre>
-                  </details>
+                  <div class="metric-label">最近危险操作</div>
+                  <div class="metric-value">{{ dashboard.recent_dangerous_actions }}</div>
                 </div>
               </div>
             </section>
@@ -1327,12 +1905,12 @@
                   <span class="label">搜索 order_no / user_id</span>
                   <input v-model="orderFilters.search" @keyup.enter="loadOrders(1)">
                 </label>
-                <button class="primary" @click="loadOrders(1)">查询</button>
-                <button @click="resetOrderFilters">重置</button>
+                <button class="btn btn-primary btn-sm" @click="loadOrders(1)"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
+                <button class="btn btn-secondary btn-sm" @click="resetOrderFilters">重置</button>
               </div>
 
               <div class="panel">
-                <table>
+                <table class="table table-hover table-sm align-middle mb-0">
                   <thead>
                     <tr>
                       <th style="width:180px">order_no</th>
@@ -1370,8 +1948,8 @@
                                 <div class="kv-key">作品</div><div class="kv-value">{{ (orderDetails[order.order_no] || order).artwork_id || "-" }}</div>
                               </div>
                               <div class="actions">
-                                <button class="ghost-danger" @click.stop="openActionModal('confirm', order)">确认收款事实</button>
-                                <button class="danger" @click.stop="openActionModal('grant', order)">发放权益</button>
+                                <button class="btn btn-outline-danger btn-sm" @click.stop="openActionModal('confirm', order)">确认收款事实</button>
+                                <button class="btn btn-danger btn-sm" @click.stop="openActionModal('grant', order)">发放权益</button>
                               </div>
                             </div>
                             <div class="detail-box">
@@ -1447,14 +2025,14 @@
                   <span class="label">batch_id</span>
                   <input v-model.trim="cdkFilters.batch_id" @keyup.enter="loadCdks(1)">
                 </label>
-                <button class="primary" @click="loadCdks(1)">查询</button>
-                <button @click="resetCdkFilters">重置</button>
-                <button class="danger" @click="openCdkBatch">批量生成</button>
-                <button @click="downloadCdkCsv">导出 CSV</button>
+                <button class="btn btn-primary btn-sm" @click="loadCdks(1)"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
+                <button class="btn btn-secondary btn-sm" @click="resetCdkFilters">重置</button>
+                <button class="btn btn-danger btn-sm" @click="openCdkBatch"><i class="fa-solid fa-plus"></i> 批量生成</button>
+                <button class="btn btn-secondary btn-sm" @click="downloadCdkCsv"><i class="fa-solid fa-file-csv"></i> 导出 CSV</button>
               </div>
               <div class="panel">
                 <div class="table-scroll">
-                  <table>
+                  <table class="table table-hover table-sm align-middle mb-0">
                     <thead>
                       <tr>
                         <th style="width:190px">code</th>
@@ -1500,12 +2078,12 @@
                   <span class="label">搜索 openid / nickname</span>
                   <input v-model.trim="userFilters.search" @keyup.enter="loadUsers(1)">
                 </label>
-                <button class="primary" @click="loadUsers(1)">查询</button>
-                <button @click="resetUserFilters">重置</button>
+                <button class="btn btn-primary btn-sm" @click="loadUsers(1)"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
+                <button class="btn btn-secondary btn-sm" @click="resetUserFilters">重置</button>
               </div>
               <div class="panel">
                 <div class="table-scroll">
-                  <table>
+                  <table class="table table-hover table-sm align-middle mb-0">
                     <thead>
                       <tr>
                         <th style="width:180px">openid</th>
@@ -1547,12 +2125,12 @@
                   <span class="label">user_id</span>
                   <input v-model.trim="artworkFilters.user_id" @keyup.enter="loadArtworks(1)">
                 </label>
-                <button class="primary" @click="loadArtworks(1)">查询</button>
-                <button @click="resetArtworkFilters">重置</button>
+                <button class="btn btn-primary btn-sm" @click="loadArtworks(1)"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
+                <button class="btn btn-secondary btn-sm" @click="resetArtworkFilters">重置</button>
               </div>
               <div class="panel">
                 <div class="table-scroll">
-                  <table>
+                  <table class="table table-hover table-sm align-middle mb-0">
                     <thead>
                       <tr>
                         <th style="width:260px">artwork_id / preview</th>
@@ -1600,7 +2178,7 @@
                 <div v-else class="config-grid">
                   <div class="config-block">
                     <h3>public</h3>
-                    <table>
+                    <table class="table table-hover table-sm align-middle mb-0">
                       <thead>
                         <tr><th style="width:220px">key</th><th>value</th></tr>
                       </thead>
@@ -1614,7 +2192,7 @@
                   </div>
                   <div class="config-block">
                     <h3>sensitive</h3>
-                    <table>
+                    <table class="table table-hover table-sm align-middle mb-0">
                       <thead>
                         <tr>
                           <th style="width:170px">key</th>
@@ -1656,12 +2234,12 @@
                   <span class="label">actor_id</span>
                   <input v-model.trim="auditFilters.actor_id" @keyup.enter="loadAuditLogs(1)">
                 </label>
-                <button class="primary" @click="loadAuditLogs(1)">查询</button>
-                <button @click="resetAuditFilters">重置</button>
+                <button class="btn btn-primary btn-sm" @click="loadAuditLogs(1)"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
+                <button class="btn btn-secondary btn-sm" @click="resetAuditFilters">重置</button>
               </div>
               <div class="panel">
                 <div class="table-scroll">
-                  <table>
+                  <table class="table table-hover table-sm align-middle mb-0">
                     <thead>
                       <tr>
                         <th style="width:170px">created_at</th>
@@ -1716,6 +2294,7 @@
                 </div>
               </div>
             </section>
+            </div>
           </main>
 
           <div v-if="selectedUser" class="drawer-backdrop" @click="closeUserDrawer"></div>
@@ -1758,13 +2337,13 @@
                   </label>
                 </div>
                 <p class="danger-note">额度变动绝对值大于 100 时，确认框会要求二次确认。</p>
-                <button class="danger" type="submit">调整额度</button>
+                <button class="btn btn-danger btn-sm" type="submit">调整额度</button>
               </form>
 
               <div class="drawer-section">
                 <h3>最近 10 单</h3>
                 <div v-if="!selectedUser.recent_orders || !selectedUser.recent_orders.length" class="empty">暂无订单</div>
-                <table v-else>
+                <table v-else class="table table-hover table-sm align-middle mb-0">
                   <thead>
                     <tr>
                       <th>order_no</th>
@@ -1834,14 +2413,14 @@
                   <div class="inline-actions">
                     <span class="badge ok">batch_id={{ cdkGenerated.batch_id }}</span>
                     <span class="badge ok">audit_id={{ cdkGenerated.audit_id }}</span>
-                    <button type="button" @click="copyGeneratedCodes">复制 codes</button>
+                    <button class="btn btn-secondary btn-sm" type="button" @click="copyGeneratedCodes">复制 codes</button>
                   </div>
                   <textarea class="code-output" readonly :value="cdkGenerated.codes.join(String.fromCharCode(10))"></textarea>
                 </div>
               </div>
               <div class="modal-foot">
-                <button type="button" @click="closeCdkBatch">取消</button>
-                <button class="danger" type="submit" :disabled="cdkBatchLoading || !cdkForm.reason.trim()">确认生成</button>
+                <button class="btn btn-secondary" type="button" @click="closeCdkBatch">取消</button>
+                <button class="btn btn-danger" type="submit" :disabled="cdkBatchLoading || !cdkForm.reason.trim()">确认生成</button>
               </div>
             </form>
           </div>
@@ -1866,8 +2445,8 @@
                 </label>
               </div>
               <div class="modal-foot">
-                <button @click="closeModal">取消</button>
-                <button class="danger" @click="submitModal" :disabled="modal.loading || !modal.reason.trim() || (modal.requiresSecondConfirm && !modal.secondConfirmed)">
+                <button class="btn btn-secondary" @click="closeModal">取消</button>
+                <button class="btn btn-danger" @click="submitModal" :disabled="modal.loading || !modal.reason.trim() || (modal.requiresSecondConfirm && !modal.secondConfirmed)">
                   确认执行
                 </button>
               </div>

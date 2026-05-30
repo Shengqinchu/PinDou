@@ -366,6 +366,11 @@ def test_admin_read_only_endpoints_require_role_and_redact_config(api_client, mo
     assert dashboard["today_orders"] >= 0
     assert "payment_success_rate" in dashboard
     assert "recent_dangerous_actions" in dashboard
+    assert dashboard["total_cdks"] >= 1
+    assert dashboard["redeemed_cdks"] >= 0
+    assert len(dashboard["daily_new_users"]) == 7
+    assert len(dashboard["daily_orders"]) == 7
+    assert set(dashboard["daily_new_users"][0]) == {"date", "count"}
 
     orders = client.get("/api/admin/orders", params={"search": "PDADMIN"}, headers=headers_admin).json()
     assert orders == {"items": [orders["items"][0]], "total": 1, "page": 1, "size": 50}
