@@ -33,11 +33,6 @@ MANUAL_PAYMENT_CONFIRMED_STATUS = "manual_payment_confirmed"
 PAID_STATUSES = {"paid_confirmed", "paid_via_hupijiao"}
 ORDER_GRANT_ACTION = "admin.order.grant_entitlement"
 
-LOGIN_FAILURE_WINDOW = timedelta(minutes=10)
-LOGIN_FAILURE_LIMIT = 5
-_LOGIN_FAILURES: dict[str, list[datetime]] = {}
-
-
 class AdminLoginRequest(BaseModel):
     username: str
     password: str
@@ -78,14 +73,9 @@ def admin_login(payload: AdminLoginRequest, request: Request, db: DbSession) -> 
     """管理员登录，返回带 role=admin 的独立 JWT。"""
     username = payload.username.strip()
     source_ip = client_ip(request)
-    now = datetime.now(timezone.utc)
-    if login_is_limited(source_ip, username, now):
-        raise ApiException(429, "ADMIN_LOGIN_RATE_LIMITED", "管理员登录失败次数过多，请稍后再试。")
     if not admin_credentials_match(username, payload.password):
-        record_login_failure(source_ip, username, now)
         raise ApiException(401, ErrorCode.ADMIN_REQUIRED, "管理员账号或密码不正确。")
 
-    clear_login_failures(source_ip, username)
     audit_id = write_audit(
         actor_id=username,
         actor_role="admin",
@@ -943,31 +933,3 @@ def client_ip(request: Request) -> str:
     if forwarded_for:
         return forwarded_for.split(",", 1)[0].strip()
     return request.client.host if request.client else "unknown"
-
-
-def login_keys(source_ip: str, username: str) -> tuple[str, str]:
-    normalized_username = username.strip().lower() or "unknown"
-    return f"ip:{source_ip}", f"account:{normalized_username}"
-
-
-def login_is_limited(source_ip: str, username: str, now: datetime) -> bool:
-    return any(len(pruned_login_failures(key, now)) >= LOGIN_FAILURE_LIMIT for key in login_keys(source_ip, username))
-
-
-def record_login_failure(source_ip: str, username: str, now: datetime) -> None:
-    for key in login_keys(source_ip, username):
-        failures = pruned_login_failures(key, now)
-        failures.append(now)
-        _LOGIN_FAILURES[key] = failures
-
-
-def clear_login_failures(source_ip: str, username: str) -> None:
-    for key in login_keys(source_ip, username):
-        _LOGIN_FAILURES.pop(key, None)
-
-
-def pruned_login_failures(key: str, now: datetime) -> list[datetime]:
-    cutoff = now - LOGIN_FAILURE_WINDOW
-    failures = [value for value in _LOGIN_FAILURES.get(key, []) if value >= cutoff]
-    _LOGIN_FAILURES[key] = failures
-    return failures
