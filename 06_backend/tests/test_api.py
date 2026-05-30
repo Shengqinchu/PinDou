@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import io
 import base64
+import csv
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from collections.abc import Iterator
 
@@ -398,6 +399,191 @@ def test_admin_login_rate_limits_failed_attempts(api_client) -> None:
     assert limited.status_code == 429
 
 
+def test_admin_two_step_order_fulfillment_is_audited_and_idempotent(api_client) -> None:
+    client, session_factory = api_client
+    with session_factory() as session:
+        user = User(openid="manual_user", nickname="Manual", avatar="")
+        order = Order(
+            user_id=user.openid,
+            order_no="PDMANUAL001",
+            sku="single_9.9",
+            amount_cny=Decimal("9.90"),
+            status="pending_cs_qr",
+            payment_provider="customer_service",
+        )
+        session.add_all([user, order])
+        session.commit()
+
+    headers_admin = admin_headers(client)
+    user_headers = auth_headers(client)
+    assert client.post(
+        "/api/admin/orders/PDMANUAL001/confirm-payment-fact",
+        json={"reason": "paid via QR"},
+        headers=user_headers,
+    ).status_code == 403
+
+    confirmed = client.post(
+        "/api/admin/orders/PDMANUAL001/confirm-payment-fact",
+        json={"reason": "paid via QR"},
+        headers=headers_admin,
+    )
+    assert confirmed.status_code == 200
+    assert confirmed.json()["changed"] is True
+    assert confirmed.json()["order"]["raw_status"] == "manual_payment_confirmed"
+    assert isinstance(confirmed.json()["audit_id"], int)
+
+    repeated_confirm = client.post(
+        "/api/admin/orders/PDMANUAL001/confirm-payment-fact",
+        json={"reason": "operator clicked again"},
+        headers=headers_admin,
+    )
+    assert repeated_confirm.status_code == 200
+    assert repeated_confirm.json()["changed"] is False
+
+    granted = client.post(
+        "/api/admin/orders/PDMANUAL001/grant-entitlement",
+        json={"reason": "release purchased credit"},
+        headers=headers_admin,
+    )
+    assert granted.status_code == 200
+    assert granted.json()["granted"] is True
+    assert granted.json()["order"]["raw_status"] == "paid_confirmed"
+    assert granted.json()["entitlement"]["user"]["paid_credits"] == 1
+
+    repeated_grant = client.post(
+        "/api/admin/orders/PDMANUAL001/grant-entitlement",
+        json={"reason": "second click"},
+        headers=headers_admin,
+    )
+    assert repeated_grant.status_code == 200
+    assert repeated_grant.json()["granted"] is False
+    with session_factory() as session:
+        manual_user = session.scalar(select(User).where(User.openid == "manual_user"))
+        assert manual_user is not None
+        assert manual_user.paid_credits == 1
+        audits = list(
+            session.scalars(select(AdminAuditLog).where(AdminAuditLog.resource_id == "PDMANUAL001"))
+        )
+        assert [audit.action for audit in audits].count("admin.order.confirm_payment_fact") == 2
+        assert [audit.action for audit in audits].count("admin.order.grant_entitlement") == 2
+
+
+def test_admin_grant_requires_confirmed_or_paid_order(api_client) -> None:
+    client, session_factory = api_client
+    with session_factory() as session:
+        user = User(openid="unconfirmed_user", nickname="Unconfirmed", avatar="")
+        order = Order(
+            user_id=user.openid,
+            order_no="PDUNCONFIRMED",
+            sku="single_9.9",
+            amount_cny=Decimal("9.90"),
+            status="pending_qr",
+            payment_provider="hupijiao",
+        )
+        session.add_all([user, order])
+        session.commit()
+
+    response = client.post(
+        "/api/admin/orders/PDUNCONFIRMED/grant-entitlement",
+        json={"reason": "too early"},
+        headers=admin_headers(client),
+    )
+    assert response.status_code == 409
+
+
+def test_admin_adjust_credits_requires_reason_and_blocks_negative_balances(api_client) -> None:
+    client, session_factory = api_client
+    with session_factory() as session:
+        user = User(openid="credit_user", nickname="Credit", avatar="", free_credits_remaining=1, paid_credits=1)
+        session.add(user)
+        session.commit()
+
+    headers_admin = admin_headers(client)
+    assert client.post(
+        "/api/admin/users/credit_user/credits",
+        json={"delta_paid": 1, "reason": "viewer should not write"},
+        headers=auth_headers(client),
+    ).status_code == 403
+
+    negative = client.post(
+        "/api/admin/users/credit_user/credits",
+        json={"delta_free": -2, "reason": "invalid negative"},
+        headers=headers_admin,
+    )
+    assert negative.status_code == 400
+
+    adjusted = client.post(
+        "/api/admin/users/credit_user/credits",
+        json={"delta_free": 2, "delta_paid": -1, "set_monthly_card_days": 30, "reason": "support adjustment"},
+        headers=headers_admin,
+    )
+    assert adjusted.status_code == 200
+    payload = adjusted.json()
+    assert payload["user"]["free_credits_remaining"] == 3
+    assert payload["user"]["paid_credits"] == 0
+    assert payload["user"]["monthly_card_expires_at"] is not None
+    assert isinstance(payload["audit_id"], int)
+    with session_factory() as session:
+        audit = session.get(AdminAuditLog, payload["audit_id"])
+        assert audit is not None
+        assert audit.action == "admin.user.adjust_credits"
+        assert audit.reason == "support adjustment"
+
+
+def test_admin_cdk_batch_generation_and_csv_export(api_client) -> None:
+    client, _session_factory = api_client
+    headers_admin = admin_headers(client)
+    assert client.post(
+        "/api/admin/cdks/batch",
+        json={"type": "credit_pack_5", "value": 5, "count": 2, "sales_channel": "xhs", "reason": "seed batch"},
+        headers=auth_headers(client),
+    ).status_code == 403
+
+    created = client.post(
+        "/api/admin/cdks/batch",
+        json={
+            "type": "credit_pack_5",
+            "value": 5,
+            "count": 3,
+            "sales_channel": "xhs",
+            "notes": "launch",
+            "reason": "seed launch batch",
+        },
+        headers=headers_admin,
+    )
+    assert created.status_code == 200
+    payload = created.json()
+    assert len(payload["codes"]) == 3
+    assert len(set(payload["codes"])) == 3
+    assert payload["batch_id"]
+    assert isinstance(payload["audit_id"], int)
+
+    csv_denied = client.get("/api/admin/cdks/export.csv", headers=auth_headers(client))
+    assert csv_denied.status_code == 403
+    exported = client.get(
+        "/api/admin/cdks/export.csv",
+        params={"batch_id": payload["batch_id"], "status": "active"},
+        headers=headers_admin,
+    )
+    assert exported.status_code == 200
+    assert exported.headers["content-type"].startswith("text/csv")
+    rows = list(csv.DictReader(io.StringIO(exported.text)))
+    assert len(rows) == 3
+    assert set(rows[0]) == {
+        "code",
+        "type",
+        "value",
+        "status",
+        "sales_channel",
+        "batch_id",
+        "redeemed_by",
+        "redeemed_at",
+        "created_at",
+    }
+    assert {row["batch_id"] for row in rows} == {payload["batch_id"]}
+    assert {row["sales_channel"] for row in rows} == {"xhs"}
+
+
 def test_hupijiao_webhook_marks_order_paid_and_grants_monthly_card(api_client) -> None:
     client, session_factory = api_client
     headers = auth_headers(client)
@@ -435,10 +621,21 @@ def test_hupijiao_webhook_marks_order_paid_and_grants_monthly_card(api_client) -
     assert webhook["amount_matched"] is True
     assert webhook["duplicate_callback"] is True
     assert len(webhook["callback_logs"]) == 2
+    admin_grant = client.post(
+        f"/api/admin/orders/{payload['order_no']}/grant-entitlement",
+        json={"reason": "verify webhook fulfillment is idempotent"},
+        headers=admin_headers(client),
+    )
+    assert admin_grant.status_code == 200
+    assert admin_grant.json()["granted"] is False
     with session_factory() as session:
         user = session.scalar(select(User).where(User.openid.like("wx_%")))
         assert user is not None
         assert user.monthly_card_expires_at is not None
+        expires_at = user.monthly_card_expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        assert expires_at < datetime.now(timezone.utc) + timedelta(days=31)
 
 
 def test_cdk_redeem_and_admin_batch_generate(api_client) -> None:

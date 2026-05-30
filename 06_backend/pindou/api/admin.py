@@ -2,21 +2,26 @@
 
 from __future__ import annotations
 
+import csv
+import io
+import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Any
 from urllib.parse import urlsplit
 
 from fastapi import APIRouter, Depends, Query, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import func, or_, select
 
 from pindou.api.deps import DbSession, require_role
 from pindou.api.errors import ApiException, ErrorCode
-from pindou.api.payment import ConfirmOrderRequest
+from pindou.api.payment import ConfirmOrderRequest, SKU_CATALOG
 from pindou.api.security import admin_credentials_match, create_access_token
 from pindou.config import get_settings
-from pindou.db.models import AdminAuditLog, Artwork, CDK, Order, User, iso_or_none
+from pindou.db.models import AdminAuditLog, Artwork, CDK, Order, User, iso_or_none, utc_now
 from pindou.services.admin_audit_service import write_audit
+from pindou.services.cdk_service import CDKService
 
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -24,6 +29,9 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 ADMIN_ROLES = ("admin", "operator", "viewer")
 AdminReadActor = Annotated[dict[str, Any], Depends(require_role(*ADMIN_ROLES))]
 AdminOnlyActor = Annotated[dict[str, Any], Depends(require_role("admin"))]
+MANUAL_PAYMENT_CONFIRMED_STATUS = "manual_payment_confirmed"
+PAID_STATUSES = {"paid_confirmed", "paid_via_hupijiao"}
+ORDER_GRANT_ACTION = "admin.order.grant_entitlement"
 
 LOGIN_FAILURE_WINDOW = timedelta(minutes=10)
 LOGIN_FAILURE_LIMIT = 5
@@ -45,8 +53,24 @@ class BatchGenerateCDKRequest(BaseModel):
 
 
 class AdjustCreditsRequest(BaseModel):
-    free_credits_remaining: int | None = Field(default=None, ge=0)
-    paid_credits: int | None = Field(default=None, ge=0)
+    delta_free: int | None = None
+    delta_paid: int | None = None
+    set_monthly_card_days: int | None = Field(default=None, ge=0)
+    reason: str = Field(min_length=1, max_length=500)
+
+
+class ReasonRequest(BaseModel):
+    reason: str = Field(min_length=1, max_length=500)
+
+
+class CreateCDKBatchRequest(BaseModel):
+    type: str = Field(pattern="^(single_use|monthly_card|credit_pack_5|credit_pack_10)$")
+    value: int = Field(ge=1)
+    count: int = Field(default=1, ge=1, le=500)
+    sales_channel: str | None = None
+    expires_at: str | None = None
+    notes: str | None = None
+    reason: str = Field(min_length=1, max_length=500)
 
 
 @router.post("/login")
@@ -120,6 +144,169 @@ def get_order_detail(order_no: str, _actor: AdminReadActor, db: DbSession) -> di
         raise ApiException(404, ErrorCode.ORDER_NOT_FOUND, "没有找到这个订单。")
     webhook_logs = order_webhook_logs(db, order.order_no)
     return order_payload(order) | {"webhook": webhook_summary(webhook_logs)}
+
+
+@router.post("/orders/{order_no}/confirm-payment-fact")
+def confirm_payment_fact(
+    order_no: str,
+    payload: ReasonRequest,
+    request: Request,
+    actor: AdminOnlyActor,
+    db: DbSession,
+) -> dict:
+    """第一步：仅确认已收到款，不发放权益。"""
+    reason = clean_reason(payload.reason)
+    order = get_order_by_no(order_no, db)
+    before = order_snapshot(order)
+    result = "confirmed"
+    changed = False
+
+    if order.status == MANUAL_PAYMENT_CONFIRMED_STATUS:
+        result = "already_confirmed"
+    elif order.status in PAID_STATUSES:
+        result = "already_paid"
+    elif order.status in {"cancelled", "refunded"}:
+        raise ApiException(409, ErrorCode.INVALID_ORDER_STATUS, "已取消或已退款订单不能人工确认收款。")
+    else:
+        order.status = MANUAL_PAYMENT_CONFIRMED_STATUS
+        changed = True
+
+    after = order_snapshot(order)
+    audit_id = audit_admin_action(
+        db=db,
+        actor=actor,
+        action="admin.order.confirm_payment_fact",
+        resource_type="order",
+        resource_id=order.order_no,
+        before=before,
+        after={"order": after, "result": result, "changed": changed},
+        reason=reason,
+        request_id=request.headers.get("x-request-id"),
+    )
+    db.refresh(order)
+    return {
+        "order": order_payload(order),
+        "audit_id": audit_id,
+        "changed": changed,
+        "message": "收款事实已确认。" if changed else "订单收款事实已确认，无需重复修改。",
+    }
+
+
+@router.post("/orders/{order_no}/grant-entitlement")
+def grant_order_entitlement_for_admin(
+    order_no: str,
+    payload: ReasonRequest,
+    request: Request,
+    actor: AdminOnlyActor,
+    db: DbSession,
+) -> dict:
+    """第二步：在收款事实确认后发放订单权益。"""
+    reason = clean_reason(payload.reason)
+    order = get_order_by_no(order_no, db)
+    if order.status not in {MANUAL_PAYMENT_CONFIRMED_STATUS, *PAID_STATUSES}:
+        raise ApiException(409, ErrorCode.INVALID_ORDER_STATUS, "订单必须先确认收款事实，或已处于已支付状态，才能发放权益。")
+
+    before = {
+        "order": order_snapshot(order),
+        "entitlement": entitlement_subject_snapshot(order, db),
+    }
+    if has_entitlement_grant_record(db, order.order_no):
+        after = {
+            "order": order_snapshot(order),
+            "entitlement": entitlement_subject_snapshot(order, db),
+            "result": "already_granted",
+            "granted": False,
+        }
+        audit_id = audit_admin_action(
+            db=db,
+            actor=actor,
+            action=ORDER_GRANT_ACTION,
+            resource_type="order",
+            resource_id=order.order_no,
+            before=before,
+            after=after,
+            reason=reason,
+            request_id=request.headers.get("x-request-id"),
+        )
+        return {
+            "order": order_payload(order),
+            "entitlement": after["entitlement"],
+            "audit_id": audit_id,
+            "granted": False,
+            "message": "订单权益已发放过，本次未重复发放。",
+        }
+
+    entitlement = apply_order_entitlement(order, db)
+    order.status = "paid_via_hupijiao" if order.payment_provider == "hupijiao" else "paid_confirmed"
+    order.paid_at = order.paid_at or utc_now()
+    after = {
+        "order": order_snapshot(order),
+        "entitlement": entitlement_subject_snapshot(order, db),
+        "result": "granted",
+        "granted": True,
+        "grant": entitlement,
+    }
+    audit_id = audit_admin_action(
+        db=db,
+        actor=actor,
+        action=ORDER_GRANT_ACTION,
+        resource_type="order",
+        resource_id=order.order_no,
+        before=before,
+        after=after,
+        reason=reason,
+        request_id=request.headers.get("x-request-id"),
+    )
+    db.refresh(order)
+    return {
+        "order": order_payload(order),
+        "entitlement": after["entitlement"],
+        "audit_id": audit_id,
+        "granted": True,
+        "message": "订单权益已发放。",
+    }
+
+
+@router.get("/cdks/export.csv")
+def export_cdks_csv(
+    _actor: AdminOnlyActor,
+    db: DbSession,
+    batch_id: str | None = Query(default=None),
+    status: str | None = Query(default=None),
+) -> StreamingResponse:
+    """导出 CDK CSV。"""
+    clauses = []
+    if batch_id:
+        clauses.append(CDK.batch_id == batch_id)
+    if status:
+        clauses.append(CDK.status == status)
+    stmt = select(CDK)
+    if clauses:
+        stmt = stmt.where(*clauses)
+    cdks = list(db.scalars(stmt.order_by(CDK.created_at.desc(), CDK.code.asc())))
+
+    output = io.StringIO()
+    writer = csv.writer(output, lineterminator="\n")
+    writer.writerow(["code", "type", "value", "status", "sales_channel", "batch_id", "redeemed_by", "redeemed_at", "created_at"])
+    for cdk in cdks:
+        writer.writerow(
+            [
+                cdk.code,
+                cdk.type,
+                cdk.value,
+                cdk.status,
+                cdk.sales_channel or "",
+                cdk.batch_id or "",
+                cdk.redeemed_by or "",
+                iso_or_none(cdk.redeemed_at) or "",
+                iso_or_none(cdk.created_at) or "",
+            ]
+        )
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="pindou-cdks.csv"'},
+    )
 
 
 @router.get("/cdks")
@@ -280,10 +467,266 @@ def batch_generate_cdk(_payload: BatchGenerateCDKRequest, _actor: AdminOnlyActor
     raise ApiException(403, ErrorCode.ADMIN_REQUIRED, "CDK 批量生成需要 reason 和审计，将在 Batch 2 接口开放。")
 
 
+@router.post("/cdks/batch")
+def create_cdk_batch(
+    payload: CreateCDKBatchRequest,
+    request: Request,
+    actor: AdminOnlyActor,
+    db: DbSession,
+) -> dict:
+    """批量生成 CDK，写入审计并返回本批 codes。"""
+    reason = clean_reason(payload.reason)
+    batch_id = f"cdk_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{secrets.token_hex(4)}"
+    expires_at = parse_optional_datetime(payload.expires_at)
+    codes: list[str] = []
+    for _index in range(payload.count):
+        code = generate_unique_cdk_code(db)
+        cdk = CDK(
+            code=code,
+            type=payload.type,
+            value=payload.value,
+            status="active",
+            sales_channel=payload.sales_channel,
+            batch_id=batch_id,
+            created_by=actor_id(actor),
+            expires_at=expires_at,
+            notes=payload.notes or "",
+        )
+        db.add(cdk)
+        codes.append(code)
+
+    audit_id = audit_admin_action(
+        db=db,
+        actor=actor,
+        action="admin.cdk.batch_generate",
+        resource_type="cdk_batch",
+        resource_id=batch_id,
+        before=None,
+        after={
+            "batch_id": batch_id,
+            "count": payload.count,
+            "type": payload.type,
+            "value": payload.value,
+            "sales_channel": payload.sales_channel,
+            "expires_at": iso_or_none(expires_at),
+            "notes": payload.notes or "",
+        },
+        reason=reason,
+        request_id=request.headers.get("x-request-id"),
+    )
+    return {"codes": codes, "batch_id": batch_id, "audit_id": audit_id}
+
+
 @router.post("/users/{user_id}/credits")
-def adjust_user_credits(_user_id: str, _payload: AdjustCreditsRequest, _actor: AdminOnlyActor) -> dict:
-    """Legacy credit adjustment is disabled until Batch 2 reason + audit flow."""
-    raise ApiException(403, ErrorCode.ADMIN_REQUIRED, "额度调整需要 reason 和审计，将在 Batch 2 接口开放。")
+def adjust_user_credits(
+    user_id: str,
+    payload: AdjustCreditsRequest,
+    request: Request,
+    actor: AdminOnlyActor,
+    db: DbSession,
+) -> dict:
+    """调整用户额度或月卡，必须 reason + 审计。"""
+    reason = clean_reason(payload.reason)
+    if payload.delta_free is None and payload.delta_paid is None and payload.set_monthly_card_days is None:
+        raise ApiException(422, ErrorCode.VALIDATION_ERROR, "至少提供一个额度或月卡调整字段。")
+
+    user = db.scalar(select(User).where(User.openid == user_id))
+    if user is None:
+        raise ApiException(404, ErrorCode.USER_NOT_FOUND, "没有找到这个用户。")
+    before = user_credit_snapshot(user)
+
+    if payload.delta_free is not None:
+        user.free_credits_remaining += payload.delta_free
+    if payload.delta_paid is not None:
+        user.paid_credits += payload.delta_paid
+    if user.free_credits_remaining < 0 or user.paid_credits < 0:
+        raise ApiException(400, ErrorCode.VALIDATION_ERROR, "调整后额度不能为负数。")
+    if payload.set_monthly_card_days is not None:
+        user.monthly_card_expires_at = (
+            None if payload.set_monthly_card_days == 0 else utc_now() + timedelta(days=payload.set_monthly_card_days)
+        )
+
+    after = user_credit_snapshot(user)
+    audit_id = audit_admin_action(
+        db=db,
+        actor=actor,
+        action="admin.user.adjust_credits",
+        resource_type="user",
+        resource_id=user.openid,
+        before=before,
+        after=after,
+        reason=reason,
+        request_id=request.headers.get("x-request-id"),
+    )
+    db.refresh(user)
+    return {"user": user_credit_snapshot(user), "audit_id": audit_id}
+
+
+def get_order_by_no(order_no: str, db: DbSession) -> Order:
+    order = db.scalar(select(Order).where(Order.order_no == order_no))
+    if order is None:
+        raise ApiException(404, ErrorCode.ORDER_NOT_FOUND, "没有找到这个订单。")
+    return order
+
+
+def clean_reason(reason: str) -> str:
+    normalized = reason.strip()
+    if not normalized:
+        raise ApiException(422, ErrorCode.VALIDATION_ERROR, "危险操作必须填写 reason。")
+    return normalized
+
+
+def audit_admin_action(
+    *,
+    db: DbSession,
+    actor: dict[str, Any],
+    action: str,
+    resource_type: str,
+    resource_id: str | None,
+    before: Any | None,
+    after: Any | None,
+    reason: str,
+    request_id: str | None,
+) -> int:
+    return write_audit(
+        actor_id=actor_id(actor),
+        actor_role=actor_role(actor),
+        action=action,
+        resource_type=resource_type,
+        resource_id=resource_id,
+        before=before,
+        after=after,
+        reason=reason,
+        request_id=request_id,
+        session=db,
+    )
+
+
+def actor_id(actor: dict[str, Any]) -> str:
+    return str(actor.get("sub") or "admin")
+
+
+def actor_role(actor: dict[str, Any]) -> str:
+    return str(actor.get("role") or "admin")
+
+
+def order_snapshot(order: Order) -> dict[str, Any]:
+    return {
+        "order_id": order.order_id,
+        "order_no": order.order_no,
+        "user_id": order.user_id,
+        "sku": order.sku,
+        "amount_cny": str(order.amount_cny),
+        "status": order.status,
+        "payment_method": order.payment_method,
+        "payment_provider": order.payment_provider,
+        "paid_at": iso_or_none(order.paid_at),
+        "artwork_id": order.artwork_id,
+        "cdk_code": order.cdk_code,
+    }
+
+
+def user_credit_snapshot(user: User) -> dict[str, Any]:
+    return {
+        "user_id": user.user_id,
+        "free_credits_remaining": user.free_credits_remaining,
+        "paid_credits": user.paid_credits,
+        "monthly_card_expires_at": iso_or_none(user.monthly_card_expires_at),
+    }
+
+
+def entitlement_subject_snapshot(order: Order, db: DbSession) -> dict[str, Any]:
+    item = SKU_CATALOG.get(order.sku)
+    if item is None:
+        return {"type": "unknown", "sku": order.sku}
+    entitlement = item["entitlement"]
+    if entitlement in {"credits", "monthly_card"}:
+        user = db.scalar(select(User).where(User.openid == order.user_id))
+        return {"type": entitlement, "user": user_credit_snapshot(user)} if user else {"type": entitlement, "user": None}
+    if entitlement == "manual_polish":
+        artwork = db.get(Artwork, order.artwork_id) if order.artwork_id else None
+        return {
+            "type": entitlement,
+            "artwork": {
+                "artwork_id": artwork.artwork_id,
+                "is_paid_unlocked": artwork.is_paid_unlocked,
+            }
+            if artwork
+            else None,
+        }
+    return {"type": entitlement}
+
+
+def apply_order_entitlement(order: Order, db: DbSession) -> dict[str, Any]:
+    item = SKU_CATALOG.get(order.sku)
+    if item is None:
+        raise ApiException(422, ErrorCode.VALIDATION_ERROR, "订单 SKU 未配置权益，无法发放。")
+    entitlement = item["entitlement"]
+    if entitlement == "credits":
+        user = db.scalar(select(User).where(User.openid == order.user_id))
+        if user is None:
+            raise ApiException(404, ErrorCode.USER_NOT_FOUND, "没有找到这个用户。")
+        credits = int(item["credits"])
+        user.paid_credits += credits
+        return {"type": "credits", "credits": credits, "user_id": user.user_id}
+    if entitlement == "monthly_card":
+        user = db.scalar(select(User).where(User.openid == order.user_id))
+        if user is None:
+            raise ApiException(404, ErrorCode.USER_NOT_FOUND, "没有找到这个用户。")
+        days = int(item["days"])
+        now = utc_now()
+        current_expires = user.monthly_card_expires_at
+        if current_expires and current_expires.tzinfo is None:
+            current_expires = current_expires.replace(tzinfo=now.tzinfo)
+        base = current_expires if current_expires and current_expires > now else now
+        user.monthly_card_expires_at = base + timedelta(days=days)
+        return {"type": "monthly_card", "days": days, "user_id": user.user_id}
+    if entitlement == "manual_polish":
+        if not order.artwork_id:
+            raise ApiException(422, ErrorCode.VALIDATION_ERROR, "人工精修订单缺少 artwork_id，无法解锁作品。")
+        artwork = db.get(Artwork, order.artwork_id)
+        if artwork is None:
+            raise ApiException(404, ErrorCode.ARTWORK_NOT_FOUND, "没有找到这个作品。")
+        artwork.is_paid_unlocked = True
+        return {"type": "manual_polish", "artwork_id": artwork.artwork_id, "is_paid_unlocked": True}
+    raise ApiException(422, ErrorCode.VALIDATION_ERROR, "订单权益类型暂不支持。")
+
+
+def has_entitlement_grant_record(db: DbSession, order_no: str) -> bool:
+    audit = db.scalar(
+        select(AdminAuditLog.id).where(
+            AdminAuditLog.action == ORDER_GRANT_ACTION,
+            AdminAuditLog.resource_type == "order",
+            AdminAuditLog.resource_id == order_no,
+        )
+    )
+    if audit is not None:
+        return True
+    webhook_paid = db.scalar(
+        select(AdminAuditLog.id).where(
+            AdminAuditLog.action == "payment.webhook",
+            AdminAuditLog.resource_type == "order",
+            AdminAuditLog.resource_id == order_no,
+            AdminAuditLog.after_json["result"].as_string() == "paid",
+        )
+    )
+    return webhook_paid is not None
+
+
+def parse_optional_datetime(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise ApiException(422, ErrorCode.VALIDATION_ERROR, "expires_at 必须是 ISO datetime。") from exc
+
+
+def generate_unique_cdk_code(db: DbSession) -> str:
+    while True:
+        code = CDKService.generate_code()
+        if db.get(CDK, code) is None:
+            return code
 
 
 def order_payload(order: Order) -> dict[str, Any]:
