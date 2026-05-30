@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Annotated
+from collections.abc import Callable
+from typing import Annotated, Any
 
 from fastapi import Depends, Header
 from sqlalchemy import select
@@ -48,9 +49,36 @@ def get_current_admin(token: Annotated[str, Depends(bearer_token)]) -> dict:
         payload = decode_access_token(token)
     except TokenError as exc:
         raise ApiException(401, ErrorCode.AUTH_REQUIRED, "管理员登录已过期，请重新登录。") from exc
-    if not payload.get("admin"):
-        raise ApiException(403, ErrorCode.ADMIN_REQUIRED, "需要管理员权限。")
+    role = _role_from_payload(payload)
+    if role != "admin":
+        raise ApiException(403, ErrorCode.ADMIN_REQUIRED, "当前角色无权访问，需要角色：admin。")
+    payload["role"] = role
     return payload
+
+
+def require_role(*allowed_roles: str) -> Callable[[str], dict[str, Any]]:
+    allowed = set(allowed_roles)
+
+    def dependency(token: Annotated[str, Depends(bearer_token)]) -> dict[str, Any]:
+        try:
+            payload = decode_access_token(token)
+        except TokenError as exc:
+            raise ApiException(401, ErrorCode.AUTH_REQUIRED, "管理员登录已过期，请重新登录。") from exc
+        role = _role_from_payload(payload)
+        if role not in allowed:
+            allowed_label = " / ".join(sorted(allowed)) or "未配置"
+            raise ApiException(403, ErrorCode.ADMIN_REQUIRED, f"当前角色 {role} 无权访问，需要角色：{allowed_label}。")
+        payload["role"] = role
+        return payload
+
+    return dependency
+
+
+def _role_from_payload(payload: dict[str, Any]) -> str:
+    role = str(payload.get("role") or "").strip()
+    if role:
+        return role
+    return "admin" if payload.get("admin") else "user"
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]

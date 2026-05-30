@@ -21,14 +21,17 @@ def create_access_token(
     *,
     subject: str,
     is_admin: bool = False,
+    role: str | None = None,
     expires_delta: timedelta = timedelta(days=30),
 ) -> str:
     now = int(time.time())
+    token_role = role or ("admin" if is_admin else "user")
     payload = {
         "sub": subject,
         "iat": now,
         "exp": now + int(expires_delta.total_seconds()),
-        "admin": is_admin,
+        "admin": bool(is_admin or token_role == "admin"),
+        "role": token_role,
     }
     header = {"alg": "HS256", "typ": "JWT"}
     signing_input = ".".join([_b64json(header), _b64json(payload)])

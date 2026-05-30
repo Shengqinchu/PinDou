@@ -9,7 +9,8 @@ from PIL import Image
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from pindou.db.models import Artwork, User
+from pindou.db.models import AdminAuditLog, Artwork, User
+from pindou.services.admin_audit_service import write_audit
 from pindou.services.artwork_service import ArtworkService
 from pindou.services.cdk_service import CDKInvalidError, CDKRateLimitError, CDKService
 from pindou.services.payment_service import (
@@ -199,6 +200,28 @@ def test_payment_service_normalizes_blank_optional_order_refs(db_session: Sessio
     assert order.artwork_id is None
     assert order.qr_code_path is None
     assert order.cdk_code is None
+
+
+def test_write_audit_persists_backend_event(db_session: Session) -> None:
+    audit_id = write_audit(
+        actor_id="admin",
+        actor_role="admin",
+        action="admin.login",
+        resource_type="admin_session",
+        resource_id="admin",
+        before=None,
+        after={"result": "success"},
+        reason="unit test",
+        request_id="req-1",
+        session=db_session,
+    )
+
+    audit = db_session.get(AdminAuditLog, audit_id)
+    assert audit is not None
+    assert audit.actor_id == "admin"
+    assert audit.actor_role == "admin"
+    assert audit.after_json == {"result": "success"}
+    assert audit.request_id == "req-1"
 
 
 def test_delete_expired_originals_once_marks_only_old_uploads(db_session: Session, tmp_path) -> None:

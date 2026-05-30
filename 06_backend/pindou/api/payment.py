@@ -17,7 +17,8 @@ from pindou.api.deps import CurrentUser, DbSession
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.config import get_settings
 from pindou.db.models import Order, utc_now
-from pindou.services.hupijiao_service import HupijiaoError, HupijiaoService
+from pindou.services.admin_audit_service import write_audit
+from pindou.services.hupijiao_service import HupijiaoError, HupijiaoService, sanitize_payload
 from pindou.services.payment_service import (
     InvalidOrderTransitionError,
     ORDER_STATUS_PAID,
@@ -222,19 +223,70 @@ async def hupijiao_webhook(request: Request, db: DbSession) -> PlainTextResponse
     """虎皮椒支付回调：验签后幂等发放权益。"""
     params = await parse_hupijiao_payload(request)
     service = build_hupijiao_service()
-    if not service.verify_webhook(params):
-        return PlainTextResponse("fail", status_code=400)
-
     order_no = str(params.get("trade_order_id") or "")
     gateway_status = str(params.get("status") or "")
+    request_id = request.headers.get("x-request-id")
+    signature_passed = service.verify_webhook(params)
+    if not signature_passed:
+        write_webhook_audit(
+            db=db,
+            order=None,
+            order_no=order_no or None,
+            params=params,
+            signature_passed=False,
+            amount_matched=None,
+            duplicate_callback=False,
+            result="signature_failed",
+            request_id=request_id,
+        )
+        return PlainTextResponse("fail", status_code=400)
+
     if not order_no:
+        write_webhook_audit(
+            db=db,
+            order=None,
+            order_no=None,
+            params=params,
+            signature_passed=True,
+            amount_matched=None,
+            duplicate_callback=False,
+            result="missing_order_no",
+            request_id=request_id,
+        )
         return PlainTextResponse("fail", status_code=400)
     order = PaymentService(db).get_order(order_no)
     if order is None:
+        write_webhook_audit(
+            db=db,
+            order=None,
+            order_no=order_no,
+            params=params,
+            signature_passed=True,
+            amount_matched=None,
+            duplicate_callback=False,
+            result="order_not_found",
+            request_id=request_id,
+        )
         return PlainTextResponse("fail", status_code=404)
-    if not amounts_match(order.amount_cny, params.get("total_fee")):
+    amount_matched = amounts_match(order.amount_cny, params.get("total_fee"))
+    if not amount_matched:
+        write_webhook_audit(
+            db=db,
+            order=order,
+            before_order=order_audit_snapshot(order),
+            order_no=order.order_no,
+            params=params,
+            signature_passed=True,
+            amount_matched=False,
+            duplicate_callback=False,
+            result="amount_mismatch",
+            request_id=request_id,
+        )
         return PlainTextResponse("fail", status_code=400)
 
+    before_order_snapshot = order_audit_snapshot(order)
+    result = "ignored"
+    duplicate_callback = order.status != ORDER_STATUS_PENDING_HUPIJIAO
     if gateway_status == "OD" and order.status == ORDER_STATUS_PENDING_HUPIJIAO:
         paid_at = parse_timestamp(params.get("time"))
         paid = PaymentService(db).transition_order(
@@ -243,8 +295,26 @@ async def hupijiao_webhook(request: Request, db: DbSession) -> PlainTextResponse
             paid_at=paid_at,
         )
         grant_order_entitlement(paid, db)
+        order = paid
+        result = "paid"
+        duplicate_callback = False
     elif gateway_status in {"CD", "UD"} and order.status == ORDER_STATUS_PENDING_HUPIJIAO:
-        PaymentService(db).transition_order(order_no=order.order_no, status="cancelled")
+        order = PaymentService(db).transition_order(order_no=order.order_no, status="cancelled")
+        result = "cancelled"
+        duplicate_callback = False
+
+    write_webhook_audit(
+        db=db,
+        order=order,
+        before_order=before_order_snapshot,
+        order_no=order.order_no,
+        params=params,
+        signature_passed=True,
+        amount_matched=True,
+        duplicate_callback=duplicate_callback,
+        result=result,
+        request_id=request_id,
+    )
 
     return PlainTextResponse("success")
 
@@ -318,6 +388,55 @@ def parse_timestamp(value: Any) -> datetime | None:
         return datetime.fromtimestamp(int(value), tz=utc_now().tzinfo)
     except (TypeError, ValueError, OSError):
         return None
+
+
+def write_webhook_audit(
+    *,
+    db: DbSession,
+    order: Order | None,
+    order_no: str | None,
+    params: dict[str, Any],
+    signature_passed: bool,
+    amount_matched: bool | None,
+    duplicate_callback: bool,
+    result: str,
+    request_id: str | None,
+    before_order: dict[str, Any] | None = None,
+) -> int:
+    order_snapshot = order_audit_snapshot(order) if order is not None else None
+    return write_audit(
+        actor_id="hupijiao",
+        actor_role="system",
+        action="payment.webhook",
+        resource_type="order",
+        resource_id=order_no,
+        before={"order": before_order or order_snapshot} if (before_order or order_snapshot) else None,
+        after={
+            "result": result,
+            "gateway_status": str(params.get("status") or ""),
+            "signature_passed": signature_passed,
+            "amount_matched": amount_matched,
+            "duplicate_callback": duplicate_callback,
+            "payload": sanitize_payload(params),
+            "order": order_snapshot,
+        },
+        reason=f"hupijiao webhook {result}",
+        request_id=request_id,
+        session=db,
+    )
+
+
+def order_audit_snapshot(order: Order) -> dict[str, Any]:
+    return {
+        "order_id": order.order_id,
+        "order_no": order.order_no,
+        "user_id": order.user_id,
+        "sku": order.sku,
+        "amount_cny": str(order.amount_cny),
+        "status": order.status,
+        "payment_provider": order.payment_provider,
+        "paid_at": order.paid_at.isoformat() if order.paid_at else None,
+    }
 
 
 def grant_order_entitlement(order: Order, db: DbSession) -> None:

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import io
 import base64
+import json
 from datetime import datetime
+from decimal import Decimal
 from collections.abc import Iterator
 
 import pytest
@@ -14,7 +16,8 @@ from sqlalchemy.pool import StaticPool
 
 from pindou.api.deps import get_db
 from pindou.config import get_settings
-from pindou.db.models import Base, User
+from pindou.api.security import create_access_token
+from pindou.db.models import AdminAuditLog, Artwork, Base, CDK, Order, User
 from pindou.main import create_app
 from pindou.providers.base import PreviewResult
 from pindou.services.hupijiao_service import sign_params
@@ -69,6 +72,12 @@ def auth_headers(client: TestClient, *, consent: bool = True) -> dict[str, str]:
     if consent:
         assert client.post("/api/user/consent", json={"type": "sensitive"}, headers=headers).status_code == 200
     return headers
+
+
+def admin_headers(client: TestClient) -> dict[str, str]:
+    response = client.post("/api/admin/login", json={"username": "admin", "password": "admin"})
+    assert response.status_code == 200
+    return {"Authorization": f"Bearer {response.json()['token']}"}
 
 
 def upload_image(client: TestClient, headers: dict[str, str]) -> str:
@@ -261,7 +270,7 @@ def test_preview_generate_accepts_sqlite_naive_monthly_card(api_client, monkeypa
     assert response.json()["provider_used"] == "fake"
 
 
-def test_payment_and_admin_confirm_flow(api_client) -> None:
+def test_payment_and_admin_read_only_flow(api_client) -> None:
     client, _session_factory = api_client
     headers = auth_headers(client)
     unauthorized = client.get("/api/admin/orders")
@@ -269,7 +278,8 @@ def test_payment_and_admin_confirm_flow(api_client) -> None:
 
     order = client.post("/api/payment/order/create", json={"sku_id": "single_9.9"}, headers=headers)
     assert order.status_code == 200
-    order_id = order.json()["order_id"]
+    order_payload = order.json()
+    order_id = order_payload["order_id"]
 
     assert client.get(f"/api/payment/order/{order_id}", headers=headers).json() == {"status": "pending"}
     qr = client.get("/api/payment/customer-service", params={"order_id": order_id}, headers=headers)
@@ -278,13 +288,114 @@ def test_payment_and_admin_confirm_flow(api_client) -> None:
 
     bad_admin = client.post("/api/admin/login", json={"username": "admin", "password": "wrong"})
     assert bad_admin.status_code == 401
-    admin_token = client.post("/api/admin/login", json={"username": "admin", "password": "admin"}).json()["token"]
-    admin_headers = {"Authorization": f"Bearer {admin_token}"}
-    confirmed = client.post("/api/admin/payment/confirm", json={"order_id": order_id}, headers=admin_headers)
-    assert confirmed.status_code == 200
-    assert client.get(f"/api/payment/order/{order_id}", headers=headers).json() == {"status": "paid_confirmed"}
-    assert client.get("/api/admin/orders", headers=admin_headers).status_code == 200
-    assert client.get("/api/admin/users", headers=admin_headers).status_code == 200
+    headers_admin = admin_headers(client)
+    listed = client.get("/api/admin/orders", headers=headers_admin)
+    assert listed.status_code == 200
+    assert listed.json()["total"] == 1
+    detail = client.get(f"/api/admin/orders/{order_payload['order_no']}", headers=headers_admin)
+    assert detail.status_code == 200
+    assert detail.json()["webhook"]["callback_logs"] == []
+    disabled = client.post("/api/admin/payment/confirm", json={"order_id": order_id}, headers=headers_admin)
+    assert disabled.status_code == 403
+
+
+def test_admin_read_only_endpoints_require_role_and_redact_config(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, session_factory = api_client
+    monkeypatch.setenv("COS_SECRET_KEY", "cos-secret-should-not-leak")
+    monkeypatch.setenv("HUPIJIAO_APP_SECRET", "hupijiao-secret-should-not-leak")
+    get_settings.cache_clear()
+
+    with session_factory() as session:
+        user = User(openid="admin_target", nickname="Needle", avatar="")
+        session.add(user)
+        session.flush()
+        artwork = Artwork(
+            user_id=user.openid,
+            original_path="uploads/source.png",
+            preview_path="/static/previews/legacy.png",
+            pattern_json={"grid": [["01"]]},
+            style_preset="chibi",
+            size_preset="26x26",
+            title="Legacy preview",
+        )
+        order = Order(
+            user_id=user.openid,
+            order_no="PDADMIN001",
+            sku="single_9.9",
+            amount_cny=Decimal("9.90"),
+            status="pending_qr",
+            payment_provider="hupijiao",
+        )
+        cdk = CDK(code="ADMINCDKABCDEFGHJK", type="credit_pack_5", value=5, batch_id="batch-1")
+        session.add_all([artwork, order, cdk])
+        session.commit()
+
+    headers_admin = admin_headers(client)
+    with session_factory() as session:
+        login_audit = session.scalar(select(AdminAuditLog).where(AdminAuditLog.action == "admin.login"))
+        assert login_audit is not None
+        assert login_audit.actor_role == "admin"
+        assert login_audit.after_json["result"] == "success"
+    user_headers = auth_headers(client)
+    bad_role_headers = {"Authorization": f"Bearer {create_access_token(subject='ops', role='outsider')}"}
+    endpoints = [
+        "/api/admin/orders",
+        "/api/admin/orders/PDADMIN001",
+        "/api/admin/cdks",
+        "/api/admin/users",
+        "/api/admin/users/admin_target",
+        "/api/admin/artworks",
+        "/api/admin/config",
+    ]
+
+    for endpoint in endpoints:
+        assert client.get(endpoint).status_code == 401
+        assert client.get(endpoint, headers=user_headers).status_code == 403
+        assert client.get(endpoint, headers=bad_role_headers).status_code == 403
+        assert client.get(endpoint, headers=headers_admin).status_code == 200
+
+    orders = client.get("/api/admin/orders", params={"search": "PDADMIN"}, headers=headers_admin).json()
+    assert orders == {"items": [orders["items"][0]], "total": 1, "page": 1, "size": 50}
+    assert orders["items"][0]["order_no"] == "PDADMIN001"
+    assert orders["items"][0]["raw_status"] == "pending_qr"
+
+    users = client.get("/api/admin/users", params={"search": "Needle"}, headers=headers_admin).json()
+    assert users["items"][0]["user_id"] == "admin_target"
+    assert users["items"][0]["artwork_count"] == 1
+
+    user_detail = client.get("/api/admin/users/admin_target", headers=headers_admin).json()
+    assert user_detail["artwork_count"] == 1
+    assert user_detail["recent_orders"][0]["order_no"] == "PDADMIN001"
+
+    artworks = client.get("/api/admin/artworks", params={"user_id": "admin_target"}, headers=headers_admin).json()
+    assert artworks["items"][0]["legacy_preview"] is True
+
+    config = client.get("/api/admin/config", headers=headers_admin).json()
+    config_text = json.dumps(config, ensure_ascii=False)
+    assert "cos-secret-should-not-leak" not in config_text
+    assert "hupijiao-secret-should-not-leak" not in config_text
+    assert config["sensitive"]["COS_SECRET_KEY"] == {"env": "COS_SECRET_KEY", "configured": True}
+    assert config["sensitive"]["HUPIJIAO_APP_SECRET"] == {"env": "HUPIJIAO_APP_SECRET", "configured": True}
+
+
+def test_admin_login_rate_limits_failed_attempts(api_client) -> None:
+    client, _session_factory = api_client
+    headers = {"x-forwarded-for": "203.0.113.77"}
+
+    for _index in range(5):
+        response = client.post(
+            "/api/admin/login",
+            json={"username": "limited-admin", "password": "wrong"},
+            headers=headers,
+        )
+        assert response.status_code == 401
+
+    limited = client.post(
+        "/api/admin/login",
+        json={"username": "limited-admin", "password": "wrong"},
+        headers=headers,
+    )
+    assert limited.status_code == 429
 
 
 def test_hupijiao_webhook_marks_order_paid_and_grants_monthly_card(api_client) -> None:
@@ -311,9 +422,19 @@ def test_hupijiao_webhook_marks_order_paid_and_grants_monthly_card(api_client) -
     callback = client.post("/api/v1/webhook/hupijiao", data=webhook_payload)
     assert callback.status_code == 200
     assert callback.text == "success"
+    duplicate = client.post("/api/v1/webhook/hupijiao", data=webhook_payload)
+    assert duplicate.status_code == 200
+    assert duplicate.text == "success"
     assert client.get(f"/api/payment/order/{payload['order_id']}", headers=headers).json() == {
         "status": "paid_confirmed"
     }
+    detail = client.get(f"/api/admin/orders/{payload['order_no']}", headers=admin_headers(client))
+    assert detail.status_code == 200
+    webhook = detail.json()["webhook"]
+    assert webhook["signature_passed"] is True
+    assert webhook["amount_matched"] is True
+    assert webhook["duplicate_callback"] is True
+    assert len(webhook["callback_logs"]) == 2
     with session_factory() as session:
         user = session.scalar(select(User).where(User.openid.like("wx_%")))
         assert user is not None
@@ -333,11 +454,13 @@ def test_cdk_redeem_and_admin_batch_generate(api_client) -> None:
     assert redeemed.status_code == 200
     assert redeemed.json()["cdk_type"] == "credit_pack_5"
 
-    admin_token = client.post("/api/admin/login", json={"username": "admin", "password": "admin"}).json()["token"]
+    headers_admin = admin_headers(client)
+    listed = client.get("/api/admin/cdks", headers=headers_admin)
+    assert listed.status_code == 200
+    assert listed.json()["items"][0]["code"] == "ABCDEFGHJKLMNPQRTU"
     batch = client.post(
         "/api/admin/cdk/batch_generate",
         json={"cdk_type": "single_use", "value": 1, "count": 2},
-        headers={"Authorization": f"Bearer {admin_token}"},
+        headers=headers_admin,
     )
-    assert batch.status_code == 200
-    assert len(batch.json()["cdks"]) == 2
+    assert batch.status_code == 403
