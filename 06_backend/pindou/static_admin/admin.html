@@ -957,6 +957,8 @@
     .table {
       margin-bottom: 0;
       color: var(--gray-800);
+      table-layout: auto;
+      min-width: 980px;
     }
     .table > :not(caption) > * > * {
       padding: 14px 16px;
@@ -1030,6 +1032,77 @@
     .thumb {
       border-radius: 12px;
       border-color: var(--gray-200);
+    }
+    .users-table { min-width: 1120px; }
+    .artworks-table { min-width: 1320px; }
+    .id-cell {
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+    }
+    .id-stack {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+    .id-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+    .mono-id {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      word-break: break-all;
+      color: var(--gray-900);
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .copy-icon {
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--gray-500);
+    }
+    .copy-icon:hover {
+      color: var(--primary);
+      border-color: var(--primary);
+      background: var(--primary-bg);
+    }
+    .preview-box {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 72px;
+      height: 72px;
+      border: 1px solid var(--gray-200);
+      border-radius: 14px;
+      background: var(--gray-50);
+      overflow: hidden;
+    }
+    .preview-box .thumb {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      border-radius: 0;
+    }
+    .preview-missing {
+      display: grid;
+      gap: 4px;
+      place-items: center;
+      padding: 6px;
+      color: var(--gray-400);
+      font-size: 11px;
+      line-height: 1.15;
+      text-align: center;
     }
     .placeholder {
       border-radius: 16px;
@@ -1713,6 +1786,18 @@
         previewSrc(artwork) {
           return artwork.preview_path || artwork.preview_url || artwork.thumbnail_url || "";
         },
+        markPreviewFailed(artwork) {
+          artwork.preview_failed = true;
+        },
+        async copyText(text, label = "内容") {
+          if (!text) return;
+          if (!navigator.clipboard) {
+            this.showBad("当前浏览器不支持剪贴板 API。");
+            return;
+          }
+          await navigator.clipboard.writeText(String(text));
+          this.showOk(`${label} 已复制。`);
+        },
         configPublicRows() {
           return this.flattenConfig(this.configData ? this.configData.public : {}, "");
         },
@@ -2083,10 +2168,10 @@
               </div>
               <div class="panel">
                 <div class="table-scroll">
-                  <table class="table table-hover table-sm align-middle mb-0">
+                  <table class="table table-hover table-sm align-middle mb-0 users-table">
                     <thead>
                       <tr>
-                        <th style="width:180px">openid</th>
+                        <th style="width:280px">openid</th>
                         <th style="width:140px">nickname</th>
                         <th style="width:110px">free_credits</th>
                         <th style="width:110px">paid_credits</th>
@@ -2097,7 +2182,14 @@
                     </thead>
                     <tbody v-if="users.items.length">
                       <tr class="clickable" v-for="user in users.items" :key="user.user_id" @click="selectUser(user)">
-                        <td>{{ user.user_id }}</td>
+                        <td class="id-cell">
+                          <div class="id-line">
+                            <span class="mono-id">{{ user.user_id }}</span>
+                            <button class="copy-icon" title="复制 openid" @click.stop="copyText(user.user_id, 'openid')">
+                              <i class="fa-regular fa-copy"></i>
+                            </button>
+                          </div>
+                        </td>
                         <td>{{ user.nickname || "-" }}</td>
                         <td>{{ user.free_credits_remaining }}</td>
                         <td>{{ user.paid_credits }}</td>
@@ -2130,11 +2222,11 @@
               </div>
               <div class="panel">
                 <div class="table-scroll">
-                  <table class="table table-hover table-sm align-middle mb-0">
+                  <table class="table table-hover table-sm align-middle mb-0 artworks-table">
                     <thead>
                       <tr>
-                        <th style="width:260px">artwork_id / preview</th>
-                        <th style="width:170px">user</th>
+                        <th style="width:430px">artwork_id / preview</th>
+                        <th style="width:300px">user</th>
                         <th style="width:110px">style</th>
                         <th style="width:100px">size</th>
                         <th style="width:90px">tier</th>
@@ -2144,14 +2236,37 @@
                     </thead>
                     <tbody v-if="artworks.items.length">
                       <tr v-for="artwork in artworks.items" :key="artwork.artwork_id" :class="{ 'legacy-row': artwork.legacy_preview }">
-                        <td>
+                        <td class="id-cell">
                           <div class="thumb-cell">
-                            <img v-if="previewSrc(artwork)" class="thumb" :src="previewSrc(artwork)" @error="$event.target.style.display='none'">
-                            <span>{{ artwork.artwork_id }}</span>
-                            <span v-if="artwork.legacy_preview" class="badge bad">legacy_preview</span>
+                            <div class="preview-box">
+                              <img v-if="previewSrc(artwork) && !artwork.preview_failed" class="thumb" :src="previewSrc(artwork)" @error="markPreviewFailed(artwork)">
+                              <div v-else class="preview-missing">
+                                <i class="fa-regular fa-image"></i>
+                                <span>{{ artwork.legacy_preview ? "旧路径" : "无预览" }}</span>
+                              </div>
+                            </div>
+                            <div class="id-stack">
+                              <div class="id-line">
+                                <span class="mono-id">{{ artwork.artwork_id }}</span>
+                                <button class="copy-icon" title="复制 artwork_id" @click.stop="copyText(artwork.artwork_id, 'artwork_id')">
+                                  <i class="fa-regular fa-copy"></i>
+                                </button>
+                              </div>
+                              <div class="inline-actions">
+                                <span v-if="artwork.legacy_preview" class="badge bad">legacy_preview</span>
+                                <span v-if="artwork.preview_failed" class="badge warn">preview_failed</span>
+                              </div>
+                            </div>
                           </div>
                         </td>
-                        <td>{{ artwork.user_id }}</td>
+                        <td class="id-cell">
+                          <div class="id-line">
+                            <span class="mono-id">{{ artwork.user_id }}</span>
+                            <button class="copy-icon" title="复制 user_id" @click.stop="copyText(artwork.user_id, 'user_id')">
+                              <i class="fa-regular fa-copy"></i>
+                            </button>
+                          </div>
+                        </td>
                         <td>{{ artwork.style_preset || "-" }}</td>
                         <td>{{ artwork.size_preset || "-" }}</td>
                         <td>{{ artwork.tier || "-" }}</td>
