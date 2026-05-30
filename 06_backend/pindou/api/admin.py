@@ -513,6 +513,41 @@ def get_admin_config(_actor: AdminReadActor) -> dict:
     }
 
 
+@router.get("/audit-logs")
+def list_audit_logs(
+    _actor: AdminReadActor,
+    db: DbSession,
+    action: str | None = Query(default=None),
+    resource_type: str | None = Query(default=None),
+    actor_id: str | None = Query(default=None),
+    page: int = Query(default=1, ge=1),
+    size: int = Query(default=50, ge=1, le=200),
+) -> dict:
+    """分页查询后台审计日志。"""
+    clauses = []
+    if action:
+        clauses.append(AdminAuditLog.action == action)
+    if resource_type:
+        clauses.append(AdminAuditLog.resource_type == resource_type)
+    if actor_id:
+        clauses.append(AdminAuditLog.actor_id == actor_id)
+
+    total_stmt = select(func.count()).select_from(AdminAuditLog)
+    stmt = select(AdminAuditLog)
+    if clauses:
+        total_stmt = total_stmt.where(*clauses)
+        stmt = stmt.where(*clauses)
+    total = int(db.scalar(total_stmt) or 0)
+    logs = list(
+        db.scalars(
+            stmt.order_by(AdminAuditLog.created_at.desc(), AdminAuditLog.id.desc())
+            .offset(offset_for(page, size))
+            .limit(size)
+        )
+    )
+    return paged_response([audit_payload(log) for log in logs], total, page, size)
+
+
 @router.post("/payment/confirm")
 def admin_confirm_payment(_payload: ConfirmOrderRequest, _actor: AdminOnlyActor) -> dict:
     """Legacy one-step payment confirmation is disabled until Batch 2 two-step flow."""

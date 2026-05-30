@@ -352,6 +352,7 @@ def test_admin_read_only_endpoints_require_role_and_redact_config(api_client, mo
         "/api/admin/users/admin_target",
         "/api/admin/artworks",
         "/api/admin/config",
+        "/api/admin/audit-logs",
     ]
 
     for endpoint in endpoints:
@@ -388,6 +389,15 @@ def test_admin_read_only_endpoints_require_role_and_redact_config(api_client, mo
     assert "hupijiao-secret-should-not-leak" not in config_text
     assert config["sensitive"]["COS_SECRET_KEY"] == {"env": "COS_SECRET_KEY", "configured": True}
     assert config["sensitive"]["HUPIJIAO_APP_SECRET"] == {"env": "HUPIJIAO_APP_SECRET", "configured": True}
+
+    audit_logs = client.get(
+        "/api/admin/audit-logs",
+        params={"action": "admin.login", "resource_type": "admin_session"},
+        headers=headers_admin,
+    ).json()
+    assert audit_logs["total"] >= 1
+    assert audit_logs["items"][0]["action"] == "admin.login"
+    assert audit_logs["items"][0]["resource_type"] == "admin_session"
 
 
 def test_admin_login_rate_limits_failed_attempts(api_client) -> None:

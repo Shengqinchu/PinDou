@@ -226,6 +226,10 @@
       border-radius: 8px;
       box-shadow: var(--shadow);
     }
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -248,6 +252,7 @@
     }
     tr.clickable { cursor: pointer; }
     tr.clickable:hover td { background: #f8fbff; }
+    tr.legacy-row td { background: #fff8f7; }
     tr:last-child td { border-bottom: 0; }
     .status-pill {
       display: inline-flex;
@@ -345,6 +350,115 @@
     .badge.ok { background: var(--ok-soft); color: var(--ok); }
     .badge.bad { background: var(--danger-soft); color: var(--danger); }
     .badge.warn { background: var(--warn-soft); color: var(--warn); }
+    .muted { color: var(--muted); }
+    .nowrap { white-space: nowrap; }
+    .inline-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .field.full { grid-column: 1 / -1; }
+    .danger-note {
+      color: var(--danger);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .code-output {
+      width: 100%;
+      min-height: 120px;
+      margin-top: 10px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+    }
+    .thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      object-fit: cover;
+      background: #f3f5f8;
+    }
+    .thumb-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .config-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+    .config-block {
+      padding: 10px;
+      border-right: 1px solid var(--line);
+    }
+    .config-block:last-child { border-right: 0; }
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.18);
+      z-index: 20;
+    }
+    .drawer {
+      position: fixed;
+      top: 52px;
+      right: 0;
+      bottom: 0;
+      width: min(520px, 100%);
+      background: var(--panel);
+      border-left: 1px solid var(--line);
+      box-shadow: -12px 0 32px rgba(15, 23, 42, 0.16);
+      z-index: 21;
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .drawer-head h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+    .drawer-body {
+      min-height: 0;
+      overflow: auto;
+      padding: 12px;
+    }
+    .drawer-section {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    .drawer-section h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+    }
+    .checkbox-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text);
+    }
+    .checkbox-row input {
+      width: auto;
+      height: auto;
+      margin-top: 3px;
+    }
     details {
       border: 1px solid var(--line);
       border-radius: 6px;
@@ -471,7 +585,14 @@
       }
       .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .detail-grid { grid-template-columns: 1fr; }
+      .config-grid { grid-template-columns: 1fr; }
+      .config-block { border-right: 0; border-bottom: 1px solid var(--line); }
+      .config-block:last-child { border-bottom: 0; }
       .toolbar .field { width: 100%; }
+    }
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .drawer { top: 0; }
     }
   </style>
 </head>
@@ -493,11 +614,11 @@
           tabs: [
             ["dashboard", "Dashboard", ""],
             ["orders", "订单", ""],
-            ["cdks", "CDK", "Batch 4"],
-            ["users", "用户", "Batch 4"],
-            ["artworks", "作品", "Batch 4"],
-            ["config", "配置", "Batch 4"],
-            ["audit", "审计", "Batch 4"]
+            ["cdks", "CDK", ""],
+            ["users", "用户", ""],
+            ["artworks", "作品", ""],
+            ["config", "配置", ""],
+            ["audit", "审计", ""]
           ],
           feedback: null,
           dashboard: null,
@@ -507,6 +628,28 @@
           orderLoading: false,
           expandedOrderNo: "",
           orderDetails: {},
+          cdks: { items: [], total: 0, page: 1, size: 20 },
+          cdkFilters: { status: "", type: "", batch_id: "" },
+          cdkLoading: false,
+          cdkBatchOpen: false,
+          cdkBatchLoading: false,
+          cdkForm: { type: "credit_pack_5", value: 5, count: 10, sales_channel: "", expires_at: "", notes: "", reason: "" },
+          cdkGenerated: null,
+          users: { items: [], total: 0, page: 1, size: 20 },
+          userFilters: { search: "" },
+          userLoading: false,
+          selectedUser: null,
+          userDetailLoading: false,
+          creditForm: { delta_free: "", delta_paid: "", set_monthly_card_days: "", reason: "" },
+          artworks: { items: [], total: 0, page: 1, size: 20 },
+          artworkFilters: { user_id: "" },
+          artworkLoading: false,
+          configData: null,
+          configLoading: false,
+          auditLogs: { items: [], total: 0, page: 1, size: 20 },
+          auditFilters: { action: "", resource_type: "", actor_id: "" },
+          auditLoading: false,
+          expandedAuditId: null,
           modal: null
         };
       },
@@ -521,8 +664,7 @@
       },
       mounted() {
         if (this.isAuthed) {
-          this.loadDashboard();
-          this.loadOrders();
+          this.loadActiveTab();
         }
       },
       methods: {
@@ -564,7 +706,7 @@
             localStorage.setItem("pindou_admin_role", this.role);
             this.loginForm.password = "";
             this.showOk("登录成功。");
-            await Promise.all([this.loadDashboard(), this.loadOrders()]);
+            await this.loadActiveTab();
           } catch (error) {
             this.showBad(error.message);
           } finally {
@@ -583,8 +725,20 @@
         switchTab(tab) {
           this.activeTab = tab;
           this.feedback = null;
-          if (tab === "dashboard") this.loadDashboard();
-          if (tab === "orders") this.loadOrders();
+          this.loadActiveTab();
+        },
+        refreshActiveTab() {
+          this.loadActiveTab(true);
+        },
+        loadActiveTab(force = false) {
+          if (this.activeTab === "dashboard") return this.loadDashboard();
+          if (this.activeTab === "orders") return this.loadOrders(force ? this.orders.page : this.orders.page || 1);
+          if (this.activeTab === "cdks") return this.loadCdks(force ? this.cdks.page : this.cdks.page || 1);
+          if (this.activeTab === "users") return this.loadUsers(force ? this.users.page : this.users.page || 1);
+          if (this.activeTab === "artworks") return this.loadArtworks(force ? this.artworks.page : this.artworks.page || 1);
+          if (this.activeTab === "config") return this.loadConfig();
+          if (this.activeTab === "audit") return this.loadAuditLogs(force ? this.auditLogs.page : this.auditLogs.page || 1);
+          return null;
         },
         showOk(message) {
           this.feedback = { type: "ok", message };
@@ -651,19 +805,253 @@
             if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
           }
         },
+        async loadCdks(page = this.cdks.page || 1) {
+          if (!this.token) return;
+          this.cdkLoading = true;
+          const params = new URLSearchParams({ page: String(page), size: String(this.cdks.size) });
+          if (this.cdkFilters.status) params.set("status", this.cdkFilters.status);
+          if (this.cdkFilters.type) params.set("type", this.cdkFilters.type);
+          if (this.cdkFilters.batch_id.trim()) params.set("batch_id", this.cdkFilters.batch_id.trim());
+          try {
+            this.cdks = await this.api(`/cdks?${params.toString()}`);
+          } catch (error) {
+            if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
+          } finally {
+            this.cdkLoading = false;
+          }
+        },
+        resetCdkFilters() {
+          this.cdkFilters = { status: "", type: "", batch_id: "" };
+          this.loadCdks(1);
+        },
+        openCdkBatch() {
+          this.cdkBatchOpen = true;
+          this.cdkGenerated = null;
+        },
+        closeCdkBatch() {
+          if (!this.cdkBatchLoading) this.cdkBatchOpen = false;
+        },
+        async submitCdkBatch() {
+          if (!this.cdkForm.reason.trim()) {
+            this.showBad("请填写 reason。");
+            return;
+          }
+          const body = {
+            type: this.cdkForm.type,
+            value: Number(this.cdkForm.value),
+            count: Number(this.cdkForm.count),
+            reason: this.cdkForm.reason.trim()
+          };
+          if (this.cdkForm.sales_channel.trim()) body.sales_channel = this.cdkForm.sales_channel.trim();
+          if (this.cdkForm.expires_at) body.expires_at = this.cdkForm.expires_at;
+          if (this.cdkForm.notes.trim()) body.notes = this.cdkForm.notes.trim();
+          this.cdkBatchLoading = true;
+          try {
+            const payload = await this.api("/cdks/batch", {
+              method: "POST",
+              body: JSON.stringify(body)
+            });
+            this.cdkGenerated = payload;
+            this.showOk(`CDK 批次已生成，batch_id=${payload.batch_id}，audit_id=${payload.audit_id}`);
+            await this.loadCdks(1);
+            await this.loadDashboard();
+          } catch (error) {
+            if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
+          } finally {
+            this.cdkBatchLoading = false;
+          }
+        },
+        async copyGeneratedCodes() {
+          if (!this.cdkGenerated || !this.cdkGenerated.codes) return;
+          const text = this.cdkGenerated.codes.join("\n");
+          if (!navigator.clipboard) {
+            this.showBad("当前浏览器不支持剪贴板 API。");
+            return;
+          }
+          await navigator.clipboard.writeText(text);
+          this.showOk("codes 已复制。");
+        },
+        async downloadCdkCsv() {
+          const params = new URLSearchParams();
+          if (this.cdkFilters.status) params.set("status", this.cdkFilters.status);
+          if (this.cdkFilters.batch_id.trim()) params.set("batch_id", this.cdkFilters.batch_id.trim());
+          try {
+            const response = await fetch(`${API_BASE}/cdks/export.csv?${params.toString()}`, {
+              headers: { Authorization: `Bearer ${this.token}` }
+            });
+            if (response.status === 401) {
+              this.logout("登录已过期，请重新登录。");
+              return;
+            }
+            if (!response.ok) throw new Error(await response.text());
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "pindou-cdks.csv";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+          } catch (error) {
+            this.showBad(error.message || "导出 CSV 失败。");
+          }
+        },
+        async loadUsers(page = this.users.page || 1) {
+          if (!this.token) return;
+          this.userLoading = true;
+          const params = new URLSearchParams({ page: String(page), size: String(this.users.size) });
+          if (this.userFilters.search.trim()) params.set("search", this.userFilters.search.trim());
+          try {
+            this.users = await this.api(`/users?${params.toString()}`);
+          } catch (error) {
+            if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
+          } finally {
+            this.userLoading = false;
+          }
+        },
+        resetUserFilters() {
+          this.userFilters.search = "";
+          this.loadUsers(1);
+        },
+        async selectUser(user) {
+          const openid = user.user_id || user.openid;
+          this.selectedUser = user;
+          await this.loadUserDetail(openid);
+        },
+        async loadUserDetail(openid) {
+          this.userDetailLoading = true;
+          try {
+            this.selectedUser = await this.api(`/users/${encodeURIComponent(openid)}`);
+            this.resetCreditForm();
+          } catch (error) {
+            if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
+          } finally {
+            this.userDetailLoading = false;
+          }
+        },
+        closeUserDrawer() {
+          this.selectedUser = null;
+        },
+        resetCreditForm() {
+          this.creditForm = { delta_free: "", delta_paid: "", set_monthly_card_days: "", reason: "" };
+        },
+        openCreditModal() {
+          if (!this.selectedUser) return;
+          const deltaFree = this.optionalNumber(this.creditForm.delta_free);
+          const deltaPaid = this.optionalNumber(this.creditForm.delta_paid);
+          const monthlyDays = this.optionalNumber(this.creditForm.set_monthly_card_days);
+          if (deltaFree === null && deltaPaid === null && monthlyDays === null) {
+            this.showBad("至少填写一个额度或月卡字段。");
+            return;
+          }
+          if (!this.creditForm.reason.trim()) {
+            this.showBad("请填写 reason。");
+            return;
+          }
+          const payload = {};
+          const impactLines = [
+            `用户：${this.selectedUser.user_id}`,
+            `当前免费额度：${this.selectedUser.free_credits_remaining}`,
+            `当前付费额度：${this.selectedUser.paid_credits}`
+          ];
+          if (deltaFree !== null) {
+            payload.delta_free = deltaFree;
+            impactLines.push(`免费额度变动：${deltaFree} → ${Number(this.selectedUser.free_credits_remaining || 0) + deltaFree}`);
+          }
+          if (deltaPaid !== null) {
+            payload.delta_paid = deltaPaid;
+            impactLines.push(`付费额度变动：${deltaPaid} → ${Number(this.selectedUser.paid_credits || 0) + deltaPaid}`);
+          }
+          if (monthlyDays !== null) {
+            payload.set_monthly_card_days = monthlyDays;
+            impactLines.push(monthlyDays === 0 ? "月卡到期：清空" : `月卡到期：从现在起 ${monthlyDays} 天`);
+          }
+          const needsSecondConfirm = Math.abs(deltaFree || 0) > 100 || Math.abs(deltaPaid || 0) > 100;
+          this.modal = {
+            kind: "credits",
+            title: "调整用户额度",
+            endpoint: `/users/${encodeURIComponent(this.selectedUser.user_id)}/credits`,
+            user: this.selectedUser,
+            payload,
+            impactLines,
+            reason: this.creditForm.reason.trim(),
+            loading: false,
+            requiresSecondConfirm: needsSecondConfirm,
+            secondConfirmed: false
+          };
+        },
+        async loadArtworks(page = this.artworks.page || 1) {
+          if (!this.token) return;
+          this.artworkLoading = true;
+          const params = new URLSearchParams({ page: String(page), size: String(this.artworks.size) });
+          if (this.artworkFilters.user_id.trim()) params.set("user_id", this.artworkFilters.user_id.trim());
+          try {
+            this.artworks = await this.api(`/artworks?${params.toString()}`);
+          } catch (error) {
+            if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
+          } finally {
+            this.artworkLoading = false;
+          }
+        },
+        resetArtworkFilters() {
+          this.artworkFilters.user_id = "";
+          this.loadArtworks(1);
+        },
+        async loadConfig() {
+          if (!this.token) return;
+          this.configLoading = true;
+          try {
+            this.configData = await this.api("/config");
+          } catch (error) {
+            if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
+          } finally {
+            this.configLoading = false;
+          }
+        },
+        async loadAuditLogs(page = this.auditLogs.page || 1) {
+          if (!this.token) return;
+          this.auditLoading = true;
+          const params = new URLSearchParams({ page: String(page), size: String(this.auditLogs.size) });
+          if (this.auditFilters.action.trim()) params.set("action", this.auditFilters.action.trim());
+          if (this.auditFilters.resource_type.trim()) params.set("resource_type", this.auditFilters.resource_type.trim());
+          if (this.auditFilters.actor_id.trim()) params.set("actor_id", this.auditFilters.actor_id.trim());
+          try {
+            this.auditLogs = await this.api(`/audit-logs?${params.toString()}`);
+          } catch (error) {
+            if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
+          } finally {
+            this.auditLoading = false;
+          }
+        },
+        resetAuditFilters() {
+          this.auditFilters = { action: "", resource_type: "", actor_id: "" };
+          this.loadAuditLogs(1);
+        },
+        toggleAudit(log) {
+          this.expandedAuditId = this.expandedAuditId === log.id ? null : log.id;
+        },
         openActionModal(type, order) {
           const detail = this.orderDetails[order.order_no] || order;
           const entitlement = this.entitlementText(detail);
           this.modal = {
+            kind: "order",
             type,
             order,
             reason: "",
             loading: false,
             title: type === "confirm" ? "确认收款事实" : "发放订单权益",
-            dangerText: type === "confirm" ? "仅标记已收到款，不发放权益。" : `将${entitlement}。`,
+            impactLines: [
+              `订单：${order.order_no}`,
+              `用户：${order.user_id}`,
+              type === "confirm" ? "影响：仅标记已收到款，不发放权益。" : `影响：将${entitlement}。`
+            ],
             endpoint: type === "confirm"
               ? `/orders/${encodeURIComponent(order.order_no)}/confirm-payment-fact`
-              : `/orders/${encodeURIComponent(order.order_no)}/grant-entitlement`
+              : `/orders/${encodeURIComponent(order.order_no)}/grant-entitlement`,
+            payload: {},
+            requiresSecondConfirm: false,
+            secondConfirmed: false
           };
         },
         closeModal() {
@@ -674,19 +1062,33 @@
             this.showBad("请填写 reason。");
             return;
           }
+          if (this.modal.requiresSecondConfirm && !this.modal.secondConfirmed) {
+            this.showBad("这次额度变动超过 100，请完成二次确认。");
+            return;
+          }
           this.modal.loading = true;
+          const currentModal = this.modal;
           try {
-            const payload = await this.api(this.modal.endpoint, {
+            const payload = await this.api(currentModal.endpoint, {
               method: "POST",
-              body: JSON.stringify({ reason: this.modal.reason.trim() })
+              body: JSON.stringify(Object.assign({}, currentModal.payload || {}, { reason: currentModal.reason.trim() }))
             });
-            this.showOk(`${payload.message || "操作完成。"} audit_id=${payload.audit_id}`);
-            const orderNo = this.modal.order.order_no;
-            this.modal = null;
-            await this.loadOrders(this.orders.page);
-            await this.loadOrderDetail(orderNo);
-            this.expandedOrderNo = orderNo;
-            await this.loadDashboard();
+            if (currentModal.kind === "order") {
+              this.showOk(`${payload.message || "操作完成。"} audit_id=${payload.audit_id}`);
+              const orderNo = currentModal.order.order_no;
+              this.modal = null;
+              await this.loadOrders(this.orders.page);
+              await this.loadOrderDetail(orderNo);
+              this.expandedOrderNo = orderNo;
+              await this.loadDashboard();
+            } else if (currentModal.kind === "credits") {
+              this.showOk(`额度已调整，audit_id=${payload.audit_id}`);
+              const openid = currentModal.user.user_id;
+              this.modal = null;
+              await this.loadUsers(this.users.page);
+              await this.loadUserDetail(openid);
+              await this.loadDashboard();
+            }
           } catch (error) {
             if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
           } finally {
@@ -706,6 +1108,11 @@
         formatPercent(value) {
           return `${(Number(value || 0) * 100).toFixed(1)}%`;
         },
+        optionalNumber(value) {
+          if (value === "" || value === null || value === undefined) return null;
+          const number = Number(value);
+          return Number.isFinite(number) ? number : null;
+        },
         statusText(status) {
           const map = {
             pending_qr: "待支付",
@@ -717,6 +1124,25 @@
             refunded: "已退款"
           };
           return map[status] || status || "-";
+        },
+        cdkTypeText(type) {
+          const map = {
+            single_use: "单次兑换",
+            monthly_card: "月卡",
+            credit_pack_5: "5 额度包",
+            credit_pack_10: "10 额度包"
+          };
+          return map[type] || type || "-";
+        },
+        cdkStatusText(status) {
+          const map = { active: "可用", redeemed: "已兑换", expired: "已过期", disabled: "已禁用" };
+          return map[status] || status || "-";
+        },
+        creditDeltaText(value) {
+          if (value === "" || value === null || value === undefined) return "-";
+          const number = Number(value);
+          if (!Number.isFinite(number)) return value;
+          return number > 0 ? `+${number}` : String(number);
         },
         boolBadgeClass(value) {
           if (value === true) return "ok";
@@ -743,8 +1169,49 @@
           if (order.sku === "custom_99") return `解锁作品 ${order.artwork_id || "-"}`;
           return `按 SKU ${order.sku} 发放权益给 ${order.user_id}`;
         },
+        previewSrc(artwork) {
+          return artwork.preview_path || artwork.preview_url || artwork.thumbnail_url || "";
+        },
+        configPublicRows() {
+          return this.flattenConfig(this.configData ? this.configData.public : {}, "");
+        },
+        configSensitiveRows() {
+          const sensitive = this.configData ? this.configData.sensitive || {} : {};
+          return Object.entries(sensitive).map(([key, value]) => ({
+            key,
+            env: value.env || key,
+            configured: Boolean(value.configured),
+            scheme: value.scheme || "-",
+            password_configured: value.password_configured,
+            host_configured: value.host_configured,
+            database_configured: value.database_configured
+          }));
+        },
+        flattenConfig(value, prefix) {
+          const rows = [];
+          Object.entries(value || {}).forEach(([key, item]) => {
+            const path = prefix ? `${prefix}.${key}` : key;
+            if (item && typeof item === "object" && !Array.isArray(item)) {
+              rows.push(...this.flattenConfig(item, path));
+            } else {
+              rows.push({ key: path, value: Array.isArray(item) ? item.join(", ") : String(item) });
+            }
+          });
+          return rows;
+        },
         jsonText(value) {
           return JSON.stringify(value || {}, null, 2);
+        },
+        changePage(collection, delta) {
+          const state = this[collection];
+          const maxPage = Math.max(1, Math.ceil(state.total / state.size));
+          const page = Math.min(maxPage, Math.max(1, state.page + delta));
+          if (page === state.page) return;
+          if (collection === "orders") this.loadOrders(page);
+          if (collection === "cdks") this.loadCdks(page);
+          if (collection === "users") this.loadUsers(page);
+          if (collection === "artworks") this.loadArtworks(page);
+          if (collection === "auditLogs") this.loadAuditLogs(page);
         },
         previousPage() {
           if (this.orders.page > 1) this.loadOrders(this.orders.page - 1);
@@ -800,8 +1267,7 @@
           <main class="main">
             <div class="section-title">
               <h1>{{ activeTabLabel }}</h1>
-              <button v-if="activeTab === 'dashboard'" @click="loadDashboard">刷新</button>
-              <button v-if="activeTab === 'orders'" @click="loadOrders(orders.page)">刷新</button>
+              <button @click="refreshActiveTab">刷新</button>
             </div>
 
             <div class="feedback" v-if="feedback">
@@ -955,10 +1421,430 @@
               </div>
             </section>
 
-            <section v-else class="placeholder">
-              {{ activeTabLabel }}：Batch 4
+            <section v-else-if="activeTab === 'cdks'" :class="{ loading: cdkLoading }">
+              <div class="toolbar">
+                <label class="field">
+                  <span class="label">状态</span>
+                  <select v-model="cdkFilters.status" @change="loadCdks(1)">
+                    <option value="">全部</option>
+                    <option value="active">可用</option>
+                    <option value="redeemed">已兑换</option>
+                    <option value="expired">已过期</option>
+                    <option value="disabled">已禁用</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span class="label">类型</span>
+                  <select v-model="cdkFilters.type" @change="loadCdks(1)">
+                    <option value="">全部</option>
+                    <option value="single_use">单次兑换</option>
+                    <option value="monthly_card">月卡</option>
+                    <option value="credit_pack_5">5 额度包</option>
+                    <option value="credit_pack_10">10 额度包</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span class="label">batch_id</span>
+                  <input v-model.trim="cdkFilters.batch_id" @keyup.enter="loadCdks(1)">
+                </label>
+                <button class="primary" @click="loadCdks(1)">查询</button>
+                <button @click="resetCdkFilters">重置</button>
+                <button class="danger" @click="openCdkBatch">批量生成</button>
+                <button @click="downloadCdkCsv">导出 CSV</button>
+              </div>
+              <div class="panel">
+                <div class="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th style="width:190px">code</th>
+                        <th style="width:120px">type</th>
+                        <th style="width:80px">value</th>
+                        <th style="width:100px">status</th>
+                        <th style="width:130px">sales_channel</th>
+                        <th style="width:180px">batch_id</th>
+                        <th style="width:150px">redeemed_by</th>
+                        <th style="width:170px">redeemed_at</th>
+                        <th style="width:170px">created_at</th>
+                      </tr>
+                    </thead>
+                    <tbody v-if="cdks.items.length">
+                      <tr v-for="cdk in cdks.items" :key="cdk.code">
+                        <td>{{ cdk.code }}</td>
+                        <td>{{ cdkTypeText(cdk.type) }}</td>
+                        <td>{{ cdk.value }}</td>
+                        <td><span class="status-pill">{{ cdkStatusText(cdk.status) }}</span></td>
+                        <td>{{ cdk.sales_channel || "-" }}</td>
+                        <td>{{ cdk.batch_id || "-" }}</td>
+                        <td>{{ cdk.redeemed_by || "-" }}</td>
+                        <td>{{ formatDate(cdk.redeemed_at) }}</td>
+                        <td>{{ formatDate(cdk.created_at) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="empty" v-if="!cdks.items.length">暂无 CDK</div>
+                <div class="pager">
+                  <span>共 {{ cdks.total }} 条，第 {{ cdks.page }} 页，每页 {{ cdks.size }} 条</span>
+                  <span>
+                    <button @click="changePage('cdks', -1)" :disabled="cdks.page <= 1">上一页</button>
+                    <button @click="changePage('cdks', 1)" :disabled="cdks.page >= Math.ceil(cdks.total / cdks.size)">下一页</button>
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section v-else-if="activeTab === 'users'" :class="{ loading: userLoading }">
+              <div class="toolbar">
+                <label class="field">
+                  <span class="label">搜索 openid / nickname</span>
+                  <input v-model.trim="userFilters.search" @keyup.enter="loadUsers(1)">
+                </label>
+                <button class="primary" @click="loadUsers(1)">查询</button>
+                <button @click="resetUserFilters">重置</button>
+              </div>
+              <div class="panel">
+                <div class="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th style="width:180px">openid</th>
+                        <th style="width:140px">nickname</th>
+                        <th style="width:110px">free_credits</th>
+                        <th style="width:110px">paid_credits</th>
+                        <th style="width:170px">月卡到期</th>
+                        <th style="width:90px">artwork数</th>
+                        <th style="width:170px">created_at</th>
+                      </tr>
+                    </thead>
+                    <tbody v-if="users.items.length">
+                      <tr class="clickable" v-for="user in users.items" :key="user.user_id" @click="selectUser(user)">
+                        <td>{{ user.user_id }}</td>
+                        <td>{{ user.nickname || "-" }}</td>
+                        <td>{{ user.free_credits_remaining }}</td>
+                        <td>{{ user.paid_credits }}</td>
+                        <td>{{ formatDate(user.monthly_card_expires_at) }}</td>
+                        <td>{{ user.artwork_count }}</td>
+                        <td>{{ formatDate(user.created_at) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="empty" v-if="!users.items.length">暂无用户</div>
+                <div class="pager">
+                  <span>共 {{ users.total }} 条，第 {{ users.page }} 页，每页 {{ users.size }} 条</span>
+                  <span>
+                    <button @click="changePage('users', -1)" :disabled="users.page <= 1">上一页</button>
+                    <button @click="changePage('users', 1)" :disabled="users.page >= Math.ceil(users.total / users.size)">下一页</button>
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section v-else-if="activeTab === 'artworks'" :class="{ loading: artworkLoading }">
+              <div class="toolbar">
+                <label class="field">
+                  <span class="label">user_id</span>
+                  <input v-model.trim="artworkFilters.user_id" @keyup.enter="loadArtworks(1)">
+                </label>
+                <button class="primary" @click="loadArtworks(1)">查询</button>
+                <button @click="resetArtworkFilters">重置</button>
+              </div>
+              <div class="panel">
+                <div class="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th style="width:260px">artwork_id / preview</th>
+                        <th style="width:170px">user</th>
+                        <th style="width:110px">style</th>
+                        <th style="width:100px">size</th>
+                        <th style="width:90px">tier</th>
+                        <th style="width:130px">is_paid_unlocked</th>
+                        <th style="width:170px">created_at</th>
+                      </tr>
+                    </thead>
+                    <tbody v-if="artworks.items.length">
+                      <tr v-for="artwork in artworks.items" :key="artwork.artwork_id" :class="{ 'legacy-row': artwork.legacy_preview }">
+                        <td>
+                          <div class="thumb-cell">
+                            <img v-if="previewSrc(artwork)" class="thumb" :src="previewSrc(artwork)" @error="$event.target.style.display='none'">
+                            <span>{{ artwork.artwork_id }}</span>
+                            <span v-if="artwork.legacy_preview" class="badge bad">legacy_preview</span>
+                          </div>
+                        </td>
+                        <td>{{ artwork.user_id }}</td>
+                        <td>{{ artwork.style_preset || "-" }}</td>
+                        <td>{{ artwork.size_preset || "-" }}</td>
+                        <td>{{ artwork.tier || "-" }}</td>
+                        <td>{{ artwork.is_paid_unlocked ? "是" : "否" }}</td>
+                        <td>{{ formatDate(artwork.created_at) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="empty" v-if="!artworks.items.length">暂无作品</div>
+                <div class="pager">
+                  <span>共 {{ artworks.total }} 条，第 {{ artworks.page }} 页，每页 {{ artworks.size }} 条</span>
+                  <span>
+                    <button @click="changePage('artworks', -1)" :disabled="artworks.page <= 1">上一页</button>
+                    <button @click="changePage('artworks', 1)" :disabled="artworks.page >= Math.ceil(artworks.total / artworks.size)">下一页</button>
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section v-else-if="activeTab === 'config'" :class="{ loading: configLoading }">
+              <div class="panel">
+                <div class="empty" v-if="!configData">暂无配置数据</div>
+                <div v-else class="config-grid">
+                  <div class="config-block">
+                    <h3>public</h3>
+                    <table>
+                      <thead>
+                        <tr><th style="width:220px">key</th><th>value</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="row in configPublicRows()" :key="row.key">
+                          <td>{{ row.key }}</td>
+                          <td>{{ row.value }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="config-block">
+                    <h3>sensitive</h3>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th style="width:170px">key</th>
+                          <th style="width:170px">env</th>
+                          <th style="width:100px">configured</th>
+                          <th>state</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="row in configSensitiveRows()" :key="row.key">
+                          <td>{{ row.key }}</td>
+                          <td>{{ row.env }}</td>
+                          <td><span class="badge" :class="row.configured ? 'ok' : ''">{{ row.configured ? "是" : "否" }}</span></td>
+                          <td>
+                            <span v-if="row.scheme !== '-'">scheme={{ row.scheme }}；</span>
+                            <span v-if="row.password_configured !== undefined">password_configured={{ row.password_configured }}；</span>
+                            <span v-if="row.host_configured !== undefined">host_configured={{ row.host_configured }}；</span>
+                            <span v-if="row.database_configured !== undefined">database_configured={{ row.database_configured }}</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section v-else-if="activeTab === 'audit'" :class="{ loading: auditLoading }">
+              <div class="toolbar">
+                <label class="field">
+                  <span class="label">action</span>
+                  <input v-model.trim="auditFilters.action" @keyup.enter="loadAuditLogs(1)">
+                </label>
+                <label class="field">
+                  <span class="label">resource_type</span>
+                  <input v-model.trim="auditFilters.resource_type" @keyup.enter="loadAuditLogs(1)">
+                </label>
+                <label class="field">
+                  <span class="label">actor_id</span>
+                  <input v-model.trim="auditFilters.actor_id" @keyup.enter="loadAuditLogs(1)">
+                </label>
+                <button class="primary" @click="loadAuditLogs(1)">查询</button>
+                <button @click="resetAuditFilters">重置</button>
+              </div>
+              <div class="panel">
+                <div class="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th style="width:170px">created_at</th>
+                        <th style="width:150px">actor_id</th>
+                        <th style="width:90px">role</th>
+                        <th style="width:230px">action</th>
+                        <th style="width:130px">resource_type</th>
+                        <th style="width:170px">resource_id</th>
+                        <th>reason</th>
+                      </tr>
+                    </thead>
+                    <tbody v-if="auditLogs.items.length">
+                      <template v-for="log in auditLogs.items" :key="log.id">
+                        <tr class="clickable" @click="toggleAudit(log)">
+                          <td>{{ formatDate(log.created_at) }}</td>
+                          <td>{{ log.actor_id }}</td>
+                          <td>{{ log.actor_role }}</td>
+                          <td>{{ log.action }}</td>
+                          <td>{{ log.resource_type }}</td>
+                          <td>{{ log.resource_id || "-" }}</td>
+                          <td>{{ log.reason }}</td>
+                        </tr>
+                        <tr v-if="expandedAuditId === log.id" class="detail-row">
+                          <td colspan="7">
+                            <div class="detail-grid">
+                              <div class="detail-box">
+                                <details open>
+                                  <summary>before_json</summary>
+                                  <pre>{{ jsonText(log.before) }}</pre>
+                                </details>
+                              </div>
+                              <div class="detail-box">
+                                <details open>
+                                  <summary>after_json</summary>
+                                  <pre>{{ jsonText(log.after) }}</pre>
+                                </details>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="empty" v-if="!auditLogs.items.length">暂无审计日志</div>
+                <div class="pager">
+                  <span>共 {{ auditLogs.total }} 条，第 {{ auditLogs.page }} 页，每页 {{ auditLogs.size }} 条</span>
+                  <span>
+                    <button @click="changePage('auditLogs', -1)" :disabled="auditLogs.page <= 1">上一页</button>
+                    <button @click="changePage('auditLogs', 1)" :disabled="auditLogs.page >= Math.ceil(auditLogs.total / auditLogs.size)">下一页</button>
+                  </span>
+                </div>
+              </div>
             </section>
           </main>
+
+          <div v-if="selectedUser" class="drawer-backdrop" @click="closeUserDrawer"></div>
+          <aside v-if="selectedUser" class="drawer" :class="{ loading: userDetailLoading }">
+            <div class="drawer-head">
+              <h2>用户详情</h2>
+              <button @click="closeUserDrawer">关闭</button>
+            </div>
+            <div class="drawer-body">
+              <div class="drawer-section">
+                <h3>{{ selectedUser.user_id }}</h3>
+                <div class="kv">
+                  <div class="kv-key">昵称</div><div class="kv-value">{{ selectedUser.nickname || "-" }}</div>
+                  <div class="kv-key">免费额度</div><div class="kv-value">{{ selectedUser.free_credits_remaining }}</div>
+                  <div class="kv-key">付费额度</div><div class="kv-value">{{ selectedUser.paid_credits }}</div>
+                  <div class="kv-key">月卡到期</div><div class="kv-value">{{ formatDate(selectedUser.monthly_card_expires_at) }}</div>
+                  <div class="kv-key">作品数</div><div class="kv-value">{{ selectedUser.artwork_count }}</div>
+                  <div class="kv-key">创建时间</div><div class="kv-value">{{ formatDate(selectedUser.created_at) }}</div>
+                </div>
+              </div>
+
+              <form class="drawer-section" @submit.prevent="openCreditModal">
+                <h3>调整额度</h3>
+                <div class="form-grid">
+                  <label class="field">
+                    <span class="label">delta_free</span>
+                    <input v-model="creditForm.delta_free" type="number" step="1" placeholder="例如 1 或 -1">
+                  </label>
+                  <label class="field">
+                    <span class="label">delta_paid</span>
+                    <input v-model="creditForm.delta_paid" type="number" step="1" placeholder="例如 1 或 -1">
+                  </label>
+                  <label class="field">
+                    <span class="label">set_monthly_card_days</span>
+                    <input v-model="creditForm.set_monthly_card_days" type="number" min="0" step="1" placeholder="0 表示清空">
+                  </label>
+                  <label class="field full">
+                    <span class="label">reason</span>
+                    <textarea v-model="creditForm.reason" placeholder="请输入操作原因" required></textarea>
+                  </label>
+                </div>
+                <p class="danger-note">额度变动绝对值大于 100 时，确认框会要求二次确认。</p>
+                <button class="danger" type="submit">调整额度</button>
+              </form>
+
+              <div class="drawer-section">
+                <h3>最近 10 单</h3>
+                <div v-if="!selectedUser.recent_orders || !selectedUser.recent_orders.length" class="empty">暂无订单</div>
+                <table v-else>
+                  <thead>
+                    <tr>
+                      <th>order_no</th>
+                      <th style="width:90px">金额</th>
+                      <th style="width:110px">状态</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="order in selectedUser.recent_orders" :key="order.order_no">
+                      <td>{{ order.order_no }}</td>
+                      <td>¥{{ formatMoney(order.amount_cny) }}</td>
+                      <td>{{ statusText(order.raw_status) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </aside>
+
+          <div v-if="cdkBatchOpen" class="modal-backdrop" @click.self="closeCdkBatch">
+            <form class="modal" :class="{ loading: cdkBatchLoading }" @submit.prevent="submitCdkBatch">
+              <div class="modal-head">
+                <h2>批量生成 CDK</h2>
+                <button type="button" @click="closeCdkBatch">关闭</button>
+              </div>
+              <div class="modal-body">
+                <div class="impact">
+                  <div><strong>影响：</strong>生成一批可兑换 CDK，created_by 为当前管理员。</div>
+                  <div><strong>审计：</strong>提交后写入 admin.cdk.batch_generate。</div>
+                </div>
+                <div class="form-grid">
+                  <label class="field">
+                    <span class="label">type</span>
+                    <select v-model="cdkForm.type" required>
+                      <option value="single_use">single_use</option>
+                      <option value="monthly_card">monthly_card</option>
+                      <option value="credit_pack_5">credit_pack_5</option>
+                      <option value="credit_pack_10">credit_pack_10</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span class="label">value</span>
+                    <input v-model.number="cdkForm.value" type="number" min="1" step="1" required>
+                  </label>
+                  <label class="field">
+                    <span class="label">count</span>
+                    <input v-model.number="cdkForm.count" type="number" min="1" max="500" step="1" required>
+                  </label>
+                  <label class="field">
+                    <span class="label">sales_channel</span>
+                    <input v-model.trim="cdkForm.sales_channel">
+                  </label>
+                  <label class="field">
+                    <span class="label">expires_at</span>
+                    <input v-model="cdkForm.expires_at" type="datetime-local">
+                  </label>
+                  <label class="field full">
+                    <span class="label">notes</span>
+                    <input v-model.trim="cdkForm.notes">
+                  </label>
+                  <label class="field full">
+                    <span class="label">reason</span>
+                    <textarea v-model="cdkForm.reason" placeholder="请输入操作原因" required></textarea>
+                  </label>
+                </div>
+                <div v-if="cdkGenerated">
+                  <div class="inline-actions">
+                    <span class="badge ok">batch_id={{ cdkGenerated.batch_id }}</span>
+                    <span class="badge ok">audit_id={{ cdkGenerated.audit_id }}</span>
+                    <button type="button" @click="copyGeneratedCodes">复制 codes</button>
+                  </div>
+                  <textarea class="code-output" readonly :value="cdkGenerated.codes.join(String.fromCharCode(10))"></textarea>
+                </div>
+              </div>
+              <div class="modal-foot">
+                <button type="button" @click="closeCdkBatch">取消</button>
+                <button class="danger" type="submit" :disabled="cdkBatchLoading || !cdkForm.reason.trim()">确认生成</button>
+              </div>
+            </form>
+          </div>
 
           <div v-if="modal" class="modal-backdrop" @click.self="closeModal">
             <div class="modal" :class="{ loading: modal.loading }">
@@ -968,18 +1854,20 @@
               </div>
               <div class="modal-body">
                 <div class="impact">
-                  <div><strong>订单：</strong>{{ modal.order.order_no }}</div>
-                  <div><strong>用户：</strong>{{ modal.order.user_id }}</div>
-                  <div><strong>影响：</strong>{{ modal.dangerText }}</div>
+                  <div v-for="line in modal.impactLines" :key="line">{{ line }}</div>
                 </div>
                 <label class="field">
                   <span class="label">reason</span>
                   <textarea v-model="modal.reason" placeholder="请输入操作原因" required></textarea>
                 </label>
+                <label v-if="modal.requiresSecondConfirm" class="checkbox-row">
+                  <input type="checkbox" v-model="modal.secondConfirmed">
+                  <span>我确认本次单项额度变动绝对值超过 100，已核对用户、额度和 reason。</span>
+                </label>
               </div>
               <div class="modal-foot">
                 <button @click="closeModal">取消</button>
-                <button class="danger" @click="submitModal" :disabled="modal.loading || !modal.reason.trim()">
+                <button class="danger" @click="submitModal" :disabled="modal.loading || !modal.reason.trim() || (modal.requiresSecondConfirm && !modal.secondConfirmed)">
                   确认执行
                 </button>
               </div>
