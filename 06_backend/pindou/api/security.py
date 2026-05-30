@@ -75,6 +75,27 @@ def admin_credentials_match(username: str, password: str) -> bool:
     return False
 
 
+def admin_credentials_diagnostics(username: str, password: str) -> dict[str, Any]:
+    """Return non-secret booleans for diagnosing admin login configuration."""
+    settings = get_settings()
+    configured_username = settings.admin_username or ""
+    configured_hash = settings.admin_password_hash.get_secret_value() if settings.admin_password_hash else ""
+    trimmed_hash = configured_hash.strip()
+    return {
+        "app_env": settings.app_env,
+        "admin_username_configured": bool(configured_username),
+        "admin_password_hash_configured": bool(configured_hash),
+        "admin_username_matches": bool(configured_username and username == configured_username),
+        "admin_username_trim_matches": bool(configured_username and username.strip() == configured_username.strip()),
+        "admin_username_has_surrounding_space": bool(configured_username and configured_username != configured_username.strip()),
+        "password_hash_has_sha256_prefix": configured_hash.startswith("sha256:"),
+        "password_hash_length": len(configured_hash) if configured_hash else 0,
+        "password_hash_trim_changes": configured_hash != trimmed_hash,
+        "password_matches": bool(configured_hash and password_matches(password, configured_hash)),
+        "password_matches_trimmed_hash": bool(trimmed_hash and password_matches(password, trimmed_hash)),
+    }
+
+
 def _secret() -> bytes:
     settings = get_settings()
     secret = settings.jwt_secret.get_secret_value() if settings.jwt_secret else "pindou-dev-only-jwt-secret"

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import io
+import logging
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Any
@@ -17,7 +18,7 @@ from sqlalchemy import func, or_, select
 from pindou.api.deps import DbSession, require_role
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.api.payment import ConfirmOrderRequest, SKU_CATALOG
-from pindou.api.security import admin_credentials_match, create_access_token
+from pindou.api.security import admin_credentials_diagnostics, admin_credentials_match, create_access_token
 from pindou.config import get_settings
 from pindou.db.models import AdminAuditLog, Artwork, CDK, Order, User, iso_or_none, utc_now
 from pindou.services.admin_audit_service import write_audit
@@ -25,6 +26,7 @@ from pindou.services.cdk_service import CDKService
 
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+logger = logging.getLogger(__name__)
 
 ADMIN_ROLES = ("admin", "operator", "viewer")
 AdminReadActor = Annotated[dict[str, Any], Depends(require_role(*ADMIN_ROLES))]
@@ -74,6 +76,12 @@ def admin_login(payload: AdminLoginRequest, request: Request, db: DbSession) -> 
     username = payload.username.strip()
     source_ip = client_ip(request)
     if not admin_credentials_match(username, payload.password):
+        logger.warning(
+            "admin_login_failed source_ip=%s request_id=%s diagnostics=%s",
+            source_ip,
+            request.headers.get("x-request-id"),
+            admin_credentials_diagnostics(username, payload.password),
+        )
         raise ApiException(401, ErrorCode.ADMIN_REQUIRED, "管理员账号或密码不正确。")
 
     audit_id = write_audit(

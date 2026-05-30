@@ -400,9 +400,10 @@ def test_admin_read_only_endpoints_require_role_and_redact_config(api_client, mo
     assert audit_logs["items"][0]["resource_type"] == "admin_session"
 
 
-def test_admin_login_failed_attempts_do_not_lock_out(api_client) -> None:
+def test_admin_login_failed_attempts_do_not_lock_out(api_client, caplog: pytest.LogCaptureFixture) -> None:
     client, _session_factory = api_client
     headers = {"x-forwarded-for": "203.0.113.77"}
+    caplog.set_level("WARNING", logger="pindou.api.admin")
 
     for _index in range(6):
         response = client.post(
@@ -412,6 +413,10 @@ def test_admin_login_failed_attempts_do_not_lock_out(api_client) -> None:
         )
         assert response.status_code == 401
         assert response.json()["message_cn"] == "管理员账号或密码不正确。"
+    assert "admin_login_failed" in caplog.text
+    assert "admin_username_matches" in caplog.text
+    assert "password_matches" in caplog.text
+    assert "wrong" not in caplog.text
 
 
 def test_admin_two_step_order_fulfillment_is_audited_and_idempotent(api_client) -> None:
