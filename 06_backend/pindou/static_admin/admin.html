@@ -673,12 +673,12 @@
           if (this.token) headers.Authorization = `Bearer ${this.token}`;
           if (options.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
           const response = await fetch(`${API_BASE}${path}`, Object.assign({}, options, { headers }));
-          if (response.status === 401) {
+          const contentType = response.headers.get("content-type") || "";
+          const payload = contentType.includes("application/json") ? await response.json() : await response.text();
+          if (response.status === 401 && path !== "/login") {
             this.logout("登录已过期，请重新登录。");
             throw new Error("AUTH_REQUIRED");
           }
-          const contentType = response.headers.get("content-type") || "";
-          const payload = contentType.includes("application/json") ? await response.json() : await response.text();
           if (!response.ok) {
             const message = this.errorMessage(payload, response.status);
             throw new Error(message);
