@@ -29,6 +29,13 @@ ORDER_STATUS_TRANSITIONS = {
 }
 
 
+def _normalize_optional_order_ref(value: str | None) -> str | None:
+    if value is None:
+        return None
+    normalized = value.strip()
+    return normalized or None
+
+
 class InvalidOrderTransitionError(ValueError):
     pass
 
@@ -58,9 +65,9 @@ class PaymentService:
             status=status,
             payment_method=payment_method,
             payment_provider=payment_provider,
-            qr_code_path=qr_code_path,
-            artwork_id=artwork_id,
-            cdk_code=cdk_code,
+            qr_code_path=_normalize_optional_order_ref(qr_code_path),
+            artwork_id=_normalize_optional_order_ref(artwork_id),
+            cdk_code=_normalize_optional_order_ref(cdk_code),
         )
         self.session.add(order)
         self.session.commit()

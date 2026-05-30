@@ -183,6 +183,24 @@ def test_payment_service_customer_service_qr_state_machine(db_session: Session) 
         service.transition_order(order_no=order.order_no, status=ORDER_STATUS_CANCELLED)
 
 
+def test_payment_service_normalizes_blank_optional_order_refs(db_session: Session) -> None:
+    user = add_user(db_session)
+    service = PaymentService(db_session)
+
+    order = service.create_order(
+        user_id=user.openid,
+        sku="single_export",
+        amount_cny="9.90",
+        artwork_id=" ",
+        qr_code_path="",
+        cdk_code="\t",
+    )
+
+    assert order.artwork_id is None
+    assert order.qr_code_path is None
+    assert order.cdk_code is None
+
+
 def test_delete_expired_originals_once_marks_only_old_uploads(db_session: Session, tmp_path) -> None:
     user = add_user(db_session)
     now = datetime(2026, 5, 25, 12, 0, tzinfo=timezone.utc)
