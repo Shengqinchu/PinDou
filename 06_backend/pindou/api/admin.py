@@ -105,6 +105,64 @@ def admin_login(payload: AdminLoginRequest, request: Request, db: DbSession) -> 
     }
 
 
+@router.get("/dashboard")
+def get_dashboard(_actor: AdminReadActor, db: DbSession) -> dict:
+    """后台 Dashboard 只读汇总。"""
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    total_users = int(db.scalar(select(func.count()).select_from(User)) or 0)
+    total_orders = int(db.scalar(select(func.count()).select_from(Order)) or 0)
+    today_orders = int(db.scalar(select(func.count()).select_from(Order).where(Order.created_at >= today_start)) or 0)
+    paid_orders = int(db.scalar(select(func.count()).select_from(Order).where(Order.status.in_(PAID_STATUSES))) or 0)
+    failed_orders = int(
+        db.scalar(
+            select(func.count())
+            .select_from(Order)
+            .where(Order.status.in_(("cancelled", "refunded", MANUAL_PAYMENT_CONFIRMED_STATUS)))
+        )
+        or 0
+    )
+    webhook_anomalies = int(
+        db.scalar(
+            select(func.count())
+            .select_from(AdminAuditLog)
+            .where(
+                AdminAuditLog.action == "payment.webhook",
+                or_(
+                    AdminAuditLog.after_json["signature_passed"].as_boolean() == False,  # noqa: E712
+                    AdminAuditLog.after_json["amount_matched"].as_boolean() == False,  # noqa: E712
+                ),
+            )
+        )
+        or 0
+    )
+    recent_since = datetime.now(timezone.utc) - timedelta(days=7)
+    dangerous_prefixes = (
+        "admin.order.confirm_payment_fact",
+        "admin.order.grant_entitlement",
+        "admin.user.adjust_credits",
+        "admin.cdk.batch_generate",
+    )
+    recent_dangerous_actions = int(
+        db.scalar(
+            select(func.count())
+            .select_from(AdminAuditLog)
+            .where(AdminAuditLog.action.in_(dangerous_prefixes), AdminAuditLog.created_at >= recent_since)
+        )
+        or 0
+    )
+    success_rate = round(paid_orders / total_orders, 4) if total_orders else 0.0
+    return {
+        "total_users": total_users,
+        "today_orders": today_orders,
+        "payment_success_rate": success_rate,
+        "abnormal_orders": failed_orders + webhook_anomalies,
+        "recent_dangerous_actions": recent_dangerous_actions,
+        "links": {
+            "abnormal_order_statuses": ["cancelled", "refunded", MANUAL_PAYMENT_CONFIRMED_STATUS],
+        },
+    }
+
+
 @router.get("/orders")
 def list_orders(
     _actor: AdminReadActor,

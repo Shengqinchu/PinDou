@@ -94,6 +94,10 @@ def upload_image(client: TestClient, headers: dict[str, str]) -> str:
 def test_user_login_profile_consent_and_auth_error(api_client) -> None:
     client, _session_factory = api_client
 
+    console = client.get("/console/")
+    assert console.status_code == 200
+    assert "PinDou Admin Console" in console.text
+
     assert client.get("/api/user/me").status_code == 401
     response = client.post("/api/user/login", json={"code": "abc", "nickname": "Pin"})
     assert response.status_code == 200
@@ -340,6 +344,7 @@ def test_admin_read_only_endpoints_require_role_and_redact_config(api_client, mo
     user_headers = auth_headers(client)
     bad_role_headers = {"Authorization": f"Bearer {create_access_token(subject='ops', role='outsider')}"}
     endpoints = [
+        "/api/admin/dashboard",
         "/api/admin/orders",
         "/api/admin/orders/PDADMIN001",
         "/api/admin/cdks",
@@ -354,6 +359,12 @@ def test_admin_read_only_endpoints_require_role_and_redact_config(api_client, mo
         assert client.get(endpoint, headers=user_headers).status_code == 403
         assert client.get(endpoint, headers=bad_role_headers).status_code == 403
         assert client.get(endpoint, headers=headers_admin).status_code == 200
+
+    dashboard = client.get("/api/admin/dashboard", headers=headers_admin).json()
+    assert dashboard["total_users"] >= 1
+    assert dashboard["today_orders"] >= 0
+    assert "payment_success_rate" in dashboard
+    assert "recent_dangerous_actions" in dashboard
 
     orders = client.get("/api/admin/orders", params={"search": "PDADMIN"}, headers=headers_admin).json()
     assert orders == {"items": [orders["items"][0]], "total": 1, "page": 1, "size": 50}

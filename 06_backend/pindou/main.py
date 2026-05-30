@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from pindou import __version__
@@ -16,6 +18,9 @@ from pindou.db.session import init_db
 from pindou.services.storage_util import ensure_storage_dirs
 from pindou.tasks.delete_expired_originals import ExpiredOriginalsDeleteScheduler
 from pindou.tasks.reverse_proxy_health_check import ReverseProxyHealthMonitor
+
+
+STATIC_ADMIN_DIR = Path(__file__).resolve().parent / "static_admin"
 
 
 def create_app() -> FastAPI:
@@ -71,6 +76,11 @@ def create_app() -> FastAPI:
     @app.get("/health", tags=["system"])
     async def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @app.get("/console", include_in_schema=False)
+    @app.get("/console/", include_in_schema=False)
+    async def admin_console() -> FileResponse:
+        return FileResponse(STATIC_ADMIN_DIR / "admin.html")
 
     app.state.reverse_proxy_health_monitor = monitor
     app.state.expired_originals_delete_scheduler = expired_originals_scheduler

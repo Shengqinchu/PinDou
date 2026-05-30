@@ -1,0 +1,993 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PinDou Admin Console</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --line: #d9dee7;
+      --muted: #657083;
+      --text: #17202f;
+      --brand: #1f6feb;
+      --brand-soft: #e8f0ff;
+      --danger: #c7352b;
+      --danger-soft: #fdecea;
+      --ok: #16794a;
+      --ok-soft: #e8f6ef;
+      --warn: #9a6700;
+      --warn-soft: #fff4d6;
+      --shadow: 0 1px 2px rgba(18, 25, 38, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      font-size: 14px;
+    }
+    button, input, select, textarea { font: inherit; }
+    button {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      height: 32px;
+      padding: 0 10px;
+      cursor: pointer;
+    }
+    button:hover { border-color: #9aa7ba; }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
+    }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+    input, select { height: 32px; padding: 0 10px; }
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+      padding: 8px 10px;
+      line-height: 1.45;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(31, 111, 235, 0.12);
+    }
+    .login-page {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .login-panel {
+      width: min(380px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+    .login-title {
+      margin: 0 0 18px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .field { margin-bottom: 12px; }
+    .label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .primary {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+    }
+    .danger {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: #fff;
+    }
+    .ghost-danger {
+      color: var(--danger);
+      border-color: #e1a09a;
+      background: #fff;
+    }
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 176px minmax(0, 1fr);
+      grid-template-rows: 52px minmax(0, 1fr);
+    }
+    .topbar {
+      grid-column: 1 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: #111827;
+      color: #fff;
+      padding: 0 16px;
+    }
+    .topbar-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      font-weight: 700;
+    }
+    .role-pill {
+      border: 1px solid rgba(255,255,255,0.24);
+      border-radius: 999px;
+      padding: 2px 8px;
+      color: #c9d2e3;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: #fff;
+      padding: 10px;
+    }
+    .tab-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 34px;
+      margin-bottom: 4px;
+      border: 0;
+      background: transparent;
+      text-align: left;
+    }
+    .tab-button.active {
+      color: var(--brand);
+      background: var(--brand-soft);
+      font-weight: 700;
+    }
+    .batch-tag {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .main {
+      min-width: 0;
+      padding: 14px;
+      overflow: auto;
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 10px;
+    }
+    .section-title h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    .toolbar .field {
+      width: 190px;
+      margin: 0;
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .metric {
+      min-height: 82px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 12px;
+    }
+    .metric.clickable { cursor: pointer; }
+    .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .metric-value {
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 800;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 8px 10px;
+      vertical-align: middle;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    th {
+      color: var(--muted);
+      background: #fbfcfe;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: left;
+    }
+    tr.clickable { cursor: pointer; }
+    tr.clickable:hover td { background: #f8fbff; }
+    tr:last-child td { border-bottom: 0; }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+      height: 22px;
+      border-radius: 999px;
+      padding: 0 8px;
+      font-size: 12px;
+      background: #eef2f7;
+      color: #445066;
+    }
+    .status-paid_confirmed,
+    .status-paid_via_hupijiao {
+      background: var(--ok-soft);
+      color: var(--ok);
+    }
+    .status-cancelled,
+    .status-refunded {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+    .status-manual_payment_confirmed,
+    .status-pending_qr,
+    .status-pending_cs_qr {
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+    .detail-row td {
+      background: #fafbfc;
+      white-space: normal;
+      padding: 0;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+      gap: 12px;
+      padding: 12px;
+    }
+    .detail-box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px;
+    }
+    .detail-box h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+    }
+    .kv {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 6px 8px;
+      font-size: 13px;
+    }
+    .kv-key { color: var(--muted); }
+    .kv-value { min-width: 0; overflow-wrap: anywhere; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .log-list {
+      display: grid;
+      gap: 8px;
+      max-height: 360px;
+      overflow: auto;
+    }
+    .log-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      background: #fff;
+    }
+    .log-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      border-radius: 999px;
+      padding: 0 8px;
+      font-size: 12px;
+      background: #eef2f7;
+      color: #445066;
+    }
+    .badge.ok { background: var(--ok-soft); color: var(--ok); }
+    .badge.bad { background: var(--danger-soft); color: var(--danger); }
+    .badge.warn { background: var(--warn-soft); color: var(--warn); }
+    details {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: #fbfcfe;
+    }
+    summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 12px;
+      user-select: none;
+    }
+    pre {
+      max-height: 220px;
+      overflow: auto;
+      margin: 8px 0 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .pager {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .empty {
+      padding: 28px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .placeholder {
+      padding: 30px;
+      color: var(--muted);
+      background: var(--panel);
+      border: 1px dashed #bac4d2;
+      border-radius: 8px;
+    }
+    .feedback {
+      min-height: 30px;
+      margin-bottom: 10px;
+    }
+    .alert {
+      display: inline-flex;
+      max-width: 100%;
+      border-radius: 6px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }
+    .alert.ok { border-color: #9ed8bb; background: var(--ok-soft); color: var(--ok); }
+    .alert.bad { border-color: #f0b4ae; background: var(--danger-soft); color: var(--danger); }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 30;
+    }
+    .modal {
+      width: min(520px, 100%);
+      background: var(--panel);
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 46px rgba(15, 23, 42, 0.22);
+    }
+    .modal-head, .modal-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .modal-foot {
+      border-top: 1px solid var(--line);
+      border-bottom: 0;
+      justify-content: flex-end;
+    }
+    .modal-body { padding: 14px; }
+    .modal h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+    .impact {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+      padding: 10px;
+      background: #fbfcfe;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .loading {
+      opacity: 0.66;
+      pointer-events: none;
+    }
+    @media (max-width: 920px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+        grid-template-rows: 52px auto minmax(0, 1fr);
+      }
+      .topbar { grid-column: 1; }
+      .sidebar {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .tab-button {
+        min-width: 110px;
+        margin-bottom: 0;
+      }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .detail-grid { grid-template-columns: 1fr; }
+      .toolbar .field { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    const { createApp } = Vue;
+    const TOKEN_KEY = "pindou_admin_token";
+    const API_BASE = "/api/v1/admin";
+
+    createApp({
+      data() {
+        return {
+          token: localStorage.getItem(TOKEN_KEY) || "",
+          role: localStorage.getItem("pindou_admin_role") || "",
+          loginForm: { username: "", password: "" },
+          loginLoading: false,
+          activeTab: "dashboard",
+          tabs: [
+            ["dashboard", "Dashboard", ""],
+            ["orders", "订单", ""],
+            ["cdks", "CDK", "Batch 4"],
+            ["users", "用户", "Batch 4"],
+            ["artworks", "作品", "Batch 4"],
+            ["config", "配置", "Batch 4"],
+            ["audit", "审计", "Batch 4"]
+          ],
+          feedback: null,
+          dashboard: null,
+          dashboardLoading: false,
+          orders: { items: [], total: 0, page: 1, size: 20 },
+          orderFilters: { status: "", search: "" },
+          orderLoading: false,
+          expandedOrderNo: "",
+          orderDetails: {},
+          modal: null
+        };
+      },
+      computed: {
+        isAuthed() {
+          return Boolean(this.token);
+        },
+        activeTabLabel() {
+          const found = this.tabs.find(([key]) => key === this.activeTab);
+          return found ? found[1] : "";
+        }
+      },
+      mounted() {
+        if (this.isAuthed) {
+          this.loadDashboard();
+          this.loadOrders();
+        }
+      },
+      methods: {
+        async api(path, options = {}) {
+          const headers = Object.assign({}, options.headers || {});
+          if (this.token) headers.Authorization = `Bearer ${this.token}`;
+          if (options.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
+          const response = await fetch(`${API_BASE}${path}`, Object.assign({}, options, { headers }));
+          if (response.status === 401) {
+            this.logout("登录已过期，请重新登录。");
+            throw new Error("AUTH_REQUIRED");
+          }
+          const contentType = response.headers.get("content-type") || "";
+          const payload = contentType.includes("application/json") ? await response.json() : await response.text();
+          if (!response.ok) {
+            const message = this.errorMessage(payload, response.status);
+            throw new Error(message);
+          }
+          return payload;
+        },
+        errorMessage(payload, status) {
+          if (!payload) return `请求失败 (${status})`;
+          if (payload.message_cn) return payload.message_cn;
+          if (payload.detail) return Array.isArray(payload.detail) ? JSON.stringify(payload.detail) : payload.detail;
+          if (payload.error) return payload.error;
+          return `请求失败 (${status})`;
+        },
+        async login() {
+          this.loginLoading = true;
+          this.feedback = null;
+          try {
+            const payload = await this.api("/login", {
+              method: "POST",
+              body: JSON.stringify(this.loginForm)
+            });
+            this.token = payload.token;
+            this.role = payload.role || "admin";
+            localStorage.setItem(TOKEN_KEY, this.token);
+            localStorage.setItem("pindou_admin_role", this.role);
+            this.loginForm.password = "";
+            this.showOk("登录成功。");
+            await Promise.all([this.loadDashboard(), this.loadOrders()]);
+          } catch (error) {
+            this.showBad(error.message);
+          } finally {
+            this.loginLoading = false;
+          }
+        },
+        logout(message) {
+          this.token = "";
+          this.role = "";
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem("pindou_admin_role");
+          this.expandedOrderNo = "";
+          this.orderDetails = {};
+          if (message) this.showBad(message);
+        },
+        switchTab(tab) {
+          this.activeTab = tab;
+          this.feedback = null;
+          if (tab === "dashboard") this.loadDashboard();
+          if (tab === "orders") this.loadOrders();
+        },
+        showOk(message) {
+          this.feedback = { type: "ok", message };
+          window.setTimeout(() => {
+            if (this.feedback && this.feedback.message === message) this.feedback = null;
+          }, 3200);
+        },
+        showBad(message) {
+          this.feedback = { type: "bad", message };
+        },
+        async loadDashboard() {
+          if (!this.token) return;
+          this.dashboardLoading = true;
+          try {
+            this.dashboard = await this.api("/dashboard");
+          } catch (error) {
+            if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
+          } finally {
+            this.dashboardLoading = false;
+          }
+        },
+        async loadOrders(page = this.orders.page || 1) {
+          if (!this.token) return;
+          this.orderLoading = true;
+          const params = new URLSearchParams({
+            page: String(page),
+            size: String(this.orders.size)
+          });
+          if (this.orderFilters.status) params.set("status", this.orderFilters.status);
+          if (this.orderFilters.search.trim()) params.set("search", this.orderFilters.search.trim());
+          try {
+            const payload = await this.api(`/orders?${params.toString()}`);
+            this.orders = payload;
+          } catch (error) {
+            if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
+          } finally {
+            this.orderLoading = false;
+          }
+        },
+        resetOrderFilters() {
+          this.orderFilters.status = "";
+          this.orderFilters.search = "";
+          this.loadOrders(1);
+        },
+        jumpToAbnormalOrders() {
+          this.activeTab = "orders";
+          this.orderFilters.status = "cancelled";
+          this.loadOrders(1);
+        },
+        async toggleOrder(order) {
+          if (this.expandedOrderNo === order.order_no) {
+            this.expandedOrderNo = "";
+            return;
+          }
+          this.expandedOrderNo = order.order_no;
+          if (!this.orderDetails[order.order_no]) {
+            await this.loadOrderDetail(order.order_no);
+          }
+        },
+        async loadOrderDetail(orderNo) {
+          try {
+            this.orderDetails[orderNo] = await this.api(`/orders/${encodeURIComponent(orderNo)}`);
+          } catch (error) {
+            if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
+          }
+        },
+        openActionModal(type, order) {
+          const detail = this.orderDetails[order.order_no] || order;
+          const entitlement = this.entitlementText(detail);
+          this.modal = {
+            type,
+            order,
+            reason: "",
+            loading: false,
+            title: type === "confirm" ? "确认收款事实" : "发放订单权益",
+            dangerText: type === "confirm" ? "仅标记已收到款，不发放权益。" : `将${entitlement}。`,
+            endpoint: type === "confirm"
+              ? `/orders/${encodeURIComponent(order.order_no)}/confirm-payment-fact`
+              : `/orders/${encodeURIComponent(order.order_no)}/grant-entitlement`
+          };
+        },
+        closeModal() {
+          if (!this.modal || !this.modal.loading) this.modal = null;
+        },
+        async submitModal() {
+          if (!this.modal || !this.modal.reason.trim()) {
+            this.showBad("请填写 reason。");
+            return;
+          }
+          this.modal.loading = true;
+          try {
+            const payload = await this.api(this.modal.endpoint, {
+              method: "POST",
+              body: JSON.stringify({ reason: this.modal.reason.trim() })
+            });
+            this.showOk(`${payload.message || "操作完成。"} audit_id=${payload.audit_id}`);
+            const orderNo = this.modal.order.order_no;
+            this.modal = null;
+            await this.loadOrders(this.orders.page);
+            await this.loadOrderDetail(orderNo);
+            this.expandedOrderNo = orderNo;
+            await this.loadDashboard();
+          } catch (error) {
+            if (error.message !== "AUTH_REQUIRED") this.showBad(error.message);
+          } finally {
+            if (this.modal) this.modal.loading = false;
+          }
+        },
+        formatMoney(value) {
+          const number = Number(value || 0);
+          return number.toFixed(2);
+        },
+        formatDate(value) {
+          if (!value) return "-";
+          const date = new Date(value);
+          if (Number.isNaN(date.getTime())) return value;
+          return date.toLocaleString("zh-CN", { hour12: false });
+        },
+        formatPercent(value) {
+          return `${(Number(value || 0) * 100).toFixed(1)}%`;
+        },
+        statusText(status) {
+          const map = {
+            pending_qr: "待支付",
+            pending_cs_qr: "客服待付",
+            manual_payment_confirmed: "人工已收款",
+            paid_confirmed: "已支付",
+            paid_via_hupijiao: "已支付",
+            cancelled: "已取消",
+            refunded: "已退款"
+          };
+          return map[status] || status || "-";
+        },
+        boolBadgeClass(value) {
+          if (value === true) return "ok";
+          if (value === false) return "bad";
+          return "";
+        },
+        amountBadgeClass(value) {
+          if (value === false) return "bad";
+          if (value === true) return "ok";
+          return "";
+        },
+        boolText(value, trueText, falseText) {
+          if (value === true) return trueText;
+          if (value === false) return falseText;
+          return "未知";
+        },
+        paymentProviderText(provider) {
+          return provider === "hupijiao" ? "虎皮椒" : "客服";
+        },
+        entitlementText(order) {
+          if (!order) return "发放权益";
+          if (order.sku === "single_9.9") return `给用户 ${order.user_id} 增加 1 个付费额度`;
+          if (order.sku === "monthly_28") return `给用户 ${order.user_id} 开通 30 天月卡`;
+          if (order.sku === "custom_99") return `解锁作品 ${order.artwork_id || "-"}`;
+          return `按 SKU ${order.sku} 发放权益给 ${order.user_id}`;
+        },
+        jsonText(value) {
+          return JSON.stringify(value || {}, null, 2);
+        },
+        previousPage() {
+          if (this.orders.page > 1) this.loadOrders(this.orders.page - 1);
+        },
+        nextPage() {
+          const maxPage = Math.max(1, Math.ceil(this.orders.total / this.orders.size));
+          if (this.orders.page < maxPage) this.loadOrders(this.orders.page + 1);
+        }
+      },
+      template: `
+        <div v-if="!isAuthed" class="login-page">
+          <form class="login-panel" :class="{ loading: loginLoading }" @submit.prevent="login">
+            <h1 class="login-title">PinDou Admin Console</h1>
+            <div class="feedback" v-if="feedback">
+              <div class="alert" :class="feedback.type">{{ feedback.message }}</div>
+            </div>
+            <label class="field">
+              <span class="label">用户名</span>
+              <input v-model.trim="loginForm.username" autocomplete="username" required>
+            </label>
+            <label class="field">
+              <span class="label">密码</span>
+              <input v-model="loginForm.password" type="password" autocomplete="current-password" required>
+            </label>
+            <button class="primary" type="submit" style="width:100%" :disabled="loginLoading">
+              {{ loginLoading ? "登录中" : "登录" }}
+            </button>
+          </form>
+        </div>
+
+        <div v-else class="app-shell">
+          <header class="topbar">
+            <div class="topbar-title">
+              <span>PinDou Admin Console</span>
+              <span class="role-pill">{{ role || "admin" }}</span>
+            </div>
+            <button @click="logout()">退出</button>
+          </header>
+
+          <aside class="sidebar">
+            <button
+              v-for="[key, label, tag] in tabs"
+              :key="key"
+              class="tab-button"
+              :class="{ active: activeTab === key }"
+              @click="switchTab(key)"
+            >
+              <span>{{ label }}</span>
+              <span v-if="tag" class="batch-tag">{{ tag }}</span>
+            </button>
+          </aside>
+
+          <main class="main">
+            <div class="section-title">
+              <h1>{{ activeTabLabel }}</h1>
+              <button v-if="activeTab === 'dashboard'" @click="loadDashboard">刷新</button>
+              <button v-if="activeTab === 'orders'" @click="loadOrders(orders.page)">刷新</button>
+            </div>
+
+            <div class="feedback" v-if="feedback">
+              <div class="alert" :class="feedback.type">{{ feedback.message }}</div>
+            </div>
+
+            <section v-if="activeTab === 'dashboard'" :class="{ loading: dashboardLoading }">
+              <div class="metrics">
+                <div class="metric">
+                  <div class="metric-label">总用户数</div>
+                  <div class="metric-value">{{ dashboard ? dashboard.total_users : "-" }}</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">今日订单数</div>
+                  <div class="metric-value">{{ dashboard ? dashboard.today_orders : "-" }}</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">支付成功率</div>
+                  <div class="metric-value">{{ dashboard ? formatPercent(dashboard.payment_success_rate) : "-" }}</div>
+                </div>
+                <div class="metric clickable" @click="jumpToAbnormalOrders">
+                  <div class="metric-label">异常订单数</div>
+                  <div class="metric-value">{{ dashboard ? dashboard.abnormal_orders : "-" }}</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">最近危险操作</div>
+                  <div class="metric-value">{{ dashboard ? dashboard.recent_dangerous_actions : "-" }}</div>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="empty" v-if="!dashboard">暂无 Dashboard 数据</div>
+                <div class="detail-box" v-else>
+                  <details open>
+                    <summary>Dashboard JSON</summary>
+                    <pre>{{ jsonText(dashboard) }}</pre>
+                  </details>
+                </div>
+              </div>
+            </section>
+
+            <section v-else-if="activeTab === 'orders'" :class="{ loading: orderLoading }">
+              <div class="toolbar">
+                <label class="field">
+                  <span class="label">状态</span>
+                  <select v-model="orderFilters.status" @change="loadOrders(1)">
+                    <option value="">全部</option>
+                    <option value="pending_qr">待支付</option>
+                    <option value="pending_cs_qr">客服待付</option>
+                    <option value="manual_payment_confirmed">人工已收款</option>
+                    <option value="paid_confirmed">已支付</option>
+                    <option value="paid_via_hupijiao">虎皮椒已支付</option>
+                    <option value="cancelled">已取消</option>
+                    <option value="refunded">已退款</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span class="label">搜索 order_no / user_id</span>
+                  <input v-model="orderFilters.search" @keyup.enter="loadOrders(1)">
+                </label>
+                <button class="primary" @click="loadOrders(1)">查询</button>
+                <button @click="resetOrderFilters">重置</button>
+              </div>
+
+              <div class="panel">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width:180px">order_no</th>
+                      <th style="width:160px">用户</th>
+                      <th style="width:120px">sku</th>
+                      <th style="width:90px">金额</th>
+                      <th style="width:140px">状态</th>
+                      <th style="width:90px">渠道</th>
+                      <th style="width:170px">创建时间</th>
+                    </tr>
+                  </thead>
+                  <tbody v-if="orders.items.length">
+                    <template v-for="order in orders.items" :key="order.order_no">
+                      <tr class="clickable" @click="toggleOrder(order)">
+                        <td>{{ order.order_no }}</td>
+                        <td>{{ order.user_id }}</td>
+                        <td>{{ order.sku }}</td>
+                        <td>¥{{ formatMoney(order.amount_cny) }}</td>
+                        <td>
+                          <span class="status-pill" :class="'status-' + order.raw_status">{{ statusText(order.raw_status) }}</span>
+                        </td>
+                        <td>{{ paymentProviderText(order.payment_provider) }}</td>
+                        <td>{{ formatDate(order.created_at) }}</td>
+                      </tr>
+                      <tr v-if="expandedOrderNo === order.order_no" class="detail-row">
+                        <td colspan="7">
+                          <div class="detail-grid">
+                            <div class="detail-box">
+                              <h3>订单详情</h3>
+                              <div class="kv">
+                                <div class="kv-key">订单</div><div class="kv-value">{{ order.order_no }}</div>
+                                <div class="kv-key">用户</div><div class="kv-value">{{ order.user_id }}</div>
+                                <div class="kv-key">权益</div><div class="kv-value">{{ entitlementText(orderDetails[order.order_no] || order) }}</div>
+                                <div class="kv-key">支付时间</div><div class="kv-value">{{ formatDate((orderDetails[order.order_no] || order).paid_at) }}</div>
+                                <div class="kv-key">作品</div><div class="kv-value">{{ (orderDetails[order.order_no] || order).artwork_id || "-" }}</div>
+                              </div>
+                              <div class="actions">
+                                <button class="ghost-danger" @click.stop="openActionModal('confirm', order)">确认收款事实</button>
+                                <button class="danger" @click.stop="openActionModal('grant', order)">发放权益</button>
+                              </div>
+                            </div>
+                            <div class="detail-box">
+                              <h3>回调日志</h3>
+                              <div v-if="!orderDetails[order.order_no]" class="empty">加载中</div>
+                              <div v-else-if="!orderDetails[order.order_no].webhook.callback_logs.length" class="empty">暂无回调</div>
+                              <div v-else class="log-list">
+                                <div
+                                  class="log-item"
+                                  v-for="log in orderDetails[order.order_no].webhook.callback_logs"
+                                  :key="log.id"
+                                >
+                                  <div class="log-head">
+                                    <span>#{{ log.id }}</span>
+                                    <span>{{ formatDate(log.created_at) }}</span>
+                                    <span class="badge" :class="boolBadgeClass(log.after.signature_passed)">
+                                      验签 {{ boolText(log.after.signature_passed, "通过", "失败") }}
+                                    </span>
+                                    <span class="badge" :class="amountBadgeClass(log.after.amount_matched)">
+                                      金额 {{ boolText(log.after.amount_matched, "一致", "不一致") }}
+                                    </span>
+                                    <span class="badge" :class="log.after.duplicate_callback ? 'warn' : ''">
+                                      {{ log.after.duplicate_callback ? "重复回调" : "首次/有效" }}
+                                    </span>
+                                  </div>
+                                  <details>
+                                    <summary>JSON</summary>
+                                    <pre>{{ jsonText(log.after) }}</pre>
+                                  </details>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+                <div class="empty" v-if="!orders.items.length">暂无订单</div>
+                <div class="pager">
+                  <span>共 {{ orders.total }} 条，第 {{ orders.page }} 页，每页 {{ orders.size }} 条</span>
+                  <span>
+                    <button @click="previousPage" :disabled="orders.page <= 1">上一页</button>
+                    <button @click="nextPage" :disabled="orders.page >= Math.ceil(orders.total / orders.size)">下一页</button>
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section v-else class="placeholder">
+              {{ activeTabLabel }}：Batch 4
+            </section>
+          </main>
+
+          <div v-if="modal" class="modal-backdrop" @click.self="closeModal">
+            <div class="modal" :class="{ loading: modal.loading }">
+              <div class="modal-head">
+                <h2>{{ modal.title }}</h2>
+                <button @click="closeModal">关闭</button>
+              </div>
+              <div class="modal-body">
+                <div class="impact">
+                  <div><strong>订单：</strong>{{ modal.order.order_no }}</div>
+                  <div><strong>用户：</strong>{{ modal.order.user_id }}</div>
+                  <div><strong>影响：</strong>{{ modal.dangerText }}</div>
+                </div>
+                <label class="field">
+                  <span class="label">reason</span>
+                  <textarea v-model="modal.reason" placeholder="请输入操作原因" required></textarea>
+                </label>
+              </div>
+              <div class="modal-foot">
+                <button @click="closeModal">取消</button>
+                <button class="danger" @click="submitModal" :disabled="modal.loading || !modal.reason.trim()">
+                  确认执行
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `
+    }).mount("#app");
+  </script>
+</body>
+</html>
