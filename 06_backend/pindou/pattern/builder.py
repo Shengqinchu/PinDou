@@ -14,6 +14,13 @@ from pindou.providers.base import SizePreset
 
 DOMINANT_DOWNSAMPLE_BIN_SIZE = 8
 DOMINANT_ALPHA_THRESHOLD = 128
+LOW_GRID_FEATURE_MAX_DIMENSION = 32
+LOW_GRID_DARK_LUMINANCE_THRESHOLD = 72
+LOW_GRID_DARK_PIXEL_RATIO = 0.09
+LOW_GRID_SATURATED_PIXEL_RATIO = 0.06
+LOW_GRID_MIN_FEATURE_PIXELS = 2
+SATURATED_COLOR_SPREAD_THRESHOLD = 70
+SATURATED_RED_DOMINANCE_THRESHOLD = 42
 
 
 @dataclass(frozen=True)
@@ -133,7 +140,7 @@ class PatternBuilder:
     ) -> PatternSheet:
         from pindou.colormap.loader import estimate_cost_cny, load_palette
         from pindou.pattern.exporter import PatternExporter
-        from pindou.pattern.postprocess import merge_small_components
+        from pindou.pattern.postprocess import merge_small_components, reinforce_low_grid_outline
         from pindou.pattern.quantize import quantize_to_codes
 
         size = size if isinstance(size, SizePreset) else SizePreset(str(size))
@@ -164,6 +171,13 @@ class PatternBuilder:
             palette_by_code,
             min_component_size=self.min_component_size,
         )
+        low_grid_feature_priority = min(parse_size(size)) <= LOW_GRID_FEATURE_MAX_DIMENSION
+        outline_reinforced = False
+        if low_grid_feature_priority and quantized.flat_image_detected:
+            processed_codes, outline_reinforced = reinforce_low_grid_outline(
+                processed_codes,
+                palette_by_code,
+            )
         sheet = build_pattern_sheet(
             processed_codes,
             palette_by_code,
@@ -183,6 +197,8 @@ class PatternBuilder:
                 "quantize_runtime_ms": round(quantized.runtime_ms, 2),
                 "white_bg_detected": white_bg_detected,
                 "auto_remove_white_bg_requested": bool(auto_remove_white_bg and input_mode == "script"),
+                "low_grid_feature_priority": low_grid_feature_priority,
+                "low_grid_outline_reinforced": outline_reinforced,
             },
         )
         preview_png = PatternExporter().to_simple_grid_png(sheet)
@@ -226,7 +242,13 @@ def prepare_input_image(
         source = source.convert("RGBA")
     background_alpha = 0 if input_mode == "ai" or white_bg_detected else 255
     background = (255, 255, 255, background_alpha)
-    fitted = fit_to_canvas(source, width, height, background)
+    fitted = fit_to_canvas(
+        source,
+        width,
+        height,
+        background,
+        preserve_features=min(width, height) <= LOW_GRID_FEATURE_MAX_DIMENSION,
+    )
     alpha = np.array(fitted.getchannel("A"), dtype=np.uint8)
     if input_mode == "ai" or white_bg_detected:
         no_bead_mask = (alpha < 128).tolist()
@@ -235,7 +257,14 @@ def prepare_input_image(
     return fitted, no_bead_mask, white_bg_detected
 
 
-def fit_to_canvas(image: Image.Image, width: int, height: int, background: tuple[int, int, int, int]) -> Image.Image:
+def fit_to_canvas(
+    image: Image.Image,
+    width: int,
+    height: int,
+    background: tuple[int, int, int, int],
+    *,
+    preserve_features: bool = False,
+) -> Image.Image:
     source = image.convert("RGBA")
     source_arr = np.array(source, dtype=np.uint8)
     source_height, source_width = source_arr.shape[:2]
@@ -262,9 +291,55 @@ def fit_to_canvas(image: Image.Image, width: int, height: int, background: tuple
             src_x1 = min(source_width, int(np.ceil((x + 1 - offset_x) / scale_x)))
             if src_x1 <= src_x0:
                 src_x1 = min(source_width, src_x0 + 1)
-            canvas[y, x] = dominant_region_rgba(source_arr[src_y0:src_y1, src_x0:src_x1], background)
+            region = source_arr[src_y0:src_y1, src_x0:src_x1]
+            if preserve_features:
+                canvas[y, x] = feature_priority_region_rgba(region, background)
+            else:
+                canvas[y, x] = dominant_region_rgba(region, background)
 
     return Image.fromarray(canvas)
+
+
+def feature_priority_region_rgba(region: np.ndarray, background: tuple[int, int, int, int]) -> np.ndarray:
+    foreground = region[region[:, :, 3] >= DOMINANT_ALPHA_THRESHOLD]
+    if len(foreground) == 0:
+        return np.array(background, dtype=np.uint8)
+
+    rgb = foreground[:, :3]
+    if len(rgb) < LOW_GRID_MIN_FEATURE_PIXELS:
+        return dominant_region_rgba(region, background)
+
+    luma = (
+        0.2126 * rgb[:, 0].astype(np.float64)
+        + 0.7152 * rgb[:, 1].astype(np.float64)
+        + 0.0722 * rgb[:, 2].astype(np.float64)
+    )
+    dark_mask = luma <= LOW_GRID_DARK_LUMINANCE_THRESHOLD
+    red_feature_mask = (
+        (rgb[:, 0].astype(np.int16) - np.maximum(rgb[:, 1], rgb[:, 2]).astype(np.int16))
+        >= SATURATED_RED_DOMINANCE_THRESHOLD
+    )
+    saturated_mask = (
+        (rgb.max(axis=1).astype(np.int16) - rgb.min(axis=1).astype(np.int16))
+        >= SATURATED_COLOR_SPREAD_THRESHOLD
+    ) & red_feature_mask
+
+    dark_count = int(dark_mask.sum())
+    saturated_count = int(saturated_mask.sum())
+    total = len(rgb)
+    dark_ratio = dark_count / total
+    saturated_ratio = saturated_count / total
+
+    if saturated_count >= LOW_GRID_MIN_FEATURE_PIXELS and saturated_ratio >= LOW_GRID_SATURATED_PIXEL_RATIO:
+        if dark_count < LOW_GRID_MIN_FEATURE_PIXELS or saturated_ratio * 1.35 >= dark_ratio:
+            best_rgb = dominant_rgb(rgb[saturated_mask])
+            return np.array([int(best_rgb[0]), int(best_rgb[1]), int(best_rgb[2]), 255], dtype=np.uint8)
+
+    if dark_count >= LOW_GRID_MIN_FEATURE_PIXELS and dark_ratio >= LOW_GRID_DARK_PIXEL_RATIO:
+        best_rgb = dominant_rgb(rgb[dark_mask])
+        return np.array([int(best_rgb[0]), int(best_rgb[1]), int(best_rgb[2]), 255], dtype=np.uint8)
+
+    return dominant_region_rgba(region, background)
 
 
 def dominant_region_rgba(region: np.ndarray, background: tuple[int, int, int, int]) -> np.ndarray:
@@ -272,17 +347,20 @@ def dominant_region_rgba(region: np.ndarray, background: tuple[int, int, int, in
     if len(foreground) == 0:
         return np.array(background, dtype=np.uint8)
     rgb = foreground[:, :3]
+    best_rgb = dominant_rgb(rgb)
+    return np.array([int(best_rgb[0]), int(best_rgb[1]), int(best_rgb[2]), 255], dtype=np.uint8)
+
+
+def dominant_rgb(rgb: np.ndarray) -> np.ndarray:
     first_rgb = rgb[0]
     if np.all(rgb == first_rgb):
-        best_rgb = first_rgb
-    else:
-        bins = (rgb // DOMINANT_DOWNSAMPLE_BIN_SIZE).astype(np.uint16)
-        packed = (bins[:, 0] << 10) | (bins[:, 1] << 5) | bins[:, 2]
-        _unique_bins, inverse, counts = np.unique(packed, return_inverse=True, return_counts=True)
-        best_bin = int(np.argmax(counts))
-        members = rgb[inverse == best_bin].astype(np.float64)
-        best_rgb = np.rint(members.mean(axis=0)).astype(np.uint8)
-    return np.array([int(best_rgb[0]), int(best_rgb[1]), int(best_rgb[2]), 255], dtype=np.uint8)
+        return first_rgb
+    bins = (rgb // DOMINANT_DOWNSAMPLE_BIN_SIZE).astype(np.uint16)
+    packed = (bins[:, 0] << 10) | (bins[:, 1] << 5) | bins[:, 2]
+    _unique_bins, inverse, counts = np.unique(packed, return_inverse=True, return_counts=True)
+    best_bin = int(np.argmax(counts))
+    members = rgb[inverse == best_bin].astype(np.float64)
+    return np.rint(members.mean(axis=0)).astype(np.uint8)
 
 
 def parse_size(size: SizePreset) -> tuple[int, int]:

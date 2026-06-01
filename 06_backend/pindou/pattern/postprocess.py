@@ -21,6 +21,7 @@ EDGE_BACKGROUND_MIN_DOMINANCE = 0.30
 LIGHT_BACKGROUND_MIN_CHANNEL = 185
 LIGHT_BACKGROUND_MAX_SPREAD = 70
 OPAQUE_ALPHA_THRESHOLD = 128
+LOW_GRID_OUTLINE_MIN_DARK_RATIO = 0.025
 
 
 def merge_small_components(
@@ -51,6 +52,102 @@ def merge_small_components(
             for y, x in component:
                 result[y][x] = replacement
     return result
+
+
+def reinforce_low_grid_outline(
+    codes: GridCodes,
+    palette_by_code: dict[str, ColorRef],
+) -> tuple[GridCodes, bool]:
+    if not codes or not codes[0]:
+        return codes, False
+
+    height = len(codes)
+    width = len(codes[0])
+    foreground = [(row, col) for row in range(height) for col in range(width) if codes[row][col] is not None]
+    if not foreground:
+        return codes, False
+
+    black_counts: dict[str, int] = {}
+    for row, col in foreground:
+        code = codes[row][col]
+        if code is not None and code in palette_by_code and is_black_outline(palette_by_code[code]):
+            black_counts[code] = black_counts.get(code, 0) + 1
+    if not black_counts or sum(black_counts.values()) / len(foreground) < LOW_GRID_OUTLINE_MIN_DARK_RATIO:
+        return codes, False
+
+    outline_code = max(black_counts, key=black_counts.get)
+    result = [row[:] for row in codes]
+    changed = False
+
+    for row, col in foreground:
+        if not is_foreground_boundary(codes, row, col):
+            continue
+        code = result[row][col]
+        if code is not None and code in palette_by_code and is_feature_accent_color(palette_by_code[code]):
+            continue
+        if result[row][col] != outline_code:
+            result[row][col] = outline_code
+            changed = True
+
+    changed = bridge_single_cell_outline_gaps(result, palette_by_code, outline_code) or changed
+    return result, changed
+
+
+def is_foreground_boundary(codes: GridCodes, row: int, col: int) -> bool:
+    height = len(codes)
+    width = len(codes[0])
+    for d_row in (-1, 0, 1):
+        for d_col in (-1, 0, 1):
+            if d_row == 0 and d_col == 0:
+                continue
+            n_row = row + d_row
+            n_col = col + d_col
+            if n_row < 0 or n_row >= height or n_col < 0 or n_col >= width:
+                return True
+            if codes[n_row][n_col] is None:
+                return True
+    return False
+
+
+def bridge_single_cell_outline_gaps(
+    codes: GridCodes,
+    palette_by_code: dict[str, ColorRef],
+    outline_code: str,
+) -> bool:
+    height = len(codes)
+    width = len(codes[0])
+    changed = False
+    original = [row[:] for row in codes]
+    for row in range(height):
+        for col in range(width):
+            code = original[row][col]
+            if code is None or code == outline_code:
+                continue
+            if code in palette_by_code and (
+                is_black_outline(palette_by_code[code]) or is_feature_accent_color(palette_by_code[code])
+            ):
+                continue
+            horizontal = (
+                col > 0
+                and col < width - 1
+                and original[row][col - 1] == outline_code
+                and original[row][col + 1] == outline_code
+            )
+            vertical = (
+                row > 0
+                and row < height - 1
+                and original[row - 1][col] == outline_code
+                and original[row + 1][col] == outline_code
+            )
+            if horizontal or vertical:
+                codes[row][col] = outline_code
+                changed = True
+    return changed
+
+
+def is_feature_accent_color(color: ColorRef) -> bool:
+    r, g, b = color.rgb
+    return r >= 150 and r - max(g, b) >= 45 and max(color.rgb) - min(color.rgb) >= 70
 
 
 def detect_and_remove_white_bg(

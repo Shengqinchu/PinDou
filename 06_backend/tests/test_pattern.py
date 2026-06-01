@@ -207,6 +207,69 @@ def test_flat_sticker_builds_transparent_low_color_pattern() -> None:
     assert any(sheet.color_counts[code] > 0 for code in red_codes)
 
 
+def test_low_grid_flat_sticker_preserves_outline_and_small_features() -> None:
+    builder = PatternBuilder(target_colors=24)
+
+    sheet = builder.build(
+        SizePreset.SINGLE_BOARD_26X26,
+        raw_image=flat_rabbit_sticker_bytes(),
+        mode="script",
+        auto_remove_white_bg=True,
+    )
+
+    black_codes = {
+        color.code
+        for color in sheet.palette_used
+        if max(color.rgb) <= 60 or 0.2126 * color.rgb[0] + 0.7152 * color.rgb[1] + 0.0722 * color.rgb[2] <= 45
+    }
+    red_codes = {
+        color.code
+        for color in sheet.palette_used
+        if color.rgb[0] >= 160 and color.rgb[1] <= 90 and color.rgb[2] <= 100
+    }
+    black_cells = cells_for_codes(sheet, black_codes)
+
+    assert sheet.metadata["white_bg_detected"] is True
+    assert sheet.metadata["low_grid_feature_priority"] is True
+    assert sheet.metadata["low_grid_outline_reinforced"] is True
+    assert len(sheet.color_counts) <= 6
+    assert sum(sheet.color_counts.get(code, 0) for code in black_codes) >= 55
+    assert largest_component(black_cells, 26, 26) >= 45
+    assert sum(sheet.color_counts.get(code, 0) for code in red_codes) >= 8
+    assert count_cells_in_box(black_cells, row_range=range(8, 14), col_range=range(8, 18)) >= 2
+
+
+def test_feature_priority_downsample_keeps_tiny_red_block_over_fill_vote() -> None:
+    image = Image.new("RGBA", (16, 16), (170, 140, 110, 255))
+    draw = ImageDraw.Draw(image)
+    draw.rectangle([6, 6, 9, 9], fill=(220, 20, 35, 255))
+
+    fitted_plain = fit_to_canvas(image, 1, 1, (255, 255, 255, 0), preserve_features=False)
+    fitted_feature = fit_to_canvas(image, 1, 1, (255, 255, 255, 0), preserve_features=True)
+
+    assert fitted_plain.getpixel((0, 0))[:3] == (170, 140, 110)
+    assert fitted_feature.getpixel((0, 0))[0] >= 200
+    assert fitted_feature.getpixel((0, 0))[1] <= 60
+
+
+def test_medium_and_large_flat_sticker_do_not_regress() -> None:
+    builder = PatternBuilder(target_colors=24)
+    raw = flat_rabbit_sticker_bytes()
+
+    for size in (SizePreset.DOUBLE_BOARD_52X52, SizePreset.FOUR_BOARD_104X104):
+        sheet = builder.build(size, raw_image=raw, mode="script", auto_remove_white_bg=True)
+        red_codes = {
+            color.code
+            for color in sheet.palette_used
+            if color.rgb[0] >= 160 and color.rgb[1] <= 90 and color.rgb[2] <= 100
+        }
+
+        assert sheet.metadata["white_bg_detected"] is True
+        assert len(sheet.color_counts) <= 6
+        assert sum(sheet.color_counts.get(code, 0) for code in red_codes) > 0
+        assert sheet.bead_total + sum(sum(row) for row in sheet.no_bead_mask) == size.width * size.height
+
+
 def test_large_pattern_build_stays_under_two_seconds_after_warmup() -> None:
     builder = PatternBuilder()
     raw = read_input("cartoon_synthetic.png")
@@ -297,6 +360,62 @@ def flat_dog_sticker_bytes() -> bytes:
     draw.ellipse([90, 62, 102, 74], fill=(255, 255, 255), outline=(20, 20, 20), width=3)
     draw.ellipse([75, 78, 86, 88], fill=(20, 20, 20))
     return image_bytes(image)
+
+
+def flat_rabbit_sticker_bytes() -> bytes:
+    image = Image.new("RGB", (180, 180), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    fill = (238, 218, 185)
+    outline = (18, 18, 18)
+    red = (214, 30, 42)
+    pink = (252, 158, 182)
+
+    draw.ellipse([48, 8, 78, 86], fill=fill, outline=outline, width=8)
+    draw.ellipse([102, 8, 132, 86], fill=fill, outline=outline, width=8)
+    draw.ellipse([57, 20, 69, 70], fill=pink)
+    draw.ellipse([111, 20, 123, 70], fill=pink)
+    draw.ellipse([36, 48, 144, 144], fill=fill, outline=outline, width=8)
+    draw.ellipse([64, 78, 76, 92], fill=outline)
+    draw.ellipse([104, 78, 116, 92], fill=outline)
+    draw.ellipse([86, 96, 96, 106], fill=outline)
+    draw.arc([74, 98, 92, 118], start=20, end=155, fill=outline, width=4)
+    draw.arc([88, 98, 106, 118], start=25, end=160, fill=outline, width=4)
+    draw.rectangle([56, 130, 124, 145], fill=red, outline=outline, width=4)
+    return image_bytes(image)
+
+
+def cells_for_codes(sheet, codes: set[str]) -> set[tuple[int, int]]:
+    return {
+        (row_idx, col_idx)
+        for row_idx, row in enumerate(sheet.grid)
+        for col_idx, cell in enumerate(row)
+        if not isinstance(cell, NoBead) and cell.code in codes
+    }
+
+
+def largest_component(cells: set[tuple[int, int]], height: int, width: int) -> int:
+    remaining = set(cells)
+    best = 0
+    while remaining:
+        start = remaining.pop()
+        stack = [start]
+        size = 1
+        while stack:
+            row, col = stack.pop()
+            for d_row, d_col in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                neighbor = (row + d_row, col + d_col)
+                if 0 <= neighbor[0] < height and 0 <= neighbor[1] < width and neighbor in remaining:
+                    remaining.remove(neighbor)
+                    stack.append(neighbor)
+                    size += 1
+        best = max(best, size)
+    return best
+
+
+def count_cells_in_box(cells: set[tuple[int, int]], *, row_range: range, col_range: range) -> int:
+    rows = set(row_range)
+    cols = set(col_range)
+    return sum(1 for row, col in cells if row in rows and col in cols)
 
 
 def image_bytes(image: Image.Image) -> bytes:
