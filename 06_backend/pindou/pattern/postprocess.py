@@ -10,11 +10,17 @@ from PIL import Image
 from pindou.colormap.matcher import ciede2000_distance
 from pindou.colormap.matcher import nearest_color_code
 from pindou.pattern.builder import ColorRef
+from pindou.pattern.quantize_core import delta_e_ciede2000, rgb_to_lab
 
 
 GridCodes = list[list[str | None]]
 WHITE_RGB = (255, 255, 255)
-FLOOD_FILL_WHITE_DELTA_E = 15.0
+FLOOD_FILL_WHITE_DELTA_E = 18.0
+EDGE_BACKGROUND_BIN_SIZE = 8
+EDGE_BACKGROUND_MIN_DOMINANCE = 0.30
+LIGHT_BACKGROUND_MIN_CHANNEL = 185
+LIGHT_BACKGROUND_MAX_SPREAD = 70
+OPAQUE_ALPHA_THRESHOLD = 128
 
 
 def merge_small_components(
@@ -49,39 +55,84 @@ def merge_small_components(
 
 def detect_and_remove_white_bg(
     image: Image.Image,
-    tolerance_delta_e: float = 8.0,
+    tolerance_delta_e: float = FLOOD_FILL_WHITE_DELTA_E,
 ) -> tuple[Image.Image, bool]:
     rgba = image.convert("RGBA")
-    corner_delta = average_corner_delta_e_to_white(rgba)
-    if corner_delta >= tolerance_delta_e:
+    arr = np.array(rgba, dtype=np.uint8)
+    background_rgb = dominant_edge_background(arr)
+    if background_rgb is None or not is_removable_background(background_rgb, tolerance_delta_e):
         return image, False
 
-    arr = np.array(rgba, dtype=np.uint8)
     height, width = arr.shape[:2]
+    background_mask = background_similarity_mask(arr, background_rgb, tolerance_delta_e)
     visited = np.zeros((height, width), dtype=bool)
-    queue: deque[tuple[int, int]] = deque(
-        [
-            (0, 0),
-            (width - 1, 0),
-            (0, height - 1),
-            (width - 1, height - 1),
-        ]
-    )
+    queue: deque[tuple[int, int]] = deque()
+    for x in range(width):
+        if background_mask[0, x]:
+            queue.append((x, 0))
+        if height > 1 and background_mask[height - 1, x]:
+            queue.append((x, height - 1))
+    for y in range(1, max(height - 1, 1)):
+        if background_mask[y, 0]:
+            queue.append((0, y))
+        if width > 1 and background_mask[y, width - 1]:
+            queue.append((width - 1, y))
 
+    removed = 0
     while queue:
         x, y = queue.popleft()
-        if visited[y, x]:
+        if visited[y, x] or not background_mask[y, x]:
             continue
         visited[y, x] = True
-        rgb = (int(arr[y, x, 0]), int(arr[y, x, 1]), int(arr[y, x, 2]))
-        if ciede2000_distance(rgb, WHITE_RGB) >= FLOOD_FILL_WHITE_DELTA_E:
-            continue
         arr[y, x, 3] = 0
+        removed += 1
         for next_x, next_y in pixel_neighbors(x, y, width, height):
             if not visited[next_y, next_x]:
                 queue.append((next_x, next_y))
 
+    if removed == 0:
+        return image, False
     return Image.fromarray(arr), True
+
+
+def dominant_edge_background(arr: np.ndarray) -> tuple[int, int, int] | None:
+    height, width = arr.shape[:2]
+    if height == 0 or width == 0:
+        return None
+    edge_pixels = np.concatenate(
+        (
+            arr[0, :, :],
+            arr[height - 1, :, :],
+            arr[:, 0, :],
+            arr[:, width - 1, :],
+        ),
+        axis=0,
+    )
+    edge_pixels = edge_pixels[edge_pixels[:, 3] >= OPAQUE_ALPHA_THRESHOLD]
+    if len(edge_pixels) == 0:
+        return None
+    bins = (edge_pixels[:, :3] // EDGE_BACKGROUND_BIN_SIZE).astype(np.uint16)
+    _unique_bins, inverse, counts = np.unique(bins, axis=0, return_inverse=True, return_counts=True)
+    best = int(np.argmax(counts))
+    if counts[best] / len(edge_pixels) < EDGE_BACKGROUND_MIN_DOMINANCE:
+        return None
+    members = edge_pixels[inverse == best, :3].astype(np.float64)
+    mean = np.rint(members.mean(axis=0)).astype(int)
+    return (int(mean[0]), int(mean[1]), int(mean[2]))
+
+
+def is_removable_background(rgb: tuple[int, int, int], tolerance_delta_e: float) -> bool:
+    if ciede2000_distance(rgb, WHITE_RGB) <= tolerance_delta_e:
+        return True
+    return min(rgb) >= LIGHT_BACKGROUND_MIN_CHANNEL and max(rgb) - min(rgb) <= LIGHT_BACKGROUND_MAX_SPREAD
+
+
+def background_similarity_mask(arr: np.ndarray, background_rgb: tuple[int, int, int], tolerance_delta_e: float) -> np.ndarray:
+    rgb = arr[:, :, :3].astype(np.float64)
+    lab = rgb_to_lab(rgb)
+    background_lab = rgb_to_lab(np.array(background_rgb, dtype=np.float64).reshape(1, 1, 3)).reshape(3)
+    distance = delta_e_ciede2000(lab, background_lab)
+    return (arr[:, :, 3] >= OPAQUE_ALPHA_THRESHOLD) & (distance <= tolerance_delta_e)
 
 
 def average_corner_delta_e_to_white(image: Image.Image, sample_size: int = 5) -> float:

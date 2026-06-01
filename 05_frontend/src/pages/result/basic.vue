@@ -80,11 +80,6 @@
             <span class="result__summary-num">{{ colorsCount }}</span>
             <span class="result__summary-unit">色号数</span>
           </div>
-          <span class="result__summary-divider" aria-hidden="true"></span>
-          <div class="result__summary-cell">
-            <span class="result__summary-num result__summary-num--cost">¥{{ estimatedCostLabel }}</span>
-            <span class="result__summary-unit">估算成本</span>
-          </div>
         </div>
       </div>
 
@@ -301,7 +296,6 @@ const patternColors = computed<DisplayColor[]>(() => {
     .sort((a, b) => b.count - a.count);
 });
 const colorsCount = computed(() => patternColors.value.length);
-const estimatedCostLabel = computed(() => Number(pattern.value.estimated_cost_cny || 0).toFixed(2));
 
 const normalizeAssetUrl = (url: string) => {
   if (!url) return '';
@@ -718,9 +712,6 @@ onMounted(() => {
   color: var(--pd-fg-1);
   line-height: 1;
   letter-spacing: -0.02em;
-}
-.result__summary-num--cost { 
-  color: var(--pd-pink-deep); 
 }
 .result__summary-unit {
   font-size: 11px;

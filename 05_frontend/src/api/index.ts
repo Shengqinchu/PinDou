@@ -529,7 +529,8 @@ export const api = {
             size: params.size,
             brand: params.brand || 'MARD',
             bead_diameter_mm: params.bead_diameter_mm || 5.0,
-            mode: params.mode
+            mode: params.mode,
+            auto_remove_white_bg: true
           }
         }));
 
@@ -543,7 +544,8 @@ export const api = {
               size: params.size,
               brand: params.brand || 'MARD',
               bead_diameter_mm: String(params.bead_diameter_mm || 5.0),
-              mode: params.mode
+              mode: params.mode,
+              auto_remove_white_bg: 'true'
             },
             fallbackMessage: '图纸生成失败'
           }).catch((err) => {
@@ -566,7 +568,8 @@ export const api = {
           size: params.size,
           brand: params.brand || 'MARD',
           bead_diameter_mm: String(params.bead_diameter_mm || 5.0),
-          mode: params.mode
+          mode: params.mode,
+          auto_remove_white_bg: 'true'
         },
         fallbackMessage: '图纸生成失败'
       });

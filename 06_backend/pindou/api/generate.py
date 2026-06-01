@@ -44,7 +44,7 @@ async def generate_script(request: Request, current_user: CurrentUser, db: DbSes
     payload, raw_upload = await parse_payload_or_upload(request, upload_field="raw_image")
     raw_image, original_path = await resolve_raw_image(payload, raw_upload)
     size = parse_size(payload.get("size_preset") or payload.get("size") or "26x26")
-    auto_remove_white_bg = bool(payload.get("auto_remove_white_bg", False))
+    auto_remove_white_bg = parse_bool_default_false(payload.get("auto_remove_white_bg", False))
 
     try:
         sheet = PatternBuilder().build(
@@ -188,6 +188,12 @@ def decode_base64_image(value: str) -> bytes:
         return base64.b64decode(encoded, validate=True)
     except (binascii.Error, ValueError) as exc:
         raise ApiException(422, ErrorCode.VALIDATION_ERROR, "图片数据格式不正确。") from exc
+
+
+def parse_bool_default_false(value: Any) -> bool:
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    return bool(value)
 
 
 def parse_size(value: Any) -> SizePreset:

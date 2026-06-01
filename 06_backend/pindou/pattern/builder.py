@@ -12,6 +12,10 @@ from PIL import Image
 from pindou.providers.base import SizePreset
 
 
+DOMINANT_DOWNSAMPLE_BIN_SIZE = 8
+DOMINANT_ALPHA_THRESHOLD = 128
+
+
 @dataclass(frozen=True)
 class NoBead:
     reason: str = "transparent"
@@ -173,6 +177,9 @@ class PatternBuilder:
                 "board_aligned": size.warning is None,
                 "algorithm": "kmeans+ciede2000+none",
                 "target_colors": self.target_colors,
+                "effective_target_colors": quantized.effective_target_colors,
+                "flat_image_detected": quantized.flat_image_detected,
+                "palette_merge_delta_e": quantized.palette_merge_threshold_delta_e,
                 "quantize_runtime_ms": round(quantized.runtime_ms, 2),
                 "white_bg_detected": white_bg_detected,
                 "auto_remove_white_bg_requested": bool(auto_remove_white_bg and input_mode == "script"),
@@ -229,12 +236,53 @@ def prepare_input_image(
 
 
 def fit_to_canvas(image: Image.Image, width: int, height: int, background: tuple[int, int, int, int]) -> Image.Image:
-    fitted = image.copy()
-    fitted.thumbnail((width, height), Image.Resampling.LANCZOS)
-    canvas = Image.new("RGBA", (width, height), background)
-    offset = ((width - fitted.width) // 2, (height - fitted.height) // 2)
-    canvas.alpha_composite(fitted, dest=offset)
-    return canvas
+    source = image.convert("RGBA")
+    source_arr = np.array(source, dtype=np.uint8)
+    source_height, source_width = source_arr.shape[:2]
+    if source_width == 0 or source_height == 0:
+        return Image.new("RGBA", (width, height), background)
+
+    scale = min(width / source_width, height / source_height, 1.0)
+    fitted_width = max(1, min(width, int(round(source_width * scale))))
+    fitted_height = max(1, min(height, int(round(source_height * scale))))
+    offset_x = (width - fitted_width) // 2
+    offset_y = (height - fitted_height) // 2
+    scale_x = fitted_width / source_width
+    scale_y = fitted_height / source_height
+    canvas = np.zeros((height, width, 4), dtype=np.uint8)
+    canvas[:, :] = np.array(background, dtype=np.uint8)
+
+    for y in range(offset_y, offset_y + fitted_height):
+        src_y0 = max(0, int(np.floor((y - offset_y) / scale_y)))
+        src_y1 = min(source_height, int(np.ceil((y + 1 - offset_y) / scale_y)))
+        if src_y1 <= src_y0:
+            src_y1 = min(source_height, src_y0 + 1)
+        for x in range(offset_x, offset_x + fitted_width):
+            src_x0 = max(0, int(np.floor((x - offset_x) / scale_x)))
+            src_x1 = min(source_width, int(np.ceil((x + 1 - offset_x) / scale_x)))
+            if src_x1 <= src_x0:
+                src_x1 = min(source_width, src_x0 + 1)
+            canvas[y, x] = dominant_region_rgba(source_arr[src_y0:src_y1, src_x0:src_x1], background)
+
+    return Image.fromarray(canvas)
+
+
+def dominant_region_rgba(region: np.ndarray, background: tuple[int, int, int, int]) -> np.ndarray:
+    foreground = region[region[:, :, 3] >= DOMINANT_ALPHA_THRESHOLD]
+    if len(foreground) == 0:
+        return np.array(background, dtype=np.uint8)
+    rgb = foreground[:, :3]
+    first_rgb = rgb[0]
+    if np.all(rgb == first_rgb):
+        best_rgb = first_rgb
+    else:
+        bins = (rgb // DOMINANT_DOWNSAMPLE_BIN_SIZE).astype(np.uint16)
+        packed = (bins[:, 0] << 10) | (bins[:, 1] << 5) | bins[:, 2]
+        _unique_bins, inverse, counts = np.unique(packed, return_inverse=True, return_counts=True)
+        best_bin = int(np.argmax(counts))
+        members = rgb[inverse == best_bin].astype(np.float64)
+        best_rgb = np.rint(members.mean(axis=0)).astype(np.uint8)
+    return np.array([int(best_rgb[0]), int(best_rgb[1]), int(best_rgb[2]), 255], dtype=np.uint8)
 
 
 def parse_size(size: SizePreset) -> tuple[int, int]:

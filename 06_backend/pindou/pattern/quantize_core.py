@@ -152,6 +152,52 @@ def select_palette_colors(
     return np.array(list(dict.fromkeys(mapped.tolist())), dtype=int)
 
 
+def merge_palette_indices_by_delta_e(
+    selected_indices: np.ndarray,
+    palette: Palette,
+    pixels_rgb: np.ndarray,
+    *,
+    threshold_delta_e: float,
+    metric: str = "ciede2000",
+) -> np.ndarray:
+    """Collapse visually indistinguishable selected bead colors into the larger pixel cluster."""
+    if threshold_delta_e <= 0 or len(selected_indices) <= 1:
+        return selected_indices
+
+    selected_indices = np.array(list(dict.fromkeys(selected_indices.tolist())), dtype=int)
+    selected_rgb = palette.rgb[selected_indices]
+    assignments = nearest_indices(pixels_rgb, selected_rgb, metric)
+    counts = np.bincount(assignments, minlength=len(selected_indices)).astype(np.int64)
+    selected_lab = palette.lab[selected_indices]
+    delta = delta_e_ciede2000(selected_lab[:, None, :], selected_lab[None, :, :])
+    active = set(range(len(selected_indices)))
+
+    while True:
+        best_pair: tuple[int, int] | None = None
+        best_distance = float("inf")
+        active_list = sorted(active)
+        for pos, left in enumerate(active_list):
+            for right in active_list[pos + 1 :]:
+                distance = float(delta[left, right])
+                if distance < threshold_delta_e and distance < best_distance:
+                    best_distance = distance
+                    best_pair = (left, right)
+        if best_pair is None:
+            break
+
+        left, right = best_pair
+        if counts[left] > counts[right]:
+            keep, drop = left, right
+        elif counts[right] > counts[left]:
+            keep, drop = right, left
+        else:
+            keep, drop = (left, right) if left < right else (right, left)
+        counts[keep] += counts[drop]
+        active.remove(drop)
+
+    return selected_indices[[index for index in range(len(selected_indices)) if index in active]]
+
+
 def apply_no_dither(image_rgb: np.ndarray, palette_rgb: np.ndarray, metric: str) -> np.ndarray:
     idx = nearest_indices(image_rgb, palette_rgb, metric)
     return palette_rgb[idx].reshape(image_rgb.shape).astype(np.uint8)

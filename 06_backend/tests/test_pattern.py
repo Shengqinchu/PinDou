@@ -4,11 +4,14 @@ import io
 import time
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageDraw
 
-from pindou.pattern.builder import NoBead, PatternBuilder
+from pindou.pattern.builder import NoBead, PatternBuilder, fit_to_canvas
 from pindou.pattern.exporter import PatternExporter, fit_cell_code_font, labeled_grid_filename, partition_filename
 from pindou.pattern.postprocess import detect_and_remove_white_bg
+from pindou.pattern.quantize import choose_effective_target_colors
+from pindou.pattern.quantize_core import Palette, merge_palette_indices_by_delta_e, rgb_to_lab
 from pindou.providers.base import SizePreset
 
 
@@ -106,7 +109,7 @@ def test_white_bg_detect_skip() -> None:
 
 def test_white_bg_detect_threshold_boundary() -> None:
     near_white = Image.new("RGB", (20, 20), (218, 218, 218))
-    just_over = Image.new("RGB", (20, 20), (217, 217, 217))
+    just_over = Image.new("RGB", (20, 20), (160, 160, 160))
 
     processed_near, detected_near = detect_and_remove_white_bg(near_white)
     processed_over, detected_over = detect_and_remove_white_bg(just_over)
@@ -115,6 +118,93 @@ def test_white_bg_detect_threshold_boundary() -> None:
     assert processed_near.convert("RGBA").getpixel((0, 0))[3] == 0
     assert detected_over is False
     assert list(processed_over.getdata()) == list(just_over.getdata())
+
+
+def test_white_bg_flood_fill_removes_only_edge_connected_background() -> None:
+    image = Image.new("RGB", (80, 80), (252, 252, 248))
+    draw = ImageDraw.Draw(image)
+    draw.ellipse([18, 14, 62, 62], fill=(150, 124, 96), outline=(20, 20, 20), width=5)
+    draw.ellipse([34, 30, 46, 42], fill=(255, 255, 255), outline=(20, 20, 20), width=2)
+
+    processed, detected = detect_and_remove_white_bg(image)
+    rgba = processed.convert("RGBA")
+
+    assert detected is True
+    assert rgba.getpixel((0, 0))[3] == 0
+    assert rgba.getpixel((40, 36))[3] == 255
+
+
+def test_dominant_downsample_does_not_invent_boundary_color() -> None:
+    image = Image.new("RGBA", (40, 10), (160, 130, 100, 255))
+    draw = ImageDraw.Draw(image)
+    draw.rectangle([0, 0, 21, 9], fill=(10, 10, 10, 255))
+
+    fitted = fit_to_canvas(image, 4, 1, (255, 255, 255, 0))
+    colors = [fitted.getpixel((x, 0))[:3] for x in range(4)]
+
+    assert set(colors) <= {(10, 10, 10), (160, 130, 100)}
+    assert colors[2] == (160, 130, 100)
+
+
+def test_palette_delta_e_merge_collapses_near_colors_to_larger_cluster() -> None:
+    rgb = np.array([(200, 0, 0), (203, 2, 2), (0, 0, 200)], dtype=np.float64)
+    palette = Palette(
+        codes=["R1", "R2", "B1"],
+        rgb=rgb,
+        lab=rgb_to_lab(rgb.reshape(-1, 1, 3)).reshape(-1, 3),
+    )
+    pixels = np.array([(200, 0, 0)] * 80 + [(203, 2, 2)] * 10 + [(0, 0, 200)] * 40, dtype=np.uint8)
+
+    merged = merge_palette_indices_by_delta_e(
+        np.array([0, 1, 2], dtype=int),
+        palette,
+        pixels,
+        threshold_delta_e=5.0,
+    )
+
+    assert merged.tolist() == [0, 2]
+
+
+def test_flat_image_detection_lowers_k_without_touching_photo_like_pixels() -> None:
+    flat_pixels = np.array(
+        [(20, 20, 20)] * 50 + [(150, 120, 90)] * 35 + [(210, 30, 30)] * 10 + [(255, 255, 255)] * 5,
+        dtype=np.uint8,
+    )
+    photo_like_pixels = np.array([(i, (i * 37) % 256, (i * 83) % 256) for i in range(180)], dtype=np.uint8)
+
+    flat_target, is_flat = choose_effective_target_colors(flat_pixels, 24)
+    photo_target, photo_is_flat = choose_effective_target_colors(photo_like_pixels, 24)
+
+    assert is_flat is True
+    assert flat_target == 5
+    assert photo_is_flat is False
+    assert photo_target == 24
+
+
+def test_flat_sticker_builds_transparent_low_color_pattern() -> None:
+    builder = PatternBuilder(target_colors=24)
+
+    sheet = builder.build(
+        SizePreset.DOUBLE_BOARD_52X52,
+        raw_image=flat_dog_sticker_bytes(),
+        mode="script",
+        auto_remove_white_bg=True,
+    )
+
+    no_bead_count = sum(sum(row) for row in sheet.no_bead_mask)
+    red_codes = {
+        color.code
+        for color in sheet.palette_used
+        if color.rgb[0] >= 160 and color.rgb[1] <= 80 and color.rgb[2] <= 90
+    }
+
+    assert sheet.metadata["white_bg_detected"] is True
+    assert sheet.metadata["flat_image_detected"] is True
+    assert sheet.metadata["effective_target_colors"] <= 5
+    assert len(sheet.color_counts) <= 5
+    assert no_bead_count > 52 * 52 * 0.45
+    assert sheet.bead_total + no_bead_count == 52 * 52
+    assert any(sheet.color_counts[code] > 0 for code in red_codes)
 
 
 def test_large_pattern_build_stays_under_two_seconds_after_warmup() -> None:
@@ -194,6 +284,19 @@ def transparent_preview_bytes() -> bytes:
     output = io.BytesIO()
     image.save(output, format="PNG")
     return output.getvalue()
+
+
+def flat_dog_sticker_bytes() -> bytes:
+    image = Image.new("RGB", (160, 160), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    draw.ellipse([38, 30, 122, 122], fill=(151, 128, 102), outline=(20, 20, 20), width=8)
+    draw.polygon([(52, 36), (36, 16), (70, 30)], fill=(151, 128, 102), outline=(20, 20, 20))
+    draw.polygon([(108, 36), (124, 16), (90, 30)], fill=(151, 128, 102), outline=(20, 20, 20))
+    draw.rectangle([55, 104, 105, 116], fill=(210, 40, 42), outline=(20, 20, 20), width=3)
+    draw.ellipse([58, 62, 70, 74], fill=(255, 255, 255), outline=(20, 20, 20), width=3)
+    draw.ellipse([90, 62, 102, 74], fill=(255, 255, 255), outline=(20, 20, 20), width=3)
+    draw.ellipse([75, 78, 86, 88], fill=(20, 20, 20))
+    return image_bytes(image)
 
 
 def image_bytes(image: Image.Image) -> bytes:

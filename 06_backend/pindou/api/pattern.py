@@ -6,7 +6,7 @@ from fastapi import APIRouter, Request
 
 from pindou.api.deps import CurrentUser, DbSession
 from pindou.api.errors import ApiException, ErrorCode
-from pindou.api.generate import parse_payload_or_upload, parse_size, resolve_raw_image
+from pindou.api.generate import parse_bool_default_false, parse_payload_or_upload, parse_size, resolve_raw_image
 from pindou.api.pattern_assets import finalize_artwork_pattern_assets
 from pindou.api.quota import consume_script_quota, consume_white_bg_quota, require_sensitive_consent
 from pindou.api.storage import load_preview_image, load_uploaded_image, save_pattern_png, save_uploaded_image
@@ -42,7 +42,7 @@ async def build_pattern(request: Request, current_user: CurrentUser, db: DbSessi
                 brand=brand,
                 bead_diameter_mm=bead_diameter_mm,
                 mode="script",
-                auto_remove_white_bg=bool(payload.get("auto_remove_white_bg", False)),
+                auto_remove_white_bg=parse_bool_default_false(payload.get("auto_remove_white_bg", False)),
             )
             consume_script_quota(db, current_user)
             if sheet.metadata.get("white_bg_detected"):

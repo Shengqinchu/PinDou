@@ -113,10 +113,6 @@
           <span class="premium__stat-num">{{ colorsCount }}</span>
           <span class="premium__stat-unit">色号数</span>
         </div>
-        <div class="premium__stat">
-          <span class="premium__stat-num premium__stat-num--cost">¥{{ pattern.estimated_cost || 6.5 }}</span>
-          <span class="premium__stat-unit">估算成本</span>
-        </div>
       </div>
 
       <!-- ===== CTAs ===== -->
@@ -627,9 +623,6 @@ const handleEmail = () => {
   font-weight: 800;
   color: var(--pd-fg-1);
   line-height: 1;
-}
-.premium__stat-num--cost { 
-  color: var(--pd-pink-deep); 
 }
 .premium__stat-unit {
   font-size: 11px;
