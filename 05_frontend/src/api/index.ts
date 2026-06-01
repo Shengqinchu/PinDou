@@ -46,7 +46,11 @@ function uploadResponseError(res: UniApp.UploadFileSuccessCallbackResult, fallba
   return new PinDouApiError(message, {
     statusCode: res.statusCode,
     code: body?.error,
-    details: body?.details
+    details: {
+      body_details: body?.details,
+      upload_status: res.statusCode,
+      raw_data_preview: typeof res.data === 'string' ? res.data.slice(0, 300) : res.data
+    }
   });
 }
 
@@ -159,7 +163,28 @@ async function readCloudImagePayload(filePath: string, fallbackFilename: string)
 }
 
 function shouldFallbackToCloudBase64(err: unknown): boolean {
-  return !(err instanceof PinDouApiError && typeof err.statusCode === 'number' && err.statusCode >= 400);
+  if (!(err instanceof PinDouApiError)) return true;
+  if (err.code === 'UPLOAD_TIMEOUT' || err.code === 'NETWORK_ERROR' || err.code === 'UPLOAD_PARSE_ERROR') {
+    return true;
+  }
+
+  const statusCode = typeof err.statusCode === 'number' ? err.statusCode : 0;
+  if (statusCode >= 500) return !err.code;
+  if (statusCode === 413 && !err.code) return true;
+
+  const businessErrorCodes = [
+    'AUTH_REQUIRED',
+    'CONSENT_REQUIRED',
+    'QUOTA_EXCEEDED',
+    'INVALID_UPLOAD',
+    'IMAGE_NOT_FOUND',
+    'VALIDATION_ERROR'
+  ];
+  if (statusCode >= 400 && statusCode < 500) {
+    return !err.code || !businessErrorCodes.includes(err.code);
+  }
+
+  return true;
 }
 
 /* ==========================================
