@@ -21,6 +21,7 @@ from pindou.tasks.reverse_proxy_health_check import ReverseProxyHealthMonitor
 
 
 STATIC_ADMIN_DIR = Path(__file__).resolve().parent / "static_admin"
+STATIC_H5_DIR = Path(__file__).resolve().parent / "static_h5"
 
 
 def create_app() -> FastAPI:
@@ -72,6 +73,7 @@ def create_app() -> FastAPI:
     app.mount("/static/previews", StaticFiles(directory=settings.preview_dir), name="previews")
     app.mount("/static/patterns", StaticFiles(directory=settings.pattern_dir), name="patterns")
     app.mount("/static/thumbnails", StaticFiles(directory=settings.thumbnail_dir), name="thumbnails")
+    app.mount("/h5", StaticFiles(directory=STATIC_H5_DIR, html=True), name="h5")
 
     @app.get("/health", tags=["system"])
     async def health() -> dict[str, str]:

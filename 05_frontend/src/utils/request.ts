@@ -5,6 +5,7 @@ declare const process: {
     NODE_ENV?: string;
     VITE_PINDOU_DEV_API?: string;
     VITE_PINDOU_PROD_API?: string;
+    VITE_API_BASE_URL?: string;
     VITE_USE_WX_CLOUD?: string;
     VITE_WX_CLOUD_ENV?: string;
     VITE_WX_CLOUD_SERVICE?: string;
@@ -19,15 +20,17 @@ const runtimeEnv = {
   ...viteEnv,
   ...(typeof process !== 'undefined' && process.env ? process.env : {})
 };
-const DEV_API = runtimeEnv.VITE_PINDOU_DEV_API || 'http://192.168.2.40:8000/api/v1';
-const PROD_API = runtimeEnv.VITE_PINDOU_PROD_API || 'https://api.pindou.cn/api/v1';
+const CLOUD_API = 'https://pindou-backend-263102-4-1437642655.sh.run.tcloudbase.com/api/v1';
+const DEV_API = runtimeEnv.VITE_PINDOU_DEV_API || defaultDevApi();
+const PROD_API = runtimeEnv.VITE_API_BASE_URL || runtimeEnv.VITE_PINDOU_PROD_API || CLOUD_API;
 const isDev = runtimeEnv.NODE_ENV !== 'production';
+export const IS_H5_CLIENT = detectH5Client();
 const storageWxCloudFlag = uni.getStorageSync('pd_use_wx_cloud');
 
 export const BASE_URL = normalizeBaseUrl(
-  uni.getStorageSync('pd_api_base_url') || (isDev ? DEV_API : PROD_API)
+  runtimeEnv.VITE_API_BASE_URL || uni.getStorageSync('pd_api_base_url') || (isDev ? DEV_API : PROD_API)
 );
-export const USE_WX_CLOUD = storageWxCloudFlag
+export const USE_WX_CLOUD = IS_H5_CLIENT ? false : storageWxCloudFlag
   ? storageWxCloudFlag !== 'false'
   : runtimeEnv.VITE_USE_WX_CLOUD !== 'false';
 export const WX_CLOUD_ENV = runtimeEnv.VITE_WX_CLOUD_ENV || 'prod-01';
@@ -239,7 +242,7 @@ function refreshAuthOnce(): Promise<void> {
 
 async function performWxLogin(): Promise<void> {
   clearStoredAuth();
-  const code = await getWxLoginCode();
+  const code = await getPlatformLoginCode();
   const data = await sendRequest<LoginResponse>({
     url: '/user/login',
     method: 'POST',
@@ -259,7 +262,29 @@ function clearStoredAuth() {
   uni.removeStorageSync('pd_user');
 }
 
-function getWxLoginCode(): Promise<string> {
+export function getPlatformLoginCode(): Promise<string> {
+  // #ifdef H5
+  return Promise.resolve(getOrCreateH5DeviceId());
+  // #endif
+  // #ifdef MP-WEIXIN
+  return getWxLoginCode();
+  // #endif
+  return Promise.resolve(getOrCreateH5DeviceId());
+}
+
+export function getOrCreateH5DeviceId(): string {
+  const storageKey = 'pd_device_id';
+  const stored = readLocalStorage(storageKey) || uni.getStorageSync(storageKey);
+  if (stored) {
+    return String(stored);
+  }
+  const deviceId = `h5_${createDeviceUuid()}`;
+  writeLocalStorage(storageKey, deviceId);
+  uni.setStorageSync(storageKey, deviceId);
+  return deviceId;
+}
+
+export function getWxLoginCode(): Promise<string> {
   return new Promise((resolve, reject) => {
     uni.login({
       provider: 'weixin',
@@ -273,6 +298,34 @@ function getWxLoginCode(): Promise<string> {
       fail: reject
     });
   });
+}
+
+function createDeviceUuid(): string {
+  const cryptoApi = typeof globalThis !== 'undefined' ? (globalThis as any).crypto : null;
+  if (cryptoApi && typeof cryptoApi.randomUUID === 'function') {
+    return cryptoApi.randomUUID();
+  }
+  const randomPart = Math.random().toString(36).slice(2, 12);
+  const timePart = Date.now().toString(36);
+  return `${timePart}-${randomPart}`;
+}
+
+function readLocalStorage(key: string): string {
+  try {
+    const storage = typeof globalThis !== 'undefined' ? (globalThis as any).localStorage : null;
+    return storage?.getItem(key) || '';
+  } catch {
+    return '';
+  }
+}
+
+function writeLocalStorage(key: string, value: string): void {
+  try {
+    const storage = typeof globalThis !== 'undefined' ? (globalThis as any).localStorage : null;
+    storage?.setItem(key, value);
+  } catch {
+    // uni storage above is still enough for non-browser runtimes.
+  }
 }
 
 async function syncUserStore(data: LoginResponse): Promise<void> {
@@ -338,6 +391,13 @@ function normalizeBaseUrl(url: string): string {
   return url.replace(/\/+$/, '');
 }
 
+function defaultDevApi(): string {
+  // #ifndef H5
+  return 'http://192.168.2.40:8000/api/v1';
+  // #endif
+  return CLOUD_API;
+}
+
 function normalizeApiPrefix(prefix: string): string {
   const normalized = prefix.trim() || '/api/v1';
   return normalized.startsWith('/') ? normalized.replace(/\/+$/, '') : `/${normalized.replace(/\/+$/, '')}`;
@@ -370,4 +430,11 @@ function shouldFallbackToLegacyHttp(err: any): boolean {
 
 function canUseWxCloud(): boolean {
   return typeof wx !== 'undefined' && !!wx.cloud && typeof wx.cloud.callContainer === 'function';
+}
+
+function detectH5Client(): boolean {
+  // #ifdef H5
+  return true;
+  // #endif
+  return false;
 }

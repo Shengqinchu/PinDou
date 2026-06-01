@@ -1,0 +1,366 @@
+/* =========================================================
+   PinDou shared components — frame chrome, buttons, cards,
+   chips, tags, tabbar, footnotes.
+   Loaded after colors_and_type.css on every page.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   Phone frame — 375x667 WeChat mini-program viewport
+   --------------------------------------------------------- */
+.frame {
+  --pd-status-height: 20px;
+  --pd-menu-top: 24px;
+  --pd-menu-height: 32px;
+  --pd-top-chrome-height: 64px;
+  --pd-safe-bottom: 0px;
+  --pd-capsule-reserve: 107px;
+  --pd-capsule-width: 87px;
+  --pd-title-side-inset: 107px;
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  background: var(--pd-bg);
+  position: relative;
+  overflow: hidden;
+  box-shadow: none;
+  font-family: var(--pd-font-body);
+  box-sizing: border-box;
+}
+@media (max-width: 480px) {
+  .frame {
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* ---- Header (44px) ---- */
+.frame__header {
+  height: var(--pd-menu-height);
+  margin-top: var(--pd-menu-top);
+  padding: 0 12px;
+  padding-right: var(--pd-capsule-reserve);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 5;
+}
+
+.frame__header--home {
+  padding-left: 16px;
+}
+
+.frame__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--pd-font-display);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--pd-fg-1);
+}
+.frame__logo-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--pd-gradient);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(255, 107, 157, 0.35);
+}
+.frame__logo-dot-core {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #fff;
+}
+
+.frame__back {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: var(--pd-fg-1);
+  text-decoration: none;
+}
+.frame__back:active { opacity: 0.6; }
+.frame__back-icon {
+  width: 10px;
+  height: 10px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.frame__title {
+  position: absolute;
+  left: var(--pd-title-side-inset);
+  right: var(--pd-title-side-inset);
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  font-family: var(--pd-font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--pd-fg-1);
+  letter-spacing: -0.01em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Body (fills remaining 603px) ---- */
+.frame__body {
+  height: calc(100vh - var(--pd-top-chrome-height) - var(--pd-safe-bottom));
+  margin-top: 8px;
+  padding-bottom: var(--pd-safe-bottom);
+  padding-bottom: calc(var(--pd-safe-bottom) + env(safe-area-inset-bottom));
+  overflow: hidden;
+  position: relative;
+}
+.frame__body--scroll {
+  overflow-y: auto;
+}
+
+/* ---------------------------------------------------------
+   Buttons
+   --------------------------------------------------------- */
+.btn {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: var(--pd-fs-body);
+  line-height: 1;
+  padding: 14px 28px;
+  border-radius: var(--pd-r-btn);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    transform var(--pd-dur-fast) var(--pd-ease-out),
+    box-shadow var(--pd-dur-base) var(--pd-ease-out),
+    background var(--pd-dur-base) var(--pd-ease-out);
+  text-decoration: none;
+  color: var(--pd-fg-1);
+}
+.btn:active { transform: scale(0.97); }
+
+.btn--block { width: 100%; }
+.btn--lg    { height: 54px; font-size: 17px; letter-spacing: 0.5px; }
+.btn--md    { height: 50px; }
+.btn--sm    { height: 38px; padding: 0 18px; font-size: 13px; }
+
+.btn--primary {
+  color: var(--pd-fg-on-pink);
+  background: var(--pd-gradient);
+  box-shadow: var(--pd-shadow-cta);
+}
+.btn--primary:active { box-shadow: var(--pd-shadow-cta-pressed); }
+
+.btn--secondary {
+  color: var(--pd-fg-1);
+  background: transparent;
+  border: 1.5px solid var(--pd-stroke);
+}
+.btn--secondary:active { background: var(--pd-bg-warm); }
+
+.btn--ghost {
+  color: var(--pd-pink-deep);
+  background: var(--pd-pink-50);
+}
+
+/* Solid hot-pink — used for free-tier primary CTAs ("下载图纸") so the
+   pink-orange gradient stays reserved for upsell buttons. */
+.btn--pink {
+  color: #fff;
+  background: var(--pd-pink);
+  box-shadow: 0 6px 16px rgba(255, 107, 157, 0.28);
+}
+.btn--pink:active { box-shadow: 0 2px 6px rgba(255, 107, 157, 0.22); }
+
+/* Solid success-green CTA (used after CDK redeem succeeds). */
+.btn--success {
+  color: #fff;
+  background: var(--pd-success);
+  box-shadow: 0 6px 16px rgba(52, 199, 89, 0.28);
+}
+
+/* ---------------------------------------------------------
+   Cards
+   --------------------------------------------------------- */
+.card {
+  background: var(--pd-card);
+  border-radius: var(--pd-r-card);
+  box-shadow: var(--pd-shadow-card);
+}
+
+/* gradient border via padding-box / border-box trick */
+.card--recommended {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    var(--pd-gradient) border-box;
+  box-shadow: var(--pd-shadow-float);
+}
+
+/* ---------------------------------------------------------
+   Chips (themed pill with icon)
+   --------------------------------------------------------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px 9px 12px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--pd-divider);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--pd-fg-1);
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(255, 138, 168, 0.06);
+}
+.chip__icon {
+  color: var(--pd-pink);
+  display: inline-flex;
+}
+
+/* ---------------------------------------------------------
+   Tags / badges (smaller than chips)
+   --------------------------------------------------------- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--pd-fg-2);
+  background: #F4EFE9;
+  letter-spacing: 0.2px;
+}
+.tag--ai {
+  background: var(--pd-gradient-warm);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  box-shadow: 0 2px 6px rgba(255, 142, 83, 0.32);
+}
+.tag--recommended {
+  background: var(--pd-gradient);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  box-shadow: 0 4px 10px rgba(255, 107, 157, 0.32);
+}
+.tag--warm {
+  background: var(--pd-peach-50);
+  color: var(--pd-orange);
+}
+
+/* ---------------------------------------------------------
+   Tab bar (bottom navigation)
+   --------------------------------------------------------- */
+.tabbar {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 64px;
+  padding-bottom: 4px;
+  background: rgba(255, 249, 245, 0.92);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border-top: 0.5px solid var(--pd-divider);
+  display: flex;
+  z-index: 30;
+}
+.tabbar__item {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 0 4px;
+  font-family: inherit;
+  text-decoration: none;
+  color: var(--pd-fg-2);
+}
+.tabbar__icon { width: 24px; height: 24px; display: block; }
+.tabbar__icon--filled { display: none; }
+.tabbar__label {
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: inherit;
+}
+.tabbar__item--active {
+  color: var(--pd-pink);
+}
+.tabbar__item--active .tabbar__label { font-weight: 600; }
+.tabbar__item--active .tabbar__icon--outline { display: none; }
+.tabbar__item--active .tabbar__icon--filled  { display: block; }
+
+/* ---------------------------------------------------------
+   Footnote (legal fine print)
+   --------------------------------------------------------- */
+.footnote {
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--pd-fg-3);
+  text-align: center;
+  padding: 0 28px;
+}
+.footnote-link {
+  color: var(--pd-pink-deep);
+  text-decoration: none;
+}
+
+/* ---------------------------------------------------------
+   Help link with leading icon
+   --------------------------------------------------------- */
+.help-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--pd-fg-2);
+  text-decoration: none;
+}
+.help-link__label {
+  border-bottom: 0.5px solid var(--pd-fg-3);
+  padding-bottom: 1px;
+}
+
+/* ---------------------------------------------------------
+   Gradient text helper (used on hero headlines, prices)
+   --------------------------------------------------------- */
+.text-grad {
+  background: var(--pd-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}

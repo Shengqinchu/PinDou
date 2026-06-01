@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { api, User } from '../api';
+import { getOrCreateH5DeviceId, getPlatformLoginCode, getWxLoginCode } from '../utils/request';
 
 export interface UiMetrics {
   statusBarHeight: number;
@@ -129,29 +130,24 @@ export const useUserStore = defineStore('user', {
         if (activeLoginPromise) {
           return activeLoginPromise;
         }
-        // 小程序获取 code
-        activeLoginPromise = new Promise<any>((resolve, reject) => {
-          uni.login({
-            provider: 'weixin',
-            success: async (loginRes) => {
-              if (loginRes.code) {
-                try {
-                  const data = await api.login(loginRes.code);
-                  this.token = data.token;
-                  this.userInfo = data.user;
-                  uni.setStorageSync('pd_token', data.token);
-                  uni.setStorageSync('pd_user', JSON.stringify(data.user));
-                  resolve(data);
-                } catch (err) {
-                  reject(err);
-                }
-              } else {
-                reject(new Error('微信登录失败：未获取到code'));
-              }
-            },
-            fail: (err) => reject(err)
-          });
-        });
+        activeLoginPromise = (async () => {
+          let code = '';
+          // #ifdef MP-WEIXIN
+          code = await getWxLoginCode();
+          // #endif
+          // #ifdef H5
+          code = getOrCreateH5DeviceId();
+          // #endif
+          if (!code) {
+            code = await getPlatformLoginCode();
+          }
+          const data = await api.login(code);
+          this.token = data.token;
+          this.userInfo = data.user;
+          uni.setStorageSync('pd_token', data.token);
+          uni.setStorageSync('pd_user', JSON.stringify(data.user));
+          return data;
+        })();
         return await activeLoginPromise;
       } catch (error) {
         console.error('Login action error:', error);
