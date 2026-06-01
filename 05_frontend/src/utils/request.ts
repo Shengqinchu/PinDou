@@ -20,7 +20,7 @@ const runtimeEnv = {
   ...viteEnv,
   ...(typeof process !== 'undefined' && process.env ? process.env : {})
 };
-const CLOUD_API = 'https://pindou-backend-263102-4-1437642655.sh.run.tcloudbase.com/api/v1';
+const CLOUD_API = 'https://pindoupuppy.com/api/v1';
 const DEV_API = runtimeEnv.VITE_PINDOU_DEV_API || defaultDevApi();
 const PROD_API = runtimeEnv.VITE_API_BASE_URL || runtimeEnv.VITE_PINDOU_PROD_API || CLOUD_API;
 const isDev = runtimeEnv.NODE_ENV !== 'production';

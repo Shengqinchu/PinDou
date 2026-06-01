@@ -19,7 +19,7 @@ from typing import Any
 import requests
 
 
-DEFAULT_BASE_URL = "https://pindou-backend-263102-4-1437642655.sh.run.tcloudbase.com/api/v1"
+DEFAULT_BASE_URL = "https://pindoupuppy.com/api/v1"
 
 
 def parse_args() -> argparse.Namespace:

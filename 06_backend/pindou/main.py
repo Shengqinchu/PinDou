@@ -7,7 +7,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from pindou import __version__
@@ -78,6 +78,10 @@ def create_app() -> FastAPI:
     @app.get("/health", tags=["system"])
     async def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @app.get("/", include_in_schema=False)
+    async def h5_root() -> RedirectResponse:
+        return RedirectResponse(url="/h5/", status_code=307)
 
     @app.get("/console", include_in_schema=False)
     @app.get("/console/", include_in_schema=False)
