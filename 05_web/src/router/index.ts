@@ -1,7 +1,7 @@
 import type { Router } from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
 
-import { clearToken, hasToken } from '../auth/tokenStorage';
+import { clearStoredUser, clearToken, hasToken } from '../auth/tokenStorage';
 import HomePage from '../views/HomePage.vue';
 import LoginPage from '../views/LoginPage.vue';
 import MePage from '../views/MePage.vue';
@@ -68,6 +68,6 @@ export function setupAuthRedirect(activeRouter: Router): void {
 
 export function expireAuthSession(): void {
   clearToken();
+  clearStoredUser();
   window.dispatchEvent(new CustomEvent('pindou:auth-expired'));
 }
-

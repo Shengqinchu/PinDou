@@ -6,6 +6,7 @@ export const API_BASE = '/api/v1';
 export interface ApiErrorBody {
   error?: string;
   message?: string;
+  message_cn?: string;
   detail?: unknown;
 }
 
@@ -15,7 +16,7 @@ export class ApiError extends Error {
   detail?: unknown;
 
   constructor(status: number, body: ApiErrorBody = {}) {
-    super(body.message || body.error || `请求失败 (${status})`);
+    super(body.message_cn || body.message || body.error || `请求失败 (${status})`);
     this.name = 'ApiError';
     this.status = status;
     this.code = body.error || String(status);
@@ -75,4 +76,3 @@ async function readErrorBody(response: Response): Promise<ApiErrorBody> {
     return { error: String(response.status), message: response.statusText };
   }
 }
-
