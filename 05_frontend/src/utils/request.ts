@@ -27,9 +27,10 @@ const PUBLIC_API = 'https://pindoupuppy.com/api/v1';
 const DEV_API = runtimeEnv.VITE_PINDOU_DEV_API || defaultDevApi();
 const PROD_API = runtimeEnv.VITE_API_BASE_URL || runtimeEnv.VITE_PINDOU_PROD_API || PUBLIC_API;
 const storageWxCloudFlag = uni.getStorageSync('pd_use_wx_cloud');
+const storageApiBase = uni.getStorageSync('pd_api_base_url');
 const configuredApiBase =
   runtimeEnv.VITE_API_BASE_URL ||
-  uni.getStorageSync('pd_api_base_url') ||
+  (IS_H5_CLIENT && !isDev ? '' : storageApiBase) ||
   (IS_H5_CLIENT ? (isDev ? DEV_API : SAME_ORIGIN_API) : (isDev ? DEV_API : PROD_API));
 
 export const BASE_URL = normalizeBaseUrl(configuredApiBase);
