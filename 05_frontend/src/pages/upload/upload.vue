@@ -156,7 +156,11 @@ const handleConsentAgree = async () => {
     triggerChooseImage();
   } catch (e) {
     uni.hideLoading();
-    uni.showToast({ title: '授权服务连接失败，请稍后重试', icon: 'none' });
+    const message = String((e as Error)?.message || e || '');
+    uni.showToast({
+      title: message.includes('登录') ? '请先登录后再授权' : '授权服务连接失败，请稍后重试',
+      icon: 'none'
+    });
   }
 };
 

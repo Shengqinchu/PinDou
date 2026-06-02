@@ -20,16 +20,19 @@ const runtimeEnv = {
   ...viteEnv,
   ...(typeof process !== 'undefined' && process.env ? process.env : {})
 };
-const CLOUD_API = 'https://pindoupuppy.com/api/v1';
-const DEV_API = runtimeEnv.VITE_PINDOU_DEV_API || defaultDevApi();
-const PROD_API = runtimeEnv.VITE_API_BASE_URL || runtimeEnv.VITE_PINDOU_PROD_API || CLOUD_API;
 const isDev = runtimeEnv.NODE_ENV !== 'production';
 export const IS_H5_CLIENT = detectH5Client();
+const SAME_ORIGIN_API = '/api/v1';
+const PUBLIC_API = 'https://pindoupuppy.com/api/v1';
+const DEV_API = runtimeEnv.VITE_PINDOU_DEV_API || defaultDevApi();
+const PROD_API = runtimeEnv.VITE_API_BASE_URL || runtimeEnv.VITE_PINDOU_PROD_API || PUBLIC_API;
 const storageWxCloudFlag = uni.getStorageSync('pd_use_wx_cloud');
+const configuredApiBase =
+  runtimeEnv.VITE_API_BASE_URL ||
+  uni.getStorageSync('pd_api_base_url') ||
+  (IS_H5_CLIENT ? (isDev ? DEV_API : SAME_ORIGIN_API) : (isDev ? DEV_API : PROD_API));
 
-export const BASE_URL = normalizeBaseUrl(
-  runtimeEnv.VITE_API_BASE_URL || uni.getStorageSync('pd_api_base_url') || (isDev ? DEV_API : PROD_API)
-);
+export const BASE_URL = normalizeBaseUrl(configuredApiBase);
 export const USE_WX_CLOUD = IS_H5_CLIENT ? false : storageWxCloudFlag
   ? storageWxCloudFlag !== 'false'
   : runtimeEnv.VITE_USE_WX_CLOUD !== 'false';
@@ -399,7 +402,7 @@ function defaultDevApi(): string {
   // #ifndef H5
   return 'http://192.168.2.40:8000/api/v1';
   // #endif
-  return CLOUD_API;
+  return PUBLIC_API;
 }
 
 function normalizeApiPrefix(prefix: string): string {

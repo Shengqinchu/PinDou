@@ -162,8 +162,12 @@ export const useUserStore = defineStore('user', {
       return data;
     },
     requireH5Login(redirectUrl = ''): boolean {
-      if (!IS_H5_CLIENT || this.isLoggedIn) {
+      if (!IS_H5_CLIENT) {
         return true;
+      }
+      if (this.isLoggedIn && this.userInfo?.email) return true;
+      if (this.isLoggedIn && !this.userInfo?.email) {
+        this.logout();
       }
       const target = redirectUrl || currentPageUrl();
       uni.navigateTo({
