@@ -84,6 +84,12 @@ view, scroll-view, text, image, button, input, textarea {
 }
 
 /* #ifdef H5 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 /* Desktop browsers should see the mobile app as a centered phone column.
    The mobile breakpoint keeps the original full-width behavior untouched. */
 @media (min-width: 768px) {
@@ -330,7 +336,7 @@ view, scroll-view, text, image, button, input, textarea {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 10px;
     flex: 0 0 auto;
     margin-left: auto;
   }
@@ -351,26 +357,33 @@ view, scroll-view, text, image, button, input, textarea {
     background: #f5f0e0;
   }
 
-  .desktop-nav__user {
-    min-width: 0;
-    flex: 0 0 auto;
-    height: 44px;
-    padding: 0 12px 0 6px;
-    border: 1px solid rgba(229, 229, 229, 0.78) !important;
-    border-radius: 999px !important;
-    background: #fffaf0 !important;
-    box-shadow: none;
+  .desktop-nav__account {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: 10px;
-    color: #0a0a0a;
+    justify-content: center;
+  }
+
+  .desktop-nav__avatar-button {
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(229, 229, 229, 0.78) !important;
+    border-radius: 999px;
+    background: #fffaf0 !important;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  }
+
+  .desktop-nav__avatar-button:hover,
+  .desktop-nav__avatar-button--active {
+    transform: translateY(-1px);
+    border-color: rgba(255, 176, 132, 0.72) !important;
+    box-shadow: 0 10px 26px rgba(255, 176, 132, 0.18);
   }
 
   .desktop-nav__avatar {
     width: 32px;
     height: 32px;
-    border-radius: 999px;
+    border-radius: inherit;
     background: #1a3a3a;
     color: #fffaf0;
     display: inline-flex;
@@ -380,13 +393,38 @@ view, scroll-view, text, image, button, input, textarea {
     font-size: 15px;
   }
 
-  .desktop-nav__user-text {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .desktop-nav__menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 260;
+    width: 152px;
+    padding: 8px;
+    border: 1px solid rgba(229, 229, 229, 0.86);
+    border-radius: 16px;
+    background: rgba(255, 250, 240, 0.98);
+    box-shadow: 0 18px 48px rgba(10, 10, 10, 0.12);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .desktop-nav__menu-item {
+    width: 100%;
+    min-height: 38px;
+    justify-content: flex-start !important;
+    padding: 0 12px !important;
+    border-radius: 10px !important;
+    color: #1a1a1a !important;
     font-size: 13px;
     font-weight: 700;
+  }
+
+  .desktop-nav__menu-item:hover {
+    background: #f5f0e0 !important;
+  }
+
+  .desktop-nav__menu-item--danger {
+    color: #d93d30 !important;
   }
 
   .desktop-footer {
@@ -420,18 +458,19 @@ view, scroll-view, text, image, button, input, textarea {
 
   .home__container {
     display: grid;
-    grid-template-columns: minmax(0, 520px) minmax(460px, 520px);
+    grid-template-columns: minmax(0, 0.95fr) minmax(360px, 0.9fr);
     grid-template-areas:
       "hero sample"
       "chips sample"
       "cta sample";
     grid-template-rows: auto auto auto;
-    align-content: start;
-    align-items: start;
+    align-content: center;
+    align-items: center;
     justify-content: space-between;
-    column-gap: 96px;
-    min-height: auto;
-    padding: 88px 0 92px;
+    column-gap: clamp(36px, 7vw, 96px);
+    min-height: calc(100vh - 150px);
+    min-height: calc(100dvh - 150px);
+    padding: clamp(56px, 8vh, 88px) 0 92px;
   }
 
   .home__hero-wash {
@@ -447,13 +486,13 @@ view, scroll-view, text, image, button, input, textarea {
 
   .home__swiper {
     width: 100%;
-    height: 520px !important;
+    height: clamp(444px, 47vw, 520px) !important;
   }
 
   .home__banner {
     width: 100% !important;
     max-width: none !important;
-    height: 506px !important;
+    height: clamp(430px, 45vw, 506px) !important;
     border: 1px solid rgba(229, 229, 229, 0.78);
     border-radius: 24px !important;
     background: #faf5e8 !important;
@@ -487,7 +526,7 @@ view, scroll-view, text, image, button, input, textarea {
 
   .home__headline {
     max-width: 620px;
-    font-size: clamp(56px, 5.2vw, 72px) !important;
+    font-size: clamp(50px, 5.2vw, 72px) !important;
     line-height: 1 !important;
     letter-spacing: 0 !important;
   }

@@ -23,18 +23,35 @@
         >
           作品集
         </button>
-        <button
-          type="button"
-          class="desktop-nav__link"
-          :class="{ 'desktop-nav__link--active': isDesktopNavActive('me') }"
-          @click="goMe"
-        >
-          我的
-        </button>
-        <button type="button" class="desktop-nav__user" @click="goMe" aria-label="打开个人中心">
-          <span class="desktop-nav__avatar" aria-hidden="true">{{ desktopUserInitial }}</span>
-          <span class="desktop-nav__user-text">{{ desktopUserName }}</span>
-        </button>
+        <div class="desktop-nav__account">
+          <button
+            type="button"
+            class="desktop-nav__avatar-button"
+            :class="{ 'desktop-nav__avatar-button--active': isDesktopNavActive('me') || desktopMenuOpen }"
+            :aria-expanded="desktopMenuOpen ? 'true' : 'false'"
+            aria-haspopup="menu"
+            aria-label="打开用户菜单"
+            @click="toggleDesktopMenu"
+          >
+            <span class="desktop-nav__avatar" aria-hidden="true">{{ desktopUserInitial }}</span>
+          </button>
+          <div v-if="desktopMenuOpen" class="desktop-nav__menu" role="menu" aria-label="用户菜单">
+            <button type="button" class="desktop-nav__menu-item" role="menuitem" @click="goMeFromMenu">
+              我的账户
+            </button>
+            <button type="button" class="desktop-nav__menu-item" role="menuitem" @click="goWorksFromMenu">
+              我的作品
+            </button>
+            <button
+              type="button"
+              class="desktop-nav__menu-item desktop-nav__menu-item--danger"
+              role="menuitem"
+              @click="logoutFromMenu"
+            >
+              退出
+            </button>
+          </div>
+        </div>
       </div>
     </nav>
     <!-- #endif -->
@@ -74,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useUserStore } from '../store/user';
 
 interface Props {
@@ -103,6 +120,7 @@ const desktopUserInitial = computed(() => {
   const first = desktopUserName.value.trim().charAt(0);
   return first || 'P';
 });
+const desktopMenuOpen = ref(false);
 
 const frameStyle = computed(() => ({
   '--pd-status-height': `${uiMetrics.value.statusBarHeight}px`,
@@ -121,7 +139,16 @@ const isDesktopNavActive = (section: 'home' | 'works' | 'me') => {
   return currentRoute.value.includes('pages/user/');
 };
 
+const closeDesktopMenu = () => {
+  desktopMenuOpen.value = false;
+};
+
+const toggleDesktopMenu = () => {
+  desktopMenuOpen.value = !desktopMenuOpen.value;
+};
+
 const goHome = () => {
+  closeDesktopMenu();
   uni.switchTab({
     url: '/pages/index/index',
     fail: () => {
@@ -131,6 +158,7 @@ const goHome = () => {
 };
 
 const goWorks = () => {
+  closeDesktopMenu();
   uni.switchTab({
     url: '/pages/artwork/list',
     fail: () => {
@@ -140,12 +168,28 @@ const goWorks = () => {
 };
 
 const goMe = () => {
+  closeDesktopMenu();
   uni.switchTab({
     url: '/pages/user/me',
     fail: () => {
       uni.navigateTo({ url: '/pages/user/me' });
     }
   });
+};
+
+const goMeFromMenu = () => {
+  goMe();
+};
+
+const goWorksFromMenu = () => {
+  goWorks();
+};
+
+const logoutFromMenu = () => {
+  closeDesktopMenu();
+  userStore.logout();
+  uni.showToast({ title: '已退出', icon: 'none' });
+  uni.reLaunch({ url: '/pages/index/index' });
 };
 
 const goAgreement = () => {

@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: Clay-design-analysis
-description: A vibrant claymation-meets-data interface for Clay.com (GTM data-orchestration platform). Anchors on white canvas with dark-navy primary CTAs, custom rounded display type, and saturated single-color feature cards — hot pink, deep teal, lavender, peach, ochre — that punctuate long-scroll explainer pages. Brand voltage comes from 3D-rendered claymation illustrations (mountains, characters, mascots) used as full-bleed hero artifacts and the bright multi-color card surfaces showing product UI fragments.
+description: A vibrant claymation-inspired interface adapted for PinDou's handmade bead-pattern product. It anchors on warm cream canvas, a single warm peach/orange-to-coral primary CTA, custom rounded display type, and soft craft-friendly cards in peach, mint, lavender, ochre, and coral. Brand voltage comes from cute bead-pattern examples and clay-like warmth, while actions stay clear and mobile-first.
 
 colors:
   primary: "#0a0a0a"
@@ -30,6 +30,8 @@ colors:
   brand-ochre: "#e8b94a"
   brand-mint: "#a4d4c5"
   brand-coral: "#ff6b5a"
+  brand-gradient-primary: "linear-gradient(135deg, #ffb084 0%, #ff8e53 48%, #ff6b5a 100%)"
+  brand-gradient-primary-active: "linear-gradient(135deg, #ffc09a 0%, #ff995f 46%, #ff7668 100%)"
   success: "#22c55e"
   warning: "#f59e0b"
   error: "#ef4444"
@@ -135,14 +137,16 @@ spacing:
 
 components:
   button-primary:
-    backgroundColor: "{colors.primary}"
+    backgroundColor: "{colors.brand-gradient-primary}"
     textColor: "{colors.on-primary}"
     typography: "{typography.button}"
     rounded: "{rounded.md}"
     padding: 12px 20px
     height: 44px
+    shadow: "0 16px 34px rgba(255, 142, 83, 0.28), 0 8px 18px rgba(255, 107, 90, 0.18)"
+    hover: "scale(1.025), brighten slightly"
   button-primary-active:
-    backgroundColor: "{colors.primary-active}"
+    backgroundColor: "{colors.brand-gradient-primary-active}"
     textColor: "{colors.on-primary}"
     rounded: "{rounded.md}"
   button-primary-disabled:
@@ -427,11 +431,11 @@ The system uses no heavy shadows. Depth comes from the saturated color contrast 
 
 ### Top Navigation
 
-**`top-nav`** — Cream nav bar pinned to top. 64px tall, `{colors.canvas}` background. Carries the Clay logo + wordmark at left, primary horizontal menu (Product, Solutions, Resources, Pricing, Customers) center, right-side cluster with "Sign in" + "Try free" `{component.button-primary}`. Menu items in `{typography.nav-link}` (Inter 14px / 500).
+**`top-nav`** — Cream nav bar pinned to top. 64px tall, `{colors.canvas}` background. Carries the PinDou logo + wordmark at left, a compact right-aligned menu (首页 / 作品集), and one avatar account trigger with a small dropdown. Mobile H5 keeps only the logo in the top bar and uses the existing bottom tab.
 
 ### Buttons
 
-**`button-primary`** — Background `{colors.primary}` (near-black), text `{colors.on-primary}` (white), type `{typography.button}` (Inter 14px / 600), padding 12px × 20px, height 44px, rounded `{rounded.md}` (12px).
+**`button-primary`** — PinDou overrides Clay's near-black primary with `{colors.brand-gradient-primary}`: warm peach/orange to coral, text `{colors.on-primary}` (white), type `{typography.button}` (Inter 14px / 600), padding 12px × 20px, height 44px, rounded `{rounded.md}` (12px), with a soft warm shadow. On hover, scale up subtly and brighten; this is the strongest CTA treatment and should appear once per landing viewport.
 
 **`button-secondary`** — Cream button with hairline outline. Background `{colors.canvas}`, text `{colors.ink}`, 1px hairline border.
 
