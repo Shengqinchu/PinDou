@@ -1,5 +1,6 @@
 #app {
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 a {
@@ -128,8 +129,7 @@ a {
   }
 
   .app-nav {
-    gap: 10px;
-    font-size: 13px;
+    display: none;
   }
 
   .app-main {
@@ -141,4 +141,3 @@ a {
     border-radius: 20px;
   }
 }
-

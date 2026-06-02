@@ -5,6 +5,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '../api';
 import { useAuthStore } from '../stores/auth';
 
+type BeadTone = 'blank' | 'ink' | 'peach' | 'coral' | 'mint' | 'cream';
+
 const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
@@ -18,6 +20,54 @@ const verifying = ref(false);
 const cooldown = ref(0);
 
 let cooldownTimer: number | undefined;
+
+const beadPalette: Record<BeadTone, string> = {
+  blank: '#fff7ef',
+  ink: '#263238',
+  peach: '#ffb084',
+  coral: '#ff6b5a',
+  mint: '#a4d4c5',
+  cream: '#ffe2c6'
+};
+
+const sampleCards = [
+  {
+    title: '萌宠头像',
+    caption: '52 x 52 拼豆图纸',
+    rows: toBeadRows([
+      '000111100000',
+      '001222210000',
+      '012222221000',
+      '122122122100',
+      '122222222100',
+      '122211222100',
+      '012222221000',
+      '001211210000',
+      '000133100000',
+      '000033000000',
+      '000000000000',
+      '000000000000'
+    ])
+  },
+  {
+    title: '手作配色',
+    caption: '干净色块和轮廓',
+    rows: toBeadRows([
+      '000044000000',
+      '000444400000',
+      '004444440000',
+      '044444444000',
+      '044144144000',
+      '044444444000',
+      '004411440000',
+      '000433400000',
+      '000333000000',
+      '000000000000',
+      '000000000000',
+      '000000000000'
+    ])
+  }
+];
 
 const normalizedEmail = computed(() => email.value.trim().toLowerCase());
 const canSendCode = computed(() => isEmail(normalizedEmail.value) && !sending.value && cooldown.value <= 0);
@@ -113,6 +163,17 @@ function isEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function toBeadRows(rows: string[]): BeadTone[] {
+  const toneMap: Record<string, BeadTone> = {
+    '0': 'blank',
+    '1': 'ink',
+    '2': 'peach',
+    '3': 'coral',
+    '4': 'mint'
+  };
+  return rows.flatMap((row) => row.split('').map((value) => toneMap[value] || 'blank'));
+}
+
 onUnmounted(() => {
   if (cooldownTimer) {
     window.clearInterval(cooldownTimer);
@@ -122,48 +183,83 @@ onUnmounted(() => {
 
 <template>
   <section class="login-page">
-    <div class="login-card">
-      <p class="eyebrow">Email Login</p>
-      <h1>登录 / 注册 PinDou</h1>
-      <p class="login-card__intro">输入邮箱接收 6 位验证码。首次验证会自动创建账号，之后用同一个邮箱继续查看作品和订单。</p>
-
-      <form class="login-form" @submit.prevent="handleVerify">
-        <label class="login-field">
-          <span>邮箱</span>
-          <input
-            v-model="email"
-            type="email"
-            inputmode="email"
-            autocomplete="email"
-            placeholder="you@example.com"
-          />
-        </label>
-
-        <div class="login-code-row">
-          <label class="login-field login-field--code">
-            <span>验证码</span>
-            <input
-              v-model="code"
-              type="text"
-              inputmode="numeric"
-              autocomplete="one-time-code"
-              maxlength="6"
-              placeholder="6 位数字"
-            />
-          </label>
-          <button class="login-send" type="button" :disabled="!canSendCode" @click="handleSendCode">
-            {{ sendButtonText }}
-          </button>
+    <div class="auth-landing">
+      <aside class="auth-story" aria-label="PinDou 登录说明">
+        <div class="story-copy">
+          <p class="eyebrow">PinDou Web</p>
+          <h1>把照片变成可以开工的拼豆图纸</h1>
+          <p>登录后保存作品、继续生成图纸、查看订单和额度。我们只用邮箱验证码确认是你本人。</p>
         </div>
 
-        <p v-if="feedback" class="login-feedback" :class="`login-feedback--${feedbackKind}`" role="status" aria-live="polite">
-          {{ feedback }}
-        </p>
+        <div class="sample-stack" aria-label="拼豆样例">
+          <article v-for="sample in sampleCards" :key="sample.title" class="sample-card">
+            <div class="bead-board" aria-hidden="true">
+              <span
+                v-for="(cell, index) in sample.rows"
+                :key="`${sample.title}-${index}`"
+                class="bead-dot"
+                :style="`--bead-color:${beadPalette[cell]}`"
+              ></span>
+            </div>
+            <div>
+              <strong>{{ sample.title }}</strong>
+              <span>{{ sample.caption }}</span>
+            </div>
+          </article>
+        </div>
 
-        <button class="pd-btn pd-btn--primary login-submit" type="submit" :disabled="!canVerify">
-          {{ verifying ? '登录中...' : '登录 / 注册' }}
-        </button>
-      </form>
+        <ol class="flow-list" aria-label="生成流程">
+          <li><span>1</span>上传照片</li>
+          <li><span>2</span>AI 生成</li>
+          <li><span>3</span>拿图纸开做</li>
+        </ol>
+
+        <p class="privacy-note">照片仅用于生成拼豆图纸，并按隐私策略定期删除。</p>
+      </aside>
+
+      <div class="login-card">
+        <p class="eyebrow">邮箱验证码</p>
+        <h2>欢迎来到 PinDou</h2>
+        <p class="login-card__intro">输入邮箱接收 6 位验证码。首次验证会自动创建账号。</p>
+
+        <form class="login-form" @submit.prevent="handleVerify">
+          <label class="login-field">
+            <span>邮箱</span>
+            <input
+              v-model="email"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+            />
+          </label>
+
+          <div class="login-code-row">
+            <label class="login-field login-field--code">
+              <span>验证码</span>
+              <input
+                v-model="code"
+                type="text"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                placeholder="6 位数字"
+              />
+            </label>
+            <button class="login-send" type="button" :disabled="!canSendCode" @click="handleSendCode">
+              {{ sendButtonText }}
+            </button>
+          </div>
+
+          <p v-if="feedback" class="login-feedback" :class="`login-feedback--${feedbackKind}`" role="status" aria-live="polite">
+            {{ feedback }}
+          </p>
+
+          <button class="pd-btn pd-btn--primary login-submit" type="submit" :disabled="!canVerify">
+            {{ verifying ? '正在进入...' : '继续生成图纸' }}
+          </button>
+        </form>
+      </div>
     </div>
   </section>
 </template>
@@ -175,22 +271,175 @@ onUnmounted(() => {
   place-items: center;
 }
 
+.auth-landing {
+  width: min(100%, 1060px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.06fr) minmax(380px, 0.94fr);
+  align-items: stretch;
+  gap: clamp(22px, 4vw, 48px);
+  min-width: 0;
+}
+
+.auth-story,
 .login-card {
-  width: min(100%, 520px);
+  min-width: 0;
   padding: clamp(30px, 6vw, 56px);
   border: 1px solid rgba(237, 228, 218, 0.82);
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: var(--pd-shadow-float);
+}
+
+.auth-story {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  align-content: space-between;
+  gap: 24px;
+  background:
+    radial-gradient(circle at 84% 12%, rgba(164, 212, 197, 0.24), transparent 30%),
+    linear-gradient(145deg, rgba(255, 241, 232, 0.96), rgba(255, 255, 255, 0.9));
+}
+
+.auth-story::after {
+  content: "";
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  right: -48px;
+  bottom: -52px;
+  border-radius: 48% 52% 46% 54%;
+  background: rgba(255, 176, 136, 0.18);
+  pointer-events: none;
+}
+
+.story-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.story-copy h1 {
+  max-width: 520px;
+  margin: 0 0 14px;
+  color: var(--pd-fg-1);
+  font-family: var(--pd-font-display);
+  font-size: clamp(34px, 4.2vw, 56px);
+  line-height: 1.08;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.story-copy p:last-child,
+.privacy-note {
+  max-width: 480px;
+  margin: 0;
+  color: var(--pd-fg-2);
+}
+
+.sample-stack {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sample-card {
+  display: grid;
+  gap: 14px;
+  border: 1px solid rgba(237, 228, 218, 0.82);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.76);
+  padding: 16px;
+  box-shadow: var(--pd-shadow-card);
+}
+
+.sample-card strong,
+.sample-card span {
+  display: block;
+}
+
+.sample-card strong {
+  color: var(--pd-fg-1);
+  font-size: 15px;
+}
+
+.sample-card span {
+  color: var(--pd-fg-2);
+  font-size: 12px;
+}
+
+.bead-board {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 3px;
+  aspect-ratio: 1;
+  border-radius: 18px;
+  background: var(--pd-bg);
+  padding: 10px;
+}
+
+.bead-dot {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--bead-color);
+  box-shadow: inset 0 -1px 1px rgba(45, 45, 45, 0.08);
+}
+
+.flow-list {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.flow-list li {
+  display: grid;
+  gap: 8px;
+  border-radius: 18px;
+  background: rgba(255, 176, 136, 0.15);
+  color: var(--pd-fg-1);
+  font-weight: 900;
+  padding: 14px;
+}
+
+.flow-list span {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--pd-r-full);
+  background: var(--pd-gradient-warm);
+  color: #fff;
+  font-size: 12px;
+}
+
+.privacy-note {
+  position: relative;
+  z-index: 1;
+  border-radius: 18px;
+  background: rgba(164, 212, 197, 0.18);
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.login-card {
+  align-self: center;
   text-align: center;
 }
 
-.login-card h1 {
+.login-card h2 {
   margin: 0 0 12px;
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
-  font-size: clamp(30px, 5vw, 44px);
-  line-height: 1.1;
+  font-size: clamp(30px, 3.8vw, 42px);
+  line-height: 1.12;
+  letter-spacing: 0;
 }
 
 .login-card__intro {
@@ -204,7 +453,7 @@ onUnmounted(() => {
   color: var(--pd-orange);
   font-size: 12px;
   font-weight: 900;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -230,7 +479,7 @@ onUnmounted(() => {
   background: #fff;
   color: var(--pd-fg-1);
   font: inherit;
-  font-size: 15px;
+  font-size: 16px;
   outline: none;
   padding: 0 16px;
   transition: border-color var(--pd-dur-fast) var(--pd-ease-out), box-shadow var(--pd-dur-fast) var(--pd-ease-out);
@@ -265,8 +514,10 @@ onUnmounted(() => {
 .login-send:disabled,
 .login-submit:disabled {
   cursor: not-allowed;
-  filter: grayscale(0.35);
-  opacity: 0.58;
+  background: #ede5dd;
+  color: #9b8e84;
+  box-shadow: none;
+  opacity: 1;
   transform: none;
 }
 
@@ -301,6 +552,44 @@ onUnmounted(() => {
 @media (max-width: 640px) {
   .login-page {
     min-height: calc(100vh - 112px);
+  }
+
+  .auth-landing {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .auth-story {
+    padding: 24px 20px;
+    border-radius: 22px;
+  }
+
+  .story-copy h1 {
+    font-size: 28px;
+  }
+
+  .sample-stack {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .sample-card {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .bead-board {
+    gap: 2px;
+    padding: 8px;
+    border-radius: 14px;
+  }
+
+  .flow-list {
+    grid-template-columns: 1fr;
+  }
+
+  .privacy-note {
+    font-size: 12px;
   }
 
   .login-card {

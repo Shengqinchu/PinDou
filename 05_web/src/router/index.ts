@@ -6,6 +6,7 @@ import HomePage from '../views/HomePage.vue';
 import LoginPage from '../views/LoginPage.vue';
 import MePage from '../views/MePage.vue';
 import PlaceholderPage from '../views/PlaceholderPage.vue';
+import UploadPage from '../views/UploadPage.vue';
 
 const protectedRoutes = new Set(['upload', 'result', 'works', 'me']);
 
@@ -17,7 +18,7 @@ export const router = createRouter({
     {
       path: '/upload',
       name: 'upload',
-      component: PlaceholderPage,
+      component: UploadPage,
       meta: { title: '上传', requiresAuth: true }
     },
     {
