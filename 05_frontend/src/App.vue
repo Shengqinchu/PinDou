@@ -82,4 +82,82 @@ page {
 view, scroll-view, text, image, button, input, textarea {
   box-sizing: border-box;
 }
+
+/* #ifdef H5 */
+/* Desktop browsers should see the mobile app as a centered phone column.
+   The mobile breakpoint keeps the original full-width behavior untouched. */
+@media (min-width: 768px) {
+  html,
+  body {
+    min-height: 100%;
+    background:
+      radial-gradient(circle at 18% 14%, rgba(255, 176, 136, 0.32), transparent 28%),
+      radial-gradient(circle at 82% 20%, rgba(255, 107, 157, 0.24), transparent 30%),
+      linear-gradient(135deg, #FFF9F5 0%, #FFF1E8 48%, #FFF1F6 100%) !important;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  #app,
+  uni-app {
+    width: min(100vw, 430px) !important;
+    max-width: 430px !important;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0 auto !important;
+    position: relative;
+    overflow: hidden;
+    background: var(--pd-bg, #FFF9F5);
+    box-shadow:
+      0 24px 70px rgba(255, 107, 157, 0.18),
+      0 2px 16px rgba(45, 45, 45, 0.06);
+  }
+
+  uni-page,
+  uni-page-wrapper,
+  uni-page-body,
+  .frame {
+    width: 100% !important;
+    max-width: 430px !important;
+  }
+
+  .frame {
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+
+  .frame__body {
+    height: calc(100vh - var(--pd-top-chrome-height) - var(--pd-safe-bottom));
+    height: calc(100dvh - var(--pd-top-chrome-height) - var(--pd-safe-bottom));
+  }
+
+  uni-tabbar,
+  uni-tabbar.uni-tabbar-bottom,
+  .uni-tabbar-bottom,
+  .uni-tabbar-bottom .uni-tabbar {
+    width: min(100vw, 430px) !important;
+    max-width: 430px !important;
+  }
+
+  .uni-tabbar-bottom,
+  .uni-tabbar-bottom .uni-tabbar {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .uni-tabbar-bottom .uni-tabbar {
+    bottom: 0 !important;
+  }
+
+  .uni-tabbar ~ .uni-placeholder {
+    width: 100% !important;
+    max-width: 430px !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+/* #endif */
 </style>
