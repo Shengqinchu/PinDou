@@ -196,6 +196,7 @@ export type CDKType = 'single_use' | 'monthly_card' | 'credit_pack_5' | 'credit_
 
 export interface User {
   user_id: string;
+  email?: string | null;
   nickname: string;
   avatar: string;
   created_at: string;
@@ -400,6 +401,14 @@ export const api = {
       });
     }
     return request({ url: '/user/login', method: 'POST', data: { code } });
+  },
+
+  sendEmailCode(email: string): Promise<{ success: boolean; message: string; cooldown_seconds: number; expires_in_seconds: number }> {
+    return request({ url: '/user/email/send-code', method: 'POST', data: { email } });
+  },
+
+  verifyEmailCode(email: string, code: string): Promise<{ token: string; user: User }> {
+    return request({ url: '/user/email/verify', method: 'POST', data: { email, code } });
   },
 
   // 获取个人资料

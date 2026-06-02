@@ -105,6 +105,7 @@ const showConsentModal = ref(false);
 const pendingSourceType = ref<'camera' | 'album'>('album');
 
 const handlePick = (type: 'camera' | 'album') => {
+  if (!userStore.requireH5Login(`/pages/upload/upload?style=${stylePreset.value}`)) return;
   pendingSourceType.value = type;
   
   // 拦截合规机制：用户必须进行单独的敏感人像同意

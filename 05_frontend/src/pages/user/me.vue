@@ -11,9 +11,20 @@
           <h2 class="me__nickname">{{ nickname }}</h2>
           <p class="me__user-meta">{{ profileStatus }}</p>
         </div>
+        <button v-if="!isLoggedIn" type="button" class="me__login-btn" @click="goLogin">
+          登录/注册
+        </button>
       </section>
 
-      <section class="card me__credits">
+      <section v-if="!isLoggedIn" class="card me__guest">
+        <h3 class="me__guest-title">登录后保存你的拼豆作品</h3>
+        <p class="me__guest-text">用邮箱验证码即可注册，之后可以查看作品集、兑换 CDK、同步订单和额度。</p>
+        <button type="button" class="btn btn--primary btn--block btn--md" @click="goLogin">
+          用邮箱登录
+        </button>
+      </section>
+
+      <section v-else class="card me__credits">
         <div class="me__credits-head">
           <h3 class="me__credits-title">我的额度</h3>
           <button type="button" class="me__credits-more" @click="goCdk">去兑换 ›</button>
@@ -77,6 +88,12 @@
           <span class="me__menu-label">关于 PinDou</span>
           <span class="me__menu-arrow" aria-hidden="true">v0.1.0 ›</span>
         </button>
+
+        <button v-if="isLoggedIn" type="button" class="me__menu-item" @click="handleLogout">
+          <span class="me__menu-icon me__menu-icon--logout" aria-hidden="true"></span>
+          <span class="me__menu-label">退出登录</span>
+          <span class="me__menu-arrow" aria-hidden="true">›</span>
+        </button>
       </nav>
 
       <p v-if="loadError" class="me__error">{{ loadError }}</p>
@@ -106,7 +123,7 @@ import { computed, ref } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import { useUserStore } from '../../store/user';
-import { BASE_URL } from '../../utils/request';
+import { BASE_URL, IS_H5_CLIENT } from '../../utils/request';
 
 const userStore = useUserStore();
 const showCsQr = ref(false);
@@ -115,7 +132,8 @@ const loadError = ref('');
 const API_ORIGIN = BASE_URL.replace(/\/api\/v\d+$/, '');
 
 const user = computed(() => userStore.userInfo);
-const nickname = computed(() => user.value?.nickname || '小拼豆');
+const isLoggedIn = computed(() => userStore.isLoggedIn);
+const nickname = computed(() => user.value?.email || user.value?.nickname || '未登录');
 const avatarUrl = computed(() => normalizeAssetUrl(user.value?.avatar));
 const isMonthlyMember = computed(() => userStore.isMonthlyMember);
 const freeCredits = computed(() => user.value?.free_credits_remaining || 0);
@@ -123,6 +141,8 @@ const paidCredits = computed(() => user.value?.paid_credits || 0);
 
 const profileStatus = computed(() => {
   if (!userStore.token) return '未登录';
+  if (user.value?.email) return '邮箱账号 · 已登录';
+  if (IS_H5_CLIENT) return '邮箱账号 · 待验证';
   if (user.value?.sensitive_consent_at) return '微信用户 · 已授权生成';
   if (user.value?.privacy_consent_at) return '微信用户 · 已同意隐私协议';
   return '微信用户 · 待授权';
@@ -163,6 +183,9 @@ const formatDate = (dateText: string) => {
 
 const loadProfile = async () => {
   loadError.value = '';
+  if (!userStore.token) {
+    return;
+  }
   try {
     await userStore.fetchProfile();
   } catch (error) {
@@ -171,16 +194,29 @@ const loadProfile = async () => {
   }
 };
 
+const goLogin = () => {
+  uni.navigateTo({
+    url: `/pages/auth/email-login?redirect=${encodeURIComponent('/pages/user/me')}`
+  });
+};
+
 const goWorks = () => {
+  if (!userStore.requireH5Login('/pages/artwork/list')) return;
   uni.switchTab({
     url: '/pages/artwork/list'
   });
 };
 
 const goCdk = () => {
+  if (!userStore.requireH5Login('/pages/cdk/redeem')) return;
   uni.navigateTo({
     url: '/pages/cdk/redeem'
   });
+};
+
+const handleLogout = () => {
+  userStore.logout();
+  uni.showToast({ title: '已退出', icon: 'none' });
 };
 
 const goAgreement = () => {
@@ -255,6 +291,7 @@ onShow(() => {
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  flex: 1;
 }
 
 .me__nickname {
@@ -268,6 +305,38 @@ onShow(() => {
 .me__user-meta {
   margin: 0;
   font-size: 12px;
+  color: var(--pd-fg-2);
+}
+
+.me__login-btn {
+  border: 0;
+  border-radius: 999px;
+  background: var(--pd-gradient-warm);
+  color: #fff;
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 10px 22px rgba(255, 142, 83, 0.22);
+}
+
+.me__guest {
+  margin: 0 16px 16px;
+  padding: 18px;
+}
+
+.me__guest-title {
+  margin: 0 0 8px;
+  font-family: var(--pd-font-display);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--pd-fg-1);
+}
+
+.me__guest-text {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.65;
   color: var(--pd-fg-2);
 }
 
@@ -471,6 +540,24 @@ onShow(() => {
   font-family: var(--pd-font-display);
   font-weight: 900;
   font-size: 16px;
+}
+
+.me__menu-icon--logout::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border: 1.6px solid currentColor;
+  border-radius: 4px;
+}
+
+.me__menu-icon--logout::after {
+  content: "";
+  position: absolute;
+  right: 6px;
+  width: 9px;
+  height: 1.6px;
+  border-radius: 99px;
+  background: currentColor;
 }
 
 .me__menu-label {

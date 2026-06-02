@@ -61,6 +61,9 @@ class Settings(BaseSettings):
 
     wechat_mp_appid: str | None = Field(default=None, validation_alias="WECHAT_MP_APPID")
     wechat_mp_appsecret: SecretStr | None = Field(default=None, validation_alias="WECHAT_MP_APPSECRET")
+    resend_api_key: SecretStr | None = Field(default=None, validation_alias="RESEND_API_KEY")
+    sender_email: str = Field(default="noreply@pindoupuppy.com", validation_alias="SENDER_EMAIL")
+    sender_name: str = Field(default="PinDou 拼豆", validation_alias="SENDER_NAME")
 
     jwt_secret: SecretStr | None = Field(default=None, validation_alias="JWT_SECRET")
     admin_username: str | None = Field(default=None, validation_alias="ADMIN_USERNAME")

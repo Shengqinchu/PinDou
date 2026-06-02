@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from datetime import date, datetime, timedelta
 
 from sqlalchemy import select
@@ -16,6 +17,9 @@ class UserService:
 
     def get_user(self, user_id: str) -> User | None:
         return self.session.scalar(select(User).where(User.openid == user_id))
+
+    def get_user_by_email(self, email: str) -> User | None:
+        return self.session.scalar(select(User).where(User.email == email.lower().strip()))
 
     def register_or_login(
         self,
@@ -33,6 +37,26 @@ class UserService:
                 user.nickname = nickname
             if avatar is not None:
                 user.avatar = avatar
+        self.session.commit()
+        self.session.refresh(user)
+        return user
+
+    def register_or_login_email(self, *, email: str) -> User:
+        normalized_email = email.lower().strip()
+        openid = email_openid(normalized_email)
+        user = self.get_user_by_email(normalized_email) or self.get_user(openid)
+        if user is None:
+            user = User(
+                openid=openid,
+                email=normalized_email,
+                nickname=_email_nickname(normalized_email),
+                avatar="",
+            )
+            self.session.add(user)
+        else:
+            user.email = normalized_email
+            if not user.nickname:
+                user.nickname = _email_nickname(normalized_email)
         self.session.commit()
         self.session.refresh(user)
         return user
@@ -116,3 +140,13 @@ class UserService:
         self.session.commit()
         self.session.refresh(user)
         return user
+
+
+def email_openid(email: str) -> str:
+    digest = hashlib.sha256(email.lower().strip().encode("utf-8")).hexdigest()[:24]
+    return f"email_{digest}"
+
+
+def _email_nickname(email: str) -> str:
+    local_part = email.split("@", 1)[0].strip()
+    return local_part[:32] or "PinDou 用户"

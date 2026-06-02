@@ -18,7 +18,7 @@ from sqlalchemy.pool import StaticPool
 from pindou.api.deps import get_db
 from pindou.config import get_settings
 from pindou.api.security import create_access_token
-from pindou.db.models import AdminAuditLog, Artwork, Base, CDK, Order, User
+from pindou.db.models import AdminAuditLog, Artwork, Base, CDK, EmailCode, Order, User
 from pindou.main import create_app
 from pindou.providers.base import PreviewResult
 from pindou.services.hupijiao_service import sign_params
@@ -35,6 +35,8 @@ def api_client(monkeypatch: pytest.MonkeyPatch, tmp_path) -> Iterator[tuple[Test
     monkeypatch.setenv("HUPIJIAO_APP_ID", "")
     monkeypatch.setenv("HUPIJIAO_APP_SECRET", "")
     monkeypatch.setenv("HUPIJIAO_WEBHOOK_SECRET", "")
+    monkeypatch.setenv("ADMIN_USERNAME", "admin")
+    monkeypatch.setenv("ADMIN_PASSWORD_HASH", "sha256:8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918")
     get_settings.cache_clear()
 
     engine = create_engine(
@@ -111,6 +113,72 @@ def test_user_login_profile_consent_and_auth_error(api_client) -> None:
     consent = client.post("/api/user/consent", json={"type": "privacy"}, headers=headers)
     assert consent.status_code == 200
     assert consent.json()["success"] is True
+
+
+def test_email_code_login_uses_shared_db_and_returns_email_user(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, session_factory = api_client
+    sent_codes: list[tuple[str, str]] = []
+
+    async def fake_send_verification_email(email: str, code: str) -> tuple[bool, str]:
+        sent_codes.append((email, code))
+        return True, "ok"
+
+    monkeypatch.setattr(
+        "pindou.services.email_verification.send_verification_email",
+        fake_send_verification_email,
+    )
+
+    sent = client.post("/api/user/email/send-code", json={"email": "Test.User@Example.COM"})
+    assert sent.status_code == 200
+    assert sent.json()["success"] is True
+    assert sent.json()["expires_in_seconds"] == 300
+    assert sent_codes and sent_codes[0][0] == "test.user@example.com"
+    code = sent_codes[0][1]
+    assert code.isdigit()
+    assert len(code) == 6
+
+    rate_limited = client.post("/api/user/email/send-code", json={"email": "test.user@example.com"})
+    assert rate_limited.status_code == 429
+    assert rate_limited.json()["error"] == "EMAIL_CODE_RATE_LIMITED"
+
+    wrong_code = "000000" if code != "000000" else "111111"
+    wrong = client.post("/api/user/email/verify", json={"email": "test.user@example.com", "code": wrong_code})
+    assert wrong.status_code == 400
+    assert wrong.json()["error"] == "EMAIL_CODE_INVALID"
+
+    verified = client.post("/api/user/email/verify", json={"email": "test.user@example.com", "code": code})
+    assert verified.status_code == 200
+    payload = verified.json()
+    assert payload["token"]
+    assert payload["user"]["email"] == "test.user@example.com"
+    assert payload["user"]["user_id"].startswith("email_")
+    assert payload["user"]["nickname"] == "test.user"
+
+    profile = client.get("/api/user/profile", headers={"Authorization": f"Bearer {payload['token']}"})
+    assert profile.status_code == 200
+    assert profile.json()["email"] == "test.user@example.com"
+
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.email == "test.user@example.com"))
+        assert user is not None
+        assert user.openid == payload["user"]["user_id"]
+        record = session.scalar(select(EmailCode).where(EmailCode.email == "test.user@example.com"))
+        assert record is not None
+        assert record.consumed_at is not None
+        assert record.code_hash != code
+
+
+def test_email_code_rejects_disposable_email(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, _session_factory = api_client
+
+    async def fail_if_called(email: str, code: str) -> tuple[bool, str]:
+        raise AssertionError("disposable email should be rejected before sending")
+
+    monkeypatch.setattr("pindou.services.email_verification.send_verification_email", fail_if_called)
+
+    response = client.post("/api/user/email/send-code", json={"email": "demo@mailinator.com"})
+    assert response.status_code == 400
+    assert response.json()["message_cn"] == "暂不支持一次性邮箱，请换一个常用邮箱。"
 
 
 def test_upload_happy_path_and_consent_error(api_client) -> None:

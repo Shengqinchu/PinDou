@@ -71,6 +71,13 @@
       }
     },
     {
+      "path": "pages/auth/email-login",
+      "style": {
+        "navigationBarTitleText": "登录 / 注册",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/consent/consent",
       "style": {
         "navigationBarTitleText": "用户授权与隐私协议",

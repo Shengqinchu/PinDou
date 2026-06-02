@@ -115,7 +115,7 @@ const currentRoute = computed(() => {
   const page = pages[pages.length - 1] as { route?: string } | undefined;
   return page?.route || '';
 });
-const desktopUserName = computed(() => userStore.userInfo?.nickname || '我的账户');
+const desktopUserName = computed(() => userStore.userInfo?.email || userStore.userInfo?.nickname || '我的账户');
 const desktopUserInitial = computed(() => {
   const first = desktopUserName.value.trim().charAt(0);
   return first || 'P';
@@ -159,6 +159,7 @@ const goHome = () => {
 
 const goWorks = () => {
   closeDesktopMenu();
+  if (!userStore.requireH5Login('/pages/artwork/list')) return;
   uni.switchTab({
     url: '/pages/artwork/list',
     fail: () => {

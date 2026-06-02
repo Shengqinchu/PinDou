@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
 import { useUserStore } from "./store/user";
+import { IS_H5_CLIENT } from "./utils/request";
 
 declare const wx: any;
 declare const process: { env?: { VITE_WX_CLOUD_ENV?: string } };
@@ -16,10 +17,15 @@ onLaunch(() => {
   if (userStore.token) {
     void refreshProfileInBackground(userStore);
   } else {
+    // #ifdef H5
+    console.log("H5 默认保持未登录态，用户需要身份动作时再走邮箱验证码登录。");
+    // #endif
+    // #ifndef H5
     // 首次启动：自动微信登录拿 JWT，保证 consent / upload 等鉴权接口可用
     void userStore.login().catch((e) => {
       console.warn("自动登录失败（可继续浏览，鉴权动作时会再触发）:", e);
     });
+    // #endif
   }
 });
 
@@ -33,7 +39,11 @@ onHide(() => {
 
 async function refreshProfileInBackground(userStore: ReturnType<typeof useUserStore>) {
   try {
-    await userStore.fetchProfile();
+    const profile = await userStore.fetchProfile();
+    if (IS_H5_CLIENT && !profile.email) {
+      console.warn("H5 检测到旧匿名登录态，已清除并切换为邮箱登录。");
+      userStore.logout();
+    }
   } catch (e) {
     console.warn("自动登录拉取 Profile 失败，可能登录态已失效:", e);
     userStore.logout();

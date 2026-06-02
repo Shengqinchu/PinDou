@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { api, User } from '../api';
-import { getOrCreateH5DeviceId, getPlatformLoginCode, getWxLoginCode } from '../utils/request';
+import { IS_H5_CLIENT, getWxLoginCode } from '../utils/request';
 
 export interface UiMetrics {
   statusBarHeight: number;
@@ -127,20 +127,14 @@ export const useUserStore = defineStore('user', {
     },
     async login() {
       try {
+        if (IS_H5_CLIENT) {
+          throw new Error('请先使用邮箱登录。');
+        }
         if (activeLoginPromise) {
           return activeLoginPromise;
         }
         activeLoginPromise = (async () => {
-          let code = '';
-          // #ifdef MP-WEIXIN
-          code = await getWxLoginCode();
-          // #endif
-          // #ifdef H5
-          code = getOrCreateH5DeviceId();
-          // #endif
-          if (!code) {
-            code = await getPlatformLoginCode();
-          }
+          const code = await getWxLoginCode();
           const data = await api.login(code);
           this.token = data.token;
           this.userInfo = data.user;
@@ -156,6 +150,27 @@ export const useUserStore = defineStore('user', {
         activeLoginPromise = null;
       }
     },
+    async sendEmailCode(email: string) {
+      return api.sendEmailCode(email);
+    },
+    async loginWithEmail(email: string, code: string) {
+      const data = await api.verifyEmailCode(email, code);
+      this.token = data.token;
+      this.userInfo = data.user;
+      uni.setStorageSync('pd_token', data.token);
+      uni.setStorageSync('pd_user', JSON.stringify(data.user));
+      return data;
+    },
+    requireH5Login(redirectUrl = ''): boolean {
+      if (!IS_H5_CLIENT || this.isLoggedIn) {
+        return true;
+      }
+      const target = redirectUrl || currentPageUrl();
+      uni.navigateTo({
+        url: `/pages/auth/email-login?redirect=${encodeURIComponent(target)}`
+      });
+      return false;
+    },
     async fetchProfile() {
       try {
         const user = await api.getProfile();
@@ -165,6 +180,9 @@ export const useUserStore = defineStore('user', {
       } catch (error) {
         if (isAuthExpiredError(error)) {
           this.logout();
+          if (IS_H5_CLIENT) {
+            throw error;
+          }
           const data = await this.login();
           return data.user as User;
         }
@@ -182,6 +200,10 @@ export const useUserStore = defineStore('user', {
       } catch (error) {
         if (isAuthExpiredError(error)) {
           this.logout();
+          if (IS_H5_CLIENT) {
+            this.requireH5Login();
+            throw error;
+          }
           await this.login();
           const res = await api.submitConsent(type);
           if (res.success) {
@@ -201,3 +223,15 @@ export const useUserStore = defineStore('user', {
     }
   }
 });
+
+function currentPageUrl(): string {
+  const pages = getCurrentPages();
+  const current = pages[pages.length - 1] as { route?: string; options?: Record<string, string> } | undefined;
+  if (!current?.route) return '/pages/index/index';
+  const query = current.options
+    ? Object.entries(current.options)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
+      .join('&')
+    : '';
+  return `/${current.route}${query ? `?${query}` : ''}`;
+}

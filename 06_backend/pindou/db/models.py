@@ -37,6 +37,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     openid: Mapped[str] = mapped_column(String(128), unique=True, index=True, nullable=False)
+    email: Mapped[str | None] = mapped_column(String(255), unique=True, index=True, nullable=True)
     nickname: Mapped[str] = mapped_column(String(128), default="")
     avatar: Mapped[str] = mapped_column(String(512), default="")
     free_credits_remaining: Mapped[int] = mapped_column(Integer, default=3, nullable=False)
@@ -56,6 +57,7 @@ class User(Base):
     def to_frontend_dict(self) -> dict[str, Any]:
         return {
             "user_id": self.user_id,
+            "email": self.email,
             "nickname": self.nickname,
             "avatar": self.avatar,
             "created_at": iso_or_none(self.created_at),
@@ -65,6 +67,19 @@ class User(Base):
             "privacy_consent_at": iso_or_none(self.privacy_consent_at),
             "sensitive_consent_at": iso_or_none(self.sensitive_consent_at),
         }
+
+
+class EmailCode(Base):
+    __tablename__ = "email_codes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
+    code_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    consumed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    request_ip: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
 
 class Artwork(Base):

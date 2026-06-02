@@ -207,7 +207,7 @@ function shouldShowErrorToast(options: RequestOptions, statusCode: number): bool
 }
 
 function canRefreshAuth(options: RequestOptions): boolean {
-  return !options._retried && !options._skipAuthRefresh && !isLoginRequest(options.url);
+  return !IS_H5_CLIENT && !options._retried && !options._skipAuthRefresh && !isLoginRequest(options.url);
 }
 
 function shouldRefreshAuth(error: unknown, options: RequestOptions): boolean {
@@ -228,7 +228,8 @@ function isUnauthorizedError(error: unknown): boolean {
 }
 
 function isLoginRequest(url: string): boolean {
-  return cloudPath(url).includes('/user/login');
+  const path = cloudPath(url);
+  return path.includes('/user/login') || path.includes('/user/email/verify') || path.includes('/user/email/send-code');
 }
 
 function refreshAuthOnce(): Promise<void> {
@@ -242,6 +243,9 @@ function refreshAuthOnce(): Promise<void> {
 
 async function performWxLogin(): Promise<void> {
   clearStoredAuth();
+  if (IS_H5_CLIENT) {
+    throw new RequestError('请先使用邮箱登录。', 401, { error: 'AUTH_REQUIRED' });
+  }
   const code = await getPlatformLoginCode();
   const data = await sendRequest<LoginResponse>({
     url: '/user/login',
@@ -264,12 +268,12 @@ function clearStoredAuth() {
 
 export function getPlatformLoginCode(): Promise<string> {
   // #ifdef H5
-  return Promise.resolve(getOrCreateH5DeviceId());
+  return Promise.reject(new Error('H5 不支持微信自动登录，请使用邮箱登录。'));
   // #endif
   // #ifdef MP-WEIXIN
   return getWxLoginCode();
   // #endif
-  return Promise.resolve(getOrCreateH5DeviceId());
+  return getWxLoginCode();
 }
 
 export function getOrCreateH5DeviceId(): string {

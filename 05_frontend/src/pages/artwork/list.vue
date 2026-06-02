@@ -85,10 +85,12 @@ import { computed, ref } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import { useArtworkStore } from '../../store/artwork';
+import { useUserStore } from '../../store/user';
 import { Artwork } from '../../api';
 import { BASE_URL } from '../../utils/request';
 
 const artworkStore = useArtworkStore();
+const userStore = useUserStore();
 const isLoading = ref(false);
 const loadError = ref('');
 const brokenThumbIds = ref<string[]>([]);
@@ -158,6 +160,7 @@ const handleImageError = (id: string) => {
 };
 
 const loadArtworks = async () => {
+  if (!userStore.requireH5Login('/pages/artwork/list')) return;
   isLoading.value = true;
   loadError.value = '';
   try {

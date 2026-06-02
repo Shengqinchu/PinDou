@@ -53,10 +53,10 @@
           {{ isLoading ? '正在生成订单...' : ctaText }}
         </button>
 
-        <navigator class="paywall__cdk" url="/pages/cdk/redeem" @click.stop>
+        <button type="button" class="paywall__cdk" @click.stop="goCdk">
           <span class="paywall__cdk-icon" aria-hidden="true">券</span>
           我有 CDK 兑换码
-        </navigator>
+        </button>
       </section>
 
       <!-- ===== Sheet: QR-payment state ===== -->
@@ -178,7 +178,13 @@ const backToPlans = () => {
   currentState.value = 'plans';
 };
 
+const goCdk = () => {
+  if (!userStore.requireH5Login('/pages/cdk/redeem')) return;
+  uni.navigateTo({ url: '/pages/cdk/redeem' });
+};
+
 const handleShowQR = async () => {
+  if (!userStore.requireH5Login()) return;
   isLoading.value = true;
   stopPolling();
   try {
@@ -204,6 +210,7 @@ const handleShowQR = async () => {
 };
 
 const handleCustomerServiceFallback = async () => {
+  if (!userStore.requireH5Login()) return;
   isLoading.value = true;
   stopPolling();
   try {
@@ -476,6 +483,8 @@ onUnmounted(stopPolling);
   font-size: 13px;
   color: var(--pd-fg-2);
   text-decoration: none;
+  border: 0;
+  background: transparent;
   padding: 6px 12px;
   align-self: center;
   cursor: pointer;

@@ -100,8 +100,10 @@
 import { ref, computed } from 'vue';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import { useCDKStore } from '../../store/cdk';
+import { useUserStore } from '../../store/user';
 
 const cdkStore = useCDKStore();
+const userStore = useUserStore();
 
 const currentState = ref<'entry' | 'success'>('entry');
 const cleanCode = ref('');
@@ -131,6 +133,7 @@ const handleInput = (e: any) => {
 
 const handleRedeem = async () => {
   if (!isCodeValid.value) return;
+  if (!userStore.requireH5Login('/pages/cdk/redeem')) return;
   
   isLoading.value = true;
   errorMsg.value = '';

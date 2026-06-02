@@ -294,6 +294,7 @@ onLoad((options: any) => {
 });
 
 const handleSelect = (tier: 'quick' | 'premium') => {
+  if (!userStore.requireH5Login()) return;
   if (!ensureValidSize()) return;
   if (SKIP_CONFIRM_FOR_PREMIUM && isPremiumUser.value) {
     startGeneration(tier);
@@ -360,6 +361,7 @@ const parseSize = (size: SizePreset): [number, number] => {
 };
 
 const goCdk = () => {
+  if (!userStore.requireH5Login('/pages/cdk/redeem')) return;
   uni.navigateTo({ url: '/pages/cdk/redeem' });
 };
 
