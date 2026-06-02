@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from pindou.api.deps import CurrentUser, DbSession
 from pindou.api.errors import ApiException, ErrorCode
+from pindou.api.request_meta import client_ip
 from pindou.services.cdk_service import CDKAlreadyRedeemedError, CDKInvalidError, CDKRateLimitError, CDKService
 
 router = APIRouter(prefix="/cdk", tags=["cdk"])
@@ -24,7 +25,7 @@ def redeem_cdk(payload: RedeemCDKRequest, request: Request, current_user: Curren
         cdk = service.redeem(
             code=payload.cdk_code,
             user_id=current_user.user_id,
-            ip=request.client.host if request.client else None,
+            ip=client_ip(request),
         )
     except CDKRateLimitError as exc:
         raise ApiException(429, ErrorCode.CDK_RATE_LIMITED, "您操作太快了，稍后再试。") from exc

@@ -18,6 +18,7 @@ from sqlalchemy import func, or_, select
 from pindou.api.deps import DbSession, require_role
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.api.payment import ConfirmOrderRequest, SKU_CATALOG
+from pindou.api.request_meta import client_ip
 from pindou.api.security import admin_credentials_diagnostics, admin_credentials_match, create_access_token
 from pindou.config import get_settings
 from pindou.db.models import AdminAuditLog, Artwork, CDK, Order, User, iso_or_none, utc_now
@@ -954,9 +955,3 @@ def database_state(database_url: str) -> dict[str, Any]:
         "database_configured": bool(parsed.path and parsed.path != "/"),
     }
 
-
-def client_ip(request: Request) -> str:
-    forwarded_for = request.headers.get("x-forwarded-for")
-    if forwarded_for:
-        return forwarded_for.split(",", 1)[0].strip()
-    return request.client.host if request.client else "unknown"

@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 from pindou.api.deps import CurrentUser, DbSession
 from pindou.api.security import create_access_token
+from pindou.api.request_meta import client_ip
 from pindou.services.email_verification import EmailVerificationService
 from pindou.services.user_service import UserService
 
@@ -51,7 +52,7 @@ async def send_email_code(payload: EmailSendCodeRequest, request: Request, db: D
     """H5 邮箱登录/注册第一步：发送 6 位验证码。"""
     return await EmailVerificationService(db).send_code(
         email=payload.email,
-        request_ip=request.client.host if request.client else None,
+        request_ip=client_ip(request),
     )
 
 
