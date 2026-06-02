@@ -3,50 +3,11 @@
     <div class="home__container">
       <div class="home__hero-wash" aria-hidden="true"></div>
 
-      <!-- ===== Banner carousel ===== -->
-      <section class="home__carousel-section" aria-label="拼豆样张">
-        <swiper 
-          class="home__swiper" 
-          :autoplay="autoplay" 
-          :interval="4000" 
-          :current="activeIndex"
-          @change="onSwiperChange"
-          @pointerdown="stopAutoplay"
-          @pointerup="startAutoplay"
-        >
-          <swiper-item v-for="(banner, index) in banners" :key="index">
-            <div class="home__banner">
-              <image class="home__banner-image" :src="banner.image" mode="aspectFit" />
-              <span class="tag tag--ai home__banner-badge">
-                <span class="home__badge-mark" aria-hidden="true">AI</span>
-                AI 生成
-              </span>
-              <div class="home__banner-caption">
-                <span class="home__banner-title">{{ banner.title }}</span>
-                <span class="home__banner-meta">{{ banner.meta }}</span>
-              </div>
-            </div>
-          </swiper-item>
-        </swiper>
-
-        <!-- 自定义胶囊 Indicators -->
-        <nav class="home__dots" aria-label="样张选择">
-          <button 
-            v-for="(banner, index) in banners" 
-            :key="index"
-            type="button" 
-            class="home__dot" 
-            :class="{ 'home__dot--active': activeIndex === index }" 
-            @click="goToSlide(index)" 
-            :aria-label="'第 ' + (index + 1) + ' 张'"
-          ></button>
-        </nav>
-      </section>
-
       <!-- ===== Hero copy ===== -->
       <section class="home__hero">
         <view class="home__headline">
-          30 秒生成你的<span class="text-grad">拼豆图纸</span>
+          <span class="home__headline-line">30 秒生成你的</span>
+          <span class="text-grad home__headline-keyword">拼豆图纸</span>
         </view>
         <p class="home__subtitle">上传一张照片，AI 自动转 Q 版输出图纸</p>
       </section>
@@ -82,6 +43,46 @@
         </navigator>
         <p class="home__cta-hint">支持 JPG / PNG · 单张图片 ≤ 10MB</p>
       </div>
+
+      <!-- ===== Banner carousel ===== -->
+      <section class="home__carousel-section" aria-label="拼豆样张">
+        <swiper
+          class="home__swiper"
+          :autoplay="autoplay"
+          :interval="4000"
+          :current="activeIndex"
+          @change="onSwiperChange"
+          @pointerdown="stopAutoplay"
+          @pointerup="startAutoplay"
+        >
+          <swiper-item v-for="(banner, index) in banners" :key="index">
+            <div class="home__banner">
+              <span class="tag tag--ai home__banner-badge">
+                <span class="home__badge-mark" aria-hidden="true">AI</span>
+                AI 生成
+              </span>
+              <image class="home__banner-image" :src="banner.image" mode="aspectFit" />
+              <div class="home__banner-caption">
+                <span class="home__banner-title">{{ banner.title }}</span>
+                <span class="home__banner-meta">{{ banner.meta }}</span>
+              </div>
+            </div>
+          </swiper-item>
+        </swiper>
+
+        <!-- 自定义胶囊 Indicators -->
+        <nav class="home__dots" aria-label="样张选择">
+          <button
+            v-for="(banner, index) in banners"
+            :key="index"
+            type="button"
+            class="home__dot"
+            :class="{ 'home__dot--active': activeIndex === index }"
+            @click="goToSlide(index)"
+            :aria-label="'第 ' + (index + 1) + ' 张'"
+          ></button>
+        </nav>
+      </section>
     </div>
   </MiniProgramLayout>
 </template>
@@ -120,53 +121,68 @@ const startAutoplay = () => {
 <style scoped lang="scss">
 .home__container {
   position: relative;
-  height: 100%;
+  min-height: 100%;
+  padding: 18px 20px 28px;
+  background: #fffaf0;
+  overflow: hidden;
 }
 
-/* soft pink wash behind the hero, fades out before the chips */
 .home__hero-wash {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 240px;
-  background: radial-gradient(120% 100% at 50% 0%,
-              #FFE4EE 0%, rgba(255, 228, 238, 0) 70%);
+  top: -80px;
+  right: -120px;
+  width: 260px;
+  height: 260px;
+  border-radius: 44% 56% 52% 48%;
+  background: rgba(255, 176, 132, 0.28);
   pointer-events: none;
   z-index: 0;
 }
 
 /* ===== Swiper / Carousel ===== */
 .home__carousel-section {
-  padding-top: 16px;
+  margin-top: 24px;
+  margin-left: -20px;
+  margin-right: -20px;
   position: relative;
   z-index: 1;
 }
 
 .home__swiper {
-  height: 188px;
+  height: 300px;
   width: 100%;
 }
 
 .home__banner {
-  width: 327px;
-  height: 188px;
-  margin: 0 auto;
-  border-radius: var(--pd-r-card);
-  background: linear-gradient(135deg, #FFF1E8 0%, #FFE4EE 100%);
+  width: calc(100vw - 40px);
+  max-width: 350px;
+  height: 288px;
+  margin: 0 0 0 20px;
+  border: 1px solid rgba(229, 229, 229, 0.78);
+  border-radius: 24px;
+  background: #faf5e8;
+  box-shadow: 0 12px 34px rgba(10, 10, 10, 0.06);
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  box-shadow: var(--pd-shadow-card);
   position: relative;
+  padding: 14px 14px 12px;
 }
 
 .home__banner-image {
   width: 100%;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
 }
 
 .home__banner-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 14px;
+  left: 14px;
   z-index: 2;
+  background: #ffb084;
+  color: #0a0a0a;
+  box-shadow: 0 8px 18px rgba(255, 176, 132, 0.26);
 }
 
 .home__badge-mark {
@@ -177,35 +193,33 @@ const startAutoplay = () => {
   height: 16px;
   margin-right: 4px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.44);
   font-size: 8px;
   font-weight: 800;
   line-height: 1;
 }
 
 .home__banner-caption {
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  padding: 24px 14px 12px;
-  background: linear-gradient(180deg,
-              rgba(45, 45, 45, 0) 0%,
-              rgba(45, 45, 45, 0.55) 100%);
-  color: #fff;
+  padding: 12px 18px 0 2px;
+  color: #0a0a0a;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   z-index: 1;
+  border-top: 1px solid rgba(229, 229, 229, 0.72);
 }
 
 .home__banner-title {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 14px;
-  letter-spacing: 0.2px;
+  letter-spacing: 0;
 }
 
 .home__banner-meta {
+  flex: 0 0 auto;
+  white-space: nowrap;
   font-size: 11px;
-  opacity: 0.88;
+  color: #6a6a6a;
 }
 
 /* ===== Page dots ===== */
@@ -224,49 +238,71 @@ const startAutoplay = () => {
   height: 6px;
   width: 6px;
   border-radius: 999px;
-  background: var(--pd-pink-100);
+  background: #ebe6d6;
   transition: all 280ms var(--pd-ease-out);
 }
 
 .home__dot--active {
   width: 18px;
-  background: var(--pd-pink);
+  background: #0a0a0a;
 }
 
 /* ===== Hero copy ===== */
 .home__hero {
-  padding: 28px 24px 0;
-  text-align: center;
+  padding: 12px 0 0;
+  text-align: left;
   position: relative;
   z-index: 1;
 }
 
 .home__headline {
-  font-size: 26px;
+  max-width: 360px;
+  font-size: 34px;
   font-weight: 800;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-  color: var(--pd-fg-1);
+  line-height: 1.08;
+  letter-spacing: 0;
+  color: #0a0a0a;
   margin: 0;
 }
 
+.home__headline-line,
+.home__headline-keyword {
+  display: block;
+}
+
+.home__headline-keyword {
+  width: max-content;
+  white-space: nowrap;
+  color: #ff6b5a;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
 .home__subtitle {
-  margin: 10px 0 0;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--pd-fg-2);
+  max-width: 320px;
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #3a3a3a;
 }
 
 /* ===== Theme chips ===== */
 .home__chips {
-  margin: 16px 0 0;
-  padding: 0 16px;
+  margin: 18px 0 0;
+  padding: 0;
   display: flex;
   gap: 8px;
-  justify-content: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .home__chips .chip {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #f5f0e0;
+  border: 1px solid rgba(229, 229, 229, 0.75);
+  color: #0a0a0a;
   text-decoration: none;
   transition: transform 180ms var(--pd-ease-out);
 }
@@ -283,17 +319,25 @@ const startAutoplay = () => {
 
 /* ===== CTA block ===== */
 .home__cta-wrap {
-  padding: 24px 24px 0;
+  width: 100%;
+  max-width: 360px;
+  padding: 20px 0 0;
   position: relative;
   z-index: 1;
 }
 
 .home__cta { 
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
   height: 54px; 
   font-size: 17px; 
-  letter-spacing: 0.5px; 
+  letter-spacing: 0; 
   opacity: 1;
-  background: var(--pd-gradient);
+  background: #0a0a0a;
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(10, 10, 10, 0.18);
 }
 
 .home__cta-icon {
@@ -312,8 +356,122 @@ const startAutoplay = () => {
 
 .home__cta-hint {
   margin: 10px 0 0;
-  text-align: center;
+  text-align: left;
   font-size: 11px;
-  color: var(--pd-fg-3);
+  color: #6a6a6a;
 }
+
+/* #ifdef H5 */
+@media (min-width: 1024px) {
+  .home__container {
+    display: grid;
+    grid-template-columns: minmax(0, 520px) minmax(460px, 520px);
+    grid-template-areas:
+      "hero sample"
+      "chips sample"
+      "cta sample";
+    grid-template-rows: auto auto auto;
+    align-content: start;
+    align-items: start;
+    justify-content: space-between;
+    column-gap: 96px;
+    min-height: auto;
+    padding: 88px 0 92px;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .home__hero-wash {
+    display: none;
+  }
+
+  .home__hero {
+    grid-area: hero;
+    padding: 0;
+  }
+
+  .home__headline {
+    max-width: 620px;
+    font-size: clamp(56px, 5.2vw, 72px);
+    line-height: 1;
+    font-weight: 800;
+  }
+
+  .home__subtitle {
+    max-width: 520px;
+    margin-top: 24px;
+    font-size: 20px;
+    line-height: 1.55;
+  }
+
+  .home__chips {
+    grid-area: chips;
+    margin-top: 36px;
+    gap: 12px;
+  }
+
+  .home__chips .chip {
+    min-height: 44px;
+    padding: 0 18px;
+    font-size: 15px;
+  }
+
+  .home__cta-wrap {
+    grid-area: cta;
+    width: 360px;
+    padding-top: 28px;
+  }
+
+  .home__cta-hint {
+    font-size: 13px;
+  }
+
+  .home__carousel-section {
+    grid-area: sample;
+    width: 100%;
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .home__swiper {
+    height: 520px;
+  }
+
+  .home__banner {
+    height: 506px;
+    max-width: none;
+    margin: 0 auto;
+    padding: 22px 22px 18px;
+    border-radius: 24px;
+    background: #faf5e8;
+    box-shadow: 0 22px 60px rgba(10, 10, 10, 0.08);
+  }
+
+  .home__banner-image {
+    padding: 8px 0 0;
+  }
+
+  .home__banner-badge {
+    top: 22px;
+    left: 22px;
+  }
+
+  .home__banner-caption {
+    padding: 16px 28px 0 2px;
+  }
+
+  .home__banner-title {
+    font-size: 22px;
+  }
+
+  .home__banner-meta {
+    font-size: 14px;
+  }
+
+  .home__dots {
+    margin-top: 14px;
+  }
+}
+/* #endif */
 </style>

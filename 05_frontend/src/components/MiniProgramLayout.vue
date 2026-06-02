@@ -31,11 +31,11 @@
         >
           我的
         </button>
+        <button type="button" class="desktop-nav__user" @click="goMe" aria-label="打开个人中心">
+          <span class="desktop-nav__avatar" aria-hidden="true">{{ desktopUserInitial }}</span>
+          <span class="desktop-nav__user-text">{{ desktopUserName }}</span>
+        </button>
       </div>
-      <button type="button" class="desktop-nav__user" @click="goMe" aria-label="打开个人中心">
-        <span class="desktop-nav__avatar" aria-hidden="true">{{ desktopUserInitial }}</span>
-        <span class="desktop-nav__user-text">{{ desktopUserName }}</span>
-      </button>
     </nav>
     <!-- #endif -->
 
