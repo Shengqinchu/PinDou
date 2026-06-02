@@ -1,5 +1,44 @@
 <template>
   <div class="frame" :style="frameStyle">
+    <!-- #ifdef H5 -->
+    <nav class="desktop-nav" aria-label="PinDou 桌面导航">
+      <button type="button" class="desktop-nav__brand" @click="goHome">
+        <span class="desktop-nav__logo-dot" aria-hidden="true"></span>
+        <span>PinDou 拼豆</span>
+      </button>
+      <div class="desktop-nav__links" aria-label="主导航">
+        <button
+          type="button"
+          class="desktop-nav__link"
+          :class="{ 'desktop-nav__link--active': isDesktopNavActive('home') }"
+          @click="goHome"
+        >
+          首页
+        </button>
+        <button
+          type="button"
+          class="desktop-nav__link"
+          :class="{ 'desktop-nav__link--active': isDesktopNavActive('works') }"
+          @click="goWorks"
+        >
+          作品集
+        </button>
+        <button
+          type="button"
+          class="desktop-nav__link"
+          :class="{ 'desktop-nav__link--active': isDesktopNavActive('me') }"
+          @click="goMe"
+        >
+          我的
+        </button>
+      </div>
+      <button type="button" class="desktop-nav__user" @click="goMe" aria-label="打开个人中心">
+        <span class="desktop-nav__avatar" aria-hidden="true">{{ desktopUserInitial }}</span>
+        <span class="desktop-nav__user-text">{{ desktopUserName }}</span>
+      </button>
+    </nav>
+    <!-- #endif -->
+
     <!-- 页面导航栏 -->
     <!-- 首页样式：Logo + 标题左对齐 -->
     <header v-if="variant === 'home'" class="frame__header frame__header--home">
@@ -23,6 +62,14 @@
     <main class="frame__body" :class="{ 'frame__body--scroll': scroll }">
       <slot></slot>
     </main>
+
+    <!-- #ifdef H5 -->
+    <footer class="desktop-footer" aria-label="PinDou 页脚">
+      <button type="button" class="desktop-footer__link" @click="goAgreement">用户服务协议</button>
+      <span class="desktop-footer__dot" aria-hidden="true"></span>
+      <button type="button" class="desktop-footer__link" @click="goPrivacy">隐私政策</button>
+    </footer>
+    <!-- #endif -->
   </div>
 </template>
 
@@ -46,6 +93,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userStore = useUserStore();
 const uiMetrics = computed(() => userStore.uiMetrics);
+const currentRoute = computed(() => {
+  const pages = getCurrentPages();
+  const page = pages[pages.length - 1] as { route?: string } | undefined;
+  return page?.route || '';
+});
+const desktopUserName = computed(() => userStore.userInfo?.nickname || '我的账户');
+const desktopUserInitial = computed(() => {
+  const first = desktopUserName.value.trim().charAt(0);
+  return first || 'P';
+});
 
 const frameStyle = computed(() => ({
   '--pd-status-height': `${uiMetrics.value.statusBarHeight}px`,
@@ -57,6 +114,47 @@ const frameStyle = computed(() => ({
   '--pd-capsule-width': `${uiMetrics.value.menuButtonWidth}px`,
   '--pd-title-side-inset': `${Math.max(52, uiMetrics.value.capsuleReserveRight)}px`,
 }));
+
+const isDesktopNavActive = (section: 'home' | 'works' | 'me') => {
+  if (section === 'home') return currentRoute.value.includes('pages/index/');
+  if (section === 'works') return currentRoute.value.includes('pages/artwork/');
+  return currentRoute.value.includes('pages/user/');
+};
+
+const goHome = () => {
+  uni.switchTab({
+    url: '/pages/index/index',
+    fail: () => {
+      uni.reLaunch({ url: '/pages/index/index' });
+    }
+  });
+};
+
+const goWorks = () => {
+  uni.switchTab({
+    url: '/pages/artwork/list',
+    fail: () => {
+      uni.navigateTo({ url: '/pages/artwork/list' });
+    }
+  });
+};
+
+const goMe = () => {
+  uni.switchTab({
+    url: '/pages/user/me',
+    fail: () => {
+      uni.navigateTo({ url: '/pages/user/me' });
+    }
+  });
+};
+
+const goAgreement = () => {
+  uni.navigateTo({ url: '/pages/consent/consent?type=agreement' });
+};
+
+const goPrivacy = () => {
+  uni.navigateTo({ url: '/pages/consent/consent?type=privacy' });
+};
 
 const handleBack = () => {
   if (props.backUrl) {
