@@ -6,6 +6,7 @@ import { ApiError } from '../api';
 import { useAuthStore } from '../stores/auth';
 
 type AuthMode = 'register' | 'login';
+type LoginMethod = 'password' | 'code';
 type FeedbackKind = 'info' | 'success' | 'error';
 
 const route = useRoute();
@@ -13,6 +14,7 @@ const router = useRouter();
 const auth = useAuthStore();
 
 const mode = ref<AuthMode>('register');
+const loginMethod = ref<LoginMethod>('password');
 const registerEmail = ref('');
 const registerCode = ref('');
 const registerPassword = ref('');
@@ -20,6 +22,7 @@ const confirmPassword = ref('');
 const cdk = ref('');
 const loginEmail = ref('');
 const loginPassword = ref('');
+const loginCode = ref('');
 const feedback = ref('');
 const feedbackKind = ref<FeedbackKind>('info');
 const sending = ref(false);
@@ -33,7 +36,13 @@ let cooldownTimer: number | undefined;
 
 const normalizedRegisterEmail = computed(() => registerEmail.value.trim().toLowerCase());
 const normalizedLoginEmail = computed(() => loginEmail.value.trim().toLowerCase());
-const canSendCode = computed(() => isEmail(normalizedRegisterEmail.value) && !sending.value && cooldown.value <= 0);
+const activeCodeEmail = computed(() => {
+  if (mode.value === 'login' && loginMethod.value === 'code') {
+    return normalizedLoginEmail.value;
+  }
+  return normalizedRegisterEmail.value;
+});
+const canSendCode = computed(() => isEmail(activeCodeEmail.value) && !sending.value && cooldown.value <= 0);
 const canRegister = computed(() => {
   return (
     isEmail(normalizedRegisterEmail.value) &&
@@ -44,7 +53,15 @@ const canRegister = computed(() => {
     !submitting.value
   );
 });
-const canLogin = computed(() => isEmail(normalizedLoginEmail.value) && loginPassword.value.length > 0 && !submitting.value);
+const canLogin = computed(() => {
+  if (!isEmail(normalizedLoginEmail.value) || submitting.value) {
+    return false;
+  }
+  if (loginMethod.value === 'code') {
+    return /^\d{6}$/.test(loginCode.value.trim());
+  }
+  return loginPassword.value.length > 0;
+});
 const sendButtonText = computed(() => {
   if (sending.value) {
     return '发送中';
@@ -69,8 +86,23 @@ function switchMode(nextMode: AuthMode): void {
   }
 }
 
+function switchLoginMethod(nextMethod: LoginMethod, message = ''): void {
+  if (mode.value !== 'login') {
+    mode.value = 'login';
+  }
+  if (loginMethod.value === nextMethod) {
+    if (message) {
+      showMessage(message, 'info');
+    }
+    return;
+  }
+  loginMethod.value = nextMethod;
+  showMessage(message, message ? 'info' : 'info');
+}
+
 async function handleSendCode(): Promise<void> {
-  if (!isEmail(normalizedRegisterEmail.value)) {
+  const targetEmail = activeCodeEmail.value;
+  if (!isEmail(targetEmail)) {
     showMessage('请输入正确的邮箱地址。', 'error');
     return;
   }
@@ -79,7 +111,7 @@ async function handleSendCode(): Promise<void> {
   showMessage('', 'info');
 
   try {
-    const response = await auth.sendEmailCode(normalizedRegisterEmail.value);
+    const response = await auth.sendEmailCode(targetEmail);
     showMessage(response.message || '验证码已发送，请查看邮箱。', 'success');
     startCooldown(response.cooldown_seconds || 60);
   } catch (error) {
@@ -132,7 +164,11 @@ async function handleLogin(): Promise<void> {
     showMessage('请输入正确的邮箱地址。', 'error');
     return;
   }
-  if (!loginPassword.value) {
+  if (loginMethod.value === 'code' && !/^\d{6}$/.test(loginCode.value.trim())) {
+    showMessage('请填写 6 位邮箱验证码。', 'error');
+    return;
+  }
+  if (loginMethod.value === 'password' && !loginPassword.value) {
     showMessage('请输入密码。', 'error');
     return;
   }
@@ -141,7 +177,11 @@ async function handleLogin(): Promise<void> {
   showMessage('', 'info');
 
   try {
-    await auth.loginWithPassword(normalizedLoginEmail.value, loginPassword.value);
+    if (loginMethod.value === 'code') {
+      await auth.loginWithEmail(normalizedLoginEmail.value, loginCode.value.trim());
+    } else {
+      await auth.loginWithPassword(normalizedLoginEmail.value, loginPassword.value);
+    }
     showMessage('登录成功，正在进入 PinDou。', 'success');
     await wait(260);
     await router.replace(readRedirectPath());
@@ -237,124 +277,159 @@ onUnmounted(() => {
         </button>
       </div>
 
-      <Transition name="auth-form" mode="out-in">
-        <form v-if="mode === 'register'" key="register" class="auth-form auth-form--register" @submit.prevent="handleRegister">
-          <div class="auth-heading">
-            <p class="eyebrow">Create Account</p>
-            <h1>创建你的拼豆账号</h1>
-            <p>邮箱验证后即可保存作品、同步额度和兑换激活码。</p>
-          </div>
+      <div class="auth-form-stage">
+        <Transition name="auth-form" mode="out-in">
+          <form v-if="mode === 'register'" key="register" class="auth-form auth-form--register" @submit.prevent="handleRegister">
+            <div class="auth-heading">
+              <p class="eyebrow">Create Account</p>
+              <h1>创建你的拼豆账号</h1>
+              <p>邮箱验证后即可保存作品、同步额度和兑换激活码。</p>
+            </div>
 
-          <label class="auth-field">
-            <span>邮箱</span>
-            <input v-model="registerEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
-          </label>
-
-          <div class="auth-code-row">
             <label class="auth-field">
-              <span>邮箱验证码</span>
-              <input v-model="registerCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6 位数字" />
+              <span>邮箱</span>
+              <input v-model="registerEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
             </label>
-            <button class="code-button" type="button" :disabled="!canSendCode" @click="handleSendCode">
-              {{ sendButtonText }}
+
+            <div class="auth-code-row">
+              <label class="auth-field">
+                <span>邮箱验证码</span>
+                <input v-model="registerCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6 位数字" />
+              </label>
+              <button class="code-button" type="button" :disabled="!canSendCode" @click="handleSendCode">
+                {{ sendButtonText }}
+              </button>
+            </div>
+
+            <label class="auth-field">
+              <span>设置密码</span>
+              <span class="password-wrap">
+                <input
+                  v-model="registerPassword"
+                  :type="showRegisterPassword ? 'text' : 'password'"
+                  autocomplete="new-password"
+                  placeholder="至少 6 位"
+                />
+                <button
+                  class="eye-button"
+                  type="button"
+                  :aria-label="showRegisterPassword ? '隐藏密码' : '显示密码'"
+                  @click="showRegisterPassword = !showRegisterPassword"
+                >
+                  <span class="eye-icon" :class="{ 'eye-icon--hidden': !showRegisterPassword }"></span>
+                </button>
+              </span>
+            </label>
+
+            <label class="auth-field">
+              <span>确认密码</span>
+              <span class="password-wrap">
+                <input
+                  v-model="confirmPassword"
+                  :type="showConfirmPassword ? 'text' : 'password'"
+                  autocomplete="new-password"
+                  placeholder="再输入一次"
+                />
+                <button
+                  class="eye-button"
+                  type="button"
+                  :aria-label="showConfirmPassword ? '隐藏密码' : '显示密码'"
+                  @click="showConfirmPassword = !showConfirmPassword"
+                >
+                  <span class="eye-icon" :class="{ 'eye-icon--hidden': !showConfirmPassword }"></span>
+                </button>
+              </span>
+            </label>
+
+            <label class="auth-field">
+              <span>激活码 <em>可选</em></span>
+              <input v-model="cdk" type="text" autocomplete="off" placeholder="填写后赠送生成次数" />
+            </label>
+
+            <p v-if="feedback" class="auth-feedback" :class="`auth-feedback--${feedbackKind}`" role="status" aria-live="polite">
+              {{ feedback }}
+            </p>
+
+            <button class="auth-submit" type="submit" :disabled="!canRegister">
+              {{ submitting ? '创建中...' : '创建账号' }}
             </button>
-          </div>
+          </form>
 
-          <label class="auth-field">
-            <span>设置密码</span>
-            <span class="password-wrap">
-              <input
-                v-model="registerPassword"
-                :type="showRegisterPassword ? 'text' : 'password'"
-                autocomplete="new-password"
-                placeholder="至少 6 位"
-              />
-              <button
-                class="eye-button"
-                type="button"
-                :aria-label="showRegisterPassword ? '隐藏密码' : '显示密码'"
-                @click="showRegisterPassword = !showRegisterPassword"
-              >
-                <span class="eye-icon" :class="{ 'eye-icon--hidden': !showRegisterPassword }"></span>
+          <form v-else key="login" class="auth-form auth-form--login" @submit.prevent="handleLogin">
+            <div class="auth-heading">
+              <p class="eyebrow">Welcome Back</p>
+              <h1>继续你的拼豆计划</h1>
+              <p>{{ loginMethod === 'code' ? '收取邮箱验证码，临时登录并找回访问权限。' : '用邮箱和密码登录，回到上次保存的作品和额度。' }}</p>
+            </div>
+
+            <label class="auth-field">
+              <span>邮箱</span>
+              <input v-model="loginEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
+            </label>
+
+            <label v-if="loginMethod === 'password'" class="auth-field">
+              <span>密码</span>
+              <span class="password-wrap">
+                <input
+                  v-model="loginPassword"
+                  :type="showLoginPassword ? 'text' : 'password'"
+                  autocomplete="current-password"
+                  placeholder="输入密码"
+                />
+                <button
+                  class="eye-button"
+                  type="button"
+                  :aria-label="showLoginPassword ? '隐藏密码' : '显示密码'"
+                  @click="showLoginPassword = !showLoginPassword"
+                >
+                  <span class="eye-icon" :class="{ 'eye-icon--hidden': !showLoginPassword }"></span>
+                </button>
+              </span>
+            </label>
+
+            <div v-else class="auth-code-row">
+              <label class="auth-field">
+                <span>邮箱验证码</span>
+                <input v-model="loginCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6 位数字" />
+              </label>
+              <button class="code-button" type="button" :disabled="!canSendCode" @click="handleSendCode">
+                {{ sendButtonText }}
               </button>
-            </span>
-          </label>
+            </div>
 
-          <label class="auth-field">
-            <span>确认密码</span>
-            <span class="password-wrap">
-              <input
-                v-model="confirmPassword"
-                :type="showConfirmPassword ? 'text' : 'password'"
-                autocomplete="new-password"
-                placeholder="再输入一次"
-              />
+            <div class="login-options">
               <button
-                class="eye-button"
+                v-if="loginMethod === 'password'"
                 type="button"
-                :aria-label="showConfirmPassword ? '隐藏密码' : '显示密码'"
-                @click="showConfirmPassword = !showConfirmPassword"
+                @click="switchLoginMethod('code')"
               >
-                <span class="eye-icon" :class="{ 'eye-icon--hidden': !showConfirmPassword }"></span>
+                用验证码登录
               </button>
-            </span>
-          </label>
-
-          <label class="auth-field">
-            <span>激活码 <em>可选</em></span>
-            <input v-model="cdk" type="text" autocomplete="off" placeholder="填写后赠送生成次数" />
-          </label>
-
-          <p v-if="feedback" class="auth-feedback" :class="`auth-feedback--${feedbackKind}`" role="status" aria-live="polite">
-            {{ feedback }}
-          </p>
-
-          <button class="auth-submit" type="submit" :disabled="!canRegister">
-            {{ submitting ? '创建中...' : '创建账号' }}
-          </button>
-        </form>
-
-        <form v-else key="login" class="auth-form" @submit.prevent="handleLogin">
-          <div class="auth-heading">
-            <p class="eyebrow">Welcome Back</p>
-            <h1>继续你的拼豆计划</h1>
-            <p>用邮箱和密码登录，回到上次保存的作品和额度。</p>
-          </div>
-
-          <label class="auth-field">
-            <span>邮箱</span>
-            <input v-model="loginEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
-          </label>
-
-          <label class="auth-field">
-            <span>密码</span>
-            <span class="password-wrap">
-              <input
-                v-model="loginPassword"
-                :type="showLoginPassword ? 'text' : 'password'"
-                autocomplete="current-password"
-                placeholder="输入密码"
-              />
               <button
-                class="eye-button"
+                v-else
                 type="button"
-                :aria-label="showLoginPassword ? '隐藏密码' : '显示密码'"
-                @click="showLoginPassword = !showLoginPassword"
+                @click="switchLoginMethod('password')"
               >
-                <span class="eye-icon" :class="{ 'eye-icon--hidden': !showLoginPassword }"></span>
+                用密码登录
               </button>
-            </span>
-          </label>
+              <button
+                type="button"
+                @click="switchLoginMethod('code', '用邮箱验证码登录即可找回访问权限。')"
+              >
+                忘记密码？
+              </button>
+            </div>
 
-          <p v-if="feedback" class="auth-feedback" :class="`auth-feedback--${feedbackKind}`" role="status" aria-live="polite">
-            {{ feedback }}
-          </p>
+            <p v-if="feedback" class="auth-feedback" :class="`auth-feedback--${feedbackKind}`" role="status" aria-live="polite">
+              {{ feedback }}
+            </p>
 
-          <button class="auth-submit" type="submit" :disabled="!canLogin">
-            {{ submitting ? '登录中...' : '登录' }}
-          </button>
-        </form>
-      </Transition>
+            <button class="auth-submit" type="submit" :disabled="!canLogin">
+              {{ submitting ? '登录中...' : '登录' }}
+            </button>
+          </form>
+        </Transition>
+      </div>
 
       <p class="auth-note">照片仅用于生成图纸，并按隐私策略定期删除。</p>
     </div>
@@ -370,7 +445,8 @@ onUnmounted(() => {
 }
 
 .auth-card {
-  width: min(100%, clamp(420px, 30vw, 486px));
+  width: min(100%, clamp(540px, 42vw, 620px));
+  min-height: 720px;
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(237, 228, 218, 0.86);
@@ -382,10 +458,6 @@ onUnmounted(() => {
   box-shadow: 0 28px 70px rgba(255, 107, 90, 0.14), 0 10px 26px rgba(45, 45, 45, 0.06);
   padding: clamp(24px, 5vw, 36px);
   animation: card-rise 420ms var(--pd-ease-soft) both;
-}
-
-.auth-card--register {
-  width: min(100%, clamp(520px, 42vw, 620px));
 }
 
 .auth-card::before {
@@ -499,15 +571,31 @@ onUnmounted(() => {
   color: var(--pd-fg-1);
 }
 
-.auth-form {
+.auth-form-stage {
   position: relative;
   z-index: 1;
+  min-height: 484px;
+  display: grid;
+  align-items: center;
+}
+
+.auth-form {
+  position: relative;
   display: grid;
   gap: 14px;
+  width: 100%;
 }
 
 .auth-form--register {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-self: start;
+}
+
+.auth-form--login {
+  align-self: center;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding: 18px 0 8px;
 }
 
 .auth-form--register > .auth-heading,
@@ -595,6 +683,38 @@ onUnmounted(() => {
   grid-template-columns: 1fr 118px;
   align-items: end;
   gap: 12px;
+}
+
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: -4px;
+}
+
+.login-options button {
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 244, 236, 0.7);
+  color: var(--pd-orange);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 8px 12px;
+  transition:
+    background var(--pd-dur-base) var(--pd-ease-out),
+    color var(--pd-dur-base) var(--pd-ease-out),
+    transform var(--pd-dur-fast) var(--pd-ease-out),
+    box-shadow var(--pd-dur-base) var(--pd-ease-out);
+}
+
+.login-options button:hover {
+  background: #fff;
+  color: var(--pd-coral);
+  box-shadow: 0 10px 24px rgba(255, 142, 83, 0.16);
+  transform: translateY(-1px);
 }
 
 .code-button {
@@ -782,12 +902,9 @@ onUnmounted(() => {
 
 @media (max-height: 920px) and (min-width: 721px) {
   .auth-card {
+    min-height: 674px;
     border-radius: 26px;
     padding: 24px 30px;
-  }
-
-  .auth-card--register {
-    width: min(100%, 600px);
   }
 
   .auth-brand {
@@ -806,6 +923,10 @@ onUnmounted(() => {
 
   .auth-tabs {
     margin-bottom: 18px;
+  }
+
+  .auth-form-stage {
+    min-height: 462px;
   }
 
   .auth-tabs button {
@@ -843,49 +964,51 @@ onUnmounted(() => {
 }
 
 @media (max-height: 820px) and (min-width: 721px) {
-  .auth-card--register {
+  .auth-card {
+    min-height: 620px;
     padding: 20px 28px;
   }
 
-  .auth-card--register .auth-brand {
+  .auth-brand {
     margin-bottom: 12px;
   }
 
-  .auth-card--register .auth-tabs {
+  .auth-tabs {
     margin-bottom: 14px;
   }
 
-  .auth-card--register .auth-form {
+  .auth-form-stage {
+    min-height: 430px;
+  }
+
+  .auth-form {
     gap: 9px;
   }
 
-  .auth-card--register .auth-heading h1 {
+  .auth-heading h1 {
     font-size: 28px;
   }
 
-  .auth-card--register .auth-heading p:last-child,
-  .auth-card--register .auth-note {
+  .auth-heading p:last-child,
+  .auth-note {
     display: none;
   }
 
-  .auth-card--register .auth-field input,
-  .auth-card--register .code-button {
+  .auth-field input,
+  .code-button {
     min-height: 44px;
   }
 
-  .auth-card--register .auth-submit {
+  .auth-submit {
     min-height: 46px;
   }
 }
 
 @media (max-height: 680px) and (min-width: 721px) {
   .auth-card {
-    width: min(100%, 460px);
+    width: min(100%, 600px);
+    min-height: 560px;
     padding: 20px 28px;
-  }
-
-  .auth-card--register {
-    width: min(100%, 640px);
   }
 
   .auth-brand {
@@ -908,6 +1031,10 @@ onUnmounted(() => {
     gap: 9px;
   }
 
+  .auth-form-stage {
+    min-height: 380px;
+  }
+
   .auth-note {
     display: none;
   }
@@ -920,12 +1047,22 @@ onUnmounted(() => {
 
   .auth-card {
     width: 100%;
+    min-height: auto;
     border-radius: 24px;
     padding: 22px 18px;
   }
 
+  .auth-form-stage {
+    min-height: 0;
+    align-items: start;
+  }
+
   .auth-form--register {
     grid-template-columns: 1fr;
+  }
+
+  .auth-form--login {
+    padding: 0;
   }
 
   .auth-form--register > * {
@@ -950,6 +1087,11 @@ onUnmounted(() => {
 
   .auth-code-row {
     grid-template-columns: 1fr;
+  }
+
+  .login-options {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .code-button {
