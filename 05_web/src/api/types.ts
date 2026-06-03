@@ -79,13 +79,28 @@ export interface Artwork {
   user_id: string;
   title?: string | null;
   original_path?: string | null;
+  original_image_url?: string | null;
+  original_image_deleted_at?: string | null;
   preview_path?: string | null;
+  preview_url?: string | null;
+  thumbnail_url?: string | null;
   pattern_data: PatternSheet;
   style_preset: StylePreset | string;
   size_preset: SizePreset | string;
   is_paid_unlocked?: boolean;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface GenerateScriptResponse {
+  artwork_id: string;
+  pattern_url: string;
+  pattern: PatternSheet;
+}
+
+export interface ConsentResponse {
+  success: boolean;
+  consent_at: string;
 }
 
 export interface CDKRedeemResult {
@@ -110,4 +125,3 @@ export interface Order {
   created_at?: string;
   updated_at?: string;
 }
-

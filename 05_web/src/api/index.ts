@@ -2,7 +2,15 @@ export * from './client';
 export * from './types';
 
 import { apiRequest } from './client';
-import type { User } from './types';
+import type {
+  Artwork,
+  ConsentResponse,
+  GenerateScriptResponse,
+  PartitionSheet,
+  PatternSheet,
+  SizePreset,
+  User
+} from './types';
 
 export interface EmailCodeResponse {
   success: boolean;
@@ -64,4 +72,38 @@ export function emailPasswordLogin(email: string, password: string): Promise<Aut
 
 export function getProfile(): Promise<User> {
   return apiRequest<User>('/user/profile');
+}
+
+export function submitConsent(type: 'privacy' | 'sensitive'): Promise<ConsentResponse> {
+  return apiRequest<ConsentResponse>('/user/consent', {
+    method: 'POST',
+    body: { type }
+  });
+}
+
+export function generateScriptPattern(file: File, size: SizePreset = '26x26'): Promise<GenerateScriptResponse> {
+  const form = new FormData();
+  form.set('raw_image', file);
+  form.set('size', size);
+  form.set('size_preset', size);
+  form.set('brand', 'MARD');
+  form.set('mode', 'script');
+  form.set('auto_remove_white_bg', 'true');
+
+  return apiRequest<GenerateScriptResponse>('/generate/script', {
+    method: 'POST',
+    body: form
+  });
+}
+
+export function getArtworkDetail(artworkId: string): Promise<Artwork> {
+  return apiRequest<Artwork>(`/artwork/${encodeURIComponent(artworkId)}`);
+}
+
+export function getPattern(artworkId: string): Promise<PatternSheet> {
+  return apiRequest<PatternSheet>(`/pattern/${encodeURIComponent(artworkId)}`);
+}
+
+export function getPatternPartitions(artworkId: string): Promise<PartitionSheet> {
+  return apiRequest<PartitionSheet>(`/pattern/${encodeURIComponent(artworkId)}/partitions`);
 }

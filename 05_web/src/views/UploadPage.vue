@@ -2,7 +2,10 @@
 import { computed, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
+import { useGenerationStore } from '../stores/generation';
+
 const router = useRouter();
+const generation = useGenerationStore();
 const galleryInput = ref<HTMLInputElement | null>(null);
 const cameraInput = ref<HTMLInputElement | null>(null);
 const selectedFile = ref<File | null>(null);
@@ -93,7 +96,9 @@ async function startGenerate(): Promise<void> {
     message.value = '请先选择一张照片。';
     return;
   }
-  await router.push({ name: 'result', params: { id: 'preview' }, query: { from: 'upload' } });
+  generation.setSourceFile(selectedFile.value);
+  generation.setSize('26x26');
+  await router.push({ name: 'loading', query: { from: 'upload' } });
 }
 
 onUnmounted(revokePreview);

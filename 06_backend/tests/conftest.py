@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -7,6 +9,10 @@ from sqlalchemy.pool import StaticPool
 
 from pindou.db.models import Base
 from pindou.services.cdk_service import CDKService
+
+os.environ.setdefault("DATABASE_URL", "sqlite:///./var/test.db")
+os.environ.setdefault("ENABLE_REVERSE_PROXY_HEALTH_MONITOR", "false")
+os.environ.setdefault("ENABLE_EXPIRED_ORIGINAL_DELETE_TASK", "false")
 
 
 @pytest.fixture()

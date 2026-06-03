@@ -64,6 +64,7 @@ class Settings(BaseSettings):
     resend_api_key: SecretStr | None = Field(default=None, validation_alias="RESEND_API_KEY")
     sender_email: str = Field(default="noreply@pindoupuppy.com", validation_alias="SENDER_EMAIL")
     sender_name: str = Field(default="PinDou 拼豆", validation_alias="SENDER_NAME")
+    unlimited_credit_emails: str = Field(default="", validation_alias="UNLIMITED_CREDIT_EMAILS")
 
     jwt_secret: SecretStr | None = Field(default=None, validation_alias="JWT_SECRET")
     admin_username: str | None = Field(default=None, validation_alias="ADMIN_USERNAME")
@@ -121,6 +122,14 @@ class Settings(BaseSettings):
     @property
     def cors_allow_origins(self) -> list[str]:
         return [origin.strip() for origin in self.app_cors_allow_origins.split(",") if origin.strip()]
+
+    @property
+    def unlimited_credit_email_set(self) -> set[str]:
+        return {
+            email.strip().lower()
+            for email in self.unlimited_credit_emails.split(",")
+            if email.strip()
+        }
 
 
 @lru_cache

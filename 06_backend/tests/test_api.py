@@ -4,7 +4,7 @@ import io
 import base64
 import csv
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from collections.abc import Iterator
 
@@ -18,7 +18,7 @@ from sqlalchemy.pool import StaticPool
 from pindou.api.deps import get_db
 from pindou.config import get_settings
 from pindou.api.security import create_access_token
-from pindou.db.models import AdminAuditLog, Artwork, Base, CDK, EmailCode, Order, User
+from pindou.db.models import AdminAuditLog, Artwork, Base, CDK, DailyQuota, EmailCode, Order, User
 from pindou.main import create_app
 from pindou.providers.base import PreviewResult
 from pindou.services.hupijiao_service import sign_params
@@ -390,6 +390,45 @@ def test_generate_script_artwork_pattern_and_delete_flow(api_client) -> None:
     assert client.get(f"/api/artwork/{artwork_id}", headers=headers).status_code == 404
 
 
+def test_unlimited_credit_email_skips_script_daily_quota(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, session_factory = api_client
+    monkeypatch.setenv("UNLIMITED_CREDIT_EMAILS", " StayWithCSQ@Outlook.com ")
+    get_settings.cache_clear()
+    user_id = "email_unlimited_script"
+
+    with session_factory() as session:
+        user = User(
+            openid=user_id,
+            email="staywithcsq@outlook.com",
+            nickname="Stay",
+            avatar="",
+            sensitive_consent_at=datetime.now(timezone.utc),
+        )
+        quota = DailyQuota(
+            user_id=user_id,
+            date=date.today(),
+            script_used=3,
+            white_bg_used=1,
+        )
+        session.add_all([user, quota])
+        session.commit()
+
+    response = client.post(
+        "/api/v1/generate/script",
+        data={"size": "26x26", "mode": "script"},
+        files={"raw_image": ("sample.png", png_bytes((240, 240, 240)), "image/png")},
+        headers={"Authorization": f"Bearer {create_access_token(subject=user_id)}"},
+    )
+    assert response.status_code == 200
+    assert response.json()["artwork_id"]
+
+    with session_factory() as session:
+        quota = session.scalar(select(DailyQuota).where(DailyQuota.user_id == user_id))
+        assert quota is not None
+        assert quota.script_used == 3
+        assert quota.white_bg_used == 1
+
+
 def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
     client, _session_factory = api_client
     headers = auth_headers(client)
@@ -424,6 +463,52 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
     assert preview_only.json()["provider_used"] == "fake"
     assert "preview_id" in preview_only.json()
     assert "pattern" not in preview_only.json()
+
+
+def test_unlimited_credit_email_skips_ai_credit_requirement(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, session_factory = api_client
+    monkeypatch.setenv("UNLIMITED_CREDIT_EMAILS", "staywithcsq@outlook.com")
+    get_settings.cache_clear()
+    user_id = "email_unlimited_ai"
+
+    with session_factory() as session:
+        user = User(
+            openid=user_id,
+            email="staywithcsq@outlook.com",
+            nickname="Stay",
+            avatar="",
+            free_credits_remaining=0,
+            paid_credits=0,
+            sensitive_consent_at=datetime.now(timezone.utc),
+        )
+        session.add(user)
+        session.commit()
+
+    class FakeChain:
+        def generate(self, image: bytes, style_preset, size_preset, seed=None) -> PreviewResult:
+            return PreviewResult.from_image_bytes(
+                png_bytes((255, 255, 255)),
+                target_color_count=8,
+                provider_used="fake",
+                cost_estimate=0.0,
+                latency_ms=10,
+            )
+
+    monkeypatch.setattr("pindou.api.generate.build_preview_chain", lambda: FakeChain())
+    response = client.post(
+        "/api/v1/preview/generate",
+        data={"style_preset": "q_portrait", "size_preset": "26x26"},
+        files={"image": ("sample.png", png_bytes((255, 255, 255)), "image/png")},
+        headers={"Authorization": f"Bearer {create_access_token(subject=user_id)}"},
+    )
+    assert response.status_code == 200
+    assert response.json()["provider_used"] == "fake"
+
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid == user_id))
+        assert user is not None
+        assert user.free_credits_remaining == 0
+        assert user.paid_credits == 0
 
 
 def test_preview_generate_accepts_sqlite_naive_monthly_card(api_client, monkeypatch: pytest.MonkeyPatch) -> None:

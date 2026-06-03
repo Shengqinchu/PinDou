@@ -8,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from pindou.api.errors import ApiException, ErrorCode
+from pindou.config import get_settings
 from pindou.db.models import DailyQuota, User, as_aware_utc, utc_now
 
 
@@ -37,7 +38,14 @@ def get_or_create_quota(session: Session, user_id: str, quota_date: date | None 
     return quota
 
 
+def has_unlimited_credit(user: User) -> bool:
+    email = (user.email or "").strip().lower()
+    return bool(email and email in get_settings().unlimited_credit_email_set)
+
+
 def consume_script_quota(session: Session, user: User) -> None:
+    if has_unlimited_credit(user):
+        return
     quota = get_or_create_quota(session, user.user_id)
     if quota.script_used >= SCRIPT_DAILY_FREE_LIMIT + quota.script_ad_continued:
         raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "今日快速生成次数已用完，可以稍后通过激励视频续次。")
@@ -46,6 +54,8 @@ def consume_script_quota(session: Session, user: User) -> None:
 
 
 def consume_white_bg_quota(session: Session, user: User) -> None:
+    if has_unlimited_credit(user):
+        return
     quota = get_or_create_quota(session, user.user_id)
     if quota.white_bg_used >= WHITE_BG_DAILY_FREE_LIMIT + quota.white_bg_ad_continued:
         raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "今日自动去白底次数已用完。")
@@ -54,6 +64,8 @@ def consume_white_bg_quota(session: Session, user: User) -> None:
 
 
 def consume_ai_credit(session: Session, user: User) -> None:
+    if has_unlimited_credit(user):
+        return
     now = utc_now()
     if has_ai_credit(user, now=now):
         monthly_card_expires_at = as_aware_utc(user.monthly_card_expires_at)
@@ -71,6 +83,8 @@ def consume_ai_credit(session: Session, user: User) -> None:
 
 
 def require_ai_credit_available(user: User) -> None:
+    if has_unlimited_credit(user):
+        return
     if not has_ai_credit(user):
         raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "您的 AI 额度不足，去充值或兑换一些额度吧。")
 
