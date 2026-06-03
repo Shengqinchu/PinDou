@@ -4,9 +4,9 @@ import { useRoute, useRouter } from 'vue-router';
 
 import {
   GENERATION_MODE_DETAILS,
-  SIZE_OPTION_DETAILS,
   STYLE_OPTION_DETAILS,
   isResultSizePreset,
+  resultSizeLabel,
   useGenerationStore
 } from '../stores/generation';
 
@@ -37,7 +37,7 @@ const scriptStages: StageItem[] = [
 ];
 
 const stages = computed(() => (generation.generationMode === 'ai' ? aiStages : scriptStages));
-const selectedSizeLabel = computed(() => SIZE_OPTION_DETAILS[generation.selectedSize].label);
+const selectedSizeLabel = computed(() => resultSizeLabel(generation.selectedSize));
 const modeLabel = computed(() => GENERATION_MODE_DETAILS[generation.generationMode].label);
 const styleLabel = computed(() => STYLE_OPTION_DETAILS[generation.selectedStyle].label);
 const canRetry = computed(() => Boolean(generation.sourceFile));

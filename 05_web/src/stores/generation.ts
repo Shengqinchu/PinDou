@@ -3,31 +3,31 @@ import { defineStore } from 'pinia';
 import { generateAiPattern, generateScriptPattern, getArtworkDetail, submitConsent } from '../api';
 import type { Artwork, GenerateScriptResponse, PatternSheet, SizePreset, StylePreset } from '../api/types';
 
-export const RESULT_SIZE_OPTIONS = ['26x26', '52x52', '78x78', '104x104'] as const;
-export type ResultSizePreset = (typeof RESULT_SIZE_OPTIONS)[number];
+export const RESULT_SIZE_OPTIONS = ['26x26', '52x52', '78x78'] as const;
+export type FixedResultSizeOption = (typeof RESULT_SIZE_OPTIONS)[number];
+export type ResultSizePreset = SizePreset;
 export const DEFAULT_GENERATION_SIZE: ResultSizePreset = '52x52';
 export const GENERATION_MODE_OPTIONS = ['ai', 'script'] as const;
 export type GenerationMode = (typeof GENERATION_MODE_OPTIONS)[number];
 export const DEFAULT_GENERATION_MODE: GenerationMode = 'ai';
 export const GENERATION_MODE_DETAILS: Record<GenerationMode, { label: string; hint: string; badge?: string }> = {
-  ai: { label: 'AI 精品', hint: 'Q版后转图纸', badge: '推荐' },
-  script: { label: '脚本快速', hint: '秒出原图量化' }
+  ai: { label: 'AI 模式', hint: 'Q版后转图纸', badge: '推荐' },
+  script: { label: '普通模式', hint: '秒出原图量化' }
 };
 
-export const SIZE_OPTION_DETAILS: Record<ResultSizePreset, { label: string; hint: string }> = {
-  '26x26': { label: '26', hint: '简易·豆少' },
-  '52x52': { label: '52', hint: '推荐' },
-  '78x78': { label: '78', hint: '三板' },
-  '104x104': { label: '104', hint: '精细·豆多' }
+export const SIZE_OPTION_DETAILS: Record<FixedResultSizeOption, { label: string }> = {
+  '26x26': { label: '26' },
+  '52x52': { label: '52' },
+  '78x78': { label: '78' }
 };
 
-export const STYLE_OPTIONS = ['q_pet', 'q_couple', 'q_portrait'] as const;
+export const STYLE_OPTIONS = ['q_pet', 'q_portrait', 'q_couple'] as const;
 export type GenerationStylePreset = Extract<StylePreset, (typeof STYLE_OPTIONS)[number]>;
 export const DEFAULT_STYLE_PRESET: GenerationStylePreset = 'q_portrait';
-export const STYLE_OPTION_DETAILS: Record<GenerationStylePreset, { label: string; hint: string; icon: string }> = {
-  q_pet: { label: '宠萌宠', hint: '耳朵花纹更清楚', icon: '宠' },
-  q_couple: { label: '心情侣', hint: '保留左右关系', icon: '心' },
-  q_portrait: { label: '拍自拍', hint: '适合头像半身照', icon: '拍' }
+export const STYLE_OPTION_DETAILS: Record<GenerationStylePreset, { label: string; hint: string; iconSrc: string }> = {
+  q_pet: { label: '萌宠', hint: '宠物轮廓更清楚', iconSrc: '/brand/style-pet.png' },
+  q_portrait: { label: '人像', hint: '适合真人和实物照', iconSrc: '/brand/style-portrait.png' },
+  q_couple: { label: '卡通', hint: '适合卡通原图', iconSrc: '/brand/style-cartoon.png' }
 };
 
 interface GenerationState {
@@ -125,11 +125,23 @@ export const useGenerationStore = defineStore('generation', {
 });
 
 export function isResultSizePreset(value: unknown): value is ResultSizePreset {
-  return RESULT_SIZE_OPTIONS.includes(value as ResultSizePreset);
+  if (typeof value !== 'string') {
+    return false;
+  }
+  const match = /^([1-9]\d{1,2})x([1-9]\d{1,2})$/.exec(value);
+  if (!match || match[1] !== match[2]) {
+    return false;
+  }
+  const size = Number(match[1]);
+  return size >= 10 && size <= 200;
 }
 
 export function isGenerationStylePreset(value: unknown): value is GenerationStylePreset {
   return STYLE_OPTIONS.includes(value as GenerationStylePreset);
+}
+
+export function resultSizeLabel(size: ResultSizePreset | string): string {
+  return size.split('x')[0] || String(size);
 }
 
 export function extractPatternImageUrl(pattern: PatternSheet | null, fallback = ''): string {

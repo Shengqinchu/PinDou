@@ -39,23 +39,22 @@ a {
   font-weight: 900;
   font-size: 18px;
   text-decoration: none;
+  transition:
+    filter 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
 }
 
-.brand__mark {
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  background: var(--pd-gradient-warm);
-  box-shadow: var(--pd-shadow-cta);
-  position: relative;
+.brand:hover {
+  filter: brightness(1.02);
+  transform: translateY(-1px);
 }
 
-.brand__mark::after {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  border-radius: inherit;
-  background: #fff;
+.brand__logo {
+  width: 34px;
+  height: 34px;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 10px rgba(255, 142, 83, 0.16));
 }
 
 .app-nav {

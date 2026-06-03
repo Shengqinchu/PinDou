@@ -10,7 +10,7 @@ const isAuthPage = computed(() => route.name === 'login');
   <div class="app-shell">
     <header class="app-header">
       <RouterLink class="brand" to="/" aria-label="PinDou 首页">
-        <span class="brand__mark" aria-hidden="true"></span>
+        <img class="brand__logo" src="/brand/logo.png" alt="" aria-hidden="true" />
         <span class="brand__text">PinDou 拼豆</span>
       </RouterLink>
       <nav class="app-nav" aria-label="主导航">

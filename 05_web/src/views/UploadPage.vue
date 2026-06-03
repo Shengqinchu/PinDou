@@ -9,20 +9,29 @@ import {
   SIZE_OPTION_DETAILS,
   STYLE_OPTION_DETAILS,
   STYLE_OPTIONS,
+  resultSizeLabel,
   useGenerationStore,
   type GenerationMode,
   type GenerationStylePreset,
   type ResultSizePreset
 } from '../stores/generation';
 
+type TooltipKey = 'mode' | 'size';
+
 const router = useRouter();
 const generation = useGenerationStore();
 const galleryInput = ref<HTMLInputElement | null>(null);
 const cameraInput = ref<HTMLInputElement | null>(null);
+const customSizeField = ref<HTMLInputElement | null>(null);
 const selectedFile = ref<File | null>(null);
 const previewUrl = ref('');
 const isDragging = ref(false);
 const message = ref('');
+const customSizeInput = ref('104');
+const activeTooltip = ref<TooltipKey | null>(null);
+
+const modeTooltip = 'AI 模式：先把照片变成 Q 版再转图纸，更精细，真人、实物照片强烈推荐（有 AI 参与，稍慢一点）。普通模式：直接量化原图，秒出，适合本来就是卡通的图。';
+const sizeTooltip = '格子越多，细节越清楚、越还原；格子越少越好拼，但细节会糊。建议从 52 格起步。格数越高，生成时间也越久哦。';
 
 const fileSizeMb = computed(() => {
   if (!selectedFile.value) {
@@ -40,9 +49,10 @@ const isHeic = computed(() => {
   return file.type.includes('heic') || file.type.includes('heif') || name.endsWith('.heic') || name.endsWith('.heif');
 });
 
-const generationVerb = computed(() => (generation.generationMode === 'ai' ? 'AI 生成' : '快速生成'));
+const isCustomSizeActive = computed(() => !RESULT_SIZE_OPTIONS.includes(generation.selectedSize as (typeof RESULT_SIZE_OPTIONS)[number]));
+const generationVerb = computed(() => GENERATION_MODE_DETAILS[generation.generationMode].label);
 const ctaLabel = computed(() => {
-  const size = generation.selectedSize.split('x')[0];
+  const size = resultSizeLabel(generation.selectedSize);
   return selectedFile.value ? `${generationVerb.value} · ${size}格 ->` : '选择照片后开始生成';
 });
 
@@ -130,6 +140,46 @@ function chooseSize(size: ResultSizePreset): void {
   generation.setSize(size);
 }
 
+function chooseCustomSize(): void {
+  const size = normalizeCustomSize(customSizeInput.value);
+  customSizeInput.value = String(size);
+  generation.setSize(`${size}x${size}` as ResultSizePreset);
+}
+
+function focusCustomSize(): void {
+  chooseCustomSize();
+  window.setTimeout(() => customSizeField.value?.focus(), 0);
+}
+
+function handleCustomSizeInput(): void {
+  customSizeInput.value = customSizeInput.value.replace(/\D/g, '').slice(0, 3);
+  if (isCustomSizeActive.value && customSizeInput.value) {
+    chooseCustomSize();
+  }
+}
+
+function commitCustomSize(): void {
+  chooseCustomSize();
+}
+
+function normalizeCustomSize(rawValue: string): number {
+  const parsed = Number.parseInt(rawValue, 10);
+  if (!Number.isFinite(parsed)) {
+    return 52;
+  }
+  return Math.max(10, Math.min(200, parsed));
+}
+
+function showTooltip(key: TooltipKey): void {
+  activeTooltip.value = key;
+}
+
+function hideTooltip(key: TooltipKey): void {
+  if (activeTooltip.value === key) {
+    activeTooltip.value = null;
+  }
+}
+
 onUnmounted(revokePreview);
 </script>
 
@@ -176,7 +226,12 @@ onUnmounted(revokePreview);
           </template>
           <template v-else>
             <div class="upload-mark" aria-hidden="true">
-              <span></span>
+              <svg viewBox="0 0 48 48" focusable="false">
+                <path d="M14 33.5v2.25A4.25 4.25 0 0 0 18.25 40h11.5A4.25 4.25 0 0 0 34 35.75V33.5" />
+                <path d="M24 31V10" />
+                <path d="m16.5 17.5 7.5-7.5 7.5 7.5" />
+                <path d="M14 27.5h20" />
+              </svg>
             </div>
             <strong>拖拽照片到这里</strong>
             <span>或点击选择图片</span>
@@ -200,8 +255,30 @@ onUnmounted(revokePreview);
       <aside class="control-panel" aria-label="生成选项">
         <section class="option-group" aria-label="生成方式">
           <div class="option-heading">
-            <strong>生成方式</strong>
-            <span>AI 默认推荐</span>
+            <div class="heading-title">
+              <strong>生成方式</strong>
+              <span
+                class="info-wrap"
+                @mouseenter="showTooltip('mode')"
+                @mouseleave="hideTooltip('mode')"
+              >
+                <button
+                  class="info-trigger"
+                  type="button"
+                  aria-label="生成方式说明"
+                  :aria-expanded="activeTooltip === 'mode'"
+                  @click.stop="showTooltip('mode')"
+                  @focus="showTooltip('mode')"
+                  @blur="hideTooltip('mode')"
+                >
+                  i
+                </button>
+                <span v-if="activeTooltip === 'mode'" class="info-tip" role="tooltip">
+                  {{ modeTooltip }}
+                </span>
+              </span>
+            </div>
+            <span class="heading-note">AI 默认推荐</span>
           </div>
           <div class="mode-grid">
             <button
@@ -225,7 +302,7 @@ onUnmounted(revokePreview);
         <section class="option-group" aria-label="风格">
           <div class="option-heading">
             <strong>风格</strong>
-            <span>{{ generation.generationMode === 'ai' ? 'Q版风格化' : '切回 AI 时生效' }}</span>
+            <span class="heading-note">{{ generation.generationMode === 'ai' ? 'Q版风格化' : '切回 AI 时生效' }}</span>
           </div>
           <div class="style-grid">
             <button
@@ -237,7 +314,9 @@ onUnmounted(revokePreview);
               :aria-pressed="generation.selectedStyle === style"
               @click="chooseStyle(style)"
             >
-              <span>{{ STYLE_OPTION_DETAILS[style].icon }}</span>
+              <span class="style-icon" aria-hidden="true">
+                <img :src="STYLE_OPTION_DETAILS[style].iconSrc" :alt="`${STYLE_OPTION_DETAILS[style].label}图标`" />
+              </span>
               <strong>{{ STYLE_OPTION_DETAILS[style].label }}</strong>
               <em>{{ STYLE_OPTION_DETAILS[style].hint }}</em>
             </button>
@@ -246,8 +325,30 @@ onUnmounted(revokePreview);
 
         <section class="option-group" aria-label="目标格数">
           <div class="option-heading">
-            <strong>目标格数</strong>
-            <span>按拼豆板规格</span>
+            <div class="heading-title">
+              <strong>目标格数</strong>
+              <span
+                class="info-wrap"
+                @mouseenter="showTooltip('size')"
+                @mouseleave="hideTooltip('size')"
+              >
+                <button
+                  class="info-trigger"
+                  type="button"
+                  aria-label="目标格数说明"
+                  :aria-expanded="activeTooltip === 'size'"
+                  @click.stop="showTooltip('size')"
+                  @focus="showTooltip('size')"
+                  @blur="hideTooltip('size')"
+                >
+                  i
+                </button>
+                <span v-if="activeTooltip === 'size'" class="info-tip" role="tooltip">
+                  {{ sizeTooltip }}
+                </span>
+              </span>
+            </div>
+            <span class="heading-note">按拼豆板规格</span>
           </div>
           <div class="size-grid">
             <button
@@ -260,16 +361,37 @@ onUnmounted(revokePreview);
               @click="chooseSize(size)"
             >
               <strong>{{ SIZE_OPTION_DETAILS[size].label }}</strong>
-              <span>{{ SIZE_OPTION_DETAILS[size].hint }}</span>
             </button>
+            <label
+              class="size-card size-card--custom"
+              :class="{ 'size-card--active': isCustomSizeActive }"
+              @click="focusCustomSize"
+            >
+              <strong>自定义</strong>
+              <input
+                ref="customSizeField"
+                v-model="customSizeInput"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                aria-label="自定义目标格数"
+                @click.stop
+                @focus="chooseCustomSize"
+                @input="handleCustomSizeInput"
+                @blur="commitCustomSize"
+              />
+              <span>按拼豆板规格更好拼</span>
+            </label>
           </div>
         </section>
+      </aside>
 
+      <div class="generate-bar">
         <p v-if="message" class="upload-message">{{ message }}</p>
         <button class="pd-btn generate-cta" type="button" :disabled="!selectedFile" @click="startGenerate">
           {{ ctaLabel }}
         </button>
-      </aside>
+      </div>
     </div>
   </section>
 </template>
@@ -280,12 +402,13 @@ onUnmounted(revokePreview);
 }
 
 .studio-shell {
-  width: min(100%, 1140px);
+  width: min(100%, 1080px);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(540px, 1fr) 390px;
+  grid-template-columns: minmax(500px, 1fr) minmax(340px, 368px);
   gap: clamp(18px, 2.4vw, 28px);
   align-items: start;
+  justify-content: center;
 }
 
 .upload-stage,
@@ -295,6 +418,17 @@ onUnmounted(revokePreview);
   background: rgba(255, 255, 255, 0.9);
   box-shadow: var(--pd-shadow-float);
   padding: clamp(18px, 3.2vw, 30px);
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.upload-stage:hover,
+.control-panel:hover {
+  border-color: rgba(255, 142, 83, 0.36);
+  box-shadow: 0 22px 54px rgba(255, 142, 83, 0.15), 0 16px 36px rgba(45, 45, 45, 0.08);
+  transform: translateY(-3px);
 }
 
 .upload-stage {
@@ -305,7 +439,7 @@ onUnmounted(revokePreview);
 
 .drop-zone {
   position: relative;
-  min-height: clamp(280px, 34vw, 420px);
+  min-height: clamp(240px, 30vw, 360px);
   display: grid;
   place-items: center;
   align-content: center;
@@ -378,19 +512,20 @@ onUnmounted(revokePreview);
   transform: rotate(-4deg) scale(1.05);
 }
 
-.upload-mark span {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  background:
-    linear-gradient(90deg, #fff 0 6px, transparent 6px 14px, #fff 14px 20px, transparent 20px),
-    linear-gradient(#fff 0 6px, transparent 6px 14px, #fff 14px 20px, transparent 20px);
+.upload-mark svg {
+  width: 43px;
+  height: 43px;
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4.2;
 }
 
 .preview-image {
   width: 100%;
   height: 100%;
-  max-height: 420px;
+  max-height: 360px;
   display: block;
   border-radius: 18px;
   object-fit: contain;
@@ -428,7 +563,9 @@ onUnmounted(revokePreview);
 
 .stage-actions .pd-btn,
 .generate-cta {
+  cursor: pointer;
   transition:
+    border-color 180ms var(--pd-ease-out),
     filter 180ms var(--pd-ease-out),
     box-shadow 180ms var(--pd-ease-out),
     transform 180ms var(--pd-ease-out);
@@ -477,6 +614,14 @@ onUnmounted(revokePreview);
   cursor: pointer;
   font: inherit;
   font-weight: 900;
+  transition:
+    color 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.file-strip button:hover {
+  color: var(--pd-pink);
+  transform: translateY(-1px);
 }
 
 .control-panel {
@@ -492,21 +637,87 @@ onUnmounted(revokePreview);
 
 .option-heading {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
-.option-heading strong {
+.heading-title {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.option-heading strong,
+.heading-title strong {
   color: var(--pd-fg-1);
   font-size: 15px;
   font-weight: 900;
+  white-space: nowrap;
 }
 
-.option-heading span {
+.heading-note {
   color: var(--pd-fg-2);
   font-size: 12px;
   font-weight: 900;
+  white-space: nowrap;
+}
+
+.info-wrap {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+.info-trigger {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 142, 83, 0.34);
+  border-radius: 999px;
+  background: rgba(255, 241, 232, 0.88);
+  color: var(--pd-orange);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    background 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.info-trigger:hover,
+.info-trigger:focus-visible {
+  border-color: rgba(255, 142, 83, 0.72);
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(255, 142, 83, 0.16);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.info-tip {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 6;
+  width: min(312px, 76vw);
+  border: 1px solid rgba(255, 142, 83, 0.3);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 18px 42px rgba(45, 45, 45, 0.12), 0 10px 24px rgba(255, 142, 83, 0.12);
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.62;
+  padding: 12px 13px;
+  text-align: left;
+  white-space: normal;
 }
 
 .mode-grid,
@@ -525,7 +736,7 @@ onUnmounted(revokePreview);
 }
 
 .size-grid {
-  grid-template-columns: repeat(4, minmax(74px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .mode-card,
@@ -649,26 +860,32 @@ onUnmounted(revokePreview);
   padding: 11px 12px;
 }
 
-.style-pill > span {
+.style-icon {
   width: 38px;
   height: 38px;
   display: grid;
   grid-row: 1 / span 2;
   place-items: center;
   border-radius: 14px;
-  background: rgba(164, 212, 197, 0.2);
-  color: var(--pd-fg-1);
-  font-weight: 900;
+  background: rgba(255, 249, 245, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(237, 228, 218, 0.62);
+  overflow: hidden;
 }
 
-.style-pill--active > span {
-  background: rgba(255, 255, 255, 0.22);
-  color: #fff;
+.style-icon img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
 }
 
-.style-pill--active:hover > span {
+.style-pill--active .style-icon {
   background: rgba(255, 255, 255, 0.22);
-  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.36);
+}
+
+.style-pill--active:hover .style-icon {
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.36);
 }
 
 .style-pill--muted:not(.style-pill--active) {
@@ -676,13 +893,13 @@ onUnmounted(revokePreview);
 }
 
 .style-pill strong {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 900;
   white-space: nowrap;
 }
 
 .size-card {
-  min-height: 70px;
+  min-height: 64px;
   border-radius: 18px;
   padding: 10px 7px;
   text-align: center;
@@ -694,16 +911,73 @@ onUnmounted(revokePreview);
   line-height: 1;
 }
 
-.size-card span {
-  margin-top: 6px;
-  color: var(--pd-fg-2);
-  font-size: 11px;
+.size-card--custom {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto minmax(72px, 108px) minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.size-card--custom strong {
+  font-size: 16px;
+}
+
+.size-card--custom input {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  border: 1px solid rgba(255, 142, 83, 0.34);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--pd-fg-1);
+  cursor: text;
+  font: inherit;
+  font-size: 18px;
   font-weight: 900;
-  line-height: 1.2;
+  outline: none;
+  padding: 0 10px;
+  text-align: center;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out);
+}
+
+.size-card--custom input:focus {
+  border-color: rgba(255, 142, 83, 0.72);
+  box-shadow: 0 0 0 4px rgba(255, 142, 83, 0.12);
+}
+
+.size-card--custom span {
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.25;
   white-space: nowrap;
 }
 
+.size-card--active.size-card--custom input {
+  border-color: rgba(255, 255, 255, 0.48);
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.size-card--active.size-card--custom input::placeholder,
+.size-card--active.size-card--custom span {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.generate-bar {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
 .upload-message {
+  width: min(100%, 640px);
   margin: 0;
   border-radius: 16px;
   background: rgba(164, 212, 197, 0.18);
@@ -714,10 +988,11 @@ onUnmounted(revokePreview);
 }
 
 .generate-cta {
-  width: 100%;
-  min-height: 56px;
+  width: min(100%, 640px);
+  min-height: 60px;
   margin-top: 2px;
-  font-size: 16px;
+  border: 1px solid transparent;
+  font-size: 17px;
 }
 
 .generate-cta:not(:disabled) {
@@ -776,7 +1051,7 @@ onUnmounted(revokePreview);
     justify-items: start;
   }
 
-  .style-pill > span {
+  .style-icon {
     grid-row: auto;
   }
 }
