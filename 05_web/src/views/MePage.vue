@@ -103,6 +103,17 @@ async function logout(): Promise<void> {
     radial-gradient(circle at 88% 12%, rgba(164, 212, 197, 0.22), transparent 30%),
     rgba(255, 255, 255, 0.9);
   box-shadow: var(--pd-shadow-float);
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out),
+    background 180ms var(--pd-ease-out);
+}
+
+.me-card:hover {
+  border-color: rgba(255, 142, 83, 0.34);
+  box-shadow: 0 18px 44px rgba(255, 107, 90, 0.15), 0 8px 20px rgba(45, 45, 45, 0.07);
+  transform: translateY(-3px);
 }
 
 .me-hero {
@@ -159,6 +170,18 @@ async function logout(): Promise<void> {
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.76);
   padding: 16px;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out),
+    background 180ms var(--pd-ease-out);
+}
+
+.me-profile:hover {
+  border-color: rgba(255, 142, 83, 0.34);
+  background: #fff;
+  box-shadow: var(--pd-shadow-card);
+  transform: translateY(-2px);
 }
 
 .me-profile strong,
@@ -200,10 +223,26 @@ async function logout(): Promise<void> {
   border-radius: 18px;
   background: var(--pd-peach-50);
   padding: 16px;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out),
+    background 180ms var(--pd-ease-out);
+}
+
+.me-stat:hover {
+  border-color: rgba(255, 142, 83, 0.42);
+  background: #fff;
+  box-shadow: 0 12px 26px rgba(255, 142, 83, 0.12);
+  transform: translateY(-3px);
 }
 
 .me-stat--primary {
   background: linear-gradient(145deg, rgba(255, 176, 136, 0.3), rgba(255, 241, 232, 0.86));
+}
+
+.me-stat--primary:hover {
+  background: linear-gradient(145deg, rgba(255, 176, 136, 0.38), rgba(255, 255, 255, 0.94));
 }
 
 .me-stats dt {
@@ -251,6 +290,18 @@ async function logout(): Promise<void> {
   border-radius: 22px;
   background: rgba(164, 212, 197, 0.16);
   padding: 18px;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out),
+    background 180ms var(--pd-ease-out);
+}
+
+.me-next:hover {
+  border-color: rgba(255, 142, 83, 0.36);
+  background: rgba(164, 212, 197, 0.22);
+  box-shadow: 0 14px 30px rgba(164, 212, 197, 0.16), 0 8px 18px rgba(255, 142, 83, 0.1);
+  transform: translateY(-3px);
 }
 
 .me-next strong,
@@ -271,6 +322,16 @@ async function logout(): Promise<void> {
   grid-column: 2;
   grid-row: 1 / span 2;
   white-space: nowrap;
+  transition:
+    box-shadow 180ms var(--pd-ease-out),
+    filter 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.me-next .pd-btn:hover {
+  filter: brightness(1.035);
+  box-shadow: 0 18px 38px rgba(255, 142, 83, 0.34), 0 8px 20px rgba(255, 107, 90, 0.2);
+  transform: translateY(-2px) scale(1.01);
 }
 
 .me-error {
@@ -287,6 +348,25 @@ async function logout(): Promise<void> {
   border: 1px solid rgba(255, 90, 90, 0.28);
   background: rgba(255, 90, 90, 0.1);
   color: var(--pd-danger);
+  box-shadow: none;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    background 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    color 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.me-logout:hover {
+  border-color: rgba(255, 90, 90, 0.48);
+  background: rgba(255, 90, 90, 0.16);
+  box-shadow: 0 12px 26px rgba(255, 90, 90, 0.12);
+  color: #d93636;
+  transform: translateY(-2px);
+}
+
+.me-logout:active {
+  transform: translateY(0) scale(0.99);
 }
 
 @media (max-width: 640px) {
