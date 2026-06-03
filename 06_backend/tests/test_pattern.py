@@ -59,6 +59,60 @@ def test_preview_alpha_path_marks_transparent_cells_as_no_bead() -> None:
     assert any(cell is None for row in sheet.to_frontend_dict()["grid"] for cell in row)
 
 
+def test_subject_alignment_centers_symmetric_cartoon_on_grid_axis() -> None:
+    image = shifted_symmetric_face_image()
+
+    for size in (26, 52):
+        unaligned = fit_to_canvas(
+            image,
+            size,
+            size,
+            (255, 255, 255, 0),
+            align_subject_to_grid=False,
+        )
+        aligned = fit_to_canvas(image, size, size, (255, 255, 255, 0))
+        target_axis = size / 2
+
+        unaligned_error = abs(foreground_bbox_center_x(unaligned) - target_axis)
+        aligned_error = abs(foreground_bbox_center_x(aligned) - target_axis)
+        unaligned_mismatch = vertical_alpha_mismatch(unaligned, target_axis)
+        aligned_mismatch = vertical_alpha_mismatch(aligned, target_axis)
+
+        assert unaligned_error >= 0.7
+        assert aligned_error <= 0.3
+        assert aligned_mismatch < unaligned_mismatch
+
+
+def test_subject_alignment_metadata_is_reported_for_transparent_preview() -> None:
+    builder = PatternBuilder(target_colors=8)
+
+    sheet = builder.build(
+        SizePreset.SINGLE_BOARD_26X26,
+        preview=image_bytes(shifted_symmetric_face_image()),
+        mode="ai",
+    )
+
+    alignment = sheet.metadata["subject_grid_alignment"]
+    assert alignment["applied"] is True
+    assert alignment["target_center"][0] == 13.0
+    assert abs(alignment["shift_x"]) >= 0.7
+
+
+def test_subject_alignment_does_not_transform_opaque_photo_like_input() -> None:
+    image = opaque_asymmetric_photo_like_image()
+
+    baseline = fit_to_canvas(
+        image,
+        26,
+        26,
+        (255, 255, 255, 255),
+        align_subject_to_grid=False,
+    )
+    aligned = fit_to_canvas(image, 26, 26, (255, 255, 255, 255))
+
+    assert np.array_equal(np.array(aligned, dtype=np.uint8), np.array(baseline, dtype=np.uint8))
+
+
 def test_custom_size_builds_and_reports_board_alignment_warning() -> None:
     builder = PatternBuilder(target_colors=8)
     sheet = builder.build("45x30", raw_image=read_input("cartoon_synthetic.png"), mode="script")
@@ -429,6 +483,57 @@ def flat_rabbit_sticker_bytes() -> bytes:
     draw.arc([88, 98, 106, 118], start=25, end=160, fill=outline, width=4)
     draw.rectangle([56, 130, 124, 145], fill=red, outline=outline, width=4)
     return image_bytes(image)
+
+
+def shifted_symmetric_face_image() -> Image.Image:
+    image = Image.new("RGBA", (120, 120), (255, 255, 255, 0))
+    draw = ImageDraw.Draw(image)
+    axis = 52
+    fill = (238, 214, 180, 255)
+    outline = (20, 20, 20, 255)
+    red = (210, 36, 48, 255)
+
+    draw.ellipse([axis - 34, 18, axis + 34, 94], fill=fill, outline=outline, width=6)
+    draw.ellipse([axis - 49, 40, axis - 29, 66], fill=fill, outline=outline, width=5)
+    draw.ellipse([axis + 29, 40, axis + 49, 66], fill=fill, outline=outline, width=5)
+    draw.ellipse([axis - 20, 50, axis - 9, 61], fill=outline)
+    draw.ellipse([axis + 9, 50, axis + 20, 61], fill=outline)
+    draw.rectangle([axis - 18, 75, axis + 18, 84], fill=red, outline=outline, width=3)
+    draw.rectangle([axis - 12, 94, axis + 12, 112], fill=(80, 120, 220, 255), outline=outline, width=4)
+    return image
+
+
+def opaque_asymmetric_photo_like_image() -> Image.Image:
+    image = Image.new("RGBA", (96, 72), (190, 170, 145, 255))
+    draw = ImageDraw.Draw(image)
+    draw.rectangle([0, 0, 42, 71], fill=(70, 94, 138, 255))
+    draw.rectangle([43, 0, 95, 71], fill=(205, 178, 118, 255))
+    draw.ellipse([8, 22, 42, 58], fill=(230, 70, 60, 255))
+    draw.polygon([(58, 10), (88, 30), (74, 62)], fill=(50, 150, 105, 255))
+    return image
+
+
+def foreground_bbox_center_x(image: Image.Image) -> float:
+    alpha = np.array(image.getchannel("A"), dtype=np.uint8)
+    _ys, xs = np.nonzero(alpha >= 128)
+    assert len(xs) > 0
+    return (int(xs.min()) + int(xs.max()) + 1) / 2
+
+
+def vertical_alpha_mismatch(image: Image.Image, axis_x: float) -> float:
+    alpha = np.array(image.getchannel("A"), dtype=np.uint8) >= 128
+    height, width = alpha.shape
+    radius = int(min(axis_x, width - axis_x))
+    mismatches = 0
+    compared = 0
+    for offset in range(radius):
+        left = int(axis_x - 1 - offset)
+        right = int(axis_x + offset)
+        if left < 0 or right >= width:
+            continue
+        mismatches += int(np.count_nonzero(alpha[:, left] != alpha[:, right]))
+        compared += height
+    return mismatches / compared if compared else 0.0
 
 
 def cells_for_codes(sheet, codes: set[str]) -> set[tuple[int, int]]:

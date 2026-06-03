@@ -21,6 +21,10 @@ LOW_GRID_SATURATED_PIXEL_RATIO = 0.06
 LOW_GRID_MIN_FEATURE_PIXELS = 2
 SATURATED_COLOR_SPREAD_THRESHOLD = 70
 SATURATED_RED_DOMINANCE_THRESHOLD = 42
+SUBJECT_ALIGNMENT_ALPHA_THRESHOLD = 128
+SUBJECT_ALIGNMENT_MIN_PIXELS = 4
+SUBJECT_ALIGNMENT_MAX_FOREGROUND_RATIO = 0.98
+SUBJECT_ALIGNMENT_EPSILON = 0.02
 
 
 @dataclass(frozen=True)
@@ -47,6 +51,28 @@ class ColorRef:
             "hex": self.hex,
             "rgb": self.rgb,
             "bead_diameter_mm": self.bead_diameter_mm,
+        }
+
+
+@dataclass(frozen=True)
+class SubjectGridAlignment:
+    applied: bool
+    shift_x: float = 0.0
+    shift_y: float = 0.0
+    target_center_x: float | None = None
+    target_center_y: float | None = None
+    subject_center_x: float | None = None
+    subject_center_y: float | None = None
+    bbox: tuple[int, int, int, int] | None = None
+
+    def to_metadata(self) -> dict[str, Any]:
+        return {
+            "applied": self.applied,
+            "shift_x": round(self.shift_x, 3),
+            "shift_y": round(self.shift_y, 3),
+            "target_center": rounded_pair(self.target_center_x, self.target_center_y),
+            "subject_center": rounded_pair(self.subject_center_x, self.subject_center_y),
+            "bbox": list(self.bbox) if self.bbox is not None else None,
         }
 
 
@@ -150,7 +176,7 @@ class PatternBuilder:
             raise ValueError("PatternBuilder requires preview or raw_image bytes.")
 
         palette = list(load_palette(brand, bead_diameter_mm))
-        prepared_image, no_bead_mask, white_bg_detected = prepare_input_image(
+        prepared_image, no_bead_mask, white_bg_detected, subject_alignment = prepare_input_image(
             image_bytes,
             size,
             input_mode=input_mode,
@@ -199,6 +225,7 @@ class PatternBuilder:
                 "auto_remove_white_bg_requested": bool(auto_remove_white_bg and input_mode == "script"),
                 "low_grid_feature_priority": low_grid_feature_priority,
                 "low_grid_outline_reinforced": outline_reinforced,
+                "subject_grid_alignment": subject_alignment.to_metadata(),
             },
         )
         preview_png = PatternExporter().to_simple_grid_png(sheet)
@@ -231,7 +258,7 @@ def prepare_input_image(
     *,
     input_mode: str,
     auto_remove_white_bg: bool = False,
-) -> tuple[Image.Image, list[list[bool]], bool]:
+) -> tuple[Image.Image, list[list[bool]], bool, SubjectGridAlignment]:
     from pindou.pattern.postprocess import detect_and_remove_white_bg
 
     source = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
@@ -242,7 +269,7 @@ def prepare_input_image(
         source = source.convert("RGBA")
     background_alpha = 0 if input_mode == "ai" or white_bg_detected else 255
     background = (255, 255, 255, background_alpha)
-    fitted = fit_to_canvas(
+    fitted, subject_alignment = fit_to_canvas_with_alignment(
         source,
         width,
         height,
@@ -254,7 +281,7 @@ def prepare_input_image(
         no_bead_mask = (alpha < 128).tolist()
     else:
         no_bead_mask = [[False for _ in range(width)] for _ in range(height)]
-    return fitted, no_bead_mask, white_bg_detected
+    return fitted, no_bead_mask, white_bg_detected, subject_alignment
 
 
 def fit_to_canvas(
@@ -264,12 +291,33 @@ def fit_to_canvas(
     background: tuple[int, int, int, int],
     *,
     preserve_features: bool = False,
+    align_subject_to_grid: bool = True,
 ) -> Image.Image:
+    image, _alignment = fit_to_canvas_with_alignment(
+        image,
+        width,
+        height,
+        background,
+        preserve_features=preserve_features,
+        align_subject_to_grid=align_subject_to_grid,
+    )
+    return image
+
+
+def fit_to_canvas_with_alignment(
+    image: Image.Image,
+    width: int,
+    height: int,
+    background: tuple[int, int, int, int],
+    *,
+    preserve_features: bool = False,
+    align_subject_to_grid: bool = True,
+) -> tuple[Image.Image, SubjectGridAlignment]:
     source = image.convert("RGBA")
     source_arr = np.array(source, dtype=np.uint8)
     source_height, source_width = source_arr.shape[:2]
     if source_width == 0 or source_height == 0:
-        return Image.new("RGBA", (width, height), background)
+        return Image.new("RGBA", (width, height), background), SubjectGridAlignment(applied=False)
 
     scale = min(width / source_width, height / source_height, 1.0)
     fitted_width = max(1, min(width, int(round(source_width * scale))))
@@ -278,26 +326,113 @@ def fit_to_canvas(
     offset_y = (height - fitted_height) // 2
     scale_x = fitted_width / source_width
     scale_y = fitted_height / source_height
+    subject_alignment = compute_subject_grid_alignment(
+        source_arr,
+        width=width,
+        height=height,
+        offset_x=offset_x,
+        offset_y=offset_y,
+        scale_x=scale_x,
+        scale_y=scale_y,
+        enabled=align_subject_to_grid,
+    )
     canvas = np.zeros((height, width, 4), dtype=np.uint8)
     canvas[:, :] = np.array(background, dtype=np.uint8)
 
-    for y in range(offset_y, offset_y + fitted_height):
-        src_y0 = max(0, int(np.floor((y - offset_y) / scale_y)))
-        src_y1 = min(source_height, int(np.ceil((y + 1 - offset_y) / scale_y)))
-        if src_y1 <= src_y0:
-            src_y1 = min(source_height, src_y0 + 1)
-        for x in range(offset_x, offset_x + fitted_width):
-            src_x0 = max(0, int(np.floor((x - offset_x) / scale_x)))
-            src_x1 = min(source_width, int(np.ceil((x + 1 - offset_x) / scale_x)))
-            if src_x1 <= src_x0:
-                src_x1 = min(source_width, src_x0 + 1)
+    for y in range(height):
+        src_y0_raw = (y - offset_y - subject_alignment.shift_y) / scale_y
+        src_y1_raw = (y + 1 - offset_y - subject_alignment.shift_y) / scale_y
+        src_y0 = max(0, int(np.floor(src_y0_raw)))
+        src_y1 = min(source_height, int(np.ceil(src_y1_raw)))
+        for x in range(width):
+            src_x0_raw = (x - offset_x - subject_alignment.shift_x) / scale_x
+            src_x1_raw = (x + 1 - offset_x - subject_alignment.shift_x) / scale_x
+            src_x0 = max(0, int(np.floor(src_x0_raw)))
+            src_x1 = min(source_width, int(np.ceil(src_x1_raw)))
+            if src_y1 <= src_y0 or src_x1 <= src_x0:
+                continue
             region = source_arr[src_y0:src_y1, src_x0:src_x1]
             if preserve_features:
                 canvas[y, x] = feature_priority_region_rgba(region, background)
             else:
                 canvas[y, x] = dominant_region_rgba(region, background)
 
-    return Image.fromarray(canvas)
+    return Image.fromarray(canvas), subject_alignment
+
+
+def compute_subject_grid_alignment(
+    source_arr: np.ndarray,
+    *,
+    width: int,
+    height: int,
+    offset_x: int,
+    offset_y: int,
+    scale_x: float,
+    scale_y: float,
+    enabled: bool,
+) -> SubjectGridAlignment:
+    if not enabled:
+        return SubjectGridAlignment(applied=False)
+
+    foreground = subject_foreground_mask(source_arr)
+    if foreground is None:
+        return SubjectGridAlignment(applied=False)
+
+    ys, xs = np.nonzero(foreground)
+    min_x = int(xs.min())
+    max_x = int(xs.max()) + 1
+    min_y = int(ys.min())
+    max_y = int(ys.max()) + 1
+    bbox_center_x = (min_x + max_x) / 2
+    bbox_center_y = (min_y + max_y) / 2
+
+    target_center_x = float(round(width / 2))
+    target_center_y = height / 2
+    subject_canvas_x = offset_x + bbox_center_x * scale_x
+    subject_canvas_y = offset_y + bbox_center_y * scale_y
+    raw_shift_x = target_center_x - subject_canvas_x
+    raw_shift_y = target_center_y - subject_canvas_y
+
+    bbox_canvas_min_x = offset_x + min_x * scale_x
+    bbox_canvas_max_x = offset_x + max_x * scale_x
+    bbox_canvas_min_y = offset_y + min_y * scale_y
+    bbox_canvas_max_y = offset_y + max_y * scale_y
+    shift_x = clamp(raw_shift_x, -bbox_canvas_min_x, width - bbox_canvas_max_x)
+    shift_y = clamp(raw_shift_y, -bbox_canvas_min_y, height - bbox_canvas_max_y)
+    applied = abs(shift_x) >= SUBJECT_ALIGNMENT_EPSILON or abs(shift_y) >= SUBJECT_ALIGNMENT_EPSILON
+
+    return SubjectGridAlignment(
+        applied=applied,
+        shift_x=shift_x,
+        shift_y=shift_y,
+        target_center_x=target_center_x,
+        target_center_y=target_center_y,
+        subject_center_x=subject_canvas_x,
+        subject_center_y=subject_canvas_y,
+        bbox=(min_x, min_y, max_x, max_y),
+    )
+
+
+def subject_foreground_mask(source_arr: np.ndarray) -> np.ndarray | None:
+    alpha = source_arr[:, :, 3]
+    foreground = alpha >= SUBJECT_ALIGNMENT_ALPHA_THRESHOLD
+    foreground_count = int(foreground.sum())
+    if foreground_count < SUBJECT_ALIGNMENT_MIN_PIXELS:
+        return None
+    foreground_ratio = foreground_count / foreground.size
+    if foreground_ratio >= SUBJECT_ALIGNMENT_MAX_FOREGROUND_RATIO:
+        return None
+    return foreground
+
+
+def clamp(value: float, minimum: float, maximum: float) -> float:
+    return min(max(value, minimum), maximum)
+
+
+def rounded_pair(x: float | None, y: float | None) -> list[float] | None:
+    if x is None or y is None:
+        return None
+    return [round(x, 3), round(y, 3)]
 
 
 def feature_priority_region_rgba(region: np.ndarray, background: tuple[int, int, int, int]) -> np.ndarray:
