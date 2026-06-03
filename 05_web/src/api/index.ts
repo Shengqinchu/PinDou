@@ -8,6 +8,7 @@ import type {
   GenerateScriptResponse,
   PartitionSheet,
   PatternSheet,
+  SaveArtworkPatternResponse,
   SizePreset,
   User
 } from './types';
@@ -98,6 +99,16 @@ export function generateScriptPattern(file: File, size: SizePreset = '26x26'): P
 
 export function getArtworkDetail(artworkId: string): Promise<Artwork> {
   return apiRequest<Artwork>(`/artwork/${encodeURIComponent(artworkId)}`);
+}
+
+export function saveArtworkPattern(
+  artworkId: string,
+  patternJson: PatternSheet
+): Promise<SaveArtworkPatternResponse> {
+  return apiRequest<SaveArtworkPatternResponse>(`/artwork/${encodeURIComponent(artworkId)}/pattern`, {
+    method: 'PUT',
+    body: { pattern_json: patternJson }
+  });
 }
 
 export function getPattern(artworkId: string): Promise<PatternSheet> {

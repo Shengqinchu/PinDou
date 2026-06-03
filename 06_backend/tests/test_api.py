@@ -390,6 +390,49 @@ def test_generate_script_artwork_pattern_and_delete_flow(api_client) -> None:
     assert client.get(f"/api/artwork/{artwork_id}", headers=headers).status_code == 404
 
 
+def test_save_artwork_pattern_rebuilds_counts_and_exports_png(api_client) -> None:
+    client, _session_factory = api_client
+    headers = auth_headers(client)
+    image_id = upload_image(client, headers)
+
+    generated = client.post("/api/generate/script", json={"image_id": image_id, "size": "26x26"}, headers=headers)
+    assert generated.status_code == 200
+    artwork_id = generated.json()["artwork_id"]
+    pattern = generated.json()["pattern"]
+    replacement_color = {
+        "brand": "MARD",
+        "code": "H7",
+        "name_cn": "H7",
+        "name_en": "H7",
+        "hex": "#F05050",
+        "rgb": [240, 80, 80],
+        "bead_diameter_mm": 5.0,
+    }
+
+    pattern["grid"][0][0] = replacement_color
+    pattern["palette_used"].append(replacement_color)
+    pattern["color_counts"] = {}
+    pattern["bead_total"] = 0
+    pattern["metadata"]["thumbnail_url"] = "/static/patterns/stale_thumb.png"
+
+    saved = client.put(f"/api/artwork/{artwork_id}/pattern", json={"pattern_json": pattern}, headers=headers)
+    assert saved.status_code == 200
+    payload = saved.json()
+    saved_pattern = payload["pattern"]
+    assert payload["success"] is True
+    assert payload["pattern_url"].endswith(f"pattern_{artwork_id}.json")
+    assert saved_pattern["grid"][0][0]["code"] == "H7"
+    assert saved_pattern["color_counts"]["H7"] >= 1
+    assert saved_pattern["bead_total"] > 0
+    assert saved_pattern["metadata"]["labeled_image_url"].endswith("_with_grid.png")
+    assert saved_pattern["metadata"].get("thumbnail_url") != "/static/patterns/stale_thumb.png"
+    assert payload["artwork"]["preview_url"] == saved_pattern["metadata"]["labeled_image_url"]
+
+    detail = client.get(f"/api/artwork/{artwork_id}", headers=headers)
+    assert detail.status_code == 200
+    assert detail.json()["pattern_data"]["grid"][0][0]["code"] == "H7"
+
+
 def test_unlimited_credit_email_skips_script_daily_quota(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
     client, session_factory = api_client
     monkeypatch.setenv("UNLIMITED_CREDIT_EMAILS", " StayWithCSQ@Outlook.com ")

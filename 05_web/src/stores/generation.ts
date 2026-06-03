@@ -73,6 +73,10 @@ export const useGenerationStore = defineStore('generation', {
     async loadArtwork(artworkId: string): Promise<Artwork> {
       this.error = '';
       const artwork = await getArtworkDetail(artworkId);
+      this.applyArtwork(artwork);
+      return artwork;
+    },
+    applyArtwork(artwork: Artwork): void {
       this.currentArtwork = artwork;
       this.currentResult = {
         artwork_id: artwork.artwork_id,
@@ -82,7 +86,6 @@ export const useGenerationStore = defineStore('generation', {
       if (isResultSizePreset(artwork.size_preset)) {
         this.selectedSize = artwork.size_preset;
       }
-      return artwork;
     }
   }
 });

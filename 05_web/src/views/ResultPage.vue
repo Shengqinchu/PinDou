@@ -1,21 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+import { saveArtworkPattern } from '../api';
+import PatternEditor from '../components/PatternEditor.vue';
 import { RESULT_SIZE_OPTIONS, useGenerationStore, type ResultSizePreset } from '../stores/generation';
-import type { ColorRef } from '../api/types';
+import type { ColorRef, PatternSheet } from '../api/types';
 
 interface PaletteRow {
   color: ColorRef;
   count: number;
   percent: number;
-}
-
-interface GridCell {
-  key: string;
-  code: string;
-  color: string;
-  empty: boolean;
 }
 
 const route = useRoute();
@@ -24,9 +19,18 @@ const generation = useGenerationStore();
 const loading = ref(false);
 const error = ref('');
 const sizeNotice = ref('');
+const editablePattern = ref<PatternSheet | null>(null);
+const availablePalette = ref<ColorRef[]>([]);
+const undoStack = ref<PatternSheet[]>([]);
+const redoStack = ref<PatternSheet[]>([]);
+const isSaving = ref(false);
+const isDirty = ref(false);
+const saveMessage = ref('');
+const saveError = ref('');
+const skipSourcePatternReset = ref(false);
 
-const pattern = computed(() => generation.currentPattern);
-const patternImageUrl = computed(() => generation.patternImageUrl);
+const sourcePattern = computed(() => generation.currentPattern);
+const pattern = computed(() => editablePattern.value);
 const hasSourceFile = computed(() => Boolean(generation.sourceFile));
 const artworkId = computed(() => String(route.params.id || generation.currentArtworkId || ''));
 const selectedSizeNumber = computed(() => generation.selectedSize.split('x')[0]);
@@ -52,26 +56,23 @@ const paletteRows = computed<PaletteRow[]>(() => {
     .sort((left, right) => right.count - left.count);
 });
 
-const gridColumnCount = computed(() => {
-  const grid = pattern.value?.grid || [];
-  return Math.max(...grid.map((row) => row.length), 0);
-});
-
-const gridCells = computed<GridCell[]>(() => {
-  const grid = pattern.value?.grid || [];
-  return grid.flatMap((row, rowIndex) =>
-    row.map((cell, colIndex) => ({
-      key: `${rowIndex}-${colIndex}`,
-      code: cell?.code || '',
-      color: cell?.hex || 'transparent',
-      empty: !cell
-    }))
-  );
-});
+const canUndo = computed(() => undoStack.value.length > 0);
+const canRedo = computed(() => redoStack.value.length > 0);
 
 onMounted(() => {
   void loadArtworkIfNeeded();
 });
+
+watch(
+  sourcePattern,
+  (nextPattern) => {
+    if (skipSourcePatternReset.value) {
+      return;
+    }
+    resetEditablePattern(nextPattern);
+  },
+  { immediate: true }
+);
 
 watch(
   () => route.params.id,
@@ -119,6 +120,169 @@ async function regenerate(): Promise<void> {
   }
   await router.push({ name: 'loading', query: { retry: '1', size: generation.selectedSize } });
 }
+
+function resetEditablePattern(nextPattern: PatternSheet | null): void {
+  editablePattern.value = nextPattern ? recalculatePattern(clonePattern(nextPattern)) : null;
+  availablePalette.value = nextPattern ? uniqueColors(nextPattern.palette_used.map(cloneColor)) : [];
+  undoStack.value = [];
+  redoStack.value = [];
+  isDirty.value = false;
+  saveMessage.value = '';
+  saveError.value = '';
+}
+
+function recolorCell(payload: { row: number; col: number; color: ColorRef }): void {
+  const sheet = editablePattern.value;
+  const row = sheet?.grid[payload.row];
+  if (!sheet || !row || payload.col < 0 || payload.col >= row.length) {
+    return;
+  }
+  const current = row[payload.col];
+  if (current?.code === payload.color.code) {
+    return;
+  }
+
+  pushUndo(sheet);
+  redoStack.value = [];
+  saveMessage.value = '';
+  saveError.value = '';
+
+  const nextPattern = clonePattern(sheet);
+  nextPattern.grid[payload.row][payload.col] = cloneColor(payload.color);
+  availablePalette.value = uniqueColors([...availablePalette.value, cloneColor(payload.color)]);
+  editablePattern.value = recalculatePattern(nextPattern);
+  isDirty.value = true;
+}
+
+function undoEdit(): void {
+  const previous = undoStack.value.pop();
+  if (!previous || !editablePattern.value) {
+    return;
+  }
+  redoStack.value.push(clonePattern(editablePattern.value));
+  editablePattern.value = recalculatePattern(previous);
+  isDirty.value = true;
+  saveMessage.value = '';
+  saveError.value = '';
+}
+
+function redoEdit(): void {
+  const next = redoStack.value.pop();
+  if (!next || !editablePattern.value) {
+    return;
+  }
+  undoStack.value.push(clonePattern(editablePattern.value));
+  editablePattern.value = recalculatePattern(next);
+  isDirty.value = true;
+  saveMessage.value = '';
+  saveError.value = '';
+}
+
+async function savePatternEdits(): Promise<void> {
+  const id = artworkId.value;
+  const sheet = editablePattern.value;
+  if (!id || !sheet || isSaving.value || !isDirty.value) {
+    return;
+  }
+
+  isSaving.value = true;
+  saveError.value = '';
+  saveMessage.value = '';
+  try {
+    const saved = await saveArtworkPattern(id, recalculatePattern(clonePattern(sheet)));
+    skipSourcePatternReset.value = true;
+    generation.applyArtwork(saved.artwork);
+    editablePattern.value = recalculatePattern(clonePattern(saved.pattern));
+    availablePalette.value = uniqueColors(saved.pattern.palette_used.map(cloneColor));
+    undoStack.value = [];
+    redoStack.value = [];
+    isDirty.value = false;
+    saveMessage.value = '已保存，导出图纸已更新。';
+    await nextTick();
+    skipSourcePatternReset.value = false;
+  } catch (saveFailure) {
+    skipSourcePatternReset.value = false;
+    saveError.value = saveFailure instanceof Error ? saveFailure.message : '保存失败，请稍后再试。';
+  } finally {
+    isSaving.value = false;
+  }
+}
+
+function pushUndo(sheet: PatternSheet): void {
+  undoStack.value.push(clonePattern(sheet));
+  if (undoStack.value.length > 50) {
+    undoStack.value.shift();
+  }
+}
+
+function recalculatePattern(sheet: PatternSheet): PatternSheet {
+  const grid = sheet.grid.map((row) => row.map((cell) => (cell ? cloneColor(cell) : null)));
+  const counts: Record<string, number> = {};
+  const coords: [number, number, string | null][] = [];
+  const noBeadMask: boolean[][] = [];
+  const paletteIndex = new Map(sheet.palette_used.map((color, index) => [color.code, index]));
+  const colorByCode = new Map<string, ColorRef>();
+
+  for (const color of sheet.palette_used) {
+    colorByCode.set(color.code, cloneColor(color));
+  }
+
+  grid.forEach((row, rowIndex) => {
+    const maskRow: boolean[] = [];
+    row.forEach((cell, colIndex) => {
+      if (!cell) {
+        maskRow.push(true);
+        return;
+      }
+      counts[cell.code] = (counts[cell.code] || 0) + 1;
+      coords.push([rowIndex, colIndex, cell.code]);
+      colorByCode.set(cell.code, cloneColor(cell));
+      maskRow.push(false);
+    });
+    noBeadMask.push(maskRow);
+  });
+
+  const paletteUsed = Array.from(colorByCode.values())
+    .filter((color) => counts[color.code] > 0)
+    .sort((left, right) => {
+      const leftIndex = paletteIndex.get(left.code) ?? Number.MAX_SAFE_INTEGER;
+      const rightIndex = paletteIndex.get(right.code) ?? Number.MAX_SAFE_INTEGER;
+      return leftIndex - rightIndex || left.code.localeCompare(right.code);
+    });
+
+  return {
+    ...sheet,
+    grid,
+    color_counts: counts,
+    bead_total: Object.values(counts).reduce((sum, count) => sum + count, 0),
+    coords,
+    no_bead_mask: noBeadMask,
+    palette_used: paletteUsed
+  };
+}
+
+function clonePattern(sheet: PatternSheet): PatternSheet {
+  return JSON.parse(JSON.stringify(sheet)) as PatternSheet;
+}
+
+function cloneColor(color: ColorRef): ColorRef {
+  return {
+    ...color,
+    rgb: [...color.rgb] as [number, number, number]
+  };
+}
+
+function uniqueColors(colors: ColorRef[]): ColorRef[] {
+  const seen = new Set<string>();
+  const unique: ColorRef[] = [];
+  for (const color of colors) {
+    if (!seen.has(color.code)) {
+      seen.add(color.code);
+      unique.push(cloneColor(color));
+    }
+  }
+  return unique;
+}
 </script>
 
 <template>
@@ -148,6 +312,15 @@ async function regenerate(): Promise<void> {
           <p>{{ artworkId }} · {{ sizeLabel }}</p>
         </div>
         <div class="result-actions">
+          <button class="pd-btn result-secondary" type="button" :disabled="!canUndo || isSaving" @click="undoEdit">
+            撤销
+          </button>
+          <button class="pd-btn result-secondary" type="button" :disabled="!canRedo || isSaving" @click="redoEdit">
+            重做
+          </button>
+          <button class="pd-btn pd-btn--primary" type="button" :disabled="!isDirty || isSaving" @click="savePatternEdits">
+            {{ isSaving ? '保存中' : '保存图纸' }}
+          </button>
           <button class="pd-btn pd-btn--primary" type="button" @click="regenerate">重新生成</button>
           <RouterLink class="pd-btn result-secondary" to="/upload">换一张照片</RouterLink>
         </div>
@@ -155,23 +328,11 @@ async function regenerate(): Promise<void> {
 
       <div class="result-layout">
         <section class="preview-panel" aria-label="拼豆图纸预览">
-          <div class="pattern-frame">
-            <img v-if="patternImageUrl" class="pattern-image" :src="patternImageUrl" alt="拼豆图纸预览" />
-            <div
-              v-else
-              class="pattern-grid"
-              :style="{ gridTemplateColumns: `repeat(${gridColumnCount}, minmax(0, 1fr))` }"
-              aria-label="拼豆网格预览"
-            >
-              <span
-                v-for="cell in gridCells"
-                :key="cell.key"
-                :class="{ 'pattern-grid__cell--empty': cell.empty }"
-                :style="{ backgroundColor: cell.color }"
-                :title="cell.code"
-              ></span>
-            </div>
+          <div class="pattern-frame pattern-frame--editor">
+            <PatternEditor :pattern="pattern" :palette="availablePalette" @recolor="recolorCell" />
           </div>
+          <p v-if="saveMessage" class="edit-status">{{ saveMessage }}</p>
+          <p v-else-if="saveError" class="edit-status edit-status--error">{{ saveError }}</p>
 
           <div class="size-switch" aria-label="尺寸切换">
             <button
@@ -292,6 +453,12 @@ async function regenerate(): Promise<void> {
   gap: 12px;
 }
 
+.result-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+  box-shadow: none;
+}
+
 .result-secondary {
   border: 1px solid rgba(255, 142, 83, 0.28);
   background: var(--pd-peach-50);
@@ -342,31 +509,24 @@ async function regenerate(): Promise<void> {
   background-size: 20px 20px;
 }
 
-.pattern-image {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: contain;
-  background: #fff;
+.pattern-frame--editor {
+  place-items: stretch;
+  padding: 12px;
 }
 
-.pattern-grid {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  gap: 1px;
-  background: rgba(45, 45, 45, 0.12);
+.edit-status {
+  margin: 12px 0 0;
+  border-radius: 16px;
+  background: rgba(164, 212, 197, 0.18);
+  color: var(--pd-fg-2);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 12px 14px;
 }
 
-.pattern-grid span {
-  min-width: 0;
-  min-height: 0;
-}
-
-.pattern-grid__cell--empty {
-  background:
-    linear-gradient(45deg, rgba(237, 228, 218, 0.55) 25%, transparent 25%),
-    #fff !important;
+.edit-status--error {
+  background: rgba(255, 91, 110, 0.14);
+  color: #c42535;
 }
 
 .size-switch {

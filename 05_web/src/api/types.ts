@@ -30,7 +30,7 @@ export interface PatternSheet {
   grid: (ColorRef | null)[][];
   color_counts: Record<string, number>;
   bead_total: number;
-  coords?: Array<{ row: number; col: number; code: string | null }>;
+  coords?: Array<{ row: number; col: number; code: string | null } | [number, number, string | null]>;
   no_bead_mask?: boolean[][];
   palette_used: ColorRef[];
   estimated_cost_cny?: number;
@@ -96,6 +96,13 @@ export interface GenerateScriptResponse {
   artwork_id: string;
   pattern_url: string;
   pattern: PatternSheet;
+}
+
+export interface SaveArtworkPatternResponse {
+  success: boolean;
+  pattern_url: string;
+  pattern: PatternSheet;
+  artwork: Artwork;
 }
 
 export interface ConsentResponse {
