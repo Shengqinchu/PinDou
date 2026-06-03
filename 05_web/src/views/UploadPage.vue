@@ -136,12 +136,6 @@ onUnmounted(revokePreview);
 
 <template>
   <section class="upload-page">
-    <header class="studio-hero">
-      <p class="eyebrow">Create Pattern</p>
-      <h1>把照片变成一张干净的 Q 版拼豆图纸</h1>
-      <p>上传照片，选择生成方式、风格和目标格数，然后交给 PinDou 做图纸。</p>
-    </header>
-
     <div class="studio-shell">
       <section class="upload-stage" aria-label="上传照片">
         <input
@@ -289,30 +283,7 @@ onUnmounted(revokePreview);
 
 <style scoped>
 .upload-page {
-  display: grid;
-  gap: clamp(22px, 4vw, 34px);
-}
-
-.studio-hero {
-  width: min(100%, 860px);
-}
-
-.studio-hero h1 {
-  max-width: 760px;
-  margin: 0 0 12px;
-  color: var(--pd-fg-1);
-  font-family: var(--pd-font-display);
-  font-size: clamp(34px, 5.2vw, 60px);
-  font-weight: 900;
-  line-height: 1.04;
-  letter-spacing: 0;
-}
-
-.studio-hero p:last-child {
-  max-width: 640px;
-  margin: 0;
-  color: var(--pd-fg-2);
-  font-size: 16px;
+  padding-top: clamp(14px, 4vh, 42px);
 }
 
 .eyebrow {
@@ -325,10 +296,12 @@ onUnmounted(revokePreview);
 }
 
 .studio-shell {
+  width: min(100%, 1100px);
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.16fr) minmax(330px, 0.62fr);
-  gap: 22px;
-  align-items: stretch;
+  grid-template-columns: minmax(0, 1.22fr) minmax(340px, 0.62fr);
+  gap: clamp(18px, 3vw, 28px);
+  align-items: start;
 }
 
 .upload-stage,
@@ -682,9 +655,24 @@ onUnmounted(revokePreview);
   box-shadow: var(--pd-shadow-cta);
 }
 
+.mode-card--active:hover,
+.style-pill--active:hover,
+.size-card--active:hover {
+  border-color: transparent;
+  background: var(--pd-gradient-warm);
+  color: #fff;
+  box-shadow: var(--pd-shadow-cta);
+}
+
 .mode-card--active em,
 .style-pill--active em,
 .size-card--active span {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.mode-card--active:hover em,
+.style-pill--active:hover em,
+.size-card--active:hover span {
   color: rgba(255, 255, 255, 0.86);
 }
 
@@ -716,6 +704,11 @@ onUnmounted(revokePreview);
 }
 
 .style-pill--active > span {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.style-pill--active:hover > span {
   background: rgba(255, 255, 255, 0.22);
   color: #fff;
 }
@@ -830,15 +823,7 @@ onUnmounted(revokePreview);
 
 @media (max-width: 640px) {
   .upload-page {
-    gap: 20px;
-  }
-
-  .studio-hero h1 {
-    font-size: 32px;
-  }
-
-  .studio-hero p:last-child {
-    font-size: 14px;
+    padding-top: 12px;
   }
 
   .upload-stage,
