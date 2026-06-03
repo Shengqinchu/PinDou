@@ -206,7 +206,7 @@ onUnmounted(() => {
 
 <template>
   <section class="login-page">
-    <div class="auth-card">
+    <div class="auth-card" :class="`auth-card--${mode}`">
       <div class="auth-brand">
         <span class="auth-brand__mark" aria-hidden="true"></span>
         <div>
@@ -238,7 +238,7 @@ onUnmounted(() => {
       </div>
 
       <Transition name="auth-form" mode="out-in">
-        <form v-if="mode === 'register'" key="register" class="auth-form" @submit.prevent="handleRegister">
+        <form v-if="mode === 'register'" key="register" class="auth-form auth-form--register" @submit.prevent="handleRegister">
           <div class="auth-heading">
             <p class="eyebrow">Create Account</p>
             <h1>创建你的拼豆账号</h1>
@@ -363,14 +363,14 @@ onUnmounted(() => {
 
 <style scoped>
 .login-page {
-  min-height: calc(100vh - 150px);
+  width: 100%;
   display: grid;
   place-items: center;
-  padding: 16px 0;
+  padding: 0;
 }
 
 .auth-card {
-  width: min(100%, 486px);
+  width: min(100%, clamp(420px, 30vw, 486px));
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(237, 228, 218, 0.86);
@@ -382,6 +382,10 @@ onUnmounted(() => {
   box-shadow: 0 28px 70px rgba(255, 107, 90, 0.14), 0 10px 26px rgba(45, 45, 45, 0.06);
   padding: clamp(24px, 5vw, 36px);
   animation: card-rise 420ms var(--pd-ease-soft) both;
+}
+
+.auth-card--register {
+  width: min(100%, clamp(520px, 42vw, 620px));
 }
 
 .auth-card::before {
@@ -500,6 +504,19 @@ onUnmounted(() => {
   z-index: 1;
   display: grid;
   gap: 14px;
+}
+
+.auth-form--register {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.auth-form--register > .auth-heading,
+.auth-form--register > .auth-field:first-of-type,
+.auth-form--register > .auth-code-row,
+.auth-form--register > .auth-field:last-of-type,
+.auth-form--register > .auth-feedback,
+.auth-form--register > .auth-submit {
+  grid-column: 1 / -1;
 }
 
 .auth-heading {
@@ -763,15 +780,156 @@ onUnmounted(() => {
   }
 }
 
+@media (max-height: 920px) and (min-width: 721px) {
+  .auth-card {
+    border-radius: 26px;
+    padding: 24px 30px;
+  }
+
+  .auth-card--register {
+    width: min(100%, 600px);
+  }
+
+  .auth-brand {
+    margin-bottom: 16px;
+  }
+
+  .auth-brand__mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 14px;
+  }
+
+  .auth-brand strong {
+    font-size: 18px;
+  }
+
+  .auth-tabs {
+    margin-bottom: 18px;
+  }
+
+  .auth-tabs button {
+    min-height: 38px;
+  }
+
+  .auth-form {
+    gap: 11px;
+  }
+
+  .auth-heading h1 {
+    font-size: 32px;
+  }
+
+  .auth-heading p:last-child {
+    font-size: 13px;
+  }
+
+  .auth-field {
+    gap: 6px;
+  }
+
+  .auth-field input,
+  .code-button {
+    min-height: 46px;
+  }
+
+  .auth-submit {
+    min-height: 48px;
+  }
+
+  .auth-note {
+    margin-top: 14px;
+  }
+}
+
+@media (max-height: 820px) and (min-width: 721px) {
+  .auth-card--register {
+    padding: 20px 28px;
+  }
+
+  .auth-card--register .auth-brand {
+    margin-bottom: 12px;
+  }
+
+  .auth-card--register .auth-tabs {
+    margin-bottom: 14px;
+  }
+
+  .auth-card--register .auth-form {
+    gap: 9px;
+  }
+
+  .auth-card--register .auth-heading h1 {
+    font-size: 28px;
+  }
+
+  .auth-card--register .auth-heading p:last-child,
+  .auth-card--register .auth-note {
+    display: none;
+  }
+
+  .auth-card--register .auth-field input,
+  .auth-card--register .code-button {
+    min-height: 44px;
+  }
+
+  .auth-card--register .auth-submit {
+    min-height: 46px;
+  }
+}
+
+@media (max-height: 680px) and (min-width: 721px) {
+  .auth-card {
+    width: min(100%, 460px);
+    padding: 20px 28px;
+  }
+
+  .auth-card--register {
+    width: min(100%, 640px);
+  }
+
+  .auth-brand {
+    margin-bottom: 12px;
+  }
+
+  .auth-tabs {
+    margin-bottom: 14px;
+  }
+
+  .auth-heading h1 {
+    font-size: 28px;
+  }
+
+  .auth-heading p:last-child {
+    display: none;
+  }
+
+  .auth-form {
+    gap: 9px;
+  }
+
+  .auth-note {
+    display: none;
+  }
+}
+
 @media (max-width: 640px) {
   .login-page {
-    min-height: calc(100vh - 88px);
-    padding: 8px 0 24px;
+    place-items: start center;
   }
 
   .auth-card {
+    width: 100%;
     border-radius: 24px;
     padding: 22px 18px;
+  }
+
+  .auth-form--register {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-form--register > * {
+    grid-column: 1;
   }
 
   .auth-brand {
