@@ -10,8 +10,8 @@ export const GENERATION_MODE_OPTIONS = ['ai', 'script'] as const;
 export type GenerationMode = (typeof GENERATION_MODE_OPTIONS)[number];
 export const DEFAULT_GENERATION_MODE: GenerationMode = 'ai';
 export const GENERATION_MODE_DETAILS: Record<GenerationMode, { label: string; hint: string; badge?: string }> = {
-  ai: { label: 'AI 精品', hint: '先做 Q 版卡通，再转拼豆图纸', badge: '推荐' },
-  script: { label: '脚本快速', hint: '省次数·秒出，直接量化原图' }
+  ai: { label: 'AI 精品', hint: 'Q版后转图纸', badge: '推荐' },
+  script: { label: '脚本快速', hint: '秒出原图量化' }
 };
 
 export const SIZE_OPTION_DETAILS: Record<ResultSizePreset, { label: string; hint: string }> = {
@@ -25,9 +25,9 @@ export const STYLE_OPTIONS = ['q_pet', 'q_couple', 'q_portrait'] as const;
 export type GenerationStylePreset = Extract<StylePreset, (typeof STYLE_OPTIONS)[number]>;
 export const DEFAULT_STYLE_PRESET: GenerationStylePreset = 'q_portrait';
 export const STYLE_OPTION_DETAILS: Record<GenerationStylePreset, { label: string; hint: string; icon: string }> = {
-  q_pet: { label: '宠萌宠', hint: '保留耳朵、花纹和表情', icon: '宠' },
-  q_couple: { label: '心情侣', hint: '保持人数和左右关系', icon: '心' },
-  q_portrait: { label: '拍自拍', hint: '适合头像、半身照和日常照片', icon: '拍' }
+  q_pet: { label: '宠萌宠', hint: '耳朵花纹更清楚', icon: '宠' },
+  q_couple: { label: '心情侣', hint: '保留左右关系', icon: '心' },
+  q_portrait: { label: '拍自拍', hint: '适合头像半身照', icon: '拍' }
 };
 
 interface GenerationState {

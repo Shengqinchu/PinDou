@@ -45,7 +45,6 @@ const ctaLabel = computed(() => {
   const size = generation.selectedSize.split('x')[0];
   return selectedFile.value ? `${generationVerb.value} · ${size}格 ->` : '选择照片后开始生成';
 });
-const selectedModeDetail = computed(() => GENERATION_MODE_DETAILS[generation.generationMode]);
 
 function openGallery(): void {
   galleryInput.value?.click();
@@ -199,12 +198,6 @@ onUnmounted(revokePreview);
       </section>
 
       <aside class="control-panel" aria-label="生成选项">
-        <div class="panel-head">
-          <p class="eyebrow">Generate Setup</p>
-          <strong>{{ selectedModeDetail.label }}</strong>
-          <span>{{ selectedModeDetail.hint }}</span>
-        </div>
-
         <section class="option-group" aria-label="生成方式">
           <div class="option-heading">
             <strong>生成方式</strong>
@@ -283,24 +276,15 @@ onUnmounted(revokePreview);
 
 <style scoped>
 .upload-page {
-  padding-top: clamp(14px, 4vh, 42px);
-}
-
-.eyebrow {
-  margin: 0 0 10px;
-  color: var(--pd-orange);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0;
-  text-transform: uppercase;
+  padding: clamp(8px, 3vh, 26px) 0 24px;
 }
 
 .studio-shell {
-  width: min(100%, 1100px);
+  width: min(100%, 1140px);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.22fr) minmax(340px, 0.62fr);
-  gap: clamp(18px, 3vw, 28px);
+  grid-template-columns: minmax(540px, 1fr) 390px;
+  gap: clamp(18px, 2.4vw, 28px);
   align-items: start;
 }
 
@@ -315,13 +299,13 @@ onUnmounted(revokePreview);
 
 .upload-stage {
   display: grid;
-  grid-template-rows: minmax(320px, 1fr) auto auto;
-  gap: 14px;
+  grid-template-rows: auto auto auto;
+  gap: 12px;
 }
 
 .drop-zone {
   position: relative;
-  min-height: clamp(340px, 48vw, 560px);
+  min-height: clamp(280px, 34vw, 420px);
   display: grid;
   place-items: center;
   align-content: center;
@@ -338,16 +322,16 @@ onUnmounted(revokePreview);
   padding: 24px;
   text-align: center;
   transition:
-    border-color 220ms var(--pd-ease-out),
-    background 220ms var(--pd-ease-out),
-    box-shadow 220ms var(--pd-ease-out),
-    transform 220ms var(--pd-ease-out);
+    border-color 180ms var(--pd-ease-out),
+    background 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
 }
 
 .drop-zone:hover {
-  border-color: rgba(255, 142, 83, 0.62);
-  box-shadow: inset 0 0 0 1px rgba(255, 176, 136, 0.18), 0 16px 34px rgba(255, 142, 83, 0.14);
-  transform: translateY(-2px);
+  border-color: rgba(255, 142, 83, 0.7);
+  box-shadow: inset 0 0 0 1px rgba(255, 176, 136, 0.22), 0 18px 34px rgba(255, 142, 83, 0.18);
+  transform: translateY(-3px);
 }
 
 .drop-zone--active {
@@ -406,7 +390,7 @@ onUnmounted(revokePreview);
 .preview-image {
   width: 100%;
   height: 100%;
-  max-height: 560px;
+  max-height: 420px;
   display: block;
   border-radius: 18px;
   object-fit: contain;
@@ -453,6 +437,8 @@ onUnmounted(revokePreview);
 .stage-actions .pd-btn:hover,
 .generate-cta:hover:not(:disabled) {
   filter: brightness(1.03);
+  border-color: rgba(255, 142, 83, 0.58);
+  box-shadow: 0 16px 28px rgba(255, 142, 83, 0.2);
   transform: translateY(-2px);
 }
 
@@ -496,39 +482,7 @@ onUnmounted(revokePreview);
 .control-panel {
   display: grid;
   align-content: start;
-  gap: 18px;
-}
-
-.panel-head {
-  border-radius: 22px;
-  background:
-    linear-gradient(135deg, rgba(255, 176, 136, 0.18), rgba(184, 164, 237, 0.12)),
-    var(--pd-peach-50);
-  padding: 18px;
-}
-
-.panel-head .eyebrow {
-  margin-bottom: 8px;
-}
-
-.panel-head strong,
-.panel-head span {
-  display: block;
-}
-
-.panel-head strong {
-  color: var(--pd-fg-1);
-  font-size: 24px;
-  font-weight: 900;
-  line-height: 1.1;
-}
-
-.panel-head span {
-  margin-top: 8px;
-  color: var(--pd-fg-2);
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1.5;
+  gap: 16px;
 }
 
 .option-group {
@@ -563,7 +517,7 @@ onUnmounted(revokePreview);
 }
 
 .mode-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(150px, 1fr));
 }
 
 .style-grid {
@@ -571,7 +525,7 @@ onUnmounted(revokePreview);
 }
 
 .size-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(74px, 1fr));
 }
 
 .mode-card,
@@ -594,17 +548,17 @@ onUnmounted(revokePreview);
 }
 
 .mode-card {
-  min-height: 112px;
+  min-height: 104px;
   border-radius: 20px;
-  padding: 16px;
+  padding: 16px 14px;
 }
 
 .mode-card:hover,
 .style-pill:hover,
 .size-card:hover {
-  border-color: rgba(255, 142, 83, 0.42);
+  border-color: rgba(255, 142, 83, 0.62);
   background: #fff;
-  box-shadow: 0 12px 26px rgba(255, 142, 83, 0.12);
+  box-shadow: 0 14px 28px rgba(255, 142, 83, 0.16);
   transform: translateY(-2px);
 }
 
@@ -616,22 +570,26 @@ onUnmounted(revokePreview);
 .size-card span {
   display: block;
   min-width: 0;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 
 .mode-card strong {
   padding-right: 42px;
   font-size: 17px;
   font-weight: 900;
+  white-space: nowrap;
 }
 
 .mode-card em,
 .style-pill em {
-  margin-top: 8px;
+  margin-top: 7px;
   color: var(--pd-fg-2);
   font-size: 12px;
   font-style: normal;
   font-weight: 800;
   line-height: 1.45;
+  white-space: nowrap;
 }
 
 .option-badge {
@@ -658,10 +616,10 @@ onUnmounted(revokePreview);
 .mode-card--active:hover,
 .style-pill--active:hover,
 .size-card--active:hover {
-  border-color: transparent;
+  border-color: rgba(255, 142, 83, 0.7);
   background: var(--pd-gradient-warm);
   color: #fff;
-  box-shadow: var(--pd-shadow-cta);
+  box-shadow: 0 18px 34px rgba(255, 142, 83, 0.26), 0 9px 18px rgba(255, 107, 90, 0.18);
 }
 
 .mode-card--active em,
@@ -686,9 +644,9 @@ onUnmounted(revokePreview);
   grid-template-columns: auto minmax(0, 1fr);
   gap: 2px 10px;
   align-items: center;
-  min-height: 68px;
+  min-height: 64px;
   border-radius: 18px;
-  padding: 12px;
+  padding: 11px 12px;
 }
 
 .style-pill > span {
@@ -720,12 +678,13 @@ onUnmounted(revokePreview);
 .style-pill strong {
   font-size: 14px;
   font-weight: 900;
+  white-space: nowrap;
 }
 
 .size-card {
-  min-height: 72px;
+  min-height: 70px;
   border-radius: 18px;
-  padding: 10px 8px;
+  padding: 10px 7px;
   text-align: center;
 }
 
@@ -741,6 +700,7 @@ onUnmounted(revokePreview);
   font-size: 11px;
   font-weight: 900;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .upload-message {
@@ -823,7 +783,7 @@ onUnmounted(revokePreview);
 
 @media (max-width: 640px) {
   .upload-page {
-    padding-top: 12px;
+    padding-top: 8px;
   }
 
   .upload-stage,
