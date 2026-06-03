@@ -65,7 +65,6 @@ class PatternExporter:
         cols = max(len(row) for row in grid)
         cell_size = labeled_cell_size(cols, rows)
         legend_lines = legend_text_lines(pattern, max_chars=max(30, cols * cell_size // 7))
-        cell_font = load_font(labeled_font_size(cols, rows))
         legend_font = load_font(15)
         legend_line_height = font_line_height(legend_font) + 8
         legend_height = legend_line_height * max(1, len(legend_lines)) + 16
@@ -109,15 +108,7 @@ class PatternExporter:
                 else:
                     draw_bead_square(draw, x0, y0, x1, y1, fill=fill, outline=darken(bead.rgb, factor=0.72))
                 if code and should_draw_cell_code(row_idx, col_idx, cols, rows):
-                    text_box = draw.textbbox((0, 0), code, font=cell_font)
-                    text_w = text_box[2] - text_box[0]
-                    text_h = text_box[3] - text_box[1]
-                    draw.text(
-                        (x0 + (cell_size - text_w) / 2, y0 + (cell_size - text_h) / 2 - 1),
-                        code,
-                        font=cell_font,
-                        fill=text_fill,
-                    )
+                    draw_centered_cell_code(draw, code, x0, y0, cell_size, fill=text_fill)
 
         overlay = Image.new("RGBA", image.size, (255, 255, 255, 0))
         overlay_draw = ImageDraw.Draw(overlay)
@@ -280,20 +271,7 @@ def render_partition_image(
                 continue
             draw_bead_square(draw, x0, y0, x1, y1, fill=(*bead.rgb, 255), outline=darken(bead.rgb, factor=0.72))
             code = bead.code
-            code_font = fit_cell_code_font(draw, code, cell_size)
-            if code_font is None:
-                continue
-            text_box = draw.textbbox((0, 0), code, font=code_font)
-            text_w = text_box[2] - text_box[0]
-            text_h = text_box[3] - text_box[1]
-            text_x = x0 + (cell_size - text_w) / 2 - text_box[0]
-            text_y = y0 + (cell_size - text_h) / 2 - text_box[1]
-            draw.text(
-                (text_x, text_y),
-                code,
-                font=code_font,
-                fill=contrast_text(bead.rgb),
-            )
+            draw_centered_cell_code(draw, code, x0, y0, cell_size, fill=contrast_text(bead.rgb))
 
     overlay = Image.new("RGBA", image.size, (255, 255, 255, 0))
     overlay_draw = ImageDraw.Draw(overlay)
@@ -375,15 +353,6 @@ def labeled_cell_size(cols: int, rows: int) -> int:
     return 18
 
 
-def labeled_font_size(cols: int, rows: int) -> int:
-    max_dim = max(cols, rows)
-    if max_dim <= 26:
-        return 15
-    if max_dim <= 52:
-        return 12
-    return 9
-
-
 def should_draw_cell_code(row_idx: int, col_idx: int, cols: int, rows: int) -> bool:
     if max(cols, rows) <= 52:
         return True
@@ -453,17 +422,39 @@ def load_monospace_font(size: int) -> ImageFont.ImageFont:
     return load_font(size)
 
 
+def draw_centered_cell_code(
+    draw: ImageDraw.ImageDraw,
+    code: str,
+    x0: int,
+    y0: int,
+    cell_size: int,
+    *,
+    fill: tuple[int, int, int, int],
+) -> bool:
+    code_font = fit_cell_code_font(draw, code, cell_size)
+    if code_font is None:
+        return False
+    text_box = draw.textbbox((0, 0), code, font=code_font)
+    text_w = text_box[2] - text_box[0]
+    text_h = text_box[3] - text_box[1]
+    text_x = x0 + (cell_size - text_w) / 2 - text_box[0]
+    text_y = y0 + (cell_size - text_h) / 2 - text_box[1]
+    draw.text((text_x, text_y), code, font=code_font, fill=fill)
+    return True
+
+
 def fit_cell_code_font(draw: ImageDraw.ImageDraw, code: str, cell_size: int) -> ImageFont.ImageFont | None:
-    cell_padding = max(1, int(cell_size * 0.10))
+    cell_padding = max(2, int(cell_size * 0.12))
     max_width = max(4, cell_size - cell_padding * 2)
-    font_size = max(7, int(cell_size * 0.30))
-    if len(code) >= 3:
-        font_size = max(7, int(font_size * 0.85))
+    max_height = max(4, cell_size - cell_padding * 2)
+    font_size = max(7, int(cell_size * 0.46))
 
     while font_size >= 7:
         font = load_monospace_font(font_size)
         text_box = draw.textbbox((0, 0), code, font=font)
-        if text_box[2] - text_box[0] <= max_width:
+        text_width = text_box[2] - text_box[0]
+        text_height = text_box[3] - text_box[1]
+        if text_width <= max_width and text_height <= max_height:
             return font
         font_size -= 1
     return None

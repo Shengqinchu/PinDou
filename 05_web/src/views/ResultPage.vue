@@ -371,7 +371,7 @@ async function regenerate(): Promise<void> {
 
 .size-switch {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   margin-top: 16px;
 }
@@ -589,6 +589,7 @@ async function regenerate(): Promise<void> {
   }
 
   .size-switch {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
 

@@ -2,7 +2,13 @@
 import { computed, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { useGenerationStore } from '../stores/generation';
+import {
+  DEFAULT_GENERATION_SIZE,
+  RESULT_SIZE_OPTIONS,
+  SIZE_OPTION_DETAILS,
+  useGenerationStore,
+  type ResultSizePreset
+} from '../stores/generation';
 
 const router = useRouter();
 const generation = useGenerationStore();
@@ -12,6 +18,7 @@ const selectedFile = ref<File | null>(null);
 const previewUrl = ref('');
 const isDragging = ref(false);
 const message = ref('');
+const sizeOptions = RESULT_SIZE_OPTIONS;
 
 const fileSizeMb = computed(() => {
   if (!selectedFile.value) {
@@ -70,6 +77,7 @@ function useFile(file: File): void {
 
   revokePreview();
   selectedFile.value = file;
+  generation.setSize(DEFAULT_GENERATION_SIZE);
   previewUrl.value = URL.createObjectURL(file);
   message.value = isLargeFile(file) ? '照片较大也没关系，我们会在生成前自动整理。' : '照片已选好，可以开始生成了。';
 }
@@ -97,8 +105,11 @@ async function startGenerate(): Promise<void> {
     return;
   }
   generation.setSourceFile(selectedFile.value);
-  generation.setSize('26x26');
   await router.push({ name: 'loading', query: { from: 'upload' } });
+}
+
+function chooseSize(size: ResultSizePreset): void {
+  generation.setSize(size);
 }
 
 onUnmounted(revokePreview);
@@ -170,9 +181,30 @@ onUnmounted(revokePreview);
           <button type="button" @click="clearFile">重新选择</button>
         </div>
 
+        <section v-if="selectedFile" class="size-picker" aria-label="选择目标格数">
+          <div class="size-picker__head">
+            <strong>目标格数</strong>
+            <span>按拼豆板规格生成</span>
+          </div>
+          <div class="size-picker__options">
+            <button
+              v-for="size in sizeOptions"
+              :key="size"
+              class="size-picker__option"
+              type="button"
+              :class="{ 'size-picker__option--active': size === generation.selectedSize }"
+              :aria-pressed="size === generation.selectedSize"
+              @click="chooseSize(size)"
+            >
+              <strong>{{ SIZE_OPTION_DETAILS[size].label }}</strong>
+              <span>{{ SIZE_OPTION_DETAILS[size].hint }}</span>
+            </button>
+          </div>
+        </section>
+
         <p v-if="message" class="upload-message">{{ message }}</p>
         <button class="pd-btn upload-next" type="button" :disabled="!selectedFile" @click="startGenerate">
-          {{ selectedFile ? '开始生成 →' : '选择照片后开始生成' }}
+          {{ selectedFile ? `开始生成 ${generation.selectedSize.split('x')[0]} 格 →` : '选择照片后开始生成' }}
         </button>
       </section>
 
@@ -439,6 +471,97 @@ onUnmounted(revokePreview);
   transform: translateY(-1px);
 }
 
+.size-picker {
+  margin-top: 16px;
+  border: 1px solid rgba(237, 228, 218, 0.82);
+  border-radius: 20px;
+  background: rgba(255, 241, 232, 0.54);
+  padding: 16px;
+}
+
+.size-picker__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.size-picker__head strong {
+  color: var(--pd-fg-1);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.size-picker__head span {
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.size-picker__options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.size-picker__option {
+  appearance: none;
+  min-width: 0;
+  min-height: 74px;
+  border: 1px solid rgba(255, 142, 83, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--pd-fg-1);
+  cursor: pointer;
+  font: inherit;
+  padding: 10px 8px;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    background 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    color 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.size-picker__option:hover {
+  border-color: rgba(255, 142, 83, 0.44);
+  background: #fff;
+  box-shadow: 0 12px 26px rgba(255, 142, 83, 0.12);
+  transform: translateY(-2px);
+}
+
+.size-picker__option strong,
+.size-picker__option span {
+  display: block;
+  min-width: 0;
+}
+
+.size-picker__option strong {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.size-picker__option span {
+  margin-top: 6px;
+  color: var(--pd-fg-2);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.size-picker__option--active {
+  border-color: transparent;
+  background: var(--pd-gradient-warm);
+  color: #fff;
+  box-shadow: var(--pd-shadow-cta);
+}
+
+.size-picker__option--active span {
+  color: rgba(255, 255, 255, 0.88);
+}
+
 .upload-message {
   margin: 14px 0 0;
   border-radius: 16px;
@@ -587,6 +710,16 @@ onUnmounted(revokePreview);
   .drop-zone {
     min-height: 260px;
     border-radius: 20px;
+  }
+
+  .size-picker__head {
+    align-items: start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .size-picker__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .upload-actions,

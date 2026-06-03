@@ -3,8 +3,16 @@ import { defineStore } from 'pinia';
 import { generateScriptPattern, getArtworkDetail, submitConsent } from '../api';
 import type { Artwork, GenerateScriptResponse, PatternSheet, SizePreset } from '../api/types';
 
-export const RESULT_SIZE_OPTIONS = ['26x26', '52x52', '104x104'] as const;
+export const RESULT_SIZE_OPTIONS = ['26x26', '52x52', '78x78', '104x104'] as const;
 export type ResultSizePreset = (typeof RESULT_SIZE_OPTIONS)[number];
+export const DEFAULT_GENERATION_SIZE: ResultSizePreset = '52x52';
+
+export const SIZE_OPTION_DETAILS: Record<ResultSizePreset, { label: string; hint: string }> = {
+  '26x26': { label: '26', hint: '简易·豆少' },
+  '52x52': { label: '52', hint: '推荐' },
+  '78x78': { label: '78', hint: '三板' },
+  '104x104': { label: '104', hint: '精细·豆多' }
+};
 
 interface GenerationState {
   sourceFile: File | null;
@@ -18,7 +26,7 @@ interface GenerationState {
 export const useGenerationStore = defineStore('generation', {
   state: (): GenerationState => ({
     sourceFile: null,
-    selectedSize: '26x26',
+    selectedSize: DEFAULT_GENERATION_SIZE,
     currentResult: null,
     currentArtwork: null,
     isGenerating: false,

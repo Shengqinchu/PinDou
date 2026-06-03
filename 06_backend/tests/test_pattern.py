@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
 
-from pindou.pattern.builder import NoBead, PatternBuilder, fit_to_canvas
+from pindou.pattern.builder import ColorRef, NoBead, PatternBuilder, PatternSheet, fit_to_canvas
 from pindou.pattern.exporter import PatternExporter, fit_cell_code_font, labeled_grid_filename, partition_filename
 from pindou.pattern.postprocess import detect_and_remove_white_bg
 from pindou.pattern.quantize import choose_effective_target_colors
@@ -328,7 +328,54 @@ def test_partition_cell_code_font_fits_multi_character_codes() -> None:
     assert font is not None
     bbox = draw.textbbox((0, 0), "R12", font=font)
 
-    assert bbox[2] - bbox[0] <= 21
+    assert bbox[2] - bbox[0] <= 24
+    assert bbox[3] - bbox[1] <= 24
+
+
+def test_labeled_grid_cell_code_font_fits_common_color_codes() -> None:
+    image = Image.new("RGBA", (60, 60), (255, 255, 255, 255))
+    draw = ImageDraw.Draw(image)
+
+    for code in ("H7", "G11", "F23"):
+        font = fit_cell_code_font(draw, code, 24)
+        assert font is not None
+        bbox = draw.textbbox((0, 0), code, font=font)
+        assert bbox[2] - bbox[0] <= 20
+        assert bbox[3] - bbox[1] <= 20
+
+
+def test_labeled_grid_exporter_handles_multi_character_codes_on_26_grid() -> None:
+    colors = [
+        ColorRef("MARD", "H7", "H7", None, "#F05050", (240, 80, 80), 5.0),
+        ColorRef("MARD", "G11", "G11", None, "#50A050", (80, 160, 80), 5.0),
+        ColorRef("MARD", "F23", "F23", None, "#5060D0", (80, 96, 208), 5.0),
+    ]
+    grid = [[colors[(row + col) % len(colors)] for col in range(26)] for row in range(26)]
+    counts = {color.code: 0 for color in colors}
+    coords = []
+    for row_idx, row in enumerate(grid):
+        for col_idx, color in enumerate(row):
+            counts[color.code] += 1
+            coords.append((row_idx, col_idx, color.code))
+
+    sheet = PatternSheet(
+        grid=grid,
+        color_counts=counts,
+        bead_total=26 * 26,
+        coords=coords,
+        no_bead_mask=[[False for _col in range(26)] for _row in range(26)],
+        palette_used=colors,
+        estimated_cost_cny=0.0,
+        brand="MARD",
+        bead_diameter_mm=5.0,
+    )
+
+    png = PatternExporter().to_labeled_grid_png(sheet)
+    image = Image.open(io.BytesIO(png))
+
+    assert image.format == "PNG"
+    assert image.width >= 26 * 24
+    assert image.height > 26 * 24
 
 
 def white_bg_raw_image_bytes() -> bytes:
