@@ -5,85 +5,72 @@ import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '../api';
 import { useAuthStore } from '../stores/auth';
 
-type BeadTone = 'blank' | 'ink' | 'peach' | 'coral' | 'mint' | 'cream';
+type AuthMode = 'register' | 'login';
+type FeedbackKind = 'info' | 'success' | 'error';
 
 const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
 
-const email = ref('');
-const code = ref('');
+const mode = ref<AuthMode>('register');
+const registerEmail = ref('');
+const registerCode = ref('');
+const registerPassword = ref('');
+const confirmPassword = ref('');
+const cdk = ref('');
+const loginEmail = ref('');
+const loginPassword = ref('');
 const feedback = ref('');
-const feedbackKind = ref<'info' | 'success' | 'error'>('info');
+const feedbackKind = ref<FeedbackKind>('info');
 const sending = ref(false);
-const verifying = ref(false);
+const submitting = ref(false);
 const cooldown = ref(0);
+const showRegisterPassword = ref(false);
+const showConfirmPassword = ref(false);
+const showLoginPassword = ref(false);
 
 let cooldownTimer: number | undefined;
 
-const beadPalette: Record<BeadTone, string> = {
-  blank: '#fff7ef',
-  ink: '#263238',
-  peach: '#ffb084',
-  coral: '#ff6b5a',
-  mint: '#a4d4c5',
-  cream: '#ffe2c6'
-};
-
-const sampleCards = [
-  {
-    title: '萌宠头像',
-    caption: '52 x 52 拼豆图纸',
-    rows: toBeadRows([
-      '000111100000',
-      '001222210000',
-      '012222221000',
-      '122122122100',
-      '122222222100',
-      '122211222100',
-      '012222221000',
-      '001211210000',
-      '000133100000',
-      '000033000000',
-      '000000000000',
-      '000000000000'
-    ])
-  },
-  {
-    title: '手作配色',
-    caption: '干净色块和轮廓',
-    rows: toBeadRows([
-      '000044000000',
-      '000444400000',
-      '004444440000',
-      '044444444000',
-      '044144144000',
-      '044444444000',
-      '004411440000',
-      '000433400000',
-      '000333000000',
-      '000000000000',
-      '000000000000',
-      '000000000000'
-    ])
-  }
-];
-
-const normalizedEmail = computed(() => email.value.trim().toLowerCase());
-const canSendCode = computed(() => isEmail(normalizedEmail.value) && !sending.value && cooldown.value <= 0);
-const canVerify = computed(() => isEmail(normalizedEmail.value) && /^\d{6}$/.test(code.value.trim()) && !verifying.value);
+const normalizedRegisterEmail = computed(() => registerEmail.value.trim().toLowerCase());
+const normalizedLoginEmail = computed(() => loginEmail.value.trim().toLowerCase());
+const canSendCode = computed(() => isEmail(normalizedRegisterEmail.value) && !sending.value && cooldown.value <= 0);
+const canRegister = computed(() => {
+  return (
+    isEmail(normalizedRegisterEmail.value) &&
+    /^\d{6}$/.test(registerCode.value.trim()) &&
+    registerPassword.value.length >= 6 &&
+    confirmPassword.value.length >= 6 &&
+    registerPassword.value === confirmPassword.value &&
+    !submitting.value
+  );
+});
+const canLogin = computed(() => isEmail(normalizedLoginEmail.value) && loginPassword.value.length > 0 && !submitting.value);
 const sendButtonText = computed(() => {
   if (sending.value) {
-    return '发送中...';
+    return '发送中';
   }
   if (cooldown.value > 0) {
-    return `${cooldown.value}s 后重发`;
+    return `${cooldown.value}s`;
   }
-  return '发送验证码';
+  return '发验证码';
 });
 
+function switchMode(nextMode: AuthMode): void {
+  if (mode.value === nextMode) {
+    return;
+  }
+  mode.value = nextMode;
+  showMessage('', 'info');
+  if (nextMode === 'login' && !loginEmail.value) {
+    loginEmail.value = normalizedRegisterEmail.value;
+  }
+  if (nextMode === 'register' && !registerEmail.value) {
+    registerEmail.value = normalizedLoginEmail.value;
+  }
+}
+
 async function handleSendCode(): Promise<void> {
-  if (!isEmail(normalizedEmail.value)) {
+  if (!isEmail(normalizedRegisterEmail.value)) {
     showMessage('请输入正确的邮箱地址。', 'error');
     return;
   }
@@ -92,7 +79,7 @@ async function handleSendCode(): Promise<void> {
   showMessage('', 'info');
 
   try {
-    const response = await auth.sendEmailCode(normalizedEmail.value);
+    const response = await auth.sendEmailCode(normalizedRegisterEmail.value);
     showMessage(response.message || '验证码已发送，请查看邮箱。', 'success');
     startCooldown(response.cooldown_seconds || 60);
   } catch (error) {
@@ -102,23 +89,66 @@ async function handleSendCode(): Promise<void> {
   }
 }
 
-async function handleVerify(): Promise<void> {
-  if (!canVerify.value) {
-    showMessage('请填写邮箱和 6 位验证码。', 'error');
+async function handleRegister(): Promise<void> {
+  if (!isEmail(normalizedRegisterEmail.value)) {
+    showMessage('请输入正确的邮箱地址。', 'error');
+    return;
+  }
+  if (!/^\d{6}$/.test(registerCode.value.trim())) {
+    showMessage('请填写 6 位邮箱验证码。', 'error');
+    return;
+  }
+  if (registerPassword.value.length < 6) {
+    showMessage('密码至少需要 6 位。', 'error');
+    return;
+  }
+  if (registerPassword.value !== confirmPassword.value) {
+    showMessage('两次输入的密码不一致。', 'error');
     return;
   }
 
-  verifying.value = true;
+  submitting.value = true;
   showMessage('', 'info');
 
   try {
-    await auth.loginWithEmail(normalizedEmail.value, code.value.trim());
-    showMessage('登录成功，正在进入 PinDou。', 'success');
+    const response = await auth.registerWithPassword({
+      email: normalizedRegisterEmail.value,
+      code: registerCode.value.trim(),
+      password: registerPassword.value,
+      cdk: cdk.value.trim() || undefined
+    });
+    showMessage(response.cdk?.message_cn || '账号创建成功，正在进入 PinDou。', response.cdk?.success === false && cdk.value.trim() ? 'info' : 'success');
+    await wait(420);
     await router.replace(readRedirectPath());
   } catch (error) {
-    showMessage(readErrorMessage(error, '验证码不正确或已过期。'), 'error');
+    showMessage(readErrorMessage(error, '注册失败，请检查信息后重试。'), 'error');
   } finally {
-    verifying.value = false;
+    submitting.value = false;
+  }
+}
+
+async function handleLogin(): Promise<void> {
+  if (!isEmail(normalizedLoginEmail.value)) {
+    showMessage('请输入正确的邮箱地址。', 'error');
+    return;
+  }
+  if (!loginPassword.value) {
+    showMessage('请输入密码。', 'error');
+    return;
+  }
+
+  submitting.value = true;
+  showMessage('', 'info');
+
+  try {
+    await auth.loginWithPassword(normalizedLoginEmail.value, loginPassword.value);
+    showMessage('登录成功，正在进入 PinDou。', 'success');
+    await wait(260);
+    await router.replace(readRedirectPath());
+  } catch (error) {
+    showMessage(readErrorMessage(error, '登录失败，请稍后再试。'), 'error');
+  } finally {
+    submitting.value = false;
   }
 }
 
@@ -136,7 +166,7 @@ function startCooldown(seconds: number): void {
   }, 1000);
 }
 
-function showMessage(message: string, kind: 'info' | 'success' | 'error'): void {
+function showMessage(message: string, kind: FeedbackKind): void {
   feedback.value = message;
   feedbackKind.value = kind;
 }
@@ -146,7 +176,7 @@ function readRedirectPath(): string {
   if (typeof redirect === 'string' && redirect.startsWith('/') && !redirect.startsWith('//')) {
     return redirect;
   }
-  return '/me';
+  return '/upload';
 }
 
 function readErrorMessage(error: unknown, fallback: string): string {
@@ -163,15 +193,8 @@ function isEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function toBeadRows(rows: string[]): BeadTone[] {
-  const toneMap: Record<string, BeadTone> = {
-    '0': 'blank',
-    '1': 'ink',
-    '2': 'peach',
-    '3': 'coral',
-    '4': 'mint'
-  };
-  return rows.flatMap((row) => row.split('').map((value) => toneMap[value] || 'blank'));
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
 onUnmounted(() => {
@@ -183,287 +206,333 @@ onUnmounted(() => {
 
 <template>
   <section class="login-page">
-    <div class="auth-landing">
-      <aside class="auth-story" aria-label="PinDou 登录说明">
-        <div class="story-copy">
-          <p class="eyebrow">PinDou Web</p>
-          <h1>把照片变成可以开工的拼豆图纸</h1>
-          <p>登录后保存作品、继续生成图纸、查看订单和额度。我们只用邮箱验证码确认是你本人。</p>
+    <div class="auth-card">
+      <div class="auth-brand">
+        <span class="auth-brand__mark" aria-hidden="true"></span>
+        <div>
+          <strong>PinDou 拼豆</strong>
+          <span>照片变图纸，开工更轻松</span>
         </div>
+      </div>
 
-        <div class="sample-stack" aria-label="拼豆样例">
-          <article v-for="sample in sampleCards" :key="sample.title" class="sample-card">
-            <div class="bead-board" aria-hidden="true">
-              <span
-                v-for="(cell, index) in sample.rows"
-                :key="`${sample.title}-${index}`"
-                class="bead-dot"
-                :style="`--bead-color:${beadPalette[cell]}`"
-              ></span>
-            </div>
-            <div>
-              <strong>{{ sample.title }}</strong>
-              <span>{{ sample.caption }}</span>
-            </div>
-          </article>
-        </div>
+      <div class="auth-tabs" role="tablist" aria-label="登录注册切换">
+        <span class="auth-tabs__indicator" :class="`auth-tabs__indicator--${mode}`" aria-hidden="true"></span>
+        <button
+          type="button"
+          role="tab"
+          :aria-selected="mode === 'register'"
+          :class="{ 'is-active': mode === 'register' }"
+          @click="switchMode('register')"
+        >
+          注册
+        </button>
+        <button
+          type="button"
+          role="tab"
+          :aria-selected="mode === 'login'"
+          :class="{ 'is-active': mode === 'login' }"
+          @click="switchMode('login')"
+        >
+          登录
+        </button>
+      </div>
 
-        <ol class="flow-list" aria-label="生成流程">
-          <li><span>1</span>上传照片</li>
-          <li><span>2</span>AI 生成</li>
-          <li><span>3</span>拿图纸开做</li>
-        </ol>
+      <Transition name="auth-form" mode="out-in">
+        <form v-if="mode === 'register'" key="register" class="auth-form" @submit.prevent="handleRegister">
+          <div class="auth-heading">
+            <p class="eyebrow">Create Account</p>
+            <h1>创建你的拼豆账号</h1>
+            <p>邮箱验证后即可保存作品、同步额度和兑换激活码。</p>
+          </div>
 
-        <p class="privacy-note">照片仅用于生成拼豆图纸，并按隐私策略定期删除。</p>
-      </aside>
-
-      <div class="login-card">
-        <p class="eyebrow">邮箱验证码</p>
-        <h2>欢迎来到 PinDou</h2>
-        <p class="login-card__intro">输入邮箱接收 6 位验证码。首次验证会自动创建账号。</p>
-
-        <form class="login-form" @submit.prevent="handleVerify">
-          <label class="login-field">
+          <label class="auth-field">
             <span>邮箱</span>
-            <input
-              v-model="email"
-              type="email"
-              inputmode="email"
-              autocomplete="email"
-              placeholder="you@example.com"
-            />
+            <input v-model="registerEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
           </label>
 
-          <div class="login-code-row">
-            <label class="login-field login-field--code">
-              <span>验证码</span>
-              <input
-                v-model="code"
-                type="text"
-                inputmode="numeric"
-                autocomplete="one-time-code"
-                maxlength="6"
-                placeholder="6 位数字"
-              />
+          <div class="auth-code-row">
+            <label class="auth-field">
+              <span>邮箱验证码</span>
+              <input v-model="registerCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6 位数字" />
             </label>
-            <button class="login-send" type="button" :disabled="!canSendCode" @click="handleSendCode">
+            <button class="code-button" type="button" :disabled="!canSendCode" @click="handleSendCode">
               {{ sendButtonText }}
             </button>
           </div>
 
-          <p v-if="feedback" class="login-feedback" :class="`login-feedback--${feedbackKind}`" role="status" aria-live="polite">
+          <label class="auth-field">
+            <span>设置密码</span>
+            <span class="password-wrap">
+              <input
+                v-model="registerPassword"
+                :type="showRegisterPassword ? 'text' : 'password'"
+                autocomplete="new-password"
+                placeholder="至少 6 位"
+              />
+              <button
+                class="eye-button"
+                type="button"
+                :aria-label="showRegisterPassword ? '隐藏密码' : '显示密码'"
+                @click="showRegisterPassword = !showRegisterPassword"
+              >
+                <span class="eye-icon" :class="{ 'eye-icon--hidden': !showRegisterPassword }"></span>
+              </button>
+            </span>
+          </label>
+
+          <label class="auth-field">
+            <span>确认密码</span>
+            <span class="password-wrap">
+              <input
+                v-model="confirmPassword"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                autocomplete="new-password"
+                placeholder="再输入一次"
+              />
+              <button
+                class="eye-button"
+                type="button"
+                :aria-label="showConfirmPassword ? '隐藏密码' : '显示密码'"
+                @click="showConfirmPassword = !showConfirmPassword"
+              >
+                <span class="eye-icon" :class="{ 'eye-icon--hidden': !showConfirmPassword }"></span>
+              </button>
+            </span>
+          </label>
+
+          <label class="auth-field">
+            <span>激活码 <em>可选</em></span>
+            <input v-model="cdk" type="text" autocomplete="off" placeholder="填写后赠送生成次数" />
+          </label>
+
+          <p v-if="feedback" class="auth-feedback" :class="`auth-feedback--${feedbackKind}`" role="status" aria-live="polite">
             {{ feedback }}
           </p>
 
-          <button class="pd-btn pd-btn--primary login-submit" type="submit" :disabled="!canVerify">
-            {{ verifying ? '正在进入...' : '继续生成图纸' }}
+          <button class="auth-submit" type="submit" :disabled="!canRegister">
+            {{ submitting ? '创建中...' : '创建账号' }}
           </button>
         </form>
-      </div>
+
+        <form v-else key="login" class="auth-form" @submit.prevent="handleLogin">
+          <div class="auth-heading">
+            <p class="eyebrow">Welcome Back</p>
+            <h1>继续你的拼豆计划</h1>
+            <p>用邮箱和密码登录，回到上次保存的作品和额度。</p>
+          </div>
+
+          <label class="auth-field">
+            <span>邮箱</span>
+            <input v-model="loginEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
+          </label>
+
+          <label class="auth-field">
+            <span>密码</span>
+            <span class="password-wrap">
+              <input
+                v-model="loginPassword"
+                :type="showLoginPassword ? 'text' : 'password'"
+                autocomplete="current-password"
+                placeholder="输入密码"
+              />
+              <button
+                class="eye-button"
+                type="button"
+                :aria-label="showLoginPassword ? '隐藏密码' : '显示密码'"
+                @click="showLoginPassword = !showLoginPassword"
+              >
+                <span class="eye-icon" :class="{ 'eye-icon--hidden': !showLoginPassword }"></span>
+              </button>
+            </span>
+          </label>
+
+          <p v-if="feedback" class="auth-feedback" :class="`auth-feedback--${feedbackKind}`" role="status" aria-live="polite">
+            {{ feedback }}
+          </p>
+
+          <button class="auth-submit" type="submit" :disabled="!canLogin">
+            {{ submitting ? '登录中...' : '登录' }}
+          </button>
+        </form>
+      </Transition>
+
+      <p class="auth-note">照片仅用于生成图纸，并按隐私策略定期删除。</p>
     </div>
   </section>
 </template>
 
 <style scoped>
 .login-page {
-  min-height: calc(100vh - 160px);
+  min-height: calc(100vh - 150px);
   display: grid;
   place-items: center;
+  padding: 16px 0;
 }
 
-.auth-landing {
-  width: min(100%, 1060px);
-  display: grid;
-  grid-template-columns: minmax(0, 1.06fr) minmax(380px, 0.94fr);
-  align-items: stretch;
-  gap: clamp(22px, 4vw, 48px);
-  min-width: 0;
-}
-
-.auth-story,
-.login-card {
-  min-width: 0;
-  padding: clamp(30px, 6vw, 56px);
-  border: 1px solid rgba(237, 228, 218, 0.82);
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: var(--pd-shadow-float);
-}
-
-.auth-story {
+.auth-card {
+  width: min(100%, 486px);
   position: relative;
   overflow: hidden;
-  display: grid;
-  align-content: space-between;
-  gap: 24px;
+  border: 1px solid rgba(237, 228, 218, 0.86);
+  border-radius: 30px;
   background:
-    radial-gradient(circle at 84% 12%, rgba(164, 212, 197, 0.24), transparent 30%),
-    linear-gradient(145deg, rgba(255, 241, 232, 0.96), rgba(255, 255, 255, 0.9));
+    radial-gradient(circle at 86% 10%, rgba(164, 212, 197, 0.2), transparent 30%),
+    radial-gradient(circle at 8% 88%, rgba(255, 176, 136, 0.2), transparent 32%),
+    rgba(255, 255, 255, 0.92);
+  box-shadow: 0 28px 70px rgba(255, 107, 90, 0.14), 0 10px 26px rgba(45, 45, 45, 0.06);
+  padding: clamp(24px, 5vw, 36px);
+  animation: card-rise 420ms var(--pd-ease-soft) both;
 }
 
-.auth-story::after {
+.auth-card::before {
   content: "";
   position: absolute;
-  width: 150px;
-  height: 150px;
-  right: -48px;
-  bottom: -52px;
-  border-radius: 48% 52% 46% 54%;
+  width: 156px;
+  height: 156px;
+  right: -70px;
+  top: -72px;
+  border-radius: 44% 56% 52% 48%;
   background: rgba(255, 176, 136, 0.18);
   pointer-events: none;
 }
 
-.story-copy {
+.auth-brand {
   position: relative;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  text-align: left;
 }
 
-.story-copy h1 {
-  max-width: 520px;
-  margin: 0 0 14px;
+.auth-brand__mark {
+  width: 42px;
+  height: 42px;
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 16px;
+  background: var(--pd-gradient-warm);
+  box-shadow: var(--pd-shadow-cta);
+  transform: rotate(-5deg);
+}
+
+.auth-brand__mark::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: var(--pd-r-full);
+  background: #fff;
+}
+
+.auth-brand strong,
+.auth-brand span {
+  display: block;
+}
+
+.auth-brand strong {
   color: var(--pd-fg-1);
-  font-family: var(--pd-font-display);
-  font-size: clamp(34px, 4.2vw, 56px);
-  line-height: 1.08;
-  letter-spacing: 0;
-  overflow-wrap: anywhere;
+  font-size: 20px;
+  font-weight: 900;
 }
 
-.story-copy p:last-child,
-.privacy-note {
-  max-width: 480px;
-  margin: 0;
+.auth-brand span {
   color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 800;
 }
 
-.sample-stack {
+.auth-tabs {
   position: relative;
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 0;
+  margin-bottom: 24px;
+  border: 1px solid rgba(237, 228, 218, 0.9);
+  border-radius: 18px;
+  background: rgba(255, 244, 236, 0.82);
+  padding: 5px;
 }
 
-.sample-card {
-  display: grid;
-  gap: 14px;
-  border: 1px solid rgba(237, 228, 218, 0.82);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.76);
-  padding: 16px;
-  box-shadow: var(--pd-shadow-card);
+.auth-tabs__indicator {
+  position: absolute;
+  inset: 5px auto 5px 5px;
+  width: calc(50% - 5px);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 26px rgba(255, 142, 83, 0.16), 0 1px 2px rgba(45, 45, 45, 0.04);
+  transition: transform 260ms var(--pd-ease-soft);
 }
 
-.sample-card strong,
-.sample-card span {
-  display: block;
+.auth-tabs__indicator--login {
+  transform: translateX(100%);
 }
 
-.sample-card strong {
-  color: var(--pd-fg-1);
-  font-size: 15px;
-}
-
-.sample-card span {
+.auth-tabs button {
+  position: relative;
+  z-index: 1;
+  min-height: 42px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
   color: var(--pd-fg-2);
-  font-size: 12px;
-}
-
-.bead-board {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 3px;
-  aspect-ratio: 1;
-  border-radius: 18px;
-  background: var(--pd-bg);
-  padding: 10px;
-}
-
-.bead-dot {
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--bead-color);
-  box-shadow: inset 0 -1px 1px rgba(45, 45, 45, 0.08);
-}
-
-.flow-list {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.flow-list li {
-  display: grid;
-  gap: 8px;
-  border-radius: 18px;
-  background: rgba(255, 176, 136, 0.15);
-  color: var(--pd-fg-1);
+  cursor: pointer;
+  font: inherit;
+  font-size: 15px;
   font-weight: 900;
-  padding: 14px;
+  transition: color var(--pd-dur-base) var(--pd-ease-out), transform var(--pd-dur-fast) var(--pd-ease-out);
 }
 
-.flow-list span {
-  width: 26px;
-  height: 26px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--pd-r-full);
-  background: var(--pd-gradient-warm);
-  color: #fff;
-  font-size: 12px;
+.auth-tabs button:hover {
+  transform: translateY(-1px);
 }
 
-.privacy-note {
+.auth-tabs button.is-active {
+  color: var(--pd-fg-1);
+}
+
+.auth-form {
   position: relative;
   z-index: 1;
-  border-radius: 18px;
-  background: rgba(164, 212, 197, 0.18);
-  padding: 14px 16px;
-  font-size: 13px;
-  font-weight: 800;
+  display: grid;
+  gap: 14px;
 }
 
-.login-card {
-  align-self: center;
+.auth-heading {
+  margin-bottom: 2px;
   text-align: center;
 }
 
-.login-card h2 {
-  margin: 0 0 12px;
+.auth-heading h1 {
+  margin: 0 0 8px;
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
-  font-size: clamp(30px, 3.8vw, 42px);
-  line-height: 1.12;
+  font-size: clamp(28px, 5vw, 38px);
+  line-height: 1.08;
   letter-spacing: 0;
 }
 
-.login-card__intro {
-  margin: 0 auto 28px;
-  max-width: 420px;
+.auth-heading p:last-child {
+  margin: 0 auto;
+  max-width: 360px;
   color: var(--pd-fg-2);
+  font-size: 14px;
 }
 
 .eyebrow {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   color: var(--pd-orange);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0;
   text-transform: uppercase;
 }
 
-.login-form {
-  display: grid;
-  gap: 16px;
-  text-align: left;
-}
-
-.login-field {
+.auth-field {
   display: grid;
   gap: 8px;
   color: var(--pd-fg-1);
@@ -471,137 +540,261 @@ onUnmounted(() => {
   font-weight: 900;
 }
 
-.login-field input {
+.auth-field em {
+  color: var(--pd-fg-2);
+  font-style: normal;
+  font-weight: 800;
+}
+
+.auth-field input {
   width: 100%;
   min-height: 50px;
   border: 1px solid var(--pd-stroke);
-  border-radius: var(--pd-r-input);
-  background: #fff;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
   color: var(--pd-fg-1);
   font: inherit;
   font-size: 16px;
   outline: none;
   padding: 0 16px;
-  transition: border-color var(--pd-dur-fast) var(--pd-ease-out), box-shadow var(--pd-dur-fast) var(--pd-ease-out);
+  transition:
+    border-color var(--pd-dur-base) var(--pd-ease-out),
+    box-shadow var(--pd-dur-base) var(--pd-ease-out),
+    transform var(--pd-dur-fast) var(--pd-ease-out);
 }
 
-.login-field input:focus {
+.auth-field input:hover {
+  border-color: rgba(255, 142, 83, 0.42);
+}
+
+.auth-field input:focus {
   border-color: var(--pd-orange);
   box-shadow: 0 0 0 4px rgba(255, 142, 83, 0.16);
+  transform: translateY(-1px);
 }
 
-.login-code-row {
+.auth-code-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 118px;
   align-items: end;
   gap: 12px;
 }
 
-.login-send {
-  min-width: 116px;
+.code-button {
   min-height: 50px;
-  border: 1px solid rgba(255, 142, 83, 0.36);
-  border-radius: var(--pd-r-input);
+  border: 1px solid rgba(255, 142, 83, 0.32);
+  border-radius: 16px;
   background: var(--pd-peach-50);
   color: var(--pd-orange);
   cursor: pointer;
   font: inherit;
   font-size: 14px;
   font-weight: 900;
-  padding: 0 16px;
+  transition:
+    background var(--pd-dur-base) var(--pd-ease-out),
+    transform var(--pd-dur-fast) var(--pd-ease-out),
+    box-shadow var(--pd-dur-base) var(--pd-ease-out);
 }
 
-.login-send:disabled,
-.login-submit:disabled {
-  cursor: not-allowed;
-  background: #ede5dd;
-  color: #9b8e84;
-  box-shadow: none;
+.code-button:hover:not(:disabled) {
+  background: #fff;
+  box-shadow: var(--pd-shadow-card);
+  transform: translateY(-1px);
+}
+
+.password-wrap {
+  position: relative;
+  display: block;
+}
+
+.password-wrap input {
+  padding-right: 52px;
+}
+
+.eye-button {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background var(--pd-dur-fast) var(--pd-ease-out), transform var(--pd-dur-fast) var(--pd-ease-out);
+}
+
+.eye-button:hover {
+  background: var(--pd-peach-50);
+  transform: translateY(-50%) scale(1.04);
+}
+
+.eye-icon {
+  width: 20px;
+  height: 13px;
+  position: relative;
+  display: block;
+  border: 2px solid var(--pd-orange);
+  border-radius: 999px 999px 760px 760px;
+  opacity: 0.9;
+}
+
+.eye-icon::before {
+  content: "";
+  position: absolute;
+  inset: 3px 6px;
+  border-radius: var(--pd-r-full);
+  background: var(--pd-orange);
+}
+
+.eye-icon::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 2px;
+  left: -3px;
+  top: 5px;
+  border-radius: var(--pd-r-full);
+  background: var(--pd-orange);
+  opacity: 0;
+  transform: rotate(-38deg);
+  transition: opacity var(--pd-dur-fast) var(--pd-ease-out);
+}
+
+.eye-icon--hidden::after {
   opacity: 1;
-  transform: none;
 }
 
-.login-feedback {
+.auth-feedback {
   margin: 0;
   border-radius: 14px;
   font-size: 13px;
   font-weight: 800;
   padding: 12px 14px;
-  text-align: left;
 }
 
-.login-feedback--success {
+.auth-feedback--success {
   background: rgba(52, 199, 89, 0.12);
   color: #168538;
 }
 
-.login-feedback--error {
+.auth-feedback--error {
   background: rgba(255, 90, 90, 0.12);
   color: #cc3d3d;
 }
 
-.login-feedback--info {
-  background: var(--pd-peach-50);
+.auth-feedback--info {
+  background: rgba(164, 212, 197, 0.17);
   color: var(--pd-fg-2);
 }
 
-.login-submit {
-  width: 100%;
+.auth-submit {
+  min-height: 52px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--pd-gradient);
+  box-shadow: var(--pd-shadow-cta);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 900;
+  transition:
+    filter var(--pd-dur-base) var(--pd-ease-out),
+    transform var(--pd-dur-fast) var(--pd-ease-out),
+    box-shadow var(--pd-dur-base) var(--pd-ease-out);
+}
+
+.auth-submit:hover:not(:disabled) {
+  filter: brightness(1.035);
+  box-shadow: 0 18px 38px rgba(255, 142, 83, 0.34), 0 8px 20px rgba(255, 107, 90, 0.2);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.auth-submit:active:not(:disabled) {
+  transform: translateY(0) scale(0.99);
+}
+
+.auth-submit:disabled,
+.code-button:disabled {
+  background: #ede5dd;
+  box-shadow: none;
+  color: #9b8e84;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.auth-note {
+  position: relative;
+  z-index: 1;
+  margin: 18px 0 0;
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.auth-form-enter-active,
+.auth-form-leave-active {
+  transition: opacity 180ms var(--pd-ease-out), transform 180ms var(--pd-ease-out);
+}
+
+.auth-form-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.auth-form-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+@keyframes card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @media (max-width: 640px) {
   .login-page {
-    min-height: calc(100vh - 112px);
+    min-height: calc(100vh - 88px);
+    padding: 8px 0 24px;
   }
 
-  .auth-landing {
-    grid-template-columns: 1fr;
-    gap: 16px;
+  .auth-card {
+    border-radius: 24px;
+    padding: 22px 18px;
   }
 
-  .auth-story {
-    padding: 24px 20px;
-    border-radius: 22px;
+  .auth-brand {
+    justify-content: flex-start;
   }
 
-  .story-copy h1 {
-    font-size: 28px;
+  .auth-heading {
+    text-align: left;
   }
 
-  .sample-stack {
-    grid-template-columns: 1fr;
-    gap: 10px;
+  .auth-heading h1 {
+    font-size: 30px;
   }
 
-  .sample-card {
-    padding: 12px;
-    border-radius: 18px;
+  .auth-heading p:last-child {
+    margin-left: 0;
   }
 
-  .bead-board {
-    gap: 2px;
-    padding: 8px;
-    border-radius: 14px;
-  }
-
-  .flow-list {
+  .auth-code-row {
     grid-template-columns: 1fr;
   }
 
-  .privacy-note {
-    font-size: 12px;
-  }
-
-  .login-card {
-    padding: 28px 20px;
-    border-radius: 22px;
-  }
-
-  .login-code-row {
-    grid-template-columns: 1fr;
-  }
-
-  .login-send {
+  .code-button {
     width: 100%;
   }
 }

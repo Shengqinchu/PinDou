@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 
-import { getProfile, sendEmailCode, verifyEmailCode } from '../api';
-import type { EmailCodeResponse } from '../api';
+import { emailPasswordLogin, getProfile, registerWebAccount, sendEmailCode, verifyEmailCode } from '../api';
+import type { EmailCodeResponse, RegisterResponse } from '../api';
 import type { User } from '../api/types';
 import {
   clearStoredUser,
@@ -33,6 +33,21 @@ export const useAuthStore = defineStore('auth', {
     },
     async loginWithEmail(email: string, code: string): Promise<User> {
       const payload = await verifyEmailCode(email, code);
+      this.setSession(payload.token, payload.user);
+      return payload.user;
+    },
+    async registerWithPassword(payload: {
+      email: string;
+      code: string;
+      password: string;
+      cdk?: string;
+    }): Promise<RegisterResponse> {
+      const response = await registerWebAccount(payload);
+      this.setSession(response.token, response.user);
+      return response;
+    },
+    async loginWithPassword(email: string, password: string): Promise<User> {
+      const payload = await emailPasswordLogin(email, password);
       this.setSession(payload.token, payload.user);
       return payload.user;
     },

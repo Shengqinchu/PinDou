@@ -9,6 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from pindou.db.models import ConsentLog, DailyQuota, User, utc_now
+from pindou.services.password_auth import hash_password, verify_password
 
 
 class UserService:
@@ -59,6 +60,20 @@ class UserService:
                 user.nickname = _email_nickname(normalized_email)
         self.session.commit()
         self.session.refresh(user)
+        return user
+
+    def register_or_complete_password_account(self, *, email: str, password: str) -> User:
+        normalized_email = email.lower().strip()
+        user = self.register_or_login_email(email=normalized_email)
+        user.password_hash = hash_password(password)
+        self.session.commit()
+        self.session.refresh(user)
+        return user
+
+    def authenticate_email_password(self, *, email: str, password: str) -> User | None:
+        user = self.get_user_by_email(email)
+        if user is None or not verify_password(password, user.password_hash):
+            return None
         return user
 
     def record_consent(

@@ -93,6 +93,20 @@ def upload_image(client: TestClient, headers: dict[str, str]) -> str:
     return response.json()["image_id"]
 
 
+def capture_email_codes(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, str]]:
+    sent_codes: list[tuple[str, str]] = []
+
+    async def fake_send_verification_email(email: str, code: str) -> tuple[bool, str]:
+        sent_codes.append((email, code))
+        return True, "ok"
+
+    monkeypatch.setattr(
+        "pindou.services.email_verification.send_verification_email",
+        fake_send_verification_email,
+    )
+    return sent_codes
+
+
 def test_user_login_profile_consent_and_auth_error(api_client) -> None:
     client, _session_factory = api_client
 
@@ -117,16 +131,7 @@ def test_user_login_profile_consent_and_auth_error(api_client) -> None:
 
 def test_email_code_login_uses_shared_db_and_returns_email_user(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
     client, session_factory = api_client
-    sent_codes: list[tuple[str, str]] = []
-
-    async def fake_send_verification_email(email: str, code: str) -> tuple[bool, str]:
-        sent_codes.append((email, code))
-        return True, "ok"
-
-    monkeypatch.setattr(
-        "pindou.services.email_verification.send_verification_email",
-        fake_send_verification_email,
-    )
+    sent_codes = capture_email_codes(monkeypatch)
 
     sent = client.post("/api/user/email/send-code", json={"email": "Test.User@Example.COM"})
     assert sent.status_code == 200
@@ -166,6 +171,117 @@ def test_email_code_login_uses_shared_db_and_returns_email_user(api_client, monk
         assert record is not None
         assert record.consumed_at is not None
         assert record.code_hash != code
+
+
+def test_web_password_register_login_and_duplicate_register(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, session_factory = api_client
+    sent_codes = capture_email_codes(monkeypatch)
+
+    sent = client.post("/api/user/email/send-code", json={"email": "Password.User@Example.COM"})
+    assert sent.status_code == 200
+    code = sent_codes[-1][1]
+
+    registered = client.post(
+        "/api/user/register",
+        json={"email": "password.user@example.com", "code": code, "password": "secret123"},
+    )
+    assert registered.status_code == 200
+    payload = registered.json()
+    assert payload["token"]
+    assert payload["user"]["email"] == "password.user@example.com"
+    assert payload["cdk"]["success"] is False
+
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.email == "password.user@example.com"))
+        assert user is not None
+        assert user.password_hash
+        assert "secret123" not in user.password_hash
+        assert user.password_hash.startswith("pbkdf2_sha256$")
+
+    duplicate = client.post(
+        "/api/user/register",
+        json={"email": "password.user@example.com", "code": code, "password": "another123"},
+    )
+    assert duplicate.status_code == 409
+    assert duplicate.json()["message_cn"] == "该邮箱已注册，请登录。"
+
+    logged_in = client.post(
+        "/api/user/email-login",
+        json={"email": "Password.User@Example.COM", "password": "secret123"},
+    )
+    assert logged_in.status_code == 200
+    assert logged_in.json()["user"]["user_id"] == payload["user"]["user_id"]
+
+
+def test_web_password_register_rejects_wrong_code_and_wrong_password(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, _session_factory = api_client
+    sent_codes = capture_email_codes(monkeypatch)
+
+    sent = client.post("/api/user/email/send-code", json={"email": "wrong.code@example.com"})
+    assert sent.status_code == 200
+    code = sent_codes[-1][1]
+    wrong_code = "000000" if code != "000000" else "111111"
+
+    bad_register = client.post(
+        "/api/user/register",
+        json={"email": "wrong.code@example.com", "code": wrong_code, "password": "secret123"},
+    )
+    assert bad_register.status_code == 400
+    assert bad_register.json()["error"] == "EMAIL_CODE_INVALID"
+
+    assert client.post("/api/user/email/send-code", json={"email": "login.fail@example.com"}).status_code == 200
+    valid_code = sent_codes[-1][1]
+    assert client.post(
+        "/api/user/register",
+        json={"email": "login.fail@example.com", "code": valid_code, "password": "secret123"},
+    ).status_code == 200
+
+    wrong_password = client.post(
+        "/api/user/email-login",
+        json={"email": "login.fail@example.com", "password": "wrong-password"},
+    )
+    assert wrong_password.status_code == 401
+    assert wrong_password.json()["message_cn"] == "密码不正确，请重新输入。"
+
+    missing_user = client.post(
+        "/api/user/email-login",
+        json={"email": "not.registered@example.com", "password": "secret123"},
+    )
+    assert missing_user.status_code == 404
+    assert missing_user.json()["message_cn"] == "邮箱未注册，请先注册。"
+
+
+def test_web_password_register_with_cdk_grants_credits(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, session_factory = api_client
+    CDKService._attempts.clear()
+    sent_codes = capture_email_codes(monkeypatch)
+    code_value = "REGCDKABCDEFGHJKL"
+
+    with session_factory() as session:
+        CDKService(session).create_cdk(code=code_value, cdk_type="credit_pack_5", value=5)
+
+    assert client.post("/api/user/email/send-code", json={"email": "cdk.register@example.com"}).status_code == 200
+    email_code = sent_codes[-1][1]
+    registered = client.post(
+        "/api/user/register",
+        json={
+            "email": "cdk.register@example.com",
+            "code": email_code,
+            "password": "secret123",
+            "cdk": code_value.lower(),
+        },
+    )
+    assert registered.status_code == 200
+    payload = registered.json()
+    assert payload["cdk"]["success"] is True
+    assert payload["cdk"]["value"] == 5
+    assert payload["user"]["paid_credits"] == 5
+
+    with session_factory() as session:
+        cdk = session.get(CDK, code_value)
+        assert cdk is not None
+        assert cdk.status == "redeemed"
+        assert cdk.redeemed_by == payload["user"]["user_id"]
 
 
 def test_email_code_rejects_disposable_email(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
