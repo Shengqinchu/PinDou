@@ -3,10 +3,15 @@ import { computed, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import {
-  DEFAULT_GENERATION_SIZE,
+  GENERATION_MODE_DETAILS,
+  GENERATION_MODE_OPTIONS,
   RESULT_SIZE_OPTIONS,
   SIZE_OPTION_DETAILS,
+  STYLE_OPTION_DETAILS,
+  STYLE_OPTIONS,
   useGenerationStore,
+  type GenerationMode,
+  type GenerationStylePreset,
   type ResultSizePreset
 } from '../stores/generation';
 
@@ -18,7 +23,6 @@ const selectedFile = ref<File | null>(null);
 const previewUrl = ref('');
 const isDragging = ref(false);
 const message = ref('');
-const sizeOptions = RESULT_SIZE_OPTIONS;
 
 const fileSizeMb = computed(() => {
   if (!selectedFile.value) {
@@ -35,6 +39,13 @@ const isHeic = computed(() => {
   const name = file.name.toLowerCase();
   return file.type.includes('heic') || file.type.includes('heif') || name.endsWith('.heic') || name.endsWith('.heif');
 });
+
+const generationVerb = computed(() => (generation.generationMode === 'ai' ? 'AI 生成' : '快速生成'));
+const ctaLabel = computed(() => {
+  const size = generation.selectedSize.split('x')[0];
+  return selectedFile.value ? `${generationVerb.value} · ${size}格 ->` : '选择照片后开始生成';
+});
+const selectedModeDetail = computed(() => GENERATION_MODE_DETAILS[generation.generationMode]);
 
 function openGallery(): void {
   galleryInput.value?.click();
@@ -77,9 +88,8 @@ function useFile(file: File): void {
 
   revokePreview();
   selectedFile.value = file;
-  generation.setSize(DEFAULT_GENERATION_SIZE);
   previewUrl.value = URL.createObjectURL(file);
-  message.value = isLargeFile(file) ? '照片较大也没关系，我们会在生成前自动整理。' : '照片已选好，可以开始生成了。';
+  message.value = isLargeFile(file) ? '照片较大，会在生成前自动整理。' : '照片已就位，可以开始生成。';
 }
 
 function clearFile(): void {
@@ -108,6 +118,15 @@ async function startGenerate(): Promise<void> {
   await router.push({ name: 'loading', query: { from: 'upload' } });
 }
 
+function chooseMode(mode: GenerationMode): void {
+  generation.setGenerationMode(mode);
+}
+
+function chooseStyle(style: GenerationStylePreset): void {
+  generation.setStyle(style);
+  generation.setGenerationMode('ai');
+}
+
 function chooseSize(size: ResultSizePreset): void {
   generation.setSize(size);
 }
@@ -117,14 +136,14 @@ onUnmounted(revokePreview);
 
 <template>
   <section class="upload-page">
-    <div class="upload-hero">
-      <p class="eyebrow">开始生成</p>
-      <h1>选一张清晰照片，做成你的<span>专属拼豆图纸</span></h1>
-      <p>主体清楚、光线柔和、背景简单的近距离照片效果最好。宠物、自拍、情侣照都可以先试一张。</p>
-    </div>
+    <header class="studio-hero">
+      <p class="eyebrow">Create Pattern</p>
+      <h1>把照片变成一张干净的 Q 版拼豆图纸</h1>
+      <p>上传照片，选择生成方式、风格和目标格数，然后交给 PinDou 做图纸。</p>
+    </header>
 
-    <div class="upload-layout">
-      <section class="upload-card" aria-label="上传照片">
+    <div class="studio-shell">
+      <section class="upload-stage" aria-label="上传照片">
         <input
           ref="galleryInput"
           class="sr-only"
@@ -158,42 +177,99 @@ onUnmounted(revokePreview);
             <img v-if="!isHeic" class="preview-image" :src="previewUrl" alt="已选择照片预览" />
             <div v-else class="preview-fallback">
               <strong>HEIC 照片已选择</strong>
-              <span>部分浏览器不能直接预览 HEIC，也可以继续生成。</span>
+              <span>可以继续生成。</span>
             </div>
+            <div class="preview-sheen" aria-hidden="true"></div>
           </template>
           <template v-else>
-            <div class="upload-icon" aria-hidden="true">图</div>
-            <strong>拖拽照片到这里，或点击选择</strong>
-            <span>支持 jpg、png、webp、HEIC；手机上也可以直接拍照。</span>
+            <div class="upload-mark" aria-hidden="true">
+              <span></span>
+            </div>
+            <strong>拖拽照片到这里</strong>
+            <span>或点击选择图片</span>
           </template>
         </div>
 
-        <div class="upload-actions">
+        <div class="stage-actions">
           <button class="pd-btn pd-btn--primary" type="button" @click="openGallery">从相册选择</button>
-          <button class="pd-btn upload-secondary" type="button" @click="openCamera">拍一张</button>
+          <button class="pd-btn stage-secondary" type="button" @click="openCamera">拍一张</button>
         </div>
 
-        <div v-if="selectedFile" class="file-summary">
+        <div v-if="selectedFile" class="file-strip">
           <div>
             <strong>{{ selectedFile.name }}</strong>
             <span>{{ selectedFile.type || 'image/*' }} · {{ fileSizeMb }}</span>
           </div>
           <button type="button" @click="clearFile">重新选择</button>
         </div>
+      </section>
 
-        <section v-if="selectedFile" class="size-picker" aria-label="选择目标格数">
-          <div class="size-picker__head">
-            <strong>目标格数</strong>
-            <span>按拼豆板规格生成</span>
+      <aside class="control-panel" aria-label="生成选项">
+        <div class="panel-head">
+          <p class="eyebrow">Generate Setup</p>
+          <strong>{{ selectedModeDetail.label }}</strong>
+          <span>{{ selectedModeDetail.hint }}</span>
+        </div>
+
+        <section class="option-group" aria-label="生成方式">
+          <div class="option-heading">
+            <strong>生成方式</strong>
+            <span>AI 默认推荐</span>
           </div>
-          <div class="size-picker__options">
+          <div class="mode-grid">
             <button
-              v-for="size in sizeOptions"
-              :key="size"
-              class="size-picker__option"
+              v-for="mode in GENERATION_MODE_OPTIONS"
+              :key="mode"
               type="button"
-              :class="{ 'size-picker__option--active': size === generation.selectedSize }"
-              :aria-pressed="size === generation.selectedSize"
+              class="mode-card"
+              :class="{ 'mode-card--active': generation.generationMode === mode }"
+              :aria-pressed="generation.generationMode === mode"
+              @click="chooseMode(mode)"
+            >
+              <span v-if="GENERATION_MODE_DETAILS[mode].badge" class="option-badge">
+                {{ GENERATION_MODE_DETAILS[mode].badge }}
+              </span>
+              <strong>{{ GENERATION_MODE_DETAILS[mode].label }}</strong>
+              <em>{{ GENERATION_MODE_DETAILS[mode].hint }}</em>
+            </button>
+          </div>
+        </section>
+
+        <section class="option-group" aria-label="风格">
+          <div class="option-heading">
+            <strong>风格</strong>
+            <span>{{ generation.generationMode === 'ai' ? 'Q版风格化' : '切回 AI 时生效' }}</span>
+          </div>
+          <div class="style-grid">
+            <button
+              v-for="style in STYLE_OPTIONS"
+              :key="style"
+              type="button"
+              class="style-pill"
+              :class="{ 'style-pill--active': generation.selectedStyle === style, 'style-pill--muted': generation.generationMode !== 'ai' }"
+              :aria-pressed="generation.selectedStyle === style"
+              @click="chooseStyle(style)"
+            >
+              <span>{{ STYLE_OPTION_DETAILS[style].icon }}</span>
+              <strong>{{ STYLE_OPTION_DETAILS[style].label }}</strong>
+              <em>{{ STYLE_OPTION_DETAILS[style].hint }}</em>
+            </button>
+          </div>
+        </section>
+
+        <section class="option-group" aria-label="目标格数">
+          <div class="option-heading">
+            <strong>目标格数</strong>
+            <span>按拼豆板规格</span>
+          </div>
+          <div class="size-grid">
+            <button
+              v-for="size in RESULT_SIZE_OPTIONS"
+              :key="size"
+              type="button"
+              class="size-card"
+              :class="{ 'size-card--active': generation.selectedSize === size }"
+              :aria-pressed="generation.selectedSize === size"
               @click="chooseSize(size)"
             >
               <strong>{{ SIZE_OPTION_DETAILS[size].label }}</strong>
@@ -203,22 +279,9 @@ onUnmounted(revokePreview);
         </section>
 
         <p v-if="message" class="upload-message">{{ message }}</p>
-        <button class="pd-btn upload-next" type="button" :disabled="!selectedFile" @click="startGenerate">
-          {{ selectedFile ? `开始生成 ${generation.selectedSize.split('x')[0]} 格 →` : '选择照片后开始生成' }}
+        <button class="pd-btn generate-cta" type="button" :disabled="!selectedFile" @click="startGenerate">
+          {{ ctaLabel }}
         </button>
-      </section>
-
-      <aside class="tips-card" aria-label="照片建议">
-        <p class="eyebrow">怎样效果更好</p>
-        <ul>
-          <li><span>近</span><strong>主体占大一些</strong><em>脸部、宠物头部或主要物体越清楚，图纸越好认。</em></li>
-          <li><span>净</span><strong>背景简单干净</strong><em>白墙、桌面、纯色背景更容易保留清爽轮廓。</em></li>
-          <li><span>亮</span><strong>光线柔和均匀</strong><em>避开强背光和糊图，颜色会更接近真实豆色。</em></li>
-        </ul>
-        <div class="format-note">
-          <strong>iPhone 照片也放心</strong>
-          <p>HEIC、大图和照片方向问题，我们会尽量自动处理；如果预览不显示，也可以继续试试。</p>
-        </div>
       </aside>
     </div>
   </section>
@@ -227,32 +290,29 @@ onUnmounted(revokePreview);
 <style scoped>
 .upload-page {
   display: grid;
-  gap: 24px;
+  gap: clamp(22px, 4vw, 34px);
 }
 
-.upload-hero {
-  width: min(100%, 820px);
-  margin: 0 auto;
-  text-align: center;
+.studio-hero {
+  width: min(100%, 860px);
 }
 
-.upload-hero h1 {
+.studio-hero h1 {
+  max-width: 760px;
   margin: 0 0 12px;
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
-  font-size: clamp(34px, 4.7vw, 54px);
-  line-height: 1.12;
+  font-size: clamp(34px, 5.2vw, 60px);
+  font-weight: 900;
+  line-height: 1.04;
   letter-spacing: 0;
 }
 
-.upload-hero h1 span {
-  white-space: nowrap;
-}
-
-.upload-hero p:last-child {
-  margin: 0 auto;
-  max-width: 650px;
+.studio-hero p:last-child {
+  max-width: 640px;
+  margin: 0;
   color: var(--pd-fg-2);
+  font-size: 16px;
 }
 
 .eyebrow {
@@ -264,198 +324,193 @@ onUnmounted(revokePreview);
   text-transform: uppercase;
 }
 
-.upload-layout {
+.studio-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(316px, 0.46fr);
+  grid-template-columns: minmax(0, 1.16fr) minmax(330px, 0.62fr);
+  gap: 22px;
   align-items: stretch;
-  gap: 24px;
 }
 
-.upload-card,
-.tips-card {
-  border: 1px solid rgba(237, 228, 218, 0.82);
+.upload-stage,
+.control-panel {
+  border: 1px solid rgba(237, 228, 218, 0.86);
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: var(--pd-shadow-float);
-  padding: clamp(22px, 4vw, 36px);
-  transition:
-    border-color 180ms var(--pd-ease-out),
-    box-shadow 180ms var(--pd-ease-out),
-    transform 180ms var(--pd-ease-out),
-    background 180ms var(--pd-ease-out);
+  padding: clamp(18px, 3.2vw, 30px);
 }
 
-.upload-card:hover,
-.tips-card:hover {
-  border-color: rgba(255, 142, 83, 0.34);
-  box-shadow: 0 18px 44px rgba(255, 107, 90, 0.15), 0 8px 20px rgba(45, 45, 45, 0.07);
-  transform: translateY(-3px);
+.upload-stage {
+  display: grid;
+  grid-template-rows: minmax(320px, 1fr) auto auto;
+  gap: 14px;
 }
 
 .drop-zone {
-  min-height: clamp(260px, 32vw, 340px);
+  position: relative;
+  min-height: clamp(340px, 48vw, 560px);
   display: grid;
   place-items: center;
   align-content: center;
   gap: 10px;
-  border: 2px dashed rgba(255, 142, 83, 0.28);
-  border-radius: 26px;
+  overflow: hidden;
+  border: 2px dashed rgba(255, 142, 83, 0.3);
+  border-radius: 24px;
   background:
-    radial-gradient(circle at 18% 16%, rgba(255, 176, 136, 0.14), transparent 28%),
-    var(--pd-peach-50);
+    linear-gradient(135deg, rgba(255, 176, 136, 0.1), rgba(164, 212, 197, 0.12)),
+    repeating-linear-gradient(45deg, rgba(237, 228, 218, 0.24) 0 1px, transparent 1px 14px),
+    #fffaf5;
   color: var(--pd-fg-2);
   cursor: pointer;
-  overflow: hidden;
-  padding: 22px;
+  padding: 24px;
   text-align: center;
   transition:
-    border-color 180ms var(--pd-ease-out),
-    border-style 180ms var(--pd-ease-out),
-    background 180ms var(--pd-ease-out),
-    box-shadow 180ms var(--pd-ease-out),
-    transform 180ms var(--pd-ease-out);
+    border-color 220ms var(--pd-ease-out),
+    background 220ms var(--pd-ease-out),
+    box-shadow 220ms var(--pd-ease-out),
+    transform 220ms var(--pd-ease-out);
 }
 
 .drop-zone:hover {
-  border-color: rgba(255, 142, 83, 0.58);
-  box-shadow: inset 0 0 0 1px rgba(255, 176, 136, 0.16), 0 12px 28px rgba(255, 142, 83, 0.12);
-  transform: translateY(-3px);
+  border-color: rgba(255, 142, 83, 0.62);
+  box-shadow: inset 0 0 0 1px rgba(255, 176, 136, 0.18), 0 16px 34px rgba(255, 142, 83, 0.14);
+  transform: translateY(-2px);
 }
 
 .drop-zone--active {
   border-style: solid;
   border-color: var(--pd-orange);
   background:
-    radial-gradient(circle at 18% 16%, rgba(255, 176, 136, 0.24), transparent 30%),
-    rgba(255, 241, 232, 0.96);
-  box-shadow: 0 18px 38px rgba(255, 142, 83, 0.2), 0 0 0 4px rgba(255, 142, 83, 0.12);
-  transform: translateY(-4px) scale(1.01);
+    linear-gradient(135deg, rgba(255, 176, 136, 0.2), rgba(184, 164, 237, 0.16)),
+    #fff7ef;
+  box-shadow: 0 20px 42px rgba(255, 142, 83, 0.22), 0 0 0 4px rgba(255, 142, 83, 0.12);
+  transform: translateY(-4px) scale(1.008);
 }
 
 .drop-zone--filled {
-  padding: 12px;
+  border-style: solid;
+  border-color: rgba(237, 228, 218, 0.92);
   background: #fff;
+  padding: 12px;
 }
 
 .drop-zone strong {
   color: var(--pd-fg-1);
-  font-size: 19px;
-  line-height: 1.35;
+  font-size: 22px;
+  font-weight: 900;
 }
 
-.drop-zone span {
-  max-width: 360px;
-  line-height: 1.55;
+.drop-zone > span {
+  color: var(--pd-fg-2);
+  font-weight: 800;
 }
 
-.upload-icon {
-  width: 68px;
-  height: 68px;
+.upload-mark {
+  width: 86px;
+  height: 86px;
   display: grid;
   place-items: center;
-  border-radius: 26px;
+  border-radius: 28px;
   background: var(--pd-gradient-warm);
-  color: #fff;
-  font-size: 28px;
-  font-weight: 900;
   box-shadow: var(--pd-shadow-cta);
+  transition: transform 260ms var(--pd-ease-soft);
+}
+
+.drop-zone:hover .upload-mark,
+.drop-zone--active .upload-mark {
+  transform: rotate(-4deg) scale(1.05);
+}
+
+.upload-mark span {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background:
+    linear-gradient(90deg, #fff 0 6px, transparent 6px 14px, #fff 14px 20px, transparent 20px),
+    linear-gradient(#fff 0 6px, transparent 6px 14px, #fff 14px 20px, transparent 20px);
 }
 
 .preview-image {
   width: 100%;
   height: 100%;
-  max-height: 360px;
+  max-height: 560px;
   display: block;
-  border-radius: 20px;
+  border-radius: 18px;
   object-fit: contain;
+  animation: previewIn 360ms var(--pd-ease-out);
+}
+
+.preview-sheen {
+  position: absolute;
+  inset: 12px;
+  pointer-events: none;
+  border-radius: 18px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.58), inset 0 -40px 80px rgba(255, 176, 136, 0.06);
 }
 
 .preview-fallback {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   place-items: center;
-  border-radius: 22px;
-  background: rgba(255, 176, 136, 0.15);
-  padding: 36px;
+  border-radius: 20px;
+  background: rgba(255, 176, 136, 0.14);
+  padding: 32px;
 }
 
-.upload-actions {
+.stage-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-top: 16px;
 }
 
-.upload-actions .pd-btn,
-.upload-next {
-  transition:
-    border-color 180ms var(--pd-ease-out),
-    background 180ms var(--pd-ease-out),
-    box-shadow 180ms var(--pd-ease-out),
-    filter 180ms var(--pd-ease-out),
-    transform 180ms var(--pd-ease-out);
-}
-
-.upload-actions .pd-btn:hover,
-.upload-next:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.01);
-}
-
-.upload-actions .pd-btn--primary:hover,
-.upload-next:hover:not(:disabled) {
-  filter: brightness(1.035);
-  box-shadow: 0 18px 38px rgba(255, 142, 83, 0.34), 0 8px 20px rgba(255, 107, 90, 0.2);
-}
-
-.upload-secondary {
+.stage-secondary {
   border: 1px solid rgba(255, 142, 83, 0.28);
   background: var(--pd-peach-50);
   color: var(--pd-orange);
 }
 
-.upload-secondary:hover {
-  border-color: rgba(255, 142, 83, 0.58);
-  background: #fff;
-  box-shadow: 0 12px 26px rgba(255, 142, 83, 0.12);
-}
-
-.file-summary {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  margin-top: 16px;
-  border: 1px solid var(--pd-stroke);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.76);
-  padding: 14px 16px;
+.stage-actions .pd-btn,
+.generate-cta {
   transition:
-    border-color 180ms var(--pd-ease-out),
+    filter 180ms var(--pd-ease-out),
     box-shadow 180ms var(--pd-ease-out),
     transform 180ms var(--pd-ease-out);
 }
 
-.file-summary:hover {
-  border-color: rgba(255, 142, 83, 0.34);
-  box-shadow: var(--pd-shadow-card);
+.stage-actions .pd-btn:hover,
+.generate-cta:hover:not(:disabled) {
+  filter: brightness(1.03);
   transform: translateY(-2px);
 }
 
-.file-summary strong,
-.file-summary span {
+.file-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid var(--pd-stroke);
+  border-radius: 18px;
+  background: rgba(255, 241, 232, 0.58);
+  padding: 13px 15px;
+}
+
+.file-strip strong,
+.file-strip span {
   display: block;
 }
 
-.file-summary strong {
+.file-strip strong {
   color: var(--pd-fg-1);
   word-break: break-all;
 }
 
-.file-summary span {
+.file-strip span {
   color: var(--pd-fg-2);
   font-size: 12px;
+  font-weight: 800;
 }
 
-.file-summary button {
+.file-strip button {
   flex: 0 0 auto;
   border: 0;
   background: transparent;
@@ -463,87 +518,231 @@ onUnmounted(revokePreview);
   cursor: pointer;
   font: inherit;
   font-weight: 900;
-  transition: color 160ms var(--pd-ease-out), transform 160ms var(--pd-ease-out);
 }
 
-.file-summary button:hover {
-  color: var(--pd-pink-deep);
-  transform: translateY(-1px);
+.control-panel {
+  display: grid;
+  align-content: start;
+  gap: 18px;
 }
 
-.size-picker {
-  margin-top: 16px;
-  border: 1px solid rgba(237, 228, 218, 0.82);
-  border-radius: 20px;
-  background: rgba(255, 241, 232, 0.54);
-  padding: 16px;
+.panel-head {
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(255, 176, 136, 0.18), rgba(184, 164, 237, 0.12)),
+    var(--pd-peach-50);
+  padding: 18px;
 }
 
-.size-picker__head {
+.panel-head .eyebrow {
+  margin-bottom: 8px;
+}
+
+.panel-head strong,
+.panel-head span {
+  display: block;
+}
+
+.panel-head strong {
+  color: var(--pd-fg-1);
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.panel-head span {
+  margin-top: 8px;
+  color: var(--pd-fg-2);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.option-group {
+  display: grid;
+  gap: 10px;
+}
+
+.option-heading {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
 }
 
-.size-picker__head strong {
+.option-heading strong {
   color: var(--pd-fg-1);
   font-size: 15px;
   font-weight: 900;
 }
 
-.size-picker__head span {
+.option-heading span {
   color: var(--pd-fg-2);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
-.size-picker__options {
+.mode-grid,
+.style-grid,
+.size-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
-.size-picker__option {
+.mode-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.style-grid {
+  grid-template-columns: 1fr;
+}
+
+.size-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.mode-card,
+.style-pill,
+.size-card {
   appearance: none;
+  position: relative;
   min-width: 0;
-  min-height: 74px;
-  border: 1px solid rgba(255, 142, 83, 0.18);
-  border-radius: 18px;
+  border: 1px solid var(--pd-stroke);
   background: rgba(255, 255, 255, 0.82);
   color: var(--pd-fg-1);
   cursor: pointer;
   font: inherit;
-  padding: 10px 8px;
+  text-align: left;
   transition:
     border-color 180ms var(--pd-ease-out),
     background 180ms var(--pd-ease-out),
     box-shadow 180ms var(--pd-ease-out),
-    color 180ms var(--pd-ease-out),
     transform 180ms var(--pd-ease-out);
 }
 
-.size-picker__option:hover {
-  border-color: rgba(255, 142, 83, 0.44);
+.mode-card {
+  min-height: 112px;
+  border-radius: 20px;
+  padding: 16px;
+}
+
+.mode-card:hover,
+.style-pill:hover,
+.size-card:hover {
+  border-color: rgba(255, 142, 83, 0.42);
   background: #fff;
   box-shadow: 0 12px 26px rgba(255, 142, 83, 0.12);
   transform: translateY(-2px);
 }
 
-.size-picker__option strong,
-.size-picker__option span {
+.mode-card strong,
+.mode-card em,
+.style-pill strong,
+.style-pill em,
+.size-card strong,
+.size-card span {
   display: block;
   min-width: 0;
 }
 
-.size-picker__option strong {
+.mode-card strong {
+  padding-right: 42px;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.mode-card em,
+.style-pill em {
+  margin-top: 8px;
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.option-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border-radius: 999px;
+  background: rgba(255, 107, 157, 0.12);
+  color: var(--pd-pink-deep);
+  font-size: 11px;
+  font-weight: 900;
+  padding: 4px 8px;
+}
+
+.mode-card--active,
+.style-pill--active,
+.size-card--active {
+  border-color: transparent;
+  background: var(--pd-gradient-warm);
+  color: #fff;
+  box-shadow: var(--pd-shadow-cta);
+}
+
+.mode-card--active em,
+.style-pill--active em,
+.size-card--active span {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.mode-card--active .option-badge {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.style-pill {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 10px;
+  align-items: center;
+  min-height: 68px;
+  border-radius: 18px;
+  padding: 12px;
+}
+
+.style-pill > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  grid-row: 1 / span 2;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(164, 212, 197, 0.2);
+  color: var(--pd-fg-1);
+  font-weight: 900;
+}
+
+.style-pill--active > span {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.style-pill--muted:not(.style-pill--active) {
+  opacity: 0.72;
+}
+
+.style-pill strong {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.size-card {
+  min-height: 72px;
+  border-radius: 18px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.size-card strong {
   font-size: 22px;
   font-weight: 900;
   line-height: 1;
 }
 
-.size-picker__option span {
+.size-card span {
   margin-top: 6px;
   color: var(--pd-fg-2);
   font-size: 11px;
@@ -551,125 +750,34 @@ onUnmounted(revokePreview);
   line-height: 1.2;
 }
 
-.size-picker__option--active {
-  border-color: transparent;
-  background: var(--pd-gradient-warm);
-  color: #fff;
-  box-shadow: var(--pd-shadow-cta);
-}
-
-.size-picker__option--active span {
-  color: rgba(255, 255, 255, 0.88);
-}
-
 .upload-message {
-  margin: 14px 0 0;
+  margin: 0;
   border-radius: 16px;
   background: rgba(164, 212, 197, 0.18);
   color: var(--pd-fg-2);
   font-size: 13px;
   font-weight: 800;
   padding: 12px 14px;
-  transition:
-    border-color 180ms var(--pd-ease-out),
-    box-shadow 180ms var(--pd-ease-out),
-    transform 180ms var(--pd-ease-out);
 }
 
-.upload-message:hover {
-  box-shadow: var(--pd-shadow-card);
-  transform: translateY(-2px);
-}
-
-.upload-next {
+.generate-cta {
   width: 100%;
-  margin-top: 14px;
+  min-height: 56px;
+  margin-top: 2px;
+  font-size: 16px;
 }
 
-.upload-next:not(:disabled) {
+.generate-cta:not(:disabled) {
   background: var(--pd-gradient);
   color: #fff;
   box-shadow: var(--pd-shadow-cta);
 }
 
-.upload-next:disabled {
+.generate-cta:disabled {
   background: #ede5dd;
   color: #9b8e84;
   box-shadow: none;
   cursor: not-allowed;
-}
-
-.tips-card ul {
-  display: grid;
-  gap: 12px;
-  margin: 0 0 18px;
-  padding: 0;
-  list-style: none;
-}
-
-.tips-card li {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 4px 12px;
-  border-radius: 18px;
-  background: var(--pd-peach-50);
-  padding: 14px;
-  transition:
-    border-color 180ms var(--pd-ease-out),
-    box-shadow 180ms var(--pd-ease-out),
-    transform 180ms var(--pd-ease-out),
-    background 180ms var(--pd-ease-out);
-}
-
-.tips-card li:hover {
-  background: #fff;
-  box-shadow: 0 12px 26px rgba(255, 142, 83, 0.12);
-  transform: translateY(-3px);
-}
-
-.tips-card li span {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  grid-row: 1 / span 2;
-  place-items: center;
-  border-radius: var(--pd-r-full);
-  background: var(--pd-gradient-warm);
-  color: #fff;
-  font-weight: 900;
-}
-
-.tips-card strong {
-  color: var(--pd-fg-1);
-}
-
-.tips-card em {
-  color: var(--pd-fg-2);
-  font-size: 13px;
-  font-style: normal;
-  line-height: 1.5;
-}
-
-.format-note {
-  border-radius: 18px;
-  background: rgba(164, 212, 197, 0.16);
-  padding: 16px;
-  transition:
-    box-shadow 180ms var(--pd-ease-out),
-    transform 180ms var(--pd-ease-out),
-    background 180ms var(--pd-ease-out);
-}
-
-.format-note:hover {
-  background: rgba(164, 212, 197, 0.22);
-  box-shadow: 0 12px 26px rgba(164, 212, 197, 0.16);
-  transform: translateY(-3px);
-}
-
-.format-note p {
-  margin: 8px 0 0;
-  color: var(--pd-fg-2);
-  font-size: 13px;
 }
 
 .sr-only {
@@ -681,9 +789,42 @@ onUnmounted(revokePreview);
   clip: rect(0, 0, 0, 0);
 }
 
-@media (max-width: 900px) {
-  .upload-layout {
+@keyframes previewIn {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 980px) {
+  .studio-shell {
     grid-template-columns: 1fr;
+  }
+
+  .upload-stage {
+    grid-template-rows: auto auto auto;
+  }
+
+  .drop-zone {
+    min-height: 360px;
+  }
+
+  .style-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .style-pill {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .style-pill > span {
+    grid-row: auto;
   }
 }
 
@@ -692,43 +833,38 @@ onUnmounted(revokePreview);
     gap: 20px;
   }
 
-  .upload-hero {
-    text-align: left;
-  }
-
-  .upload-hero h1 {
-    max-width: 420px;
+  .studio-hero h1 {
     font-size: 32px;
   }
 
-  .upload-card,
-  .tips-card {
+  .studio-hero p:last-child {
+    font-size: 14px;
+  }
+
+  .upload-stage,
+  .control-panel {
     border-radius: 22px;
-    padding: 20px;
+    padding: 16px;
   }
 
   .drop-zone {
-    min-height: 260px;
+    min-height: 300px;
     border-radius: 20px;
   }
 
-  .size-picker__head {
-    align-items: start;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .size-picker__options {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .upload-actions,
-  .file-summary {
+  .stage-actions,
+  .mode-grid,
+  .style-grid {
     grid-template-columns: 1fr;
   }
 
-  .file-summary {
-    display: grid;
+  .size-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .file-strip {
+    align-items: start;
+    flex-direction: column;
   }
 }
 </style>

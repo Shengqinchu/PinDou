@@ -476,9 +476,11 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
     client, _session_factory = api_client
     headers = auth_headers(client)
     image_id = upload_image(client, headers)
+    calls = []
 
     class FakeChain:
         def generate(self, image: bytes, style_preset, size_preset, seed=None) -> PreviewResult:
+            calls.append({"style": style_preset.value, "size": size_preset.value, "seed": seed, "bytes": len(image)})
             return PreviewResult.from_image_bytes(
                 png_bytes((255, 255, 255)),
                 target_color_count=8,
@@ -496,6 +498,19 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
     assert response.status_code == 200
     assert response.json()["preview"]["provider_used"] == "fake"
 
+    web_form = client.post(
+        "/api/v1/generate/ai",
+        data={"style_preset": "q_pet", "size_preset": "52x52"},
+        files={"image": ("sample.png", png_bytes((255, 255, 255)), "image/png")},
+        headers=headers,
+    )
+    assert web_form.status_code == 200
+    assert web_form.json()["preview"]["provider_used"] == "fake"
+    assert web_form.json()["pattern"]["metadata"]["size_preset"] == "52x52"
+    assert calls[-1]["style"] == "q_pet"
+    assert calls[-1]["size"] == "52x52"
+    assert calls[-1]["bytes"] > 0
+
     preview_only = client.post(
         "/api/v1/preview/generate",
         data={"style_preset": "q_portrait", "size_preset": "26x26"},
@@ -506,6 +521,44 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
     assert preview_only.json()["provider_used"] == "fake"
     assert "preview_id" in preview_only.json()
     assert "pattern" not in preview_only.json()
+
+
+def test_generate_ai_refuses_script_fallback(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, session_factory = api_client
+    headers = auth_headers(client)
+
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid.like("wx_%")))
+        assert user is not None
+        before_free_credits = user.free_credits_remaining
+        before_artworks = len(session.scalars(select(Artwork)).all())
+
+    class FakeFallbackChain:
+        def generate(self, image: bytes, style_preset, size_preset, seed=None) -> PreviewResult:
+            return PreviewResult.from_image_bytes(
+                png_bytes((255, 255, 255)),
+                target_color_count=8,
+                provider_used="fallback_quantize",
+                fallback_count=1,
+                cost_estimate=0.0,
+                latency_ms=10,
+            )
+
+    monkeypatch.setattr("pindou.api.generate.build_preview_chain", lambda: FakeFallbackChain())
+    response = client.post(
+        "/api/v1/generate/ai",
+        data={"style_preset": "q_portrait", "size_preset": "52x52"},
+        files={"image": ("sample.png", png_bytes((255, 255, 255)), "image/png")},
+        headers=headers,
+    )
+    assert response.status_code == 500
+    assert response.json()["error"] == "PREVIEW_FAILED"
+
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid.like("wx_%")))
+        assert user is not None
+        assert user.free_credits_remaining == before_free_credits
+        assert len(session.scalars(select(Artwork)).all()) == before_artworks
 
 
 def test_unlimited_credit_email_skips_ai_credit_requirement(api_client, monkeypatch: pytest.MonkeyPatch) -> None:

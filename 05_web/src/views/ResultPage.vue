@@ -4,7 +4,17 @@ import { useRoute, useRouter } from 'vue-router';
 
 import { saveArtworkPattern } from '../api';
 import PatternEditor from '../components/PatternEditor.vue';
-import { RESULT_SIZE_OPTIONS, useGenerationStore, type ResultSizePreset } from '../stores/generation';
+import {
+  GENERATION_MODE_DETAILS,
+  GENERATION_MODE_OPTIONS,
+  RESULT_SIZE_OPTIONS,
+  STYLE_OPTION_DETAILS,
+  STYLE_OPTIONS,
+  useGenerationStore,
+  type GenerationMode,
+  type GenerationStylePreset,
+  type ResultSizePreset
+} from '../stores/generation';
 import type { ColorRef, PatternSheet } from '../api/types';
 
 interface PaletteRow {
@@ -58,6 +68,10 @@ const paletteRows = computed<PaletteRow[]>(() => {
 
 const canUndo = computed(() => undoStack.value.length > 0);
 const canRedo = computed(() => redoStack.value.length > 0);
+const retryCtaLabel = computed(() => {
+  const mode = generation.generationMode === 'ai' ? 'AI 重新生成' : '快速重新生成';
+  return `${mode} · ${generation.selectedSize.split('x')[0]}格`;
+});
 
 onMounted(() => {
   void loadArtworkIfNeeded();
@@ -109,7 +123,22 @@ async function chooseSize(size: ResultSizePreset): Promise<void> {
     sizeNotice.value = '当前页面没有保留原图，请回到上传页重新选择后生成这个尺寸。';
     return;
   }
-  await router.push({ name: 'loading', query: { size } });
+  sizeNotice.value = `已选择 ${size.split('x')[0]} 格，点击重新生成后生效。`;
+}
+
+function chooseMode(mode: GenerationMode): void {
+  generation.setGenerationMode(mode);
+  if (generation.sourceFile) {
+    sizeNotice.value = `已选择${GENERATION_MODE_DETAILS[mode].label}，点击重新生成后生效。`;
+  }
+}
+
+function chooseStyle(style: GenerationStylePreset): void {
+  generation.setStyle(style);
+  generation.setGenerationMode('ai');
+  if (generation.sourceFile) {
+    sizeNotice.value = `已选择${STYLE_OPTION_DETAILS[style].label}，点击重新生成后生效。`;
+  }
 }
 
 async function regenerate(): Promise<void> {
@@ -334,21 +363,54 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
           <p v-if="saveMessage" class="edit-status">{{ saveMessage }}</p>
           <p v-else-if="saveError" class="edit-status edit-status--error">{{ saveError }}</p>
 
-          <div class="size-switch" aria-label="尺寸切换">
-            <button
-              v-for="size in RESULT_SIZE_OPTIONS"
-              :key="size"
-              type="button"
-              :class="{ 'size-switch__item--active': size === generation.selectedSize }"
-              :aria-pressed="size === generation.selectedSize"
-              @click="chooseSize(size)"
-            >
-              <strong>{{ size.split('x')[0] }}</strong>
-              <span>格</span>
-            </button>
+          <div class="retry-panel" aria-label="重新生成设置">
+            <div class="retry-panel__head">
+              <strong>重新生成</strong>
+              <button type="button" :disabled="!hasSourceFile" @click="regenerate">{{ retryCtaLabel }}</button>
+            </div>
+
+            <div class="retry-group" aria-label="生成方式">
+              <button
+                v-for="mode in GENERATION_MODE_OPTIONS"
+                :key="mode"
+                type="button"
+                :class="{ 'retry-chip--active': mode === generation.generationMode }"
+                :aria-pressed="mode === generation.generationMode"
+                @click="chooseMode(mode)"
+              >
+                {{ GENERATION_MODE_DETAILS[mode].label }}
+              </button>
+            </div>
+
+            <div class="retry-group" aria-label="风格">
+              <button
+                v-for="style in STYLE_OPTIONS"
+                :key="style"
+                type="button"
+                :class="{ 'retry-chip--active': style === generation.selectedStyle }"
+                :aria-pressed="style === generation.selectedStyle"
+                @click="chooseStyle(style)"
+              >
+                {{ STYLE_OPTION_DETAILS[style].label }}
+              </button>
+            </div>
+
+            <div class="size-switch" aria-label="尺寸切换">
+              <button
+                v-for="size in RESULT_SIZE_OPTIONS"
+                :key="size"
+                type="button"
+                :class="{ 'size-switch__item--active': size === generation.selectedSize }"
+                :aria-pressed="size === generation.selectedSize"
+                @click="chooseSize(size)"
+              >
+                <strong>{{ size.split('x')[0] }}</strong>
+                <span>格</span>
+              </button>
+            </div>
           </div>
           <p v-if="sizeNotice" class="size-notice">{{ sizeNotice }}</p>
-          <p v-else-if="hasSourceFile" class="size-hint">切换尺寸会用当前原图重新生成。</p>
+          <p v-else-if="hasSourceFile" class="size-hint">可换方式、风格或格数后再次生成。</p>
         </section>
 
         <aside class="summary-panel" aria-label="图纸摘要">
@@ -529,11 +591,95 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
   color: #c42535;
 }
 
+.retry-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  border: 1px solid rgba(237, 228, 218, 0.86);
+  border-radius: 20px;
+  background: rgba(255, 241, 232, 0.5);
+  padding: 14px;
+}
+
+.retry-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.retry-panel__head strong {
+  color: var(--pd-fg-1);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.retry-panel__head button {
+  appearance: none;
+  min-height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pd-gradient);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 0 14px;
+  box-shadow: var(--pd-shadow-cta);
+}
+
+.retry-panel__head button:disabled {
+  background: #ede5dd;
+  color: #9b8e84;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.retry-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.retry-group button {
+  appearance: none;
+  min-height: 34px;
+  border: 1px solid var(--pd-stroke);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--pd-fg-1);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 0 12px;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    background 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    color 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.retry-group button:hover {
+  border-color: rgba(255, 142, 83, 0.42);
+  background: #fff;
+  box-shadow: 0 10px 20px rgba(255, 142, 83, 0.1);
+  transform: translateY(-1px);
+}
+
+.retry-chip--active {
+  border-color: transparent !important;
+  background: var(--pd-gradient-warm) !important;
+  color: #fff !important;
+}
+
 .size-switch {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
-  margin-top: 16px;
+  margin-top: 0;
 }
 
 .size-switch button {
@@ -751,6 +897,11 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
   .size-switch {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
+  }
+
+  .retry-panel__head {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .size-switch button {

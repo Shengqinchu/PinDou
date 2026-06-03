@@ -27,7 +27,7 @@ from pindou.api.storage import (
     save_uploaded_image,
 )
 from pindou.pattern.builder import PatternBuilder
-from pindou.providers.base import SizePreset, StylePreset
+from pindou.providers.base import PreviewProviderError, SizePreset, StylePreset
 from pindou.providers.chain import PreviewProviderChain
 from pindou.providers.fallback_quantize import FallbackProvider
 from pindou.providers.xiaochi_gpt import XiaochiGptProvider
@@ -93,6 +93,8 @@ async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession
 
     try:
         preview = build_preview_chain().generate(raw_image, style, size, seed=seed)
+        if preview.fallback_count > 0 or preview.provider_used == FallbackProvider.name:
+            raise PreviewProviderError("AI provider unavailable; refusing script fallback for AI generation.")
         preview_path, preview_url = save_preview_png(preview.preview_id, preview.image)
         preview = replace(preview, image_url=preview_url)
         sheet = PatternBuilder().build(size=size, preview=preview.image, mode="ai")

@@ -1,11 +1,18 @@
 import { defineStore } from 'pinia';
 
-import { generateScriptPattern, getArtworkDetail, submitConsent } from '../api';
-import type { Artwork, GenerateScriptResponse, PatternSheet, SizePreset } from '../api/types';
+import { generateAiPattern, generateScriptPattern, getArtworkDetail, submitConsent } from '../api';
+import type { Artwork, GenerateScriptResponse, PatternSheet, SizePreset, StylePreset } from '../api/types';
 
 export const RESULT_SIZE_OPTIONS = ['26x26', '52x52', '78x78', '104x104'] as const;
 export type ResultSizePreset = (typeof RESULT_SIZE_OPTIONS)[number];
 export const DEFAULT_GENERATION_SIZE: ResultSizePreset = '52x52';
+export const GENERATION_MODE_OPTIONS = ['ai', 'script'] as const;
+export type GenerationMode = (typeof GENERATION_MODE_OPTIONS)[number];
+export const DEFAULT_GENERATION_MODE: GenerationMode = 'ai';
+export const GENERATION_MODE_DETAILS: Record<GenerationMode, { label: string; hint: string; badge?: string }> = {
+  ai: { label: 'AI 精品', hint: '先做 Q 版卡通，再转拼豆图纸', badge: '推荐' },
+  script: { label: '脚本快速', hint: '省次数·秒出，直接量化原图' }
+};
 
 export const SIZE_OPTION_DETAILS: Record<ResultSizePreset, { label: string; hint: string }> = {
   '26x26': { label: '26', hint: '简易·豆少' },
@@ -14,9 +21,20 @@ export const SIZE_OPTION_DETAILS: Record<ResultSizePreset, { label: string; hint
   '104x104': { label: '104', hint: '精细·豆多' }
 };
 
+export const STYLE_OPTIONS = ['q_pet', 'q_couple', 'q_portrait'] as const;
+export type GenerationStylePreset = Extract<StylePreset, (typeof STYLE_OPTIONS)[number]>;
+export const DEFAULT_STYLE_PRESET: GenerationStylePreset = 'q_portrait';
+export const STYLE_OPTION_DETAILS: Record<GenerationStylePreset, { label: string; hint: string; icon: string }> = {
+  q_pet: { label: '宠萌宠', hint: '保留耳朵、花纹和表情', icon: '宠' },
+  q_couple: { label: '心情侣', hint: '保持人数和左右关系', icon: '心' },
+  q_portrait: { label: '拍自拍', hint: '适合头像、半身照和日常照片', icon: '拍' }
+};
+
 interface GenerationState {
   sourceFile: File | null;
   selectedSize: ResultSizePreset;
+  generationMode: GenerationMode;
+  selectedStyle: GenerationStylePreset;
   currentResult: GenerateScriptResponse | null;
   currentArtwork: Artwork | null;
   isGenerating: boolean;
@@ -27,6 +45,8 @@ export const useGenerationStore = defineStore('generation', {
   state: (): GenerationState => ({
     sourceFile: null,
     selectedSize: DEFAULT_GENERATION_SIZE,
+    generationMode: DEFAULT_GENERATION_MODE,
+    selectedStyle: DEFAULT_STYLE_PRESET,
     currentResult: null,
     currentArtwork: null,
     isGenerating: false,
@@ -50,6 +70,12 @@ export const useGenerationStore = defineStore('generation', {
     setSize(size: ResultSizePreset) {
       this.selectedSize = size;
     },
+    setGenerationMode(mode: GenerationMode) {
+      this.generationMode = mode;
+    },
+    setStyle(style: GenerationStylePreset) {
+      this.selectedStyle = style;
+    },
     async generateCurrent(): Promise<GenerateScriptResponse> {
       if (!this.sourceFile) {
         throw new Error('请先选择一张照片。');
@@ -59,7 +85,9 @@ export const useGenerationStore = defineStore('generation', {
       this.error = '';
       try {
         await submitConsent('sensitive');
-        const result = await generateScriptPattern(this.sourceFile, this.selectedSize as SizePreset);
+        const result = this.generationMode === 'ai'
+          ? await generateAiPattern(this.sourceFile, this.selectedSize as SizePreset, this.selectedStyle)
+          : await generateScriptPattern(this.sourceFile, this.selectedSize as SizePreset);
         this.currentResult = result;
         this.currentArtwork = null;
         return result;
@@ -86,12 +114,22 @@ export const useGenerationStore = defineStore('generation', {
       if (isResultSizePreset(artwork.size_preset)) {
         this.selectedSize = artwork.size_preset;
       }
+      if (isGenerationStylePreset(artwork.style_preset)) {
+        this.selectedStyle = artwork.style_preset;
+        this.generationMode = 'ai';
+      } else if (artwork.style_preset === 'cartoon_fallback') {
+        this.generationMode = 'script';
+      }
     }
   }
 });
 
 export function isResultSizePreset(value: unknown): value is ResultSizePreset {
   return RESULT_SIZE_OPTIONS.includes(value as ResultSizePreset);
+}
+
+export function isGenerationStylePreset(value: unknown): value is GenerationStylePreset {
+  return STYLE_OPTIONS.includes(value as GenerationStylePreset);
 }
 
 export function extractPatternImageUrl(pattern: PatternSheet | null, fallback = ''): string {

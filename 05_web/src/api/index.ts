@@ -10,6 +10,7 @@ import type {
   PatternSheet,
   SaveArtworkPatternResponse,
   SizePreset,
+  StylePreset,
   User
 } from './types';
 
@@ -92,6 +93,25 @@ export function generateScriptPattern(file: File, size: SizePreset = '26x26'): P
   form.set('auto_remove_white_bg', 'true');
 
   return apiRequest<GenerateScriptResponse>('/generate/script', {
+    method: 'POST',
+    body: form
+  });
+}
+
+export function generateAiPattern(
+  file: File,
+  size: SizePreset = '52x52',
+  style: StylePreset = 'q_portrait'
+): Promise<GenerateScriptResponse> {
+  const form = new FormData();
+  form.set('image', file);
+  form.set('size', size);
+  form.set('size_preset', size);
+  form.set('style', style);
+  form.set('style_preset', style);
+  form.set('brand', 'MARD');
+
+  return apiRequest<GenerateScriptResponse>('/generate/ai', {
     method: 'POST',
     body: form
   });
