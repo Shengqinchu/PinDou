@@ -144,7 +144,7 @@ export function getArtworkDetail(artworkId: string): Promise<Artwork> {
   return apiRequest<Artwork>(`/artwork/${encodeURIComponent(artworkId)}`);
 }
 
-export function getArtworkGallery(page = 1, size = 12): Promise<ArtworkListResponse> {
+export function getArtworkGallery(page = 1, size = 20): Promise<ArtworkListResponse> {
   const params = new URLSearchParams({ page: String(page), size: String(size) });
   return apiRequest<ArtworkListResponse>(`/artwork/gallery?${params.toString()}`);
 }

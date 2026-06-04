@@ -83,7 +83,7 @@ class ArtworkService:
         total = self.session.scalar(select(func.count()).select_from(Artwork).where(Artwork.user_id == user_id))
         return int(total or 0)
 
-    def list_gallery_artworks(self, *, user_id: str, limit: int = 12, offset: int = 0) -> list[dict[str, Any]]:
+    def list_gallery_artworks(self, *, user_id: str, limit: int = 20, offset: int = 0) -> list[dict[str, Any]]:
         artworks = list(
             self.session.scalars(
                 select(Artwork)

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 
 import { getArtworkGallery } from '../api';
 import type { ArtworkListItem } from '../api/types';
 import { resultSizeLabel } from '../stores/generation';
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 20;
 
 const router = useRouter();
 const works = ref<ArtworkListItem[]>([]);
@@ -17,6 +17,7 @@ const loading = ref(true);
 const loadingMore = ref(false);
 const errorMessage = ref('');
 const failedImages = ref(new Set<string>());
+const showBackTop = ref(false);
 
 const totalLabel = computed(() => {
   if (loading.value) {
@@ -30,6 +31,12 @@ const totalLabel = computed(() => {
 
 onMounted(() => {
   void loadWorks(1);
+  updateBackTopVisibility();
+  window.addEventListener('scroll', updateBackTopVisibility, { passive: true });
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', updateBackTopVisibility);
 });
 
 async function loadWorks(targetPage: number, append = false): Promise<void> {
@@ -58,10 +65,18 @@ function openWork(work: ArtworkListItem): void {
 }
 
 function loadMore(): void {
-  if (!hasMore.value || loadingMore.value) {
+  if (!hasMore.value || loadingMore.value || loading.value) {
     return;
   }
   void loadWorks(page.value + 1, true);
+}
+
+function updateBackTopVisibility(): void {
+  showBackTop.value = window.scrollY > window.innerHeight;
+}
+
+function scrollToTop(): void {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function markImageFailed(artworkId: string): void {
@@ -97,7 +112,6 @@ function formatDate(value?: string): string {
   <section class="works-page">
     <header class="works-hero">
       <div class="works-hero__copy">
-        <span>作品集</span>
         <h1>我的拼豆作品</h1>
         <p>{{ totalLabel }}</p>
       </div>
@@ -141,6 +155,7 @@ function formatDate(value?: string): string {
               :src="imageSrc(work)"
               :alt="workTitle(work, index)"
               loading="lazy"
+              decoding="async"
               @error="markImageFailed(work.artwork_id)"
             />
             <span v-else class="work-card__fallback" aria-hidden="true">拼</span>
@@ -151,6 +166,18 @@ function formatDate(value?: string): string {
             <span class="work-card__date">{{ formatDate(work.created_at) }}</span>
           </span>
         </button>
+        <template v-if="loadingMore">
+          <div
+            v-for="item in 4"
+            :key="`loading-more-${item}`"
+            class="work-card work-card--skeleton"
+            aria-hidden="true"
+          >
+            <span class="work-card__thumb"></span>
+            <span class="work-card__line work-card__line--wide"></span>
+            <span class="work-card__line"></span>
+          </div>
+        </template>
       </section>
 
       <div class="works-pager" v-if="hasMore">
@@ -158,7 +185,18 @@ function formatDate(value?: string): string {
           {{ loadingMore ? '加载中…' : '加载更多' }}
         </button>
       </div>
+      <p v-else class="works-end">没有更多作品了</p>
     </template>
+
+    <button
+      v-show="showBackTop"
+      class="works-backtop"
+      type="button"
+      aria-label="回到顶部"
+      @click="scrollToTop"
+    >
+      ↑
+    </button>
   </section>
 </template>
 
@@ -169,6 +207,7 @@ function formatDate(value?: string): string {
   margin: 0 auto;
   display: grid;
   gap: clamp(16px, 2.6vw, 26px);
+  padding-inline: clamp(0px, 1vw, 6px);
   overflow-x: clip;
 }
 
@@ -189,21 +228,15 @@ function formatDate(value?: string): string {
 
 .works-hero__copy {
   display: grid;
-  gap: 7px;
+  gap: 8px;
   min-width: 0;
-}
-
-.works-hero__copy span {
-  color: var(--pd-orange);
-  font-size: 12px;
-  font-weight: 900;
 }
 
 .works-hero__copy h1 {
   margin: 0;
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
-  font-size: clamp(30px, 5vw, 48px);
+  font-size: clamp(28px, 4.2vw, 42px);
   line-height: 1.08;
 }
 
@@ -249,7 +282,7 @@ function formatDate(value?: string): string {
 
 .works-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(14px, 2vw, 20px);
   min-width: 0;
 }
@@ -266,7 +299,7 @@ function formatDate(value?: string): string {
   color: inherit;
   cursor: pointer;
   font: inherit;
-  padding: 12px;
+  padding: clamp(9px, 1.35vw, 12px);
   text-align: left;
   transition:
     border-color 180ms var(--pd-ease-out),
@@ -287,7 +320,7 @@ function formatDate(value?: string): string {
   width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: clamp(12px, 1.8vw, 16px);
   background:
     repeating-linear-gradient(45deg, rgba(237, 228, 218, 0.28) 0 1px, transparent 1px 12px),
     linear-gradient(135deg, rgba(255, 241, 232, 0.94), rgba(244, 250, 247, 0.88));
@@ -320,7 +353,7 @@ function formatDate(value?: string): string {
 
 .work-card__body {
   display: grid;
-  gap: 6px;
+  gap: clamp(4px, 0.8vw, 6px);
   min-width: 0;
 }
 
@@ -336,19 +369,19 @@ function formatDate(value?: string): string {
 .work-card__body strong {
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
-  font-size: clamp(17px, 2vw, 19px);
+  font-size: clamp(15px, 1.8vw, 19px);
   font-weight: 900;
 }
 
 .work-card__meta {
   color: var(--pd-fg-2);
-  font-size: 13px;
+  font-size: clamp(11px, 1.25vw, 13px);
   font-weight: 900;
 }
 
 .work-card__date {
   color: #a5968b;
-  font-size: 12px;
+  font-size: clamp(10px, 1.15vw, 12px);
   font-weight: 800;
 }
 
@@ -390,11 +423,49 @@ function formatDate(value?: string): string {
   justify-items: center;
 }
 
+.works-end {
+  margin: 0;
+  color: #a5968b;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+}
+
 .works-pager__button:disabled {
   background: #ede5dd;
   box-shadow: none;
   color: #9b8e84;
   cursor: wait;
+}
+
+.works-backtop {
+  position: fixed;
+  right: max(18px, calc(env(safe-area-inset-right) + 18px));
+  bottom: max(20px, calc(env(safe-area-inset-bottom) + 20px));
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 142, 83, 0.38);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 16px 36px rgba(45, 45, 45, 0.14), 0 8px 16px rgba(255, 142, 83, 0.16);
+  color: var(--pd-orange);
+  cursor: pointer;
+  font: inherit;
+  font-size: 22px;
+  font-weight: 900;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.works-backtop:hover {
+  border-color: rgba(255, 142, 83, 0.68);
+  box-shadow: 0 20px 42px rgba(255, 142, 83, 0.2), 0 10px 20px rgba(45, 45, 45, 0.12);
+  transform: translateY(-2px);
 }
 
 .work-card--skeleton {
@@ -430,11 +501,18 @@ function formatDate(value?: string): string {
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 1024px) {
+  .works-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
   .works-hero {
     align-items: stretch;
     border-radius: 22px;
     flex-direction: column;
+    padding: 18px;
   }
 
   .works-hero__cta,
@@ -444,7 +522,25 @@ function formatDate(value?: string): string {
   }
 
   .works-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .work-card {
+    border-radius: 18px;
+    gap: 9px;
+  }
+
+  .work-card__fallback {
+    width: 46px;
+    height: 46px;
+    font-size: 18px;
+  }
+
+  .works-backtop {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
   }
 }
 </style>

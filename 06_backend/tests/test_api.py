@@ -320,6 +320,10 @@ def test_artwork_gallery_paginates_current_user(api_client) -> None:
     unauthorized = client.get("/api/artwork/gallery")
     assert unauthorized.status_code == 401
 
+    default_page = client.get("/api/artwork/gallery", headers=headers)
+    assert default_page.status_code == 200
+    assert default_page.json()["size"] == 20
+
     page_one = client.get("/api/artwork/gallery?page=1&size=2", headers=headers)
     assert page_one.status_code == 200
     payload = page_one.json()
@@ -337,6 +341,9 @@ def test_artwork_gallery_paginates_current_user(api_client) -> None:
     payload = page_two.json()
     assert payload["has_more"] is False
     assert [item["artwork_id"] for item in payload["items"]] == ["older"]
+
+    too_large = client.get("/api/artwork/gallery?page=1&size=21", headers=headers)
+    assert too_large.status_code == 422
 
 
 def test_email_code_login_uses_shared_db_and_returns_email_user(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
