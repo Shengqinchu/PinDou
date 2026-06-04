@@ -4,6 +4,7 @@ import io
 import base64
 import csv
 import json
+import time
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from collections.abc import Iterator
@@ -91,6 +92,25 @@ def upload_image(client: TestClient, headers: dict[str, str]) -> str:
     )
     assert response.status_code == 200
     return response.json()["image_id"]
+
+
+def wait_generation_job(
+    client: TestClient,
+    headers: dict[str, str],
+    job_id: str,
+    *,
+    timeout_seconds: float = 5.0,
+) -> dict:
+    deadline = time.monotonic() + timeout_seconds
+    latest: dict | None = None
+    while time.monotonic() < deadline:
+        response = client.get(f"/api/generate/status/{job_id}", headers=headers)
+        assert response.status_code == 200
+        latest = response.json()
+        if latest["status"] in {"succeeded", "failed"}:
+            return latest
+        time.sleep(0.05)
+    raise AssertionError(f"generation job did not finish: {latest}")
 
 
 def capture_email_codes(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, str]]:
@@ -496,7 +516,13 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
         headers=headers,
     )
     assert response.status_code == 200
-    assert response.json()["preview"]["provider_used"] == "fake"
+    first_job = response.json()
+    assert first_job["job_id"]
+    assert first_job["status"] == "queued"
+    finished = wait_generation_job(client, headers, first_job["job_id"])
+    assert finished["status"] == "succeeded"
+    assert finished["progress"] == 100
+    assert finished["result"]["preview"]["provider_used"] == "fake"
 
     web_form = client.post(
         "/api/v1/generate/ai",
@@ -505,8 +531,10 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
         headers=headers,
     )
     assert web_form.status_code == 200
-    assert web_form.json()["preview"]["provider_used"] == "fake"
-    assert web_form.json()["pattern"]["metadata"]["size_preset"] == "52x52"
+    second_job = wait_generation_job(client, headers, web_form.json()["job_id"])
+    assert second_job["status"] == "succeeded"
+    assert second_job["result"]["preview"]["provider_used"] == "fake"
+    assert second_job["result"]["pattern"]["metadata"]["size_preset"] == "52x52"
     assert calls[-1]["style"] == "q_pet"
     assert calls[-1]["size"] == "52x52"
     assert calls[-1]["bytes"] > 0
@@ -551,8 +579,11 @@ def test_generate_ai_refuses_script_fallback(api_client, monkeypatch: pytest.Mon
         files={"image": ("sample.png", png_bytes((255, 255, 255)), "image/png")},
         headers=headers,
     )
-    assert response.status_code == 500
-    assert response.json()["error"] == "PREVIEW_FAILED"
+    assert response.status_code == 200
+    finished = wait_generation_job(client, headers, response.json()["job_id"])
+    assert finished["status"] == "failed"
+    assert finished["error"]["code"] == "PREVIEW_FAILED"
+    assert finished["error"]["message_cn"] == "AI 生成暂时失败，请稍后重试或切换普通模式。"
 
     with session_factory() as session:
         user = session.scalar(select(User).where(User.openid.like("wx_%")))

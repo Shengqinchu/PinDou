@@ -98,6 +98,29 @@ export interface GenerateScriptResponse {
   pattern: PatternSheet;
 }
 
+export type GenerationJobStatus = 'queued' | 'running' | 'succeeded' | 'failed' | string;
+
+export interface GenerationJobResponse {
+  job_id: string;
+  status: GenerationJobStatus;
+  mode: 'ai' | 'script' | string;
+  progress: number;
+  stage: string;
+  message_cn: string;
+  created_at?: string;
+  updated_at?: string;
+  completed_at?: string | null;
+  result?: GenerateScriptResponse & {
+    preview_url?: string;
+    preview?: PreviewResult;
+    preview_path?: string;
+  };
+  error?: {
+    code: string;
+    message_cn: string;
+  };
+}
+
 export interface SaveArtworkPatternResponse {
   success: boolean;
   pattern_url: string;

@@ -5,6 +5,7 @@ import { apiRequest } from './client';
 import type {
   Artwork,
   ConsentResponse,
+  GenerationJobResponse,
   GenerateScriptResponse,
   PartitionSheet,
   PatternSheet,
@@ -102,7 +103,7 @@ export function generateAiPattern(
   file: File,
   size: SizePreset = '52x52',
   style: StylePreset = 'q_portrait'
-): Promise<GenerateScriptResponse> {
+): Promise<GenerationJobResponse> {
   const form = new FormData();
   form.set('image', file);
   form.set('size', size);
@@ -111,10 +112,14 @@ export function generateAiPattern(
   form.set('style_preset', style);
   form.set('brand', 'MARD');
 
-  return apiRequest<GenerateScriptResponse>('/generate/ai', {
+  return apiRequest<GenerationJobResponse>('/generate/ai', {
     method: 'POST',
     body: form
   });
+}
+
+export function getGenerationStatus(jobId: string): Promise<GenerationJobResponse> {
+  return apiRequest<GenerationJobResponse>(`/generate/status/${encodeURIComponent(jobId)}`);
 }
 
 export function getArtworkDetail(artworkId: string): Promise<Artwork> {

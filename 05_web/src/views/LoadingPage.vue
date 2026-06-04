@@ -9,6 +9,7 @@ import {
   resultSizeLabel,
   useGenerationStore
 } from '../stores/generation';
+import type { GenerationJobResponse } from '../api/types';
 
 interface StageItem {
   title: string;
@@ -20,6 +21,8 @@ const route = useRoute();
 const generation = useGenerationStore();
 const activeStage = ref(0);
 const progress = ref(8);
+const progressCeiling = ref(92);
+const serverMessage = ref('');
 const error = ref('');
 let progressTimer: number | undefined;
 
@@ -52,6 +55,7 @@ const progressSub = computed(() => {
   const style = generation.generationMode === 'ai' ? ` · ${styleLabel.value}` : '';
   return `${fileName} · ${modeLabel.value}${style} · ${selectedSizeLabel.value}格`;
 });
+const liveMessage = computed(() => serverMessage.value || stages.value[activeStage.value]?.detail || '');
 const filledCells = computed(() => {
   if (error.value) {
     return 0;
@@ -80,11 +84,13 @@ async function runGeneration(): Promise<void> {
 
   error.value = '';
   progress.value = generation.generationMode === 'ai' ? 6 : 12;
+  progressCeiling.value = generation.generationMode === 'ai' ? 22 : 88;
+  serverMessage.value = generation.generationMode === 'ai' ? '正在提交 AI 生成任务。' : '';
   activeStage.value = 0;
   startProgress();
 
   try {
-    const result = await generation.generateCurrent();
+    const result = await generation.generateCurrent(applyJobUpdate);
     stopProgress();
     progress.value = 100;
     activeStage.value = stages.value.length - 1;
@@ -97,17 +103,59 @@ async function runGeneration(): Promise<void> {
   }
 }
 
+function applyJobUpdate(job: GenerationJobResponse): void {
+  serverMessage.value = job.message_cn || serverMessage.value;
+  progress.value = Math.max(progress.value, job.progress || 0);
+  progressCeiling.value = progressCeilingForStage(job.stage, job.progress);
+  activeStage.value = stageIndexForJob(job.stage, job.progress);
+}
+
 function startProgress(): void {
   stopProgress();
   progressTimer = window.setInterval(() => {
     const step = generation.generationMode === 'ai' ? 3 : 6;
-    const ceiling = generation.generationMode === 'ai' ? 92 : 88;
+    const ceiling = generation.generationMode === 'ai' ? progressCeiling.value : 88;
     progress.value = Math.min(progress.value + step, ceiling);
     activeStage.value = Math.min(
       Math.floor((progress.value / 100) * stages.value.length),
       stages.value.length - 1
     );
   }, generation.generationMode === 'ai' ? 680 : 480);
+}
+
+function progressCeilingForStage(stage: string, progressValue: number): number {
+  if (stage === 'queued') {
+    return Math.max(progressValue, 18);
+  }
+  if (stage === 'ai_style') {
+    return Math.max(progressValue, 54);
+  }
+  if (stage === 'quantize') {
+    return Math.max(progressValue, 78);
+  }
+  if (stage === 'export') {
+    return Math.max(progressValue, 94);
+  }
+  if (stage === 'done') {
+    return 100;
+  }
+  return Math.max(progressValue, progressCeiling.value);
+}
+
+function stageIndexForJob(stage: string, progressValue: number): number {
+  if (stage === 'export' || stage === 'done') {
+    return stages.value.length - 1;
+  }
+  if (stage === 'quantize') {
+    return Math.min(2, stages.value.length - 1);
+  }
+  if (progressValue >= 70) {
+    return Math.min(2, stages.value.length - 1);
+  }
+  if (progressValue >= 38) {
+    return Math.min(1, stages.value.length - 1);
+  }
+  return 0;
 }
 
 function stopProgress(): void {
@@ -125,6 +173,7 @@ function stopProgress(): void {
         <p class="eyebrow">生成中</p>
         <h1>{{ progressHeadline }}</h1>
         <p class="loading-sub">{{ progressSub }}</p>
+        <p v-if="liveMessage" class="loading-live">{{ liveMessage }}</p>
       </div>
 
       <div
@@ -210,11 +259,24 @@ function stopProgress(): void {
 }
 
 .loading-sub {
-  margin: 12px auto 26px;
+  margin: 12px auto 10px;
   max-width: 480px;
   color: var(--pd-fg-2);
   font-weight: 800;
   word-break: break-word;
+}
+
+.loading-live {
+  width: fit-content;
+  max-width: min(100%, 480px);
+  margin: 0 auto 24px;
+  border: 1px solid rgba(255, 142, 83, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 241, 232, 0.72);
+  color: var(--pd-orange);
+  font-size: 13px;
+  font-weight: 900;
+  padding: 8px 14px;
 }
 
 .bead-grid-loader {

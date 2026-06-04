@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 
-import { generateAiPattern, generateScriptPattern, getArtworkDetail, submitConsent } from '../api';
-import type { Artwork, GenerateScriptResponse, PatternSheet, SizePreset, StylePreset } from '../api/types';
+import { generateAiPattern, generateScriptPattern, getArtworkDetail, getGenerationStatus, submitConsent } from '../api';
+import type { Artwork, GenerationJobResponse, GenerateScriptResponse, PatternSheet, SizePreset, StylePreset } from '../api/types';
 
 export const RESULT_SIZE_OPTIONS = ['26x26', '52x52', '78x78', '104x104'] as const;
 export type FixedResultSizeOption = (typeof RESULT_SIZE_OPTIONS)[number];
@@ -30,6 +30,8 @@ export const STYLE_OPTION_DETAILS: Record<GenerationStylePreset, { label: string
   q_portrait: { label: '人像', hint: '适合真人和实物照', iconSrc: '/brand/style-portrait.png' },
   q_couple: { label: '卡通', hint: '适合卡通原图', iconSrc: '/brand/style-cartoon.png' }
 };
+
+export type GenerationJobUpdateHandler = (job: GenerationJobResponse) => void;
 
 interface GenerationState {
   sourceFile: File | null;
@@ -77,7 +79,7 @@ export const useGenerationStore = defineStore('generation', {
     setStyle(style: GenerationStylePreset) {
       this.selectedStyle = style;
     },
-    async generateCurrent(): Promise<GenerateScriptResponse> {
+    async generateCurrent(onJobUpdate?: GenerationJobUpdateHandler): Promise<GenerateScriptResponse> {
       if (!this.sourceFile) {
         throw new Error('请先选择一张照片。');
       }
@@ -87,17 +89,26 @@ export const useGenerationStore = defineStore('generation', {
       try {
         await submitConsent('sensitive');
         const result = this.generationMode === 'ai'
-          ? await generateAiPattern(this.sourceFile, this.selectedSize as SizePreset, this.selectedStyle)
+          ? await this.generateAiWithPolling(onJobUpdate)
           : await generateScriptPattern(this.sourceFile, this.selectedSize as SizePreset);
         this.currentResult = result;
         this.currentArtwork = null;
         return result;
       } catch (error) {
-        this.error = error instanceof Error ? error.message : '图纸生成失败，请重新试一次。';
-        throw error;
+        const friendly = normalizeGenerationError(error);
+        this.error = friendly.message;
+        throw friendly;
       } finally {
         this.isGenerating = false;
       }
+    },
+    async generateAiWithPolling(onJobUpdate?: GenerationJobUpdateHandler): Promise<GenerateScriptResponse> {
+      if (!this.sourceFile) {
+        throw new Error('请先选择一张照片。');
+      }
+      const submitted = await generateAiPattern(this.sourceFile, this.selectedSize as SizePreset, this.selectedStyle);
+      onJobUpdate?.(submitted);
+      return await pollGenerationJob(submitted.job_id, onJobUpdate);
     },
     async loadArtwork(artworkId: string): Promise<Artwork> {
       this.error = '';
@@ -150,6 +161,54 @@ export function extractPatternImageUrl(pattern: PatternSheet | null, fallback = 
   const labeled = metadataString(metadata, 'labeled_image_url');
   const thumbnail = metadataString(metadata, 'thumbnail_url');
   return labeled || pattern?.image_url || thumbnail || fallback;
+}
+
+async function pollGenerationJob(
+  jobId: string,
+  onJobUpdate?: GenerationJobUpdateHandler
+): Promise<GenerateScriptResponse> {
+  const startedAt = Date.now();
+  const timeoutMs = 12 * 60 * 1000;
+  let delayMs = 1200;
+
+  while (Date.now() - startedAt < timeoutMs) {
+    await sleep(delayMs);
+    const job = await getGenerationStatus(jobId);
+    onJobUpdate?.(job);
+
+    if (job.status === 'succeeded') {
+      if (job.result) {
+        return job.result;
+      }
+      throw new Error('生成完成但没有拿到结果，请到作品集刷新查看。');
+    }
+
+    if (job.status === 'failed') {
+      throw new Error(job.error?.message_cn || job.message_cn || 'AI 生成暂时失败，请稍后重试或切换普通模式。');
+    }
+
+    delayMs = Math.min(2600, delayMs + 220);
+  }
+
+  throw new Error('AI 生成仍在处理中，请稍后到作品集查看，或重新提交一次。');
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function normalizeGenerationError(error: unknown): Error {
+  const rawMessage = error instanceof Error ? error.message : String(error || '');
+  const status = typeof (error as { status?: unknown })?.status === 'number'
+    ? (error as { status: number }).status
+    : 0;
+  if (status === 524 || rawMessage.includes('524') || /timeout|timed out/i.test(rawMessage)) {
+    return new Error('AI 生成时间较长，请稍后重试；也可以切换普通模式先生成。');
+  }
+  if (rawMessage) {
+    return new Error(rawMessage);
+  }
+  return new Error('图纸生成失败，请重新试一次。');
 }
 
 function metadataString(metadata: Record<string, unknown>, key: string): string {

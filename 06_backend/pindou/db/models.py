@@ -135,6 +135,50 @@ class Artwork(Base):
         }
 
 
+class GenerationJob(Base):
+    __tablename__ = "generation_jobs"
+
+    job_id: Mapped[str] = mapped_column(String(64), primary_key=True, default=uuid_hex)
+    user_id: Mapped[str] = mapped_column(String(128), ForeignKey("users.openid"), index=True, nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="queued", index=True, nullable=False)
+    mode: Mapped[str] = mapped_column(String(32), default="ai", nullable=False)
+    progress: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    stage: Mapped[str] = mapped_column(String(64), default="queued", nullable=False)
+    message_cn: Mapped[str] = mapped_column(String(255), default="已提交，正在排队。", nullable=False)
+    result_json: Mapped[dict[str, Any] | None] = mapped_column(SAJSON, nullable=True)
+    error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    error_message_cn: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+        onupdate=utc_now,
+        nullable=False,
+    )
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    def to_frontend_dict(self) -> dict[str, Any]:
+        payload: dict[str, Any] = {
+            "job_id": self.job_id,
+            "status": self.status,
+            "mode": self.mode,
+            "progress": self.progress,
+            "stage": self.stage,
+            "message_cn": self.message_cn,
+            "created_at": iso_or_none(self.created_at),
+            "updated_at": iso_or_none(self.updated_at),
+            "completed_at": iso_or_none(self.completed_at),
+        }
+        if self.result_json is not None:
+            payload["result"] = self.result_json
+        if self.status == "failed":
+            payload["error"] = {
+                "code": self.error_code or "GENERATION_FAILED",
+                "message_cn": self.error_message_cn or self.message_cn,
+            }
+        return payload
+
+
 class Order(Base):
     __tablename__ = "orders"
 
