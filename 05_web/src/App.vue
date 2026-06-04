@@ -14,9 +14,12 @@ const isAuthPage = computed(() => route.name === 'login');
         <span class="brand__text">PinDou 拼豆</span>
       </RouterLink>
       <nav class="app-nav" aria-label="主导航">
-        <RouterLink to="/">首页</RouterLink>
-        <RouterLink to="/works">作品集</RouterLink>
-        <RouterLink to="/me">我的</RouterLink>
+        <RouterLink class="nav-link" to="/">首页</RouterLink>
+        <RouterLink class="nav-link" to="/works">作品集</RouterLink>
+        <RouterLink class="nav-link nav-account" to="/me" aria-label="我的账户">
+          <span class="nav-account__avatar" aria-hidden="true">我</span>
+          <span>我的</span>
+        </RouterLink>
       </nav>
     </header>
 

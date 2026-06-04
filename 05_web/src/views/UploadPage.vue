@@ -407,9 +407,13 @@ onUnmounted(revokePreview);
   width: min(100%, 1080px);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(500px, 1fr) minmax(340px, 368px);
-  gap: clamp(18px, 2.4vw, 28px);
-  align-items: start;
+  grid-template-columns: minmax(348px, 392px) minmax(500px, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "controls upload"
+    "controls action";
+  gap: clamp(14px, 2vw, 22px) clamp(18px, 2.4vw, 28px);
+  align-items: stretch;
   justify-content: center;
 }
 
@@ -434,14 +438,17 @@ onUnmounted(revokePreview);
 }
 
 .upload-stage {
-  display: grid;
-  grid-template-rows: auto auto auto;
+  grid-area: upload;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
+  min-height: 0;
 }
 
 .drop-zone {
   position: relative;
   min-height: clamp(240px, 30vw, 360px);
+  flex: 1 1 auto;
   display: grid;
   place-items: center;
   align-content: center;
@@ -627,6 +634,7 @@ onUnmounted(revokePreview);
 }
 
 .control-panel {
+  grid-area: controls;
   display: grid;
   align-content: start;
   gap: 18px;
@@ -1001,14 +1009,15 @@ onUnmounted(revokePreview);
 }
 
 .generate-bar {
-  grid-column: 1 / -1;
+  grid-area: action;
   display: grid;
-  justify-items: center;
-  gap: 12px;
+  align-content: end;
+  gap: 10px;
+  min-width: 0;
 }
 
 .upload-message {
-  width: min(100%, 640px);
+  width: 100%;
   margin: 0;
   border-radius: 16px;
   background: rgba(164, 212, 197, 0.18);
@@ -1019,9 +1028,8 @@ onUnmounted(revokePreview);
 }
 
 .generate-cta {
-  width: min(100%, 640px);
+  width: 100%;
   min-height: 60px;
-  margin-top: 2px;
   border: 1px solid transparent;
   font-size: 17px;
 }
@@ -1063,10 +1071,15 @@ onUnmounted(revokePreview);
 @media (max-width: 980px) {
   .studio-shell {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "upload"
+      "controls"
+      "action";
   }
 
   .upload-stage {
-    grid-template-rows: auto auto auto;
+    min-height: auto;
   }
 
   .drop-zone {
