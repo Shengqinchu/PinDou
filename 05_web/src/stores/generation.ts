@@ -149,7 +149,7 @@ export function isResultSizePreset(value: unknown): value is ResultSizePreset {
   }
   const width = Number(match[1]);
   const height = Number(match[2]);
-  return width >= 16 && width <= 200 && height >= 16 && height <= 200;
+  return width >= 1 && width <= 200 && height >= 1 && height <= 200;
 }
 
 export function isGenerationStylePreset(value: unknown): value is GenerationStylePreset {

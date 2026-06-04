@@ -32,6 +32,9 @@ const customWidthInput = ref('120');
 const customHeightInput = ref('120');
 const activeTooltip = ref<TooltipKey | null>(null);
 const isConfirmOpen = ref(false);
+const isCustomSizeSelected = ref(false);
+const CUSTOM_MIN_SIZE = 1;
+const CUSTOM_MAX_SIZE = 200;
 
 const modeTooltip = 'AI 模式：先把照片变成 Q 版再转图纸，更精细，真人、实物照片强烈推荐（有 AI 参与，稍慢一点）。普通模式：直接量化原图，秒出，适合本来就是卡通的图。';
 const sizeTooltip = '格子越多，细节越清楚、越还原；格子越少越好拼，但细节会糊。建议从 52 格起步。格数越高，生成时间也越久哦。';
@@ -52,15 +55,29 @@ const isHeic = computed(() => {
   return file.type.includes('heic') || file.type.includes('heif') || name.endsWith('.heic') || name.endsWith('.heif');
 });
 
-const isCustomSizeActive = computed(() => !RESULT_SIZE_OPTIONS.includes(generation.selectedSize as (typeof RESULT_SIZE_OPTIONS)[number]));
+const isCustomPresetSize = computed(() => RESULT_SIZE_OPTIONS.includes(generation.selectedSize as (typeof RESULT_SIZE_OPTIONS)[number]));
+const isCustomSizeActive = computed(() => isCustomSizeSelected.value || !isCustomPresetSize.value);
 const generationVerb = computed(() => GENERATION_MODE_DETAILS[generation.generationMode].label);
 const selectedSizeLabel = computed(() => resultSizeLabel(generation.selectedSize));
 const selectedStyleLabel = computed(() => STYLE_OPTION_DETAILS[generation.selectedStyle].label);
 const isAiMode = computed(() => generation.generationMode === 'ai');
+const customSizeDraft = computed(() => ({
+  width: parseCustomDimension(customWidthInput.value),
+  height: parseCustomDimension(customHeightInput.value)
+}));
+const isCustomSizeValid = computed(() => (
+  isValidCustomDimension(customSizeDraft.value.width) &&
+  isValidCustomDimension(customSizeDraft.value.height)
+));
+const hasInvalidCustomSize = computed(() => isCustomSizeActive.value && !isCustomSizeValid.value);
+const canStartGenerate = computed(() => Boolean(selectedFile.value) && !hasInvalidCustomSize.value);
 const creditSummary = computed(() => (
   isAiMode.value ? 'AI 模式：消耗 1 次 AI 额度' : '普通模式：免费，不消耗 AI 额度'
 ));
 const ctaLabel = computed(() => {
+  if (hasInvalidCustomSize.value) {
+    return '请输入至少 1 × 1 的格数';
+  }
   return selectedFile.value ? `${generationVerb.value} · ${selectedSizeLabel.value}格 ->` : '选择照片后开始生成';
 });
 
@@ -131,6 +148,9 @@ async function startGenerate(): Promise<void> {
     message.value = '请先选择一张照片。';
     return;
   }
+  if (!ensureCustomSizeReady()) {
+    return;
+  }
   isConfirmOpen.value = true;
 }
 
@@ -138,6 +158,10 @@ async function confirmGenerate(): Promise<void> {
   if (!selectedFile.value) {
     isConfirmOpen.value = false;
     message.value = '请先选择一张照片。';
+    return;
+  }
+  if (!ensureCustomSizeReady()) {
+    isConfirmOpen.value = false;
     return;
   }
   generation.setSourceFile(selectedFile.value);
@@ -160,15 +184,20 @@ function chooseStyle(style: GenerationStylePreset): void {
 }
 
 function chooseSize(size: ResultSizePreset): void {
+  isCustomSizeSelected.value = false;
   generation.setSize(size);
+  message.value = '';
 }
 
-function chooseCustomSize(): void {
-  const width = normalizeCustomDimension(customWidthInput.value);
-  const height = normalizeCustomDimension(customHeightInput.value);
-  customWidthInput.value = String(width);
-  customHeightInput.value = String(height);
+function chooseCustomSize(): boolean {
+  isCustomSizeSelected.value = true;
+  const { width, height } = customSizeDraft.value;
+  if (!isValidCustomDimension(width) || !isValidCustomDimension(height)) {
+    return false;
+  }
   generation.setSize(`${width}x${height}` as ResultSizePreset);
+  message.value = '';
+  return true;
 }
 
 function focusCustomSize(): void {
@@ -182,25 +211,37 @@ function handleCustomSizeInput(axis: 'width' | 'height'): void {
   } else {
     customHeightInput.value = sanitizeDimensionInput(customHeightInput.value);
   }
-  if (isCustomSizeActive.value && customWidthInput.value && customHeightInput.value) {
-    chooseCustomSize();
-  }
+  chooseCustomSize();
 }
 
 function commitCustomSize(): void {
-  chooseCustomSize();
+  if (!chooseCustomSize() && isCustomSizeActive.value) {
+    message.value = '自定义格数至少为 1 × 1，且宽高都不能超过 200。';
+  }
 }
 
 function sanitizeDimensionInput(rawValue: string): string {
   return rawValue.replace(/\D/g, '').slice(0, 3);
 }
 
-function normalizeCustomDimension(rawValue: string): number {
+function parseCustomDimension(rawValue: string): number {
   const parsed = Number.parseInt(rawValue, 10);
-  if (!Number.isFinite(parsed)) {
-    return 52;
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function isValidCustomDimension(value: number): boolean {
+  return value >= CUSTOM_MIN_SIZE && value <= CUSTOM_MAX_SIZE;
+}
+
+function ensureCustomSizeReady(): boolean {
+  if (!isCustomSizeActive.value) {
+    return true;
   }
-  return Math.max(16, Math.min(200, parsed));
+  if (chooseCustomSize()) {
+    return true;
+  }
+  message.value = '自定义格数至少为 1 × 1，且宽高都不能超过 200。';
+  return false;
 }
 
 function showTooltip(key: TooltipKey): void {
@@ -441,7 +482,7 @@ onUnmounted(revokePreview);
 
       <div class="generate-bar">
         <p v-if="message" class="upload-message">{{ message }}</p>
-        <button class="pd-btn generate-cta" type="button" :disabled="!selectedFile" @click="startGenerate">
+        <button class="pd-btn generate-cta" type="button" :disabled="!canStartGenerate" @click="startGenerate">
           {{ ctaLabel }}
         </button>
       </div>
