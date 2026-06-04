@@ -895,6 +895,10 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
 }
 
 .result-stats div {
+  display: grid;
+  min-width: 0;
+  min-height: 96px;
+  align-content: center;
   border: 1px solid var(--pd-stroke);
   border-radius: 18px;
   background: var(--pd-peach-50);
@@ -911,9 +915,10 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
 .result-stats dd {
   margin: 0;
   color: var(--pd-fg-1);
-  font-size: 24px;
+  font-size: clamp(22px, 2.6vw, 24px);
   font-weight: 900;
   line-height: 1;
+  overflow-wrap: anywhere;
 }
 
 .result-stats small {
@@ -949,7 +954,7 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
 
 .palette-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-columns: 34px minmax(0, 1fr) minmax(52px, auto) 38px;
   align-items: center;
   gap: 10px;
   border: 1px solid var(--pd-stroke);
@@ -995,6 +1000,11 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
   white-space: nowrap;
 }
 
+.palette-count {
+  justify-self: end;
+  text-align: right;
+}
+
 .palette-percent {
   min-width: 38px;
   text-align: right;
@@ -1035,6 +1045,35 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
 
   .size-switch button {
     min-height: 62px;
+  }
+
+  .result-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .result-stats div {
+    min-height: 86px;
+    border-radius: 16px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+
+  .result-stats dt,
+  .result-stats small {
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  .result-stats dd {
+    font-size: clamp(19px, 6vw, 24px);
+  }
+
+  .palette-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .regen-modal {
@@ -1095,11 +1134,50 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
   }
 
   .palette-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: 32px minmax(0, 1fr) minmax(44px, auto);
+    gap: 8px;
+    padding: 9px;
   }
 
   .palette-percent {
     display: none;
+  }
+
+  .palette-swatch {
+    width: 32px;
+    height: 32px;
+  }
+
+  .palette-row strong {
+    line-height: 1.25;
+    white-space: normal;
+  }
+
+  .palette-row em {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .palette-count {
+    align-self: center;
+    min-width: 44px;
+  }
+}
+
+@media (max-width: 380px) {
+  .preview-panel,
+  .summary-panel,
+  .result-state {
+    padding: 16px;
+  }
+
+  .result-stats {
+    gap: 6px;
+  }
+
+  .result-stats div {
+    padding: 10px 6px;
   }
 }
 </style>

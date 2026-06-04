@@ -629,12 +629,12 @@ onUnmounted(revokePreview);
 .control-panel {
   display: grid;
   align-content: start;
-  gap: 16px;
+  gap: 18px;
 }
 
 .option-group {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .option-heading {
@@ -726,6 +726,7 @@ onUnmounted(revokePreview);
 .style-grid,
 .size-grid {
   display: grid;
+  width: 100%;
   gap: 10px;
 }
 
@@ -762,6 +763,9 @@ onUnmounted(revokePreview);
 }
 
 .mode-card {
+  display: grid;
+  align-content: center;
+  gap: 7px;
   min-height: 104px;
   border-radius: 20px;
   padding: 16px 14px;
@@ -799,7 +803,6 @@ onUnmounted(revokePreview);
 
 .mode-card em,
 .style-pill em {
-  margin-top: 7px;
   color: var(--pd-fg-2);
   font-size: 12px;
   font-style: normal;
@@ -859,29 +862,32 @@ onUnmounted(revokePreview);
 
 .style-pill {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
+  grid-template-columns: 48px minmax(0, 1fr);
   gap: 12px;
   align-items: center;
+  justify-items: start;
   min-height: 72px;
   border-radius: 18px;
-  padding: 12px 14px;
+  padding: 12px 16px;
 }
 
 .style-icon {
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
   justify-self: start;
-  border-radius: 14px;
+  align-self: center;
+  border-radius: 16px;
   background: rgba(255, 249, 245, 0.72);
   box-shadow: inset 0 0 0 1px rgba(237, 228, 218, 0.62);
   overflow: hidden;
 }
 
 .style-icon img {
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
+  display: block;
   object-fit: contain;
 }
 
@@ -903,6 +909,8 @@ onUnmounted(revokePreview);
   display: grid;
   gap: 4px;
   align-content: center;
+  justify-items: start;
+  line-height: 1.2;
 }
 
 .style-pill strong {
@@ -1092,8 +1100,34 @@ onUnmounted(revokePreview);
     grid-template-columns: 1fr;
   }
 
+  .mode-card {
+    min-height: 88px;
+  }
+
+  .mode-card em,
+  .style-pill em,
+  .custom-size-field span {
+    white-space: normal;
+  }
+
+  .style-pill {
+    grid-template-columns: 48px minmax(0, 1fr);
+    min-height: 70px;
+    padding: 11px 14px;
+  }
+
   .size-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .custom-size-field {
+    grid-template-columns: minmax(0, 1fr) minmax(84px, 108px);
+    gap: 8px 10px;
+  }
+
+  .custom-size-field span {
+    grid-column: 1 / -1;
+    line-height: 1.35;
   }
 
   .file-strip {

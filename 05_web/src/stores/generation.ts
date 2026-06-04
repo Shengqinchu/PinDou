@@ -2,6 +2,9 @@ import { defineStore } from 'pinia';
 
 import { generateAiPattern, generateScriptPattern, getArtworkDetail, getGenerationStatus, submitConsent } from '../api';
 import type { Artwork, GenerationJobResponse, GenerateScriptResponse, PatternSheet, SizePreset, StylePreset } from '../api/types';
+import styleCartoonIcon from '../assets/brand/style-cartoon.png';
+import stylePetIcon from '../assets/brand/style-pet.png';
+import stylePortraitIcon from '../assets/brand/style-portrait.png';
 
 export const RESULT_SIZE_OPTIONS = ['26x26', '52x52', '78x78', '104x104'] as const;
 export type FixedResultSizeOption = (typeof RESULT_SIZE_OPTIONS)[number];
@@ -26,9 +29,9 @@ export const STYLE_OPTIONS = ['q_pet', 'q_portrait', 'q_couple'] as const;
 export type GenerationStylePreset = Extract<StylePreset, (typeof STYLE_OPTIONS)[number]>;
 export const DEFAULT_STYLE_PRESET: GenerationStylePreset = 'q_portrait';
 export const STYLE_OPTION_DETAILS: Record<GenerationStylePreset, { label: string; hint: string; iconSrc: string }> = {
-  q_pet: { label: '萌宠', hint: '宠物轮廓更清楚', iconSrc: '/brand/style-pet.png' },
-  q_portrait: { label: '人像', hint: '适合真人和实物照', iconSrc: '/brand/style-portrait.png' },
-  q_couple: { label: '卡通', hint: '适合卡通原图', iconSrc: '/brand/style-cartoon.png' }
+  q_pet: { label: '萌宠', hint: '宠物轮廓更清楚', iconSrc: stylePetIcon },
+  q_portrait: { label: '人像', hint: '适合真人和实物照', iconSrc: stylePortraitIcon },
+  q_couple: { label: '卡通', hint: '适合卡通原图', iconSrc: styleCartoonIcon }
 };
 
 export type GenerationJobUpdateHandler = (job: GenerationJobResponse) => void;
