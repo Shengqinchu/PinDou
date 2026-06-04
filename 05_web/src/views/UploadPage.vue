@@ -27,7 +27,7 @@ const selectedFile = ref<File | null>(null);
 const previewUrl = ref('');
 const isDragging = ref(false);
 const message = ref('');
-const customSizeInput = ref('104');
+const customSizeInput = ref('120');
 const activeTooltip = ref<TooltipKey | null>(null);
 
 const modeTooltip = 'AI 模式：先把照片变成 Q 版再转图纸，更精细，真人、实物照片强烈推荐（有 AI 参与，稍慢一点）。普通模式：直接量化原图，秒出，适合本来就是卡通的图。';
@@ -317,8 +317,10 @@ onUnmounted(revokePreview);
               <span class="style-icon" aria-hidden="true">
                 <img :src="STYLE_OPTION_DETAILS[style].iconSrc" :alt="`${STYLE_OPTION_DETAILS[style].label}图标`" />
               </span>
-              <strong>{{ STYLE_OPTION_DETAILS[style].label }}</strong>
-              <em>{{ STYLE_OPTION_DETAILS[style].hint }}</em>
+              <span class="style-copy">
+                <strong>{{ STYLE_OPTION_DETAILS[style].label }}</strong>
+                <em>{{ STYLE_OPTION_DETAILS[style].hint }}</em>
+              </span>
             </button>
           </div>
         </section>
@@ -362,27 +364,27 @@ onUnmounted(revokePreview);
             >
               <strong>{{ SIZE_OPTION_DETAILS[size].label }}</strong>
             </button>
-            <label
-              class="size-card size-card--custom"
-              :class="{ 'size-card--active': isCustomSizeActive }"
-              @click="focusCustomSize"
-            >
-              <strong>自定义</strong>
-              <input
-                ref="customSizeField"
-                v-model="customSizeInput"
-                type="text"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                aria-label="自定义目标格数"
-                @click.stop
-                @focus="chooseCustomSize"
-                @input="handleCustomSizeInput"
-                @blur="commitCustomSize"
-              />
-              <span>按拼豆板规格更好拼</span>
-            </label>
           </div>
+          <label
+            class="custom-size-field"
+            :class="{ 'custom-size-field--active': isCustomSizeActive }"
+            @click="focusCustomSize"
+          >
+            <strong>自定义</strong>
+            <input
+              ref="customSizeField"
+              v-model="customSizeInput"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              aria-label="自定义目标格数"
+              @click.stop
+              @focus="chooseCustomSize"
+              @input="handleCustomSizeInput"
+              @blur="commitCustomSize"
+            />
+            <span>按拼豆板规格更好拼</span>
+          </label>
         </section>
       </aside>
 
@@ -736,12 +738,13 @@ onUnmounted(revokePreview);
 }
 
 .size-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .mode-card,
 .style-pill,
-.size-card {
+.size-card,
+.custom-size-field {
   appearance: none;
   position: relative;
   min-width: 0;
@@ -766,7 +769,8 @@ onUnmounted(revokePreview);
 
 .mode-card:hover,
 .style-pill:hover,
-.size-card:hover {
+.size-card:hover,
+.custom-size-field:hover {
   border-color: rgba(255, 142, 83, 0.62);
   background: #fff;
   box-shadow: 0 14px 28px rgba(255, 142, 83, 0.16);
@@ -775,6 +779,7 @@ onUnmounted(revokePreview);
 
 .mode-card strong,
 .mode-card em,
+.style-copy,
 .style-pill strong,
 .style-pill em,
 .size-card strong,
@@ -817,7 +822,8 @@ onUnmounted(revokePreview);
 
 .mode-card--active,
 .style-pill--active,
-.size-card--active {
+.size-card--active,
+.custom-size-field--active {
   border-color: transparent;
   background: var(--pd-gradient-warm);
   color: #fff;
@@ -826,7 +832,8 @@ onUnmounted(revokePreview);
 
 .mode-card--active:hover,
 .style-pill--active:hover,
-.size-card--active:hover {
+.size-card--active:hover,
+.custom-size-field--active:hover {
   border-color: rgba(255, 142, 83, 0.7);
   background: var(--pd-gradient-warm);
   color: #fff;
@@ -852,20 +859,20 @@ onUnmounted(revokePreview);
 
 .style-pill {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 2px 10px;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
   align-items: center;
-  min-height: 64px;
+  min-height: 72px;
   border-radius: 18px;
-  padding: 11px 12px;
+  padding: 12px 14px;
 }
 
 .style-icon {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   display: grid;
-  grid-row: 1 / span 2;
   place-items: center;
+  justify-self: start;
   border-radius: 14px;
   background: rgba(255, 249, 245, 0.72);
   box-shadow: inset 0 0 0 1px rgba(237, 228, 218, 0.62);
@@ -873,8 +880,8 @@ onUnmounted(revokePreview);
 }
 
 .style-icon img {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
 }
 
@@ -892,10 +899,22 @@ onUnmounted(revokePreview);
   opacity: 0.72;
 }
 
+.style-copy {
+  display: grid;
+  gap: 4px;
+  align-content: center;
+}
+
 .style-pill strong {
   font-size: 16px;
   font-weight: 900;
+  line-height: 1.15;
   white-space: nowrap;
+}
+
+.style-pill em {
+  margin-top: 0;
+  line-height: 1.3;
 }
 
 .size-card {
@@ -911,21 +930,25 @@ onUnmounted(revokePreview);
   line-height: 1;
 }
 
-.size-card--custom {
-  grid-column: 1 / -1;
+.custom-size-field {
   display: grid;
   grid-template-columns: auto minmax(72px, 108px) minmax(0, 1fr);
   gap: 10px;
   align-items: center;
+  min-height: 64px;
+  border-radius: 18px;
+  margin-top: 10px;
   padding: 12px 14px;
   text-align: left;
 }
 
-.size-card--custom strong {
+.custom-size-field strong {
   font-size: 16px;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
-.size-card--custom input {
+.custom-size-field input {
   width: 100%;
   min-width: 0;
   height: 38px;
@@ -945,12 +968,12 @@ onUnmounted(revokePreview);
     box-shadow 180ms var(--pd-ease-out);
 }
 
-.size-card--custom input:focus {
+.custom-size-field input:focus {
   border-color: rgba(255, 142, 83, 0.72);
   box-shadow: 0 0 0 4px rgba(255, 142, 83, 0.12);
 }
 
-.size-card--custom span {
+.custom-size-field span {
   color: var(--pd-fg-2);
   font-size: 12px;
   font-weight: 900;
@@ -958,14 +981,14 @@ onUnmounted(revokePreview);
   white-space: nowrap;
 }
 
-.size-card--active.size-card--custom input {
+.custom-size-field--active input {
   border-color: rgba(255, 255, 255, 0.48);
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
 }
 
-.size-card--active.size-card--custom input::placeholder,
-.size-card--active.size-card--custom span {
+.custom-size-field--active input::placeholder,
+.custom-size-field--active span {
   color: rgba(255, 255, 255, 0.86);
 }
 
@@ -1043,16 +1066,7 @@ onUnmounted(revokePreview);
   }
 
   .style-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .style-pill {
     grid-template-columns: 1fr;
-    justify-items: start;
-  }
-
-  .style-icon {
-    grid-row: auto;
   }
 }
 

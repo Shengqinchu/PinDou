@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { generateAiPattern, generateScriptPattern, getArtworkDetail, submitConsent } from '../api';
 import type { Artwork, GenerateScriptResponse, PatternSheet, SizePreset, StylePreset } from '../api/types';
 
-export const RESULT_SIZE_OPTIONS = ['26x26', '52x52', '78x78'] as const;
+export const RESULT_SIZE_OPTIONS = ['26x26', '52x52', '78x78', '104x104'] as const;
 export type FixedResultSizeOption = (typeof RESULT_SIZE_OPTIONS)[number];
 export type ResultSizePreset = SizePreset;
 export const DEFAULT_GENERATION_SIZE: ResultSizePreset = '52x52';
@@ -18,7 +18,8 @@ export const GENERATION_MODE_DETAILS: Record<GenerationMode, { label: string; hi
 export const SIZE_OPTION_DETAILS: Record<FixedResultSizeOption, { label: string }> = {
   '26x26': { label: '26' },
   '52x52': { label: '52' },
-  '78x78': { label: '78' }
+  '78x78': { label: '78' },
+  '104x104': { label: '104' }
 };
 
 export const STYLE_OPTIONS = ['q_pet', 'q_portrait', 'q_couple'] as const;
