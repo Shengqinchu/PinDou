@@ -18,90 +18,23 @@ from pindou.pattern.postprocess import detect_and_remove_white_bg
 from pindou.providers.base import PreviewProvider, PreviewProviderError, PreviewResult, SizePreset, StylePreset
 
 
-TARGET_COLOR_COUNT = 8
+TARGET_COLOR_COUNT = 6
 IMAGE_SIZE = "1024x1024"
 
-STYLE_PROMPTS: dict[StylePreset, str] = {
-    StylePreset.Q_PORTRAIT: """
-Transform the uploaded photo into a cute Q-version chibi illustration for a perler bead finished-product preview.
+BEAD_OPTIMIZED_CHIBI_PROMPT = """
+把上传照片变成可爱 Q 版(chibi)卡通贴纸，用于转拼豆图纸：
+- 先自动识别画面真实主体(人/宠物/物体)，按真实主体萌化；即使与所选风格不符，也以真实主体为准(明显是人就出人，不要出成动物)。【静默执行，不向用户提示】
+- 用尽量少的平涂色，通常 3-6 种，简单主体更少；不要渐变、不要细碎纹理。
+- 粗而干净的黑色描边；背景透明或纯色；主体居中占画面大。
+- 保留关键特征(眼睛/嘴/显著花纹)与辨识度；尽量左右对称、形状干净。
+- 风格：温暖可爱、韩系手绘贴纸感。
+""".strip()
 
-Strict composition rules:
-- Preserve the original visible body range and pose.
-- Do not invent missing body parts.
-- If legs, feet, shoes, or the full lower body are not visible in the original photo, do not generate them.
-- Keep the subject as a waist-up / upper-body composition if the original is waist-up.
-- Do not change the number of people.
-- Do not add extra pets, props, text, logos, or decorative objects.
-
-Preserve identity and key details:
-- Preserve hairstyle, glasses, face direction, clothing type and main colors, accessories, and hand-held objects.
-- Remove background clutter, license plates, text, and watermarks.
-
-Perler bead design style:
-- Hand-drawn perler bead pattern style, like children's coloring book line art.
-- Thick 3-5 pixel solid black outline on every subject edge and major internal feature.
-- Large clean flat solid color blocks.
-- Simple cute facial features.
-- Use ONLY 5-8 solid colors total.
-- No fur texture, no realistic shading, no photo realism, no gradients, no anti-aliasing, no soft shadows.
-- Plain white or transparent-looking background; background should not be part of the bead design.
-- Suitable for later conversion into a small chibi bead grid.
-""".strip(),
-    StylePreset.Q_COUPLE: """
-Transform the uploaded couple/group photo into a cute Q-version chibi illustration for a perler bead finished-product preview.
-
-Strict composition rules:
-- Keep the same number of people and preserve their left/right relationship.
-- Preserve the original visible body range and pose for each person.
-- Do not invent missing body parts; if the lower body is not visible, keep the result upper-body only.
-- Do not add extra pets, props, text, logos, or decorative objects.
-
-Preserve identity and key details:
-- Preserve each person's hairstyle, glasses, face direction, clothing type and main colors, accessories, hand-held objects, and relative height impression.
-- For graduation photos, preserve graduation caps, black gowns, collar trim colors, bouquet, and glasses if visible.
-- Remove background clutter, cars, license plates, text, and watermarks.
-
-Perler bead design style:
-- Hand-drawn perler bead pattern style, like children's coloring book line art.
-- Thick 3-5 pixel solid black outline on every subject edge and major internal feature.
-- Large clean flat solid color blocks.
-- Simple cute facial features.
-- Use ONLY 5-8 solid colors total.
-- No fur texture, no realistic shading, no photo realism, no gradients, no anti-aliasing, no soft shadows.
-- Plain white or transparent-looking background; background should not be part of the bead design.
-- Suitable for later conversion into a small chibi bead grid.
-""".strip(),
-    StylePreset.Q_PET: """
-Transform the uploaded pet photo into a cute Q-version chibi pet illustration for a perler bead finished-product preview.
-
-Strict composition rules:
-- Preserve the pet species, pose, visible body range, and main silhouette.
-- Do not invent missing legs, tail, collar, accessories, props, or extra pets.
-- Keep distinctive ears, eye shape, nose position, fur markings, and expression.
-- Remove background clutter, text, logos, and watermarks.
-
-Perler bead design style:
-- Hand-drawn perler bead pattern style, like children's coloring book line art.
-- Thick 3-5 pixel solid black outline on every subject edge and major internal feature.
-- Large clean flat solid color blocks.
-- Simple cute facial features while keeping the pet recognizable.
-- Use ONLY 5-8 solid colors total.
-- No fur texture, no realistic shading, no photo realism, no gradients, no anti-aliasing, no soft shadows.
-- Plain white or transparent-looking background; background should not be part of the bead design.
-- Suitable for later conversion into a small chibi bead grid.
-""".strip(),
-    StylePreset.CARTOON_FALLBACK: """
-Create a perler bead finished-product preview based on the uploaded image.
-
-Keep the original subject count, visible body range, pose, main silhouette, and key accessories.
-Do not invent missing body parts, extra props, text, logos, decorative objects, fake legends, or fake coordinates.
-Use round bead-like dots, clean black outlines, large readable color blocks, and a plain white or transparent-looking background.
-Use hand-drawn perler bead pattern style, like children's coloring book line art.
-Use ONLY 5-8 solid colors total.
-Use thick 3-5 pixel solid black outlines.
-No fur texture, no realistic shading, no photo realism, no gradients, no anti-aliasing, no soft shadows.
-Keep the design centered and suitable for a small chibi bead grid.
-""".strip(),
+STYLE_HINTS: dict[StylePreset, str] = {
+    StylePreset.Q_PORTRAIT: "人像提示：如果真实主体是人，请重点保留发型、眼镜、脸部朝向、衣服主色和标志性配饰。",
+    StylePreset.Q_COUPLE: "卡通提示：如果真实主体本来就是卡通/插画，请保留原角色轮廓、表情和主要配色，继续做成干净 Q 版贴纸。",
+    StylePreset.Q_PET: "萌宠提示：如果真实主体是宠物，请重点保留物种、耳朵、眼鼻位置、显著花纹和表情。",
+    StylePreset.CARTOON_FALLBACK: "普通卡通提示：保留真实主体数量、姿势、主体轮廓和关键特征，避免增加无关道具。",
 }
 
 PERLER_NEGATIVE_CONSTRAINTS = """
@@ -109,6 +42,7 @@ Hard negative constraints:
 - Do not preserve photographic fur strands, skin pores, fabric texture, bokeh, lens blur, realistic highlights, or tonal gradients.
 - Do not use painterly shading, airbrush lighting, semi-transparent shadows, tiny texture strokes, or anti-aliased fuzzy edges.
 - Do not create extra colors for shadows; if a shadow is unavoidable, replace it with one flat darker solid color.
+- Prefer 3-6 total flat colors; simple subjects should use only 3-4 colors when possible.
 - Every colored region must be simple enough to become one or more perler bead cells.
 - Output should look like a finished bead-pattern preview, not a realistic cartoon portrait.
 """.strip()
@@ -194,12 +128,13 @@ class XiaochiGptProvider(PreviewProvider):
 
     def _build_prompt(self, style_preset: StylePreset, size_preset: SizePreset, seed: int | None) -> str:
         try:
-            prompt = STYLE_PROMPTS[style_preset]
+            style_hint = STYLE_HINTS[style_preset]
         except KeyError as exc:
             raise PreviewProviderError(f"Unsupported style preset: {style_preset}") from exc
         return "\n\n".join(
             [
-                prompt,
+                BEAD_OPTIMIZED_CHIBI_PROMPT,
+                f"所选风格提示（仅作参考，真实主体识别优先，静默纠偏）：{style_hint}",
                 PERLER_NEGATIVE_CONSTRAINTS,
                 f"Output canvas: {IMAGE_SIZE}. Target bead grid preset: {size_preset.value}.",
                 "Return only the final finished-preview image, no text overlays.",

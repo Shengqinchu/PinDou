@@ -25,6 +25,7 @@ SUBJECT_ALIGNMENT_ALPHA_THRESHOLD = 128
 SUBJECT_ALIGNMENT_MIN_PIXELS = 4
 SUBJECT_ALIGNMENT_MAX_FOREGROUND_RATIO = 0.98
 SUBJECT_ALIGNMENT_EPSILON = 0.02
+AI_PALETTE_MERGE_DELTA_E = 9.0
 
 
 @dataclass(frozen=True)
@@ -182,6 +183,9 @@ class PatternBuilder:
             input_mode=input_mode,
             auto_remove_white_bg=auto_remove_white_bg,
         )
+        quantize_options: dict[str, Any] = {}
+        if input_mode == "ai":
+            quantize_options["palette_merge_delta_e"] = AI_PALETTE_MERGE_DELTA_E
         quantized = quantize_to_codes(
             prepared_image,
             palette,
@@ -190,6 +194,7 @@ class PatternBuilder:
             target_colors=self.target_colors,
             metric="ciede2000",
             dither_mode="none",
+            **quantize_options,
         )
         palette_by_code = {color.code: color for color in palette}
         shape_cleanup = cleanup_shape_artifacts(

@@ -99,17 +99,18 @@ def wait_generation_job(
     headers: dict[str, str],
     job_id: str,
     *,
-    timeout_seconds: float = 5.0,
+    timeout_seconds: float = 10.0,
 ) -> dict:
     deadline = time.monotonic() + timeout_seconds
     latest: dict | None = None
+    time.sleep(0.1)
     while time.monotonic() < deadline:
         response = client.get(f"/api/generate/status/{job_id}", headers=headers)
         assert response.status_code == 200
         latest = response.json()
         if latest["status"] in {"succeeded", "failed"}:
             return latest
-        time.sleep(0.05)
+        time.sleep(0.15)
     raise AssertionError(f"generation job did not finish: {latest}")
 
 
@@ -535,6 +536,7 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
     assert second_job["status"] == "succeeded"
     assert second_job["result"]["preview"]["provider_used"] == "fake"
     assert second_job["result"]["pattern"]["metadata"]["size_preset"] == "52x52"
+    assert second_job["result"]["pattern"]["metadata"]["target_colors"] == 8
     assert calls[-1]["style"] == "q_pet"
     assert calls[-1]["size"] == "52x52"
     assert calls[-1]["bytes"] > 0

@@ -92,6 +92,28 @@ def test_xiaochi_provider_retries_once_with_new_seed_hint() -> None:
     assert fake_images.calls[1]["response_format"] == "b64_json"
 
 
+def test_xiaochi_provider_uses_silent_subject_detect_minimal_palette_prompt() -> None:
+    fake_images = FakeImages([api_response(PNG_1X1)])
+    fake_client = SimpleNamespace(images=fake_images)
+    provider = XiaochiGptProvider(
+        api_key="test-key",
+        base_url="https://example.test/v1",
+        client=fake_client,
+        retry_count=0,
+    )
+
+    result = provider.generate(PNG_1X1, StylePreset.Q_PET, SizePreset.DOUBLE_BOARD_52X52, seed=7)
+    prompt = str(fake_images.calls[0]["prompt"])
+
+    assert result.target_color_count == 6
+    assert "先自动识别画面真实主体" in prompt
+    assert "即使与所选风格不符，也以真实主体为准" in prompt
+    assert "【静默执行，不向用户提示】" in prompt
+    assert "通常 3-6 种" in prompt
+    assert "真实主体识别优先，静默纠偏" in prompt
+    assert "萌宠提示" in prompt
+
+
 def test_xiaochi_provider_strips_ai_white_background_to_alpha() -> None:
     fake_images = FakeImages([api_response(white_bg_preview_png())])
     fake_client = SimpleNamespace(images=fake_images)

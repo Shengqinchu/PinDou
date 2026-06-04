@@ -268,6 +268,21 @@ def test_flat_sticker_builds_transparent_low_color_pattern() -> None:
     assert any(sheet.color_counts[code] > 0 for code in red_codes)
 
 
+def test_ai_flat_sticker_uses_minimal_palette_merge() -> None:
+    builder = PatternBuilder(target_colors=6)
+
+    sheet = builder.build(
+        SizePreset.DOUBLE_BOARD_52X52,
+        preview=flat_dog_sticker_bytes(),
+        mode="ai",
+    )
+
+    assert sheet.metadata["target_colors"] == 6
+    assert sheet.metadata["effective_target_colors"] <= 5
+    assert sheet.metadata["palette_merge_delta_e"] == 9.0
+    assert len(sheet.color_counts) <= 4
+
+
 def test_low_grid_flat_sticker_preserves_outline_and_small_features() -> None:
     builder = PatternBuilder(target_colors=24)
 

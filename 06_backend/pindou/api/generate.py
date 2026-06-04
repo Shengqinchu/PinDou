@@ -198,7 +198,11 @@ def run_ai_generation_job(
             )
             preview_path, preview_url = save_preview_png(preview.preview_id, preview.image)
             preview = replace(preview, image_url=preview_url)
-            sheet = PatternBuilder().build(size=size, preview=preview.image, mode="ai")
+            sheet = PatternBuilder(target_colors=preview.target_color_count).build(
+                size=size,
+                preview=preview.image,
+                mode="ai",
+            )
 
             update_generation_job(
                 db,
