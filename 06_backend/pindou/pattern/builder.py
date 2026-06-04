@@ -166,7 +166,7 @@ class PatternBuilder:
     ) -> PatternSheet:
         from pindou.colormap.loader import estimate_cost_cny, load_palette
         from pindou.pattern.exporter import PatternExporter
-        from pindou.pattern.postprocess import merge_small_components, reinforce_low_grid_outline
+        from pindou.pattern.postprocess import cleanup_shape_artifacts, reinforce_low_grid_outline
         from pindou.pattern.quantize import quantize_to_codes
 
         size = size if isinstance(size, SizePreset) else SizePreset(str(size))
@@ -192,11 +192,12 @@ class PatternBuilder:
             dither_mode="none",
         )
         palette_by_code = {color.code: color for color in palette}
-        processed_codes = merge_small_components(
+        shape_cleanup = cleanup_shape_artifacts(
             quantized.codes,
             palette_by_code,
-            min_component_size=self.min_component_size,
+            min_component_size=max(self.min_component_size, 4),
         )
+        processed_codes = shape_cleanup.codes
         low_grid_feature_priority = min(parse_size(size)) <= LOW_GRID_FEATURE_MAX_DIMENSION
         outline_reinforced = False
         if low_grid_feature_priority and quantized.flat_image_detected:
@@ -226,6 +227,7 @@ class PatternBuilder:
                 "low_grid_feature_priority": low_grid_feature_priority,
                 "low_grid_outline_reinforced": outline_reinforced,
                 "subject_grid_alignment": subject_alignment.to_metadata(),
+                "shape_cleanup": shape_cleanup.to_metadata(),
             },
         )
         preview_png = PatternExporter().to_simple_grid_png(sheet)

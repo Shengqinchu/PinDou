@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw
 
 from pindou.pattern.builder import ColorRef, NoBead, PatternBuilder, PatternSheet, fit_to_canvas
 from pindou.pattern.exporter import PatternExporter, fit_cell_code_font, labeled_grid_filename, partition_filename
-from pindou.pattern.postprocess import detect_and_remove_white_bg
+from pindou.pattern.postprocess import cleanup_shape_artifacts, detect_and_remove_white_bg
 from pindou.pattern.quantize import choose_effective_target_colors
 from pindou.pattern.quantize_core import Palette, merge_palette_indices_by_delta_e, rgb_to_lab
 from pindou.providers.base import SizePreset
@@ -28,6 +28,13 @@ def assert_grid_size(sheet, width: int, height: int) -> None:
     assert all(len(row) == width for row in sheet.grid)
     assert len(sheet.no_bead_mask) == height
     assert all(len(row) == width for row in sheet.no_bead_mask)
+
+
+def palette_map(*items: tuple[str, tuple[int, int, int]]) -> dict[str, ColorRef]:
+    return {
+        code: ColorRef("MARD", code, code, None, f"#{rgb[0]:02X}{rgb[1]:02X}{rgb[2]:02X}", rgb, 5.0)
+        for code, rgb in items
+    }
 
 
 def test_raw_image_path_builds_expected_grid_for_task_b_inputs() -> None:
@@ -304,6 +311,79 @@ def test_feature_priority_downsample_keeps_tiny_red_block_over_fill_vote() -> No
     assert fitted_plain.getpixel((0, 0))[:3] == (170, 140, 110)
     assert fitted_feature.getpixel((0, 0))[0] >= 200
     assert fitted_feature.getpixel((0, 0))[1] <= 60
+
+
+def test_shape_cleanup_merges_isolated_noise_but_keeps_dark_features() -> None:
+    palette = palette_map(
+        ("SKIN", (236, 198, 142)),
+        ("NOISE", (92, 174, 138)),
+        ("INK", (18, 18, 18)),
+    )
+    codes = [["SKIN" for _col in range(9)] for _row in range(9)]
+    codes[1][1] = "NOISE"
+    codes[3][3] = "INK"
+    codes[3][5] = "INK"
+    codes[5][4] = "INK"
+
+    cleanup = cleanup_shape_artifacts(
+        codes,
+        palette,
+        min_component_size=4,
+        smooth_passes=1,
+        enable_symmetry=False,
+    )
+
+    assert cleanup.codes[1][1] == "SKIN"
+    assert cleanup.codes[3][3] == "INK"
+    assert cleanup.codes[3][5] == "INK"
+    assert cleanup.codes[5][4] == "INK"
+    assert cleanup.denoised_cells == 1
+    assert cleanup.protected_feature_cells == 3
+
+
+def test_shape_cleanup_majority_vote_smooths_jagged_fill_edge() -> None:
+    palette = palette_map(
+        ("FILL", (230, 174, 118)),
+        ("EDGE", (150, 128, 110)),
+    )
+    codes = [["FILL" for _col in range(5)] for _row in range(5)]
+    codes[2][2] = "EDGE"
+
+    cleanup = cleanup_shape_artifacts(
+        codes,
+        palette,
+        min_component_size=1,
+        smooth_passes=1,
+        smooth_majority_threshold=5,
+        enable_symmetry=False,
+    )
+
+    assert cleanup.codes[2][2] == "FILL"
+    assert cleanup.smoothed_cells == 1
+
+
+def test_shape_cleanup_symmetry_mirrors_tiny_protected_feature() -> None:
+    palette = palette_map(
+        ("SKIN", (236, 198, 142)),
+        ("INK", (18, 18, 18)),
+    )
+    codes = [["SKIN" for _col in range(7)] for _row in range(7)]
+    codes[2][2] = "INK"
+    codes[2][4] = "INK"
+    codes[4][2] = "INK"
+
+    cleanup = cleanup_shape_artifacts(
+        codes,
+        palette,
+        min_component_size=4,
+        smooth_passes=1,
+        enable_symmetry=True,
+    )
+
+    assert cleanup.codes[4][2] == "INK"
+    assert cleanup.codes[4][4] == "INK"
+    assert cleanup.symmetry_applied is True
+    assert cleanup.symmetry_cells == 1
 
 
 def test_medium_and_large_flat_sticker_do_not_regress() -> None:
