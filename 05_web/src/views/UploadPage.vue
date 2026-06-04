@@ -522,21 +522,23 @@ onUnmounted(revokePreview);
 
 <style scoped>
 .upload-page {
-  padding: clamp(8px, 3vh, 26px) 0 24px;
+  padding: 0 0 clamp(18px, 3vh, 24px);
+  overflow-x: clip;
 }
 
 .studio-shell {
-  width: min(100%, 1080px);
+  width: min(100%, 1100px);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(348px, 392px) minmax(500px, 1fr);
+  grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
   grid-template-rows: minmax(0, 1fr) auto;
   grid-template-areas:
     "controls upload"
     "controls action";
-  gap: clamp(14px, 2vw, 22px) clamp(18px, 2.4vw, 28px);
+  gap: clamp(12px, 1.8vw, 20px) clamp(16px, 2.2vw, 26px);
   align-items: stretch;
   justify-content: center;
+  min-width: 0;
 }
 
 .upload-stage,
@@ -545,7 +547,8 @@ onUnmounted(revokePreview);
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: var(--pd-shadow-float);
-  padding: clamp(18px, 3.2vw, 30px);
+  min-width: 0;
+  padding: clamp(14px, 2.3vw, 26px);
   transition:
     border-color 180ms var(--pd-ease-out),
     box-shadow 180ms var(--pd-ease-out),
@@ -569,7 +572,7 @@ onUnmounted(revokePreview);
 
 .drop-zone {
   position: relative;
-  min-height: clamp(240px, 30vw, 360px);
+  min-height: clamp(220px, 30vw, 340px);
   flex: 1 1 auto;
   display: grid;
   place-items: center;
@@ -584,7 +587,7 @@ onUnmounted(revokePreview);
     #fffaf5;
   color: var(--pd-fg-2);
   cursor: pointer;
-  padding: 24px;
+  padding: clamp(16px, 2.5vw, 24px);
   text-align: center;
   transition:
     border-color 180ms var(--pd-ease-out),
@@ -619,7 +622,7 @@ onUnmounted(revokePreview);
 .drop-zone strong {
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
-  font-size: 22px;
+  font-size: clamp(19px, 2.6vw, 22px);
   font-weight: 900;
 }
 
@@ -683,8 +686,8 @@ onUnmounted(revokePreview);
 
 .stage-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(8px, 1.6vw, 12px);
 }
 
 .stage-secondary {
@@ -867,7 +870,7 @@ onUnmounted(revokePreview);
 }
 
 .mode-grid {
-  grid-template-columns: repeat(2, minmax(150px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .style-grid {
@@ -902,9 +905,9 @@ onUnmounted(revokePreview);
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 76px;
+  min-height: clamp(62px, 7.2vw, 76px);
   border-radius: 20px;
-  padding: 14px 16px;
+  padding: 20px clamp(8px, 1.6vw, 14px) 12px;
 }
 
 .mode-card:hover,
@@ -932,8 +935,10 @@ onUnmounted(revokePreview);
 .mode-card strong {
   padding-right: 0;
   font-family: var(--pd-font-display);
-  font-size: 20px;
+  font-size: clamp(16px, 1.75vw, 18px);
   font-weight: 900;
+  line-height: 1.08;
+  text-align: center;
   white-space: nowrap;
 }
 
@@ -948,14 +953,15 @@ onUnmounted(revokePreview);
 
 .option-badge {
   position: absolute;
-  top: 8px;
-  right: 9px;
+  top: 7px;
+  right: 7px;
   border-radius: 999px;
   background: rgba(255, 107, 157, 0.12);
   color: var(--pd-pink-deep);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
-  padding: 4px 8px;
+  line-height: 1;
+  padding: 3px 7px;
 }
 
 .mode-card--active,
@@ -995,13 +1001,13 @@ onUnmounted(revokePreview);
 
 .style-pill {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: clamp(40px, 5vw, 48px) minmax(0, 1fr);
+  gap: clamp(9px, 1.5vw, 12px);
   align-items: center;
   justify-items: start;
   min-height: 72px;
   border-radius: 18px;
-  padding: 12px 16px;
+  padding: 11px clamp(12px, 1.8vw, 16px);
 }
 
 .style-pill:disabled {
@@ -1009,8 +1015,8 @@ onUnmounted(revokePreview);
 }
 
 .style-icon {
-  width: 48px;
-  height: 48px;
+  width: clamp(40px, 5vw, 48px);
+  height: clamp(40px, 5vw, 48px);
   display: grid;
   place-items: center;
   justify-self: start;
@@ -1022,8 +1028,8 @@ onUnmounted(revokePreview);
 }
 
 .style-icon img {
-  width: 42px;
-  height: 42px;
+  width: clamp(35px, 4.4vw, 42px);
+  height: clamp(35px, 4.4vw, 42px);
   display: block;
   object-fit: contain;
 }
@@ -1048,7 +1054,7 @@ onUnmounted(revokePreview);
 
 .style-pill strong {
   font-family: var(--pd-font-display);
-  font-size: 16px;
+  font-size: clamp(14px, 1.65vw, 16px);
   font-weight: 900;
   line-height: 1.15;
   white-space: nowrap;
@@ -1056,45 +1062,46 @@ onUnmounted(revokePreview);
 
 .style-pill em {
   margin-top: 0;
+  font-size: clamp(11px, 1.3vw, 12px);
   line-height: 1.3;
 }
 
 .size-card {
-  min-height: 64px;
+  min-height: clamp(56px, 7vw, 64px);
   border-radius: 18px;
-  padding: 10px 7px;
+  padding: 9px 5px;
   text-align: center;
 }
 
 .size-card strong {
   font-family: var(--pd-font-display);
-  font-size: 22px;
+  font-size: clamp(19px, 2.1vw, 22px);
   font-weight: 900;
   line-height: 1;
 }
 
 .custom-size-field {
   display: grid;
-  grid-template-columns: auto minmax(142px, 1fr);
-  gap: 10px;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(8px, 1.5vw, 10px);
   align-items: center;
   min-height: 64px;
   border-radius: 18px;
   margin-top: 10px;
-  padding: 12px 14px;
+  padding: clamp(10px, 1.7vw, 12px) clamp(12px, 1.8vw, 14px);
   text-align: left;
 }
 
 .custom-size-field strong {
   font-family: var(--pd-font-display);
-  font-size: 16px;
+  font-size: clamp(14px, 1.65vw, 16px);
   font-weight: 900;
   white-space: nowrap;
 }
 
 .dimension-inputs {
   display: grid;
-  grid-template-columns: minmax(52px, 1fr) auto minmax(52px, 1fr);
+  grid-template-columns: minmax(44px, 1fr) auto minmax(44px, 1fr);
   align-items: center;
   gap: 7px;
 }
@@ -1115,7 +1122,7 @@ onUnmounted(revokePreview);
   color: var(--pd-fg-1);
   cursor: text;
   font: inherit;
-  font-size: 18px;
+  font-size: clamp(16px, 1.8vw, 18px);
   font-weight: 900;
   outline: none;
   padding: 0 10px;
@@ -1200,9 +1207,9 @@ onUnmounted(revokePreview);
 
 .generate-cta {
   width: 100%;
-  min-height: 60px;
+  min-height: clamp(54px, 6vw, 60px);
   border: 1px solid transparent;
-  font-size: 17px;
+  font-size: clamp(15px, 1.8vw, 17px);
 }
 
 .generate-cta:not(:disabled) {
@@ -1399,13 +1406,13 @@ onUnmounted(revokePreview);
   }
 }
 
-@media (max-width: 980px) {
+@media (max-width: 860px) {
   .studio-shell {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
     grid-template-areas:
-      "upload"
       "controls"
+      "upload"
       "action";
   }
 
@@ -1414,7 +1421,7 @@ onUnmounted(revokePreview);
   }
 
   .drop-zone {
-    min-height: 360px;
+    min-height: clamp(260px, 54vw, 360px);
   }
 
   .style-grid {
@@ -1424,7 +1431,7 @@ onUnmounted(revokePreview);
 
 @media (max-width: 640px) {
   .upload-page {
-    padding-top: 8px;
+    padding-top: 0;
   }
 
   .upload-stage,
@@ -1439,13 +1446,12 @@ onUnmounted(revokePreview);
   }
 
   .stage-actions,
-  .mode-grid,
   .style-grid {
     grid-template-columns: 1fr;
   }
 
   .mode-card {
-    min-height: 68px;
+    min-height: 64px;
   }
 
   .style-pill em,
@@ -1454,7 +1460,7 @@ onUnmounted(revokePreview);
   }
 
   .style-pill {
-    grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-columns: clamp(40px, 12vw, 48px) minmax(0, 1fr);
     min-height: 70px;
     padding: 11px 14px;
   }
@@ -1489,6 +1495,30 @@ onUnmounted(revokePreview);
   .confirm-summary div,
   .confirm-actions {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .studio-shell {
+    gap: 14px;
+  }
+
+  .mode-grid,
+  .size-grid {
+    gap: 8px;
+  }
+
+  .mode-card {
+    min-height: 62px;
+    padding-inline: 6px;
+  }
+
+  .style-pill {
+    padding-inline: 12px;
+  }
+
+  .custom-size-field {
+    padding: 10px 12px;
   }
 }
 </style>
