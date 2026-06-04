@@ -5,12 +5,11 @@ import { clearStoredUser, clearToken, hasToken } from '../auth/tokenStorage';
 import HomePage from '../views/HomePage.vue';
 import LoginPage from '../views/LoginPage.vue';
 import LoadingPage from '../views/LoadingPage.vue';
-import MePage from '../views/MePage.vue';
 import ResultPage from '../views/ResultPage.vue';
 import UploadPage from '../views/UploadPage.vue';
 import WorksPage from '../views/WorksPage.vue';
 
-const protectedRoutes = new Set(['upload', 'loading', 'result', 'works', 'me']);
+const protectedRoutes = new Set(['upload', 'loading', 'result', 'works']);
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -44,8 +43,7 @@ export const router = createRouter({
     {
       path: '/me',
       name: 'me',
-      component: MePage,
-      meta: { title: '我的', requiresAuth: true }
+      redirect: { name: 'works' }
     },
     { path: '/:pathMatch(.*)*', redirect: '/' }
   ]

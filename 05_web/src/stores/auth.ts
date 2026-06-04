@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { emailPasswordLogin, getProfile, registerWebAccount, sendEmailCode, verifyEmailCode } from '../api';
+import { emailPasswordLogin, getProfile, registerWebAccount, sendEmailCode, updateProfile, uploadAvatar, verifyEmailCode } from '../api';
 import type { EmailCodeResponse, RegisterResponse } from '../api';
 import type { User } from '../api/types';
 import {
@@ -19,14 +19,24 @@ export const useAuthStore = defineStore('auth', {
   }),
   getters: {
     isLoggedIn: (state) => Boolean(state.token),
-    displayName: (state) => state.user?.email || state.user?.nickname || 'PinDou 用户'
+    displayName: (state) => state.user?.nickname || state.user?.email || 'PinDou 用户'
   },
   actions: {
     setSession(token: string, user: User) {
       this.token = token;
-      this.user = user;
+      this.applyUser(user);
       setToken(token);
-      setStoredUser(user);
+    },
+    applyUser(user: User | null, persist = true) {
+      this.user = user;
+      if (!persist) {
+        return;
+      }
+      if (user) {
+        setStoredUser(user);
+      } else {
+        clearStoredUser();
+      }
     },
     async sendEmailCode(email: string): Promise<EmailCodeResponse> {
       return sendEmailCode(email);
@@ -53,8 +63,21 @@ export const useAuthStore = defineStore('auth', {
     },
     async refreshProfile(): Promise<User> {
       const user = await getProfile();
-      this.user = user;
-      setStoredUser(user);
+      this.applyUser(user);
+      return user;
+    },
+    async updateProfile(payload: { nickname?: string; avatar_url?: string }): Promise<User> {
+      const user = await updateProfile(payload);
+      this.applyUser(user);
+      return user;
+    },
+    async uploadAvatar(file: File): Promise<User> {
+      const response = await uploadAvatar(file);
+      this.applyUser(response.user);
+      return response.user;
+    },
+    rollbackUser(user: User | null) {
+      this.applyUser(user);
       return user;
     },
     setToken(token: string) {
@@ -63,9 +86,8 @@ export const useAuthStore = defineStore('auth', {
     },
     logout() {
       this.token = '';
-      this.user = null;
+      this.applyUser(null);
       clearToken();
-      clearStoredUser();
     }
   }
 });

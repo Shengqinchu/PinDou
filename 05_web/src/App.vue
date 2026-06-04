@@ -2,6 +2,8 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
+import AccountMenu from './components/AccountMenu.vue';
+
 const route = useRoute();
 const isAuthPage = computed(() => route.name === 'login');
 </script>
@@ -14,12 +16,8 @@ const isAuthPage = computed(() => route.name === 'login');
         <span class="brand__text">PinDou 拼豆</span>
       </RouterLink>
       <nav class="app-nav" aria-label="主导航">
-        <RouterLink class="nav-link" to="/">首页</RouterLink>
-        <RouterLink class="nav-link" to="/works">作品集</RouterLink>
-        <RouterLink class="nav-link nav-account" to="/me" aria-label="我的账户">
-          <span class="nav-account__avatar" aria-hidden="true">我</span>
-          <span>我的</span>
-        </RouterLink>
+        <RouterLink class="nav-link nav-link--home" to="/">首页</RouterLink>
+        <AccountMenu />
       </nav>
     </header>
 

@@ -3,19 +3,43 @@
 from __future__ import annotations
 
 import hashlib
+import re
+from io import BytesIO
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, File, Request, UploadFile
+from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel, Field
 
 from pindou.api.deps import CurrentUser, DbSession
-from pindou.api.errors import ApiException
+from pindou.api.errors import ApiException, ErrorCode
 from pindou.api.security import create_access_token
 from pindou.api.request_meta import client_ip
+from pindou.services.storage_util import get_storage_backend
 from pindou.services.cdk_service import CDKAlreadyRedeemedError, CDKInvalidError, CDKRateLimitError, CDKService
 from pindou.services.email_verification import EmailVerificationService, validate_email_or_raise
 from pindou.services.user_service import UserService
 
 router = APIRouter(prefix="/user", tags=["user"])
+
+AVATAR_MAX_BYTES = 2 * 1024 * 1024
+AVATAR_SIZE_PX = 256
+ALLOWED_AVATAR_TYPES = {
+    "image/jpeg": "JPEG",
+    "image/png": "PNG",
+    "image/webp": "WEBP",
+}
+SENSITIVE_NICKNAME_PATTERNS = [
+    "傻逼",
+    "死妈",
+    "fuck",
+    "shit",
+    "admin",
+    "root",
+    "官方",
+    "客服",
+    "管理员",
+]
+ALLOWED_PRESET_AVATAR_PREFIXES = ("/brand/", "/assets/", "/static/")
 
 
 class LoginRequest(BaseModel):
@@ -47,6 +71,11 @@ class RegisterRequest(BaseModel):
 class EmailPasswordLoginRequest(BaseModel):
     email: str = Field(min_length=3, max_length=255)
     password: str = Field(min_length=1, max_length=128)
+
+
+class ProfilePatchRequest(BaseModel):
+    nickname: str | None = None
+    avatar_url: str | None = Field(default=None, max_length=512)
 
 
 @router.post("/login")
@@ -124,11 +153,102 @@ def get_profile(current_user: CurrentUser) -> dict:
     return current_user.to_frontend_dict()
 
 
+@router.patch("/profile")
+def update_profile(payload: ProfilePatchRequest, current_user: CurrentUser, db: DbSession) -> dict:
+    """更新当前登录用户资料。"""
+    if payload.nickname is None and payload.avatar_url is None:
+        raise ApiException(422, ErrorCode.VALIDATION_ERROR, "请填写要更新的资料。")
+
+    if payload.nickname is not None:
+        current_user.nickname = validate_nickname(payload.nickname)
+
+    if payload.avatar_url is not None:
+        current_user.avatar = validate_preset_avatar_url(payload.avatar_url)
+
+    db.add(current_user)
+    db.commit()
+    db.refresh(current_user)
+    return current_user.to_frontend_dict()
+
+
+@router.post("/avatar")
+async def upload_avatar(
+    current_user: CurrentUser,
+    db: DbSession,
+    image: UploadFile = File(...),
+) -> dict:
+    """上传头像，服务端裁成 256x256 正方形 PNG 后保存。"""
+    content_type = (image.content_type or "").lower()
+    if content_type not in ALLOWED_AVATAR_TYPES:
+        raise ApiException(415, ErrorCode.INVALID_UPLOAD, "头像仅支持 JPG、PNG 或 WEBP 图片。")
+
+    content = await image.read(AVATAR_MAX_BYTES + 1)
+    if len(content) > AVATAR_MAX_BYTES:
+        raise ApiException(413, ErrorCode.INVALID_UPLOAD, "头像图片不能超过 2MB。")
+
+    try:
+        avatar_bytes = make_avatar_png(content, expected_format=ALLOWED_AVATAR_TYPES[content_type])
+    except UnidentifiedImageError as exc:
+        raise ApiException(415, ErrorCode.INVALID_UPLOAD, "头像图片格式不正确，请换一张 JPG、PNG 或 WEBP。") from exc
+    except ValueError as exc:
+        raise ApiException(415, ErrorCode.INVALID_UPLOAD, str(exc)) from exc
+
+    digest = hashlib.sha256(current_user.user_id.encode("utf-8")).hexdigest()[:18]
+    key = f"thumbnails/avatar_{digest}.png"
+    backend = get_storage_backend()
+    backend.upload(key, avatar_bytes, content_type="image/png")
+
+    avatar_url = backend.get_url(key)
+    current_user.avatar = avatar_url
+    db.add(current_user)
+    db.commit()
+    db.refresh(current_user)
+    return {"avatar_url": avatar_url, "user": current_user.to_frontend_dict()}
+
+
 @router.post("/consent")
 def submit_consent(payload: ConsentRequest, current_user: CurrentUser, db: DbSession) -> dict:
     """记录隐私或敏感个人信息处理同意留痕。"""
     consent = UserService(db).record_consent(user_id=current_user.user_id, consent_type=payload.type)
     return {"success": True, "consent_at": consent.consented_at.isoformat()}
+
+
+def validate_nickname(raw: str) -> str:
+    nickname = re.sub(r"\s+", " ", raw.strip())
+    if not nickname:
+        raise ApiException(422, ErrorCode.VALIDATION_ERROR, "昵称不能为空。")
+    if len(nickname) > 20:
+        raise ApiException(422, ErrorCode.VALIDATION_ERROR, "昵称最多 20 个字符。")
+    lowered = nickname.lower()
+    if any(pattern in lowered for pattern in SENSITIVE_NICKNAME_PATTERNS):
+        raise ApiException(422, ErrorCode.VALIDATION_ERROR, "这个昵称暂时不能使用，请换一个更友好的名字。")
+    return nickname
+
+
+def validate_preset_avatar_url(raw: str) -> str:
+    avatar_url = raw.strip()
+    if not avatar_url:
+        raise ApiException(422, ErrorCode.VALIDATION_ERROR, "请选择一个头像。")
+    if not avatar_url.startswith(ALLOWED_PRESET_AVATAR_PREFIXES):
+        raise ApiException(422, ErrorCode.VALIDATION_ERROR, "请选择 PinDou 提供的预设头像。")
+    return avatar_url
+
+
+def make_avatar_png(content: bytes, *, expected_format: str) -> bytes:
+    with Image.open(BytesIO(content)) as image:
+        if image.format != expected_format:
+            raise ValueError("头像图片格式不正确，请换一张 JPG、PNG 或 WEBP。")
+        image = ImageOps.exif_transpose(image).convert("RGBA")
+        side = min(image.width, image.height)
+        if side <= 0:
+            raise ValueError("头像图片无法读取，请换一张图片。")
+        left = (image.width - side) // 2
+        top = (image.height - side) // 2
+        image = image.crop((left, top, left + side, top + side))
+        image = image.resize((AVATAR_SIZE_PX, AVATAR_SIZE_PX), Image.Resampling.LANCZOS)
+        output = BytesIO()
+        image.save(output, format="PNG", optimize=True)
+        return output.getvalue()
 
 
 def _try_redeem_register_cdk(*, db: DbSession, cdk_code: str | None, user_id: str, request_ip: str | None) -> dict:

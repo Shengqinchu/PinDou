@@ -24,6 +24,7 @@ from pindou.main import create_app
 from pindou.providers.base import PreviewResult
 from pindou.services.hupijiao_service import sign_params
 from pindou.services.cdk_service import CDKService
+from pindou.services.storage_util import get_storage_backend
 
 
 @pytest.fixture()
@@ -31,6 +32,7 @@ def api_client(monkeypatch: pytest.MonkeyPatch, tmp_path) -> Iterator[tuple[Test
     monkeypatch.setenv("PINDOU_UPLOAD_DIR", str(tmp_path / "uploads"))
     monkeypatch.setenv("PINDOU_PREVIEW_DIR", str(tmp_path / "previews"))
     monkeypatch.setenv("PINDOU_PATTERN_DIR", str(tmp_path / "patterns"))
+    monkeypatch.setenv("PINDOU_THUMBNAIL_DIR", str(tmp_path / "thumbnails"))
     monkeypatch.setenv("ENABLE_REVERSE_PROXY_HEALTH_MONITOR", "false")
     monkeypatch.setenv("ENABLE_EXPIRED_ORIGINAL_DELETE_TASK", "false")
     monkeypatch.setenv("HUPIJIAO_APP_ID", "")
@@ -39,6 +41,7 @@ def api_client(monkeypatch: pytest.MonkeyPatch, tmp_path) -> Iterator[tuple[Test
     monkeypatch.setenv("ADMIN_USERNAME", "admin")
     monkeypatch.setenv("ADMIN_PASSWORD_HASH", "sha256:8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918")
     get_settings.cache_clear()
+    get_storage_backend.cache_clear()
 
     engine = create_engine(
         "sqlite://",
@@ -59,12 +62,20 @@ def api_client(monkeypatch: pytest.MonkeyPatch, tmp_path) -> Iterator[tuple[Test
         yield client, SessionTesting
     app.dependency_overrides.clear()
     get_settings.cache_clear()
+    get_storage_backend.cache_clear()
 
 
 def png_bytes(color: tuple[int, int, int] = (250, 250, 250)) -> bytes:
     image = Image.new("RGB", (32, 32), color)
     output = io.BytesIO()
     image.save(output, format="PNG")
+    return output.getvalue()
+
+
+def image_bytes(*, image_format: str = "PNG", size: tuple[int, int] = (320, 180)) -> bytes:
+    image = Image.new("RGB", size, (255, 200, 160))
+    output = io.BytesIO()
+    image.save(output, format=image_format)
     return output.getvalue()
 
 
@@ -148,6 +159,89 @@ def test_user_login_profile_consent_and_auth_error(api_client) -> None:
     consent = client.post("/api/user/consent", json={"type": "privacy"}, headers=headers)
     assert consent.status_code == 200
     assert consent.json()["success"] is True
+
+
+def test_update_profile_validates_nickname_and_preset_avatar(api_client) -> None:
+    client, _session_factory = api_client
+    headers = auth_headers(client, consent=False)
+
+    updated = client.patch(
+        "/api/user/profile",
+        json={"nickname": "  小拼 豆  ", "avatar_url": "/brand/logo.png"},
+        headers=headers,
+    )
+    assert updated.status_code == 200
+    payload = updated.json()
+    assert payload["nickname"] == "小拼 豆"
+    assert payload["avatar"] == "/brand/logo.png"
+    assert "free_credits_remaining" in payload
+    assert "paid_credits" in payload
+
+    empty = client.patch("/api/user/profile", json={"nickname": "   "}, headers=headers)
+    assert empty.status_code == 422
+    assert empty.json()["message_cn"] == "昵称不能为空。"
+
+    too_long = client.patch("/api/user/profile", json={"nickname": "豆" * 21}, headers=headers)
+    assert too_long.status_code == 422
+    assert too_long.json()["message_cn"] == "昵称最多 20 个字符。"
+
+    sensitive = client.patch("/api/user/profile", json={"nickname": "官方客服"}, headers=headers)
+    assert sensitive.status_code == 422
+    assert "昵称" in sensitive.json()["message_cn"]
+
+    bad_avatar = client.patch("/api/user/profile", json={"avatar_url": "https://example.com/avatar.png"}, headers=headers)
+    assert bad_avatar.status_code == 422
+    assert bad_avatar.json()["message_cn"] == "请选择 PinDou 提供的预设头像。"
+
+
+def test_upload_avatar_validates_type_size_and_stores_square_png(api_client, tmp_path) -> None:
+    client, session_factory = api_client
+    headers = auth_headers(client, consent=False)
+
+    uploaded = client.post(
+        "/api/user/avatar",
+        files={"image": ("avatar.png", image_bytes(image_format="PNG", size=(320, 180)), "image/png")},
+        headers=headers,
+    )
+    assert uploaded.status_code == 200
+    payload = uploaded.json()
+    assert payload["avatar_url"].startswith("/static/thumbnails/avatar_")
+    assert payload["user"]["avatar"] == payload["avatar_url"]
+
+    avatar_path = tmp_path / "thumbnails" / payload["avatar_url"].rsplit("/", 1)[-1]
+    assert avatar_path.exists()
+    with Image.open(avatar_path) as avatar:
+        assert avatar.size == (256, 256)
+        assert avatar.format == "PNG"
+
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid == payload["user"]["user_id"]))
+        assert user is not None
+        assert user.avatar == payload["avatar_url"]
+
+    too_large = client.post(
+        "/api/user/avatar",
+        files={"image": ("huge.png", b"x" * (2 * 1024 * 1024 + 1), "image/png")},
+        headers=headers,
+    )
+    assert too_large.status_code == 413
+    assert too_large.json()["message_cn"] == "头像图片不能超过 2MB。"
+
+    wrong_type = client.post(
+        "/api/user/avatar",
+        files={"image": ("avatar.gif", b"GIF89a", "image/gif")},
+        headers=headers,
+    )
+    assert wrong_type.status_code == 415
+    assert wrong_type.json()["message_cn"] == "头像仅支持 JPG、PNG 或 WEBP 图片。"
+
+    wrong_content = client.post(
+        "/api/user/avatar",
+        files={"image": ("avatar.png", image_bytes(image_format="JPEG"), "image/png")},
+        headers=headers,
+    )
+    assert wrong_content.status_code == 415
+    assert wrong_content.json()["message_cn"] == "头像图片格式不正确，请换一张 JPG、PNG 或 WEBP。"
 
 
 def test_artwork_gallery_paginates_current_user(api_client) -> None:

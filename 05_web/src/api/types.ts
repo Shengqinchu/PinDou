@@ -16,6 +16,11 @@ export interface User {
   sensitive_consent_at?: string | null;
 }
 
+export interface AvatarUploadResponse {
+  avatar_url: string;
+  user: User;
+}
+
 export interface ColorRef {
   brand: string;
   code: string;

@@ -5,6 +5,7 @@ import { apiRequest } from './client';
 import type {
   Artwork,
   ArtworkListResponse,
+  AvatarUploadResponse,
   ConsentResponse,
   GenerationJobResponse,
   GenerateScriptResponse,
@@ -76,6 +77,22 @@ export function emailPasswordLogin(email: string, password: string): Promise<Aut
 
 export function getProfile(): Promise<User> {
   return apiRequest<User>('/user/profile');
+}
+
+export function updateProfile(payload: { nickname?: string; avatar_url?: string }): Promise<User> {
+  return apiRequest<User>('/user/profile', {
+    method: 'PATCH',
+    body: payload
+  });
+}
+
+export function uploadAvatar(file: File): Promise<AvatarUploadResponse> {
+  const form = new FormData();
+  form.set('image', file);
+  return apiRequest<AvatarUploadResponse>('/user/avatar', {
+    method: 'POST',
+    body: form
+  });
 }
 
 export function submitConsent(type: 'privacy' | 'sensitive'): Promise<ConsentResponse> {
