@@ -6,6 +6,16 @@
 
 ---
 
+## 0. 当前 Web 域名
+
+- 正式入口：`https://pindoupuppy.com/`
+- 同源 API：`https://pindoupuppy.com/api/v1`
+- 健康检查：`https://pindoupuppy.com/health`
+- 对外验收、用户链接、截图和文档统一使用主域。旧 staging 子域仅保留为临时兼容/回滚入口，不再作为正式入口。
+- Cloudflare 主域规则必须指向当前 05_web Web 源站；如果看到 `/` 跳到 `/h5/` 或 `/health` 为边缘 404，说明仍命中旧 H5/Worker 规则，需要先在 Cloudflare 侧切换主域路由。
+
+---
+
 ## 1. 架构
 
 ```text

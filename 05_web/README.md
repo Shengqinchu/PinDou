@@ -2,6 +2,12 @@
 
 Batch 0 只搭地基：Vite + Vue 3 + TypeScript + Pinia + vue-router History mode。
 
+## 当前线上入口
+
+- 正式 Web 域名：`https://pindoupuppy.com/`
+- 浏览器端 API：同源 `https://pindoupuppy.com/api/v1`
+- 验收、用户链接和截图统一使用主域；旧 staging 子域只作为临时兼容/回滚入口，不再作为对外口径。
+
 ## Cloudflare Pages 配置
 
 - Project root: `05_web`
