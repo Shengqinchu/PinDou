@@ -8,7 +8,7 @@ from typing import Any
 
 from PIL import Image, ImageOps, UnidentifiedImageError
 from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -79,9 +79,49 @@ class ArtworkService:
         )
         return [self.to_frontend_dict(artwork) for artwork in artworks]
 
+    def count_artworks(self, *, user_id: str) -> int:
+        total = self.session.scalar(select(func.count()).select_from(Artwork).where(Artwork.user_id == user_id))
+        return int(total or 0)
+
+    def list_gallery_artworks(self, *, user_id: str, limit: int = 12, offset: int = 0) -> list[dict[str, Any]]:
+        artworks = list(
+            self.session.scalars(
+                select(Artwork)
+                .where(Artwork.user_id == user_id)
+                .order_by(Artwork.created_at.desc(), Artwork.artwork_id.desc())
+                .offset(offset)
+                .limit(limit)
+            )
+        )
+        return [self.to_gallery_dict(artwork) for artwork in artworks]
+
     def to_frontend_dict(self, artwork: Artwork) -> dict[str, Any]:
         self.ensure_thumbnail(artwork)
         return artwork.to_frontend_dict()
+
+    def to_gallery_dict(self, artwork: Artwork) -> dict[str, Any]:
+        pattern_json = artwork.pattern_json if isinstance(artwork.pattern_json, dict) else {}
+        metadata = pattern_json.get("metadata", {}) if isinstance(pattern_json.get("metadata"), dict) else {}
+        color_counts = pattern_json.get("color_counts", {})
+        if not isinstance(color_counts, dict):
+            color_counts = {}
+        bead_total = _safe_int(pattern_json.get("bead_total"), default=sum(_safe_int(value) for value in color_counts.values()))
+        color_count = len([value for value in color_counts.values() if _safe_int(value) > 0])
+        if color_count == 0 and isinstance(pattern_json.get("palette_used"), list):
+            color_count = len(pattern_json["palette_used"])
+        thumbnail_url = self.ensure_thumbnail(artwork) or metadata.get("thumbnail_url") or artwork.preview_path
+
+        return {
+            "artwork_id": artwork.artwork_id,
+            "title": artwork.title,
+            "thumbnail_url": thumbnail_url,
+            "preview_url": artwork.preview_url,
+            "size_preset": artwork.size_preset,
+            "bead_count": bead_total,
+            "color_count": color_count,
+            "style_preset": artwork.style_preset,
+            "created_at": artwork.to_frontend_dict()["created_at"],
+        }
 
     def ensure_thumbnail(self, artwork: Artwork) -> str | None:
         pattern_json = artwork.pattern_json if isinstance(artwork.pattern_json, dict) else {}
@@ -144,6 +184,13 @@ def delete_file_if_exists(path: str | Path | None) -> bool:
         target.unlink()
         return True
     return False
+
+
+def _safe_int(value: Any, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def create_square_thumbnail_bytes(source: bytes) -> bytes:

@@ -4,6 +4,7 @@ export * from './types';
 import { apiRequest } from './client';
 import type {
   Artwork,
+  ArtworkListResponse,
   ConsentResponse,
   GenerationJobResponse,
   GenerateScriptResponse,
@@ -124,6 +125,11 @@ export function getGenerationStatus(jobId: string): Promise<GenerationJobRespons
 
 export function getArtworkDetail(artworkId: string): Promise<Artwork> {
   return apiRequest<Artwork>(`/artwork/${encodeURIComponent(artworkId)}`);
+}
+
+export function getArtworkGallery(page = 1, size = 12): Promise<ArtworkListResponse> {
+  const params = new URLSearchParams({ page: String(page), size: String(size) });
+  return apiRequest<ArtworkListResponse>(`/artwork/gallery?${params.toString()}`);
 }
 
 export function saveArtworkPattern(

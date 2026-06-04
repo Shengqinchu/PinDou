@@ -6,9 +6,9 @@ import HomePage from '../views/HomePage.vue';
 import LoginPage from '../views/LoginPage.vue';
 import LoadingPage from '../views/LoadingPage.vue';
 import MePage from '../views/MePage.vue';
-import PlaceholderPage from '../views/PlaceholderPage.vue';
 import ResultPage from '../views/ResultPage.vue';
 import UploadPage from '../views/UploadPage.vue';
+import WorksPage from '../views/WorksPage.vue';
 
 const protectedRoutes = new Set(['upload', 'loading', 'result', 'works', 'me']);
 
@@ -38,7 +38,7 @@ export const router = createRouter({
     {
       path: '/works',
       name: 'works',
-      component: PlaceholderPage,
+      component: WorksPage,
       meta: { title: '作品集', requiresAuth: true }
     },
     {

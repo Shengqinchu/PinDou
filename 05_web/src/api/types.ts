@@ -92,6 +92,26 @@ export interface Artwork {
   updated_at?: string;
 }
 
+export interface ArtworkListItem {
+  artwork_id: string;
+  title?: string | null;
+  thumbnail_url?: string | null;
+  preview_url?: string | null;
+  size_preset: SizePreset | string;
+  bead_count: number;
+  color_count: number;
+  style_preset?: StylePreset | string;
+  created_at?: string;
+}
+
+export interface ArtworkListResponse {
+  items: ArtworkListItem[];
+  total: number;
+  page: number;
+  size: number;
+  has_more: boolean;
+}
+
 export interface GenerateScriptResponse {
   artwork_id: string;
   pattern_url: string;

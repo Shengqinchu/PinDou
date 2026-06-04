@@ -150,6 +150,101 @@ def test_user_login_profile_consent_and_auth_error(api_client) -> None:
     assert consent.json()["success"] is True
 
 
+def test_artwork_gallery_paginates_current_user(api_client) -> None:
+    client, session_factory = api_client
+    headers = auth_headers(client)
+    profile = client.get("/api/user/profile", headers=headers).json()
+    user_id = profile["user_id"]
+
+    pattern_one = {
+        "color_counts": {"H7": 12, "G11": 4},
+        "bead_total": 16,
+        "palette_used": [{"code": "H7"}, {"code": "G11"}],
+        "metadata": {"thumbnail_url": "/static/thumbnails/a.png"},
+    }
+    pattern_two = {
+        "color_counts": {"F23": 7},
+        "bead_total": 7,
+        "palette_used": [{"code": "F23"}],
+        "metadata": {"thumbnail_url": "/static/thumbnails/b.png"},
+    }
+    pattern_three = {
+        "color_counts": {"A1": 2, "B2": 1, "C3": 1},
+        "bead_total": 4,
+        "palette_used": [{"code": "A1"}, {"code": "B2"}, {"code": "C3"}],
+        "metadata": {"thumbnail_url": "/static/thumbnails/c.png"},
+    }
+
+    with session_factory() as session:
+        session.add_all(
+            [
+                Artwork(
+                    artwork_id="older",
+                    user_id=user_id,
+                    preview_path="/static/previews/older.png",
+                    pattern_json=pattern_one,
+                    style_preset="q_portrait",
+                    size_preset="52x52",
+                    title="旧作品",
+                    created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                ),
+                Artwork(
+                    artwork_id="middle",
+                    user_id=user_id,
+                    preview_path="/static/previews/middle.png",
+                    pattern_json=pattern_two,
+                    style_preset="q_pet",
+                    size_preset="26x26",
+                    title=None,
+                    created_at=datetime(2026, 1, 2, tzinfo=timezone.utc),
+                ),
+                Artwork(
+                    artwork_id="newest",
+                    user_id=user_id,
+                    preview_path="/static/previews/newest.png",
+                    pattern_json=pattern_three,
+                    style_preset="cartoon_fallback",
+                    size_preset="78x78",
+                    title="新作品",
+                    created_at=datetime(2026, 1, 3, tzinfo=timezone.utc),
+                ),
+                User(openid="other-user", nickname="Other"),
+                Artwork(
+                    artwork_id="other-artwork",
+                    user_id="other-user",
+                    preview_path="/static/previews/other.png",
+                    pattern_json=pattern_one,
+                    style_preset="q_pet",
+                    size_preset="104x104",
+                    title="别人的作品",
+                    created_at=datetime(2026, 1, 4, tzinfo=timezone.utc),
+                ),
+            ]
+        )
+        session.commit()
+
+    unauthorized = client.get("/api/artwork/gallery")
+    assert unauthorized.status_code == 401
+
+    page_one = client.get("/api/artwork/gallery?page=1&size=2", headers=headers)
+    assert page_one.status_code == 200
+    payload = page_one.json()
+    assert payload["total"] == 3
+    assert payload["page"] == 1
+    assert payload["size"] == 2
+    assert payload["has_more"] is True
+    assert [item["artwork_id"] for item in payload["items"]] == ["newest", "middle"]
+    assert payload["items"][0]["bead_count"] == 4
+    assert payload["items"][0]["color_count"] == 3
+    assert "pattern_data" not in payload["items"][0]
+
+    page_two = client.get("/api/artwork/gallery?page=2&size=2", headers=headers)
+    assert page_two.status_code == 200
+    payload = page_two.json()
+    assert payload["has_more"] is False
+    assert [item["artwork_id"] for item in payload["items"]] == ["older"]
+
+
 def test_email_code_login_uses_shared_db_and_returns_email_user(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
     client, session_factory = api_client
     sent_codes = capture_email_codes(monkeypatch)

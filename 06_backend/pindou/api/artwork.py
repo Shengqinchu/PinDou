@@ -35,6 +35,27 @@ def list_artworks(
     return ArtworkService(db).list_frontend_artworks(user_id=current_user.user_id, limit=limit, offset=offset)
 
 
+@router.get("/gallery")
+def list_artwork_gallery(
+    current_user: CurrentUser,
+    db: DbSession,
+    page: int = Query(default=1, ge=1),
+    size: int = Query(default=12, ge=1, le=50),
+) -> dict:
+    """返回当前用户作品集轻量摘要，供 Web /works 分页使用。"""
+    offset = (page - 1) * size
+    service = ArtworkService(db)
+    total = service.count_artworks(user_id=current_user.user_id)
+    items = service.list_gallery_artworks(user_id=current_user.user_id, limit=size, offset=offset)
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "size": size,
+        "has_more": offset + len(items) < total,
+    }
+
+
 @router.get("/{artwork_id}")
 def get_artwork(artwork_id: str, current_user: CurrentUser, db: DbSession) -> dict:
     """返回单个作品详情。"""
