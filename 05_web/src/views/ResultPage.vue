@@ -38,6 +38,10 @@ const isDirty = ref(false);
 const saveMessage = ref('');
 const saveError = ref('');
 const skipSourcePatternReset = ref(false);
+const isRegenerateModalOpen = ref(false);
+const draftMode = ref<GenerationMode>(generation.generationMode);
+const draftStyle = ref<GenerationStylePreset>(generation.selectedStyle);
+const draftSize = ref<ResultSizePreset>(generation.selectedSize);
 
 const sourcePattern = computed(() => generation.currentPattern);
 const pattern = computed(() => editablePattern.value);
@@ -47,10 +51,6 @@ const selectedSizeNumber = computed(() => generation.selectedSize.split('x')[0])
 const sizeLabel = computed(() => generation.selectedSize.replace('x', ' × '));
 const colorTotal = computed(() => pattern.value?.palette_used.length || 0);
 const beadTotal = computed(() => pattern.value?.bead_total || 0);
-const estimatedCost = computed(() => {
-  const value = pattern.value?.estimated_cost_cny;
-  return typeof value === 'number' && Number.isFinite(value) ? value.toFixed(1) : '';
-});
 
 const paletteRows = computed<PaletteRow[]>(() => {
   const sheet = pattern.value;
@@ -68,10 +68,6 @@ const paletteRows = computed<PaletteRow[]>(() => {
 
 const canUndo = computed(() => undoStack.value.length > 0);
 const canRedo = computed(() => redoStack.value.length > 0);
-const retryCtaLabel = computed(() => {
-  const mode = generation.generationMode === 'ai' ? 'AI 重新生成' : '快速重新生成';
-  return `${mode} · ${generation.selectedSize.split('x')[0]}格`;
-});
 
 onMounted(() => {
   void loadArtworkIfNeeded();
@@ -112,41 +108,45 @@ async function loadArtworkIfNeeded(): Promise<void> {
   }
 }
 
-async function chooseSize(size: ResultSizePreset): Promise<void> {
-  sizeNotice.value = '';
-  if (size === generation.selectedSize) {
-    return;
-  }
-
-  generation.setSize(size);
-  if (!generation.sourceFile) {
-    sizeNotice.value = '当前页面没有保留原图，请回到上传页重新选择后生成这个尺寸。';
-    return;
-  }
-  sizeNotice.value = `已选择 ${size.split('x')[0]} 格，点击重新生成后生效。`;
-}
-
-function chooseMode(mode: GenerationMode): void {
-  generation.setGenerationMode(mode);
-  if (generation.sourceFile) {
-    sizeNotice.value = `已选择${GENERATION_MODE_DETAILS[mode].label}，点击重新生成后生效。`;
-  }
-}
-
-function chooseStyle(style: GenerationStylePreset): void {
-  generation.setStyle(style);
-  generation.setGenerationMode('ai');
-  if (generation.sourceFile) {
-    sizeNotice.value = `已选择${STYLE_OPTION_DETAILS[style].label}，点击重新生成后生效。`;
-  }
-}
-
-async function regenerate(): Promise<void> {
+function openRegenerateModal(): void {
   sizeNotice.value = '';
   if (!generation.sourceFile) {
     sizeNotice.value = '重新生成需要原图，请回到上传页重新选择照片。';
     return;
   }
+  draftMode.value = generation.generationMode;
+  draftStyle.value = generation.selectedStyle;
+  draftSize.value = generation.selectedSize;
+  isRegenerateModalOpen.value = true;
+}
+
+function closeRegenerateModal(): void {
+  isRegenerateModalOpen.value = false;
+}
+
+function chooseDraftMode(mode: GenerationMode): void {
+  draftMode.value = mode;
+}
+
+function chooseDraftStyle(style: GenerationStylePreset): void {
+  draftStyle.value = style;
+  draftMode.value = 'ai';
+}
+
+function chooseDraftSize(size: ResultSizePreset): void {
+  draftSize.value = size;
+}
+
+async function confirmRegenerate(): Promise<void> {
+  if (!generation.sourceFile) {
+    closeRegenerateModal();
+    sizeNotice.value = '重新生成需要原图，请回到上传页重新选择照片。';
+    return;
+  }
+  generation.setGenerationMode(draftMode.value);
+  generation.setStyle(draftStyle.value);
+  generation.setSize(draftSize.value);
+  closeRegenerateModal();
   await router.push({ name: 'loading', query: { retry: '1', size: generation.selectedSize } });
 }
 
@@ -350,7 +350,7 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
           <button class="pd-btn pd-btn--primary" type="button" :disabled="!isDirty || isSaving" @click="savePatternEdits">
             {{ isSaving ? '保存中' : '保存图纸' }}
           </button>
-          <button class="pd-btn pd-btn--primary" type="button" @click="regenerate">重新生成</button>
+          <button class="pd-btn pd-btn--primary" type="button" @click="openRegenerateModal">重新生成</button>
           <RouterLink class="pd-btn result-secondary" to="/upload">换一张照片</RouterLink>
         </div>
       </header>
@@ -362,55 +362,7 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
           </div>
           <p v-if="saveMessage" class="edit-status">{{ saveMessage }}</p>
           <p v-else-if="saveError" class="edit-status edit-status--error">{{ saveError }}</p>
-
-          <div class="retry-panel" aria-label="重新生成设置">
-            <div class="retry-panel__head">
-              <strong>重新生成</strong>
-              <button type="button" :disabled="!hasSourceFile" @click="regenerate">{{ retryCtaLabel }}</button>
-            </div>
-
-            <div class="retry-group" aria-label="生成方式">
-              <button
-                v-for="mode in GENERATION_MODE_OPTIONS"
-                :key="mode"
-                type="button"
-                :class="{ 'retry-chip--active': mode === generation.generationMode }"
-                :aria-pressed="mode === generation.generationMode"
-                @click="chooseMode(mode)"
-              >
-                {{ GENERATION_MODE_DETAILS[mode].label }}
-              </button>
-            </div>
-
-            <div class="retry-group" aria-label="风格">
-              <button
-                v-for="style in STYLE_OPTIONS"
-                :key="style"
-                type="button"
-                :class="{ 'retry-chip--active': style === generation.selectedStyle }"
-                :aria-pressed="style === generation.selectedStyle"
-                @click="chooseStyle(style)"
-              >
-                {{ STYLE_OPTION_DETAILS[style].label }}
-              </button>
-            </div>
-
-            <div class="size-switch" aria-label="尺寸切换">
-              <button
-                v-for="size in RESULT_SIZE_OPTIONS"
-                :key="size"
-                type="button"
-                :class="{ 'size-switch__item--active': size === generation.selectedSize }"
-                :aria-pressed="size === generation.selectedSize"
-                @click="chooseSize(size)"
-              >
-                <strong>{{ size.split('x')[0] }}</strong>
-                <span>格</span>
-              </button>
-            </div>
-          </div>
           <p v-if="sizeNotice" class="size-notice">{{ sizeNotice }}</p>
-          <p v-else-if="hasSourceFile" class="size-hint">可换方式、风格或格数后再次生成。</p>
         </section>
 
         <aside class="summary-panel" aria-label="图纸摘要">
@@ -429,11 +381,6 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
               <dt>色号</dt>
               <dd>{{ colorTotal }}</dd>
               <small>种</small>
-            </div>
-            <div>
-              <dt>预估</dt>
-              <dd>{{ estimatedCost || '-' }}</dd>
-              <small>元</small>
             </div>
           </dl>
 
@@ -466,6 +413,82 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
         <RouterLink class="pd-btn pd-btn--primary" to="/upload">去上传</RouterLink>
       </div>
     </template>
+
+    <div v-if="isRegenerateModalOpen" class="regen-modal-backdrop" @click.self="closeRegenerateModal">
+      <section class="regen-modal" role="dialog" aria-modal="true" aria-labelledby="regen-title">
+        <header class="regen-modal__header">
+          <div>
+            <p class="eyebrow">重新生成</p>
+            <h2 id="regen-title">调整参数后再试一次</h2>
+          </div>
+          <button class="regen-modal__close" type="button" aria-label="关闭" @click="closeRegenerateModal">×</button>
+        </header>
+
+        <div class="regen-modal__section">
+          <div class="regen-modal__section-title">
+            <strong>生成方式</strong>
+          </div>
+          <div class="regen-choice-grid regen-choice-grid--mode">
+            <button
+              v-for="mode in GENERATION_MODE_OPTIONS"
+              :key="mode"
+              type="button"
+              class="regen-choice"
+              :class="{ 'regen-choice--active': mode === draftMode }"
+              :aria-pressed="mode === draftMode"
+              @click="chooseDraftMode(mode)"
+            >
+              <strong>{{ GENERATION_MODE_DETAILS[mode].label }}</strong>
+              <span>{{ GENERATION_MODE_DETAILS[mode].hint }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="regen-modal__section">
+          <div class="regen-modal__section-title">
+            <strong>风格</strong>
+          </div>
+          <div class="regen-choice-grid regen-choice-grid--style">
+            <button
+              v-for="style in STYLE_OPTIONS"
+              :key="style"
+              type="button"
+              class="regen-choice regen-choice--style"
+              :class="{ 'regen-choice--active': style === draftStyle && draftMode === 'ai' }"
+              :aria-pressed="style === draftStyle && draftMode === 'ai'"
+              @click="chooseDraftStyle(style)"
+            >
+              <img :src="STYLE_OPTION_DETAILS[style].iconSrc" alt="" aria-hidden="true" />
+              <span>{{ STYLE_OPTION_DETAILS[style].label }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="regen-modal__section">
+          <div class="regen-modal__section-title">
+            <strong>目标格数</strong>
+          </div>
+          <div class="size-switch size-switch--modal" aria-label="重新生成尺寸">
+            <button
+              v-for="size in RESULT_SIZE_OPTIONS"
+              :key="size"
+              type="button"
+              :class="{ 'size-switch__item--active': size === draftSize }"
+              :aria-pressed="size === draftSize"
+              @click="chooseDraftSize(size)"
+            >
+              <strong>{{ size.split('x')[0] }}</strong>
+              <span>格</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="regen-modal__actions">
+          <button class="pd-btn result-secondary" type="button" @click="closeRegenerateModal">取消</button>
+          <button class="pd-btn pd-btn--primary" type="button" @click="confirmRegenerate">确认重新生成</button>
+        </div>
+      </section>
+    </div>
   </section>
 </template>
 
@@ -591,90 +614,6 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
   color: #c42535;
 }
 
-.retry-panel {
-  display: grid;
-  gap: 12px;
-  margin-top: 16px;
-  border: 1px solid rgba(237, 228, 218, 0.86);
-  border-radius: 20px;
-  background: rgba(255, 241, 232, 0.5);
-  padding: 14px;
-}
-
-.retry-panel__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.retry-panel__head strong {
-  color: var(--pd-fg-1);
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.retry-panel__head button {
-  appearance: none;
-  min-height: 36px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--pd-gradient);
-  color: #fff;
-  cursor: pointer;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 900;
-  padding: 0 14px;
-  box-shadow: var(--pd-shadow-cta);
-}
-
-.retry-panel__head button:disabled {
-  background: #ede5dd;
-  color: #9b8e84;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.retry-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.retry-group button {
-  appearance: none;
-  min-height: 34px;
-  border: 1px solid var(--pd-stroke);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.82);
-  color: var(--pd-fg-1);
-  cursor: pointer;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 900;
-  padding: 0 12px;
-  transition:
-    border-color 180ms var(--pd-ease-out),
-    background 180ms var(--pd-ease-out),
-    box-shadow 180ms var(--pd-ease-out),
-    color 180ms var(--pd-ease-out),
-    transform 180ms var(--pd-ease-out);
-}
-
-.retry-group button:hover {
-  border-color: rgba(255, 142, 83, 0.42);
-  background: #fff;
-  box-shadow: 0 10px 20px rgba(255, 142, 83, 0.1);
-  transform: translateY(-1px);
-}
-
-.retry-chip--active {
-  border-color: transparent !important;
-  background: var(--pd-gradient-warm) !important;
-  color: #fff !important;
-}
-
 .size-switch {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -753,9 +692,204 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
   color: var(--pd-fg-2);
 }
 
+.regen-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(48, 38, 30, 0.28);
+  padding: 18px;
+  backdrop-filter: blur(10px);
+}
+
+.regen-modal {
+  width: min(100%, 560px);
+  max-height: min(760px, calc(100vh - 36px));
+  overflow: auto;
+  border: 1px solid rgba(237, 228, 218, 0.88);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 248, 244, 0.98), rgba(255, 255, 255, 0.96)),
+    #fff;
+  box-shadow: 0 28px 80px rgba(88, 55, 34, 0.2);
+  padding: 24px;
+  animation: modal-in 180ms var(--pd-ease-out);
+}
+
+.regen-modal__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.regen-modal__header .eyebrow {
+  margin-bottom: 6px;
+}
+
+.regen-modal__header h2 {
+  margin: 0;
+  color: var(--pd-fg-1);
+  font-family: var(--pd-font-display);
+  font-size: 26px;
+  line-height: 1.14;
+}
+
+.regen-modal__close {
+  appearance: none;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 142, 83, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--pd-fg-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.regen-modal__close:hover {
+  border-color: rgba(255, 142, 83, 0.48);
+  box-shadow: 0 12px 28px rgba(255, 142, 83, 0.14);
+  transform: translateY(-1px);
+}
+
+.regen-modal__section {
+  display: grid;
+  gap: 10px;
+}
+
+.regen-modal__section + .regen-modal__section {
+  margin-top: 18px;
+}
+
+.regen-modal__section-title strong {
+  color: var(--pd-fg-1);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.regen-choice-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.regen-choice-grid--mode {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.regen-choice-grid--style {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.regen-choice {
+  appearance: none;
+  min-height: 84px;
+  border: 1px solid var(--pd-stroke);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--pd-fg-1);
+  cursor: pointer;
+  font: inherit;
+  padding: 14px;
+  text-align: left;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    background 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    color 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.regen-choice:hover {
+  border-color: rgba(255, 142, 83, 0.46);
+  background: #fff;
+  box-shadow: 0 14px 30px rgba(255, 142, 83, 0.12);
+  transform: translateY(-2px);
+}
+
+.regen-choice strong,
+.regen-choice span {
+  display: block;
+}
+
+.regen-choice strong {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.regen-choice span {
+  margin-top: 6px;
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.regen-choice--active {
+  border-color: transparent;
+  background: var(--pd-gradient-warm);
+  color: #fff;
+  box-shadow: var(--pd-shadow-cta);
+}
+
+.regen-choice--active span {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.regen-choice--style {
+  min-height: 86px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.regen-choice--style img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.regen-choice--style span {
+  margin-top: 8px;
+  color: inherit;
+  font-size: 14px;
+}
+
+.size-switch--modal {
+  margin: 0;
+}
+
+.regen-modal__actions {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .result-stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin: 0 0 22px;
 }
@@ -899,13 +1033,65 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
     gap: 8px;
   }
 
-  .retry-panel__head {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
   .size-switch button {
     min-height: 62px;
+  }
+
+  .regen-modal {
+    border-radius: 22px;
+    padding: 18px;
+  }
+
+  .regen-modal__header {
+    margin-bottom: 16px;
+  }
+
+  .regen-modal__header h2 {
+    font-size: 24px;
+  }
+
+  .regen-modal__section + .regen-modal__section {
+    margin-top: 14px;
+  }
+
+  .regen-choice-grid--mode {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .regen-choice-grid--style {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .regen-choice {
+    min-height: 74px;
+    padding: 12px;
+  }
+
+  .regen-choice strong {
+    font-size: 14px;
+  }
+
+  .regen-choice span {
+    font-size: 11px;
+  }
+
+  .regen-choice--style {
+    min-height: 76px;
+    text-align: center;
+  }
+
+  .regen-choice--style img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .regen-choice--style span {
+    margin: 6px 0 0;
+  }
+
+  .regen-modal__actions {
+    grid-template-columns: 0.8fr 1.2fr;
+    margin-top: 18px;
   }
 
   .palette-row {

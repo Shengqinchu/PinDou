@@ -52,6 +52,12 @@ const progressSub = computed(() => {
   const style = generation.generationMode === 'ai' ? ` · ${styleLabel.value}` : '';
   return `${fileName} · ${modeLabel.value}${style} · ${selectedSizeLabel.value}格`;
 });
+const filledCells = computed(() => {
+  if (error.value) {
+    return 0;
+  }
+  return Math.max(1, Math.min(64, Math.round((progress.value / 100) * 64)));
+});
 
 onMounted(() => {
   const querySize = String(route.query.size || '');
@@ -116,18 +122,24 @@ function stopProgress(): void {
   <section class="loading-page">
     <div class="loading-panel">
       <div class="loading-copy">
-        <p class="eyebrow">Generating</p>
+        <p class="eyebrow">生成中</p>
         <h1>{{ progressHeadline }}</h1>
         <p class="loading-sub">{{ progressSub }}</p>
       </div>
 
       <div
-        class="bead-loader"
-        :class="{ 'bead-loader--error': error }"
-        :style="{ '--progress': progress }"
+        class="bead-grid-loader"
+        :class="{ 'bead-grid-loader--error': error }"
         aria-hidden="true"
       >
-        <span v-for="index in 16" :key="index"></span>
+        <div class="bead-grid">
+          <span
+            v-for="index in 64"
+            :key="index"
+            :class="{ 'bead-grid__cell--filled': index <= filledCells }"
+            :style="{ '--cell-delay': `${(index % 8) * 28 + Math.floor((index - 1) / 8) * 42}ms` }"
+          ></span>
+        </div>
         <strong>{{ error ? '!' : `${progress}%` }}</strong>
       </div>
 
@@ -205,72 +217,75 @@ function stopProgress(): void {
   word-break: break-word;
 }
 
-.bead-loader {
-  --loader-size: 154px;
-  position: relative;
-  width: var(--loader-size);
-  height: var(--loader-size);
+.bead-grid-loader {
   display: grid;
-  place-items: center;
+  justify-items: center;
+  gap: 14px;
   margin: 0 auto 22px;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 50% 50%, #fff 0 45%, transparent 46%),
-    conic-gradient(var(--pd-orange) calc(var(--progress, 0) * 1%), rgba(237, 228, 218, 0.9) 0);
-  box-shadow: inset 0 0 0 12px #fff, var(--pd-shadow-cta);
-  animation: breathe 1.5s var(--pd-ease-out) infinite alternate;
 }
 
-.bead-loader span {
-  position: absolute;
-  left: calc(50% - 8px);
-  top: calc(50% - 8px);
+.bead-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 16px);
+  gap: 7px;
+  border: 1px solid rgba(237, 228, 218, 0.9);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(255, 241, 232, 0.9), rgba(255, 255, 255, 0.94)),
+    #fff;
+  box-shadow:
+    inset 0 0 0 8px rgba(255, 255, 255, 0.62),
+    0 20px 46px rgba(255, 142, 83, 0.14);
+  padding: 20px;
+}
+
+.bead-grid span {
   width: 16px;
   height: 16px;
+  border: 1px solid rgba(222, 211, 199, 0.82);
   border-radius: 999px;
-  background: var(--pd-peach);
-  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.55);
-  transform:
-    rotate(calc((var(--i, 1) - 1) * 22.5deg))
-    translateY(-66px);
+  background: rgba(245, 239, 232, 0.86);
+  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.64);
+  transform: scale(0.92);
+  transition:
+    background 220ms var(--pd-ease-out) var(--cell-delay, 0ms),
+    border-color 220ms var(--pd-ease-out) var(--cell-delay, 0ms),
+    box-shadow 220ms var(--pd-ease-out) var(--cell-delay, 0ms),
+    transform 220ms var(--pd-ease-out) var(--cell-delay, 0ms);
 }
 
-.bead-loader span:nth-child(1) { --i: 1; background: #ffb088; }
-.bead-loader span:nth-child(2) { --i: 2; background: #ff8e53; }
-.bead-loader span:nth-child(3) { --i: 3; background: #ff6b9d; }
-.bead-loader span:nth-child(4) { --i: 4; background: #b8a4ed; }
-.bead-loader span:nth-child(5) { --i: 5; background: #a4d4c5; }
-.bead-loader span:nth-child(6) { --i: 6; background: #e8b94a; }
-.bead-loader span:nth-child(7) { --i: 7; background: #ffb088; }
-.bead-loader span:nth-child(8) { --i: 8; background: #ff8e53; }
-.bead-loader span:nth-child(9) { --i: 9; background: #ff6b9d; }
-.bead-loader span:nth-child(10) { --i: 10; background: #b8a4ed; }
-.bead-loader span:nth-child(11) { --i: 11; background: #a4d4c5; }
-.bead-loader span:nth-child(12) { --i: 12; background: #e8b94a; }
-.bead-loader span:nth-child(13) { --i: 13; background: #ffb088; }
-.bead-loader span:nth-child(14) { --i: 14; background: #ff8e53; }
-.bead-loader span:nth-child(15) { --i: 15; background: #ff6b9d; }
-.bead-loader span:nth-child(16) { --i: 16; background: #b8a4ed; }
+.bead-grid__cell--filled {
+  border-color: rgba(255, 142, 83, 0.38) !important;
+  background: linear-gradient(145deg, #ffb58f, #ff8f5b) !important;
+  box-shadow:
+    inset 0 0 0 4px rgba(255, 255, 255, 0.42),
+    0 8px 15px rgba(255, 142, 83, 0.16) !important;
+  transform: scale(1) !important;
+  animation: bead-settle 1.4s var(--pd-ease-out) infinite alternate;
+  animation-delay: var(--cell-delay, 0ms);
+}
 
-.bead-loader strong {
-  width: 92px;
-  height: 92px;
+.bead-grid-loader strong {
+  min-width: 74px;
+  min-height: 36px;
   display: grid;
   place-items: center;
+  border: 1px solid rgba(255, 142, 83, 0.22);
   border-radius: 999px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.86);
   color: var(--pd-fg-1);
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 900;
+  padding: 0 16px;
+  box-shadow: 0 12px 26px rgba(255, 142, 83, 0.08);
 }
 
-.bead-loader--error {
-  animation: none;
-  background: rgba(255, 90, 90, 0.16);
-  box-shadow: inset 0 0 0 12px #fff, 0 14px 30px rgba(255, 90, 90, 0.12);
+.bead-grid-loader--error .bead-grid {
+  background: rgba(255, 90, 90, 0.08);
+  box-shadow: 0 14px 30px rgba(255, 90, 90, 0.1);
 }
 
-.bead-loader--error strong {
+.bead-grid-loader--error strong {
   color: var(--pd-danger);
 }
 
@@ -375,13 +390,13 @@ function stopProgress(): void {
   color: var(--pd-orange);
 }
 
-@keyframes breathe {
+@keyframes bead-settle {
   from {
-    transform: scale(0.985) rotate(-1deg);
+    filter: brightness(1);
   }
 
   to {
-    transform: scale(1.02) rotate(1deg);
+    filter: brightness(1.04);
   }
 }
 
