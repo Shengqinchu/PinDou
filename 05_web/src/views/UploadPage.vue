@@ -905,9 +905,9 @@ onUnmounted(revokePreview);
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: clamp(62px, 7.2vw, 76px);
+  min-height: clamp(70px, 7.8vw, 84px);
   border-radius: 20px;
-  padding: 20px clamp(8px, 1.6vw, 14px) 12px;
+  padding: 12px clamp(8px, 1.6vw, 14px);
 }
 
 .mode-card:hover,
@@ -933,11 +933,14 @@ onUnmounted(revokePreview);
 }
 
 .mode-card strong {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding-right: 0;
   font-family: var(--pd-font-display);
-  font-size: clamp(16px, 1.75vw, 18px);
+  font-size: clamp(24px, 2.625vw, 27px);
   font-weight: 900;
-  line-height: 1.08;
+  line-height: 1;
   text-align: center;
   white-space: nowrap;
 }
@@ -1451,7 +1454,7 @@ onUnmounted(revokePreview);
   }
 
   .mode-card {
-    min-height: 64px;
+    min-height: 72px;
   }
 
   .style-pill em,
@@ -1509,7 +1512,7 @@ onUnmounted(revokePreview);
   }
 
   .mode-card {
-    min-height: 62px;
+    min-height: 70px;
     padding-inline: 6px;
   }
 
