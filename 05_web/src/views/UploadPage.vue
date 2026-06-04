@@ -22,13 +22,16 @@ const router = useRouter();
 const generation = useGenerationStore();
 const galleryInput = ref<HTMLInputElement | null>(null);
 const cameraInput = ref<HTMLInputElement | null>(null);
-const customSizeField = ref<HTMLInputElement | null>(null);
+const customWidthField = ref<HTMLInputElement | null>(null);
+const customHeightField = ref<HTMLInputElement | null>(null);
 const selectedFile = ref<File | null>(null);
 const previewUrl = ref('');
 const isDragging = ref(false);
 const message = ref('');
-const customSizeInput = ref('120');
+const customWidthInput = ref('120');
+const customHeightInput = ref('120');
 const activeTooltip = ref<TooltipKey | null>(null);
+const isConfirmOpen = ref(false);
 
 const modeTooltip = 'AI 模式：先把照片变成 Q 版再转图纸，更精细，真人、实物照片强烈推荐（有 AI 参与，稍慢一点）。普通模式：直接量化原图，秒出，适合本来就是卡通的图。';
 const sizeTooltip = '格子越多，细节越清楚、越还原；格子越少越好拼，但细节会糊。建议从 52 格起步。格数越高，生成时间也越久哦。';
@@ -51,9 +54,14 @@ const isHeic = computed(() => {
 
 const isCustomSizeActive = computed(() => !RESULT_SIZE_OPTIONS.includes(generation.selectedSize as (typeof RESULT_SIZE_OPTIONS)[number]));
 const generationVerb = computed(() => GENERATION_MODE_DETAILS[generation.generationMode].label);
+const selectedSizeLabel = computed(() => resultSizeLabel(generation.selectedSize));
+const selectedStyleLabel = computed(() => STYLE_OPTION_DETAILS[generation.selectedStyle].label);
+const isAiMode = computed(() => generation.generationMode === 'ai');
+const creditSummary = computed(() => (
+  isAiMode.value ? 'AI 模式：消耗 1 次 AI 额度' : '普通模式：免费，不消耗 AI 额度'
+));
 const ctaLabel = computed(() => {
-  const size = resultSizeLabel(generation.selectedSize);
-  return selectedFile.value ? `${generationVerb.value} · ${size}格 ->` : '选择照片后开始生成';
+  return selectedFile.value ? `${generationVerb.value} · ${selectedSizeLabel.value}格 ->` : '选择照片后开始生成';
 });
 
 function openGallery(): void {
@@ -123,8 +131,21 @@ async function startGenerate(): Promise<void> {
     message.value = '请先选择一张照片。';
     return;
   }
+  isConfirmOpen.value = true;
+}
+
+async function confirmGenerate(): Promise<void> {
+  if (!selectedFile.value) {
+    isConfirmOpen.value = false;
+    message.value = '请先选择一张照片。';
+    return;
+  }
   generation.setSourceFile(selectedFile.value);
   await router.push({ name: 'loading', query: { from: 'upload' } });
+}
+
+function closeConfirm(): void {
+  isConfirmOpen.value = false;
 }
 
 function chooseMode(mode: GenerationMode): void {
@@ -132,8 +153,10 @@ function chooseMode(mode: GenerationMode): void {
 }
 
 function chooseStyle(style: GenerationStylePreset): void {
+  if (!isAiMode.value) {
+    return;
+  }
   generation.setStyle(style);
-  generation.setGenerationMode('ai');
 }
 
 function chooseSize(size: ResultSizePreset): void {
@@ -141,19 +164,25 @@ function chooseSize(size: ResultSizePreset): void {
 }
 
 function chooseCustomSize(): void {
-  const size = normalizeCustomSize(customSizeInput.value);
-  customSizeInput.value = String(size);
-  generation.setSize(`${size}x${size}` as ResultSizePreset);
+  const width = normalizeCustomDimension(customWidthInput.value);
+  const height = normalizeCustomDimension(customHeightInput.value);
+  customWidthInput.value = String(width);
+  customHeightInput.value = String(height);
+  generation.setSize(`${width}x${height}` as ResultSizePreset);
 }
 
 function focusCustomSize(): void {
   chooseCustomSize();
-  window.setTimeout(() => customSizeField.value?.focus(), 0);
+  window.setTimeout(() => customWidthField.value?.focus(), 0);
 }
 
-function handleCustomSizeInput(): void {
-  customSizeInput.value = customSizeInput.value.replace(/\D/g, '').slice(0, 3);
-  if (isCustomSizeActive.value && customSizeInput.value) {
+function handleCustomSizeInput(axis: 'width' | 'height'): void {
+  if (axis === 'width') {
+    customWidthInput.value = sanitizeDimensionInput(customWidthInput.value);
+  } else {
+    customHeightInput.value = sanitizeDimensionInput(customHeightInput.value);
+  }
+  if (isCustomSizeActive.value && customWidthInput.value && customHeightInput.value) {
     chooseCustomSize();
   }
 }
@@ -162,12 +191,16 @@ function commitCustomSize(): void {
   chooseCustomSize();
 }
 
-function normalizeCustomSize(rawValue: string): number {
+function sanitizeDimensionInput(rawValue: string): string {
+  return rawValue.replace(/\D/g, '').slice(0, 3);
+}
+
+function normalizeCustomDimension(rawValue: string): number {
   const parsed = Number.parseInt(rawValue, 10);
   if (!Number.isFinite(parsed)) {
     return 52;
   }
-  return Math.max(10, Math.min(200, parsed));
+  return Math.max(16, Math.min(200, parsed));
 }
 
 function showTooltip(key: TooltipKey): void {
@@ -294,15 +327,14 @@ onUnmounted(revokePreview);
                 {{ GENERATION_MODE_DETAILS[mode].badge }}
               </span>
               <strong>{{ GENERATION_MODE_DETAILS[mode].label }}</strong>
-              <em>{{ GENERATION_MODE_DETAILS[mode].hint }}</em>
             </button>
           </div>
         </section>
 
-        <section class="option-group" aria-label="风格">
+        <section class="option-group style-option-group" :class="{ 'style-option-group--locked': !isAiMode }" aria-label="风格">
           <div class="option-heading">
             <strong>风格</strong>
-            <span class="heading-note">{{ generation.generationMode === 'ai' ? 'Q版风格化' : '切回 AI 时生效' }}</span>
+            <span class="heading-note">{{ isAiMode ? 'Q版风格化' : '仅 AI 模式可用' }}</span>
           </div>
           <div class="style-grid">
             <button
@@ -310,8 +342,9 @@ onUnmounted(revokePreview);
               :key="style"
               type="button"
               class="style-pill"
-              :class="{ 'style-pill--active': generation.selectedStyle === style, 'style-pill--muted': generation.generationMode !== 'ai' }"
+              :class="{ 'style-pill--active': generation.selectedStyle === style }"
               :aria-pressed="generation.selectedStyle === style"
+              :disabled="!isAiMode"
               @click="chooseStyle(style)"
             >
               <span class="style-icon" aria-hidden="true">
@@ -322,6 +355,9 @@ onUnmounted(revokePreview);
                 <em>{{ STYLE_OPTION_DETAILS[style].hint }}</em>
               </span>
             </button>
+          </div>
+          <div v-if="!isAiMode" class="style-lock" aria-hidden="true">
+            <span>仅 AI 模式可用</span>
           </div>
         </section>
 
@@ -371,18 +407,33 @@ onUnmounted(revokePreview);
             @click="focusCustomSize"
           >
             <strong>自定义</strong>
-            <input
-              ref="customSizeField"
-              v-model="customSizeInput"
-              type="text"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              aria-label="自定义目标格数"
-              @click.stop
-              @focus="chooseCustomSize"
-              @input="handleCustomSizeInput"
-              @blur="commitCustomSize"
-            />
+            <span class="dimension-inputs">
+              <input
+                ref="customWidthField"
+                v-model="customWidthInput"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                aria-label="自定义宽度"
+                @click.stop
+                @focus="chooseCustomSize"
+                @input="handleCustomSizeInput('width')"
+                @blur="commitCustomSize"
+              />
+              <i aria-hidden="true">×</i>
+              <input
+                ref="customHeightField"
+                v-model="customHeightInput"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                aria-label="自定义高度"
+                @click.stop
+                @focus="chooseCustomSize"
+                @input="handleCustomSizeInput('height')"
+                @blur="commitCustomSize"
+              />
+            </span>
             <span>按拼豆板规格更好拼</span>
           </label>
         </section>
@@ -394,6 +445,36 @@ onUnmounted(revokePreview);
           {{ ctaLabel }}
         </button>
       </div>
+    </div>
+
+    <div v-if="isConfirmOpen" class="confirm-backdrop" role="presentation" @click.self="closeConfirm">
+      <section class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <button class="confirm-close" type="button" aria-label="关闭确认弹窗" @click="closeConfirm">×</button>
+        <p class="confirm-kicker">生成前确认</p>
+        <h2 id="confirm-title">确认这次生成设置</h2>
+        <dl class="confirm-summary">
+          <div>
+            <dt>生成方式</dt>
+            <dd>{{ generationVerb }}</dd>
+          </div>
+          <div>
+            <dt>风格</dt>
+            <dd>{{ isAiMode ? selectedStyleLabel : '普通模式不使用风格' }}</dd>
+          </div>
+          <div>
+            <dt>格数</dt>
+            <dd>{{ selectedSizeLabel }}</dd>
+          </div>
+          <div>
+            <dt>本次消耗</dt>
+            <dd>{{ creditSummary }}</dd>
+          </div>
+        </dl>
+        <div class="confirm-actions">
+          <button class="pd-btn confirm-cancel" type="button" @click="closeConfirm">取消</button>
+          <button class="pd-btn pd-btn--primary confirm-submit" type="button" @click="confirmGenerate">确认生成</button>
+        </div>
+      </section>
     </div>
   </section>
 </template>
@@ -496,6 +577,7 @@ onUnmounted(revokePreview);
 
 .drop-zone strong {
   color: var(--pd-fg-1);
+  font-family: var(--pd-font-display);
   font-size: 22px;
   font-weight: 900;
 }
@@ -645,6 +727,10 @@ onUnmounted(revokePreview);
   gap: 12px;
 }
 
+.style-option-group {
+  position: relative;
+}
+
 .option-heading {
   display: flex;
   align-items: center;
@@ -663,6 +749,7 @@ onUnmounted(revokePreview);
 .option-heading strong,
 .heading-title strong {
   color: var(--pd-fg-1);
+  font-family: var(--pd-font-display);
   font-size: 15px;
   font-weight: 900;
   white-space: nowrap;
@@ -771,12 +858,12 @@ onUnmounted(revokePreview);
 }
 
 .mode-card {
-  display: grid;
-  align-content: center;
-  gap: 7px;
-  min-height: 104px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 76px;
   border-radius: 20px;
-  padding: 16px 14px;
+  padding: 14px 16px;
 }
 
 .mode-card:hover,
@@ -790,7 +877,6 @@ onUnmounted(revokePreview);
 }
 
 .mode-card strong,
-.mode-card em,
 .style-copy,
 .style-pill strong,
 .style-pill em,
@@ -803,13 +889,13 @@ onUnmounted(revokePreview);
 }
 
 .mode-card strong {
-  padding-right: 42px;
-  font-size: 17px;
+  padding-right: 0;
+  font-family: var(--pd-font-display);
+  font-size: 20px;
   font-weight: 900;
   white-space: nowrap;
 }
 
-.mode-card em,
 .style-pill em {
   color: var(--pd-fg-2);
   font-size: 12px;
@@ -821,8 +907,8 @@ onUnmounted(revokePreview);
 
 .option-badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 8px;
+  right: 9px;
   border-radius: 999px;
   background: rgba(255, 107, 157, 0.12);
   color: var(--pd-pink-deep);
@@ -851,13 +937,11 @@ onUnmounted(revokePreview);
   box-shadow: 0 18px 34px rgba(255, 142, 83, 0.26), 0 9px 18px rgba(255, 107, 90, 0.18);
 }
 
-.mode-card--active em,
 .style-pill--active em,
 .size-card--active span {
   color: rgba(255, 255, 255, 0.86);
 }
 
-.mode-card--active:hover em,
 .style-pill--active:hover em,
 .size-card--active:hover span {
   color: rgba(255, 255, 255, 0.86);
@@ -877,6 +961,10 @@ onUnmounted(revokePreview);
   min-height: 72px;
   border-radius: 18px;
   padding: 12px 16px;
+}
+
+.style-pill:disabled {
+  cursor: not-allowed;
 }
 
 .style-icon {
@@ -909,10 +997,6 @@ onUnmounted(revokePreview);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.36);
 }
 
-.style-pill--muted:not(.style-pill--active) {
-  opacity: 0.72;
-}
-
 .style-copy {
   display: grid;
   gap: 4px;
@@ -922,6 +1006,7 @@ onUnmounted(revokePreview);
 }
 
 .style-pill strong {
+  font-family: var(--pd-font-display);
   font-size: 16px;
   font-weight: 900;
   line-height: 1.15;
@@ -941,6 +1026,7 @@ onUnmounted(revokePreview);
 }
 
 .size-card strong {
+  font-family: var(--pd-font-display);
   font-size: 22px;
   font-weight: 900;
   line-height: 1;
@@ -948,7 +1034,7 @@ onUnmounted(revokePreview);
 
 .custom-size-field {
   display: grid;
-  grid-template-columns: auto minmax(72px, 108px) minmax(0, 1fr);
+  grid-template-columns: auto minmax(142px, 1fr);
   gap: 10px;
   align-items: center;
   min-height: 64px;
@@ -959,9 +1045,23 @@ onUnmounted(revokePreview);
 }
 
 .custom-size-field strong {
+  font-family: var(--pd-font-display);
   font-size: 16px;
   font-weight: 900;
   white-space: nowrap;
+}
+
+.dimension-inputs {
+  display: grid;
+  grid-template-columns: minmax(52px, 1fr) auto minmax(52px, 1fr);
+  align-items: center;
+  gap: 7px;
+}
+
+.dimension-inputs i {
+  color: var(--pd-fg-2);
+  font-style: normal;
+  font-weight: 900;
 }
 
 .custom-size-field input {
@@ -1003,9 +1103,39 @@ onUnmounted(revokePreview);
   color: #fff;
 }
 
+.custom-size-field--active .dimension-inputs i {
+  color: rgba(255, 255, 255, 0.84);
+}
+
 .custom-size-field--active input::placeholder,
 .custom-size-field--active span {
   color: rgba(255, 255, 255, 0.86);
+}
+
+.style-lock {
+  position: absolute;
+  inset: 36px 0 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 142, 83, 0.24);
+  border-radius: 20px;
+  background: rgba(255, 249, 245, 0.62);
+  backdrop-filter: blur(9px) saturate(1.08);
+  color: var(--pd-fg-1);
+  pointer-events: auto;
+}
+
+.style-lock span {
+  border: 1px solid rgba(255, 142, 83, 0.32);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 12px 24px rgba(255, 142, 83, 0.14);
+  color: var(--pd-orange);
+  font-family: var(--pd-font-display);
+  font-size: 15px;
+  font-weight: 900;
+  padding: 9px 15px;
 }
 
 .generate-bar {
@@ -1047,6 +1177,144 @@ onUnmounted(revokePreview);
   cursor: not-allowed;
 }
 
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(45, 36, 30, 0.26);
+  backdrop-filter: blur(8px);
+  padding: 18px;
+  animation: fadeIn 160ms var(--pd-ease-out);
+}
+
+.confirm-dialog {
+  position: relative;
+  width: min(100%, 440px);
+  max-height: min(680px, calc(100dvh - 36px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid rgba(237, 228, 218, 0.9);
+  border-radius: 28px;
+  background:
+    linear-gradient(145deg, #fff, #fff3eb),
+    #fffaf7;
+  box-shadow: var(--pd-shadow-modal), 0 18px 44px rgba(255, 142, 83, 0.18);
+  padding: 24px;
+  animation: modalPop 190ms var(--pd-ease-soft);
+}
+
+.confirm-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 142, 83, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--pd-fg-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    color 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.confirm-close:hover {
+  border-color: rgba(255, 142, 83, 0.5);
+  box-shadow: 0 10px 20px rgba(255, 142, 83, 0.14);
+  color: var(--pd-orange);
+  transform: translateY(-1px);
+}
+
+.confirm-kicker {
+  margin: 0 0 4px;
+  color: var(--pd-orange);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.confirm-dialog h2 {
+  margin: 0 42px 18px 0;
+  color: var(--pd-fg-1);
+  font-family: var(--pd-font-display);
+  font-size: 25px;
+  line-height: 1.2;
+}
+
+.confirm-summary {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.confirm-summary div {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(237, 228, 218, 0.76);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 12px 13px;
+}
+
+.confirm-summary dt,
+.confirm-summary dd {
+  margin: 0;
+}
+
+.confirm-summary dt {
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.confirm-summary dd {
+  color: var(--pd-fg-1);
+  font-weight: 900;
+}
+
+.confirm-actions {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.confirm-cancel,
+.confirm-submit {
+  cursor: pointer;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    filter 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.confirm-cancel {
+  border: 1px solid rgba(255, 142, 83, 0.28);
+  background: rgba(255, 241, 232, 0.72);
+  color: var(--pd-orange);
+}
+
+.confirm-cancel:hover,
+.confirm-submit:hover {
+  filter: brightness(1.03);
+  border-color: rgba(255, 142, 83, 0.58);
+  box-shadow: 0 14px 28px rgba(255, 142, 83, 0.18);
+  transform: translateY(-2px);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1065,6 +1333,28 @@ onUnmounted(revokePreview);
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -1114,10 +1404,9 @@ onUnmounted(revokePreview);
   }
 
   .mode-card {
-    min-height: 88px;
+    min-height: 68px;
   }
 
-  .mode-card em,
   .style-pill em,
   .custom-size-field span {
     white-space: normal;
@@ -1134,18 +1423,31 @@ onUnmounted(revokePreview);
   }
 
   .custom-size-field {
-    grid-template-columns: minmax(0, 1fr) minmax(84px, 108px);
+    grid-template-columns: minmax(0, 1fr);
     gap: 8px 10px;
   }
 
+  .dimension-inputs {
+    width: 100%;
+  }
+
   .custom-size-field span {
-    grid-column: 1 / -1;
     line-height: 1.35;
   }
 
   .file-strip {
     align-items: start;
     flex-direction: column;
+  }
+
+  .confirm-dialog {
+    border-radius: 24px;
+    padding: 20px;
+  }
+
+  .confirm-summary div,
+  .confirm-actions {
+    grid-template-columns: 1fr;
   }
 }
 </style>

@@ -29,9 +29,9 @@ export const STYLE_OPTIONS = ['q_pet', 'q_portrait', 'q_couple'] as const;
 export type GenerationStylePreset = Extract<StylePreset, (typeof STYLE_OPTIONS)[number]>;
 export const DEFAULT_STYLE_PRESET: GenerationStylePreset = 'q_portrait';
 export const STYLE_OPTION_DETAILS: Record<GenerationStylePreset, { label: string; hint: string; iconSrc: string }> = {
-  q_pet: { label: '萌宠', hint: '宠物轮廓更清楚', iconSrc: stylePetIcon },
-  q_portrait: { label: '人像', hint: '适合真人和实物照', iconSrc: stylePortraitIcon },
-  q_couple: { label: '卡通', hint: '适合卡通原图', iconSrc: styleCartoonIcon }
+  q_pet: { label: '萌宠特化', hint: '宠物轮廓更清楚', iconSrc: stylePetIcon },
+  q_portrait: { label: '人像特化', hint: '适合真人和实物照', iconSrc: stylePortraitIcon },
+  q_couple: { label: '卡通特化', hint: '适合卡通原图', iconSrc: styleCartoonIcon }
 };
 
 export type GenerationJobUpdateHandler = (job: GenerationJobResponse) => void;
@@ -144,11 +144,12 @@ export function isResultSizePreset(value: unknown): value is ResultSizePreset {
     return false;
   }
   const match = /^([1-9]\d{1,2})x([1-9]\d{1,2})$/.exec(value);
-  if (!match || match[1] !== match[2]) {
+  if (!match) {
     return false;
   }
-  const size = Number(match[1]);
-  return size >= 10 && size <= 200;
+  const width = Number(match[1]);
+  const height = Number(match[2]);
+  return width >= 16 && width <= 200 && height >= 16 && height <= 200;
 }
 
 export function isGenerationStylePreset(value: unknown): value is GenerationStylePreset {
@@ -156,7 +157,11 @@ export function isGenerationStylePreset(value: unknown): value is GenerationStyl
 }
 
 export function resultSizeLabel(size: ResultSizePreset | string): string {
-  return size.split('x')[0] || String(size);
+  const [width, height] = String(size).split('x');
+  if (!width || !height || width === height) {
+    return width || String(size);
+  }
+  return `${width} × ${height}`;
 }
 
 export function extractPatternImageUrl(pattern: PatternSheet | null, fallback = ''): string {
