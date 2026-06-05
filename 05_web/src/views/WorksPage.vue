@@ -57,6 +57,13 @@ async function loadWorks(targetPage: number): Promise<void> {
     applyGalleryResponse(snapshot.data);
     errorMessage.value = '';
     loading.value = false;
+    return;
+  }
+
+  if (snapshot) {
+    applyGalleryResponse(snapshot.data);
+    errorMessage.value = '';
+    loading.value = false;
     void revalidateWorks(targetPage, requestedSize);
     return;
   }

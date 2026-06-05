@@ -100,11 +100,10 @@ async function loadArtworkIfNeeded(): Promise<void> {
   }
 
   const snapshot = swrCache.getArtworkSnapshot(id);
-  if (snapshot?.isFresh) {
+  if (snapshot) {
     error.value = '';
     loading.value = false;
     generation.applyArtwork(snapshot.data);
-    void revalidateArtwork(id);
     return;
   }
 
@@ -116,17 +115,6 @@ async function loadArtworkIfNeeded(): Promise<void> {
     error.value = loadError instanceof Error ? loadError.message : '结果加载失败，请回到作品集重新打开。';
   } finally {
     loading.value = false;
-  }
-}
-
-async function revalidateArtwork(id: string): Promise<void> {
-  try {
-    const artwork = await swrCache.revalidateArtwork(id);
-    if (String(route.params.id || '') === id && !isDirty.value && !isSaving.value) {
-      generation.applyArtwork(artwork);
-    }
-  } catch (_error) {
-    // Keep the already-rendered cached pattern; blocking loads report errors.
   }
 }
 
