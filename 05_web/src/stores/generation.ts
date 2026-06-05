@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
 
-import { generateAiPattern, generateScriptPattern, getArtworkDetail, getGenerationStatus, submitConsent } from '../api';
+import { generateAiPattern, generateScriptPattern, getGenerationStatus, submitConsent } from '../api';
 import type { Artwork, GenerationJobResponse, GenerateScriptResponse, PatternSheet, SizePreset, StylePreset } from '../api/types';
 import styleCartoonIcon from '../assets/brand/style-cartoon.png';
 import stylePetIcon from '../assets/brand/style-pet.png';
 import stylePortraitIcon from '../assets/brand/style-portrait.png';
+import { useSWRCacheStore } from './swrCache';
 
 export const RESULT_SIZE_OPTIONS = ['26x26', '52x52', '78x78', '104x104'] as const;
 export type FixedResultSizeOption = (typeof RESULT_SIZE_OPTIONS)[number];
@@ -96,6 +97,7 @@ export const useGenerationStore = defineStore('generation', {
           : await generateScriptPattern(this.sourceFile, this.selectedSize as SizePreset);
         this.currentResult = result;
         this.currentArtwork = null;
+        useSWRCacheStore().invalidateGallery();
         return result;
       } catch (error) {
         const friendly = normalizeGenerationError(error);
@@ -115,11 +117,12 @@ export const useGenerationStore = defineStore('generation', {
     },
     async loadArtwork(artworkId: string): Promise<Artwork> {
       this.error = '';
-      const artwork = await getArtworkDetail(artworkId);
+      const artwork = await useSWRCacheStore().fetchArtwork(artworkId);
       this.applyArtwork(artwork);
       return artwork;
     },
     applyArtwork(artwork: Artwork): void {
+      useSWRCacheStore().setArtwork(artwork);
       this.currentArtwork = artwork;
       this.currentResult = {
         artwork_id: artwork.artwork_id,

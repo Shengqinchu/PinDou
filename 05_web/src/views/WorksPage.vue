@@ -2,15 +2,16 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 
-import { getArtworkGallery } from '../api';
-import type { ArtworkListItem } from '../api/types';
+import type { ArtworkListItem, ArtworkListResponse } from '../api/types';
 import { resultSizeLabel } from '../stores/generation';
+import { useSWRCacheStore } from '../stores/swrCache';
 
 const MOBILE_PAGE_SIZE = 4;
 const TABLET_PAGE_SIZE = 6;
 const DESKTOP_PAGE_SIZE = 12;
 
 const router = useRouter();
+const swrCache = useSWRCacheStore();
 const works = ref<ArtworkListItem[]>([]);
 const page = ref(1);
 const pageSize = ref(DESKTOP_PAGE_SIZE);
@@ -50,19 +51,44 @@ onUnmounted(() => {
 });
 
 async function loadWorks(targetPage: number): Promise<void> {
+  const requestedSize = pageSize.value;
+  const snapshot = swrCache.getGallerySnapshot(targetPage, requestedSize);
+  if (snapshot?.isFresh) {
+    applyGalleryResponse(snapshot.data);
+    errorMessage.value = '';
+    loading.value = false;
+    void revalidateWorks(targetPage, requestedSize);
+    return;
+  }
+
   loading.value = true;
   errorMessage.value = '';
   try {
-    const response = await getArtworkGallery(targetPage, pageSize.value);
-    page.value = response.page;
-    total.value = response.total;
-    hasMore.value = response.has_more;
-    works.value = response.items;
-    failedImages.value = new Set();
+    const response = await swrCache.fetchGallery(targetPage, requestedSize);
+    applyGalleryResponse(response);
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : '作品集暂时加载失败，请稍后再试。';
   } finally {
     loading.value = false;
+  }
+}
+
+function applyGalleryResponse(response: ArtworkListResponse): void {
+  page.value = response.page;
+  total.value = response.total;
+  hasMore.value = response.has_more;
+  works.value = response.items;
+  failedImages.value = new Set();
+}
+
+async function revalidateWorks(targetPage: number, size: number): Promise<void> {
+  try {
+    const response = await swrCache.revalidateGallery(targetPage, size);
+    if (page.value === targetPage && pageSize.value === size) {
+      applyGalleryResponse(response);
+    }
+  } catch (_error) {
+    // Cached data remains useful; surface errors only for blocking loads.
   }
 }
 

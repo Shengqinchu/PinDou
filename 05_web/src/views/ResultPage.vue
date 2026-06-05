@@ -16,6 +16,7 @@ import {
   type ResultSizePreset
 } from '../stores/generation';
 import type { ColorRef, PatternSheet } from '../api/types';
+import { useSWRCacheStore } from '../stores/swrCache';
 
 interface PaletteRow {
   color: ColorRef;
@@ -26,6 +27,7 @@ interface PaletteRow {
 const route = useRoute();
 const router = useRouter();
 const generation = useGenerationStore();
+const swrCache = useSWRCacheStore();
 const loading = ref(false);
 const error = ref('');
 const sizeNotice = ref('');
@@ -97,6 +99,15 @@ async function loadArtworkIfNeeded(): Promise<void> {
     return;
   }
 
+  const snapshot = swrCache.getArtworkSnapshot(id);
+  if (snapshot?.isFresh) {
+    error.value = '';
+    loading.value = false;
+    generation.applyArtwork(snapshot.data);
+    void revalidateArtwork(id);
+    return;
+  }
+
   loading.value = true;
   error.value = '';
   try {
@@ -105,6 +116,17 @@ async function loadArtworkIfNeeded(): Promise<void> {
     error.value = loadError instanceof Error ? loadError.message : '结果加载失败，请回到作品集重新打开。';
   } finally {
     loading.value = false;
+  }
+}
+
+async function revalidateArtwork(id: string): Promise<void> {
+  try {
+    const artwork = await swrCache.revalidateArtwork(id);
+    if (String(route.params.id || '') === id && !isDirty.value && !isSaving.value) {
+      generation.applyArtwork(artwork);
+    }
+  } catch (_error) {
+    // Keep the already-rendered cached pattern; blocking loads report errors.
   }
 }
 
@@ -146,6 +168,7 @@ async function confirmRegenerate(): Promise<void> {
   generation.setGenerationMode(draftMode.value);
   generation.setStyle(draftStyle.value);
   generation.setSize(draftSize.value);
+  swrCache.invalidateGallery();
   closeRegenerateModal();
   await router.push({ name: 'loading', query: { retry: '1', size: generation.selectedSize } });
 }
@@ -219,6 +242,8 @@ async function savePatternEdits(): Promise<void> {
   saveMessage.value = '';
   try {
     const saved = await saveArtworkPattern(id, recalculatePattern(clonePattern(sheet)));
+    swrCache.setArtwork(saved.artwork);
+    swrCache.invalidateGallery();
     skipSourcePatternReset.value = true;
     generation.applyArtwork(saved.artwork);
     editablePattern.value = recalculatePattern(clonePattern(saved.pattern));
@@ -337,7 +362,7 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
       <header class="result-hero">
         <div>
           <p class="eyebrow">生成完成</p>
-          <h1>拼豆图纸已准备好</h1>
+          <h1>点击需要编辑的格子，可以修改配色哦~</h1>
           <p>{{ artworkId }} · {{ sizeLabel }}</p>
         </div>
         <div class="result-actions">
@@ -915,10 +940,13 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
 .result-stats dd {
   margin: 0;
   color: var(--pd-fg-1);
-  font-size: clamp(22px, 2.6vw, 24px);
+  font-size: clamp(20px, 2.45vw, 24px);
+  font-variant-numeric: tabular-nums;
   font-weight: 900;
   line-height: 1;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .result-stats small {
@@ -957,6 +985,7 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
   grid-template-columns: 34px minmax(0, 1fr) minmax(52px, auto) 38px;
   align-items: center;
   gap: 10px;
+  min-width: 0;
   border: 1px solid var(--pd-stroke);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.78);
@@ -987,9 +1016,12 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
 }
 
 .palette-row em {
+  overflow: hidden;
   color: var(--pd-fg-2);
   font-size: 11px;
   font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .palette-count,
@@ -1067,7 +1099,7 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
   }
 
   .result-stats dd {
-    font-size: clamp(19px, 6vw, 24px);
+    font-size: clamp(16px, 5.4vw, 23px);
   }
 
   .palette-heading {
@@ -1134,7 +1166,7 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
   }
 
   .palette-row {
-    grid-template-columns: 32px minmax(0, 1fr) minmax(44px, auto);
+    grid-template-columns: 32px minmax(0, 1fr) minmax(50px, auto);
     gap: 8px;
     padding: 9px;
   }
@@ -1149,8 +1181,10 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
   }
 
   .palette-row strong {
+    overflow: hidden;
     line-height: 1.25;
-    white-space: normal;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .palette-row em {
@@ -1161,7 +1195,7 @@ function uniqueColors(colors: ColorRef[]): ColorRef[] {
 
   .palette-count {
     align-self: center;
-    min-width: 44px;
+    min-width: 50px;
   }
 }
 

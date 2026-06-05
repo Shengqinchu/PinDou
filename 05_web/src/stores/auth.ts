@@ -11,6 +11,7 @@ import {
   setStoredUser,
   setToken
 } from '../auth/tokenStorage';
+import { useSWRCacheStore } from './swrCache';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -23,6 +24,9 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     setSession(token: string, user: User) {
+      if (token !== this.token) {
+        useSWRCacheStore().clearAll();
+      }
       this.token = token;
       this.applyUser(user);
       setToken(token);
@@ -87,6 +91,7 @@ export const useAuthStore = defineStore('auth', {
     logout() {
       this.token = '';
       this.applyUser(null);
+      useSWRCacheStore().clearAll();
       clearToken();
     }
   }
