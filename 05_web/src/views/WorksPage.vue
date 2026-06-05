@@ -8,7 +8,7 @@ import { useSWRCacheStore } from '../stores/swrCache';
 
 const MOBILE_PAGE_SIZE = 4;
 const TABLET_PAGE_SIZE = 6;
-const DESKTOP_PAGE_SIZE = 12;
+const DESKTOP_PAGE_SIZE = 8;
 
 const router = useRouter();
 const swrCache = useSWRCacheStore();
@@ -361,7 +361,7 @@ function formatDate(value?: string): string {
 .works-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-template-rows: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: clamp(12px, 1.8vw, 20px);
   flex: 1 1 auto;
   min-width: 0;
@@ -370,11 +370,13 @@ function formatDate(value?: string): string {
 
 .work-card {
   display: grid;
+  grid-template-rows: auto minmax(0, auto);
   align-content: start;
   gap: clamp(8px, 1.2vw, 12px);
   height: 100%;
   min-width: 0;
   min-height: 0;
+  overflow: hidden;
   appearance: none;
   border: 1px solid rgba(237, 228, 218, 0.86);
   border-radius: clamp(18px, 2vw, 22px);
@@ -645,16 +647,25 @@ function formatDate(value?: string): string {
 
   .work-card {
     border-radius: 16px;
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-content: stretch;
     gap: 8px;
     padding: 7px;
   }
 
   .work-card__thumb {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 0;
     border-radius: 12px;
   }
 
   .work-card__body {
+    height: clamp(46px, 12.5svh, 58px);
+    height: clamp(46px, 12.5dvh, 58px);
+    align-content: start;
     gap: 3px;
+    overflow: hidden;
   }
 
   .work-card__body strong {

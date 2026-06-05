@@ -10,6 +10,7 @@
 
 - 正式入口：`https://pindoupuppy.com/`
 - 同源 API：`https://pindoupuppy.com/api/v1`
+- 管理后台：`https://pindoupuppy.com/Ios235169`
 - 健康检查：`https://pindoupuppy.com/health`
 - 对外验收、用户链接、截图和文档统一使用主域。旧 staging 子域仅保留为临时兼容/回滚入口，不再作为正式入口。
 - Cloudflare 当前路由（2026-06-05 已切）：`pindoupuppy.com` 和 `staging.pindoupuppy.com` 均 CNAME 到同一条 Cloudflare Tunnel（`pindou-staging`），Tunnel ingress 覆盖 `pindoupuppy.com` / `www.pindoupuppy.com` / 旧 staging 子域，源站为 `https://localhost`（`noTLSVerify=true`）。

@@ -22,6 +22,7 @@ from pindou.tasks.reverse_proxy_health_check import ReverseProxyHealthMonitor
 
 STATIC_ADMIN_DIR = Path(__file__).resolve().parent / "static_admin"
 STATIC_H5_DIR = Path(__file__).resolve().parent / "static_h5"
+ADMIN_CONSOLE_PATH = "/Ios235169"
 
 
 def create_app() -> FastAPI:
@@ -83,8 +84,8 @@ def create_app() -> FastAPI:
     async def h5_root() -> RedirectResponse:
         return RedirectResponse(url="/h5/", status_code=307)
 
-    @app.get("/console", include_in_schema=False)
-    @app.get("/console/", include_in_schema=False)
+    @app.get(ADMIN_CONSOLE_PATH, include_in_schema=False)
+    @app.get(f"{ADMIN_CONSOLE_PATH}/", include_in_schema=False)
     async def admin_console() -> FileResponse:
         return FileResponse(STATIC_ADMIN_DIR / "admin.html")
 

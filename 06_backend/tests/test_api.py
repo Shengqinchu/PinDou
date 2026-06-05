@@ -142,9 +142,10 @@ def capture_email_codes(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, str]
 def test_user_login_profile_consent_and_auth_error(api_client) -> None:
     client, _session_factory = api_client
 
-    console = client.get("/console/")
+    console = client.get("/Ios235169/")
     assert console.status_code == 200
     assert "PinDou Admin Console" in console.text
+    assert client.get("/console/").status_code == 404
 
     assert client.get("/api/user/me").status_code == 401
     response = client.post("/api/user/login", json={"code": "abc", "nickname": "Pin"})
