@@ -40,7 +40,7 @@ def list_artwork_gallery(
     current_user: CurrentUser,
     db: DbSession,
     page: int = Query(default=1, ge=1),
-    size: int = Query(default=20, ge=1, le=20),
+    size: int = Query(default=12, ge=1, le=20),
 ) -> dict:
     """返回当前用户作品集轻量摘要，供 Web /works 分页使用。"""
     offset = (page - 1) * size

@@ -322,7 +322,15 @@ def test_artwork_gallery_paginates_current_user(api_client) -> None:
 
     default_page = client.get("/api/artwork/gallery", headers=headers)
     assert default_page.status_code == 200
-    assert default_page.json()["size"] == 20
+    assert default_page.json()["size"] == 12
+
+    mobile_page = client.get("/api/artwork/gallery?page=1&size=4", headers=headers)
+    assert mobile_page.status_code == 200
+    assert mobile_page.json()["size"] == 4
+
+    tablet_page = client.get("/api/artwork/gallery?page=1&size=6", headers=headers)
+    assert tablet_page.status_code == 200
+    assert tablet_page.json()["size"] == 6
 
     page_one = client.get("/api/artwork/gallery?page=1&size=2", headers=headers)
     assert page_one.status_code == 200

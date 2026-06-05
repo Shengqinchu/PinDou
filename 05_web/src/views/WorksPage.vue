@@ -6,57 +6,63 @@ import { getArtworkGallery } from '../api';
 import type { ArtworkListItem } from '../api/types';
 import { resultSizeLabel } from '../stores/generation';
 
-const PAGE_SIZE = 20;
+const MOBILE_PAGE_SIZE = 4;
+const TABLET_PAGE_SIZE = 6;
+const DESKTOP_PAGE_SIZE = 12;
 
 const router = useRouter();
 const works = ref<ArtworkListItem[]>([]);
 const page = ref(1);
+const pageSize = ref(DESKTOP_PAGE_SIZE);
 const total = ref(0);
 const hasMore = ref(false);
 const loading = ref(true);
-const loadingMore = ref(false);
 const errorMessage = ref('');
 const failedImages = ref(new Set<string>());
 const showBackTop = ref(false);
+let resizeTimer: number | undefined;
 
 const totalLabel = computed(() => {
   if (loading.value) {
     return '正在整理作品';
   }
-  if (total.value <= 0) {
-    return '还没有作品';
-  }
   return `共 ${total.value} 个作品`;
 });
 
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pageSize.value)));
+const isFirstPage = computed(() => page.value <= 1);
+const isLastPage = computed(() => page.value >= totalPages.value);
+
 onMounted(() => {
+  pageSize.value = responsivePageSize();
   void loadWorks(1);
   updateBackTopVisibility();
   window.addEventListener('scroll', updateBackTopVisibility, { passive: true });
+  window.addEventListener('resize', schedulePageSizeRefresh, { passive: true });
 });
 
 onUnmounted(() => {
   window.removeEventListener('scroll', updateBackTopVisibility);
+  window.removeEventListener('resize', schedulePageSizeRefresh);
+  if (resizeTimer) {
+    window.clearTimeout(resizeTimer);
+  }
 });
 
-async function loadWorks(targetPage: number, append = false): Promise<void> {
-  if (append) {
-    loadingMore.value = true;
-  } else {
-    loading.value = true;
-  }
+async function loadWorks(targetPage: number): Promise<void> {
+  loading.value = true;
   errorMessage.value = '';
   try {
-    const response = await getArtworkGallery(targetPage, PAGE_SIZE);
+    const response = await getArtworkGallery(targetPage, pageSize.value);
     page.value = response.page;
     total.value = response.total;
     hasMore.value = response.has_more;
-    works.value = append ? [...works.value, ...response.items] : response.items;
+    works.value = response.items;
+    failedImages.value = new Set();
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : '作品集暂时加载失败，请稍后再试。';
   } finally {
     loading.value = false;
-    loadingMore.value = false;
   }
 }
 
@@ -64,11 +70,47 @@ function openWork(work: ArtworkListItem): void {
   void router.push({ name: 'result', params: { id: work.artwork_id } });
 }
 
-function loadMore(): void {
-  if (!hasMore.value || loadingMore.value || loading.value) {
+function goToPage(targetPage: number): void {
+  const normalizedPage = Math.min(Math.max(targetPage, 1), totalPages.value);
+  if (loading.value || normalizedPage === page.value) {
     return;
   }
-  void loadWorks(page.value + 1, true);
+  void loadWorks(normalizedPage);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goPreviousPage(): void {
+  goToPage(page.value - 1);
+}
+
+function goNextPage(): void {
+  goToPage(page.value + 1);
+}
+
+function responsivePageSize(): number {
+  if (window.innerWidth <= 640) {
+    return MOBILE_PAGE_SIZE;
+  }
+  if (window.innerWidth <= 1024) {
+    return TABLET_PAGE_SIZE;
+  }
+  return DESKTOP_PAGE_SIZE;
+}
+
+function schedulePageSizeRefresh(): void {
+  if (resizeTimer) {
+    window.clearTimeout(resizeTimer);
+  }
+  resizeTimer = window.setTimeout(() => {
+    const nextPageSize = responsivePageSize();
+    if (nextPageSize === pageSize.value) {
+      return;
+    }
+    const firstVisibleIndex = (page.value - 1) * pageSize.value;
+    pageSize.value = nextPageSize;
+    const nextPage = Math.floor(firstVisibleIndex / nextPageSize) + 1;
+    void loadWorks(nextPage);
+  }, 140);
 }
 
 function updateBackTopVisibility(): void {
@@ -119,7 +161,7 @@ function formatDate(value?: string): string {
     </header>
 
     <section v-if="loading" class="works-grid" aria-label="作品加载中">
-      <div v-for="item in 6" :key="item" class="work-card work-card--skeleton" aria-hidden="true">
+      <div v-for="item in pageSize" :key="item" class="work-card work-card--skeleton" aria-hidden="true">
         <span class="work-card__thumb"></span>
         <span class="work-card__line work-card__line--wide"></span>
         <span class="work-card__line"></span>
@@ -130,7 +172,7 @@ function formatDate(value?: string): string {
       <span class="works-empty__mark" aria-hidden="true">!</span>
       <h2>作品集没加载出来</h2>
       <p>{{ errorMessage }}</p>
-      <button class="works-empty__button" type="button" @click="loadWorks(1)">重新加载</button>
+      <button class="works-empty__button" type="button" @click="loadWorks(page)">重新加载</button>
     </section>
 
     <section v-else-if="!works.length" class="works-empty">
@@ -166,26 +208,27 @@ function formatDate(value?: string): string {
             <span class="work-card__date">{{ formatDate(work.created_at) }}</span>
           </span>
         </button>
-        <template v-if="loadingMore">
-          <div
-            v-for="item in 4"
-            :key="`loading-more-${item}`"
-            class="work-card work-card--skeleton"
-            aria-hidden="true"
-          >
-            <span class="work-card__thumb"></span>
-            <span class="work-card__line work-card__line--wide"></span>
-            <span class="work-card__line"></span>
-          </div>
-        </template>
       </section>
 
-      <div class="works-pager" v-if="hasMore">
-        <button class="works-pager__button" type="button" :disabled="loadingMore" @click="loadMore">
-          {{ loadingMore ? '加载中…' : '加载更多' }}
+      <nav class="works-pager" aria-label="作品分页">
+        <button
+          class="works-pager__button"
+          type="button"
+          :disabled="isFirstPage || loading"
+          @click="goPreviousPage"
+        >
+          上一页
         </button>
-      </div>
-      <p v-else class="works-end">没有更多作品了</p>
+        <span class="works-pager__status">第 {{ page }} / {{ totalPages }} 页</span>
+        <button
+          class="works-pager__button"
+          type="button"
+          :disabled="isLastPage || loading || !hasMore"
+          @click="goNextPage"
+        >
+          下一页
+        </button>
+      </nav>
     </template>
 
     <button
@@ -206,24 +249,24 @@ function formatDate(value?: string): string {
   max-width: 1120px;
   margin: 0 auto;
   display: grid;
-  gap: clamp(16px, 2.6vw, 26px);
-  padding-inline: clamp(0px, 1vw, 6px);
+  gap: clamp(12px, 2vw, 22px);
+  padding-inline: clamp(0px, 0.8vw, 6px);
   overflow-x: clip;
 }
 
 .works-hero {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: clamp(10px, 2vw, 18px);
   min-width: 0;
   border: 1px solid rgba(237, 228, 218, 0.82);
-  border-radius: 26px;
+  border-radius: clamp(20px, 2.4vw, 26px);
   background:
     linear-gradient(135deg, rgba(255, 241, 232, 0.92), rgba(255, 255, 255, 0.9) 56%, rgba(236, 247, 241, 0.72)),
     #fffaf7;
-  box-shadow: 0 18px 44px rgba(255, 142, 83, 0.12);
-  padding: clamp(18px, 3.2vw, 30px);
+  box-shadow: 0 14px 34px rgba(255, 142, 83, 0.11);
+  padding: clamp(14px, 2.4vw, 24px);
 }
 
 .works-hero__copy {
@@ -236,7 +279,7 @@ function formatDate(value?: string): string {
   margin: 0;
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
-  font-size: clamp(28px, 4.2vw, 42px);
+  font-size: clamp(26px, 3.8vw, 40px);
   line-height: 1.08;
 }
 
@@ -253,7 +296,7 @@ function formatDate(value?: string): string {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 46px;
+  min-height: 44px;
   border: 1px solid transparent;
   border-radius: 999px;
   background: var(--pd-gradient);
@@ -262,7 +305,7 @@ function formatDate(value?: string): string {
   cursor: pointer;
   font: inherit;
   font-weight: 900;
-  padding: 0 22px;
+  padding: 0 20px;
   text-decoration: none;
   transition:
     border-color 180ms var(--pd-ease-out),
@@ -283,17 +326,17 @@ function formatDate(value?: string): string {
 .works-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(14px, 2vw, 20px);
+  gap: clamp(12px, 1.8vw, 20px);
   min-width: 0;
 }
 
 .work-card {
   display: grid;
-  gap: 13px;
+  gap: clamp(8px, 1.2vw, 12px);
   min-width: 0;
   appearance: none;
   border: 1px solid rgba(237, 228, 218, 0.86);
-  border-radius: 22px;
+  border-radius: clamp(18px, 2vw, 22px);
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 16px 34px rgba(45, 45, 45, 0.07);
   color: inherit;
@@ -419,23 +462,30 @@ function formatDate(value?: string): string {
 }
 
 .works-pager {
-  display: grid;
-  justify-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2vw, 14px);
+  min-width: 0;
 }
 
-.works-end {
-  margin: 0;
-  color: #a5968b;
-  font-size: 13px;
+.works-pager__status {
+  min-width: 92px;
+  color: var(--pd-fg-2);
+  font-size: clamp(13px, 1.7vw, 15px);
   font-weight: 900;
   text-align: center;
+  white-space: nowrap;
 }
 
 .works-pager__button:disabled {
   background: #ede5dd;
+  border-color: rgba(217, 206, 195, 0.72);
   box-shadow: none;
   color: #9b8e84;
-  cursor: wait;
+  cursor: not-allowed;
+  filter: none;
+  transform: none;
 }
 
 .works-backtop {
@@ -508,27 +558,79 @@ function formatDate(value?: string): string {
 }
 
 @media (max-width: 640px) {
-  .works-hero {
-    align-items: stretch;
-    border-radius: 22px;
-    flex-direction: column;
-    padding: 18px;
+  .works-page {
+    gap: 10px;
   }
 
-  .works-hero__cta,
-  .works-empty__button,
-  .works-pager__button {
-    width: 100%;
+  .works-hero {
+    border-radius: 20px;
+    padding: 12px;
+  }
+
+  .works-hero__copy {
+    gap: 2px;
+  }
+
+  .works-hero__copy h1 {
+    font-size: clamp(23px, 6.2vw, 27px);
+  }
+
+  .works-hero__copy p {
+    font-size: 12px;
+  }
+
+  .works-hero__cta {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 13px;
   }
 
   .works-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 10px;
   }
 
   .work-card {
-    border-radius: 18px;
-    gap: 9px;
+    border-radius: 16px;
+    gap: 6px;
+    padding: 7px;
+  }
+
+  .work-card__thumb {
+    border-radius: 12px;
+  }
+
+  .work-card__body {
+    gap: 2px;
+  }
+
+  .work-card__body strong {
+    font-size: 14px;
+  }
+
+  .work-card__meta {
+    font-size: 10.5px;
+  }
+
+  .work-card__date {
+    font-size: 10px;
+  }
+
+  .works-pager {
+    gap: 8px;
+  }
+
+  .works-pager__button {
+    min-width: 78px;
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .works-pager__status {
+    min-width: 82px;
+    font-size: 12px;
   }
 
   .work-card__fallback {
