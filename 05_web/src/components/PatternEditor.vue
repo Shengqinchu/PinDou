@@ -1,493 +1,894 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 
 import type { ColorRef, PatternSheet } from '../api/types';
+import type { CellPatch } from '../utils/patternEditing';
+import { cloneColorOrNull, colorTextFill, fontSizeForCode } from '../utils/patternEditing';
 
-const MIN_ZOOM = 1;
-const MAX_ZOOM = 12;
-const ZOOM_STEP = 1.25;
+const CACHE_CELL_PX = 18;
+const MAX_SCALE = 82;
+const LABEL_MIN_CELL_PX = 18;
+const CONTINUOUS_MIN_CELL_PX = 23;
+const LOUPE_GRID = 9;
+const LOUPE_CELL_PX = 18;
+const PINCH_SETTLE_MS = 260;
 
 const props = defineProps<{
   pattern: PatternSheet;
   palette: ColorRef[];
+  selectedColor: ColorRef | null;
+  continuousPaint: boolean;
+  patternKey: number;
+  paintRevision: number;
+  lastPatch: CellPatch | null;
 }>();
 
 const emit = defineEmits<{
-  recolor: [payload: { row: number; col: number; color: ColorRef }];
+  paint: [payload: { row: number; col: number; color: ColorRef }];
+  cursorChange: [payload: { row: number; col: number; cell: ColorRef | null }];
 }>();
 
-interface DragState {
-  pointerId: number;
-  startX: number;
-  startY: number;
-  panX: number;
-  panY: number;
-  moved: boolean;
-}
-
-interface ActiveCell {
-  row: number;
-  col: number;
+interface Point {
   x: number;
   y: number;
 }
 
-const svgRef = ref<SVGSVGElement | null>(null);
+interface PointerPoint extends Point {
+  pointerType: string;
+}
+
+interface MouseDrag {
+  pointerId: number;
+  button: number;
+  start: Point;
+  startOffsetX: number;
+  startOffsetY: number;
+  moved: boolean;
+}
+
+interface PinchState {
+  pointerIds: [number, number];
+  startDistance: number;
+  startScale: number;
+  anchorGrid: Point;
+}
+
 const frameRef = ref<HTMLElement | null>(null);
-const zoom = ref(1);
-const pan = ref({ x: 0, y: 0 });
-const drag = ref<DragState | null>(null);
-const activeCell = ref<ActiveCell | null>(null);
-const emptyPatternId = `pd-empty-cell-${Math.random().toString(36).slice(2)}`;
+const baseCanvasRef = ref<HTMLCanvasElement | null>(null);
+const overlayCanvasRef = ref<HTMLCanvasElement | null>(null);
+const loupeCanvasRef = ref<HTMLCanvasElement | null>(null);
+const canvasSize = reactive({ width: 1, height: 1, dpr: 1 });
+const view = reactive({ scale: 10, offsetX: 0, offsetY: 0 });
+const cursor = ref({ row: 0, col: 0 });
+const pointers = new Map<number, PointerPoint>();
+const mouseDrag = ref<MouseDrag | null>(null);
+const pinch = ref<PinchState | null>(null);
+const pinchSettledAt = ref(0);
+const hoverCell = ref<{ row: number; col: number } | null>(null);
+
+let staticCanvas: HTMLCanvasElement | null = null;
+let resizeObserver: ResizeObserver | null = null;
+let baseFrame = 0;
+let overlayFrame = 0;
 
 const rows = computed(() => props.pattern.grid.length);
 const cols = computed(() => Math.max(...props.pattern.grid.map((row) => row.length), 0));
-const viewWidth = computed(() => Math.max(cols.value / zoom.value, 1));
-const viewHeight = computed(() => Math.max(rows.value / zoom.value, 1));
-const viewBox = computed(() => `${pan.value.x} ${pan.value.y} ${viewWidth.value} ${viewHeight.value}`);
-const zoomLabel = computed(() => `${Math.round(zoom.value * 100)}%`);
-const showCellCodes = computed(() => Math.max(rows.value, cols.value) <= 52 || zoom.value >= 1.7);
-const paletteOptions = computed(() => uniqueColors(props.palette));
-const activeCellLabel = computed(() => {
-  const cell = activeCell.value;
-  if (!cell) {
-    return '';
+const minScale = computed(() => {
+  if (!rows.value || !cols.value) {
+    return 1;
   }
-  return `${cell.row + 1} 行 · ${cell.col + 1} 列`;
+  return Math.max(2, Math.min(canvasSize.width / cols.value, canvasSize.height / rows.value) * 0.92);
 });
-const activeCellCode = computed(() => {
-  const cell = activeCell.value;
-  if (!cell) {
-    return '';
+const scaleLabel = computed(() => `${Math.round((view.scale / Math.max(minScale.value, 1)) * 100)}%`);
+const cursorCell = computed(() => props.pattern.grid[cursor.value.row]?.[cursor.value.col] || null);
+const cursorCode = computed(() => cursorCell.value?.code || '空');
+const selectedCode = computed(() => props.selectedColor?.code || '未选');
+const canContinuousPaint = computed(() => props.continuousPaint && view.scale >= CONTINUOUS_MIN_CELL_PX);
+const loupeSize = LOUPE_GRID * LOUPE_CELL_PX + 2;
+const loupeStyle = computed(() => {
+  const screen = cellCenterToScreen(cursor.value.row, cursor.value.col);
+  const margin = 10;
+  let left = screen.x + 22;
+  let top = screen.y - loupeSize - 18;
+  if (top < margin) {
+    top = screen.y + 24;
   }
-  return props.pattern.grid[cell.row]?.[cell.col]?.code || '空';
-});
-const paletteStyle = computed(() => {
-  const cell = activeCell.value;
-  return cell ? { left: `${cell.x}px`, top: `${cell.y}px` } : {};
+  if (left + loupeSize > canvasSize.width - margin) {
+    left = screen.x - loupeSize - 22;
+  }
+  left = clamp(left, margin, Math.max(margin, canvasSize.width - loupeSize - margin));
+  top = clamp(top, margin, Math.max(margin, canvasSize.height - loupeSize - margin));
+  return {
+    width: `${loupeSize}px`,
+    height: `${loupeSize}px`,
+    transform: `translate(${left}px, ${top}px)`
+  };
 });
 
+onMounted(() => {
+  resizeObserver = new ResizeObserver(() => {
+    resizeCanvases();
+  });
+  if (frameRef.value) {
+    resizeObserver.observe(frameRef.value);
+  }
+  void nextTick(() => {
+    resizeCanvases();
+    rebuildStaticCache();
+    resetView();
+  });
+});
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect();
+  resizeObserver = null;
+  if (baseFrame) {
+    cancelAnimationFrame(baseFrame);
+  }
+  if (overlayFrame) {
+    cancelAnimationFrame(overlayFrame);
+  }
+});
+
+watch(
+  () => props.patternKey,
+  () => {
+    rebuildStaticCache();
+    clampCurrentView();
+    cursor.value = clampCursor(cursor.value.row, cursor.value.col);
+    emitCursor();
+    scheduleBaseDraw();
+    scheduleOverlayDraw();
+  }
+);
+
+watch(
+  () => props.paintRevision,
+  () => {
+    const patch = props.lastPatch;
+    if (patch) {
+      updateCachedCell(patch.row, patch.col, cloneColorOrNull(patch.after));
+      if (patch.row === cursor.value.row && patch.col === cursor.value.col) {
+        emitCursor();
+      }
+      scheduleBaseDraw();
+      scheduleOverlayDraw();
+    }
+  }
+);
+
+watch(
+  () => props.selectedColor?.code,
+  () => {
+    scheduleOverlayDraw();
+  }
+);
+
 function zoomIn(): void {
-  setZoom(zoom.value * ZOOM_STEP);
+  zoomAt(canvasSize.width / 2, canvasSize.height / 2, view.scale * 1.22);
 }
 
 function zoomOut(): void {
-  setZoom(zoom.value / ZOOM_STEP);
+  zoomAt(canvasSize.width / 2, canvasSize.height / 2, view.scale / 1.22);
 }
 
 function resetView(): void {
-  zoom.value = 1;
-  pan.value = { x: 0, y: 0 };
-  activeCell.value = null;
+  const nextScale = minScale.value;
+  view.scale = nextScale;
+  view.offsetX = (canvasSize.width - cols.value * nextScale) / 2;
+  view.offsetY = (canvasSize.height - rows.value * nextScale) / 2;
+  cursor.value = clampCursor(Math.floor(rows.value / 2), Math.floor(cols.value / 2));
+  emitCursor();
+  scheduleBaseDraw();
+  scheduleOverlayDraw();
+}
+
+function paintAtCursor(): void {
+  if (!props.selectedColor) {
+    return;
+  }
+  emit('paint', {
+    row: cursor.value.row,
+    col: cursor.value.col,
+    color: props.selectedColor
+  });
+}
+
+function resizeCanvases(): void {
+  const frame = frameRef.value;
+  if (!frame) {
+    return;
+  }
+  const rect = frame.getBoundingClientRect();
+  canvasSize.width = Math.max(1, rect.width);
+  canvasSize.height = Math.max(1, rect.height);
+  canvasSize.dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+  setupCanvas(baseCanvasRef.value);
+  setupCanvas(overlayCanvasRef.value);
+  setupLoupeCanvas();
+  clampCurrentView();
+  scheduleBaseDraw();
+  scheduleOverlayDraw();
+}
+
+function setupCanvas(canvas: HTMLCanvasElement | null): void {
+  if (!canvas) {
+    return;
+  }
+  const width = Math.round(canvasSize.width * canvasSize.dpr);
+  const height = Math.round(canvasSize.height * canvasSize.dpr);
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+}
+
+function setupLoupeCanvas(): void {
+  const canvas = loupeCanvasRef.value;
+  if (!canvas) {
+    return;
+  }
+  const width = Math.round(loupeSize * canvasSize.dpr);
+  if (canvas.width !== width || canvas.height !== width) {
+    canvas.width = width;
+    canvas.height = width;
+  }
+}
+
+function rebuildStaticCache(): void {
+  if (!rows.value || !cols.value) {
+    staticCanvas = null;
+    return;
+  }
+  staticCanvas = document.createElement('canvas');
+  staticCanvas.width = Math.max(1, cols.value * CACHE_CELL_PX);
+  staticCanvas.height = Math.max(1, rows.value * CACHE_CELL_PX);
+  const ctx = staticCanvas.getContext('2d');
+  if (!ctx) {
+    return;
+  }
+  ctx.imageSmoothingEnabled = false;
+  ctx.fillStyle = '#fffaf5';
+  ctx.fillRect(0, 0, staticCanvas.width, staticCanvas.height);
+  for (let row = 0; row < rows.value; row += 1) {
+    for (let col = 0; col < cols.value; col += 1) {
+      drawCacheCell(ctx, row, col, props.pattern.grid[row]?.[col] || null);
+    }
+  }
+}
+
+function updateCachedCell(row: number, col: number, color: ColorRef | null): void {
+  const ctx = staticCanvas?.getContext('2d');
+  if (!ctx) {
+    rebuildStaticCache();
+    return;
+  }
+  drawCacheCell(ctx, row, col, color);
+}
+
+function drawCacheCell(ctx: CanvasRenderingContext2D, row: number, col: number, color: ColorRef | null): void {
+  const x = col * CACHE_CELL_PX;
+  const y = row * CACHE_CELL_PX;
+  ctx.fillStyle = color?.hex || '#fffaf5';
+  ctx.fillRect(x, y, CACHE_CELL_PX, CACHE_CELL_PX);
+  if (!color) {
+    ctx.strokeStyle = '#efe4da';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, y + CACHE_CELL_PX);
+    ctx.lineTo(x + CACHE_CELL_PX, y);
+    ctx.stroke();
+  }
+}
+
+function scheduleBaseDraw(): void {
+  if (baseFrame) {
+    return;
+  }
+  baseFrame = requestAnimationFrame(() => {
+    baseFrame = 0;
+    drawBase();
+  });
+}
+
+function scheduleOverlayDraw(): void {
+  if (overlayFrame) {
+    return;
+  }
+  overlayFrame = requestAnimationFrame(() => {
+    overlayFrame = 0;
+    drawOverlay();
+    drawLoupe();
+  });
+}
+
+function drawBase(): void {
+  const canvas = baseCanvasRef.value;
+  const ctx = canvas?.getContext('2d');
+  if (!canvas || !ctx) {
+    return;
+  }
+  ctx.setTransform(canvasSize.dpr, 0, 0, canvasSize.dpr, 0, 0);
+  ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
+  ctx.fillStyle = '#fffaf5';
+  ctx.fillRect(0, 0, canvasSize.width, canvasSize.height);
+  if (!staticCanvas || !rows.value || !cols.value) {
+    return;
+  }
+
+  ctx.imageSmoothingEnabled = false;
+  const visible = visibleBounds(1);
+  const sx = visible.colStart * CACHE_CELL_PX;
+  const sy = visible.rowStart * CACHE_CELL_PX;
+  const sw = Math.max(1, (visible.colEnd - visible.colStart) * CACHE_CELL_PX);
+  const sh = Math.max(1, (visible.rowEnd - visible.rowStart) * CACHE_CELL_PX);
+  const dx = view.offsetX + visible.colStart * view.scale;
+  const dy = view.offsetY + visible.rowStart * view.scale;
+  const dw = (visible.colEnd - visible.colStart) * view.scale;
+  const dh = (visible.rowEnd - visible.rowStart) * view.scale;
+  ctx.drawImage(staticCanvas, sx, sy, sw, sh, dx, dy, dw, dh);
+
+  if (view.scale >= 6) {
+    drawGridLines(ctx, visible);
+  }
+  if (view.scale >= LABEL_MIN_CELL_PX) {
+    drawCellLabels(ctx, visible);
+  }
+}
+
+function drawGridLines(ctx: CanvasRenderingContext2D, bounds: ReturnType<typeof visibleBounds>): void {
+  ctx.save();
+  ctx.strokeStyle = view.scale >= 18 ? 'rgba(45,45,45,0.3)' : 'rgba(45,45,45,0.18)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let col = bounds.colStart; col <= bounds.colEnd; col += 1) {
+    const x = crisp(view.offsetX + col * view.scale);
+    ctx.moveTo(x, view.offsetY + bounds.rowStart * view.scale);
+    ctx.lineTo(x, view.offsetY + bounds.rowEnd * view.scale);
+  }
+  for (let row = bounds.rowStart; row <= bounds.rowEnd; row += 1) {
+    const y = crisp(view.offsetY + row * view.scale);
+    ctx.moveTo(view.offsetX + bounds.colStart * view.scale, y);
+    ctx.lineTo(view.offsetX + bounds.colEnd * view.scale, y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawCellLabels(ctx: CanvasRenderingContext2D, bounds: ReturnType<typeof visibleBounds>): void {
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let row = bounds.rowStart; row < bounds.rowEnd; row += 1) {
+    for (let col = bounds.colStart; col < bounds.colEnd; col += 1) {
+      const cell = props.pattern.grid[row]?.[col] || null;
+      if (!cell) {
+        continue;
+      }
+      const x = view.offsetX + (col + 0.5) * view.scale;
+      const y = view.offsetY + (row + 0.54) * view.scale;
+      const fontSize = fontSizeForCode(cell.code, view.scale);
+      ctx.font = `900 ${fontSize}px ${getComputedStyle(document.documentElement).getPropertyValue('--pd-font-mono') || 'monospace'}`;
+      ctx.lineWidth = Math.max(2, view.scale * 0.08);
+      ctx.strokeStyle = 'rgba(255,255,255,0.62)';
+      ctx.fillStyle = colorTextFill(cell);
+      ctx.strokeText(cell.code, x, y);
+      ctx.fillText(cell.code, x, y);
+    }
+  }
+  ctx.restore();
+}
+
+function drawOverlay(): void {
+  const canvas = overlayCanvasRef.value;
+  const ctx = canvas?.getContext('2d');
+  if (!canvas || !ctx) {
+    return;
+  }
+  ctx.setTransform(canvasSize.dpr, 0, 0, canvasSize.dpr, 0, 0);
+  ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
+  drawCellMarker(ctx, cursor.value.row, cursor.value.col, '#ff6b9d', 3);
+  const hover = hoverCell.value;
+  if (hover && (hover.row !== cursor.value.row || hover.col !== cursor.value.col)) {
+    drawCellMarker(ctx, hover.row, hover.col, 'rgba(255,142,83,0.72)', 2);
+  }
+  const center = cellCenterToScreen(cursor.value.row, cursor.value.col);
+  ctx.save();
+  ctx.fillStyle = props.selectedColor?.hex || '#fff';
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, Math.max(5, Math.min(12, view.scale * 0.22)), 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawCellMarker(
+  ctx: CanvasRenderingContext2D,
+  row: number,
+  col: number,
+  color: string,
+  width: number
+): void {
+  if (row < 0 || col < 0 || row >= rows.value || col >= cols.value) {
+    return;
+  }
+  const x = view.offsetX + col * view.scale;
+  const y = view.offsetY + row * view.scale;
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.setLineDash([Math.max(4, view.scale * 0.25), Math.max(3, view.scale * 0.14)]);
+  ctx.strokeRect(x + width / 2, y + width / 2, Math.max(1, view.scale - width), Math.max(1, view.scale - width));
+  ctx.restore();
+}
+
+function drawLoupe(): void {
+  const canvas = loupeCanvasRef.value;
+  const ctx = canvas?.getContext('2d');
+  if (!canvas || !ctx) {
+    return;
+  }
+  const size = loupeSize;
+  ctx.setTransform(canvasSize.dpr, 0, 0, canvasSize.dpr, 0, 0);
+  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = '#fffaf7';
+  ctx.fillRect(0, 0, size, size);
+  const half = Math.floor(LOUPE_GRID / 2);
+  const startRow = cursor.value.row - half;
+  const startCol = cursor.value.col - half;
+  for (let rr = 0; rr < LOUPE_GRID; rr += 1) {
+    for (let cc = 0; cc < LOUPE_GRID; cc += 1) {
+      const row = startRow + rr;
+      const col = startCol + cc;
+      const x = 1 + cc * LOUPE_CELL_PX;
+      const y = 1 + rr * LOUPE_CELL_PX;
+      const cell = props.pattern.grid[row]?.[col] || null;
+      ctx.fillStyle = row < 0 || col < 0 || row >= rows.value || col >= cols.value
+        ? '#f4ebe3'
+        : cell?.hex || '#fffaf5';
+      ctx.fillRect(x, y, LOUPE_CELL_PX, LOUPE_CELL_PX);
+      ctx.strokeStyle = 'rgba(45,45,45,0.18)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(crisp(x), crisp(y), LOUPE_CELL_PX, LOUPE_CELL_PX);
+      if (cell) {
+        ctx.fillStyle = colorTextFill(cell);
+        ctx.font = `900 ${fontSizeForCode(cell.code, LOUPE_CELL_PX)}px ${getComputedStyle(document.documentElement).getPropertyValue('--pd-font-mono') || 'monospace'}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(cell.code, x + LOUPE_CELL_PX / 2, y + LOUPE_CELL_PX * 0.55);
+      }
+    }
+  }
+  const cursorX = 1 + half * LOUPE_CELL_PX;
+  const cursorY = 1 + half * LOUPE_CELL_PX;
+  ctx.strokeStyle = '#ff6b9d';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(cursorX + 1.5, cursorY + 1.5, LOUPE_CELL_PX - 3, LOUPE_CELL_PX - 3);
 }
 
 function handleWheel(event: WheelEvent): void {
-  const svg = svgRef.value;
-  if (!svg || rows.value === 0 || cols.value === 0) {
-    return;
-  }
-  const rect = svg.getBoundingClientRect();
-  const relX = rect.width > 0 ? (event.clientX - rect.left) / rect.width : 0.5;
-  const relY = rect.height > 0 ? (event.clientY - rect.top) / rect.height : 0.5;
-  const oldWidth = viewWidth.value;
-  const oldHeight = viewHeight.value;
-  const centerX = pan.value.x + relX * oldWidth;
-  const centerY = pan.value.y + relY * oldHeight;
-  const nextZoom = event.deltaY < 0 ? zoom.value * 1.16 : zoom.value / 1.16;
-  setZoom(nextZoom, { x: centerX, y: centerY, relX, relY });
+  event.preventDefault();
+  const point = localPoint(event.clientX, event.clientY);
+  const multiplier = event.deltaY < 0 ? 1.16 : 1 / 1.16;
+  zoomAt(point.x, point.y, view.scale * multiplier);
 }
 
 function handlePointerDown(event: PointerEvent): void {
-  if (event.button !== 0) {
+  event.preventDefault();
+  frameRef.value?.setPointerCapture(event.pointerId);
+  const point = localPoint(event.clientX, event.clientY);
+  pointers.set(event.pointerId, { ...point, pointerType: event.pointerType });
+
+  if (pointers.size >= 2 && event.pointerType !== 'mouse') {
+    beginPinch();
     return;
   }
-  activeCell.value = null;
-  const svg = svgRef.value;
-  svg?.setPointerCapture(event.pointerId);
-  drag.value = {
-    pointerId: event.pointerId,
-    startX: event.clientX,
-    startY: event.clientY,
-    panX: pan.value.x,
-    panY: pan.value.y,
-    moved: false
-  };
+
+  if (event.pointerType === 'mouse') {
+    mouseDrag.value = {
+      pointerId: event.pointerId,
+      button: event.button,
+      start: point,
+      startOffsetX: view.offsetX,
+      startOffsetY: view.offsetY,
+      moved: false
+    };
+    hoverCell.value = hitCell(point);
+    scheduleOverlayDraw();
+    return;
+  }
+
+  const hit = hitCell(point);
+  if (hit) {
+    setCursor(hit.row, hit.col);
+    if (canContinuousPaint.value && props.selectedColor && Date.now() > pinchSettledAt.value) {
+      paintCell(hit.row, hit.col);
+    }
+  }
 }
 
 function handlePointerMove(event: PointerEvent): void {
-  const currentDrag = drag.value;
-  const svg = svgRef.value;
-  if (!currentDrag || !svg || currentDrag.pointerId !== event.pointerId) {
+  event.preventDefault();
+  const point = localPoint(event.clientX, event.clientY);
+  if (pointers.has(event.pointerId)) {
+    pointers.set(event.pointerId, { ...point, pointerType: event.pointerType });
+  }
+
+  if (pinch.value && pointers.size >= 2) {
+    updatePinch();
     return;
   }
-  const rect = svg.getBoundingClientRect();
-  const dx = event.clientX - currentDrag.startX;
-  const dy = event.clientY - currentDrag.startY;
-  if (Math.hypot(dx, dy) > 4) {
-    currentDrag.moved = true;
+
+  const drag = mouseDrag.value;
+  if (event.pointerType === 'mouse' && drag?.pointerId === event.pointerId) {
+    const dx = point.x - drag.start.x;
+    const dy = point.y - drag.start.y;
+    if (Math.hypot(dx, dy) > 4 || drag.button !== 0) {
+      drag.moved = true;
+      view.offsetX = drag.startOffsetX + dx;
+      view.offsetY = drag.startOffsetY + dy;
+      clampCurrentView();
+      scheduleBaseDraw();
+      scheduleOverlayDraw();
+    }
+    return;
   }
-  const nextX = currentDrag.panX - (dx / Math.max(rect.width, 1)) * viewWidth.value;
-  const nextY = currentDrag.panY - (dy / Math.max(rect.height, 1)) * viewHeight.value;
-  pan.value = clampPan(nextX, nextY, zoom.value);
+
+  if (event.pointerType === 'mouse') {
+    hoverCell.value = hitCell(point);
+    scheduleOverlayDraw();
+    return;
+  }
+
+  const hit = hitCell(point);
+  if (hit) {
+    setCursor(hit.row, hit.col);
+    if (canContinuousPaint.value && props.selectedColor && Date.now() > pinchSettledAt.value) {
+      paintCell(hit.row, hit.col);
+    }
+  }
 }
 
 function handlePointerUp(event: PointerEvent): void {
-  const currentDrag = drag.value;
-  const svg = svgRef.value;
-  if (!currentDrag || currentDrag.pointerId !== event.pointerId) {
+  event.preventDefault();
+  const point = localPoint(event.clientX, event.clientY);
+  frameRef.value?.releasePointerCapture(event.pointerId);
+  pointers.delete(event.pointerId);
+
+  if (pinch.value) {
+    if (pointers.size < 2) {
+      pinch.value = null;
+      pinchSettledAt.value = Date.now() + PINCH_SETTLE_MS;
+    }
     return;
   }
-  svg?.releasePointerCapture(event.pointerId);
-  drag.value = null;
-  if (!currentDrag.moved) {
-    openCellPalette(event);
-  }
-}
 
-function openCellPalette(event: PointerEvent): void {
-  const point = svgPointFromEvent(event);
-  const row = Math.floor(point.y);
-  const col = Math.floor(point.x);
-  if (row < 0 || col < 0 || row >= rows.value || col >= (props.pattern.grid[row]?.length || 0)) {
-    activeCell.value = null;
-    return;
-  }
-  const frame = frameRef.value;
-  const rect = frame?.getBoundingClientRect();
-  const x = rect ? clamp(event.clientX - rect.left + 12, 12, Math.max(rect.width - 292, 12)) : 12;
-  const y = rect ? clamp(event.clientY - rect.top + 12, 12, Math.max(rect.height - 250, 12)) : 12;
-  activeCell.value = { row, col, x, y };
-}
-
-function chooseColor(color: ColorRef): void {
-  const cell = activeCell.value;
-  if (!cell) {
-    return;
-  }
-  emit('recolor', { row: cell.row, col: cell.col, color: cloneColor(color) });
-  activeCell.value = null;
-}
-
-function setZoom(
-  rawZoom: number,
-  anchor: { x: number; y: number; relX: number; relY: number } | null = null
-): void {
-  const nextZoom = clamp(rawZoom, MIN_ZOOM, MAX_ZOOM);
-  const oldWidth = viewWidth.value;
-  const oldHeight = viewHeight.value;
-  zoom.value = nextZoom;
-  const newWidth = viewWidth.value;
-  const newHeight = viewHeight.value;
-  const anchorX = anchor?.x ?? pan.value.x + oldWidth / 2;
-  const anchorY = anchor?.y ?? pan.value.y + oldHeight / 2;
-  const relX = anchor?.relX ?? 0.5;
-  const relY = anchor?.relY ?? 0.5;
-  pan.value = clampPan(anchorX - relX * newWidth, anchorY - relY * newHeight, nextZoom);
-}
-
-function clampPan(x: number, y: number, targetZoom: number): { x: number; y: number } {
-  const width = Math.max(cols.value / targetZoom, 1);
-  const height = Math.max(rows.value / targetZoom, 1);
-  return {
-    x: clamp(x, 0, Math.max(cols.value - width, 0)),
-    y: clamp(y, 0, Math.max(rows.value - height, 0))
-  };
-}
-
-function svgPointFromEvent(event: PointerEvent): { x: number; y: number } {
-  const svg = svgRef.value;
-  if (!svg) {
-    return { x: 0, y: 0 };
-  }
-  const rect = svg.getBoundingClientRect();
-  const relX = rect.width > 0 ? (event.clientX - rect.left) / rect.width : 0;
-  const relY = rect.height > 0 ? (event.clientY - rect.top) / rect.height : 0;
-  return {
-    x: pan.value.x + relX * viewWidth.value,
-    y: pan.value.y + relY * viewHeight.value
-  };
-}
-
-function cellFill(cell: ColorRef | null): string {
-  return cell?.hex || `url(#${emptyPatternId})`;
-}
-
-function textFill(cell: ColorRef | null): string {
-  if (!cell) {
-    return '#8b8178';
-  }
-  const [r, g, b] = cell.rgb;
-  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return luminance < 145 ? '#ffffff' : '#282828';
-}
-
-function fontSizeForCode(code: string): number {
-  if (code.length <= 2) {
-    return 0.38;
-  }
-  if (code.length === 3) {
-    return 0.31;
-  }
-  return Math.max(0.2, 0.78 / Math.max(code.length, 1));
-}
-
-function uniqueColors(colors: ColorRef[]): ColorRef[] {
-  const seen = new Set<string>();
-  const unique: ColorRef[] = [];
-  for (const color of colors) {
-    if (!seen.has(color.code)) {
-      seen.add(color.code);
-      unique.push(color);
+  const drag = mouseDrag.value;
+  if (event.pointerType === 'mouse' && drag?.pointerId === event.pointerId) {
+    mouseDrag.value = null;
+    if (!drag.moved && drag.button === 0 && props.selectedColor) {
+      const hit = hitCell(point);
+      if (hit) {
+        setCursor(hit.row, hit.col);
+        paintCell(hit.row, hit.col);
+      }
     }
   }
-  return unique;
 }
 
-function cloneColor(color: ColorRef): ColorRef {
-  return {
-    ...color,
-    rgb: [...color.rgb] as [number, number, number]
+function handlePointerCancel(event: PointerEvent): void {
+  pointers.delete(event.pointerId);
+  mouseDrag.value = null;
+  pinch.value = null;
+  pinchSettledAt.value = Date.now() + PINCH_SETTLE_MS;
+}
+
+function beginPinch(): void {
+  const active = Array.from(pointers.entries()).slice(0, 2);
+  if (active.length < 2) {
+    return;
+  }
+  const first = active[0][1];
+  const second = active[1][1];
+  const center = midpoint(first, second);
+  pinch.value = {
+    pointerIds: [active[0][0], active[1][0]],
+    startDistance: Math.max(1, distance(first, second)),
+    startScale: view.scale,
+    anchorGrid: screenToGridPoint(center)
   };
+}
+
+function updatePinch(): void {
+  const state = pinch.value;
+  if (!state) {
+    return;
+  }
+  const first = pointers.get(state.pointerIds[0]);
+  const second = pointers.get(state.pointerIds[1]);
+  if (!first || !second) {
+    return;
+  }
+  const nextDistance = Math.max(1, distance(first, second));
+  const center = midpoint(first, second);
+  const nextScale = clamp(state.startScale * (nextDistance / state.startDistance), minScale.value, MAX_SCALE);
+  view.scale = nextScale;
+  view.offsetX = center.x - state.anchorGrid.x * nextScale;
+  view.offsetY = center.y - state.anchorGrid.y * nextScale;
+  clampCurrentView();
+  scheduleBaseDraw();
+  scheduleOverlayDraw();
+}
+
+function zoomAt(screenX: number, screenY: number, rawScale: number): void {
+  const anchor = screenToGridPoint({ x: screenX, y: screenY });
+  const nextScale = clamp(rawScale, minScale.value, MAX_SCALE);
+  view.scale = nextScale;
+  view.offsetX = screenX - anchor.x * nextScale;
+  view.offsetY = screenY - anchor.y * nextScale;
+  clampCurrentView();
+  scheduleBaseDraw();
+  scheduleOverlayDraw();
+}
+
+function setCursor(row: number, col: number): void {
+  const next = clampCursor(row, col);
+  if (next.row === cursor.value.row && next.col === cursor.value.col) {
+    return;
+  }
+  cursor.value = next;
+  emitCursor();
+  scheduleOverlayDraw();
+}
+
+function paintCell(row: number, col: number): void {
+  if (!props.selectedColor) {
+    return;
+  }
+  emit('paint', { row, col, color: props.selectedColor });
+}
+
+function emitCursor(): void {
+  emit('cursorChange', {
+    row: cursor.value.row,
+    col: cursor.value.col,
+    cell: props.pattern.grid[cursor.value.row]?.[cursor.value.col] || null
+  });
+}
+
+function localPoint(clientX: number, clientY: number): Point {
+  const rect = frameRef.value?.getBoundingClientRect();
+  return {
+    x: clientX - (rect?.left || 0),
+    y: clientY - (rect?.top || 0)
+  };
+}
+
+function screenToGridPoint(point: Point): Point {
+  return {
+    x: (point.x - view.offsetX) / view.scale,
+    y: (point.y - view.offsetY) / view.scale
+  };
+}
+
+function hitCell(point: Point): { row: number; col: number } | null {
+  const gridPoint = screenToGridPoint(point);
+  const col = Math.floor(gridPoint.x);
+  const row = Math.floor(gridPoint.y);
+  if (row < 0 || col < 0 || row >= rows.value || col >= cols.value) {
+    return null;
+  }
+  return { row, col };
+}
+
+function cellCenterToScreen(row: number, col: number): Point {
+  return {
+    x: view.offsetX + (col + 0.5) * view.scale,
+    y: view.offsetY + (row + 0.5) * view.scale
+  };
+}
+
+function clampCurrentView(): void {
+  if (!rows.value || !cols.value) {
+    return;
+  }
+  const gridW = cols.value * view.scale;
+  const gridH = rows.value * view.scale;
+  if (gridW <= canvasSize.width) {
+    view.offsetX = (canvasSize.width - gridW) / 2;
+  } else {
+    view.offsetX = clamp(view.offsetX, canvasSize.width - gridW, 0);
+  }
+  if (gridH <= canvasSize.height) {
+    view.offsetY = (canvasSize.height - gridH) / 2;
+  } else {
+    view.offsetY = clamp(view.offsetY, canvasSize.height - gridH, 0);
+  }
+}
+
+function clampCursor(row: number, col: number): { row: number; col: number } {
+  return {
+    row: clamp(row, 0, Math.max(rows.value - 1, 0)),
+    col: clamp(col, 0, Math.max(cols.value - 1, 0))
+  };
+}
+
+function visibleBounds(padding = 0): { rowStart: number; rowEnd: number; colStart: number; colEnd: number } {
+  const colStart = clamp(Math.floor((-view.offsetX) / view.scale) - padding, 0, cols.value);
+  const rowStart = clamp(Math.floor((-view.offsetY) / view.scale) - padding, 0, rows.value);
+  const colEnd = clamp(Math.ceil((canvasSize.width - view.offsetX) / view.scale) + padding, 0, cols.value);
+  const rowEnd = clamp(Math.ceil((canvasSize.height - view.offsetY) / view.scale) + padding, 0, rows.value);
+  return { rowStart, rowEnd, colStart, colEnd };
+}
+
+function midpoint(first: Point, second: Point): Point {
+  return {
+    x: (first.x + second.x) / 2,
+    y: (first.y + second.y) / 2
+  };
+}
+
+function distance(first: Point, second: Point): number {
+  return Math.hypot(first.x - second.x, first.y - second.y);
+}
+
+function crisp(value: number): number {
+  return Math.round(value) + 0.5;
 }
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
+
+defineExpose({
+  paintAtCursor,
+  resetView,
+  zoomIn,
+  zoomOut,
+  scaleLabel
+});
 </script>
 
 <template>
-  <div class="pattern-editor">
-    <div class="pattern-editor__toolbar" aria-label="图纸缩放">
-      <button type="button" class="pattern-editor__tool" aria-label="缩小" @click="zoomOut">-</button>
-      <span class="pattern-editor__zoom">{{ zoomLabel }}</span>
-      <button type="button" class="pattern-editor__tool" aria-label="放大" @click="zoomIn">+</button>
-      <button type="button" class="pattern-editor__reset" @click="resetView">复位</button>
+  <div
+    ref="frameRef"
+    class="pattern-editor"
+    @contextmenu.prevent
+    @wheel="handleWheel"
+    @pointerdown="handlePointerDown"
+    @pointermove="handlePointerMove"
+    @pointerup="handlePointerUp"
+    @pointercancel="handlePointerCancel"
+    @pointerleave="hoverCell = null"
+  >
+    <canvas ref="baseCanvasRef" class="pattern-editor__canvas" aria-label="拼豆图纸画布"></canvas>
+    <canvas ref="overlayCanvasRef" class="pattern-editor__overlay" aria-hidden="true"></canvas>
+    <canvas ref="loupeCanvasRef" class="pattern-editor__loupe" :style="loupeStyle" aria-hidden="true"></canvas>
+
+    <div class="pattern-editor__hud" aria-live="polite">
+      <span>{{ cursor.row + 1 }}行 {{ cursor.col + 1 }}列</span>
+      <strong>{{ cursorCode }}</strong>
+      <em>选中 {{ selectedCode }}</em>
     </div>
 
-    <div ref="frameRef" class="pattern-editor__frame">
-      <svg
-        ref="svgRef"
-        class="pattern-editor__svg"
-        :viewBox="viewBox"
-        role="img"
-        aria-label="可编辑拼豆图纸"
-        @wheel.prevent="handleWheel"
-        @pointerdown="handlePointerDown"
-        @pointermove="handlePointerMove"
-        @pointerup="handlePointerUp"
-        @pointercancel="handlePointerUp"
-      >
-        <defs>
-          <pattern :id="emptyPatternId" width="1" height="1" patternUnits="userSpaceOnUse">
-            <rect width="1" height="1" fill="#fffaf5"></rect>
-            <path d="M0 1 L1 0" stroke="#eadfd4" stroke-width="0.04"></path>
-          </pattern>
-        </defs>
-        <rect :width="cols" :height="rows" fill="#fff"></rect>
-        <g>
-          <g v-for="(row, rowIndex) in pattern.grid" :key="rowIndex">
-            <g v-for="(cell, colIndex) in row" :key="`${rowIndex}-${colIndex}`">
-              <rect
-                :x="colIndex"
-                :y="rowIndex"
-                width="1"
-                height="1"
-                :fill="cellFill(cell)"
-                stroke="rgba(45, 45, 45, 0.28)"
-                stroke-width="0.025"
-                vector-effect="non-scaling-stroke"
-              ></rect>
-              <text
-                v-if="cell && showCellCodes"
-                :x="colIndex + 0.5"
-                :y="rowIndex + 0.56"
-                :font-size="fontSizeForCode(cell.code)"
-                :fill="textFill(cell)"
-                text-anchor="middle"
-                dominant-baseline="middle"
-                paint-order="stroke"
-                stroke="rgba(255, 255, 255, 0.5)"
-                stroke-width="0.025"
-                vector-effect="non-scaling-stroke"
-              >
-                {{ cell.code }}
-              </text>
-            </g>
-          </g>
-        </g>
-      </svg>
-
-      <div v-if="activeCell" class="pattern-editor__palette" :style="paletteStyle">
-        <div class="pattern-editor__palette-head">
-          <strong>{{ activeCellLabel }}</strong>
-          <span>{{ activeCellCode }}</span>
-        </div>
-        <div class="pattern-editor__palette-grid">
-          <button
-            v-for="color in paletteOptions"
-            :key="color.code"
-            type="button"
-            class="pattern-editor__color"
-            :class="{ 'pattern-editor__color--active': color.code === activeCellCode }"
-            :title="`${color.code} · ${color.name_cn}`"
-            @click="chooseColor(color)"
-          >
-            <span :style="{ backgroundColor: color.hex }"></span>
-            <strong>{{ color.code }}</strong>
-          </button>
-        </div>
-      </div>
-    </div>
+    <div v-if="canContinuousPaint" class="pattern-editor__paint-mode">连续涂</div>
   </div>
 </template>
 
 <style scoped>
 .pattern-editor {
+  position: relative;
   width: 100%;
   height: 100%;
   min-height: 0;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 12px;
-}
-
-.pattern-editor__toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.pattern-editor__tool,
-.pattern-editor__reset {
-  appearance: none;
-  min-width: 38px;
-  height: 38px;
-  border: 1px solid rgba(255, 142, 83, 0.28);
-  border-radius: 12px;
-  background: #fff;
-  color: var(--pd-fg-1);
-  cursor: pointer;
-  font: inherit;
-  font-weight: 900;
-}
-
-.pattern-editor__tool:hover,
-.pattern-editor__reset:hover {
-  border-color: rgba(255, 142, 83, 0.52);
-  color: var(--pd-orange);
-}
-
-.pattern-editor__reset {
-  padding: 0 14px;
-}
-
-.pattern-editor__zoom {
-  min-width: 58px;
-  color: var(--pd-fg-2);
-  font-size: 13px;
-  font-weight: 900;
-  text-align: center;
-}
-
-.pattern-editor__frame {
-  position: relative;
-  min-height: 0;
   overflow: hidden;
-  border: 1px solid var(--pd-stroke);
-  border-radius: 18px;
-  background: #fff;
+  border-radius: 22px;
+  background:
+    linear-gradient(45deg, rgba(237, 228, 218, 0.34) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(237, 228, 218, 0.34) 25%, transparent 25%),
+    #fffaf5;
+  touch-action: none;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.pattern-editor__svg {
+.pattern-editor__canvas,
+.pattern-editor__overlay {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: block;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
 }
 
-.pattern-editor__svg:active {
-  cursor: grabbing;
+.pattern-editor__overlay {
+  z-index: 2;
+  pointer-events: none;
 }
 
-.pattern-editor__palette {
+.pattern-editor__loupe {
   position: absolute;
-  z-index: 3;
-  width: min(280px, calc(100% - 24px));
-  max-height: min(360px, calc(100% - 24px));
-  overflow: auto;
-  border: 1px solid rgba(237, 228, 218, 0.92);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 18px 45px rgba(45, 45, 45, 0.16);
-  padding: 12px;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  border: 2px solid rgba(255, 142, 83, 0.55);
+  border-radius: 20px;
+  background: #fffaf7;
+  box-shadow: 0 16px 36px rgba(45, 45, 45, 0.18), 0 8px 20px rgba(255, 142, 83, 0.16);
+  pointer-events: none;
 }
 
-.pattern-editor__palette-head {
-  display: flex;
+.pattern-editor__hud {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 5;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.pattern-editor__palette-head strong {
-  color: var(--pd-fg-1);
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.pattern-editor__palette-head span {
+  gap: 8px;
+  max-width: min(360px, calc(100% - 24px));
+  border: 1px solid rgba(255, 142, 83, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 24px rgba(45, 45, 45, 0.1);
   color: var(--pd-fg-2);
   font-size: 12px;
   font-weight: 900;
+  padding: 8px 10px;
+  pointer-events: none;
 }
 
-.pattern-editor__palette-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.pattern-editor__color {
-  appearance: none;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: 7px;
-  min-width: 0;
-  min-height: 38px;
-  border: 1px solid var(--pd-stroke);
-  border-radius: 12px;
-  background: var(--pd-peach-50);
+.pattern-editor__hud strong {
   color: var(--pd-fg-1);
-  cursor: pointer;
-  font: inherit;
-  padding: 6px;
+  white-space: nowrap;
 }
 
-.pattern-editor__color:hover,
-.pattern-editor__color--active {
-  border-color: rgba(255, 142, 83, 0.58);
-  background: #fff;
-}
-
-.pattern-editor__color span {
-  width: 22px;
-  height: 22px;
-  border: 1px solid rgba(45, 45, 45, 0.12);
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
-}
-
-.pattern-editor__color strong {
-  min-width: 0;
+.pattern-editor__hud em {
   overflow: hidden;
-  font-size: 12px;
-  font-weight: 900;
-  text-align: left;
+  max-width: 120px;
+  color: var(--pd-orange);
+  font-style: normal;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.pattern-editor__paint-mode {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  z-index: 5;
+  border-radius: 999px;
+  background: var(--pd-gradient-warm);
+  box-shadow: var(--pd-shadow-cta);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 8px 11px;
+  pointer-events: none;
+}
+
+@media (max-width: 560px) {
+  .pattern-editor {
+    border-radius: 18px;
+  }
+
+  .pattern-editor__loupe {
+    border-radius: 17px;
+  }
+
+  .pattern-editor__hud {
+    left: 10px;
+    top: 10px;
+    gap: 6px;
+    font-size: 11px;
+    padding: 7px 9px;
+  }
+
+  .pattern-editor__hud em {
+    max-width: 82px;
+  }
 }
 </style>

@@ -126,6 +126,14 @@ a {
   padding: clamp(8px, 1.8vh, 20px) 20px;
 }
 
+.app-main--editor {
+  width: 100%;
+  max-width: none;
+  min-height: 100dvh;
+  padding: 0;
+  overflow: hidden;
+}
+
 .placeholder-page {
   width: min(100%, 760px);
   margin: 0 auto;

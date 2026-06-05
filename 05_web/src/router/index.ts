@@ -3,13 +3,14 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import { clearStoredUser, clearToken, hasToken } from '../auth/tokenStorage';
 import HomePage from '../views/HomePage.vue';
+import EditorPage from '../views/EditorPage.vue';
 import LoginPage from '../views/LoginPage.vue';
 import LoadingPage from '../views/LoadingPage.vue';
 import ResultPage from '../views/ResultPage.vue';
 import UploadPage from '../views/UploadPage.vue';
 import WorksPage from '../views/WorksPage.vue';
 
-const protectedRoutes = new Set(['upload', 'loading', 'result', 'works']);
+const protectedRoutes = new Set(['upload', 'loading', 'result', 'editor', 'works']);
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -33,6 +34,12 @@ export const router = createRouter({
       name: 'result',
       component: ResultPage,
       meta: { title: '结果', requiresAuth: true }
+    },
+    {
+      path: '/editor/:id',
+      name: 'editor',
+      component: EditorPage,
+      meta: { title: '编辑图纸', requiresAuth: true }
     },
     {
       path: '/works',

@@ -6,11 +6,12 @@ import AccountMenu from './components/AccountMenu.vue';
 
 const route = useRoute();
 const isAuthPage = computed(() => route.name === 'login');
+const isEditorPage = computed(() => route.name === 'editor');
 </script>
 
 <template>
   <div class="app-shell">
-    <header class="app-header">
+    <header v-if="!isEditorPage" class="app-header">
       <RouterLink class="brand" to="/" aria-label="PinDou 首页">
         <img class="brand__logo" src="/brand/logo.png" alt="" aria-hidden="true" />
         <span class="brand__text">PinDou 拼豆</span>
@@ -21,7 +22,7 @@ const isAuthPage = computed(() => route.name === 'login');
       </nav>
     </header>
 
-    <main class="app-main" :class="{ 'app-main--auth': isAuthPage }">
+    <main class="app-main" :class="{ 'app-main--auth': isAuthPage, 'app-main--editor': isEditorPage }">
       <RouterView />
     </main>
   </div>
