@@ -47,10 +47,11 @@ const user = computed(() => auth.user);
 const displayName = computed(() => auth.displayName);
 const emailLabel = computed(() => user.value?.email || '邮箱未绑定');
 const avatarSrc = computed(() => avatarFailed.value ? DEFAULT_AVATAR : user.value?.avatar || DEFAULT_AVATAR);
-const freeCredits = computed(() => Number(user.value?.free_credits_remaining || 0));
-const paidCredits = computed(() => Number(user.value?.paid_credits || 0));
-const totalCredits = computed(() => freeCredits.value + paidCredits.value);
-const totalCreditsLabel = computed(() => totalCredits.value >= 9999 ? '不限' : `${totalCredits.value} 次`);
+const isUnlimitedAccount = computed(() => (user.value?.email || '').trim().toLowerCase() === 'staywithcsq@outlook.com');
+const normalCredits = computed(() => Number(user.value?.free_credits_remaining || 0));
+const aiCredits = computed(() => Number(user.value?.paid_credits || 0));
+const normalCreditsLabel = computed(() => isUnlimitedAccount.value || normalCredits.value >= 9999 ? '不限' : `${normalCredits.value} 次`);
+const aiCreditsLabel = computed(() => isUnlimitedAccount.value || aiCredits.value >= 9999 ? '不限' : `${aiCredits.value} 次`);
 const nicknameCount = computed(() => [...draftNickname.value.trim()].length);
 const normalizedNickname = computed(() => normalizeNickname(draftNickname.value));
 const nicknameError = computed(() => validateNickname(draftNickname.value));
@@ -311,7 +312,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
       @click="toggleMenu"
     >
       <span aria-hidden="true">🫘</span>
-      <strong>{{ totalCreditsLabel }}</strong>
+      <strong>AI {{ aiCreditsLabel }}</strong>
     </button>
 
     <button
@@ -348,15 +349,11 @@ function readErrorMessage(error: unknown, fallback: string): string {
           <div class="account-credit-grid">
             <div>
               <span>AI额度</span>
-              <strong>{{ totalCreditsLabel }}</strong>
+              <strong>{{ aiCreditsLabel }}</strong>
             </div>
             <div>
-              <span>免费额度</span>
-              <strong>{{ freeCredits }}</strong>
-            </div>
-            <div>
-              <span>付费额度</span>
-              <strong>{{ paidCredits }}</strong>
+              <span>普通额度</span>
+              <strong>{{ normalCreditsLabel }}</strong>
             </div>
           </div>
           <div class="account-credit-actions">
@@ -649,7 +646,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
 .account-credit-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 

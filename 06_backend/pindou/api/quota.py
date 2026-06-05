@@ -12,10 +12,6 @@ from pindou.config import get_settings
 from pindou.db.models import DailyQuota, User, as_aware_utc, utc_now
 
 
-SCRIPT_DAILY_FREE_LIMIT = 3
-WHITE_BG_DAILY_FREE_LIMIT = 1
-
-
 def require_sensitive_consent(user: User) -> None:
     if user.sensitive_consent_at is None:
         raise ApiException(403, ErrorCode.CONSENT_REQUIRED, "请先同意敏感个人信息处理说明，再上传或处理照片。")
@@ -46,21 +42,15 @@ def has_unlimited_credit(user: User) -> bool:
 def consume_script_quota(session: Session, user: User) -> None:
     if has_unlimited_credit(user):
         return
-    quota = get_or_create_quota(session, user.user_id)
-    if quota.script_used >= SCRIPT_DAILY_FREE_LIMIT + quota.script_ad_continued:
-        raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "今日快速生成次数已用完，可以稍后通过激励视频续次。")
-    quota.script_used += 1
+    if user.free_credits_remaining <= 0:
+        raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "普通额度不足，兑换 CDK 或购买额度后再生成吧。")
+    user.free_credits_remaining -= 1
     session.commit()
 
 
 def consume_white_bg_quota(session: Session, user: User) -> None:
-    if has_unlimited_credit(user):
-        return
-    quota = get_or_create_quota(session, user.user_id)
-    if quota.white_bg_used >= WHITE_BG_DAILY_FREE_LIMIT + quota.white_bg_ad_continued:
-        raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "今日自动去白底次数已用完。")
-    quota.white_bg_used += 1
-    session.commit()
+    # White-background cleanup is part of a generation now; only normal/AI credits are user-facing.
+    return
 
 
 def consume_ai_credit(session: Session, user: User) -> None:
@@ -75,18 +65,14 @@ def consume_ai_credit(session: Session, user: User) -> None:
             user.paid_credits -= 1
             session.commit()
             return
-        if user.free_credits_remaining > 0:
-            user.free_credits_remaining -= 1
-            session.commit()
-            return
-    raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "您的 AI 额度不足，去充值或兑换一些额度吧。")
+    raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "AI 额度不足，兑换 CDK 或购买 AI 额度后再生成吧。")
 
 
 def require_ai_credit_available(user: User) -> None:
     if has_unlimited_credit(user):
         return
     if not has_ai_credit(user):
-        raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "您的 AI 额度不足，去充值或兑换一些额度吧。")
+        raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "AI 额度不足，兑换 CDK 或购买 AI 额度后再生成吧。")
 
 
 def has_ai_credit(user: User, *, now=None) -> bool:
@@ -95,7 +81,5 @@ def has_ai_credit(user: User, *, now=None) -> bool:
     if monthly_card_expires_at is not None and monthly_card_expires_at > now:
         return True
     if user.paid_credits > 0:
-        return True
-    if user.free_credits_remaining > 0:
         return True
     return False

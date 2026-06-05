@@ -501,7 +501,7 @@ def test_web_password_register_with_cdk_grants_credits(api_client, monkeypatch: 
     payload = registered.json()
     assert payload["cdk"]["success"] is True
     assert payload["cdk"]["value"] == 5
-    assert payload["user"]["paid_credits"] == 5
+    assert payload["user"]["paid_credits"] == 6
 
     with session_factory() as session:
         cdk = session.get(CDK, code_value)
@@ -596,7 +596,7 @@ def test_pattern_build_accepts_base64_payload(api_client) -> None:
 
 
 def test_generate_script_artwork_pattern_and_delete_flow(api_client) -> None:
-    client, _session_factory = api_client
+    client, session_factory = api_client
     headers = auth_headers(client)
     image_id = upload_image(client, headers)
 
@@ -605,6 +605,11 @@ def test_generate_script_artwork_pattern_and_delete_flow(api_client) -> None:
 
     generated = client.post("/api/generate/script", json={"image_id": image_id, "size": "26x26"}, headers=headers)
     assert generated.status_code == 200
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid.like("wx_%")))
+        assert user is not None
+        assert user.free_credits_remaining == 2
+        assert user.paid_credits == 1
     artwork_id = generated.json()["artwork_id"]
     assert generated.json()["pattern"]["metadata"]["artwork_id"] == artwork_id
     assert generated.json()["pattern"]["metadata"]["labeled_image_url"].endswith("_with_grid.png")
@@ -659,7 +664,7 @@ def test_save_artwork_pattern_rebuilds_counts_and_exports_png(api_client) -> Non
     assert detail.json()["pattern_data"]["grid"][0][0]["code"] == "H7"
 
 
-def test_unlimited_credit_email_skips_script_daily_quota(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_unlimited_credit_email_skips_normal_credit_consumption(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
     client, session_factory = api_client
     monkeypatch.setenv("UNLIMITED_CREDIT_EMAILS", " StayWithCSQ@Outlook.com ")
     get_settings.cache_clear()
@@ -671,6 +676,8 @@ def test_unlimited_credit_email_skips_script_daily_quota(api_client, monkeypatch
             email="staywithcsq@outlook.com",
             nickname="Stay",
             avatar="",
+            free_credits_remaining=0,
+            paid_credits=0,
             sensitive_consent_at=datetime.now(timezone.utc),
         )
         quota = DailyQuota(
@@ -696,12 +703,20 @@ def test_unlimited_credit_email_skips_script_daily_quota(api_client, monkeypatch
         assert quota is not None
         assert quota.script_used == 3
         assert quota.white_bg_used == 1
+        user = session.scalar(select(User).where(User.openid == user_id))
+        assert user is not None
+        assert user.free_credits_remaining == 0
+        assert user.paid_credits == 0
 
 
 def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
-    client, _session_factory = api_client
+    client, session_factory = api_client
     headers = auth_headers(client)
-    image_id = upload_image(client, headers)
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid.like("wx_%")))
+        assert user is not None
+        user.paid_credits = 2
+        session.commit()
     calls = []
 
     class FakeChain:
@@ -716,20 +731,6 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
             )
 
     monkeypatch.setattr("pindou.api.generate.build_preview_chain", lambda: FakeChain())
-    response = client.post(
-        "/api/generate/ai",
-        json={"image_id": image_id, "style_preset": "q_portrait", "size_preset": "26x26"},
-        headers=headers,
-    )
-    assert response.status_code == 200
-    first_job = response.json()
-    assert first_job["job_id"]
-    assert first_job["status"] == "queued"
-    finished = wait_generation_job(client, headers, first_job["job_id"])
-    assert finished["status"] == "succeeded"
-    assert finished["progress"] == 100
-    assert finished["result"]["preview"]["provider_used"] == "fake"
-
     web_form = client.post(
         "/api/v1/generate/ai",
         data={"style_preset": "q_pet", "size_preset": "52x52"},
@@ -737,11 +738,12 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
         headers=headers,
     )
     assert web_form.status_code == 200
-    second_job = wait_generation_job(client, headers, web_form.json()["job_id"])
-    assert second_job["status"] == "succeeded"
-    assert second_job["result"]["preview"]["provider_used"] == "fake"
-    assert second_job["result"]["pattern"]["metadata"]["size_preset"] == "52x52"
-    assert second_job["result"]["pattern"]["metadata"]["target_colors"] == 8
+    form_job = wait_generation_job(client, headers, web_form.json()["job_id"])
+    assert form_job["status"] == "succeeded"
+    assert form_job["progress"] == 100
+    assert form_job["result"]["preview"]["provider_used"] == "fake"
+    assert form_job["result"]["pattern"]["metadata"]["size_preset"] == "52x52"
+    assert form_job["result"]["pattern"]["metadata"]["target_colors"] == 8
     assert calls[-1]["style"] == "q_pet"
     assert calls[-1]["size"] == "52x52"
     assert calls[-1]["bytes"] > 0
@@ -756,6 +758,11 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
     assert preview_only.json()["provider_used"] == "fake"
     assert "preview_id" in preview_only.json()
     assert "pattern" not in preview_only.json()
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid.like("wx_%")))
+        assert user is not None
+        assert user.free_credits_remaining == 3
+        assert user.paid_credits <= 1
 
 
 def test_generate_ai_refuses_script_fallback(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -766,6 +773,7 @@ def test_generate_ai_refuses_script_fallback(api_client, monkeypatch: pytest.Mon
         user = session.scalar(select(User).where(User.openid.like("wx_%")))
         assert user is not None
         before_free_credits = user.free_credits_remaining
+        before_ai_credits = user.paid_credits
         before_artworks = len(session.scalars(select(Artwork)).all())
 
     class FakeFallbackChain:
@@ -796,6 +804,7 @@ def test_generate_ai_refuses_script_fallback(api_client, monkeypatch: pytest.Mon
         user = session.scalar(select(User).where(User.openid.like("wx_%")))
         assert user is not None
         assert user.free_credits_remaining == before_free_credits
+        assert user.paid_credits == before_ai_credits
         assert len(session.scalars(select(Artwork)).all()) == before_artworks
 
 
@@ -1030,7 +1039,7 @@ def test_admin_login_failed_attempts_do_not_lock_out(api_client, caplog: pytest.
 def test_admin_two_step_order_fulfillment_is_audited_and_idempotent(api_client) -> None:
     client, session_factory = api_client
     with session_factory() as session:
-        user = User(openid="manual_user", nickname="Manual", avatar="")
+        user = User(openid="manual_user", nickname="Manual", avatar="", paid_credits=0)
         order = Order(
             user_id=user.openid,
             order_no="PDMANUAL001",

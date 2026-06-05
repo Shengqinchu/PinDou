@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Any
 
 from PIL import Image, ImageOps, UnidentifiedImageError
-from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
@@ -47,14 +46,8 @@ class ArtworkService:
             is_paid_unlocked=is_paid_unlocked,
         )
         self.session.add(artwork)
+        self.session.flush()
         self.session.commit()
-        try:
-            self.session.refresh(artwork)
-        except InvalidRequestError:
-            persisted = self.session.get(Artwork, artwork.artwork_id)
-            if persisted is None:
-                raise
-            return persisted
         return artwork
 
     def get_artwork(self, artwork_id: str) -> Artwork | None:

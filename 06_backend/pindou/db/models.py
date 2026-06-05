@@ -42,7 +42,7 @@ class User(Base):
     nickname: Mapped[str] = mapped_column(String(128), default="")
     avatar: Mapped[str] = mapped_column(String(512), default="")
     free_credits_remaining: Mapped[int] = mapped_column(Integer, default=3, nullable=False)
-    paid_credits: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    paid_credits: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     monthly_card_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     privacy_consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     sensitive_consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

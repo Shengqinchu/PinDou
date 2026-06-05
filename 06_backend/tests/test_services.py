@@ -9,6 +9,8 @@ from PIL import Image
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from pindou.api.errors import ApiException
+from pindou.api.quota import consume_ai_credit, consume_script_quota
 from pindou.db.models import AdminAuditLog, Artwork, User
 from pindou.services.admin_audit_service import write_audit
 from pindou.services.artwork_service import ArtworkService
@@ -74,6 +76,27 @@ def test_user_service_register_consent_and_quota(db_session: Session) -> None:
     assert same_user.privacy_consent_at is not None
     assert quota.id == same_quota.id
     assert service.credit_summary(user.openid)["free_credits_remaining"] == 3
+    assert service.credit_summary(user.openid)["paid_credits"] == 1
+
+
+def test_normal_and_ai_credit_buckets_are_separate(db_session: Session) -> None:
+    user = add_user(db_session, openid="quota_bucket_user")
+
+    consume_script_quota(db_session, user)
+    db_session.refresh(user)
+    assert user.free_credits_remaining == 2
+    assert user.paid_credits == 1
+
+    consume_ai_credit(db_session, user)
+    db_session.refresh(user)
+    assert user.free_credits_remaining == 2
+    assert user.paid_credits == 0
+
+    with pytest.raises(ApiException):
+        consume_ai_credit(db_session, user)
+    db_session.refresh(user)
+    assert user.free_credits_remaining == 2
+    assert user.paid_credits == 0
 
 
 def test_artwork_service_save_list_delete_removes_original_file(db_session: Session, tmp_path) -> None:
@@ -137,7 +160,7 @@ def test_cdk_redeem_grants_credits_and_rate_limits(db_session: Session) -> None:
     db_session.refresh(user)
 
     assert redeemed.status == "redeemed"
-    assert user.paid_credits == 5
+    assert user.paid_credits == 6
 
     CDKService._attempts = []
     for index in range(3):

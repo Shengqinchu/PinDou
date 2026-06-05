@@ -72,7 +72,7 @@ const isCustomSizeValid = computed(() => (
 const hasInvalidCustomSize = computed(() => isCustomSizeActive.value && !isCustomSizeValid.value);
 const canStartGenerate = computed(() => Boolean(selectedFile.value) && !hasInvalidCustomSize.value);
 const creditSummary = computed(() => (
-  isAiMode.value ? 'AI 模式：消耗 1 次 AI 额度' : '普通模式：免费，不消耗 AI 额度'
+  isAiMode.value ? 'AI 模式：消耗 1 次 AI 额度' : '普通模式：消耗 1 次普通额度'
 ));
 const ctaLabel = computed(() => {
   if (hasInvalidCustomSize.value) {
