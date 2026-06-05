@@ -247,8 +247,10 @@ function formatDate(value?: string): string {
 .works-page {
   width: 100%;
   max-width: 1120px;
+  min-height: calc(100dvh - var(--app-header-height, 64px) - clamp(36px, 10vw, 112px));
   margin: 0 auto;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: clamp(12px, 2vw, 22px);
   padding-inline: clamp(0px, 0.8vw, 6px);
   overflow-x: clip;
@@ -326,14 +328,20 @@ function formatDate(value?: string): string {
 .works-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
   gap: clamp(12px, 1.8vw, 20px);
+  flex: 1 1 auto;
   min-width: 0;
+  min-height: 0;
 }
 
 .work-card {
   display: grid;
+  align-content: start;
   gap: clamp(8px, 1.2vw, 12px);
+  height: 100%;
   min-width: 0;
+  min-height: 0;
   appearance: none;
   border: 1px solid rgba(237, 228, 218, 0.86);
   border-radius: clamp(18px, 2vw, 22px);
@@ -430,8 +438,10 @@ function formatDate(value?: string): string {
 
 .works-empty {
   display: grid;
+  align-content: center;
   justify-items: center;
   gap: 12px;
+  flex: 1 1 auto;
   border: 1px solid rgba(237, 228, 218, 0.86);
   border-radius: 26px;
   background: rgba(255, 255, 255, 0.9);
@@ -554,12 +564,20 @@ function formatDate(value?: string): string {
 @media (max-width: 1024px) {
   .works-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
   .works-page {
+    width: calc(100% + 24px);
+    max-width: calc(100vw - 8px);
+    height: calc(100svh - var(--app-header-height, 62px) - 36px);
+    height: calc(100dvh - var(--app-header-height, 62px) - 36px);
+    min-height: 0;
+    margin-inline: -12px;
     gap: 10px;
+    padding-inline: 0;
   }
 
   .works-hero {
@@ -588,12 +606,13 @@ function formatDate(value?: string): string {
 
   .works-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
   .work-card {
     border-radius: 16px;
-    gap: 6px;
+    gap: 8px;
     padding: 7px;
   }
 
@@ -602,7 +621,7 @@ function formatDate(value?: string): string {
   }
 
   .work-card__body {
-    gap: 2px;
+    gap: 3px;
   }
 
   .work-card__body strong {
