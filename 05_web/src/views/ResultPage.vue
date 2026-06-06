@@ -187,12 +187,6 @@ function triggerDownload(url: string, filename: string): void {
           <div v-else class="pattern-image-empty">图纸预览生成中</div>
         </div>
 
-        <div class="result-chip-row" aria-label="图纸摘要">
-          <span>{{ selectedSizeNumber }} 格宽</span>
-          <span>{{ beadTotal }} 颗</span>
-          <span>{{ colorTotal }} 色</span>
-        </div>
-
         <div class="result-actions">
           <div class="result-actions__row">
             <RouterLink class="pd-btn pd-btn--primary result-action-primary" :to="{ name: 'editor', params: { id: artworkId } }">
@@ -225,6 +219,24 @@ function triggerDownload(url: string, filename: string): void {
       </section>
 
       <section class="palette-section result-palette-card" aria-label="色号清单">
+        <dl class="result-stats" aria-label="图纸摘要">
+          <div>
+            <dt>尺寸</dt>
+            <dd>{{ selectedSizeNumber }}</dd>
+            <small>格宽</small>
+          </div>
+          <div>
+            <dt>豆数</dt>
+            <dd>{{ beadTotal }}</dd>
+            <small>颗</small>
+          </div>
+          <div>
+            <dt>色号</dt>
+            <dd>{{ colorTotal }}</dd>
+            <small>种</small>
+          </div>
+        </dl>
+
         <div class="palette-heading">
           <p class="eyebrow">色号清单</p>
         </div>
@@ -347,11 +359,14 @@ function triggerDownload(url: string, filename: string): void {
 .hl-edit {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
-  border-radius: 999px;
-  background: var(--pd-orange);
-  color: #fff;
-  font-weight: 900;
-  padding: 0.06em 0.5em;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--pd-r-tag, 8px);
+  background: rgba(255, 198, 107, 0.3);
+  color: var(--pd-fg-1);
+  font-weight: 800;
+  padding: 0.04em 0.4em;
   white-space: nowrap;
 }
 
@@ -462,24 +477,6 @@ function triggerDownload(url: string, filename: string): void {
 
 .result-state .pd-btn {
   margin-top: 22px;
-}
-
-.result-chip-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  color: var(--pd-fg-2);
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.result-chip-row span {
-  border: 1px solid rgba(255, 142, 83, 0.16);
-  border-radius: 999px;
-  background: rgba(255, 241, 232, 0.72);
-  padding: 6px 10px;
-  white-space: nowrap;
 }
 
 .result-caption-row {
@@ -826,6 +823,52 @@ function triggerDownload(url: string, filename: string): void {
   }
 }
 
+.result-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 18px;
+}
+
+.result-stats div {
+  display: grid;
+  min-width: 0;
+  min-height: 104px;
+  align-content: center;
+  border: 1px solid var(--pd-stroke);
+  border-radius: var(--pd-r-card);
+  background: var(--pd-peach-50);
+  padding: 14px 12px;
+  text-align: center;
+}
+
+.result-stats dt {
+  margin: 0 0 7px;
+  color: var(--pd-fg-2);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.result-stats dd {
+  margin: 0;
+  overflow: hidden;
+  color: var(--pd-fg-1);
+  font-size: clamp(24px, 4vw, 32px);
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-stats small {
+  display: block;
+  margin-top: 7px;
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .palette-heading {
   margin-bottom: 12px;
 }
@@ -938,17 +981,33 @@ function triggerDownload(url: string, filename: string): void {
     font-size: 12px;
   }
 
-  .result-chip-row {
-    gap: 6px;
-    font-size: 12px;
-  }
-
-  .result-chip-row span {
-    padding: 5px 8px;
-  }
-
   .result-caption-row {
     font-size: 12px;
+  }
+
+  .result-stats {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .result-stats div {
+    min-height: 88px;
+    border-radius: 16px;
+    padding: 11px 6px;
+  }
+
+  .result-stats dt {
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+
+  .result-stats dd {
+    font-size: clamp(20px, 6vw, 26px);
+  }
+
+  .result-stats small {
+    margin-top: 6px;
+    font-size: 11px;
   }
 
   .size-switch {
@@ -1076,6 +1135,19 @@ function triggerDownload(url: string, filename: string): void {
   .result-action-icon {
     width: 12px;
     height: 12px;
+  }
+
+  .result-stats {
+    gap: 6px;
+  }
+
+  .result-stats div {
+    min-height: 82px;
+    padding: 10px 4px;
+  }
+
+  .result-stats dd {
+    font-size: clamp(18px, 5.8vw, 23px);
   }
 }
 </style>
