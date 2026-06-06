@@ -188,14 +188,21 @@ function triggerDownload(url: string, filename: string): void {
         <div class="result-actions">
           <div class="result-actions__row">
             <RouterLink class="pd-btn pd-btn--primary result-action-primary" :to="{ name: 'editor', params: { id: artworkId } }">
-              <span class="result-action-icon result-action-icon--edit" aria-hidden="true"></span>
+              <svg class="result-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 20h4.5L19 9.5 14.5 5 4 15.5V20Z" />
+                <path d="m13.5 6 4.5 4.5" />
+              </svg>
               <span>编辑图纸</span>
             </RouterLink>
             <RouterLink class="pd-btn result-secondary" to="/">
               <span>返回主页</span>
             </RouterLink>
             <button class="pd-btn result-secondary result-action-download" type="button" :disabled="!patternImageUrl || isDownloading" @click="downloadPattern">
-              <span class="result-action-icon result-action-icon--download" aria-hidden="true"></span>
+              <svg class="result-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M12 4v10" />
+                <path d="m7.5 10.5 4.5 4.5 4.5-4.5" />
+                <path d="M5 19h14" />
+              </svg>
               <span>{{ isDownloading ? '下载中' : '下载图纸' }}</span>
             </button>
           </div>
@@ -347,9 +354,9 @@ function triggerDownload(url: string, filename: string): void {
 
 .result-hero {
   display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 20px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
 }
 
 .eyebrow {
@@ -365,18 +372,20 @@ function triggerDownload(url: string, filename: string): void {
   margin: 0;
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
-  font-size: clamp(30px, 5vw, 46px);
-  line-height: 1.1;
+  font-size: clamp(26px, 5.2vw, 40px);
+  line-height: 1.4;
   letter-spacing: 0;
 }
 
 .hl-edit {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--pd-orange) 15%, transparent);
-  color: var(--pd-fg-1);
-  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--pd-orange);
+  color: #fff;
+  font-weight: 900;
+  padding: 0.06em 0.5em;
+  white-space: nowrap;
 }
 
 .result-state h1 {
@@ -395,10 +404,10 @@ function triggerDownload(url: string, filename: string): void {
 }
 
 .result-actions {
-  min-width: min(100%, 430px);
+  width: 100%;
+  max-width: 520px;
   display: grid;
-  justify-items: end;
-  gap: 8px;
+  gap: 10px;
 }
 
 .result-actions button:disabled {
@@ -410,77 +419,35 @@ function triggerDownload(url: string, filename: string): void {
 .result-actions__row {
   width: 100%;
   display: grid;
-  grid-template-columns: minmax(116px, 1.22fr) minmax(96px, 1fr) minmax(96px, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 
 .result-actions__row .pd-btn {
+  min-height: 46px;
   min-width: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding-inline: 13px;
+  padding-inline: 12px;
   white-space: nowrap;
 }
 
 .result-action-icon {
-  position: relative;
   flex: 0 0 auto;
-  width: 15px;
-  height: 15px;
-  display: inline-block;
-}
-
-.result-action-icon--edit::before {
-  position: absolute;
-  left: 3px;
-  top: 2px;
-  width: 9px;
-  height: 3px;
-  border-radius: 999px;
-  background: currentColor;
-  content: "";
-  transform: rotate(-38deg);
-  transform-origin: center;
-}
-
-.result-action-icon--edit::after {
-  position: absolute;
-  left: 2px;
-  bottom: 1px;
-  width: 10px;
-  height: 8px;
-  border: 2px solid currentColor;
-  border-top: 0;
-  border-radius: 2px;
-  content: "";
-}
-
-.result-action-icon--download::before {
-  position: absolute;
-  left: 6px;
-  top: 1px;
-  width: 3px;
-  height: 9px;
-  border-radius: 999px;
-  background: currentColor;
-  content: "";
-}
-
-.result-action-icon--download::after {
-  position: absolute;
-  left: 2px;
-  bottom: 1px;
-  width: 11px;
-  height: 8px;
-  border-right: 3px solid currentColor;
-  border-bottom: 3px solid currentColor;
-  content: "";
-  transform: rotate(45deg);
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
 }
 
 .result-regenerate-link {
+  justify-self: start;
+  margin-top: 4px;
   border: 0;
   background: transparent;
   color: var(--pd-fg-2);
@@ -992,16 +959,6 @@ function triggerDownload(url: string, filename: string): void {
 }
 
 @media (max-width: 900px) {
-  .result-hero {
-    align-items: start;
-    flex-direction: column;
-  }
-
-  .result-actions {
-    justify-content: start;
-    justify-items: stretch;
-  }
-
   .result-layout {
     grid-template-columns: 1fr;
   }
@@ -1020,23 +977,24 @@ function triggerDownload(url: string, filename: string): void {
   }
 
   .result-actions__row {
-    grid-template-columns: minmax(104px, 1.24fr) minmax(82px, 0.88fr) minmax(82px, 0.88fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
   }
 
   .result-actions__row .pd-btn {
     min-height: 46px;
-    font-size: clamp(12px, 3.25vw, 14px);
-    padding-inline: 8px;
+    gap: 5px;
+    font-size: clamp(11px, 3.2vw, 13px);
+    padding-inline: 6px;
   }
 
   .result-action-icon {
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
   }
 
   .result-regenerate-link {
-    justify-self: center;
+    justify-self: start;
     font-size: 12px;
   }
 
