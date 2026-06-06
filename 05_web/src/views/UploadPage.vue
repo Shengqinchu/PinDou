@@ -2,6 +2,8 @@
 import { computed, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
+import { hasToken } from '../auth/tokenStorage';
+import AuthPanel from '../components/AuthPanel.vue';
 import {
   GENERATION_MODE_DETAILS,
   GENERATION_MODE_OPTIONS,
@@ -32,6 +34,7 @@ const customWidthInput = ref('120');
 const customHeightInput = ref('120');
 const activeTooltip = ref<TooltipKey | null>(null);
 const isConfirmOpen = ref(false);
+const isAuthModalOpen = ref(false);
 const isCustomSizeSelected = ref(false);
 const CUSTOM_MIN_SIZE = 1;
 const CUSTOM_MAX_SIZE = 200;
@@ -164,12 +167,37 @@ async function confirmGenerate(): Promise<void> {
     isConfirmOpen.value = false;
     return;
   }
+  if (!hasToken()) {
+    isConfirmOpen.value = false;
+    isAuthModalOpen.value = true;
+    return;
+  }
+  await continueGenerate();
+}
+
+async function continueGenerate(): Promise<void> {
+  if (!selectedFile.value) {
+    message.value = '请先选择一张照片。';
+    return;
+  }
+  if (!ensureCustomSizeReady()) {
+    return;
+  }
   generation.setSourceFile(selectedFile.value);
   await router.push({ name: 'loading', query: { from: 'upload' } });
 }
 
 function closeConfirm(): void {
   isConfirmOpen.value = false;
+}
+
+async function handleAuthSuccess(): Promise<void> {
+  isAuthModalOpen.value = false;
+  await continueGenerate();
+}
+
+function closeAuthModal(): void {
+  isAuthModalOpen.value = false;
 }
 
 function chooseMode(mode: GenerationMode): void {
@@ -514,6 +542,13 @@ onUnmounted(revokePreview);
           <button class="pd-btn confirm-cancel" type="button" @click="closeConfirm">取消</button>
           <button class="pd-btn pd-btn--primary confirm-submit" type="button" @click="confirmGenerate">确认生成</button>
         </div>
+      </section>
+    </div>
+
+    <div v-if="isAuthModalOpen" class="auth-backdrop" role="presentation" @click.self="closeAuthModal">
+      <section class="auth-modal" role="dialog" aria-modal="true" aria-label="登录或注册后继续生成">
+        <button class="auth-modal__close" type="button" aria-label="关闭登录弹窗" @click="closeAuthModal">×</button>
+        <AuthPanel @success="handleAuthSuccess" />
       </section>
     </div>
   </section>
@@ -1237,6 +1272,56 @@ onUnmounted(revokePreview);
   backdrop-filter: blur(8px);
   padding: 18px;
   animation: fadeIn 160ms var(--pd-ease-out);
+}
+
+.auth-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  background: rgba(45, 36, 30, 0.26);
+  backdrop-filter: blur(12px);
+  padding: clamp(14px, 4vw, 28px);
+  animation: fadeIn 160ms var(--pd-ease-out);
+}
+
+.auth-modal {
+  position: relative;
+  width: min(100%, 540px);
+}
+
+.auth-modal__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 142, 83, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--pd-fg-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    color 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.auth-modal__close:hover {
+  border-color: rgba(255, 142, 83, 0.5);
+  box-shadow: 0 10px 20px rgba(255, 142, 83, 0.14);
+  color: var(--pd-orange);
+  transform: translateY(-1px);
 }
 
 .confirm-dialog {

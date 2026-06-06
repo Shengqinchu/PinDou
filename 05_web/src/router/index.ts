@@ -2,7 +2,6 @@ import type { Router } from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
 
 import { clearStoredUser, clearToken, hasToken } from '../auth/tokenStorage';
-import HomePage from '../views/HomePage.vue';
 import EditorPage from '../views/EditorPage.vue';
 import LoginPage from '../views/LoginPage.vue';
 import LoadingPage from '../views/LoadingPage.vue';
@@ -10,18 +9,18 @@ import ResultPage from '../views/ResultPage.vue';
 import UploadPage from '../views/UploadPage.vue';
 import WorksPage from '../views/WorksPage.vue';
 
-const protectedRoutes = new Set(['upload', 'loading', 'result', 'editor', 'works']);
+const protectedRoutes = new Set(['loading', 'result', 'editor', 'works']);
 
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', name: 'home', component: HomePage },
+    { path: '/', redirect: { name: 'upload' } },
     { path: '/login', name: 'login', component: LoginPage },
     {
       path: '/upload',
       name: 'upload',
       component: UploadPage,
-      meta: { title: '上传', requiresAuth: true }
+      meta: { title: '上传' }
     },
     {
       path: '/loading',
