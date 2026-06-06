@@ -32,7 +32,6 @@ const pattern = computed(() => generation.currentPattern);
 const hasSourceFile = computed(() => Boolean(generation.sourceFile));
 const artworkId = computed(() => String(route.params.id || generation.currentArtworkId || ''));
 const selectedSizeNumber = computed(() => generation.selectedSize.split('x')[0]);
-const sizeLabel = computed(() => generation.selectedSize.replace('x', ' × '));
 const colorTotal = computed(() => pattern.value?.palette_used.length || 0);
 const beadTotal = computed(() => pattern.value?.bead_total || 0);
 const patternImageUrl = computed(() => generation.patternImageUrl);
@@ -140,9 +139,7 @@ async function confirmRegenerate(): Promise<void> {
     <template v-else-if="pattern">
       <header class="result-hero">
         <div>
-          <p class="eyebrow">生成完成</p>
           <h1>点击需要编辑的格子，可以修改配色哦~</h1>
-          <p>{{ artworkId }} · {{ sizeLabel }}</p>
         </div>
         <div class="result-actions">
           <RouterLink class="pd-btn pd-btn--primary" :to="{ name: 'editor', params: { id: artworkId } }">编辑图纸</RouterLink>
@@ -309,7 +306,15 @@ async function confirmRegenerate(): Promise<void> {
   text-transform: uppercase;
 }
 
-.result-hero h1,
+.result-hero h1 {
+  margin: 0;
+  color: var(--pd-orange);
+  font-family: var(--pd-font-display);
+  font-size: clamp(30px, 5vw, 46px);
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
 .result-state h1 {
   margin: 0;
   color: var(--pd-fg-1);
@@ -319,7 +324,6 @@ async function confirmRegenerate(): Promise<void> {
   letter-spacing: 0;
 }
 
-.result-hero p:last-child,
 .result-state p {
   margin: 10px 0 0;
   color: var(--pd-fg-2);
