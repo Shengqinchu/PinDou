@@ -63,8 +63,11 @@ const pointers = new Map<number, PointerPoint>();
 const mouseDrag = ref<MouseDrag | null>(null);
 const pinch = ref<PinchState | null>(null);
 const pinchSettledAt = ref(0);
+const multiTouchLocked = ref(false);
+const touchGestureHadMultiTouch = ref(false);
 const hoverCell = ref<{ row: number; col: number } | null>(null);
 let lastTouchPaintKey = '';
+let pendingTouchPaintTimer: number | undefined;
 
 let staticCanvas: HTMLCanvasElement | null = null;
 let resizeObserver: ResizeObserver | null = null;
@@ -107,6 +110,7 @@ onBeforeUnmount(() => {
   if (overlayFrame) {
     cancelAnimationFrame(overlayFrame);
   }
+  clearPendingTouchPaint();
 });
 
 watch(
@@ -396,6 +400,9 @@ function handlePointerDown(event: PointerEvent): void {
   pointers.set(event.pointerId, { ...point, pointerType: event.pointerType });
 
   if (pointers.size >= 2 && event.pointerType !== 'mouse') {
+    clearPendingTouchPaint();
+    multiTouchLocked.value = true;
+    touchGestureHadMultiTouch.value = true;
     beginPinch();
     return;
   }
@@ -427,7 +434,7 @@ function handlePointerDown(event: PointerEvent): void {
     setCursor(hit.row, hit.col);
     lastTouchPaintKey = '';
     if (canTouchApply()) {
-      applyTouchCell(hit.row, hit.col);
+      schedulePendingTouchPaint(hit.row, hit.col);
     }
   }
 }
@@ -477,6 +484,13 @@ function handlePointerMove(event: PointerEvent): void {
   const hit = hitCell(point);
   if (hit) {
     setCursor(hit.row, hit.col);
+    if (multiTouchLocked.value) {
+      return;
+    }
+    if (pendingTouchPaintTimer !== undefined) {
+      flushPendingTouchPaint(hit.row, hit.col);
+      return;
+    }
     if (canTouchApply()) {
       applyTouchCell(hit.row, hit.col);
     }
@@ -489,7 +503,17 @@ function handlePointerUp(event: PointerEvent): void {
   frameRef.value?.releasePointerCapture(event.pointerId);
   pointers.delete(event.pointerId);
   if (event.pointerType !== 'mouse') {
+    const hadPendingTouchPaint = pendingTouchPaintTimer !== undefined;
     lastTouchPaintKey = '';
+    if (!touchGestureHadMultiTouch.value && hadPendingTouchPaint) {
+      const hit = hitCell(point);
+      if (hit) {
+        setCursor(hit.row, hit.col);
+        flushPendingTouchPaint(hit.row, hit.col);
+      }
+    } else {
+      clearPendingTouchPaint();
+    }
   }
 
   if (pinch.value) {
@@ -497,6 +521,14 @@ function handlePointerUp(event: PointerEvent): void {
       pinch.value = null;
       pinchSettledAt.value = Date.now() + PINCH_SETTLE_MS;
     }
+    if (touchGestureHadMultiTouch.value) {
+      finishOrContinueMultiTouchLock();
+    }
+    return;
+  }
+
+  if (event.pointerType !== 'mouse' && touchGestureHadMultiTouch.value) {
+    finishOrContinueMultiTouchLock();
     return;
   }
 
@@ -520,8 +552,12 @@ function handlePointerCancel(event: PointerEvent): void {
   pointers.delete(event.pointerId);
   mouseDrag.value = null;
   pinch.value = null;
+  clearPendingTouchPaint();
   lastTouchPaintKey = '';
   pinchSettledAt.value = Date.now() + PINCH_SETTLE_MS;
+  if (event.pointerType !== 'mouse') {
+    finishOrContinueMultiTouchLock();
+  }
 }
 
 function beginPinch(): void {
@@ -611,11 +647,51 @@ function applyTouchCell(row: number, col: number): void {
 }
 
 function canTouchApply(): boolean {
-  return props.paintEnabled && Date.now() > pinchSettledAt.value;
+  return props.paintEnabled && !multiTouchLocked.value && Date.now() > pinchSettledAt.value;
 }
 
 function cellPaintKey(row: number, col: number, color: ColorRef | null): string {
   return `${row}:${col}:${color?.code || 'erase'}`;
+}
+
+function schedulePendingTouchPaint(row: number, col: number): void {
+  clearPendingTouchPaint();
+  pendingTouchPaintTimer = window.setTimeout(() => {
+    pendingTouchPaintTimer = undefined;
+    if (pointers.size === 1 && canTouchApply()) {
+      applyTouchCell(row, col);
+    }
+  }, 80);
+}
+
+function flushPendingTouchPaint(row: number, col: number): void {
+  clearPendingTouchPaint();
+  if (pointers.size === 1 && canTouchApply()) {
+    applyTouchCell(row, col);
+  }
+}
+
+function clearPendingTouchPaint(): void {
+  if (pendingTouchPaintTimer !== undefined) {
+    window.clearTimeout(pendingTouchPaintTimer);
+    pendingTouchPaintTimer = undefined;
+  }
+}
+
+function finishOrContinueMultiTouchLock(): void {
+  clearPendingTouchPaint();
+  if (pointers.size > 0) {
+    multiTouchLocked.value = true;
+    return;
+  }
+  pinchSettledAt.value = Date.now() + PINCH_SETTLE_MS;
+  window.setTimeout(() => {
+    if (pointers.size === 0 && Date.now() >= pinchSettledAt.value) {
+      multiTouchLocked.value = false;
+      touchGestureHadMultiTouch.value = false;
+      lastTouchPaintKey = '';
+    }
+  }, PINCH_SETTLE_MS);
 }
 
 function emitCursor(): void {
