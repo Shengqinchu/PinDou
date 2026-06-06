@@ -23,7 +23,8 @@ import {
 } from '../utils/patternEditing';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
-type EditorTool = 'paint' | 'erase';
+type EditorTool = 'none' | 'paint' | 'erase';
+type DownloadStatusKind = 'busy' | 'success' | 'error';
 type CatalogColor = ColorRef & { category: string };
 type ColorModalMode = 'choose' | 'replace';
 
@@ -47,8 +48,8 @@ const error = ref('');
 const editablePattern = ref<PatternSheet | null>(null);
 const availablePalette = ref<ColorRef[]>([]);
 const selectedColor = ref<ColorRef | null>(null);
-const activeTool = ref<EditorTool>('paint');
-const paintEnabled = ref(false);
+const activeTool = ref<EditorTool>('none');
+const showGridLines = ref(true);
 const isColorModalOpen = ref(false);
 const colorModalMode = ref<ColorModalMode>('choose');
 const colorSearch = ref('');
@@ -61,6 +62,12 @@ const isDirty = ref(false);
 const saveStatus = ref<SaveStatus>('idle');
 const saveError = ref('');
 const isDownloading = ref(false);
+const downloadStatus = ref<{ visible: boolean; message: string; kind: DownloadStatusKind; canRetry: boolean }>({
+  visible: false,
+  message: '',
+  kind: 'busy',
+  canRetry: false
+});
 const patternKey = ref(0);
 const paintRevision = ref(0);
 const lastPatch = ref<CellPatch | null>(null);
@@ -71,6 +78,8 @@ const pendingReplace = ref<PendingReplace | null>(null);
 const replaceMessage = ref('');
 
 let autosaveTimer: number | undefined;
+let savePromise: Promise<SaveArtworkPatternResponse | null> | null = null;
+let downloadStatusTimer: number | undefined;
 
 const artworkId = computed(() => String(route.params.id || ''));
 const pattern = computed(() => editablePattern.value);
@@ -108,12 +117,9 @@ const filteredFullPalette = computed(() => {
 });
 const canUndo = computed(() => undoStack.value.length > 0);
 const canRedo = computed(() => redoStack.value.length > 0);
-const canDownload = computed(() => Boolean(pattern.value && artworkId.value && saveStatus.value !== 'saving' && !isDownloading.value));
+const paintEnabled = computed(() => activeTool.value !== 'none');
+const canDownload = computed(() => Boolean(pattern.value && artworkId.value && !isDownloading.value));
 const downloadFileName = computed(() => `拼豆图纸_${artworkId.value || 'pindou'}.png`);
-const paintToggleLabel = computed(() => {
-  const verb = activeTool.value === 'erase' ? '擦' : '画';
-  return `${paintEnabled.value ? '停止' : '开始'}${verb}`;
-});
 const selectedColorUseCount = computed(() => (
   selectedColor.value ? (pattern.value?.color_counts[selectedColor.value.code] || 0) : 0
 ));
@@ -142,6 +148,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   clearAutosaveTimer();
+  clearDownloadStatusTimer();
   window.removeEventListener('beforeunload', handleBeforeUnload);
   window.removeEventListener('keydown', handleKeydown);
 });
@@ -190,7 +197,7 @@ function applyLoadedPattern(nextPattern: PatternSheet): void {
   selectedColor.value = availablePalette.value[0]
     ? cloneColor(availablePalette.value[0])
     : (fullPalette.value[0] ? cloneColor(fullPalette.value[0]) : null);
-  activeTool.value = 'paint';
+  activeTool.value = 'none';
   undoStack.value = [];
   redoStack.value = [];
   isDirty.value = false;
@@ -315,8 +322,8 @@ function chooseColor(color: ColorRef): void {
   rememberRecentColor(color);
 }
 
-function chooseTool(tool: EditorTool): void {
-  activeTool.value = tool;
+function chooseTool(tool: Exclude<EditorTool, 'none'>): void {
+  activeTool.value = activeTool.value === tool ? 'none' : tool;
 }
 
 function openColorModal(mode: ColorModalMode = 'choose'): void {
@@ -446,6 +453,9 @@ function scheduleAutosave(): void {
 }
 
 async function saveNow(manual: boolean): Promise<SaveArtworkPatternResponse | null> {
+  if (savePromise) {
+    return savePromise;
+  }
   const id = artworkId.value;
   const sheet = editablePattern.value;
   if (!id || !sheet) {
@@ -458,27 +468,37 @@ async function saveNow(manual: boolean): Promise<SaveArtworkPatternResponse | nu
   const versionAtStart = dirtyVersion.value;
   saveStatus.value = 'saving';
   saveError.value = '';
-  try {
-    const saved = await saveArtworkPattern(id, recalculatePattern(clonePattern(sheet)), {
-      renderPreview: manual
-    });
-    swrCache.setArtwork(saved.artwork);
-    swrCache.invalidateGallery();
-    generation.applyArtwork(saved.artwork);
-    if (dirtyVersion.value === versionAtStart) {
-      savedVersion.value = versionAtStart;
-      isDirty.value = false;
-      saveStatus.value = 'saved';
-      saveError.value = '';
-    } else {
-      saveStatus.value = 'dirty';
-      scheduleAutosave();
+  const currentSave = (async () => {
+    try {
+      const saved = await saveArtworkPattern(id, recalculatePattern(clonePattern(sheet)), {
+        renderPreview: manual
+      });
+      swrCache.setArtwork(saved.artwork);
+      swrCache.invalidateGallery();
+      generation.applyArtwork(saved.artwork);
+      if (dirtyVersion.value === versionAtStart) {
+        savedVersion.value = versionAtStart;
+        isDirty.value = false;
+        saveStatus.value = 'saved';
+        saveError.value = '';
+      } else {
+        saveStatus.value = 'dirty';
+        scheduleAutosave();
+      }
+      return saved;
+    } catch (saveFailure) {
+      saveStatus.value = 'error';
+      saveError.value = saveFailure instanceof Error ? saveFailure.message : '保存失败，请稍后再试。';
+      return null;
     }
-    return saved;
-  } catch (saveFailure) {
-    saveStatus.value = 'error';
-    saveError.value = saveFailure instanceof Error ? saveFailure.message : '保存失败，请稍后再试。';
-    return null;
+  })();
+  savePromise = currentSave;
+  try {
+    return await currentSave;
+  } finally {
+    if (savePromise === currentSave) {
+      savePromise = null;
+    }
   }
 }
 
@@ -488,27 +508,86 @@ async function downloadCurrentPattern(): Promise<void> {
   }
   isDownloading.value = true;
   saveError.value = '';
+  clearDownloadStatusTimer();
   try {
-    if (isDirty.value || !generation.patternImageUrl) {
-      const saved = await saveNow(true);
+    if (savePromise) {
+      setDownloadStatus('保存中…', 'busy');
+      const saveStartedAt = performance.now();
+      const saved = await savePromise;
+      console.info(`[PinDou] 下载保存段 ${Math.round(performance.now() - saveStartedAt)}ms`);
       if (!saved) {
+        setDownloadStatus('保存失败', 'error', true);
         return;
       }
+      setDownloadStatus('已保存', 'success');
+      await stageDelay(180);
+    }
+
+    if (isDirty.value || !generation.patternImageUrl) {
+      setDownloadStatus('保存中…', 'busy');
+      const saveStartedAt = performance.now();
+      const saved = await saveNow(true);
+      console.info(`[PinDou] 下载保存段 ${Math.round(performance.now() - saveStartedAt)}ms`);
+      if (!saved) {
+        setDownloadStatus('保存失败', 'error', true);
+        return;
+      }
+      setDownloadStatus('已保存', 'success');
+      await stageDelay(180);
     }
 
     const url = generation.patternImageUrl;
     if (!url) {
       saveError.value = '图纸图片还没准备好，请先保存后再试。';
+      setDownloadStatus('下载失败', 'error', true);
       return;
     }
 
+    setDownloadStatus('下载中…', 'busy');
+    const fetchStartedAt = performance.now();
     const result = await downloadImage(url, downloadFileName.value);
+    console.info(`[PinDou] 下载 fetch 段 ${Math.round(performance.now() - fetchStartedAt)}ms`);
     if (result === 'opened') {
       saveError.value = '图片已在新窗口打开，手机端可长按保存。';
     }
+    setDownloadStatus('完成 ✓', 'success');
+    hideDownloadStatusLater();
+  } catch (_downloadFailure) {
+    setDownloadStatus('下载失败', 'error', true);
   } finally {
     isDownloading.value = false;
   }
+}
+
+function setDownloadStatus(message: string, kind: DownloadStatusKind, canRetry = false): void {
+  clearDownloadStatusTimer();
+  downloadStatus.value = {
+    visible: true,
+    message,
+    kind,
+    canRetry
+  };
+}
+
+function hideDownloadStatusLater(): void {
+  clearDownloadStatusTimer();
+  downloadStatusTimer = window.setTimeout(() => {
+    downloadStatus.value.visible = false;
+    downloadStatusTimer = undefined;
+  }, 1400);
+}
+
+function clearDownloadStatusTimer(): void {
+  if (downloadStatusTimer) {
+    window.clearTimeout(downloadStatusTimer);
+    downloadStatusTimer = undefined;
+  }
+}
+
+function stageDelay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
 }
 
 async function goBackToResult(): Promise<void> {
@@ -627,6 +706,17 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
         </div>
       </header>
 
+      <div
+        v-if="downloadStatus.visible"
+        class="editor-download-status"
+        :class="`editor-download-status--${downloadStatus.kind}`"
+        aria-live="polite"
+      >
+        <span class="editor-download-status__dot" aria-hidden="true"></span>
+        <strong>{{ downloadStatus.message }}</strong>
+        <button v-if="downloadStatus.canRetry" type="button" @click="downloadCurrentPattern">重试</button>
+      </div>
+
       <main class="editor-canvas-shell">
         <PatternEditorCanvas
           ref="editorRef"
@@ -635,6 +725,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
           :selected-color="selectedColor"
           :active-tool="activeTool"
           :paint-enabled="paintEnabled"
+          :show-grid-lines="showGridLines"
           :pattern-key="patternKey"
           :paint-revision="paintRevision"
           :last-patch="lastPatch"
@@ -686,12 +777,19 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
           </div>
           <button
             type="button"
-            class="editor-tool-toggle"
-            :class="{ 'editor-tool-toggle--active': paintEnabled }"
-            :aria-pressed="paintEnabled"
-            @click="paintEnabled = !paintEnabled"
+            class="editor-tool-grid"
+            :class="{ 'editor-tool-grid--active': showGridLines }"
+            :aria-pressed="showGridLines"
+            @click="showGridLines = !showGridLines"
           >
-            {{ paintToggleLabel }}
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 4h16v16H4z" />
+              <path d="M9.33 4v16" />
+              <path d="M14.67 4v16" />
+              <path d="M4 9.33h16" />
+              <path d="M4 14.67h16" />
+            </svg>
+            <span>{{ showGridLines ? '移除框线' : '添加框线' }}</span>
           </button>
         </section>
 
@@ -721,7 +819,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
         <section class="editor-current" aria-label="当前工具">
           <div class="editor-current__main">
             <div class="editor-current__swatch" :class="{ 'editor-current__swatch--erase': activeTool === 'erase' }">
-              <span v-if="activeTool === 'paint'" :style="{ backgroundColor: selectedColor?.hex || '#fff' }"></span>
+              <span v-if="activeTool !== 'erase'" :style="{ backgroundColor: selectedColor?.hex || '#fff' }"></span>
             </div>
             <div>
               <strong>{{ activeTool === 'erase' ? '橡皮擦' : selectedColor?.code || '未选色' }}</strong>
@@ -828,6 +926,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 
 <style scoped>
 .editor-page {
+  position: relative;
   width: 100%;
   min-height: 100dvh;
   height: 100dvh;
@@ -858,6 +957,18 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
   font-size: clamp(30px, 5vw, 42px);
+}
+
+@keyframes download-dot-pulse {
+  from {
+    opacity: 0.58;
+    transform: scale(0.86);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .editor-topbar {
@@ -983,6 +1094,64 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   box-shadow: var(--pd-shadow-cta);
 }
 
+.editor-download-status {
+  position: absolute;
+  top: 76px;
+  left: 50%;
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: calc(100% - 24px);
+  border: 1px solid rgba(255, 142, 83, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 250, 247, 0.94);
+  box-shadow: 0 14px 32px rgba(45, 45, 45, 0.12);
+  color: var(--pd-fg-1);
+  font-size: 13px;
+  font-weight: 900;
+  padding: 9px 12px;
+  transform: translateX(-50%);
+  backdrop-filter: blur(14px);
+}
+
+.editor-download-status__dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--pd-orange);
+  box-shadow: 0 0 0 5px rgba(255, 142, 83, 0.14);
+}
+
+.editor-download-status--busy .editor-download-status__dot {
+  animation: download-dot-pulse 840ms ease-in-out infinite alternate;
+}
+
+.editor-download-status--success .editor-download-status__dot {
+  background: #5bbf89;
+  box-shadow: 0 0 0 5px rgba(91, 191, 137, 0.14);
+}
+
+.editor-download-status--error .editor-download-status__dot {
+  background: #ff5b6e;
+  box-shadow: 0 0 0 5px rgba(255, 91, 110, 0.14);
+}
+
+.editor-download-status button {
+  min-height: 30px;
+  border: 1px solid rgba(255, 142, 83, 0.32);
+  border-radius: 999px;
+  background: rgba(255, 241, 232, 0.9);
+  color: var(--pd-orange);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 0 10px;
+}
+
 .editor-canvas-shell {
   min-height: 0;
   padding: 10px;
@@ -1037,12 +1206,6 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   gap: 6px;
 }
 
-.editor-tool-toggle--active {
-  border-color: transparent !important;
-  background: var(--pd-gradient-warm) !important;
-  color: #fff !important;
-}
-
 .editor-tools button {
   min-height: 52px;
   display: inline-flex;
@@ -1058,12 +1221,13 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   border-radius: 14px !important;
 }
 
-.editor-tool-toggle {
-  flex: 1 1 92px;
-  min-width: 88px;
+.editor-tool-grid {
+  flex: 1 1 auto;
+  min-width: 116px;
 }
 
-.editor-tool-square--active {
+.editor-tool-square--active,
+.editor-tool-grid--active {
   border-color: transparent !important;
   background: var(--pd-gradient-warm) !important;
   box-shadow: var(--pd-shadow-cta);

@@ -14,8 +14,9 @@ const props = defineProps<{
   pattern: PatternSheet;
   palette: ColorRef[];
   selectedColor: ColorRef | null;
-  activeTool: 'paint' | 'erase';
+  activeTool: 'none' | 'paint' | 'erase';
   paintEnabled: boolean;
+  showGridLines: boolean;
   patternKey: number;
   paintRevision: number;
   lastPatch: CellPatch | null;
@@ -85,7 +86,12 @@ const minScale = computed(() => {
 const scaleLabel = computed(() => `${Math.round((view.scale / Math.max(minScale.value, 1)) * 100)}%`);
 const cursorCell = computed(() => props.pattern.grid[cursor.value.row]?.[cursor.value.col] || null);
 const cursorCode = computed(() => cursorCell.value?.code || '空');
-const selectedCode = computed(() => (props.activeTool === 'erase' ? '橡皮擦' : props.selectedColor?.code || '未选'));
+const selectedCode = computed(() => {
+  if (props.activeTool === 'none') {
+    return '浏览';
+  }
+  return props.activeTool === 'erase' ? '橡皮擦' : props.selectedColor?.code || '未选';
+});
 
 onMounted(() => {
   resizeObserver = new ResizeObserver(() => {
@@ -144,6 +150,13 @@ watch(
   () => props.selectedColor?.code,
   () => {
     scheduleOverlayDraw();
+  }
+);
+
+watch(
+  () => props.showGridLines,
+  () => {
+    scheduleBaseDraw();
   }
 );
 
@@ -290,7 +303,7 @@ function drawBase(): void {
   const dh = (visible.rowEnd - visible.rowStart) * view.scale;
   ctx.drawImage(staticCanvas, sx, sy, sw, sh, dx, dy, dw, dh);
 
-  if (view.scale >= 6) {
+  if (props.showGridLines && view.scale >= 6) {
     drawGridLines(ctx, visible);
   }
   if (view.scale >= LABEL_MIN_CELL_PX) {
@@ -542,7 +555,9 @@ function handlePointerUp(event: PointerEvent): void {
       const hit = hitCell(point);
       if (hit) {
         setCursor(hit.row, hit.col);
-        applyCell(hit.row, hit.col);
+        if (props.paintEnabled) {
+          applyCell(hit.row, hit.col);
+        }
       }
     }
   }
@@ -619,6 +634,9 @@ function setCursor(row: number, col: number): void {
 }
 
 function applyCell(row: number, col: number, drag?: MouseDrag): void {
+  if (props.activeTool === 'none') {
+    return;
+  }
   if (props.activeTool === 'paint' && !props.selectedColor) {
     return;
   }
@@ -634,6 +652,9 @@ function applyCell(row: number, col: number, drag?: MouseDrag): void {
 }
 
 function applyTouchCell(row: number, col: number): void {
+  if (props.activeTool === 'none') {
+    return;
+  }
   if (props.activeTool === 'paint' && !props.selectedColor) {
     return;
   }
