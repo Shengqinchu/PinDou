@@ -110,6 +110,10 @@ const canUndo = computed(() => undoStack.value.length > 0);
 const canRedo = computed(() => redoStack.value.length > 0);
 const canDownload = computed(() => Boolean(pattern.value && artworkId.value && saveStatus.value !== 'saving' && !isDownloading.value));
 const downloadFileName = computed(() => `拼豆图纸_${artworkId.value || 'pindou'}.png`);
+const paintToggleLabel = computed(() => {
+  const verb = activeTool.value === 'erase' ? '擦' : '画';
+  return `${paintEnabled.value ? '停止' : '开始'}${verb}`;
+});
 const selectedColorUseCount = computed(() => (
   selectedColor.value ? (pattern.value?.color_counts[selectedColor.value.code] || 0) : 0
 ));
@@ -687,7 +691,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
             :aria-pressed="paintEnabled"
             @click="paintEnabled = !paintEnabled"
           >
-            {{ paintEnabled ? '停止上色' : '开始上色' }}
+            {{ paintToggleLabel }}
           </button>
         </section>
 
@@ -721,7 +725,9 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
             </div>
             <div>
               <strong>{{ activeTool === 'erase' ? '橡皮擦' : selectedColor?.code || '未选色' }}</strong>
-              <span>{{ activeTool === 'erase' ? '点格变空白' : selectedColor?.name_cn || '从全部颜色选择' }}</span>
+              <span v-if="activeTool === 'erase' || !selectedColor">
+                {{ activeTool === 'erase' ? '点格变空白' : '从全部颜色选择' }}
+              </span>
             </div>
           </div>
           <button
@@ -731,7 +737,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
             :disabled="!canReplaceSelectedColor"
             @click="openReplaceModal"
           >
-            将该色号全局替换为…
+            全局替换为…
           </button>
         </section>
       </footer>
@@ -1048,13 +1054,13 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 }
 
 .editor-tool-square {
-  min-width: 64px;
+  min-width: 88px;
   border-radius: 14px !important;
 }
 
 .editor-tool-toggle {
-  flex: 1 1 auto;
-  min-width: 112px;
+  flex: 1 1 92px;
+  min-width: 88px;
 }
 
 .editor-tool-square--active {
@@ -1125,10 +1131,10 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 
 .editor-current {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
-  min-width: 220px;
+  min-width: 260px;
   border: 1px solid rgba(255, 142, 83, 0.18);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.86);
@@ -1191,10 +1197,11 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 }
 
 .editor-replace-trigger {
-  width: 100%;
+  justify-self: end;
+  max-width: 100%;
   min-height: 38px;
   border: 1px solid rgba(255, 142, 83, 0.24);
-  border-radius: 14px;
+  border-radius: 999px;
   background: rgba(255, 241, 232, 0.84);
   color: var(--pd-orange);
   font-size: 12px;
@@ -1550,7 +1557,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   }
 
   .editor-tool-square {
-    min-width: 58px;
+    min-width: 82px;
   }
 
   .editor-color {
@@ -1561,6 +1568,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   }
 
   .editor-current {
+    grid-template-columns: minmax(0, 1fr) auto;
     min-width: 0;
     border-radius: 16px;
   }
