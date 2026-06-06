@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "build:colormap": "node scripts/build-colormap-assets.mjs",
+    "prebuild": "npm run build:colormap",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "cf:preview": "wrangler pages dev dist --compatibility-date=2026-06-02",

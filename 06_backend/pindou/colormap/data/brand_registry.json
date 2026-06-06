@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "source_dir": "06_backend/pindou/colormap/data",
+  "default_palette": {
+    "brand_id": "mard",
+    "bead_diameter_mm": 5,
+    "file": "mard_5mm.json"
+  },
+  "brands": [
+    {
+      "brand_id": "mard",
+      "display_name": "MARD",
+      "aliases": ["MARD", "Mard", "mard"],
+      "ui_visible": true,
+      "default_diameter_mm": 5,
+      "palettes": [
+        { "bead_diameter_mm": 5, "file": "mard_5mm.json", "count": 291, "status": "ready" },
+        { "bead_diameter_mm": 2.6, "file": "mard_2_6mm.json", "count": 221, "status": "ready" },
+        { "bead_diameter_mm": 10, "file": "mard_10mm.json", "count": 0, "status": "empty_placeholder", "reason": "No reliable public MARD 10mm per-color palette found." }
+      ]
+    },
+    {
+      "brand_id": "coco",
+      "display_name": "COCO",
+      "aliases": ["COCO", "Coco", "coco"],
+      "ui_visible": false,
+      "default_diameter_mm": 5,
+      "palettes": [
+        { "bead_diameter_mm": 5, "file": "coco_5mm.json", "count": 291, "status": "ready" },
+        { "bead_diameter_mm": 2.6, "file": "coco_2_6mm.json", "count": 291, "status": "ready" },
+        { "bead_diameter_mm": 10, "file": "coco_10mm.json", "count": 0, "status": "empty_placeholder", "reason": "No reliable public COCO 10mm per-color palette found." }
+      ]
+    },
+    {
+      "brand_id": "hama",
+      "display_name": "Hama",
+      "aliases": ["Hama", "hama"],
+      "ui_visible": false,
+      "default_diameter_mm": 5,
+      "palettes": [
+        { "bead_diameter_mm": 2.5, "file": "hama_2_5mm.json", "count": 89, "status": "ready" },
+        { "bead_diameter_mm": 5, "file": "hama_5mm.json", "count": 89, "status": "ready" },
+        { "bead_diameter_mm": 10, "file": "hama_10mm.json", "count": 89, "status": "ready" }
+      ]
+    },
+    {
+      "brand_id": "artkal",
+      "display_name": "Artkal",
+      "aliases": ["Artkal", "ARTKAL", "artkal"],
+      "ui_visible": false,
+      "default_diameter_mm": 5,
+      "palettes": [
+        { "bead_diameter_mm": 5, "file": "artkal_5mm.json", "count": 201, "status": "ready" },
+        { "bead_diameter_mm": 2.6, "file": "artkal_2_6mm.json", "count": 221, "status": "ready" },
+        { "bead_diameter_mm": 10, "file": "artkal_10mm.json", "count": 0, "status": "empty_placeholder", "reason": "Official X 10mm range exists, but no structured public HEX table found." }
+      ]
+    },
+    {
+      "brand_id": "perler",
+      "display_name": "Perler",
+      "aliases": ["Perler", "PERLER", "perler"],
+      "ui_visible": false,
+      "default_diameter_mm": 5,
+      "palettes": [
+        { "bead_diameter_mm": 5, "file": "perler_5mm.json", "count": 117, "status": "ready" }
+      ]
+    },
+    {
+      "brand_id": "huangdoudou",
+      "display_name": "黄豆豆",
+      "aliases": ["黄豆豆", "huangdoudou", "other_huangdoudou"],
+      "ui_visible": false,
+      "default_diameter_mm": 5,
+      "palettes": [
+        { "bead_diameter_mm": 5, "file": "other_huangdoudou_5mm.json", "count": 291, "status": "ready" }
+      ]
+    },
+    {
+      "brand_id": "mixiaowo",
+      "display_name": "咪小窝",
+      "aliases": ["咪小窝", "mixiaowo", "other_mixiaowo"],
+      "ui_visible": false,
+      "default_diameter_mm": 5,
+      "palettes": [
+        { "bead_diameter_mm": 5, "file": "other_mixiaowo_5mm.json", "count": 287, "status": "ready" }
+      ]
+    },
+    {
+      "brand_id": "panpan",
+      "display_name": "盼盼",
+      "aliases": ["盼盼", "panpan", "other_panpan"],
+      "ui_visible": false,
+      "default_diameter_mm": 5,
+      "palettes": [
+        { "bead_diameter_mm": 5, "file": "other_panpan_5mm.json", "count": 286, "status": "ready" }
+      ]
+    }
+  ]
+}

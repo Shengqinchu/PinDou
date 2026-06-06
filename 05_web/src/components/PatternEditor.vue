@@ -9,22 +9,21 @@ const CACHE_CELL_PX = 18;
 const MAX_SCALE = 82;
 const LABEL_MIN_CELL_PX = 18;
 const CONTINUOUS_MIN_CELL_PX = 23;
-const LOUPE_GRID = 9;
-const LOUPE_CELL_PX = 18;
 const PINCH_SETTLE_MS = 260;
 
 const props = defineProps<{
   pattern: PatternSheet;
   palette: ColorRef[];
   selectedColor: ColorRef | null;
-  continuousPaint: boolean;
+  activeTool: 'paint' | 'erase';
+  paintEnabled: boolean;
   patternKey: number;
   paintRevision: number;
   lastPatch: CellPatch | null;
 }>();
 
 const emit = defineEmits<{
-  paint: [payload: { row: number; col: number; color: ColorRef }];
+  applyCell: [payload: { row: number; col: number; color: ColorRef | null }];
   cursorChange: [payload: { row: number; col: number; cell: ColorRef | null }];
 }>();
 
@@ -40,10 +39,12 @@ interface PointerPoint extends Point {
 interface MouseDrag {
   pointerId: number;
   button: number;
+  mode: 'pan' | 'paint';
   start: Point;
   startOffsetX: number;
   startOffsetY: number;
   moved: boolean;
+  lastPaintedKey: string;
 }
 
 interface PinchState {
@@ -56,7 +57,6 @@ interface PinchState {
 const frameRef = ref<HTMLElement | null>(null);
 const baseCanvasRef = ref<HTMLCanvasElement | null>(null);
 const overlayCanvasRef = ref<HTMLCanvasElement | null>(null);
-const loupeCanvasRef = ref<HTMLCanvasElement | null>(null);
 const canvasSize = reactive({ width: 1, height: 1, dpr: 1 });
 const view = reactive({ scale: 10, offsetX: 0, offsetY: 0 });
 const cursor = ref({ row: 0, col: 0 });
@@ -82,28 +82,8 @@ const minScale = computed(() => {
 const scaleLabel = computed(() => `${Math.round((view.scale / Math.max(minScale.value, 1)) * 100)}%`);
 const cursorCell = computed(() => props.pattern.grid[cursor.value.row]?.[cursor.value.col] || null);
 const cursorCode = computed(() => cursorCell.value?.code || '空');
-const selectedCode = computed(() => props.selectedColor?.code || '未选');
-const canContinuousPaint = computed(() => props.continuousPaint && view.scale >= CONTINUOUS_MIN_CELL_PX);
-const loupeSize = LOUPE_GRID * LOUPE_CELL_PX + 2;
-const loupeStyle = computed(() => {
-  const screen = cellCenterToScreen(cursor.value.row, cursor.value.col);
-  const margin = 10;
-  let left = screen.x + 22;
-  let top = screen.y - loupeSize - 18;
-  if (top < margin) {
-    top = screen.y + 24;
-  }
-  if (left + loupeSize > canvasSize.width - margin) {
-    left = screen.x - loupeSize - 22;
-  }
-  left = clamp(left, margin, Math.max(margin, canvasSize.width - loupeSize - margin));
-  top = clamp(top, margin, Math.max(margin, canvasSize.height - loupeSize - margin));
-  return {
-    width: `${loupeSize}px`,
-    height: `${loupeSize}px`,
-    transform: `translate(${left}px, ${top}px)`
-  };
-});
+const selectedCode = computed(() => (props.activeTool === 'erase' ? '橡皮擦' : props.selectedColor?.code || '未选'));
+const touchPaintEnabled = computed(() => props.paintEnabled && view.scale >= CONTINUOUS_MIN_CELL_PX);
 
 onMounted(() => {
   resizeObserver = new ResizeObserver(() => {
@@ -184,14 +164,7 @@ function resetView(): void {
 }
 
 function paintAtCursor(): void {
-  if (!props.selectedColor) {
-    return;
-  }
-  emit('paint', {
-    row: cursor.value.row,
-    col: cursor.value.col,
-    color: props.selectedColor
-  });
+  applyCell(cursor.value.row, cursor.value.col);
 }
 
 function resizeCanvases(): void {
@@ -205,7 +178,6 @@ function resizeCanvases(): void {
   canvasSize.dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
   setupCanvas(baseCanvasRef.value);
   setupCanvas(overlayCanvasRef.value);
-  setupLoupeCanvas();
   clampCurrentView();
   scheduleBaseDraw();
   scheduleOverlayDraw();
@@ -220,18 +192,6 @@ function setupCanvas(canvas: HTMLCanvasElement | null): void {
   if (canvas.width !== width || canvas.height !== height) {
     canvas.width = width;
     canvas.height = height;
-  }
-}
-
-function setupLoupeCanvas(): void {
-  const canvas = loupeCanvasRef.value;
-  if (!canvas) {
-    return;
-  }
-  const width = Math.round(loupeSize * canvasSize.dpr);
-  if (canvas.width !== width || canvas.height !== width) {
-    canvas.width = width;
-    canvas.height = width;
   }
 }
 
@@ -298,7 +258,6 @@ function scheduleOverlayDraw(): void {
   overlayFrame = requestAnimationFrame(() => {
     overlayFrame = 0;
     drawOverlay();
-    drawLoupe();
   });
 }
 
@@ -424,50 +383,6 @@ function drawCellMarker(
   ctx.restore();
 }
 
-function drawLoupe(): void {
-  const canvas = loupeCanvasRef.value;
-  const ctx = canvas?.getContext('2d');
-  if (!canvas || !ctx) {
-    return;
-  }
-  const size = loupeSize;
-  ctx.setTransform(canvasSize.dpr, 0, 0, canvasSize.dpr, 0, 0);
-  ctx.clearRect(0, 0, size, size);
-  ctx.fillStyle = '#fffaf7';
-  ctx.fillRect(0, 0, size, size);
-  const half = Math.floor(LOUPE_GRID / 2);
-  const startRow = cursor.value.row - half;
-  const startCol = cursor.value.col - half;
-  for (let rr = 0; rr < LOUPE_GRID; rr += 1) {
-    for (let cc = 0; cc < LOUPE_GRID; cc += 1) {
-      const row = startRow + rr;
-      const col = startCol + cc;
-      const x = 1 + cc * LOUPE_CELL_PX;
-      const y = 1 + rr * LOUPE_CELL_PX;
-      const cell = props.pattern.grid[row]?.[col] || null;
-      ctx.fillStyle = row < 0 || col < 0 || row >= rows.value || col >= cols.value
-        ? '#f4ebe3'
-        : cell?.hex || '#fffaf5';
-      ctx.fillRect(x, y, LOUPE_CELL_PX, LOUPE_CELL_PX);
-      ctx.strokeStyle = 'rgba(45,45,45,0.18)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(crisp(x), crisp(y), LOUPE_CELL_PX, LOUPE_CELL_PX);
-      if (cell) {
-        ctx.fillStyle = colorTextFill(cell);
-        ctx.font = `900 ${fontSizeForCode(cell.code, LOUPE_CELL_PX)}px ${getComputedStyle(document.documentElement).getPropertyValue('--pd-font-mono') || 'monospace'}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(cell.code, x + LOUPE_CELL_PX / 2, y + LOUPE_CELL_PX * 0.55);
-      }
-    }
-  }
-  const cursorX = 1 + half * LOUPE_CELL_PX;
-  const cursorY = 1 + half * LOUPE_CELL_PX;
-  ctx.strokeStyle = '#ff6b9d';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(cursorX + 1.5, cursorY + 1.5, LOUPE_CELL_PX - 3, LOUPE_CELL_PX - 3);
-}
-
 function handleWheel(event: WheelEvent): void {
   event.preventDefault();
   const point = localPoint(event.clientX, event.clientY);
@@ -487,15 +402,23 @@ function handlePointerDown(event: PointerEvent): void {
   }
 
   if (event.pointerType === 'mouse') {
+    const hit = hitCell(point);
+    const mode = event.button === 0 && props.paintEnabled ? 'paint' : 'pan';
     mouseDrag.value = {
       pointerId: event.pointerId,
       button: event.button,
+      mode,
       start: point,
       startOffsetX: view.offsetX,
       startOffsetY: view.offsetY,
-      moved: false
+      moved: false,
+      lastPaintedKey: ''
     };
-    hoverCell.value = hitCell(point);
+    hoverCell.value = hit;
+    if (mode === 'paint' && hit) {
+      setCursor(hit.row, hit.col);
+      applyCell(hit.row, hit.col, mouseDrag.value);
+    }
     scheduleOverlayDraw();
     return;
   }
@@ -503,8 +426,8 @@ function handlePointerDown(event: PointerEvent): void {
   const hit = hitCell(point);
   if (hit) {
     setCursor(hit.row, hit.col);
-    if (canContinuousPaint.value && props.selectedColor && Date.now() > pinchSettledAt.value) {
-      paintCell(hit.row, hit.col);
+    if (touchPaintEnabled.value && Date.now() > pinchSettledAt.value) {
+      applyCell(hit.row, hit.col);
     }
   }
 }
@@ -523,6 +446,15 @@ function handlePointerMove(event: PointerEvent): void {
 
   const drag = mouseDrag.value;
   if (event.pointerType === 'mouse' && drag?.pointerId === event.pointerId) {
+    if (drag.mode === 'paint') {
+      const hit = hitCell(point);
+      hoverCell.value = hit;
+      if (hit) {
+        setCursor(hit.row, hit.col);
+        applyCell(hit.row, hit.col, drag);
+      }
+      return;
+    }
     const dx = point.x - drag.start.x;
     const dy = point.y - drag.start.y;
     if (Math.hypot(dx, dy) > 4 || drag.button !== 0) {
@@ -545,8 +477,8 @@ function handlePointerMove(event: PointerEvent): void {
   const hit = hitCell(point);
   if (hit) {
     setCursor(hit.row, hit.col);
-    if (canContinuousPaint.value && props.selectedColor && Date.now() > pinchSettledAt.value) {
-      paintCell(hit.row, hit.col);
+    if (touchPaintEnabled.value && Date.now() > pinchSettledAt.value) {
+      applyCell(hit.row, hit.col);
     }
   }
 }
@@ -568,11 +500,14 @@ function handlePointerUp(event: PointerEvent): void {
   const drag = mouseDrag.value;
   if (event.pointerType === 'mouse' && drag?.pointerId === event.pointerId) {
     mouseDrag.value = null;
-    if (!drag.moved && drag.button === 0 && props.selectedColor) {
+    if (drag.mode === 'paint') {
+      return;
+    }
+    if (!drag.moved && drag.button === 0) {
       const hit = hitCell(point);
       if (hit) {
         setCursor(hit.row, hit.col);
-        paintCell(hit.row, hit.col);
+        applyCell(hit.row, hit.col);
       }
     }
   }
@@ -643,11 +578,20 @@ function setCursor(row: number, col: number): void {
   scheduleOverlayDraw();
 }
 
-function paintCell(row: number, col: number): void {
-  if (!props.selectedColor) {
+function applyCell(row: number, col: number, drag?: MouseDrag): void {
+  if (props.activeTool === 'paint' && !props.selectedColor) {
     return;
   }
-  emit('paint', { row, col, color: props.selectedColor });
+  const color = props.activeTool === 'erase' ? null : props.selectedColor;
+  const colorKey = color?.code || 'erase';
+  const paintKey = `${row}:${col}:${colorKey}`;
+  if (drag) {
+    if (drag.lastPaintedKey === paintKey) {
+      return;
+    }
+    drag.lastPaintedKey = paintKey;
+  }
+  emit('applyCell', { row, col, color });
 }
 
 function emitCursor(): void {
@@ -765,7 +709,6 @@ defineExpose({
   >
     <canvas ref="baseCanvasRef" class="pattern-editor__canvas" aria-label="拼豆图纸画布"></canvas>
     <canvas ref="overlayCanvasRef" class="pattern-editor__overlay" aria-hidden="true"></canvas>
-    <canvas ref="loupeCanvasRef" class="pattern-editor__loupe" :style="loupeStyle" aria-hidden="true"></canvas>
 
     <div class="pattern-editor__hud" aria-live="polite">
       <span>{{ cursor.row + 1 }}行 {{ cursor.col + 1 }}列</span>
@@ -773,7 +716,9 @@ defineExpose({
       <em>选中 {{ selectedCode }}</em>
     </div>
 
-    <div v-if="canContinuousPaint" class="pattern-editor__paint-mode">连续涂</div>
+    <div v-if="paintEnabled" class="pattern-editor__paint-mode">
+      {{ activeTool === 'erase' ? '擦除中' : '上色中' }}
+    </div>
   </div>
 </template>
 
@@ -806,18 +751,6 @@ defineExpose({
 
 .pattern-editor__overlay {
   z-index: 2;
-  pointer-events: none;
-}
-
-.pattern-editor__loupe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 4;
-  border: 2px solid rgba(255, 142, 83, 0.55);
-  border-radius: 20px;
-  background: #fffaf7;
-  box-shadow: 0 16px 36px rgba(45, 45, 45, 0.18), 0 8px 20px rgba(255, 142, 83, 0.16);
   pointer-events: none;
 }
 
@@ -873,10 +806,6 @@ defineExpose({
 @media (max-width: 560px) {
   .pattern-editor {
     border-radius: 18px;
-  }
-
-  .pattern-editor__loupe {
-    border-radius: 17px;
   }
 
   .pattern-editor__hud {

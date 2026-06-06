@@ -5,6 +5,8 @@ import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
 import { saveArtworkPattern } from '../api';
 import PatternEditorCanvas from '../components/PatternEditor.vue';
 import type { ColorRef, PatternSheet } from '../api/types';
+import mardPaletteJson from '../assets/colormap/mard-5mm.json';
+import paletteManifestJson from '../assets/colormap/manifest.json';
 import { useGenerationStore } from '../stores/generation';
 import { useSWRCacheStore } from '../stores/swrCache';
 import {
@@ -18,9 +20,12 @@ import {
 } from '../utils/patternEditing';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
+type EditorTool = 'paint' | 'erase';
+type CatalogColor = ColorRef & { category: string };
 
 const AUTOSAVE_DELAY_MS = 1600;
 const MAX_PATCH_STACK = 240;
+const COLOR_CATEGORY_ALL = '全部';
 
 const route = useRoute();
 const router = useRouter();
@@ -32,13 +37,18 @@ const error = ref('');
 const editablePattern = ref<PatternSheet | null>(null);
 const availablePalette = ref<ColorRef[]>([]);
 const selectedColor = ref<ColorRef | null>(null);
+const activeTool = ref<EditorTool>('paint');
+const paintEnabled = ref(false);
+const isColorModalOpen = ref(false);
+const colorSearch = ref('');
+const activeCategory = ref(COLOR_CATEGORY_ALL);
+const recentColors = ref<ColorRef[]>([]);
 const cursorInfo = ref<{ row: number; col: number; cell: ColorRef | null }>({ row: 0, col: 0, cell: null });
 const undoStack = ref<CellPatch[]>([]);
 const redoStack = ref<CellPatch[]>([]);
 const isDirty = ref(false);
 const saveStatus = ref<SaveStatus>('idle');
 const saveError = ref('');
-const continuousPaint = ref(false);
 const patternKey = ref(0);
 const paintRevision = ref(0);
 const lastPatch = ref<CellPatch | null>(null);
@@ -54,6 +64,33 @@ const cols = computed(() => Math.max(...(pattern.value?.grid.map((row) => row.le
 const beadTotal = computed(() => pattern.value?.bead_total || 0);
 const colorTotal = computed(() => pattern.value?.palette_used.length || 0);
 const paletteRows = computed(() => paletteRowsForPattern(pattern.value));
+const fullPalette = computed(() => normalizeCatalog(mardPaletteJson as CatalogColor[]));
+const paletteManifest = paletteManifestJson as {
+  default_palette: string;
+  palettes: Array<{ id: string; display_name: string; count: number; categories: string[] }>;
+};
+const currentPaletteMeta = computed(() => paletteManifest.palettes.find((item) => item.id === paletteManifest.default_palette));
+const colorCategories = computed(() => [
+  COLOR_CATEGORY_ALL,
+  ...Array.from(new Set(fullPalette.value.map((color) => color.category))).sort((left, right) => (
+    left.localeCompare(right, 'zh-Hans-CN')
+  ))
+]);
+const filteredFullPalette = computed(() => {
+  const keyword = colorSearch.value.trim().toLowerCase();
+  return fullPalette.value.filter((color) => {
+    const categoryMatched = activeCategory.value === COLOR_CATEGORY_ALL || color.category === activeCategory.value;
+    if (!categoryMatched) {
+      return false;
+    }
+    if (!keyword) {
+      return true;
+    }
+    return color.code.toLowerCase().includes(keyword)
+      || color.name_cn.toLowerCase().includes(keyword)
+      || color.hex.toLowerCase().includes(keyword);
+  });
+});
 const canUndo = computed(() => undoStack.value.length > 0);
 const canRedo = computed(() => redoStack.value.length > 0);
 const saveStatusText = computed(() => {
@@ -125,7 +162,10 @@ function applyLoadedPattern(nextPattern: PatternSheet): void {
   const normalized = recalculatePattern(clonePattern(nextPattern));
   editablePattern.value = normalized;
   availablePalette.value = uniquePalette(normalized.palette_used);
-  selectedColor.value = availablePalette.value[0] ? cloneColor(availablePalette.value[0]) : null;
+  selectedColor.value = availablePalette.value[0]
+    ? cloneColor(availablePalette.value[0])
+    : (fullPalette.value[0] ? cloneColor(fullPalette.value[0]) : null);
+  activeTool.value = 'paint';
   undoStack.value = [];
   redoStack.value = [];
   isDirty.value = false;
@@ -138,28 +178,31 @@ function applyLoadedPattern(nextPattern: PatternSheet): void {
   patternKey.value += 1;
 }
 
-function handlePaint(payload: { row: number; col: number; color: ColorRef }): void {
-  applyPaint(payload.row, payload.col, payload.color);
+function handleApplyCell(payload: { row: number; col: number; color: ColorRef | null }): void {
+  applyCell(payload.row, payload.col, payload.color);
 }
 
-function applyPaint(row: number, col: number, color: ColorRef): void {
+function applyCell(row: number, col: number, color: ColorRef | null): void {
   const sheet = editablePattern.value;
   const current = sheet?.grid[row]?.[col];
   if (!sheet || !sheet.grid[row] || col < 0 || col >= sheet.grid[row].length) {
     return;
   }
-  if (current?.code === color.code) {
+  if ((current?.code || null) === (color?.code || null)) {
     return;
   }
   const patch: CellPatch = {
     row,
     col,
     before: cloneColorOrNull(current || null),
-    after: cloneColor(color)
+    after: cloneColorOrNull(color)
   };
   editablePattern.value = applyCellPatch(sheet, patch, true);
-  availablePalette.value = uniquePalette([...availablePalette.value, cloneColor(color)]);
-  selectedColor.value = cloneColor(color);
+  if (color) {
+    availablePalette.value = uniquePalette([...availablePalette.value, cloneColor(color)]);
+    selectedColor.value = cloneColor(color);
+    rememberRecentColor(color);
+  }
   undoStack.value.push(patch);
   if (undoStack.value.length > MAX_PATCH_STACK) {
     undoStack.value.shift();
@@ -202,10 +245,30 @@ function markEdited(patch: CellPatch): void {
 
 function chooseColor(color: ColorRef): void {
   selectedColor.value = cloneColor(color);
+  activeTool.value = 'paint';
+  rememberRecentColor(color);
 }
 
-function paintCursor(): void {
-  editorRef.value?.paintAtCursor();
+function chooseTool(tool: EditorTool): void {
+  activeTool.value = tool;
+}
+
+function openColorModal(): void {
+  isColorModalOpen.value = true;
+}
+
+function closeColorModal(): void {
+  isColorModalOpen.value = false;
+}
+
+function chooseFullColor(color: ColorRef): void {
+  chooseColor(color);
+  closeColorModal();
+}
+
+function rememberRecentColor(color: ColorRef): void {
+  const next = [cloneColor(color), ...recentColors.value.filter((item) => item.code !== color.code)];
+  recentColors.value = next.slice(0, 10);
 }
 
 function zoomIn(): void {
@@ -327,6 +390,13 @@ function uniquePalette(colors: ColorRef[]): ColorRef[] {
   }
   return result;
 }
+
+function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
+  return colors.map((color) => ({
+    ...cloneColor(color),
+    category: color.category || '其他'
+  }));
+}
 </script>
 
 <template>
@@ -369,11 +439,12 @@ function uniquePalette(colors: ColorRef[]): ColorRef[] {
           :pattern="pattern"
           :palette="availablePalette"
           :selected-color="selectedColor"
-          :continuous-paint="continuousPaint"
+          :active-tool="activeTool"
+          :paint-enabled="paintEnabled"
           :pattern-key="patternKey"
           :paint-revision="paintRevision"
           :last-patch="lastPatch"
-          @paint="handlePaint"
+          @apply-cell="handleApplyCell"
           @cursor-change="updateCursor"
         />
       </main>
@@ -393,48 +464,131 @@ function uniquePalette(colors: ColorRef[]): ColorRef[] {
           <button type="button" @click="resetView">复位</button>
           <button
             type="button"
-            class="editor-tool-toggle"
-            :class="{ 'editor-tool-toggle--active': continuousPaint }"
-            :aria-pressed="continuousPaint"
-            @click="continuousPaint = !continuousPaint"
+            class="editor-tool-square"
+            :class="{ 'editor-tool-square--active': activeTool === 'paint' }"
+            aria-label="画笔"
+            :aria-pressed="activeTool === 'paint'"
+            @click="chooseTool('paint')"
           >
-            连续涂
+            画
+          </button>
+          <button
+            type="button"
+            class="editor-tool-square"
+            :class="{ 'editor-tool-square--active': activeTool === 'erase' }"
+            aria-label="橡皮擦"
+            :aria-pressed="activeTool === 'erase'"
+            @click="chooseTool('erase')"
+          >
+            擦
+          </button>
+          <button
+            type="button"
+            class="editor-tool-toggle"
+            :class="{ 'editor-tool-toggle--active': paintEnabled }"
+            :aria-pressed="paintEnabled"
+            @click="paintEnabled = !paintEnabled"
+          >
+            {{ paintEnabled ? '停止上色' : '开始上色' }}
           </button>
         </section>
 
-        <section class="editor-palette" aria-label="色盘">
+        <section class="editor-palette" aria-label="已用色">
           <button
-            v-for="color in availablePalette"
-            :key="color.code"
+            v-for="row in paletteRows"
+            :key="row.color.code"
             type="button"
             class="editor-color"
-            :class="{ 'editor-color--active': selectedColor?.code === color.code }"
-            :title="`${color.code} · ${color.name_cn}`"
-            @click="chooseColor(color)"
+            :class="{ 'editor-color--active': activeTool === 'paint' && selectedColor?.code === row.color.code }"
+            :title="`${row.color.code} · ${row.color.name_cn}`"
+            @click="chooseColor(row.color)"
           >
-            <span :style="{ backgroundColor: color.hex }"></span>
-            <strong>{{ color.code }}</strong>
+            <span :style="{ backgroundColor: row.color.hex }"></span>
+            <strong>{{ row.color.code }}</strong>
+          </button>
+          <button
+            type="button"
+            class="editor-color editor-color--all"
+            @click="openColorModal"
+          >
+            <span class="editor-color__rainbow"></span>
+            <strong>全部颜色</strong>
           </button>
         </section>
 
-        <section class="editor-place">
-          <button class="editor-place__button" type="button" :disabled="!selectedColor" @click="paintCursor">
-            上色
-          </button>
-          <div class="editor-place__selected">
-            <span :style="{ backgroundColor: selectedColor?.hex || '#fff' }"></span>
-            <strong>{{ selectedColor?.code || '未选色' }}</strong>
+        <section class="editor-current" aria-label="当前工具">
+          <div class="editor-current__swatch" :class="{ 'editor-current__swatch--erase': activeTool === 'erase' }">
+            <span v-if="activeTool === 'paint'" :style="{ backgroundColor: selectedColor?.hex || '#fff' }"></span>
+          </div>
+          <div>
+            <strong>{{ activeTool === 'erase' ? '橡皮擦' : selectedColor?.code || '未选色' }}</strong>
+            <span>{{ activeTool === 'erase' ? '点格变空白' : selectedColor?.name_cn || '从全部颜色选择' }}</span>
           </div>
         </section>
       </footer>
 
-      <aside class="editor-mini" aria-label="色号清单">
-        <div v-for="row in paletteRows.slice(0, 6)" :key="row.color.code">
-          <span :style="{ backgroundColor: row.color.hex }"></span>
-          <strong>{{ row.color.code }}</strong>
-          <em>{{ row.count }}</em>
+      <Teleport to="body">
+        <div v-if="isColorModalOpen" class="editor-modal" @click.self="closeColorModal">
+          <div class="editor-color-dialog" role="dialog" aria-modal="true" aria-label="全部颜色">
+            <header class="editor-color-dialog__header">
+              <div>
+                <strong>全部颜色</strong>
+                <span>{{ currentPaletteMeta?.display_name || 'MARD' }} · {{ currentPaletteMeta?.count || fullPalette.length }} 色</span>
+              </div>
+              <button type="button" aria-label="关闭全部颜色" @click="closeColorModal">×</button>
+            </header>
+
+            <label class="editor-color-search">
+              <span>搜索色号</span>
+              <input v-model="colorSearch" type="search" placeholder="输入 A1 / 黑 / #FF" />
+            </label>
+
+            <section v-if="recentColors.length" class="editor-color-section" aria-label="最近使用">
+              <h2>最近使用</h2>
+              <div class="editor-color-grid editor-color-grid--recent">
+                <button
+                  v-for="color in recentColors"
+                  :key="`recent-${color.code}`"
+                  type="button"
+                  class="editor-color-card"
+                  @click="chooseFullColor(color)"
+                >
+                  <span :style="{ backgroundColor: color.hex }"></span>
+                  <strong>{{ color.code }}</strong>
+                </button>
+              </div>
+            </section>
+
+            <nav class="editor-color-tabs" aria-label="色系">
+              <button
+                v-for="category in colorCategories"
+                :key="category"
+                type="button"
+                :class="{ 'editor-color-tab--active': activeCategory === category }"
+                @click="activeCategory = category"
+              >
+                {{ category }}
+              </button>
+            </nav>
+
+            <div class="editor-color-grid" aria-label="MARD 色卡">
+              <button
+                v-for="color in filteredFullPalette"
+                :key="color.code"
+                type="button"
+                class="editor-color-card"
+                :class="{ 'editor-color-card--active': activeTool === 'paint' && selectedColor?.code === color.code }"
+                @click="chooseFullColor(color)"
+              >
+                <span :style="{ backgroundColor: color.hex }"></span>
+                <strong>{{ color.code }}</strong>
+                <em>{{ color.name_cn }}</em>
+              </button>
+            </div>
+            <p v-if="!filteredFullPalette.length" class="editor-color-empty">没有找到这个颜色</p>
+          </div>
         </div>
-      </aside>
+      </Teleport>
     </template>
   </section>
 </template>
@@ -490,7 +644,8 @@ function uniquePalette(colors: ColorRef[]): ColorRef[] {
 .editor-topbar__actions button,
 .editor-tools button,
 .editor-color,
-.editor-place__button {
+.editor-color-card,
+.editor-color-dialog button {
   cursor: pointer;
   font: inherit;
   font-weight: 900;
@@ -607,6 +762,7 @@ function uniquePalette(colors: ColorRef[]): ColorRef[] {
 
 .editor-tools {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 7px;
 }
@@ -619,6 +775,19 @@ function uniquePalette(colors: ColorRef[]): ColorRef[] {
 .editor-tool-toggle--active {
   border-color: transparent !important;
   background: var(--pd-gradient-warm) !important;
+  color: #fff !important;
+}
+
+.editor-tool-square {
+  aspect-ratio: 1;
+  border-radius: 14px !important;
+  padding: 0 !important;
+}
+
+.editor-tool-square--active {
+  border-color: transparent !important;
+  background: var(--pd-gradient-warm) !important;
+  box-shadow: var(--pd-shadow-cta);
   color: #fff !important;
 }
 
@@ -648,7 +817,8 @@ function uniquePalette(colors: ColorRef[]): ColorRef[] {
 }
 
 .editor-color:hover,
-.editor-color--active {
+.editor-color--active,
+.editor-color--all {
   border-color: rgba(255, 142, 83, 0.56);
   background: #fff;
   box-shadow: 0 10px 22px rgba(255, 142, 83, 0.13);
@@ -656,8 +826,8 @@ function uniquePalette(colors: ColorRef[]): ColorRef[] {
 }
 
 .editor-color span,
-.editor-place__selected span,
-.editor-mini span {
+.editor-current__swatch span,
+.editor-color-card span {
   display: block;
   border: 1px solid rgba(45, 45, 45, 0.1);
   border-radius: 999px;
@@ -669,97 +839,268 @@ function uniquePalette(colors: ColorRef[]): ColorRef[] {
   height: 24px;
 }
 
+.editor-color__rainbow {
+  background:
+    conic-gradient(from 0deg, #ff6b6b, #ffd166, #79d98b, #69b7ff, #b58cff, #ff7ab6, #ff6b6b);
+}
+
 .editor-color strong {
   font-size: 11px;
   line-height: 1;
   white-space: nowrap;
 }
 
-.editor-place {
+.editor-current {
   display: grid;
-  grid-template-columns: minmax(86px, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 8px;
-}
-
-.editor-place__button {
+  min-width: 136px;
   min-height: 54px;
-  border: 1px solid transparent;
+  border: 1px solid rgba(255, 142, 83, 0.18);
   border-radius: 20px;
-  background: var(--pd-gradient);
-  box-shadow: var(--pd-shadow-cta);
-  color: #fff;
-  padding: 0 20px;
+  background: rgba(255, 255, 255, 0.86);
+  padding: 7px 10px;
 }
 
-.editor-place__button:hover:not(:disabled) {
-  filter: brightness(1.03);
-  transform: translateY(-1px);
-}
-
-.editor-place__button:disabled {
-  cursor: not-allowed;
-  opacity: 0.52;
-}
-
-.editor-place__selected {
-  min-width: 52px;
+.editor-current__swatch {
+  width: 34px;
+  height: 34px;
   display: grid;
-  justify-items: center;
-  gap: 3px;
-  color: var(--pd-fg-2);
-  font-size: 11px;
-  font-weight: 900;
+  place-items: center;
+  border-radius: 13px;
+  background: #fff;
 }
 
-.editor-place__selected span {
+.editor-current__swatch span {
   width: 28px;
   height: 28px;
 }
 
-.editor-place__selected strong {
-  white-space: nowrap;
+.editor-current__swatch--erase::before {
+  width: 20px;
+  height: 20px;
+  display: block;
+  border: 2px solid rgba(45, 45, 45, 0.66);
+  border-radius: 6px;
+  background:
+    linear-gradient(135deg, transparent 44%, #ff6b9d 45%, #ff6b9d 55%, transparent 56%),
+    #fffaf5;
+  content: "";
 }
 
-.editor-mini {
-  position: fixed;
-  right: 14px;
-  top: 76px;
-  z-index: 3;
-  width: 104px;
-  display: grid;
-  gap: 6px;
-  border: 1px solid rgba(237, 228, 218, 0.76);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 14px 30px rgba(45, 45, 45, 0.1);
-  padding: 8px;
-  pointer-events: none;
-}
-
-.editor-mini div {
-  display: grid;
-  grid-template-columns: 18px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 5px;
-  min-width: 0;
-}
-
-.editor-mini span {
-  width: 18px;
-  height: 18px;
-}
-
-.editor-mini strong,
-.editor-mini em {
+.editor-current strong,
+.editor-current span {
+  display: block;
   overflow: hidden;
-  color: var(--pd-fg-2);
-  font-size: 10px;
-  font-style: normal;
-  font-weight: 900;
-  line-height: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.editor-current strong {
+  color: var(--pd-fg-1);
+  font-size: 12px;
+  line-height: 1.15;
+}
+
+.editor-current span {
+  color: var(--pd-fg-2);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.editor-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background: rgba(45, 45, 45, 0.24);
+  padding: clamp(12px, 4vw, 28px);
+  backdrop-filter: blur(10px);
+}
+
+.editor-color-dialog {
+  width: min(920px, 100%);
+  max-height: min(760px, calc(100dvh - 28px));
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  gap: 12px;
+  border: 1px solid rgba(255, 142, 83, 0.22);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(255, 176, 136, 0.22), transparent 30%),
+    rgba(255, 250, 247, 0.98);
+  box-shadow: var(--pd-shadow-float);
+  padding: clamp(14px, 3vw, 22px);
+}
+
+.editor-color-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.editor-color-dialog__header div {
+  display: grid;
+  gap: 2px;
+}
+
+.editor-color-dialog__header strong {
+  color: var(--pd-fg-1);
+  font-family: var(--pd-font-display);
+  font-size: clamp(24px, 5vw, 34px);
+  line-height: 1;
+}
+
+.editor-color-dialog__header span,
+.editor-color-section h2,
+.editor-color-empty {
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.editor-color-dialog__header button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 142, 83, 0.24);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--pd-fg-1);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.editor-color-search {
+  display: grid;
+  gap: 6px;
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.editor-color-search input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--pd-stroke);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--pd-fg-1);
+  font: inherit;
+  font-weight: 900;
+  outline: none;
+  padding: 0 14px;
+}
+
+.editor-color-search input:focus {
+  border-color: rgba(255, 142, 83, 0.58);
+  box-shadow: 0 0 0 4px rgba(255, 142, 83, 0.12);
+}
+
+.editor-color-section {
+  display: grid;
+  gap: 8px;
+}
+
+.editor-color-section h2 {
+  margin: 0;
+}
+
+.editor-color-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.editor-color-tabs button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  border: 1px solid var(--pd-stroke);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--pd-fg-2);
+  padding: 0 13px;
+}
+
+.editor-color-tab--active {
+  border-color: transparent !important;
+  background: var(--pd-gradient-warm) !important;
+  color: #fff !important;
+  box-shadow: 0 10px 22px rgba(255, 142, 83, 0.16);
+}
+
+.editor-color-grid {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+  gap: 9px;
+  overflow-y: auto;
+  padding: 2px 2px 4px;
+}
+
+.editor-color-grid--recent {
+  grid-template-columns: repeat(auto-fill, minmax(64px, 82px));
+  max-height: 90px;
+  overflow-y: hidden;
+}
+
+.editor-color-card {
+  min-width: 0;
+  min-height: 82px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 5px;
+  border: 1px solid var(--pd-stroke);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--pd-fg-1);
+  padding: 8px;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.editor-color-card:hover,
+.editor-color-card--active {
+  border-color: rgba(255, 142, 83, 0.56);
+  box-shadow: 0 10px 22px rgba(255, 142, 83, 0.14);
+  transform: translateY(-1px);
+}
+
+.editor-color-card span {
+  width: 28px;
+  height: 28px;
+}
+
+.editor-color-card strong,
+.editor-color-card em {
+  max-width: 100%;
+  overflow: hidden;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-color-card strong {
+  font-size: 12px;
+}
+
+.editor-color-card em {
+  color: var(--pd-fg-2);
+  font-size: 10px;
+}
+
+.editor-color-empty {
+  margin: 0;
+  text-align: center;
 }
 
 @media (max-width: 860px) {
@@ -777,20 +1118,18 @@ function uniquePalette(colors: ColorRef[]): ColorRef[] {
   }
 
   .editor-tray {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .editor-tools {
-    justify-content: flex-end;
-  }
-
+  .editor-tray__status,
+  .editor-tools,
   .editor-palette,
-  .editor-place {
+  .editor-current {
     grid-column: 1 / -1;
   }
 
-  .editor-mini {
-    display: none;
+  .editor-tools {
+    justify-content: flex-start;
   }
 }
 
@@ -844,14 +1183,24 @@ function uniquePalette(colors: ColorRef[]): ColorRef[] {
     padding: 5px 7px;
   }
 
-  .editor-place {
-    grid-template-columns: minmax(0, 1fr) auto;
+  .editor-current {
+    grid-template-columns: auto minmax(0, 1fr);
+    min-height: 48px;
+    border-radius: 16px;
   }
 
-  .editor-place__button {
-    min-height: 52px;
-    border-radius: 18px;
-    font-size: 18px;
+  .editor-color-dialog {
+    max-height: calc(100dvh - 18px);
+    border-radius: 22px;
+  }
+
+  .editor-color-grid {
+    grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+    gap: 8px;
+  }
+
+  .editor-color-card {
+    min-height: 76px;
   }
 }
 </style>
