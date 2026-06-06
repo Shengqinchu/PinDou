@@ -24,6 +24,7 @@ const loading = ref(false);
 const error = ref('');
 const sizeNotice = ref('');
 const isRegenerateModalOpen = ref(false);
+const isDownloading = ref(false);
 const draftMode = ref<GenerationMode>(generation.generationMode);
 const draftStyle = ref<GenerationStylePreset>(generation.selectedStyle);
 const draftSize = ref<ResultSizePreset>(generation.selectedSize);
@@ -36,6 +37,12 @@ const colorTotal = computed(() => pattern.value?.palette_used.length || 0);
 const beadTotal = computed(() => pattern.value?.bead_total || 0);
 const patternImageUrl = computed(() => generation.patternImageUrl);
 const paletteRows = computed(() => paletteRowsForPattern(pattern.value));
+const downloadFileName = computed(() => {
+  const title = generation.currentArtwork?.title?.trim();
+  const rawName = title || `拼豆图纸_${artworkId.value || 'pindou'}`;
+  const safeName = rawName.replace(/[\\/:*?"<>|]/g, '').trim() || '拼豆图纸';
+  return `${safeName}.png`;
+});
 
 onMounted(() => {
   void loadArtworkIfNeeded();
@@ -115,6 +122,43 @@ async function confirmRegenerate(): Promise<void> {
   closeRegenerateModal();
   await router.push({ name: 'loading', query: { retry: '1', size: generation.selectedSize } });
 }
+
+async function downloadPattern(): Promise<void> {
+  const url = patternImageUrl.value;
+  if (!url || isDownloading.value) {
+    return;
+  }
+  sizeNotice.value = '';
+  isDownloading.value = true;
+  let objectUrl = '';
+  try {
+    const response = await fetch(url, { mode: 'cors' });
+    if (!response.ok) {
+      throw new Error('download failed');
+    }
+    const blob = await response.blob();
+    objectUrl = URL.createObjectURL(blob);
+    triggerDownload(objectUrl, downloadFileName.value);
+  } catch (_error) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    sizeNotice.value = '图片已在新窗口打开，手机端可长按保存。';
+  } finally {
+    if (objectUrl) {
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+    }
+    isDownloading.value = false;
+  }
+}
+
+function triggerDownload(url: string, filename: string): void {
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.rel = 'noopener';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
 </script>
 
 <template>
@@ -139,12 +183,23 @@ async function confirmRegenerate(): Promise<void> {
     <template v-else-if="pattern">
       <header class="result-hero">
         <div>
-          <h1>点击需要编辑的格子，可以修改配色哦~</h1>
+          <h1>点击编辑图纸按钮，可以<span class="hl-edit">修改配色</span>哦~</h1>
         </div>
         <div class="result-actions">
-          <RouterLink class="pd-btn pd-btn--primary" :to="{ name: 'editor', params: { id: artworkId } }">编辑图纸</RouterLink>
-          <button class="pd-btn pd-btn--primary" type="button" @click="openRegenerateModal">重新生成</button>
-          <RouterLink class="pd-btn result-secondary" to="/upload">换一张照片</RouterLink>
+          <div class="result-actions__row">
+            <RouterLink class="pd-btn pd-btn--primary result-action-primary" :to="{ name: 'editor', params: { id: artworkId } }">
+              <span class="result-action-icon result-action-icon--edit" aria-hidden="true"></span>
+              <span>编辑图纸</span>
+            </RouterLink>
+            <RouterLink class="pd-btn result-secondary" to="/">
+              <span>返回主页</span>
+            </RouterLink>
+            <button class="pd-btn result-secondary result-action-download" type="button" :disabled="!patternImageUrl || isDownloading" @click="downloadPattern">
+              <span class="result-action-icon result-action-icon--download" aria-hidden="true"></span>
+              <span>{{ isDownloading ? '下载中' : '下载图纸' }}</span>
+            </button>
+          </div>
+          <button class="result-regenerate-link" type="button" @click="openRegenerateModal">重新生成 ›</button>
         </div>
       </header>
 
@@ -308,11 +363,20 @@ async function confirmRegenerate(): Promise<void> {
 
 .result-hero h1 {
   margin: 0;
-  color: var(--pd-orange);
+  color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
   font-size: clamp(30px, 5vw, 46px);
   line-height: 1.1;
   letter-spacing: 0;
+}
+
+.hl-edit {
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--pd-orange) 15%, transparent);
+  color: var(--pd-fg-1);
+  padding: 0 4px;
 }
 
 .result-state h1 {
@@ -331,16 +395,108 @@ async function confirmRegenerate(): Promise<void> {
 }
 
 .result-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 12px;
+  min-width: min(100%, 430px);
+  display: grid;
+  justify-items: end;
+  gap: 8px;
 }
 
 .result-actions button:disabled {
   cursor: not-allowed;
   opacity: 0.56;
   box-shadow: none;
+}
+
+.result-actions__row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(116px, 1.22fr) minmax(96px, 1fr) minmax(96px, 1fr);
+  gap: 10px;
+}
+
+.result-actions__row .pd-btn {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding-inline: 13px;
+  white-space: nowrap;
+}
+
+.result-action-icon {
+  position: relative;
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+}
+
+.result-action-icon--edit::before {
+  position: absolute;
+  left: 3px;
+  top: 2px;
+  width: 9px;
+  height: 3px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
+  transform: rotate(-38deg);
+  transform-origin: center;
+}
+
+.result-action-icon--edit::after {
+  position: absolute;
+  left: 2px;
+  bottom: 1px;
+  width: 10px;
+  height: 8px;
+  border: 2px solid currentColor;
+  border-top: 0;
+  border-radius: 2px;
+  content: "";
+}
+
+.result-action-icon--download::before {
+  position: absolute;
+  left: 6px;
+  top: 1px;
+  width: 3px;
+  height: 9px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
+}
+
+.result-action-icon--download::after {
+  position: absolute;
+  left: 2px;
+  bottom: 1px;
+  width: 11px;
+  height: 8px;
+  border-right: 3px solid currentColor;
+  border-bottom: 3px solid currentColor;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.result-regenerate-link {
+  border: 0;
+  background: transparent;
+  color: var(--pd-fg-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 2px 4px;
+  transition:
+    color 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.result-regenerate-link:hover {
+  color: var(--pd-orange);
+  transform: translateY(-1px);
 }
 
 .result-secondary {
@@ -843,6 +999,7 @@ async function confirmRegenerate(): Promise<void> {
 
   .result-actions {
     justify-content: start;
+    justify-items: stretch;
   }
 
   .result-layout {
@@ -858,9 +1015,29 @@ async function confirmRegenerate(): Promise<void> {
     padding: 20px;
   }
 
-  .result-actions,
-  .result-actions .pd-btn {
+  .result-actions {
     width: 100%;
+  }
+
+  .result-actions__row {
+    grid-template-columns: minmax(104px, 1.24fr) minmax(82px, 0.88fr) minmax(82px, 0.88fr);
+    gap: 8px;
+  }
+
+  .result-actions__row .pd-btn {
+    min-height: 46px;
+    font-size: clamp(12px, 3.25vw, 14px);
+    padding-inline: 8px;
+  }
+
+  .result-action-icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .result-regenerate-link {
+    justify-self: center;
+    font-size: 12px;
   }
 
   .size-switch {
