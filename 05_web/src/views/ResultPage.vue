@@ -181,10 +181,18 @@ function triggerDownload(url: string, filename: string): void {
     </template>
 
     <template v-else-if="pattern">
-      <header class="result-hero">
-        <div>
-          <h1>点击编辑图纸按钮，可以<span class="hl-edit">修改配色</span>哦~</h1>
+      <section class="result-card" aria-label="拼豆图纸结果">
+        <div class="pattern-frame pattern-frame--viewer">
+          <img v-if="patternImageUrl" class="pattern-image" :src="patternImageUrl" alt="拼豆图纸预览" />
+          <div v-else class="pattern-image-empty">图纸预览生成中</div>
         </div>
+
+        <div class="result-chip-row" aria-label="图纸摘要">
+          <span>{{ selectedSizeNumber }} 格宽</span>
+          <span>{{ beadTotal }} 颗</span>
+          <span>{{ colorTotal }} 色</span>
+        </div>
+
         <div class="result-actions">
           <div class="result-actions__row">
             <RouterLink class="pd-btn pd-btn--primary result-action-primary" :to="{ name: 'editor', params: { id: artworkId } }">
@@ -194,9 +202,6 @@ function triggerDownload(url: string, filename: string): void {
               </svg>
               <span>编辑图纸</span>
             </RouterLink>
-            <RouterLink class="pd-btn result-secondary" to="/">
-              <span>返回主页</span>
-            </RouterLink>
             <button class="pd-btn result-secondary result-action-download" type="button" :disabled="!patternImageUrl || isDownloading" @click="downloadPattern">
               <svg class="result-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M12 4v10" />
@@ -205,58 +210,36 @@ function triggerDownload(url: string, filename: string): void {
               </svg>
               <span>{{ isDownloading ? '下载中' : '下载图纸' }}</span>
             </button>
+            <RouterLink class="pd-btn result-secondary" to="/">
+              <span>返回主页</span>
+            </RouterLink>
           </div>
+        </div>
+
+        <div class="result-caption-row">
+          <p>点击编辑图纸即可<span class="hl-edit">修改配色</span>哦~</p>
           <button class="result-regenerate-link" type="button" @click="openRegenerateModal">重新生成 ›</button>
         </div>
-      </header>
 
-      <div class="result-layout">
-        <section class="preview-panel" aria-label="拼豆图纸预览">
-          <div class="pattern-frame pattern-frame--viewer">
-            <img v-if="patternImageUrl" class="pattern-image" :src="patternImageUrl" alt="拼豆图纸预览" />
-            <div v-else class="pattern-image-empty">图纸预览生成中</div>
+        <p v-if="sizeNotice" class="size-notice">{{ sizeNotice }}</p>
+      </section>
+
+      <section class="palette-section result-palette-card" aria-label="色号清单">
+        <div class="palette-heading">
+          <p class="eyebrow">色号清单</p>
+        </div>
+        <div class="palette-list">
+          <div v-for="row in paletteRows" :key="row.color.code" class="palette-row">
+            <span class="palette-swatch" :style="{ backgroundColor: row.color.hex }" aria-hidden="true"></span>
+            <div>
+              <strong>{{ row.color.code }} · {{ row.color.name_cn }}</strong>
+              <em>{{ row.color.brand }} · {{ row.color.hex }}</em>
+            </div>
+            <span class="palette-count">{{ row.count }} 颗</span>
+            <span class="palette-percent">{{ row.percent }}%</span>
           </div>
-          <p v-if="sizeNotice" class="size-notice">{{ sizeNotice }}</p>
-        </section>
-
-        <aside class="summary-panel" aria-label="图纸摘要">
-          <dl class="result-stats">
-            <div>
-              <dt>尺寸</dt>
-              <dd>{{ selectedSizeNumber }}</dd>
-              <small>格宽</small>
-            </div>
-            <div>
-              <dt>豆数</dt>
-              <dd>{{ beadTotal }}</dd>
-              <small>颗</small>
-            </div>
-            <div>
-              <dt>色号</dt>
-              <dd>{{ colorTotal }}</dd>
-              <small>种</small>
-            </div>
-          </dl>
-
-          <section class="palette-section" aria-label="色号清单">
-            <div class="palette-heading">
-              <p class="eyebrow">色号清单</p>
-              <strong>{{ colorTotal }} 种颜色</strong>
-            </div>
-            <div class="palette-list">
-              <div v-for="row in paletteRows" :key="row.color.code" class="palette-row">
-                <span class="palette-swatch" :style="{ backgroundColor: row.color.hex }" aria-hidden="true"></span>
-                <div>
-                  <strong>{{ row.color.code }} · {{ row.color.name_cn }}</strong>
-                  <em>{{ row.color.brand }} · {{ row.color.hex }}</em>
-                </div>
-                <span class="palette-count">{{ row.count }} 颗</span>
-                <span class="palette-percent">{{ row.percent }}%</span>
-              </div>
-            </div>
-          </section>
-        </aside>
-      </div>
+        </div>
+      </section>
     </template>
 
     <template v-else>
@@ -349,13 +332,6 @@ function triggerDownload(url: string, filename: string): void {
 <style scoped>
 .result-page {
   display: grid;
-  gap: 24px;
-}
-
-.result-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
   gap: 16px;
 }
 
@@ -368,15 +344,6 @@ function triggerDownload(url: string, filename: string): void {
   text-transform: uppercase;
 }
 
-.result-hero h1 {
-  margin: 0;
-  color: var(--pd-fg-1);
-  font-family: var(--pd-font-display);
-  font-size: clamp(26px, 5.2vw, 40px);
-  line-height: 1.4;
-  letter-spacing: 0;
-}
-
 .hl-edit {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
@@ -386,6 +353,21 @@ function triggerDownload(url: string, filename: string): void {
   font-weight: 900;
   padding: 0.06em 0.5em;
   white-space: nowrap;
+}
+
+.result-card,
+.result-palette-card,
+.result-state {
+  border: 1px solid rgba(237, 228, 218, 0.82);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--pd-shadow-float);
+  padding: clamp(14px, 4vw, 24px);
+}
+
+.result-card {
+  display: grid;
+  gap: 12px;
 }
 
 .result-state h1 {
@@ -472,23 +454,6 @@ function triggerDownload(url: string, filename: string): void {
   color: var(--pd-orange);
 }
 
-.result-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.56fr);
-  gap: 24px;
-  align-items: start;
-}
-
-.preview-panel,
-.summary-panel,
-.result-state {
-  border: 1px solid rgba(237, 228, 218, 0.82);
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: var(--pd-shadow-float);
-  padding: clamp(20px, 4vw, 32px);
-}
-
 .result-state {
   width: min(100%, 660px);
   margin: 0 auto;
@@ -497,6 +462,39 @@ function triggerDownload(url: string, filename: string): void {
 
 .result-state .pd-btn {
   margin-top: 22px;
+}
+
+.result-chip-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--pd-fg-2);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.result-chip-row span {
+  border: 1px solid rgba(255, 142, 83, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 241, 232, 0.72);
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
+.result-caption-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  color: var(--pd-fg-2);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.result-caption-row p {
+  margin: 0;
 }
 
 .pattern-frame {
@@ -828,64 +826,12 @@ function triggerDownload(url: string, filename: string): void {
   }
 }
 
-.result-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin: 0 0 22px;
-}
-
-.result-stats div {
-  display: grid;
-  min-width: 0;
-  min-height: 96px;
-  align-content: center;
-  border: 1px solid var(--pd-stroke);
-  border-radius: 18px;
-  background: var(--pd-peach-50);
-  padding: 14px;
-}
-
-.result-stats dt {
-  margin: 0 0 6px;
-  color: var(--pd-fg-2);
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.result-stats dd {
-  margin: 0;
-  color: var(--pd-fg-1);
-  font-size: clamp(20px, 2.45vw, 24px);
-  font-variant-numeric: tabular-nums;
-  font-weight: 900;
-  line-height: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.result-stats small {
-  display: block;
-  margin-top: 6px;
-  color: var(--pd-fg-2);
-  font-size: 12px;
-}
-
 .palette-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 12px;
   margin-bottom: 12px;
 }
 
 .palette-heading .eyebrow {
   margin: 0;
-}
-
-.palette-heading strong {
-  color: var(--pd-fg-1);
 }
 
 .palette-list {
@@ -958,18 +904,12 @@ function triggerDownload(url: string, filename: string): void {
   text-align: right;
 }
 
-@media (max-width: 900px) {
-  .result-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 640px) {
-  .preview-panel,
-  .summary-panel,
+  .result-card,
+  .result-palette-card,
   .result-state {
     border-radius: 22px;
-    padding: 20px;
+    padding: 14px;
   }
 
   .result-actions {
@@ -998,6 +938,19 @@ function triggerDownload(url: string, filename: string): void {
     font-size: 12px;
   }
 
+  .result-chip-row {
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .result-chip-row span {
+    padding: 5px 8px;
+  }
+
+  .result-caption-row {
+    font-size: 12px;
+  }
+
   .size-switch {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
@@ -1007,33 +960,8 @@ function triggerDownload(url: string, filename: string): void {
     min-height: 62px;
   }
 
-  .result-stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    margin-bottom: 18px;
-  }
-
-  .result-stats div {
-    min-height: 86px;
-    border-radius: 16px;
-    padding: 12px 8px;
-    text-align: center;
-  }
-
-  .result-stats dt,
-  .result-stats small {
-    font-size: 11px;
-    line-height: 1.2;
-  }
-
-  .result-stats dd {
-    font-size: clamp(16px, 5.4vw, 23px);
-  }
-
   .palette-heading {
-    align-items: start;
-    flex-direction: column;
-    gap: 6px;
+    margin-bottom: 10px;
   }
 
   .regen-modal {
@@ -1128,18 +1056,26 @@ function triggerDownload(url: string, filename: string): void {
 }
 
 @media (max-width: 380px) {
-  .preview-panel,
-  .summary-panel,
+  .result-card,
+  .result-palette-card,
   .result-state {
-    padding: 16px;
+    padding: 12px;
   }
 
-  .result-stats {
+  .result-actions__row {
     gap: 6px;
   }
 
-  .result-stats div {
-    padding: 10px 6px;
+  .result-actions__row .pd-btn {
+    min-height: 44px;
+    gap: 3px;
+    font-size: 11px;
+    padding-inline: 4px;
+  }
+
+  .result-action-icon {
+    width: 12px;
+    height: 12px;
   }
 }
 </style>
