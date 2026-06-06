@@ -151,11 +151,15 @@ export function getArtworkGallery(page = 1, size = 12): Promise<ArtworkListRespo
 
 export function saveArtworkPattern(
   artworkId: string,
-  patternJson: PatternSheet
+  patternJson: PatternSheet,
+  options: { renderPreview?: boolean } = {}
 ): Promise<SaveArtworkPatternResponse> {
   return apiRequest<SaveArtworkPatternResponse>(`/artwork/${encodeURIComponent(artworkId)}/pattern`, {
     method: 'PUT',
-    body: { pattern_json: patternJson }
+    body: {
+      pattern_json: patternJson,
+      render_preview: options.renderPreview ?? true
+    }
   });
 }
 

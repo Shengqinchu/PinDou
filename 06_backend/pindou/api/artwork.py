@@ -22,6 +22,7 @@ router = APIRouter(prefix="/artwork", tags=["artwork"])
 
 class SavePatternRequest(BaseModel):
     pattern_json: dict[str, Any] = Field(min_length=1)
+    render_preview: bool = True
 
 
 @router.get("/list")
@@ -80,8 +81,10 @@ def save_artwork_pattern(
 
     try:
         pattern_data = normalize_pattern_json(payload.pattern_json, artwork_id=artwork.artwork_id)
-        sheet = pattern_sheet_from_normalized_data(pattern_data)
-        labeled_url = attach_labeled_pattern_image(pattern_data, sheet, artwork.artwork_id)
+        labeled_url = artwork.preview_path
+        if payload.render_preview:
+            sheet = pattern_sheet_from_normalized_data(pattern_data)
+            labeled_url = attach_labeled_pattern_image(pattern_data, sheet, artwork.artwork_id)
         _pattern_path, pattern_url = save_pattern_json(f"pattern_{artwork.artwork_id}", pattern_data)
     except ApiException:
         raise
@@ -89,7 +92,8 @@ def save_artwork_pattern(
         raise ApiException(422, ErrorCode.VALIDATION_ERROR, "图纸数据格式不正确，保存失败。") from exc
 
     artwork.pattern_json = pattern_data
-    artwork.preview_path = labeled_url
+    if labeled_url:
+        artwork.preview_path = labeled_url
     flag_modified(artwork, "pattern_json")
     db.add(artwork)
     db.commit()

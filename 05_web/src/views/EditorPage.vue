@@ -271,18 +271,6 @@ function rememberRecentColor(color: ColorRef): void {
   recentColors.value = next.slice(0, 10);
 }
 
-function zoomIn(): void {
-  editorRef.value?.zoomIn();
-}
-
-function zoomOut(): void {
-  editorRef.value?.zoomOut();
-}
-
-function resetView(): void {
-  editorRef.value?.resetView();
-}
-
 function updateCursor(payload: { row: number; col: number; cell: ColorRef | null }): void {
   cursorInfo.value = payload;
 }
@@ -308,7 +296,9 @@ async function saveNow(manual: boolean): Promise<void> {
   saveStatus.value = 'saving';
   saveError.value = '';
   try {
-    const saved = await saveArtworkPattern(id, recalculatePattern(clonePattern(sheet)));
+    const saved = await saveArtworkPattern(id, recalculatePattern(clonePattern(sheet)), {
+      renderPreview: manual
+    });
     swrCache.setArtwork(saved.artwork);
     swrCache.invalidateGallery();
     generation.applyArtwork(saved.artwork);
@@ -361,14 +351,6 @@ function handleKeydown(event: KeyboardEvent): void {
   if ((event.ctrlKey || event.metaKey) && key === 's') {
     event.preventDefault();
     void saveNow(true);
-    return;
-  }
-  if (key === '+' || key === '=') {
-    zoomIn();
-    return;
-  }
-  if (key === '-') {
-    zoomOut();
   }
 }
 
@@ -459,9 +441,6 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
         </section>
 
         <section class="editor-tools" aria-label="编辑工具">
-          <button type="button" @click="zoomOut">-</button>
-          <button type="button" @click="zoomIn">+</button>
-          <button type="button" @click="resetView">复位</button>
           <button
             type="button"
             class="editor-tool-square"

@@ -663,6 +663,31 @@ def test_save_artwork_pattern_rebuilds_counts_and_exports_png(api_client) -> Non
     assert detail.status_code == 200
     assert detail.json()["pattern_data"]["grid"][0][0]["code"] == "H7"
 
+    fast_pattern = json.loads(json.dumps(saved_pattern))
+    fast_color = {
+        "brand": "MARD",
+        "code": "G11",
+        "name_cn": "G11",
+        "name_en": "G11",
+        "hex": "#5050F0",
+        "rgb": [80, 80, 240],
+        "bead_diameter_mm": 5.0,
+    }
+    original_labeled_url = saved_pattern["metadata"]["labeled_image_url"]
+    fast_pattern["grid"][0][1] = fast_color
+    fast_pattern["palette_used"].append(fast_color)
+
+    fast_saved = client.put(
+        f"/api/artwork/{artwork_id}/pattern",
+        json={"pattern_json": fast_pattern, "render_preview": False},
+        headers=headers,
+    )
+    assert fast_saved.status_code == 200
+    fast_payload = fast_saved.json()
+    assert fast_payload["pattern"]["grid"][0][1]["code"] == "G11"
+    assert fast_payload["pattern"]["metadata"]["labeled_image_url"] == original_labeled_url
+    assert fast_payload["artwork"]["preview_url"] == original_labeled_url
+
 
 def test_unlimited_credit_email_skips_normal_credit_consumption(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
     client, session_factory = api_client

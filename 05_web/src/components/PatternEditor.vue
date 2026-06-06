@@ -8,7 +8,6 @@ import { cloneColorOrNull, colorTextFill, fontSizeForCode } from '../utils/patte
 const CACHE_CELL_PX = 18;
 const MAX_SCALE = 82;
 const LABEL_MIN_CELL_PX = 18;
-const CONTINUOUS_MIN_CELL_PX = 23;
 const PINCH_SETTLE_MS = 260;
 
 const props = defineProps<{
@@ -65,6 +64,7 @@ const mouseDrag = ref<MouseDrag | null>(null);
 const pinch = ref<PinchState | null>(null);
 const pinchSettledAt = ref(0);
 const hoverCell = ref<{ row: number; col: number } | null>(null);
+let lastTouchPaintKey = '';
 
 let staticCanvas: HTMLCanvasElement | null = null;
 let resizeObserver: ResizeObserver | null = null;
@@ -83,7 +83,6 @@ const scaleLabel = computed(() => `${Math.round((view.scale / Math.max(minScale.
 const cursorCell = computed(() => props.pattern.grid[cursor.value.row]?.[cursor.value.col] || null);
 const cursorCode = computed(() => cursorCell.value?.code || '空');
 const selectedCode = computed(() => (props.activeTool === 'erase' ? '橡皮擦' : props.selectedColor?.code || '未选'));
-const touchPaintEnabled = computed(() => props.paintEnabled && view.scale >= CONTINUOUS_MIN_CELL_PX);
 
 onMounted(() => {
   resizeObserver = new ResizeObserver(() => {
@@ -426,8 +425,9 @@ function handlePointerDown(event: PointerEvent): void {
   const hit = hitCell(point);
   if (hit) {
     setCursor(hit.row, hit.col);
-    if (touchPaintEnabled.value && Date.now() > pinchSettledAt.value) {
-      applyCell(hit.row, hit.col);
+    lastTouchPaintKey = '';
+    if (canTouchApply()) {
+      applyTouchCell(hit.row, hit.col);
     }
   }
 }
@@ -477,8 +477,8 @@ function handlePointerMove(event: PointerEvent): void {
   const hit = hitCell(point);
   if (hit) {
     setCursor(hit.row, hit.col);
-    if (touchPaintEnabled.value && Date.now() > pinchSettledAt.value) {
-      applyCell(hit.row, hit.col);
+    if (canTouchApply()) {
+      applyTouchCell(hit.row, hit.col);
     }
   }
 }
@@ -488,6 +488,9 @@ function handlePointerUp(event: PointerEvent): void {
   const point = localPoint(event.clientX, event.clientY);
   frameRef.value?.releasePointerCapture(event.pointerId);
   pointers.delete(event.pointerId);
+  if (event.pointerType !== 'mouse') {
+    lastTouchPaintKey = '';
+  }
 
   if (pinch.value) {
     if (pointers.size < 2) {
@@ -517,6 +520,7 @@ function handlePointerCancel(event: PointerEvent): void {
   pointers.delete(event.pointerId);
   mouseDrag.value = null;
   pinch.value = null;
+  lastTouchPaintKey = '';
   pinchSettledAt.value = Date.now() + PINCH_SETTLE_MS;
 }
 
@@ -583,8 +587,7 @@ function applyCell(row: number, col: number, drag?: MouseDrag): void {
     return;
   }
   const color = props.activeTool === 'erase' ? null : props.selectedColor;
-  const colorKey = color?.code || 'erase';
-  const paintKey = `${row}:${col}:${colorKey}`;
+  const paintKey = cellPaintKey(row, col, color);
   if (drag) {
     if (drag.lastPaintedKey === paintKey) {
       return;
@@ -592,6 +595,27 @@ function applyCell(row: number, col: number, drag?: MouseDrag): void {
     drag.lastPaintedKey = paintKey;
   }
   emit('applyCell', { row, col, color });
+}
+
+function applyTouchCell(row: number, col: number): void {
+  if (props.activeTool === 'paint' && !props.selectedColor) {
+    return;
+  }
+  const color = props.activeTool === 'erase' ? null : props.selectedColor;
+  const paintKey = cellPaintKey(row, col, color);
+  if (lastTouchPaintKey === paintKey) {
+    return;
+  }
+  lastTouchPaintKey = paintKey;
+  applyCell(row, col);
+}
+
+function canTouchApply(): boolean {
+  return props.paintEnabled && Date.now() > pinchSettledAt.value;
+}
+
+function cellPaintKey(row: number, col: number, color: ColorRef | null): string {
+  return `${row}:${col}:${color?.code || 'erase'}`;
 }
 
 function emitCursor(): void {
