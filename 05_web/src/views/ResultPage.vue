@@ -14,6 +14,7 @@ import {
   type ResultSizePreset
 } from '../stores/generation';
 import { useSWRCacheStore } from '../stores/swrCache';
+import { downloadImage } from '../utils/download';
 import { paletteRowsForPattern } from '../utils/patternEditing';
 
 const route = useRoute();
@@ -130,34 +131,14 @@ async function downloadPattern(): Promise<void> {
   }
   sizeNotice.value = '';
   isDownloading.value = true;
-  let objectUrl = '';
   try {
-    const response = await fetch(url, { mode: 'cors' });
-    if (!response.ok) {
-      throw new Error('download failed');
+    const result = await downloadImage(url, downloadFileName.value);
+    if (result === 'opened') {
+      sizeNotice.value = '图片已在新窗口打开，手机端可长按保存。';
     }
-    const blob = await response.blob();
-    objectUrl = URL.createObjectURL(blob);
-    triggerDownload(objectUrl, downloadFileName.value);
-  } catch (_error) {
-    window.open(url, '_blank', 'noopener,noreferrer');
-    sizeNotice.value = '图片已在新窗口打开，手机端可长按保存。';
   } finally {
-    if (objectUrl) {
-      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
-    }
     isDownloading.value = false;
   }
-}
-
-function triggerDownload(url: string, filename: string): void {
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.rel = 'noopener';
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
 }
 </script>
 

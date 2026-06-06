@@ -4,11 +4,12 @@ import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
 
 import { saveArtworkPattern } from '../api';
 import PatternEditorCanvas from '../components/PatternEditor.vue';
-import type { ColorRef, PatternSheet } from '../api/types';
+import type { ColorRef, PatternSheet, SaveArtworkPatternResponse } from '../api/types';
 import mardPaletteJson from '../assets/colormap/mard-5mm.json';
 import paletteManifestJson from '../assets/colormap/manifest.json';
 import { useGenerationStore } from '../stores/generation';
 import { useSWRCacheStore } from '../stores/swrCache';
+import { downloadImage } from '../utils/download';
 import {
   applyBatchPatch,
   applyCellPatch,
@@ -59,6 +60,7 @@ const redoStack = ref<EditPatch[]>([]);
 const isDirty = ref(false);
 const saveStatus = ref<SaveStatus>('idle');
 const saveError = ref('');
+const isDownloading = ref(false);
 const patternKey = ref(0);
 const paintRevision = ref(0);
 const lastPatch = ref<CellPatch | null>(null);
@@ -106,6 +108,8 @@ const filteredFullPalette = computed(() => {
 });
 const canUndo = computed(() => undoStack.value.length > 0);
 const canRedo = computed(() => redoStack.value.length > 0);
+const canDownload = computed(() => Boolean(pattern.value && artworkId.value && saveStatus.value !== 'saving' && !isDownloading.value));
+const downloadFileName = computed(() => `拼豆图纸_${artworkId.value || 'pindou'}.png`);
 const selectedColorUseCount = computed(() => (
   selectedColor.value ? (pattern.value?.color_counts[selectedColor.value.code] || 0) : 0
 ));
@@ -437,14 +441,14 @@ function scheduleAutosave(): void {
   }, AUTOSAVE_DELAY_MS);
 }
 
-async function saveNow(manual: boolean): Promise<void> {
+async function saveNow(manual: boolean): Promise<SaveArtworkPatternResponse | null> {
   const id = artworkId.value;
   const sheet = editablePattern.value;
   if (!id || !sheet) {
-    return;
+    return null;
   }
   if (!isDirty.value && !manual) {
-    return;
+    return null;
   }
   clearAutosaveTimer();
   const versionAtStart = dirtyVersion.value;
@@ -466,9 +470,40 @@ async function saveNow(manual: boolean): Promise<void> {
       saveStatus.value = 'dirty';
       scheduleAutosave();
     }
+    return saved;
   } catch (saveFailure) {
     saveStatus.value = 'error';
     saveError.value = saveFailure instanceof Error ? saveFailure.message : '保存失败，请稍后再试。';
+    return null;
+  }
+}
+
+async function downloadCurrentPattern(): Promise<void> {
+  if (!canDownload.value) {
+    return;
+  }
+  isDownloading.value = true;
+  saveError.value = '';
+  try {
+    if (isDirty.value || !generation.patternImageUrl) {
+      const saved = await saveNow(true);
+      if (!saved) {
+        return;
+      }
+    }
+
+    const url = generation.patternImageUrl;
+    if (!url) {
+      saveError.value = '图纸图片还没准备好，请先保存后再试。';
+      return;
+    }
+
+    const result = await downloadImage(url, downloadFileName.value);
+    if (result === 'opened') {
+      saveError.value = '图片已在新窗口打开，手机端可长按保存。';
+    }
+  } finally {
+    isDownloading.value = false;
   }
 }
 
@@ -562,8 +597,26 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
           <span>{{ cols }} × {{ rows }} · {{ beadTotal }} 豆 · {{ colorTotal }} 色</span>
         </div>
         <div class="editor-topbar__actions">
-          <button type="button" :disabled="!canUndo" @click="undoEdit">撤销</button>
-          <button type="button" :disabled="!canRedo" @click="redoEdit">重做</button>
+          <button class="editor-icon-button" type="button" aria-label="撤销" title="撤销" :disabled="!canUndo" @click="undoEdit">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M9 7 4 12l5 5" />
+              <path d="M5 12h9.5a5.5 5.5 0 1 1 0 11H11" />
+            </svg>
+          </button>
+          <button class="editor-icon-button" type="button" aria-label="重做" title="重做" :disabled="!canRedo" @click="redoEdit">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="m15 7 5 5-5 5" />
+              <path d="M19 12H9.5a5.5 5.5 0 1 0 0 11H13" />
+            </svg>
+          </button>
+          <button class="editor-download" type="button" :disabled="!canDownload" @click="downloadCurrentPattern">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 4v10" />
+              <path d="m7.5 10.5 4.5 4.5 4.5-4.5" />
+              <path d="M5 19h14" />
+            </svg>
+            <span>{{ isDownloading ? '下载中' : '下载' }}</span>
+          </button>
           <button type="button" class="editor-save" :disabled="saveStatus === 'saving'" @click="saveNow(true)">
             {{ saveStatus === 'saving' ? '保存中' : '保存' }}
           </button>
@@ -596,26 +649,37 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
         </section>
 
         <section class="editor-tools" aria-label="编辑工具">
-          <button
-            type="button"
-            class="editor-tool-square"
-            :class="{ 'editor-tool-square--active': activeTool === 'paint' }"
-            aria-label="画笔"
-            :aria-pressed="activeTool === 'paint'"
-            @click="chooseTool('paint')"
-          >
-            画
-          </button>
-          <button
-            type="button"
-            class="editor-tool-square"
-            :class="{ 'editor-tool-square--active': activeTool === 'erase' }"
-            aria-label="橡皮擦"
-            :aria-pressed="activeTool === 'erase'"
-            @click="chooseTool('erase')"
-          >
-            擦
-          </button>
+          <div class="editor-tool-segment" role="group" aria-label="画笔和橡皮擦">
+            <button
+              type="button"
+              class="editor-tool-square"
+              :class="{ 'editor-tool-square--active': activeTool === 'paint' }"
+              aria-label="画笔"
+              :aria-pressed="activeTool === 'paint'"
+              @click="chooseTool('paint')"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M14 4 20 10 9 21H3v-6L14 4Z" />
+                <path d="m12 6 6 6" />
+              </svg>
+              <span>画</span>
+            </button>
+            <button
+              type="button"
+              class="editor-tool-square"
+              :class="{ 'editor-tool-square--active': activeTool === 'erase' }"
+              aria-label="橡皮擦"
+              :aria-pressed="activeTool === 'erase'"
+              @click="chooseTool('erase')"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="m4 16 8.5-8.5a3 3 0 0 1 4.2 0l1.8 1.8a3 3 0 0 1 0 4.2L11 21H7l-3-3v-2Z" />
+                <path d="M10 10 15 15" />
+                <path d="M11 21h9" />
+              </svg>
+              <span>擦</span>
+            </button>
+          </div>
           <button
             type="button"
             class="editor-tool-toggle"
@@ -651,12 +715,14 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
         </section>
 
         <section class="editor-current" aria-label="当前工具">
-          <div class="editor-current__swatch" :class="{ 'editor-current__swatch--erase': activeTool === 'erase' }">
-            <span v-if="activeTool === 'paint'" :style="{ backgroundColor: selectedColor?.hex || '#fff' }"></span>
-          </div>
-          <div>
-            <strong>{{ activeTool === 'erase' ? '橡皮擦' : selectedColor?.code || '未选色' }}</strong>
-            <span>{{ activeTool === 'erase' ? '点格变空白' : selectedColor?.name_cn || '从全部颜色选择' }}</span>
+          <div class="editor-current__main">
+            <div class="editor-current__swatch" :class="{ 'editor-current__swatch--erase': activeTool === 'erase' }">
+              <span v-if="activeTool === 'paint'" :style="{ backgroundColor: selectedColor?.hex || '#fff' }"></span>
+            </div>
+            <div>
+              <strong>{{ activeTool === 'erase' ? '橡皮擦' : selectedColor?.code || '未选色' }}</strong>
+              <span>{{ activeTool === 'erase' ? '点格变空白' : selectedColor?.name_cn || '从全部颜色选择' }}</span>
+            </div>
           </div>
           <button
             v-if="activeTool === 'paint'"
@@ -665,7 +731,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
             :disabled="!canReplaceSelectedColor"
             @click="openReplaceModal"
           >
-            替换为…
+            将该色号全局替换为…
           </button>
         </section>
       </footer>
@@ -869,10 +935,39 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   gap: 8px;
 }
 
+.editor-topbar__actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
 .editor-topbar__actions button:disabled {
   cursor: not-allowed;
   opacity: 0.48;
   transform: none;
+}
+
+.editor-icon-button {
+  width: 40px;
+  padding: 0 !important;
+}
+
+.editor-topbar__actions svg,
+.editor-tools svg {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.editor-download {
+  min-width: 78px;
 }
 
 .editor-save {
@@ -924,14 +1019,16 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 
 .editor-tools {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 7px;
+  gap: 10px;
+  min-width: 0;
 }
 
-.editor-tools button {
-  min-width: 42px;
-  padding: 0 12px;
+.editor-tool-segment {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .editor-tool-toggle--active {
@@ -940,10 +1037,24 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   color: #fff !important;
 }
 
+.editor-tools button {
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
 .editor-tool-square {
-  aspect-ratio: 1;
+  min-width: 64px;
   border-radius: 14px !important;
-  padding: 0 !important;
+}
+
+.editor-tool-toggle {
+  flex: 1 1 auto;
+  min-width: 112px;
 }
 
 .editor-tool-square--active {
@@ -1014,15 +1125,22 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 
 .editor-current {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: 8px;
-  min-width: 196px;
-  min-height: 54px;
+  min-width: 220px;
   border: 1px solid rgba(255, 142, 83, 0.18);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.86);
   padding: 7px 10px;
+}
+
+.editor-current__main {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
 }
 
 .editor-current__swatch {
@@ -1073,9 +1191,10 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 }
 
 .editor-replace-trigger {
-  min-height: 34px;
+  width: 100%;
+  min-height: 38px;
   border: 1px solid rgba(255, 142, 83, 0.24);
-  border-radius: 999px;
+  border-radius: 14px;
   background: rgba(255, 241, 232, 0.84);
   color: var(--pd-orange);
   font-size: 12px;
@@ -1353,7 +1472,12 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
     justify-content: stretch;
   }
 
-  .editor-topbar__actions button {
+  .editor-topbar__actions .editor-icon-button {
+    flex: 0 0 42px;
+  }
+
+  .editor-topbar__actions .editor-download,
+  .editor-topbar__actions .editor-save {
     flex: 1 1 0;
   }
 
@@ -1369,7 +1493,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   }
 
   .editor-tools {
-    justify-content: flex-start;
+    justify-content: stretch;
   }
 }
 
@@ -1385,10 +1509,14 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   }
 
   .editor-back,
-  .editor-topbar__actions button,
-  .editor-tools button {
+  .editor-topbar__actions button {
     min-height: 38px;
     padding: 0 11px;
+  }
+
+  .editor-icon-button {
+    width: 38px;
+    padding: 0 !important;
   }
 
   .editor-title strong {
@@ -1409,11 +1537,20 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   }
 
   .editor-tools {
+    gap: 8px;
+  }
+
+  .editor-tool-segment {
     gap: 5px;
   }
 
   .editor-tools button {
-    min-width: 38px;
+    min-height: 52px;
+    padding-inline: 9px;
+  }
+
+  .editor-tool-square {
+    min-width: 58px;
   }
 
   .editor-color {
@@ -1424,13 +1561,12 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   }
 
   .editor-current {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    min-height: 48px;
+    min-width: 0;
     border-radius: 16px;
   }
 
   .editor-replace-trigger {
-    min-height: 32px;
+    min-height: 38px;
     padding: 0 9px;
   }
 
