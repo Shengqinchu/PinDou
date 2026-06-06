@@ -10,18 +10,27 @@ import paletteManifestJson from '../assets/colormap/manifest.json';
 import { useGenerationStore } from '../stores/generation';
 import { useSWRCacheStore } from '../stores/swrCache';
 import {
+  applyBatchPatch,
   applyCellPatch,
   cloneColor,
   cloneColorOrNull,
   clonePattern,
   paletteRowsForPattern,
   recalculatePattern,
-  type CellPatch
+  type CellPatch,
+  type EditPatch
 } from '../utils/patternEditing';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
 type EditorTool = 'paint' | 'erase';
 type CatalogColor = ColorRef & { category: string };
+type ColorModalMode = 'choose' | 'replace';
+
+interface PendingReplace {
+  source: ColorRef;
+  target: ColorRef;
+  count: number;
+}
 
 const AUTOSAVE_DELAY_MS = 1600;
 const MAX_PATCH_STACK = 240;
@@ -40,12 +49,13 @@ const selectedColor = ref<ColorRef | null>(null);
 const activeTool = ref<EditorTool>('paint');
 const paintEnabled = ref(false);
 const isColorModalOpen = ref(false);
+const colorModalMode = ref<ColorModalMode>('choose');
 const colorSearch = ref('');
 const activeCategory = ref(COLOR_CATEGORY_ALL);
 const recentColors = ref<ColorRef[]>([]);
 const cursorInfo = ref<{ row: number; col: number; cell: ColorRef | null }>({ row: 0, col: 0, cell: null });
-const undoStack = ref<CellPatch[]>([]);
-const redoStack = ref<CellPatch[]>([]);
+const undoStack = ref<EditPatch[]>([]);
+const redoStack = ref<EditPatch[]>([]);
 const isDirty = ref(false);
 const saveStatus = ref<SaveStatus>('idle');
 const saveError = ref('');
@@ -54,6 +64,9 @@ const paintRevision = ref(0);
 const lastPatch = ref<CellPatch | null>(null);
 const dirtyVersion = ref(0);
 const savedVersion = ref(0);
+const replaceSourceColor = ref<ColorRef | null>(null);
+const pendingReplace = ref<PendingReplace | null>(null);
+const replaceMessage = ref('');
 
 let autosaveTimer: number | undefined;
 
@@ -93,6 +106,10 @@ const filteredFullPalette = computed(() => {
 });
 const canUndo = computed(() => undoStack.value.length > 0);
 const canRedo = computed(() => redoStack.value.length > 0);
+const selectedColorUseCount = computed(() => (
+  selectedColor.value ? (pattern.value?.color_counts[selectedColor.value.code] || 0) : 0
+));
+const canReplaceSelectedColor = computed(() => Boolean(selectedColor.value && selectedColorUseCount.value > 0));
 const saveStatusText = computed(() => {
   if (saveStatus.value === 'saving') {
     return '保存中';
@@ -203,44 +220,85 @@ function applyCell(row: number, col: number, color: ColorRef | null): void {
     selectedColor.value = cloneColor(color);
     rememberRecentColor(color);
   }
-  undoStack.value.push(patch);
+  syncAvailablePalette();
+  undoStack.value.push({ kind: 'cell', patch });
   if (undoStack.value.length > MAX_PATCH_STACK) {
     undoStack.value.shift();
   }
   redoStack.value = [];
-  markEdited(patch);
+  markSingleCellEdited(patch);
 }
 
 function undoEdit(): void {
-  const patch = undoStack.value.pop();
+  const edit = undoStack.value.pop();
   const sheet = editablePattern.value;
-  if (!patch || !sheet) {
+  if (!edit || !sheet) {
     return;
   }
-  editablePattern.value = applyCellPatch(sheet, patch, false);
-  redoStack.value.push(patch);
-  markEdited({ ...patch, before: patch.after, after: patch.before });
+  editablePattern.value = applyEditPatch(sheet, edit, false);
+  syncAvailablePalette();
+  redoStack.value.push(edit);
+  markAppliedEdit(edit, false);
 }
 
 function redoEdit(): void {
-  const patch = redoStack.value.pop();
+  const edit = redoStack.value.pop();
   const sheet = editablePattern.value;
-  if (!patch || !sheet) {
+  if (!edit || !sheet) {
     return;
   }
-  editablePattern.value = applyCellPatch(sheet, patch, true);
-  undoStack.value.push(patch);
-  markEdited(patch);
+  editablePattern.value = applyEditPatch(sheet, edit, true);
+  syncAvailablePalette();
+  undoStack.value.push(edit);
+  markAppliedEdit(edit, true);
 }
 
-function markEdited(patch: CellPatch): void {
+function applyEditPatch(sheet: PatternSheet, edit: EditPatch, useAfter: boolean): PatternSheet {
+  if (edit.kind === 'cell') {
+    return applyCellPatch(sheet, edit.patch, useAfter);
+  }
+  return applyBatchPatch(sheet, edit.patches, useAfter);
+}
+
+function markAppliedEdit(edit: EditPatch, useAfter: boolean): void {
+  if (edit.kind === 'cell') {
+    const patch = edit.patch;
+    markSingleCellEdited({
+      ...patch,
+      before: useAfter ? patch.before : patch.after,
+      after: useAfter ? patch.after : patch.before
+    });
+    return;
+  }
+  markBatchEdited();
+}
+
+function markSingleCellEdited(patch: CellPatch): void {
   lastPatch.value = patch;
   paintRevision.value += 1;
+  markDirty();
+}
+
+function markBatchEdited(): void {
+  lastPatch.value = null;
+  patternKey.value += 1;
+  markDirty();
+}
+
+function markDirty(): void {
   dirtyVersion.value += 1;
   isDirty.value = true;
   saveStatus.value = 'dirty';
   saveError.value = '';
   scheduleAutosave();
+}
+
+function syncAvailablePalette(): void {
+  if (!editablePattern.value) {
+    availablePalette.value = [];
+    return;
+  }
+  availablePalette.value = uniquePalette(editablePattern.value.palette_used);
 }
 
 function chooseColor(color: ColorRef): void {
@@ -253,16 +311,113 @@ function chooseTool(tool: EditorTool): void {
   activeTool.value = tool;
 }
 
-function openColorModal(): void {
+function openColorModal(mode: ColorModalMode = 'choose'): void {
+  colorModalMode.value = mode;
+  if (mode === 'choose') {
+    replaceSourceColor.value = null;
+    pendingReplace.value = null;
+    replaceMessage.value = '';
+  }
   isColorModalOpen.value = true;
 }
 
 function closeColorModal(): void {
   isColorModalOpen.value = false;
+  colorModalMode.value = 'choose';
+  replaceSourceColor.value = null;
+  pendingReplace.value = null;
+  replaceMessage.value = '';
 }
 
 function chooseFullColor(color: ColorRef): void {
+  if (colorModalMode.value === 'replace') {
+    prepareReplaceTarget(color);
+    return;
+  }
   chooseColor(color);
+  closeColorModal();
+}
+
+function openReplaceModal(): void {
+  const source = selectedColor.value;
+  if (!source || !selectedColorUseCount.value) {
+    replaceMessage.value = '请先选中图纸中正在使用的颜色。';
+    return;
+  }
+  replaceSourceColor.value = cloneColor(source);
+  pendingReplace.value = null;
+  replaceMessage.value = '';
+  openColorModal('replace');
+}
+
+function prepareReplaceTarget(target: ColorRef): void {
+  const source = replaceSourceColor.value;
+  if (!source) {
+    replaceMessage.value = '请先选择要替换的源色。';
+    return;
+  }
+  if (source.code === target.code) {
+    replaceMessage.value = '目标色和源色相同，不需要替换。';
+    return;
+  }
+  const count = pattern.value?.color_counts[source.code] || 0;
+  if (!count) {
+    replaceMessage.value = `图纸里已经没有 ${source.code} 了。`;
+    return;
+  }
+  pendingReplace.value = {
+    source: cloneColor(source),
+    target: cloneColor(target),
+    count
+  };
+}
+
+function cancelReplaceConfirm(): void {
+  pendingReplace.value = null;
+  replaceMessage.value = '';
+}
+
+function confirmReplaceColor(): void {
+  const pending = pendingReplace.value;
+  if (!pending) {
+    return;
+  }
+  replaceColor(pending.source, pending.target);
+}
+
+function replaceColor(source: ColorRef, target: ColorRef): void {
+  const sheet = editablePattern.value;
+  if (!sheet) {
+    return;
+  }
+  const patches: CellPatch[] = [];
+  sheet.grid.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      if (cell?.code === source.code) {
+        patches.push({
+          row: rowIndex,
+          col: colIndex,
+          before: cloneColorOrNull(cell),
+          after: cloneColor(target)
+        });
+      }
+    });
+  });
+  if (!patches.length) {
+    replaceMessage.value = `图纸里已经没有 ${source.code} 了。`;
+    return;
+  }
+
+  editablePattern.value = applyBatchPatch(sheet, patches, true);
+  syncAvailablePalette();
+  selectedColor.value = cloneColor(target);
+  rememberRecentColor(target);
+  undoStack.value.push({ kind: 'batch', patches });
+  if (undoStack.value.length > MAX_PATCH_STACK) {
+    undoStack.value.shift();
+  }
+  redoStack.value = [];
+  markBatchEdited();
   closeColorModal();
 }
 
@@ -488,7 +643,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
           <button
             type="button"
             class="editor-color editor-color--all"
-            @click="openColorModal"
+            @click="openColorModal()"
           >
             <span class="editor-color__rainbow"></span>
             <strong>全部颜色</strong>
@@ -503,6 +658,15 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
             <strong>{{ activeTool === 'erase' ? '橡皮擦' : selectedColor?.code || '未选色' }}</strong>
             <span>{{ activeTool === 'erase' ? '点格变空白' : selectedColor?.name_cn || '从全部颜色选择' }}</span>
           </div>
+          <button
+            v-if="activeTool === 'paint'"
+            type="button"
+            class="editor-replace-trigger"
+            :disabled="!canReplaceSelectedColor"
+            @click="openReplaceModal"
+          >
+            替换为…
+          </button>
         </section>
       </footer>
 
@@ -511,8 +675,11 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
           <div class="editor-color-dialog" role="dialog" aria-modal="true" aria-label="全部颜色">
             <header class="editor-color-dialog__header">
               <div>
-                <strong>全部颜色</strong>
-                <span>{{ currentPaletteMeta?.display_name || 'MARD' }} · {{ currentPaletteMeta?.count || fullPalette.length }} 色</span>
+                <strong>{{ colorModalMode === 'replace' ? '选择替换目标色' : '全部颜色' }}</strong>
+                <span v-if="colorModalMode === 'replace' && replaceSourceColor">
+                  将 {{ replaceSourceColor.code }} 替换成新的色号
+                </span>
+                <span v-else>{{ currentPaletteMeta?.display_name || 'MARD' }} · {{ currentPaletteMeta?.count || fullPalette.length }} 色</span>
               </div>
               <button type="button" aria-label="关闭全部颜色" @click="closeColorModal">×</button>
             </header>
@@ -521,6 +688,22 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
               <span>搜索色号</span>
               <input v-model="colorSearch" type="search" placeholder="输入 A1 / 黑 / #FF" />
             </label>
+
+            <section v-if="pendingReplace" class="editor-replace-confirm" aria-live="polite">
+              <div>
+                <span :style="{ backgroundColor: pendingReplace.source.hex }"></span>
+                <strong>{{ pendingReplace.source.code }}</strong>
+              </div>
+              <em>→</em>
+              <div>
+                <span :style="{ backgroundColor: pendingReplace.target.hex }"></span>
+                <strong>{{ pendingReplace.target.code }}</strong>
+              </div>
+              <p>将替换 {{ pendingReplace.count }} 格，撤销时会一次全部恢复。</p>
+              <button type="button" @click="cancelReplaceConfirm">再选一个</button>
+              <button type="button" class="editor-replace-confirm__primary" @click="confirmReplaceColor">确认替换</button>
+            </section>
+            <p v-else-if="replaceMessage" class="editor-replace-message">{{ replaceMessage }}</p>
 
             <section v-if="recentColors.length" class="editor-color-section" aria-label="最近使用">
               <h2>最近使用</h2>
@@ -621,6 +804,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 .editor-back,
 .editor-topbar__actions button,
 .editor-tools button,
+.editor-replace-trigger,
 .editor-color,
 .editor-color-card,
 .editor-color-dialog button {
@@ -830,10 +1014,10 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 
 .editor-current {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
-  min-width: 136px;
+  min-width: 196px;
   min-height: 54px;
   border: 1px solid rgba(255, 142, 83, 0.18);
   border-radius: 20px;
@@ -886,6 +1070,28 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   font-size: 11px;
   font-weight: 900;
   line-height: 1.2;
+}
+
+.editor-replace-trigger {
+  min-height: 34px;
+  border: 1px solid rgba(255, 142, 83, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 241, 232, 0.84);
+  color: var(--pd-orange);
+  font-size: 12px;
+  padding: 0 11px;
+  white-space: nowrap;
+}
+
+.editor-replace-trigger:hover:not(:disabled) {
+  border-color: rgba(255, 142, 83, 0.52);
+  box-shadow: 0 10px 22px rgba(255, 142, 83, 0.14);
+  transform: translateY(-1px);
+}
+
+.editor-replace-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
 }
 
 .editor-modal {
@@ -976,6 +1182,71 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 .editor-color-search input:focus {
   border-color: rgba(255, 142, 83, 0.58);
   box-shadow: 0 0 0 4px rgba(255, 142, 83, 0.12);
+}
+
+.editor-replace-confirm {
+  display: grid;
+  grid-template-columns: auto auto auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 142, 83, 0.26);
+  border-radius: 18px;
+  background: rgba(255, 241, 232, 0.76);
+  padding: 10px;
+}
+
+.editor-replace-confirm div {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 6px;
+  color: var(--pd-fg-1);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.editor-replace-confirm div span {
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(45, 45, 45, 0.1);
+  border-radius: 999px;
+}
+
+.editor-replace-confirm em {
+  color: var(--pd-orange);
+  font-style: normal;
+  font-weight: 900;
+}
+
+.editor-replace-confirm p,
+.editor-replace-message {
+  margin: 0;
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.editor-replace-confirm button {
+  min-height: 34px;
+  border: 1px solid rgba(255, 142, 83, 0.24);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--pd-orange);
+  padding: 0 12px;
+}
+
+.editor-replace-confirm__primary {
+  border-color: transparent !important;
+  background: var(--pd-gradient-warm) !important;
+  color: #fff !important;
+  box-shadow: 0 10px 22px rgba(255, 142, 83, 0.14);
+}
+
+.editor-replace-message {
+  border: 1px solid rgba(255, 142, 83, 0.2);
+  border-radius: 14px;
+  background: rgba(255, 241, 232, 0.68);
+  padding: 9px 11px;
 }
 
 .editor-color-section {
@@ -1153,14 +1424,28 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   }
 
   .editor-current {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
     min-height: 48px;
     border-radius: 16px;
+  }
+
+  .editor-replace-trigger {
+    min-height: 32px;
+    padding: 0 9px;
   }
 
   .editor-color-dialog {
     max-height: calc(100dvh - 18px);
     border-radius: 22px;
+  }
+
+  .editor-replace-confirm {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .editor-replace-confirm p,
+  .editor-replace-confirm button {
+    grid-column: 1 / -1;
   }
 
   .editor-color-grid {

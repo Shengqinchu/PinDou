@@ -13,6 +13,13 @@ export interface CellPatch {
   after: ColorRef | null;
 }
 
+export interface BatchPatch {
+  kind: 'batch';
+  patches: CellPatch[];
+}
+
+export type EditPatch = { kind: 'cell'; patch: CellPatch } | BatchPatch;
+
 export function recalculatePattern(sheet: PatternSheet): PatternSheet {
   const grid = sheet.grid.map((row) => row.map((cell) => (cell ? cloneColor(cell) : null)));
   const counts: Record<string, number> = {};
@@ -81,6 +88,21 @@ export function applyCellPatch(sheet: PatternSheet, patch: CellPatch, useAfter =
     return sheet;
   }
   row[patch.col] = cloneColorOrNull(useAfter ? patch.after : patch.before);
+  return recalculatePattern({ ...sheet, grid });
+}
+
+export function applyBatchPatch(sheet: PatternSheet, patches: CellPatch[], useAfter = true): PatternSheet {
+  if (!patches.length) {
+    return sheet;
+  }
+  const grid = sheet.grid.map((row) => [...row]);
+  for (const patch of patches) {
+    const row = grid[patch.row];
+    if (!row || patch.col < 0 || patch.col >= row.length) {
+      continue;
+    }
+    row[patch.col] = cloneColorOrNull(useAfter ? patch.after : patch.before);
+  }
   return recalculatePattern({ ...sheet, grid });
 }
 
