@@ -56,18 +56,6 @@ const progressSub = computed(() => {
   return `${fileName} · ${modeLabel.value}${style} · ${selectedSizeLabel.value}格`;
 });
 const liveMessage = computed(() => serverMessage.value || stages.value[activeStage.value]?.detail || '');
-const filledCells = computed(() => {
-  if (error.value) {
-    return 0;
-  }
-  return Math.max(1, Math.min(64, Math.round((progress.value / 100) * 64)));
-});
-const beadTones = [
-  ['#ffd2b9', '#ff9464'],
-  ['#ffc6d9', '#ff78a7'],
-  ['#d9efe7', '#91cdbc'],
-  ['#fff0bd', '#f5bc64']
-] as const;
 
 onMounted(() => {
   const querySize = String(route.query.size || '');
@@ -171,47 +159,23 @@ function stopProgress(): void {
   }
 }
 
-function beadCellStyle(index: number): Record<string, string> {
-  const row = Math.floor((index - 1) / 8);
-  const col = (index - 1) % 8;
-  const tone = beadTones[(row + col) % beadTones.length];
-  return {
-    '--cell-delay': `${row * 120 + col * 54}ms`,
-    '--bead-a': tone[0],
-    '--bead-b': tone[1]
-  };
-}
 </script>
 
 <template>
   <section class="loading-page">
     <div class="loading-panel">
       <div class="loading-copy">
-        <p class="eyebrow">生成中</p>
         <h1>{{ progressHeadline }}</h1>
         <p class="loading-sub">{{ progressSub }}</p>
         <p v-if="liveMessage" class="loading-live">{{ liveMessage }}</p>
       </div>
 
-      <div
-        class="bead-grid-loader"
-        :class="{ 'bead-grid-loader--error': error }"
-        aria-hidden="true"
-      >
-        <div class="bead-grid">
-          <span
-            v-for="index in 64"
-            :key="index"
-            :class="{
-              'bead-grid__cell--filled': index <= filledCells,
-              'bead-grid__cell--animated': !error
-            }"
-            :style="beadCellStyle(index)"
-          ></span>
-        </div>
-        <strong>{{ error ? '!' : `${progress}%` }}</strong>
+      <div class="loading-anim" :class="{ 'loading-anim--error': error }" aria-hidden="true">
+        <!-- TODO: 散步循环动图，待用户提供 gif/lottie/webp 素材替换。 -->
+        <img src="/brand/logo.png" alt="" />
       </div>
 
+      <div class="progress-readout" :class="{ 'progress-readout--error': error }">{{ error ? '!' : `${progress}%` }}</div>
       <div class="progress-track" aria-hidden="true">
         <span :style="{ width: `${progress}%` }"></span>
       </div>
@@ -261,21 +225,12 @@ function beadCellStyle(index: number): Record<string, string> {
 
 .loading-copy h1 {
   margin: 0;
-  color: var(--pd-fg-1);
+  color: var(--pd-orange);
   font-family: var(--pd-font-display);
   font-size: clamp(30px, 5vw, 46px);
   font-weight: 900;
   line-height: 1.08;
   letter-spacing: 0;
-}
-
-.eyebrow {
-  margin: 0 0 10px;
-  color: var(--pd-orange);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0;
-  text-transform: uppercase;
 }
 
 .loading-sub {
@@ -299,80 +254,53 @@ function beadCellStyle(index: number): Record<string, string> {
   padding: 8px 14px;
 }
 
-.bead-grid-loader {
-  display: grid;
-  justify-items: center;
-  gap: 14px;
-  margin: 0 auto 22px;
-}
-
-.bead-grid {
-  display: grid;
-  grid-template-columns: repeat(8, 16px);
-  gap: 7px;
-  border: 1px solid rgba(237, 228, 218, 0.9);
-  border-radius: 22px;
-  background:
-    linear-gradient(135deg, rgba(255, 241, 232, 0.9), rgba(255, 255, 255, 0.94)),
-    #fff;
-  box-shadow:
-    inset 0 0 0 8px rgba(255, 255, 255, 0.62),
-    0 20px 46px rgba(255, 142, 83, 0.14);
-  padding: 20px;
-}
-
-.bead-grid span {
-  width: 16px;
-  height: 16px;
-  border: 1px solid rgba(222, 211, 199, 0.82);
-  border-radius: 999px;
-  background: rgba(245, 239, 232, 0.86);
-  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.64);
-  opacity: 0.72;
-  transform: translateY(6px) scale(0.78);
-  transition:
-    background 220ms var(--pd-ease-out) var(--cell-delay, 0ms),
-    border-color 220ms var(--pd-ease-out) var(--cell-delay, 0ms),
-    box-shadow 220ms var(--pd-ease-out) var(--cell-delay, 0ms),
-    transform 220ms var(--pd-ease-out) var(--cell-delay, 0ms);
-}
-
-.bead-grid__cell--filled {
-  border-color: rgba(255, 142, 83, 0.38);
-  background: linear-gradient(145deg, var(--bead-a, #ffb58f), var(--bead-b, #ff8f5b));
-  box-shadow:
-    inset 0 0 0 4px rgba(255, 255, 255, 0.42),
-    0 8px 15px rgba(255, 142, 83, 0.16);
-  opacity: 1;
-  transform: scale(1);
-}
-
-.bead-grid__cell--animated {
-  animation: bead-fill-cycle 3.8s var(--pd-ease-out) infinite both;
-  animation-delay: var(--cell-delay, 0ms);
-}
-
-.bead-grid-loader strong {
-  min-width: 74px;
-  min-height: 36px;
+.loading-anim {
+  width: min(44vw, 190px);
+  height: min(44vw, 190px);
   display: grid;
   place-items: center;
+  margin: 2px auto 18px;
+  border: 1px solid rgba(255, 142, 83, 0.18);
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 48% 38%, rgba(255, 176, 136, 0.2), transparent 42%),
+    rgba(255, 255, 255, 0.82);
+  box-shadow:
+    inset 0 0 0 8px rgba(255, 249, 245, 0.64),
+    0 20px 46px rgba(255, 142, 83, 0.12);
+}
+
+.loading-anim img {
+  width: 76%;
+  max-width: 138px;
+  height: auto;
+  filter: drop-shadow(0 12px 18px rgba(45, 45, 45, 0.1));
+  animation: loading-logo-breathe 2.2s var(--pd-ease-out) infinite;
+}
+
+.loading-anim--error {
+  background: rgba(255, 90, 90, 0.08);
+  box-shadow: 0 14px 30px rgba(255, 90, 90, 0.1);
+}
+
+.progress-readout {
+  width: fit-content;
+  min-width: 76px;
+  min-height: 34px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 10px;
   border: 1px solid rgba(255, 142, 83, 0.22);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.86);
   color: var(--pd-fg-1);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 900;
   padding: 0 16px;
   box-shadow: 0 12px 26px rgba(255, 142, 83, 0.08);
 }
 
-.bead-grid-loader--error .bead-grid {
-  background: rgba(255, 90, 90, 0.08);
-  box-shadow: 0 14px 30px rgba(255, 90, 90, 0.1);
-}
-
-.bead-grid-loader--error strong {
+.progress-readout--error {
   color: var(--pd-danger);
 }
 
@@ -477,34 +405,16 @@ function beadCellStyle(index: number): Record<string, string> {
   color: var(--pd-orange);
 }
 
-@keyframes bead-fill-cycle {
+@keyframes loading-logo-breathe {
   0%,
-  13% {
-    border-color: rgba(222, 211, 199, 0.82);
-    background: rgba(245, 239, 232, 0.86);
-    box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.64);
-    opacity: 0.54;
-    transform: translateY(8px) scale(0.72);
-  }
-
-  25%,
-  70% {
-    border-color: rgba(255, 142, 83, 0.34);
-    background: linear-gradient(145deg, var(--bead-a, #ffd2b9), var(--bead-b, #ff9464));
-    box-shadow:
-      inset 0 0 0 4px rgba(255, 255, 255, 0.42),
-      0 9px 16px rgba(255, 142, 83, 0.14);
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-
-  82%,
   100% {
-    border-color: rgba(222, 211, 199, 0.82);
-    background: rgba(245, 239, 232, 0.86);
-    box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.64);
-    opacity: 0.62;
-    transform: translateY(3px) scale(0.82);
+    opacity: 0.9;
+    transform: translateY(2px) scale(0.985);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.015);
   }
 }
 

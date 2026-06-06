@@ -491,7 +491,6 @@ onUnmounted(revokePreview);
     <div v-if="isConfirmOpen" class="confirm-backdrop" role="presentation" @click.self="closeConfirm">
       <section class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
         <button class="confirm-close" type="button" aria-label="关闭确认弹窗" @click="closeConfirm">×</button>
-        <p class="confirm-kicker">生成前确认</p>
         <h2 id="confirm-title">确认这次生成设置</h2>
         <dl class="confirm-summary">
           <div>
@@ -1287,16 +1286,9 @@ onUnmounted(revokePreview);
   transform: translateY(-1px);
 }
 
-.confirm-kicker {
-  margin: 0 0 4px;
-  color: var(--pd-orange);
-  font-size: 12px;
-  font-weight: 900;
-}
-
 .confirm-dialog h2 {
   margin: 0 42px 18px 0;
-  color: var(--pd-fg-1);
+  color: var(--pd-orange);
   font-family: var(--pd-font-display);
   font-size: 25px;
   line-height: 1.2;

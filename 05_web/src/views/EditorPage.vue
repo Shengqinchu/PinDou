@@ -561,7 +561,6 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
               >
                 <span :style="{ backgroundColor: color.hex }"></span>
                 <strong>{{ color.code }}</strong>
-                <em>{{ color.name_cn }}</em>
               </button>
             </div>
             <p v-if="!filteredFullPalette.length" class="editor-color-empty">没有找到这个颜色</p>
@@ -1015,8 +1014,8 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 .editor-color-grid {
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
-  gap: 9px;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 8px;
   overflow-y: auto;
   padding: 2px 2px 4px;
 }
@@ -1029,11 +1028,11 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 
 .editor-color-card {
   min-width: 0;
-  min-height: 82px;
+  min-height: 68px;
   display: grid;
   justify-items: center;
   align-content: center;
-  gap: 5px;
+  gap: 6px;
   border: 1px solid var(--pd-stroke);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.9);
@@ -1053,28 +1052,19 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 }
 
 .editor-color-card span {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
 }
 
-.editor-color-card strong,
-.editor-color-card em {
+.editor-color-card strong {
   max-width: 100%;
   overflow: hidden;
-  font-style: normal;
+  color: var(--pd-fg-1);
+  font-size: 12px;
   font-weight: 900;
   line-height: 1.1;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.editor-color-card strong {
-  font-size: 12px;
-}
-
-.editor-color-card em {
-  color: var(--pd-fg-2);
-  font-size: 10px;
 }
 
 .editor-color-empty {
