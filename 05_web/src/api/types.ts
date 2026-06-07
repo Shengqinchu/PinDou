@@ -1,6 +1,15 @@
 export type StylePreset = 'q_portrait' | 'q_pet' | 'q_couple' | 'cartoon_fallback';
 export type SizePreset = '26x26' | '52x52' | '78x78' | '104x104' | `${number}x${number}`;
-export type CDKType = 'single_use' | 'monthly_card' | 'credit_pack_5' | 'credit_pack_10';
+export type CDKType = 'points' | 'membership' | 'single_use' | 'monthly_card' | 'credit_pack_5' | 'credit_pack_10';
+export type PaymentSkuCategory = 'points' | 'membership';
+export type PaymentSkuId =
+  | 'points_trial_099'
+  | 'points_standard_990'
+  | 'points_value_2990'
+  | 'membership_week_990'
+  | 'membership_month_1990'
+  | 'membership_season_4990'
+  | string;
 
 export interface User {
   user_id: string;
@@ -10,7 +19,17 @@ export interface User {
   avatar?: string;
   created_at?: string;
   free_credits_remaining?: number;
+  normal_trial_remaining?: number;
   paid_credits?: number;
+  ai_points_balance?: number;
+  ai_points_paid?: number;
+  ai_points_gift?: number;
+  ai_points_reserved?: number;
+  ai_generation_cost_points?: number;
+  register_gift_points?: number;
+  register_gift_days?: number;
+  is_unlimited_account?: boolean;
+  membership_expires_at?: string | null;
   monthly_card_expires_at?: string | null;
   privacy_consent_at?: string | null;
   sensitive_consent_at?: string | null;
@@ -166,11 +185,29 @@ export interface CDKRedeemResult {
   message?: string;
 }
 
+export interface PaymentSku {
+  sku: PaymentSkuId;
+  sku_id: PaymentSkuId;
+  category: PaymentSkuCategory;
+  title: string;
+  amount_cny: string;
+  badge?: string | null;
+  subtitle?: string | null;
+  points?: number;
+  days?: number;
+  gift_points?: number;
+}
+
+export interface PaymentSkuCatalog {
+  ai_generation_cost_points: number;
+  items: PaymentSku[];
+}
+
 export interface Order {
   order_id: string;
   order_no?: string;
   user_id?: string;
-  sku?: 'single_9.9' | 'monthly_28' | 'custom_99' | string;
+  sku?: PaymentSkuId | 'single_9.9' | 'monthly_28' | 'custom_99' | string;
   amount_cny?: string | number;
   status: string;
   qr_code_url?: string | null;
@@ -179,4 +216,8 @@ export interface Order {
   expires_at?: string | null;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface OrderStatusResponse {
+  status: string;
 }

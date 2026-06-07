@@ -2,8 +2,12 @@
 import { computed, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
+import { getSkus } from '../api';
 import { hasToken } from '../auth/tokenStorage';
 import AuthPanel from '../components/AuthPanel.vue';
+import PricingModal from '../components/PricingModal.vue';
+import type { PaymentSkuCategory } from '../api/types';
+import { useAuthStore } from '../stores/auth';
 import {
   GENERATION_MODE_DETAILS,
   GENERATION_MODE_OPTIONS,
@@ -21,6 +25,7 @@ import {
 type TooltipKey = 'mode' | 'size';
 
 const router = useRouter();
+const auth = useAuthStore();
 const generation = useGenerationStore();
 const galleryInput = ref<HTMLInputElement | null>(null);
 const cameraInput = ref<HTMLInputElement | null>(null);
@@ -35,6 +40,10 @@ const customHeightInput = ref('120');
 const activeTooltip = ref<TooltipKey | null>(null);
 const isConfirmOpen = ref(false);
 const isAuthModalOpen = ref(false);
+const isPricingOpen = ref(false);
+const pricingPanel = ref<PaymentSkuCategory>('points');
+const pricingReason = ref<'manual' | 'ai-low' | 'script-low'>('manual');
+const skuAiCost = ref(0);
 const isCustomSizeSelected = ref(false);
 const CUSTOM_MIN_SIZE = 1;
 const CUSTOM_MAX_SIZE = 200;
@@ -64,6 +73,18 @@ const generationVerb = computed(() => GENERATION_MODE_DETAILS[generation.generat
 const selectedSizeLabel = computed(() => resultSizeLabel(generation.selectedSize));
 const selectedStyleLabel = computed(() => STYLE_OPTION_DETAILS[generation.selectedStyle].label);
 const isAiMode = computed(() => generation.generationMode === 'ai');
+const isUnlimitedAccount = computed(() => Boolean(auth.user?.is_unlimited_account));
+const aiCost = computed(() => Number(auth.user?.ai_generation_cost_points || skuAiCost.value || 0));
+const aiPoints = computed(() => Number(auth.user?.ai_points_balance ?? auth.user?.paid_credits ?? 0));
+const normalTrialRemaining = computed(() => Number(auth.user?.normal_trial_remaining ?? auth.user?.free_credits_remaining ?? 0));
+const membershipExpiresAt = computed(() => auth.user?.membership_expires_at || auth.user?.monthly_card_expires_at || null);
+const membershipActive = computed(() => {
+  if (!membershipExpiresAt.value) {
+    return false;
+  }
+  const expiresAt = Date.parse(membershipExpiresAt.value);
+  return Number.isFinite(expiresAt) && expiresAt > Date.now();
+});
 const customSizeDraft = computed(() => ({
   width: parseCustomDimension(customWidthInput.value),
   height: parseCustomDimension(customHeightInput.value)
@@ -74,9 +95,15 @@ const isCustomSizeValid = computed(() => (
 ));
 const hasInvalidCustomSize = computed(() => isCustomSizeActive.value && !isCustomSizeValid.value);
 const canStartGenerate = computed(() => Boolean(selectedFile.value) && !hasInvalidCustomSize.value);
-const creditSummary = computed(() => (
-  isAiMode.value ? 'AI 模式：消耗 1 次 AI 额度' : '普通模式：消耗 1 次普通额度'
-));
+const creditSummary = computed(() => {
+  if (isAiMode.value) {
+    return aiCost.value ? `AI 模式：本次消耗 ${aiCost.value} 积分` : 'AI 模式：本次消耗 AI 积分';
+  }
+  if (isUnlimitedAccount.value || membershipActive.value) {
+    return '普通模式：会员普通无限';
+  }
+  return `普通模式：消耗 1 次普通额度（剩余 ${normalTrialRemaining.value} 次）`;
+});
 const ctaLabel = computed(() => {
   if (hasInvalidCustomSize.value) {
     return '请输入至少 1 × 1 的格数';
@@ -172,7 +199,7 @@ async function confirmGenerate(): Promise<void> {
     isAuthModalOpen.value = true;
     return;
   }
-  await continueGenerate();
+  await checkWalletAndContinue();
 }
 
 async function continueGenerate(): Promise<void> {
@@ -187,17 +214,85 @@ async function continueGenerate(): Promise<void> {
   await router.push({ name: 'loading', query: { from: 'upload' } });
 }
 
+async function checkWalletAndContinue(): Promise<void> {
+  if (!await refreshProfileForWallet()) {
+    return;
+  }
+  if (isAiMode.value && !await ensureAiCostReady()) {
+    return;
+  }
+  if (!isUnlimitedAccount.value && isAiMode.value && aiPoints.value < aiCost.value) {
+    isConfirmOpen.value = false;
+    openPricing('points', 'ai-low');
+    return;
+  }
+  if (
+    !isUnlimitedAccount.value &&
+    !isAiMode.value &&
+    !membershipActive.value &&
+    normalTrialRemaining.value <= 0
+  ) {
+    isConfirmOpen.value = false;
+    openPricing('membership', 'script-low');
+    return;
+  }
+  isConfirmOpen.value = false;
+  await continueGenerate();
+}
+
+async function ensureAiCostReady(): Promise<boolean> {
+  if (aiCost.value > 0) {
+    return true;
+  }
+  try {
+    const catalog = await getSkus();
+    skuAiCost.value = Number(catalog.ai_generation_cost_points || 0);
+  } catch (_error) {
+    message.value = 'AI 价格信息暂时加载失败，请稍后再试。';
+    return false;
+  }
+  if (aiCost.value <= 0) {
+    message.value = 'AI 价格信息暂时不可用，请稍后再试。';
+    return false;
+  }
+  return true;
+}
+
+async function refreshProfileForWallet(): Promise<boolean> {
+  try {
+    await auth.refreshProfile();
+    return true;
+  } catch (_error) {
+    message.value = '钱包信息暂时加载失败，请稍后再试。';
+    return false;
+  }
+}
+
 function closeConfirm(): void {
   isConfirmOpen.value = false;
 }
 
 async function handleAuthSuccess(): Promise<void> {
   isAuthModalOpen.value = false;
-  await continueGenerate();
+  await checkWalletAndContinue();
 }
 
 function closeAuthModal(): void {
   isAuthModalOpen.value = false;
+}
+
+function openPricing(panel: PaymentSkuCategory, reason: 'manual' | 'ai-low' | 'script-low'): void {
+  pricingPanel.value = panel;
+  pricingReason.value = reason;
+  isPricingOpen.value = true;
+}
+
+function closePricing(): void {
+  isPricingOpen.value = false;
+}
+
+async function handlePricingSuccess(): Promise<void> {
+  await refreshProfileForWallet();
 }
 
 function chooseMode(mode: GenerationMode): void {
@@ -551,6 +646,14 @@ onUnmounted(revokePreview);
         <AuthPanel @success="handleAuthSuccess" />
       </section>
     </div>
+
+    <PricingModal
+      :open="isPricingOpen"
+      :initial-panel="pricingPanel"
+      :reason="pricingReason"
+      @close="closePricing"
+      @success="handlePricingSuccess"
+    />
   </section>
 </template>
 

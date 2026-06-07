@@ -3,9 +3,11 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 
 import { ApiError } from '../api';
+import PricingModal from './PricingModal.vue';
 import styleCartoonAvatar from '../assets/brand/style-cartoon.png';
 import stylePetAvatar from '../assets/brand/style-pet.png';
 import stylePortraitAvatar from '../assets/brand/style-portrait.png';
+import type { PaymentSkuCategory } from '../api/types';
 import type { User } from '../api/types';
 import { useAuthStore } from '../stores/auth';
 
@@ -28,6 +30,8 @@ const rootRef = ref<HTMLElement | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const menuOpen = ref(false);
 const editOpen = ref(false);
+const pricingOpen = ref(false);
+const pricingPanel = ref<PaymentSkuCategory>('points');
 const draftNickname = ref('');
 const originalNickname = ref('');
 const originalAvatar = ref('');
@@ -47,11 +51,44 @@ const user = computed(() => auth.user);
 const displayName = computed(() => auth.displayName);
 const emailLabel = computed(() => user.value?.email || '邮箱未绑定');
 const avatarSrc = computed(() => avatarFailed.value ? DEFAULT_AVATAR : user.value?.avatar || DEFAULT_AVATAR);
-const isUnlimitedAccount = computed(() => (user.value?.email || '').trim().toLowerCase() === 'staywithcsq@outlook.com');
-const normalCredits = computed(() => Number(user.value?.free_credits_remaining || 0));
-const aiCredits = computed(() => Number(user.value?.paid_credits || 0));
-const normalCreditsLabel = computed(() => isUnlimitedAccount.value || normalCredits.value >= 9999 ? '不限' : `${normalCredits.value} 次`);
-const aiCreditsLabel = computed(() => isUnlimitedAccount.value || aiCredits.value >= 9999 ? '不限' : `${aiCredits.value} 次`);
+const isUnlimitedAccount = computed(() => Boolean(user.value?.is_unlimited_account));
+const aiCost = computed(() => Number(user.value?.ai_generation_cost_points || 0));
+const aiPoints = computed(() => Number(user.value?.ai_points_balance ?? user.value?.paid_credits ?? 0));
+const normalTrialRemaining = computed(() => Number(user.value?.normal_trial_remaining ?? user.value?.free_credits_remaining ?? 0));
+const aiPointsLabel = computed(() => isUnlimitedAccount.value ? '不限' : `${aiPoints.value} 分`);
+const aiGenerationsLabel = computed(() => {
+  if (isUnlimitedAccount.value) {
+    return '不限';
+  }
+  if (!aiCost.value) {
+    return '同步中';
+  }
+  return `${Math.floor(aiPoints.value / aiCost.value)} 张`;
+});
+const membershipExpiresAt = computed(() => user.value?.membership_expires_at || user.value?.monthly_card_expires_at || null);
+const membershipActive = computed(() => {
+  if (!membershipExpiresAt.value) {
+    return false;
+  }
+  const expiresAt = Date.parse(membershipExpiresAt.value);
+  return Number.isFinite(expiresAt) && expiresAt > Date.now();
+});
+const normalEntitlementLabel = computed(() => {
+  if (isUnlimitedAccount.value) {
+    return '不限';
+  }
+  if (membershipActive.value && membershipExpiresAt.value) {
+    return `会员至 ${formatMonthDay(membershipExpiresAt.value)}`;
+  }
+  return `${normalTrialRemaining.value} 次`;
+});
+const lowBalanceHint = computed(() => {
+  if (isUnlimitedAccount.value || !aiCost.value || aiPoints.value >= aiCost.value) {
+    return '';
+  }
+  const shortfall = Math.max(0, aiCost.value - aiPoints.value);
+  return `差 ${shortfall} 积分，再充值就能继续生成 AI 图纸。`;
+});
 const nicknameCount = computed(() => [...draftNickname.value.trim()].length);
 const normalizedNickname = computed(() => normalizeNickname(draftNickname.value));
 const nicknameError = computed(() => validateNickname(draftNickname.value));
@@ -67,7 +104,7 @@ const saveDisabled = computed(() => saving.value || Boolean(nicknameError.value)
 onMounted(() => {
   document.addEventListener('click', handleDocumentClick);
   window.addEventListener('keydown', handleKeydown);
-  if (auth.isLoggedIn && !auth.user) {
+  if (auth.isLoggedIn && (!auth.user || auth.user.ai_generation_cost_points == null)) {
     void refreshProfile();
   }
 });
@@ -222,8 +259,18 @@ function goWorks(): void {
   void router.push('/works');
 }
 
-function showComingSoon(label: string): void {
-  showToast(`${label}入口即将开放。`);
+function openPricing(panel: PaymentSkuCategory): void {
+  pricingPanel.value = panel;
+  pricingOpen.value = true;
+  menuOpen.value = false;
+}
+
+function closePricing(): void {
+  pricingOpen.value = false;
+}
+
+function handlePricingSuccess(): void {
+  showToast('钱包已刷新。');
 }
 
 function handleDocumentClick(event: MouseEvent): void {
@@ -298,6 +345,14 @@ function readErrorMessage(error: unknown, fallback: string): string {
   }
   return fallback;
 }
+
+function formatMonthDay(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+}
 </script>
 
 <template>
@@ -312,7 +367,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
       @click="toggleMenu"
     >
       <span aria-hidden="true">🫘</span>
-      <strong>AI {{ aiCreditsLabel }}</strong>
+      <strong>AI {{ aiPointsLabel }}</strong>
     </button>
 
     <button
@@ -343,22 +398,28 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
         <div class="account-credit-card">
           <div class="account-credit-card__head">
-            <strong>我的额度</strong>
+            <strong>我的钱包</strong>
             <span v-if="profileLoading">同步中</span>
           </div>
           <div class="account-credit-grid">
             <div>
-              <span>AI额度</span>
-              <strong>{{ aiCreditsLabel }}</strong>
+              <span>AI 积分</span>
+              <strong>{{ aiPointsLabel }}</strong>
             </div>
             <div>
-              <span>普通额度</span>
-              <strong>{{ normalCreditsLabel }}</strong>
+              <span>可生成 AI</span>
+              <strong>{{ aiGenerationsLabel }}</strong>
+            </div>
+            <div>
+              <span>普通权益</span>
+              <strong>{{ normalEntitlementLabel }}</strong>
             </div>
           </div>
+          <p v-if="lowBalanceHint" class="account-low-hint">{{ lowBalanceHint }}</p>
           <div class="account-credit-actions">
-            <button type="button" @click="showComingSoon('兑换 CDK')">兑换 CDK</button>
-            <button type="button" @click="showComingSoon('购买额度')">购买额度</button>
+            <button type="button" @click="openPricing('points')">再充值</button>
+            <button type="button" @click="openPricing('points')">兑换 CDK</button>
+            <button type="button" @click="openPricing('membership')">开通时间卡</button>
           </div>
         </div>
 
@@ -442,6 +503,14 @@ function readErrorMessage(error: unknown, fallback: string): string {
       <Transition name="account-fade">
         <div v-if="toastMessage" class="account-toast" role="status">{{ toastMessage }}</div>
       </Transition>
+
+      <PricingModal
+        :open="pricingOpen"
+        :initial-panel="pricingPanel"
+        reason="manual"
+        @close="closePricing"
+        @success="handlePricingSuccess"
+      />
     </Teleport>
   </div>
 </template>
@@ -646,7 +715,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
 .account-credit-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -671,9 +740,21 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
 .account-credit-grid strong {
   color: var(--pd-fg-1);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 900;
   white-space: nowrap;
+}
+
+.account-low-hint {
+  margin: 0;
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  border-radius: var(--pd-r-tag);
+  background: rgba(255, 198, 107, 0.3);
+  color: var(--pd-fg-1);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.45;
+  padding: 7px 9px;
 }
 
 .account-credit-actions button,
@@ -696,6 +777,8 @@ function readErrorMessage(error: unknown, fallback: string): string {
 .account-credit-actions button {
   flex: 1 1 0;
   color: var(--pd-orange);
+  padding-inline: 8px;
+  white-space: nowrap;
 }
 
 .account-menu-list {
@@ -1067,6 +1150,15 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
   .account-works-link {
     padding-inline: 10px;
+  }
+
+  .account-credit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-credit-actions {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 
   .profile-modal {

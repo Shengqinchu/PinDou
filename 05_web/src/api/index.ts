@@ -7,8 +7,13 @@ import type {
   ArtworkListResponse,
   AvatarUploadResponse,
   ConsentResponse,
+  CDKRedeemResult,
   GenerationJobResponse,
   GenerateScriptResponse,
+  Order,
+  OrderStatusResponse,
+  PaymentSkuCatalog,
+  PaymentSkuId,
   PartitionSheet,
   PatternSheet,
   SaveArtworkPatternResponse,
@@ -92,6 +97,30 @@ export function uploadAvatar(file: File): Promise<AvatarUploadResponse> {
   return apiRequest<AvatarUploadResponse>('/user/avatar', {
     method: 'POST',
     body: form
+  });
+}
+
+export function getSkus(): Promise<PaymentSkuCatalog> {
+  return apiRequest<PaymentSkuCatalog>('/payment/skus', {
+    auth: false
+  });
+}
+
+export function createOrder(payload: { sku_id: PaymentSkuId; artwork_id?: string | null }): Promise<Order> {
+  return apiRequest<Order>('/payment/order/create', {
+    method: 'POST',
+    body: payload
+  });
+}
+
+export function getOrder(orderRef: string): Promise<OrderStatusResponse> {
+  return apiRequest<OrderStatusResponse>(`/payment/order/${encodeURIComponent(orderRef)}`);
+}
+
+export function redeemCdk(cdk_code: string): Promise<CDKRedeemResult> {
+  return apiRequest<CDKRedeemResult>('/cdk/redeem', {
+    method: 'POST',
+    body: { cdk_code }
   });
 }
 
