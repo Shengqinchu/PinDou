@@ -11,6 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from pindou.db.models import CDK, EntitlementGrant, User, as_aware_utc, utc_now
+from pindou.services.credit_service import AI_GENERATION_POINT_COST, grant_points
 from pindou.services.rate_limit_service import RateLimitExceeded, RateLimitRule, consume_rate_limits
 
 
@@ -147,18 +148,39 @@ class CDKService:
             logger.warning("CDK redemption rate limited: user_id=%s ip=%s scope=%s", user_id, ip, exc.scope)
             raise CDKRateLimitError("CDK redemption rate limited.") from exc
 
-    @staticmethod
-    def _apply_entitlement(*, user: User, cdk: CDK, now: datetime) -> None:
+    def _apply_entitlement(self, *, user: User, cdk: CDK, now: datetime) -> None:
         timestamp = as_aware_utc(now) or utc_now()
-        if cdk.type == "monthly_card":
+        if cdk.type in {"membership", "monthly_card"}:
             days = cdk.value if cdk.value > 1 else 30
-            current_expiry = as_aware_utc(user.monthly_card_expires_at)
+            current_expiry = as_aware_utc(user.membership_expires_at or user.monthly_card_expires_at)
             base = current_expiry if current_expiry and current_expiry > timestamp else timestamp
-            user.monthly_card_expires_at = base + timedelta(days=days)
+            expires_at = base + timedelta(days=days)
+            user.membership_expires_at = expires_at
+            user.monthly_card_expires_at = expires_at
+            return
+
+        if cdk.type == "points":
+            grant_points(
+                self.session,
+                owner_id=user.user_id,
+                amount=max(0, cdk.value),
+                kind="paid",
+                source_type="cdk",
+                source_id=cdk.code,
+                idempotency_key=f"cdk:{cdk.code}:points",
+            )
             return
 
         if cdk.type in {"single_use", "credit_pack_5", "credit_pack_10"}:
-            user.paid_credits += max(0, cdk.value)
+            grant_points(
+                self.session,
+                owner_id=user.user_id,
+                amount=max(0, cdk.value) * AI_GENERATION_POINT_COST,
+                kind="paid",
+                source_type="legacy_cdk",
+                source_id=cdk.code,
+                idempotency_key=f"legacy_cdk:{cdk.code}:points",
+            )
             return
 
         raise CDKInvalidError(f"Unsupported CDK type: {cdk.type}")

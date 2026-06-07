@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any
 from urllib.parse import urlparse
@@ -12,14 +12,21 @@ import requests
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import PlainTextResponse, Response
 from pydantic import BaseModel
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from pindou.api.deps import CurrentUser, DbSession
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.config import get_settings
-from pindou.db.models import EntitlementGrant, Order, User, as_aware_utc, utc_now
+from pindou.db.models import Artwork, EntitlementGrant, Order, User, utc_now
 from pindou.services.admin_audit_service import write_audit
+from pindou.services.credit_service import (
+    AI_GENERATION_POINT_COST,
+    MEMBERSHIP_SKUS,
+    POINT_SKUS,
+    extend_membership,
+    grant_points,
+)
 from pindou.services.hupijiao_service import HupijiaoError, HupijiaoService, sanitize_payload
 from pindou.services.payment_service import (
     InvalidOrderTransitionError,
@@ -37,28 +44,59 @@ logger = logging.getLogger(__name__)
 DEV_MOCK_WEBHOOK_SECRET = "pindou-dev-hupijiao-mock-secret"
 
 SKU_CATALOG: dict[str, dict[str, Any]] = {
+    **{
+        sku: {
+            "amount": Decimal(str(item["amount"])),
+            "title": item["title"],
+            "entitlement": "points",
+            "points": int(item["points"]),
+            "active": True,
+            "badge": item.get("badge"),
+            "subtitle": item.get("subtitle"),
+        }
+        for sku, item in POINT_SKUS.items()
+    },
+    **{
+        sku: {
+            "amount": Decimal(str(item["amount"])),
+            "title": item["title"],
+            "entitlement": "membership",
+            "days": int(item["days"]),
+            "gift_points": int(item["gift_points"]),
+            "active": True,
+            "badge": item.get("badge"),
+            "subtitle": item.get("subtitle"),
+        }
+        for sku, item in MEMBERSHIP_SKUS.items()
+    },
     "single_9.9": {
         "amount": Decimal("9.90"),
-        "title": "PinDou 单次高级图纸",
-        "entitlement": "credits",
-        "credits": 1,
+        "title": "PinDou 旧版单次高级图纸",
+        "entitlement": "points",
+        "points": AI_GENERATION_POINT_COST,
+        "active": False,
     },
     "monthly_28": {
         "amount": Decimal("28.00"),
-        "title": "PinDou 月卡",
-        "entitlement": "monthly_card",
+        "title": "PinDou 旧版月卡",
+        "entitlement": "membership",
         "days": 30,
+        "gift_points": 1888,
+        "active": False,
     },
     "custom_99": {
         "amount": Decimal("99.00"),
         "title": "PinDou 人工精修",
         "entitlement": "manual_polish",
+        "active": True,
     },
 }
 
 SKU_ALIASES = {
-    "single_use": "single_9.9",
-    "monthly_card": "monthly_28",
+    "single_use": "points_standard_990",
+    "single_9.9": "points_standard_990",
+    "monthly_card": "membership_month_1990",
+    "monthly_28": "membership_month_1990",
     "manual_polish": "custom_99",
 }
 
@@ -75,12 +113,25 @@ class ConfirmOrderRequest(BaseModel):
     handler: str | None = None
 
 
+@router.get("/skus")
+def list_payment_skus() -> dict:
+    """Return the active public SKU catalog for pricing UI rendering."""
+    return {
+        "ai_generation_cost_points": AI_GENERATION_POINT_COST,
+        "items": [
+            serialize_sku(sku, item)
+            for sku, item in SKU_CATALOG.items()
+            if item.get("active", True) and item.get("entitlement") in {"points", "membership"}
+        ],
+    }
+
+
 @router.post("/order")
 @router.post("/order/create")
 def create_order(payload: CreateOrderRequest, current_user: CurrentUser, db: DbSession) -> dict:
     """创建虎皮椒支付码订单并返回前端 Order 类型。"""
     sku = normalize_sku(payload.sku_id or payload.sku)
-    if sku not in SKU_CATALOG:
+    if sku not in SKU_CATALOG or not SKU_CATALOG[sku].get("active", True):
         raise ApiException(422, ErrorCode.VALIDATION_ERROR, "请选择有效的购买档位。")
     item = SKU_CATALOG[sku]
     service = PaymentService(db)
@@ -130,7 +181,7 @@ def create_order(payload: CreateOrderRequest, current_user: CurrentUser, db: DbS
 def create_customer_service_order(payload: CreateOrderRequest, current_user: CurrentUser, db: DbSession) -> dict:
     """创建客服扫码兜底订单。"""
     sku = normalize_sku(payload.sku_id or payload.sku)
-    if sku not in SKU_CATALOG:
+    if sku not in SKU_CATALOG or not SKU_CATALOG[sku].get("active", True):
         raise ApiException(422, ErrorCode.VALIDATION_ERROR, "请选择有效的购买档位。")
     order = PaymentService(db).create_order(
         user_id=current_user.user_id,
@@ -299,6 +350,10 @@ async def hupijiao_webhook(request: Request, db: DbSession) -> PlainTextResponse
         order = paid
         result = "paid"
         duplicate_callback = False
+    elif gateway_status == "OD" and order.status in {ORDER_STATUS_PAID_HUPIJIAO, ORDER_STATUS_PAID}:
+        grant_order_entitlement(order, db)
+        result = "paid_retry_grant"
+        duplicate_callback = True
     elif gateway_status in {"CD", "UD"} and order.status == ORDER_STATUS_PENDING_HUPIJIAO:
         order = PaymentService(db).transition_order(order_no=order.order_no, status="cancelled")
         result = "cancelled"
@@ -341,6 +396,25 @@ def normalize_sku(sku: str | None) -> str:
     if not sku:
         return ""
     return SKU_ALIASES.get(sku, sku)
+
+
+def serialize_sku(sku: str, item: dict[str, Any]) -> dict[str, Any]:
+    entitlement = str(item.get("entitlement") or "")
+    payload: dict[str, Any] = {
+        "sku": sku,
+        "sku_id": sku,
+        "category": "points" if entitlement == "points" else "membership",
+        "title": item.get("title") or "",
+        "amount_cny": str(Decimal(item["amount"]).quantize(Decimal("0.01"))),
+        "badge": item.get("badge"),
+        "subtitle": item.get("subtitle"),
+    }
+    if entitlement == "points":
+        payload["points"] = int(item.get("points") or 0)
+    if entitlement == "membership":
+        payload["days"] = int(item.get("days") or 0)
+        payload["gift_points"] = int(item.get("gift_points") or 0)
+    return payload
 
 
 def build_hupijiao_service() -> HupijiaoService:
@@ -445,37 +519,73 @@ def grant_order_entitlement(order: Order, db: DbSession) -> None:
     if item is None:
         return
     entitlement = str(item["entitlement"])
-    value = int(item.get("credits") or item.get("days") or 0)
-    if entitlement not in {"credits", "monthly_card"}:
+    if entitlement not in {"points", "credits", "membership", "monthly_card", "manual_polish"}:
+        return
+    if db.scalar(select(EntitlementGrant).where(EntitlementGrant.source_type == "order", EntitlementGrant.source_id == order.order_no)):
         return
 
+    user = db.scalar(select(User).where(User.openid == order.user_id))
+    if user is None:
+        raise ValueError(f"User does not exist: {order.user_id}")
+
     try:
-        db.add(
-            EntitlementGrant(
+        if entitlement in {"points", "credits"}:
+            points = int(item.get("points") or int(item.get("credits") or 0) * AI_GENERATION_POINT_COST)
+            grant_points(
+                db,
+                owner_id=user.user_id,
+                amount=points,
+                kind="paid",
                 source_type="order",
                 source_id=order.order_no,
-                user_id=order.user_id,
-                entitlement_type=entitlement,
-                value=value,
+                idempotency_key=f"order:{order.order_no}:paid_points",
             )
-        )
-        if entitlement == "credits":
-            updated = db.execute(
-                update(User)
-                .where(User.openid == order.user_id)
-                .values(paid_credits=User.paid_credits + value)
+            db.add(
+                EntitlementGrant(
+                    source_type="order",
+                    source_id=order.order_no,
+                    user_id=user.user_id,
+                    entitlement_type="points",
+                    value=points,
+                )
             )
-            if updated.rowcount != 1:
-                raise ValueError(f"User does not exist: {order.user_id}")
-        elif entitlement == "monthly_card":
-            user = db.scalar(select(User).where(User.openid == order.user_id))
-            if user is None:
-                raise ValueError(f"User does not exist: {order.user_id}")
-            now = utc_now()
-            current_expires = as_aware_utc(user.monthly_card_expires_at)
-            base = current_expires if current_expires and current_expires > now else now
-            user.monthly_card_expires_at = base + timedelta(days=value)
-            db.add(user)
+        elif entitlement in {"membership", "monthly_card"}:
+            days = int(item.get("days") or 30)
+            expires_at = extend_membership(
+                db,
+                user=user,
+                days=days,
+                source_type="order",
+                source_id=order.order_no,
+                idempotency_key=f"order:{order.order_no}:membership",
+            )
+            gift_points = int(item.get("gift_points") or 0)
+            if gift_points > 0:
+                grant_points(
+                    db,
+                    owner_id=user.user_id,
+                    amount=gift_points,
+                    kind="gift",
+                    source_type="order_membership_gift",
+                    source_id=order.order_no,
+                    idempotency_key=f"order:{order.order_no}:membership_gift_points",
+                    expires_at=expires_at,
+                )
+        elif entitlement == "manual_polish":
+            if order.artwork_id:
+                artwork = db.get(Artwork, order.artwork_id)
+                if artwork is not None:
+                    artwork.is_paid_unlocked = True
+                    db.add(artwork)
+            db.add(
+                EntitlementGrant(
+                    source_type="order",
+                    source_id=order.order_no,
+                    user_id=user.user_id,
+                    entitlement_type="manual_polish",
+                    value=1,
+                )
+            )
         db.commit()
     except IntegrityError:
         db.rollback()
@@ -492,11 +602,14 @@ def refresh_hupijiao_order_if_needed(order: Order, db: DbSession) -> None:
     except HupijiaoError:
         return
     if result.status == "paid":
-        paid = PaymentService(db).transition_order(
-            order_no=order.order_no,
-            status=ORDER_STATUS_PAID_HUPIJIAO,
-            paid_at=result.paid_at,
-        )
-        grant_order_entitlement(paid, db)
+        if order.status == ORDER_STATUS_PENDING_HUPIJIAO:
+            paid = PaymentService(db).transition_order(
+                order_no=order.order_no,
+                status=ORDER_STATUS_PAID_HUPIJIAO,
+                paid_at=result.paid_at,
+            )
+            grant_order_entitlement(paid, db)
+        elif order.status in {ORDER_STATUS_PAID_HUPIJIAO, ORDER_STATUS_PAID}:
+            grant_order_entitlement(order, db)
     elif result.status == "cancelled":
         PaymentService(db).transition_order(order_no=order.order_no, status="cancelled")

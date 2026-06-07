@@ -17,13 +17,21 @@ from sqlalchemy import func, or_, select
 
 from pindou.api.deps import DbSession, require_role
 from pindou.api.errors import ApiException, ErrorCode
-from pindou.api.payment import ConfirmOrderRequest, SKU_CATALOG
+from pindou.api.payment import ConfirmOrderRequest, SKU_CATALOG, grant_order_entitlement as grant_payment_order_entitlement
 from pindou.api.request_meta import client_ip
 from pindou.api.security import admin_credentials_diagnostics, admin_credentials_match, create_access_token
 from pindou.config import get_settings
-from pindou.db.models import AdminAuditLog, Artwork, CDK, Order, User, iso_or_none, utc_now
+from pindou.db.models import AdminAuditLog, Artwork, CDK, EntitlementGrant, Order, User, iso_or_none, utc_now, uuid_hex
 from pindou.services.admin_audit_service import write_audit
 from pindou.services.cdk_service import CDKService
+from pindou.services.credit_service import (
+    AI_GENERATION_POINT_COST,
+    commit_reservation,
+    ensure_legacy_paid_credit_grant,
+    get_credit_balance,
+    grant_points,
+    reserve_points,
+)
 from pindou.services.rate_limit_service import RateLimitExceeded, RateLimitRule, consume_rate_limits
 
 
@@ -43,7 +51,7 @@ class AdminLoginRequest(BaseModel):
 
 
 class BatchGenerateCDKRequest(BaseModel):
-    cdk_type: str = Field(pattern="^(single_use|monthly_card|credit_pack_5|credit_pack_10)$")
+    cdk_type: str = Field(pattern="^(points|membership|single_use|monthly_card|credit_pack_5|credit_pack_10)$")
     value: int = Field(ge=1)
     count: int = Field(default=1, ge=1, le=500)
     sales_channel: str | None = None
@@ -63,7 +71,7 @@ class ReasonRequest(BaseModel):
 
 
 class CreateCDKBatchRequest(BaseModel):
-    type: str = Field(pattern="^(single_use|monthly_card|credit_pack_5|credit_pack_10)$")
+    type: str = Field(pattern="^(points|membership|single_use|monthly_card|credit_pack_5|credit_pack_10)$")
     value: int = Field(ge=1)
     count: int = Field(default=1, ge=1, le=500)
     sales_channel: str | None = None
@@ -651,20 +659,45 @@ def adjust_user_credits(
     user = db.scalar(select(User).where(User.openid == user_id))
     if user is None:
         raise ApiException(404, ErrorCode.USER_NOT_FOUND, "没有找到这个用户。")
-    before = user_credit_snapshot(user)
+    before = user_credit_snapshot(user, db)
 
     if payload.delta_free is not None:
         user.free_credits_remaining += payload.delta_free
     if payload.delta_paid is not None:
-        user.paid_credits += payload.delta_paid
-    if user.free_credits_remaining < 0 or user.paid_credits < 0:
+        ensure_legacy_paid_credit_grant(db, user)
+        amount = abs(payload.delta_paid) * AI_GENERATION_POINT_COST
+        source_id = f"admin_adjust:{uuid_hex()}"
+        if payload.delta_paid > 0:
+            grant_points(
+                db,
+                owner_id=user.user_id,
+                amount=amount,
+                kind="paid",
+                source_type="admin_adjust",
+                source_id=source_id,
+            )
+        elif payload.delta_paid < 0:
+            reservation_key = f"{source_id}:reserve"
+            reserve_points(
+                db,
+                owner_id=user.user_id,
+                amount=amount,
+                reservation_key=reservation_key,
+                source_type="admin_adjust",
+                source_id=source_id,
+            )
+            commit_reservation(db, reservation_key=reservation_key)
+    if user.free_credits_remaining < 0:
         raise ApiException(400, ErrorCode.VALIDATION_ERROR, "调整后额度不能为负数。")
     if payload.set_monthly_card_days is not None:
-        user.monthly_card_expires_at = (
-            None if payload.set_monthly_card_days == 0 else utc_now() + timedelta(days=payload.set_monthly_card_days)
-        )
+        expires_at = None if payload.set_monthly_card_days == 0 else utc_now() + timedelta(days=payload.set_monthly_card_days)
+        user.monthly_card_expires_at = expires_at
+        user.membership_expires_at = expires_at
 
-    after = user_credit_snapshot(user)
+    db.add(user)
+    db.flush()
+    db.refresh(user)
+    after = user_credit_snapshot(user, db)
     audit_id = audit_admin_action(
         db=db,
         actor=actor,
@@ -677,7 +710,8 @@ def adjust_user_credits(
         request_id=request.headers.get("x-request-id"),
     )
     db.refresh(user)
-    return {"user": user_credit_snapshot(user), "audit_id": audit_id}
+    db.refresh(user)
+    return {"user": user_credit_snapshot(user, db), "audit_id": audit_id}
 
 
 def get_order_by_no(order_no: str, db: DbSession) -> Order:
@@ -744,13 +778,25 @@ def order_snapshot(order: Order) -> dict[str, Any]:
     }
 
 
-def user_credit_snapshot(user: User) -> dict[str, Any]:
-    return {
+def user_credit_snapshot(user: User, db: DbSession | None = None) -> dict[str, Any]:
+    balance = get_credit_balance(db, owner_id=user.user_id) if db is not None else None
+    payload = {
         "user_id": user.user_id,
         "free_credits_remaining": user.free_credits_remaining,
         "paid_credits": user.paid_credits,
         "monthly_card_expires_at": iso_or_none(user.monthly_card_expires_at),
+        "membership_expires_at": iso_or_none(user.membership_expires_at or user.monthly_card_expires_at),
     }
+    if balance is not None:
+        payload.update(
+            {
+                "ai_points_balance": balance.available,
+                "ai_points_paid": balance.paid,
+                "ai_points_gift": balance.gift,
+                "ai_points_reserved": balance.reserved,
+            }
+        )
+    return payload
 
 
 def entitlement_subject_snapshot(order: Order, db: DbSession) -> dict[str, Any]:
@@ -758,9 +804,9 @@ def entitlement_subject_snapshot(order: Order, db: DbSession) -> dict[str, Any]:
     if item is None:
         return {"type": "unknown", "sku": order.sku}
     entitlement = item["entitlement"]
-    if entitlement in {"credits", "monthly_card"}:
+    if entitlement in {"points", "credits", "membership", "monthly_card"}:
         user = db.scalar(select(User).where(User.openid == order.user_id))
-        return {"type": entitlement, "user": user_credit_snapshot(user)} if user else {"type": entitlement, "user": None}
+        return {"type": entitlement, "user": user_credit_snapshot(user, db)} if user else {"type": entitlement, "user": None}
     if entitlement == "manual_polish":
         artwork = db.get(Artwork, order.artwork_id) if order.artwork_id else None
         return {
@@ -780,25 +826,12 @@ def apply_order_entitlement(order: Order, db: DbSession) -> dict[str, Any]:
     if item is None:
         raise ApiException(422, ErrorCode.VALIDATION_ERROR, "订单 SKU 未配置权益，无法发放。")
     entitlement = item["entitlement"]
-    if entitlement == "credits":
+    if entitlement in {"points", "credits", "membership", "monthly_card"}:
         user = db.scalar(select(User).where(User.openid == order.user_id))
         if user is None:
             raise ApiException(404, ErrorCode.USER_NOT_FOUND, "没有找到这个用户。")
-        credits = int(item["credits"])
-        user.paid_credits += credits
-        return {"type": "credits", "credits": credits, "user_id": user.user_id}
-    if entitlement == "monthly_card":
-        user = db.scalar(select(User).where(User.openid == order.user_id))
-        if user is None:
-            raise ApiException(404, ErrorCode.USER_NOT_FOUND, "没有找到这个用户。")
-        days = int(item["days"])
-        now = utc_now()
-        current_expires = user.monthly_card_expires_at
-        if current_expires and current_expires.tzinfo is None:
-            current_expires = current_expires.replace(tzinfo=now.tzinfo)
-        base = current_expires if current_expires and current_expires > now else now
-        user.monthly_card_expires_at = base + timedelta(days=days)
-        return {"type": "monthly_card", "days": days, "user_id": user.user_id}
+        grant_payment_order_entitlement(order, db)
+        return {"type": entitlement, "user_id": user.user_id}
     if entitlement == "manual_polish":
         if not order.artwork_id:
             raise ApiException(422, ErrorCode.VALIDATION_ERROR, "人工精修订单缺少 artwork_id，无法解锁作品。")
@@ -811,6 +844,14 @@ def apply_order_entitlement(order: Order, db: DbSession) -> dict[str, Any]:
 
 
 def has_entitlement_grant_record(db: DbSession, order_no: str) -> bool:
+    entitlement = db.scalar(
+        select(EntitlementGrant.id).where(
+            EntitlementGrant.source_type == "order",
+            EntitlementGrant.source_id == order_no,
+        )
+    )
+    if entitlement is not None:
+        return True
     audit = db.scalar(
         select(AdminAuditLog.id).where(
             AdminAuditLog.action == ORDER_GRANT_ACTION,
@@ -820,15 +861,7 @@ def has_entitlement_grant_record(db: DbSession, order_no: str) -> bool:
     )
     if audit is not None:
         return True
-    webhook_paid = db.scalar(
-        select(AdminAuditLog.id).where(
-            AdminAuditLog.action == "payment.webhook",
-            AdminAuditLog.resource_type == "order",
-            AdminAuditLog.resource_id == order_no,
-            AdminAuditLog.after_json["result"].as_string() == "paid",
-        )
-    )
-    return webhook_paid is not None
+    return False
 
 
 def parse_optional_datetime(value: str | None) -> datetime | None:
