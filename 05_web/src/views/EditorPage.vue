@@ -1633,6 +1633,111 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   text-align: center;
 }
 
+@media (min-width: 1024px) {
+  .editor-page {
+    grid-template-columns: minmax(0, 1fr) clamp(300px, 26vw, 360px);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+      "top top"
+      "canvas panel";
+  }
+
+  .editor-state {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+  }
+
+  .editor-topbar {
+    grid-area: top;
+  }
+
+  .editor-canvas-shell {
+    grid-area: canvas;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: clamp(14px, 2vw, 24px);
+  }
+
+  .editor-tray {
+    grid-area: panel;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    border-top: 0;
+    border-left: 1px solid rgba(237, 228, 218, 0.86);
+    background: rgba(255, 249, 245, 0.94);
+    padding: 16px clamp(14px, 1.6vw, 20px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    box-shadow: -12px 0 28px rgba(45, 45, 45, 0.05);
+  }
+
+  .editor-tray__status,
+  .editor-tools,
+  .editor-palette,
+  .editor-current {
+    width: 100%;
+  }
+
+  .editor-tray__status {
+    border: 1px solid rgba(255, 142, 83, 0.14);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.72);
+    padding: 12px;
+  }
+
+  .editor-tools {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .editor-tool-segment {
+    flex: 1 1 178px;
+  }
+
+  .editor-tool-square {
+    flex: 1 1 0;
+    min-width: 82px;
+  }
+
+  .editor-tool-grid {
+    flex: 1 1 116px;
+    min-width: 116px;
+  }
+
+  .editor-palette {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    align-items: stretch;
+    gap: 8px;
+    overflow: visible;
+    overscroll-behavior: auto;
+    padding: 0;
+  }
+
+  .editor-color {
+    width: 100%;
+    min-width: 0;
+    min-height: 56px;
+  }
+
+  .editor-color strong {
+    font-size: 10.5px;
+  }
+
+  .editor-current {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
 @media (max-width: 860px) {
   .editor-topbar {
     grid-template-columns: auto minmax(0, 1fr);
