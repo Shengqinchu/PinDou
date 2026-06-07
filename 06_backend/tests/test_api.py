@@ -25,6 +25,7 @@ from pindou.main import create_app
 from pindou.providers.base import PreviewResult
 from pindou.services.hupijiao_service import sign_params
 from pindou.services.cdk_service import CDKService
+from pindou.services.credit_service import AI_GENERATION_POINT_COST, get_credit_balance, grant_points
 from pindou.services.storage_util import get_storage_backend
 
 
@@ -767,7 +768,14 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
     with session_factory() as session:
         user = session.scalar(select(User).where(User.openid.like("wx_%")))
         assert user is not None
-        user.paid_credits = 2
+        grant_points(
+            session,
+            owner_id=user.user_id,
+            amount=2 * AI_GENERATION_POINT_COST,
+            kind="paid",
+            source_type="test",
+            source_id="generate_ai_two_runs",
+        )
         session.commit()
     calls = []
 
@@ -814,7 +822,7 @@ def test_generate_ai_endpoint_with_mocked_provider(api_client, monkeypatch: pyte
         user = session.scalar(select(User).where(User.openid.like("wx_%")))
         assert user is not None
         assert user.free_credits_remaining == 3
-        assert user.paid_credits <= 1
+        assert get_credit_balance(session, owner_id=user.user_id).available == 188
 
 
 def test_generate_ai_refuses_script_fallback(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -959,37 +967,31 @@ def test_unlimited_credit_email_skips_ai_credit_requirement(api_client, monkeypa
         assert user.paid_credits == 0
 
 
-def test_preview_generate_accepts_sqlite_naive_monthly_card(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_preview_generate_rejects_monthly_card_without_ai_points(api_client) -> None:
     client, session_factory = api_client
-    headers = auth_headers(client)
+    user_id = "monthly_no_ai_points"
 
     with session_factory() as session:
-        user = session.scalar(select(User).where(User.openid.like("wx_%")))
-        assert user is not None
-        user.free_credits_remaining = 0
-        user.paid_credits = 0
-        user.monthly_card_expires_at = datetime(2099, 1, 1, 0, 0, 0)
+        user = User(
+            openid=user_id,
+            nickname="Monthly",
+            avatar="",
+            free_credits_remaining=0,
+            paid_credits=0,
+            monthly_card_expires_at=datetime(2099, 1, 1, 0, 0, 0),
+            sensitive_consent_at=datetime.now(timezone.utc),
+        )
+        user.membership_expires_at = user.monthly_card_expires_at
+        session.add(user)
         session.commit()
-
-    class FakeChain:
-        def generate(self, image: bytes, style_preset, size_preset, seed=None) -> PreviewResult:
-            return PreviewResult.from_image_bytes(
-                png_bytes((255, 255, 255)),
-                target_color_count=8,
-                provider_used="fake",
-                cost_estimate=0.0,
-                latency_ms=10,
-            )
-
-    monkeypatch.setattr("pindou.api.generate.build_preview_chain", lambda: FakeChain())
     response = client.post(
         "/api/v1/preview/generate",
         data={"style_preset": "q_portrait", "size_preset": "26x26"},
         files={"image": ("sample.png", png_bytes((255, 255, 255)), "image/png")},
-        headers=headers,
+        headers={"Authorization": f"Bearer {create_access_token(subject=user_id)}"},
     )
-    assert response.status_code == 200
-    assert response.json()["provider_used"] == "fake"
+    assert response.status_code == 429
+    assert "AI 积分不足" in response.json()["message_cn"]
 
 
 def test_payment_and_admin_read_only_flow(api_client) -> None:
@@ -997,6 +999,22 @@ def test_payment_and_admin_read_only_flow(api_client) -> None:
     headers = auth_headers(client)
     unauthorized = client.get("/api/admin/orders")
     assert unauthorized.status_code == 401
+
+    skus = client.get("/api/payment/skus")
+    assert skus.status_code == 200
+    sku_payload = skus.json()
+    assert sku_payload["ai_generation_cost_points"] == AI_GENERATION_POINT_COST
+    assert [item["sku"] for item in sku_payload["items"] if item["category"] == "points"] == [
+        "points_trial_099",
+        "points_standard_990",
+        "points_value_2990",
+    ]
+    assert [item["sku"] for item in sku_payload["items"] if item["category"] == "membership"] == [
+        "membership_week_990",
+        "membership_month_1990",
+        "membership_season_4990",
+    ]
+    assert all(item["sku"] not in {"single_9.9", "monthly_28", "custom_99"} for item in sku_payload["items"])
 
     order = client.post("/api/payment/order/create", json={"sku_id": "single_9.9"}, headers=headers)
     assert order.status_code == 200
@@ -1354,7 +1372,7 @@ def test_hupijiao_webhook_marks_order_paid_and_grants_monthly_card(api_client) -
 
     webhook_payload = {
         "trade_order_id": payload["order_no"],
-        "total_fee": "28.00",
+        "total_fee": "19.90",
         "transaction_id": "MOCKTXN001",
         "open_order_id": "OPEN001",
         "order_title": "PinDou 月卡",
@@ -1391,10 +1409,41 @@ def test_hupijiao_webhook_marks_order_paid_and_grants_monthly_card(api_client) -
         user = session.scalar(select(User).where(User.openid.like("wx_%")))
         assert user is not None
         assert user.monthly_card_expires_at is not None
+        assert user.membership_expires_at is not None
+        assert get_credit_balance(session, owner_id=user.user_id).gift >= 1888
         expires_at = user.monthly_card_expires_at
         if expires_at.tzinfo is None:
             expires_at = expires_at.replace(tzinfo=timezone.utc)
         assert expires_at < datetime.now(timezone.utc) + timedelta(days=31)
+
+
+def test_hupijiao_webhook_grants_points_pack_idempotently(api_client) -> None:
+    client, session_factory = api_client
+    headers = auth_headers(client)
+    order = client.post("/api/payment/order/create", json={"sku_id": "points_trial_099"}, headers=headers)
+    assert order.status_code == 200
+    payload = order.json()
+    webhook_payload = {
+        "trade_order_id": payload["order_no"],
+        "total_fee": "0.99",
+        "transaction_id": "MOCKTXN_POINTS",
+        "open_order_id": "OPEN_POINTS",
+        "order_title": "PinDou 体验积分包",
+        "status": "OD",
+        "appid": "mock",
+        "time": "1760000000",
+        "nonce_str": "mocknonce-points",
+    }
+    webhook_payload["hash"] = sign_params(webhook_payload, "pindou-dev-hupijiao-mock-secret")
+
+    assert client.post("/api/v1/webhook/hupijiao", data=webhook_payload).status_code == 200
+    assert client.post("/api/v1/webhook/hupijiao", data=webhook_payload).status_code == 200
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid.like("wx_%")))
+        assert user is not None
+        balance = get_credit_balance(session, owner_id=user.user_id)
+        assert balance.available == 188 + 200
+        assert balance.paid == 200
 
 
 def test_hupijiao_webhook_rejects_missing_amount(api_client) -> None:

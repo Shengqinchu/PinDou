@@ -2,19 +2,26 @@ from __future__ import annotations
 
 import logging
 from io import BytesIO
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timedelta, timezone
 
 import pytest
 from PIL import Image
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import Session, sessionmaker
 
 from pindou.api.errors import ApiException
 from pindou.api.quota import consume_ai_credit, consume_script_quota
-from pindou.db.models import AdminAuditLog, Artwork, User
+from pindou.db.models import AdminAuditLog, Artwork, Base, User
 from pindou.services.admin_audit_service import write_audit
 from pindou.services.artwork_service import ArtworkService
 from pindou.services.cdk_service import CDKInvalidError, CDKRateLimitError, CDKService
+from pindou.services.credit_service import (
+    AI_GENERATION_POINT_COST,
+    get_credit_balance,
+    grant_points,
+    reserve_points,
+)
 from pindou.services.payment_service import (
     InvalidOrderTransitionError,
     ORDER_STATUS_CANCELLED,
@@ -77,26 +84,94 @@ def test_user_service_register_consent_and_quota(db_session: Session) -> None:
     assert quota.id == same_quota.id
     assert service.credit_summary(user.openid)["free_credits_remaining"] == 3
     assert service.credit_summary(user.openid)["paid_credits"] == 1
+    assert service.credit_summary(user.openid)["ai_points_balance"] == 188
 
 
 def test_normal_and_ai_credit_buckets_are_separate(db_session: Session) -> None:
     user = add_user(db_session, openid="quota_bucket_user")
+    grant_points(
+        db_session,
+        owner_id=user.user_id,
+        amount=AI_GENERATION_POINT_COST,
+        kind="paid",
+        source_type="test",
+        source_id="quota_bucket_user",
+    )
 
     consume_script_quota(db_session, user)
     db_session.refresh(user)
     assert user.free_credits_remaining == 2
     assert user.paid_credits == 1
 
-    consume_ai_credit(db_session, user)
+    consume_ai_credit(db_session, user, reservation_key="test:quota_bucket_user:ai:1")
+    db_session.refresh(user)
+    assert user.free_credits_remaining == 2
+    assert user.paid_credits == 0
+    assert get_credit_balance(db_session, owner_id=user.user_id).available == 0
+
+    with pytest.raises(ApiException):
+        consume_ai_credit(db_session, user, reservation_key="test:quota_bucket_user:ai:2")
     db_session.refresh(user)
     assert user.free_credits_remaining == 2
     assert user.paid_credits == 0
 
+
+def test_membership_unlocks_script_but_never_ai_points(db_session: Session) -> None:
+    user = add_user(db_session, openid="membership_not_ai_user")
+    user.free_credits_remaining = 0
+    user.membership_expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+    user.monthly_card_expires_at = user.membership_expires_at
+    db_session.add(user)
+    db_session.commit()
+
+    assert consume_script_quota(db_session, user) is False
     with pytest.raises(ApiException):
-        consume_ai_credit(db_session, user)
-    db_session.refresh(user)
-    assert user.free_credits_remaining == 2
-    assert user.paid_credits == 0
+        consume_ai_credit(db_session, user, reservation_key="test:membership_not_ai_user:ai")
+    assert get_credit_balance(db_session, owner_id=user.user_id).available == 0
+
+
+def test_ai_point_reservation_is_atomic_under_concurrency(tmp_path) -> None:
+    db_path = tmp_path / "credits.sqlite"
+    engine = create_engine(f"sqlite:///{db_path}", connect_args={"check_same_thread": False}, future=True)
+    Base.metadata.create_all(engine)
+    SessionTesting = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+    with SessionTesting() as session:
+        user = User(openid="concurrent_ai_user", nickname="Concurrent")
+        session.add(user)
+        session.flush()
+        grant_points(
+            session,
+            owner_id=user.user_id,
+            amount=AI_GENERATION_POINT_COST,
+            kind="paid",
+            source_type="test",
+            source_id="concurrent_ai_user",
+        )
+        session.commit()
+
+    def reserve_once(index: int) -> str:
+        with SessionTesting() as session:
+            try:
+                reserve_points(
+                    session,
+                    owner_id="concurrent_ai_user",
+                    amount=AI_GENERATION_POINT_COST,
+                    reservation_key=f"test:concurrent_ai_user:{index}",
+                )
+                session.commit()
+                return "reserved"
+            except ApiException:
+                return "quota_exceeded"
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(reserve_once, range(2)))
+
+    assert results.count("reserved") == 1
+    assert results.count("quota_exceeded") == 1
+    with SessionTesting() as session:
+        balance = get_credit_balance(session, owner_id="concurrent_ai_user")
+        assert balance.available == 0
+        assert balance.reserved == AI_GENERATION_POINT_COST
 
 
 def test_artwork_service_save_list_delete_removes_original_file(db_session: Session, tmp_path) -> None:
@@ -160,7 +235,8 @@ def test_cdk_redeem_grants_credits_and_rate_limits(db_session: Session) -> None:
     db_session.refresh(user)
 
     assert redeemed.status == "redeemed"
-    assert user.paid_credits == 6
+    assert user.paid_credits == 5
+    assert get_credit_balance(db_session, owner_id=user.user_id).available == 5 * AI_GENERATION_POINT_COST
 
     for index in range(3):
         with pytest.raises(CDKInvalidError):
@@ -172,6 +248,22 @@ def test_cdk_redeem_grants_credits_and_rate_limits(db_session: Session) -> None:
             )
     with pytest.raises(CDKRateLimitError):
         service.redeem(code="MISSING4", user_id=user.openid, ip="10.0.0.1", now=now + timedelta(seconds=4))
+
+
+def test_cdk_redeem_points_and_membership_types(db_session: Session) -> None:
+    user = add_user(db_session, openid="new_cdk_user")
+    service = CDKService(db_session)
+    now = datetime(2026, 5, 25, 12, 0, tzinfo=timezone.utc)
+    points_cdk = service.create_cdk(code="POINTSABCDEFGHJKLM", cdk_type="points", value=200)
+    membership_cdk = service.create_cdk(code="MEMBERABCDEFGHJKLM", cdk_type="membership", value=7)
+
+    service.redeem(code=points_cdk.code, user_id=user.openid, ip="10.0.0.3", now=now)
+    service.redeem(code=membership_cdk.code, user_id=user.openid, ip="10.0.0.3", now=now + timedelta(seconds=1))
+    db_session.refresh(user)
+
+    assert get_credit_balance(db_session, owner_id=user.user_id).available == 200
+    assert user.membership_expires_at is not None
+    assert user.membership_expires_at.date() == date(2026, 6, 1)
 
 
 def test_cdk_redeem_monthly_card_extends_existing_expiry(db_session: Session) -> None:
@@ -192,6 +284,7 @@ def test_cdk_redeem_monthly_card_extends_existing_expiry(db_session: Session) ->
 
     assert redeemed.status == "redeemed"
     assert user.monthly_card_expires_at is not None
+    assert user.membership_expires_at is not None
     assert user.monthly_card_expires_at.date() == date(2026, 6, 14)
 
 
