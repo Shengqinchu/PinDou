@@ -162,77 +162,79 @@ async function downloadPattern(): Promise<void> {
     </template>
 
     <template v-else-if="pattern">
-      <section class="result-card" aria-label="拼豆图纸结果">
-        <div class="pattern-frame pattern-frame--viewer">
-          <img v-if="patternImageUrl" class="pattern-image" :src="patternImageUrl" alt="拼豆图纸预览" />
-          <div v-else class="pattern-image-empty">图纸预览生成中</div>
-        </div>
-
-        <div class="result-actions">
-          <div class="result-actions__row">
-            <RouterLink class="pd-btn pd-btn--primary result-action-primary" :to="{ name: 'editor', params: { id: artworkId } }">
-              <svg class="result-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M4 20h4.5L19 9.5 14.5 5 4 15.5V20Z" />
-                <path d="m13.5 6 4.5 4.5" />
-              </svg>
-              <span>编辑图纸</span>
-            </RouterLink>
-            <button class="pd-btn result-secondary result-action-download" type="button" :disabled="!patternImageUrl || isDownloading" @click="downloadPattern">
-              <svg class="result-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M12 4v10" />
-                <path d="m7.5 10.5 4.5 4.5 4.5-4.5" />
-                <path d="M5 19h14" />
-              </svg>
-              <span>{{ isDownloading ? '下载中' : '下载图纸' }}</span>
-            </button>
-            <RouterLink class="pd-btn result-secondary" to="/">
-              <span>返回主页</span>
-            </RouterLink>
+      <div class="result-shell">
+        <section class="result-card" aria-label="拼豆图纸结果">
+          <div class="pattern-frame pattern-frame--viewer">
+            <img v-if="patternImageUrl" class="pattern-image" :src="patternImageUrl" alt="拼豆图纸预览" />
+            <div v-else class="pattern-image-empty">图纸预览生成中</div>
           </div>
-        </div>
 
-        <div class="result-caption-row">
-          <p>点击编辑图纸即可<span class="hl-edit">修改配色</span>哦~</p>
-          <button class="result-regenerate-link" type="button" @click="openRegenerateModal">重新生成 ›</button>
-        </div>
-
-        <p v-if="sizeNotice" class="size-notice">{{ sizeNotice }}</p>
-      </section>
-
-      <section class="palette-section result-palette-card" aria-label="色号清单">
-        <dl class="result-stats" aria-label="图纸摘要">
-          <div>
-            <dt>尺寸</dt>
-            <dd>{{ selectedSizeNumber }}</dd>
-            <small>格宽</small>
-          </div>
-          <div>
-            <dt>豆数</dt>
-            <dd>{{ beadTotal }}</dd>
-            <small>颗</small>
-          </div>
-          <div>
-            <dt>色号</dt>
-            <dd>{{ colorTotal }}</dd>
-            <small>种</small>
-          </div>
-        </dl>
-
-        <div class="palette-heading">
-          <p class="eyebrow">色号清单</p>
-        </div>
-        <div class="palette-list">
-          <div v-for="row in paletteRows" :key="row.color.code" class="palette-row">
-            <span class="palette-swatch" :style="{ backgroundColor: row.color.hex }" aria-hidden="true"></span>
-            <div>
-              <strong>{{ row.color.code }} · {{ row.color.name_cn }}</strong>
-              <em>{{ row.color.brand }} · {{ row.color.hex }}</em>
+          <div class="result-actions">
+            <div class="result-actions__row">
+              <RouterLink class="pd-btn pd-btn--primary result-action-primary" :to="{ name: 'editor', params: { id: artworkId } }">
+                <svg class="result-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M4 20h4.5L19 9.5 14.5 5 4 15.5V20Z" />
+                  <path d="m13.5 6 4.5 4.5" />
+                </svg>
+                <span>编辑图纸</span>
+              </RouterLink>
+              <button class="pd-btn result-secondary result-action-download" type="button" :disabled="!patternImageUrl || isDownloading" @click="downloadPattern">
+                <svg class="result-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 4v10" />
+                  <path d="m7.5 10.5 4.5 4.5 4.5-4.5" />
+                  <path d="M5 19h14" />
+                </svg>
+                <span>{{ isDownloading ? '下载中' : '下载图纸' }}</span>
+              </button>
+              <RouterLink class="pd-btn result-secondary" to="/">
+                <span>返回主页</span>
+              </RouterLink>
             </div>
-            <span class="palette-count">{{ row.count }} 颗</span>
-            <span class="palette-percent">{{ row.percent }}%</span>
           </div>
-        </div>
-      </section>
+
+          <div class="result-caption-row">
+            <p>点击编辑图纸即可<span class="hl-edit">修改配色</span>哦~</p>
+            <button class="result-regenerate-link" type="button" @click="openRegenerateModal">重新生成 ›</button>
+          </div>
+
+          <p v-if="sizeNotice" class="size-notice">{{ sizeNotice }}</p>
+        </section>
+
+        <section class="palette-section result-palette-card" aria-label="色号清单">
+          <dl class="result-stats" aria-label="图纸摘要">
+            <div>
+              <dt>尺寸</dt>
+              <dd>{{ selectedSizeNumber }}</dd>
+              <small>格宽</small>
+            </div>
+            <div>
+              <dt>豆数</dt>
+              <dd>{{ beadTotal }}</dd>
+              <small>颗</small>
+            </div>
+            <div>
+              <dt>色号</dt>
+              <dd>{{ colorTotal }}</dd>
+              <small>种</small>
+            </div>
+          </dl>
+
+          <div class="palette-heading">
+            <p class="eyebrow">色号清单</p>
+          </div>
+          <div class="palette-list">
+            <div v-for="row in paletteRows" :key="row.color.code" class="palette-row">
+              <span class="palette-swatch" :style="{ backgroundColor: row.color.hex }" aria-hidden="true"></span>
+              <div>
+                <strong>{{ row.color.code }} · {{ row.color.name_cn }}</strong>
+                <em>{{ row.color.brand }} · {{ row.color.hex }}</em>
+              </div>
+              <span class="palette-count">{{ row.count }} 颗</span>
+              <span class="palette-percent">{{ row.percent }}%</span>
+            </div>
+          </div>
+        </section>
+      </div>
     </template>
 
     <template v-else>
@@ -324,6 +326,12 @@ async function downloadPattern(): Promise<void> {
 
 <style scoped>
 .result-page {
+  display: grid;
+  gap: 16px;
+}
+
+.result-shell {
+  width: 100%;
   display: grid;
   gap: 16px;
 }
@@ -926,6 +934,35 @@ async function downloadPattern(): Promise<void> {
 .palette-percent {
   min-width: 38px;
   text-align: right;
+}
+
+@media (min-width: 960px) {
+  .result-shell {
+    width: min(100%, 1180px);
+    margin: 0 auto;
+    grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+    align-items: start;
+    gap: 24px;
+  }
+
+  .result-card {
+    position: sticky;
+    top: 88px;
+    align-self: start;
+  }
+
+  .result-card .pattern-frame {
+    width: min(100%, 70vh);
+    justify-self: center;
+  }
+
+  .result-palette-card {
+    min-width: 0;
+  }
+
+  .palette-list {
+    max-height: calc(100vh - 270px);
+  }
 }
 
 @media (max-width: 640px) {
