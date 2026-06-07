@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from typing import Any
 from urllib.parse import urlparse
@@ -12,11 +12,13 @@ import requests
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import PlainTextResponse, Response
 from pydantic import BaseModel
+from sqlalchemy import select, update
+from sqlalchemy.exc import IntegrityError
 
 from pindou.api.deps import CurrentUser, DbSession
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.config import get_settings
-from pindou.db.models import Order, utc_now
+from pindou.db.models import EntitlementGrant, Order, User, as_aware_utc, utc_now
 from pindou.services.admin_audit_service import write_audit
 from pindou.services.hupijiao_service import HupijiaoError, HupijiaoService, sanitize_payload
 from pindou.services.payment_service import (
@@ -26,7 +28,6 @@ from pindou.services.payment_service import (
     ORDER_STATUS_PENDING_HUPIJIAO,
     PaymentService,
 )
-from pindou.services.user_service import UserService
 
 router = APIRouter(prefix="/payment", tags=["payment"])
 webhook_router = APIRouter(prefix="/webhook", tags=["webhook"])
@@ -372,7 +373,7 @@ async def parse_hupijiao_payload(request: Request) -> dict[str, Any]:
 
 def amounts_match(expected: Decimal, actual: Any) -> bool:
     if actual in {None, ""}:
-        return True
+        return False
     try:
         actual_decimal = Decimal(str(actual)).quantize(Decimal("0.01"))
         expected_decimal = Decimal(expected).quantize(Decimal("0.01"))
@@ -443,11 +444,41 @@ def grant_order_entitlement(order: Order, db: DbSession) -> None:
     item = SKU_CATALOG.get(order.sku)
     if item is None:
         return
-    users = UserService(db)
-    if item["entitlement"] == "credits":
-        users.grant_credits(user_id=order.user_id, credits=int(item["credits"]))
-    elif item["entitlement"] == "monthly_card":
-        users.extend_monthly_card(user_id=order.user_id, days=int(item["days"]))
+    entitlement = str(item["entitlement"])
+    value = int(item.get("credits") or item.get("days") or 0)
+    if entitlement not in {"credits", "monthly_card"}:
+        return
+
+    try:
+        db.add(
+            EntitlementGrant(
+                source_type="order",
+                source_id=order.order_no,
+                user_id=order.user_id,
+                entitlement_type=entitlement,
+                value=value,
+            )
+        )
+        if entitlement == "credits":
+            updated = db.execute(
+                update(User)
+                .where(User.openid == order.user_id)
+                .values(paid_credits=User.paid_credits + value)
+            )
+            if updated.rowcount != 1:
+                raise ValueError(f"User does not exist: {order.user_id}")
+        elif entitlement == "monthly_card":
+            user = db.scalar(select(User).where(User.openid == order.user_id))
+            if user is None:
+                raise ValueError(f"User does not exist: {order.user_id}")
+            now = utc_now()
+            current_expires = as_aware_utc(user.monthly_card_expires_at)
+            base = current_expires if current_expires and current_expires > now else now
+            user.monthly_card_expires_at = base + timedelta(days=value)
+            db.add(user)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
 
 
 def refresh_hupijiao_order_if_needed(order: Order, db: DbSession) -> None:

@@ -7,11 +7,12 @@ import binascii
 import logging
 from collections.abc import Callable
 from dataclasses import replace
+from datetime import timedelta
 from threading import Thread
 from typing import Any
 
 from fastapi import APIRouter, Request
-from sqlalchemy import select
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.datastructures import UploadFile
 
@@ -22,9 +23,11 @@ from pindou.api.quota import (
     consume_ai_credit,
     consume_script_quota,
     consume_white_bg_quota,
-    require_ai_credit_available,
+    refund_ai_credit,
+    refund_script_quota,
     require_sensitive_consent,
 )
+from pindou.api.request_meta import client_ip
 from pindou.api.storage import (
     load_uploaded_image,
     normalized_upload_png_bytes,
@@ -38,6 +41,7 @@ from pindou.providers.chain import PreviewProviderChain
 from pindou.providers.fallback_quantize import FallbackProvider
 from pindou.providers.xiaochi_gpt import XiaochiGptProvider
 from pindou.services.artwork_service import ArtworkService
+from pindou.services.rate_limit_service import RateLimitExceeded, RateLimitRule, consume_rate_limits
 
 router = APIRouter(prefix="/generate", tags=["generate"])
 preview_router = APIRouter(prefix="/preview", tags=["generate"])
@@ -49,11 +53,13 @@ SessionFactory = Callable[[], Session]
 async def generate_script(request: Request, current_user: CurrentUser, db: DbSession) -> dict:
     """脚本快速生成：原图直接量化为 PatternSheet，并保存 Artwork。"""
     require_sensitive_consent(current_user)
+    enforce_generate_rate_limits(db, request=request, user_id=current_user.user_id, mode="script")
     payload, raw_upload = await parse_payload_or_upload(request, upload_field="raw_image")
     raw_image, original_path = await resolve_raw_image(payload, raw_upload)
     size = parse_size(payload.get("size_preset") or payload.get("size") or "26x26")
     auto_remove_white_bg = parse_bool_default_false(payload.get("auto_remove_white_bg", False))
 
+    consume_script_quota(db, current_user)
     try:
         sheet = PatternBuilder().build(
             size=size,
@@ -63,24 +69,30 @@ async def generate_script(request: Request, current_user: CurrentUser, db: DbSes
             mode="script",
             auto_remove_white_bg=auto_remove_white_bg,
         )
-    except Exception as exc:  # noqa: BLE001 - API normalizes pattern failures.
+
+        if sheet.metadata.get("white_bg_detected"):
+            consume_white_bg_quota(db, current_user)
+
+        pattern_data = sheet.to_frontend_dict()
+        artwork = ArtworkService(db).save_artwork(
+            user_id=current_user.user_id,
+            original_path=str(original_path) if original_path else None,
+            preview_path="",
+            pattern_json=pattern_data,
+            style_preset="cartoon_fallback",
+            size_preset=size.value,
+            title=payload.get("title"),
+        )
+        pattern_url, _labeled_url = finalize_artwork_pattern_assets(
+            db,
+            artwork=artwork,
+            sheet=sheet,
+            pattern_data=pattern_data,
+        )
+    except Exception as exc:  # noqa: BLE001 - API normalizes build/export failures and refunds consumed quota.
+        refund_script_quota(db, current_user.user_id)
         raise ApiException(500, ErrorCode.PATTERN_BUILD_FAILED, "图纸生成失败，请换一张照片再试。") from exc
 
-    consume_script_quota(db, current_user)
-    if sheet.metadata.get("white_bg_detected"):
-        consume_white_bg_quota(db, current_user)
-
-    pattern_data = sheet.to_frontend_dict()
-    artwork = ArtworkService(db).save_artwork(
-        user_id=current_user.user_id,
-        original_path=str(original_path) if original_path else None,
-        preview_path="",
-        pattern_json=pattern_data,
-        style_preset="cartoon_fallback",
-        size_preset=size.value,
-        title=payload.get("title"),
-    )
-    pattern_url, _labeled_url = finalize_artwork_pattern_assets(db, artwork=artwork, sheet=sheet, pattern_data=pattern_data)
     return {
         "artwork_id": artwork.artwork_id,
         "pattern_url": pattern_url,
@@ -92,41 +104,66 @@ async def generate_script(request: Request, current_user: CurrentUser, db: DbSes
 async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession) -> dict:
     """AI 精品生成：提交后台任务，避免 Cloudflare 524 长连接超时。"""
     require_sensitive_consent(current_user)
-    require_ai_credit_available(current_user)
+    enforce_generate_rate_limits(db, request=request, user_id=current_user.user_id, mode="ai")
+    ensure_ai_job_capacity(db, current_user.user_id)
     payload, upload = await parse_payload_or_upload(request, upload_field="image")
     raw_image, original_path = await resolve_raw_image(payload, upload)
     size = parse_size(payload.get("size_preset") or payload.get("size") or "26x26")
     style = parse_style(payload.get("style_preset") or payload.get("style") or "q_portrait")
     seed = int(payload["seed"]) if payload.get("seed") not in (None, "") else None
+    ai_credit_reserved = consume_ai_credit(db, current_user)
+    job: GenerationJob | None = None
+    job_committed = False
+    try:
+        job = GenerationJob(
+            user_id=current_user.user_id,
+            mode="ai",
+            progress=4,
+            stage="queued",
+            message_cn="已提交，正在排队生成。",
+            ai_credit_reserved=ai_credit_reserved,
+        )
+        db.add(job)
+        db.commit()
+        db.refresh(job)
+        job_committed = True
 
-    job = GenerationJob(
-        user_id=current_user.user_id,
-        mode="ai",
-        progress=4,
-        stage="queued",
-        message_cn="已提交，正在排队生成。",
-    )
-    db.add(job)
-    db.commit()
-    db.refresh(job)
+        session_factory = sessionmaker(bind=db.get_bind(), autoflush=False, autocommit=False, expire_on_commit=False)
+        start_ai_generation_job(
+            job_id=job.job_id,
+            session_factory=session_factory,
+            user_id=current_user.user_id,
+            raw_image=raw_image,
+            original_path=str(original_path) if original_path else None,
+            payload={
+                "brand": str(payload.get("brand") or "MARD"),
+                "bead_diameter_mm": float(payload.get("bead_diameter_mm") or 5.0),
+                "title": payload.get("title"),
+                "size": size.value,
+                "style": style.value,
+                "seed": seed,
+            },
+        )
+    except Exception:
+        if ai_credit_reserved:
+            if job_committed and job is not None:
+                update_generation_job(
+                    db,
+                    job.job_id,
+                    status="failed",
+                    stage="failed",
+                    message_cn="AI 生成暂时失败，请稍后重试或切换普通模式。",
+                    error_code=ErrorCode.PREVIEW_FAILED,
+                    error_message_cn="AI 生成暂时失败，请稍后重试或切换普通模式。",
+                )
+                refund_reserved_ai_credit(db, job_id=job.job_id, user_id=current_user.user_id)
+            else:
+                db.rollback()
+                refund_ai_credit(db, current_user.user_id)
+        raise
 
-    session_factory = sessionmaker(bind=db.get_bind(), autoflush=False, autocommit=False, expire_on_commit=False)
-    start_ai_generation_job(
-        job_id=job.job_id,
-        session_factory=session_factory,
-        user_id=current_user.user_id,
-        raw_image=raw_image,
-        original_path=str(original_path) if original_path else None,
-        payload={
-            "brand": str(payload.get("brand") or "MARD"),
-            "bead_diameter_mm": float(payload.get("bead_diameter_mm") or 5.0),
-            "title": payload.get("title"),
-            "size": size.value,
-            "style": style.value,
-            "seed": seed,
-        },
-    )
-
+    if job is None:
+        raise ApiException(500, ErrorCode.PREVIEW_FAILED, "AI 生成暂时失败，请稍后重试或切换普通模式。")
     return job.to_frontend_dict()
 
 
@@ -214,7 +251,6 @@ def run_ai_generation_job(
             user = db.scalar(select(User).where(User.openid == user_id))
             if user is None:
                 raise ApiException(401, ErrorCode.AUTH_REQUIRED, "登录用户不存在，请重新登录。")
-            consume_ai_credit(db, user)
 
             pattern_data = sheet.to_frontend_dict()
             artwork = ArtworkService(db).save_artwork(
@@ -260,6 +296,7 @@ def run_ai_generation_job(
                 error_code=exc.error,
                 error_message_cn=exc.message_cn,
             )
+            refund_reserved_ai_credit(db, job_id=job_id, user_id=user_id)
         except Exception as exc:  # noqa: BLE001 - background job must normalize provider/network failures.
             LOGGER.exception("ai_generation_job_failed", extra={"job_id": job_id})
             update_generation_job(
@@ -271,6 +308,7 @@ def run_ai_generation_job(
                 error_code=ErrorCode.PREVIEW_FAILED,
                 error_message_cn="AI 生成暂时失败，请稍后重试或切换普通模式。",
             )
+            refund_reserved_ai_credit(db, job_id=job_id, user_id=user_id)
 
 
 def update_generation_job(
@@ -309,28 +347,100 @@ def update_generation_job(
     db.commit()
 
 
+def refund_reserved_ai_credit(db: Session, *, job_id: str, user_id: str) -> None:
+    updated_job = db.execute(
+        update(GenerationJob)
+        .where(
+            GenerationJob.job_id == job_id,
+            GenerationJob.ai_credit_reserved.is_(True),
+            GenerationJob.ai_credit_refunded.is_(False),
+        )
+        .values(ai_credit_refunded=True, updated_at=utc_now())
+    )
+    if updated_job.rowcount != 1:
+        db.rollback()
+        return
+    updated_user = db.execute(
+        update(User).where(User.openid == user_id).values(paid_credits=User.paid_credits + 1)
+    )
+    if updated_user.rowcount != 1:
+        db.rollback()
+        return
+    db.commit()
+
+
+def enforce_generate_rate_limits(db: Session, *, request: Request, user_id: str, mode: str) -> None:
+    source_ip = client_ip(request)
+    if mode == "ai":
+        rules = [
+            RateLimitRule("generate_ai:user:10m", user_id, limit=5, window_seconds=10 * 60),
+            RateLimitRule("generate_ai:ip:10m", source_ip, limit=20, window_seconds=10 * 60),
+        ]
+    else:
+        rules = [
+            RateLimitRule("generate_script:user:minute", user_id, limit=10, window_seconds=60),
+            RateLimitRule("generate_script:ip:minute", source_ip, limit=30, window_seconds=60),
+        ]
+    try:
+        consume_rate_limits(db, rules)
+    except RateLimitExceeded as exc:
+        raise ApiException(
+            429,
+            ErrorCode.QUOTA_EXCEEDED,
+            "生成请求太频繁，请稍后再试。",
+            {"retry_after_seconds": exc.retry_after_seconds},
+        ) from exc
+
+
+def ensure_ai_job_capacity(db: Session, user_id: str) -> None:
+    cutoff = utc_now() - timedelta(hours=1)
+    active = int(
+        db.scalar(
+            select(func.count())
+            .select_from(GenerationJob)
+            .where(
+                GenerationJob.user_id == user_id,
+                GenerationJob.mode == "ai",
+                GenerationJob.status.in_(("queued", "running")),
+                GenerationJob.created_at >= cutoff,
+            )
+        )
+        or 0
+    )
+    if active >= 2:
+        raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "已有 AI 生成任务在排队，请等当前任务完成后再试。")
+
+
 @preview_router.post("/generate")
 async def generate_preview(request: Request, current_user: CurrentUser, db: DbSession) -> dict:
     """前端 PreviewResult 兼容端点：只生成并保存 AI preview，不立即建作品。"""
     require_sensitive_consent(current_user)
-    require_ai_credit_available(current_user)
+    enforce_generate_rate_limits(db, request=request, user_id=current_user.user_id, mode="ai")
     payload, upload = await parse_payload_or_upload(request, upload_field="image")
     if upload is not None:
-        raw_image = normalized_upload_png_bytes(upload.filename or "upload.png", await upload.read())
+        raw_image = normalized_upload_png_bytes(
+            upload.filename or "upload.png",
+            await upload.read(),
+            content_type=upload.content_type,
+        )
     else:
         raw_image, _path = await resolve_raw_image(payload, None)
     size = parse_size(payload.get("size_preset") or payload.get("size") or "26x26")
     style = parse_style(payload.get("style_preset") or payload.get("style") or "q_portrait")
     seed = int(payload["seed"]) if payload.get("seed") not in (None, "") else None
 
+    ai_credit_reserved = consume_ai_credit(db, current_user)
     try:
         preview = build_preview_chain().generate(raw_image, style, size, seed=seed)
+        if preview.fallback_count > 0 or preview.provider_used == FallbackProvider.name:
+            raise PreviewProviderError("AI provider unavailable; refusing script fallback for preview generation.")
         _preview_path, preview_url = save_preview_png(preview.preview_id, preview.image)
         preview = replace(preview, image_url=preview_url)
     except Exception as exc:  # noqa: BLE001 - provider failures are normalized for the client.
+        if ai_credit_reserved:
+            refund_ai_credit(db, current_user.user_id)
         raise ApiException(500, ErrorCode.PREVIEW_FAILED, "AI 生成暂时失败，请稍后再试。") from exc
 
-    consume_ai_credit(db, current_user)
     return preview.to_frontend_dict()
 
 
@@ -347,7 +457,7 @@ async def parse_payload_or_upload(request: Request, *, upload_field: str) -> tup
 async def resolve_raw_image(payload: dict[str, Any], upload: UploadFile | None) -> tuple[bytes, str | None]:
     if upload is not None:
         data = await upload.read()
-        saved = save_uploaded_image(upload.filename or "upload.png", data)
+        saved = save_uploaded_image(upload.filename or "upload.png", data, content_type=upload.content_type)
         return load_uploaded_image(saved["image_id"])[0], saved["path"]
     image_base64 = payload.get("image_base64") or payload.get("raw_image_base64")
     if image_base64:

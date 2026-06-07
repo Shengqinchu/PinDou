@@ -24,6 +24,7 @@ from pindou.config import get_settings
 from pindou.db.models import AdminAuditLog, Artwork, CDK, Order, User, iso_or_none, utc_now
 from pindou.services.admin_audit_service import write_audit
 from pindou.services.cdk_service import CDKService
+from pindou.services.rate_limit_service import RateLimitExceeded, RateLimitRule, consume_rate_limits
 
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -77,6 +78,21 @@ def admin_login(payload: AdminLoginRequest, request: Request, db: DbSession) -> 
     username = payload.username.strip()
     source_ip = client_ip(request)
     if not admin_credentials_match(username, payload.password):
+        try:
+            consume_rate_limits(
+                db,
+                [
+                    RateLimitRule("admin_login:ip:10m", source_ip, limit=5, window_seconds=10 * 60),
+                    RateLimitRule("admin_login:user:10m", username or "blank", limit=5, window_seconds=10 * 60),
+                ],
+            )
+        except RateLimitExceeded as exc:
+            raise ApiException(
+                429,
+                ErrorCode.ADMIN_REQUIRED,
+                "管理员登录尝试太频繁，请稍后再试。",
+                {"retry_after_seconds": exc.retry_after_seconds},
+            ) from exc
         logger.warning(
             "admin_login_failed source_ip=%s request_id=%s diagnostics=%s",
             source_ip,
@@ -954,4 +970,3 @@ def database_state(database_url: str) -> dict[str, Any]:
         "host_configured": bool(parsed.hostname),
         "database_configured": bool(parsed.path and parsed.path != "/"),
     }
-

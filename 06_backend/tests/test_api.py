@@ -17,9 +17,10 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from pindou.api.deps import get_db
+from pindou.api.generate import refund_reserved_ai_credit
 from pindou.config import get_settings
 from pindou.api.security import create_access_token
-from pindou.db.models import AdminAuditLog, Artwork, Base, CDK, DailyQuota, EmailCode, Order, User
+from pindou.db.models import AdminAuditLog, Artwork, Base, CDK, DailyQuota, EmailCode, GenerationJob, Order, User
 from pindou.main import create_app
 from pindou.providers.base import PreviewResult
 from pindou.services.hupijiao_service import sign_params
@@ -479,7 +480,6 @@ def test_web_password_register_rejects_wrong_code_and_wrong_password(api_client,
 
 def test_web_password_register_with_cdk_grants_credits(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
     client, session_factory = api_client
-    CDKService._attempts.clear()
     sent_codes = capture_email_codes(monkeypatch)
     code_value = "REGCDKABCDEFGHJKL"
 
@@ -543,6 +543,33 @@ def test_upload_happy_path_and_consent_error(api_client) -> None:
     )
     assert uploaded.status_code == 200
     assert uploaded.json()["image_id"]
+
+
+def test_upload_rejects_disguised_or_oversized_pixel_images(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, _session_factory = api_client
+    headers = auth_headers(client)
+
+    disguised_svg = client.post(
+        "/api/upload",
+        files={"image": ("sample.png", b"<svg xmlns='http://www.w3.org/2000/svg'></svg>", "image/png")},
+        headers=headers,
+    )
+    assert disguised_svg.status_code == 415
+
+    mismatched = client.post(
+        "/api/upload",
+        files={"image": ("sample.png", image_bytes(image_format="JPEG"), "image/png")},
+        headers=headers,
+    )
+    assert mismatched.status_code == 415
+
+    monkeypatch.setattr("pindou.api.storage.MAX_IMAGE_PIXELS", 100)
+    too_many_pixels = client.post(
+        "/api/upload",
+        files={"image": ("sample.png", png_bytes(), "image/png")},
+        headers=headers,
+    )
+    assert too_many_pixels.status_code == 413
 
 
 def test_pattern_build_happy_path_and_error(api_client) -> None:
@@ -833,6 +860,59 @@ def test_generate_ai_refuses_script_fallback(api_client, monkeypatch: pytest.Mon
         assert len(session.scalars(select(Artwork)).all()) == before_artworks
 
 
+def test_reserved_ai_credit_refund_is_idempotent(api_client) -> None:
+    _client, session_factory = api_client
+    with session_factory() as session:
+        user = User(openid="refund_user", nickname="Refund", paid_credits=0)
+        job = GenerationJob(user_id=user.openid, mode="ai", ai_credit_reserved=True, ai_credit_refunded=False)
+        session.add_all([user, job])
+        session.commit()
+        job_id = job.job_id
+
+        refund_reserved_ai_credit(session, job_id=job_id, user_id=user.openid)
+        refund_reserved_ai_credit(session, job_id=job_id, user_id=user.openid)
+
+        session.refresh(user)
+        refunded = session.get(GenerationJob, job_id)
+        assert user.paid_credits == 1
+        assert refunded is not None
+        assert refunded.ai_credit_refunded is True
+
+
+def test_preview_generate_refuses_fallback_and_refunds_ai_credit(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, session_factory = api_client
+    headers = auth_headers(client)
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid.like("wx_%")))
+        assert user is not None
+        before_ai_credits = user.paid_credits
+
+    class FakeFallbackChain:
+        def generate(self, image: bytes, style_preset, size_preset, seed=None) -> PreviewResult:
+            return PreviewResult.from_image_bytes(
+                png_bytes((255, 255, 255)),
+                target_color_count=8,
+                provider_used="fallback_quantize",
+                fallback_count=1,
+                cost_estimate=0.0,
+                latency_ms=10,
+            )
+
+    monkeypatch.setattr("pindou.api.generate.build_preview_chain", lambda: FakeFallbackChain())
+    response = client.post(
+        "/api/v1/preview/generate",
+        data={"style_preset": "q_portrait", "size_preset": "26x26"},
+        files={"image": ("sample.png", png_bytes((255, 255, 255)), "image/png")},
+        headers=headers,
+    )
+    assert response.status_code == 500
+    assert response.json()["message_cn"] == "AI 生成暂时失败，请稍后再试。"
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid.like("wx_%")))
+        assert user is not None
+        assert user.paid_credits == before_ai_credits
+
+
 def test_unlimited_credit_email_skips_ai_credit_requirement(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
     client, session_factory = api_client
     monkeypatch.setenv("UNLIMITED_CREDIT_EMAILS", "staywithcsq@outlook.com")
@@ -1042,12 +1122,12 @@ def test_admin_read_only_endpoints_require_role_and_redact_config(api_client, mo
     assert audit_logs["items"][0]["resource_type"] == "admin_session"
 
 
-def test_admin_login_failed_attempts_do_not_lock_out(api_client, caplog: pytest.LogCaptureFixture) -> None:
+def test_admin_login_failed_attempts_are_rate_limited(api_client, caplog: pytest.LogCaptureFixture) -> None:
     client, _session_factory = api_client
     headers = {"x-forwarded-for": "203.0.113.77"}
     caplog.set_level("WARNING", logger="pindou.api.admin")
 
-    for _index in range(6):
+    for _index in range(5):
         response = client.post(
             "/api/admin/login",
             json={"username": "limited-admin", "password": "wrong"},
@@ -1055,10 +1135,27 @@ def test_admin_login_failed_attempts_do_not_lock_out(api_client, caplog: pytest.
         )
         assert response.status_code == 401
         assert response.json()["message_cn"] == "管理员账号或密码不正确。"
+    locked = client.post(
+        "/api/admin/login",
+        json={"username": "limited-admin", "password": "wrong"},
+        headers=headers,
+    )
+    assert locked.status_code == 429
+    assert locked.json()["message_cn"] == "管理员登录尝试太频繁，请稍后再试。"
     assert "admin_login_failed" in caplog.text
     assert "admin_username_matches" in caplog.text
     assert "password_matches" in caplog.text
     assert "wrong" not in caplog.text
+
+
+def test_production_config_requires_real_secrets(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("JWT_SECRET", "")
+    monkeypatch.setenv("APP_CORS_ALLOW_ORIGINS", "*")
+    get_settings.cache_clear()
+    with pytest.raises(RuntimeError, match="Production configuration is not safe to start"):
+        create_app()
+    get_settings.cache_clear()
 
 
 def test_admin_two_step_order_fulfillment_is_audited_and_idempotent(api_client) -> None:
@@ -1298,6 +1395,31 @@ def test_hupijiao_webhook_marks_order_paid_and_grants_monthly_card(api_client) -
         if expires_at.tzinfo is None:
             expires_at = expires_at.replace(tzinfo=timezone.utc)
         assert expires_at < datetime.now(timezone.utc) + timedelta(days=31)
+
+
+def test_hupijiao_webhook_rejects_missing_amount(api_client) -> None:
+    client, session_factory = api_client
+    headers = auth_headers(client)
+    order = client.post("/api/payment/order/create", json={"sku_id": "monthly_28"}, headers=headers)
+    assert order.status_code == 200
+    payload = order.json()
+
+    webhook_payload = {
+        "trade_order_id": payload["order_no"],
+        "transaction_id": "MOCKTXN_NO_AMOUNT",
+        "status": "OD",
+        "appid": "mock",
+        "time": "1760000000",
+        "nonce_str": "mocknonce-no-amount",
+    }
+    webhook_payload["hash"] = sign_params(webhook_payload, "pindou-dev-hupijiao-mock-secret")
+    callback = client.post("/api/v1/webhook/hupijiao", data=webhook_payload)
+    assert callback.status_code == 400
+
+    with session_factory() as session:
+        stored = session.scalar(select(Order).where(Order.order_no == payload["order_no"]))
+        assert stored is not None
+        assert stored.status == "pending_qr"
 
 
 def test_cdk_redeem_and_admin_batch_generate(api_client) -> None:

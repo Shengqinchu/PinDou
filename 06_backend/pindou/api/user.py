@@ -14,6 +14,7 @@ from pindou.api.deps import CurrentUser, DbSession
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.api.security import create_access_token
 from pindou.api.request_meta import client_ip
+from pindou.api.storage import MAX_IMAGE_PIXELS
 from pindou.services.storage_util import get_storage_backend
 from pindou.services.cdk_service import CDKAlreadyRedeemedError, CDKInvalidError, CDKRateLimitError, CDKService
 from pindou.services.email_verification import EmailVerificationService, validate_email_or_raise
@@ -238,6 +239,8 @@ def make_avatar_png(content: bytes, *, expected_format: str) -> bytes:
     with Image.open(BytesIO(content)) as image:
         if image.format != expected_format:
             raise ValueError("头像图片格式不正确，请换一张 JPG、PNG 或 WEBP。")
+        if image.width <= 0 or image.height <= 0 or image.width * image.height > MAX_IMAGE_PIXELS:
+            raise ValueError("头像图片分辨率太高了，请换一张更小的图片。")
         image = ImageOps.exif_transpose(image).convert("RGBA")
         side = min(image.width, image.height)
         if side <= 0:

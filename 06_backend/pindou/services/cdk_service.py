@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import logging
 import secrets
-from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import ClassVar
 
-from sqlalchemy import select
+from sqlalchemy import select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from pindou.db.models import CDK, User, as_aware_utc, utc_now
+from pindou.db.models import CDK, EntitlementGrant, User, as_aware_utc, utc_now
+from pindou.services.rate_limit_service import RateLimitExceeded, RateLimitRule, consume_rate_limits
 
 
 logger = logging.getLogger(__name__)
@@ -35,16 +35,7 @@ class CDKAlreadyRedeemedError(CDKServiceError):
     """Raised when a one-time CDK has already been redeemed."""
 
 
-@dataclass(frozen=True)
-class RedeemAttempt:
-    user_id: str
-    ip: str | None
-    attempted_at: datetime
-
-
 class CDKService:
-    _attempts: ClassVar[list[RedeemAttempt]] = []
-
     def __init__(self, session: Session) -> None:
         self.session = session
 
@@ -94,7 +85,8 @@ class CDKService:
         if user is None:
             raise ValueError(f"User does not exist: {user_id}")
 
-        cdk = self.session.get(CDK, code.strip().upper())
+        normalized_code = code.strip().upper()
+        cdk = self.session.get(CDK, normalized_code)
         if cdk is None:
             raise CDKInvalidError("CDK does not exist.")
         if cdk.status == "redeemed":
@@ -107,43 +99,53 @@ class CDKService:
             self.session.commit()
             raise CDKInvalidError("CDK has expired.")
 
-        self._apply_entitlement(user=user, cdk=cdk, now=timestamp)
-        cdk.status = "redeemed"
-        cdk.redeemed_by = user_id
-        cdk.redeemed_at = timestamp
-        cdk.redemption_ip = ip
-        self.session.commit()
-        self.session.refresh(cdk)
-        return cdk
+        updated = self.session.execute(
+            update(CDK)
+            .where(CDK.code == normalized_code, CDK.status == "active")
+            .values(status="redeemed", redeemed_by=user_id, redeemed_at=timestamp, redemption_ip=ip)
+        )
+        if updated.rowcount != 1:
+            self.session.rollback()
+            current = self.session.get(CDK, normalized_code)
+            if current is not None and current.status == "redeemed":
+                raise CDKAlreadyRedeemedError("CDK has already been redeemed.")
+            raise CDKInvalidError("CDK is not active.")
+
+        try:
+            self.session.add(
+                EntitlementGrant(
+                    source_type="cdk",
+                    source_id=normalized_code,
+                    user_id=user_id,
+                    entitlement_type=cdk.type,
+                    value=cdk.value,
+                    created_at=timestamp,
+                )
+            )
+            self._apply_entitlement(user=user, cdk=cdk, now=timestamp)
+            self.session.commit()
+        except IntegrityError as exc:
+            self.session.rollback()
+            raise CDKAlreadyRedeemedError("CDK has already been redeemed.") from exc
+
+        redeemed = self.session.get(CDK, normalized_code)
+        if redeemed is None:
+            raise CDKInvalidError("CDK does not exist.")
+        return redeemed
 
     def _record_attempt(self, *, user_id: str, ip: str | None, now: datetime) -> None:
-        ten_minutes_ago = now - timedelta(minutes=10)
-        one_minute_ago = now - timedelta(minutes=1)
-        CDKService._attempts = [
-            attempt for attempt in CDKService._attempts if attempt.attempted_at >= ten_minutes_ago
-        ]
-        CDKService._attempts.append(RedeemAttempt(user_id=user_id, ip=ip, attempted_at=now))
-
-        user_recent = [
-            attempt
-            for attempt in CDKService._attempts
-            if attempt.user_id == user_id and attempt.attempted_at >= one_minute_ago
-        ]
-        if len(user_recent) > 3:
-            raise CDKRateLimitError("Same user may redeem at most 3 CDKs per minute.")
-
-        if ip:
-            ip_recent = [
-                attempt
-                for attempt in CDKService._attempts
-                if attempt.ip == ip and attempt.attempted_at >= ten_minutes_ago
-            ]
-            if len(ip_recent) >= 5:
-                logger.warning(
-                    "Suspicious CDK redemption velocity: ip=%s attempts=%s within 10 minutes.",
-                    ip,
-                    len(ip_recent),
-                )
+        try:
+            consume_rate_limits(
+                self.session,
+                [
+                    RateLimitRule("cdk_redeem:user:minute", user_id, limit=4, window_seconds=60),
+                    RateLimitRule("cdk_redeem:ip:10m", ip, limit=5, window_seconds=10 * 60),
+                ],
+                now=now,
+            )
+        except RateLimitExceeded as exc:
+            logger.warning("CDK redemption rate limited: user_id=%s ip=%s scope=%s", user_id, ip, exc.scope)
+            raise CDKRateLimitError("CDK redemption rate limited.") from exc
 
     @staticmethod
     def _apply_entitlement(*, user: User, cdk: CDK, now: datetime) -> None:

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from pindou.api.errors import ApiException, ErrorCode
@@ -42,9 +42,24 @@ def has_unlimited_credit(user: User) -> bool:
 def consume_script_quota(session: Session, user: User) -> None:
     if has_unlimited_credit(user):
         return
-    if user.free_credits_remaining <= 0:
+    result = session.execute(
+        update(User)
+        .where(User.openid == user.user_id, User.free_credits_remaining > 0)
+        .values(free_credits_remaining=User.free_credits_remaining - 1)
+    )
+    if result.rowcount != 1:
+        session.rollback()
         raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "普通额度不足，兑换 CDK 或购买额度后再生成吧。")
-    user.free_credits_remaining -= 1
+    session.commit()
+    session.refresh(user)
+
+
+def refund_script_quota(session: Session, user_id: str) -> None:
+    session.execute(
+        update(User)
+        .where(User.openid == user_id)
+        .values(free_credits_remaining=User.free_credits_remaining + 1)
+    )
     session.commit()
 
 
@@ -53,19 +68,36 @@ def consume_white_bg_quota(session: Session, user: User) -> None:
     return
 
 
-def consume_ai_credit(session: Session, user: User) -> None:
+def consume_ai_credit(session: Session, user: User) -> bool:
+    """Reserve one paid AI credit.
+
+    Returns True when a paid credit was decremented and should be refunded if
+    the paid AI generation fails. Unlimited and monthly-card users return False.
+    """
+
     if has_unlimited_credit(user):
-        return
+        return False
     now = utc_now()
     if has_ai_credit(user, now=now):
         monthly_card_expires_at = as_aware_utc(user.monthly_card_expires_at)
         if monthly_card_expires_at is not None and monthly_card_expires_at > now:
-            return
-        if user.paid_credits > 0:
-            user.paid_credits -= 1
+            return False
+        result = session.execute(
+            update(User)
+            .where(User.openid == user.user_id, User.paid_credits > 0)
+            .values(paid_credits=User.paid_credits - 1)
+        )
+        if result.rowcount == 1:
             session.commit()
-            return
+            session.refresh(user)
+            return True
+        session.rollback()
     raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "AI 额度不足，兑换 CDK 或购买 AI 额度后再生成吧。")
+
+
+def refund_ai_credit(session: Session, user_id: str) -> None:
+    session.execute(update(User).where(User.openid == user_id).values(paid_credits=User.paid_credits + 1))
+    session.commit()
 
 
 def require_ai_credit_available(user: User) -> None:

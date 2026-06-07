@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from pindou.db.models import Base
-from pindou.services.cdk_service import CDKService
 
 os.environ.setdefault("DATABASE_URL", "sqlite:///./var/test.db")
 os.environ.setdefault("ENABLE_REVERSE_PROXY_HEALTH_MONITOR", "false")
@@ -28,10 +27,3 @@ def db_session() -> Session:
     with SessionTesting() as session:
         yield session
     Base.metadata.drop_all(engine)
-
-
-@pytest.fixture(autouse=True)
-def reset_cdk_attempts() -> None:
-    CDKService._attempts = []
-    yield
-    CDKService._attempts = []

@@ -114,6 +114,28 @@ def test_xiaochi_provider_uses_silent_subject_detect_minimal_palette_prompt() ->
     assert "萌宠提示" in prompt
 
 
+def test_xiaochi_provider_prompt_b_is_configurable_and_tracked() -> None:
+    fake_images = FakeImages([api_response(PNG_1X1)])
+    fake_client = SimpleNamespace(images=fake_images)
+    provider = XiaochiGptProvider(
+        api_key="test-key",
+        base_url="https://example.test/v1",
+        client=fake_client,
+        retry_count=0,
+        prompt_variant="b",
+    )
+
+    result = provider.generate(PNG_1X1, StylePreset.Q_PORTRAIT, SizePreset.DOUBLE_BOARD_52X52, seed=11)
+    prompt = str(fake_images.calls[0]["prompt"])
+
+    assert "四周保留清晰安全边距" in prompt
+    assert "正面/正交视角" in prompt
+    assert "足够大、足够干净" in prompt
+    assert result.metadata["prompt_variant"] == "prompt_b_grid_symmetry_20260606"
+    assert result.metadata["prompt_version"] == "2026-06-06"
+    assert len(result.metadata["prompt_hash"]) == 12
+
+
 def test_xiaochi_provider_strips_ai_white_background_to_alpha() -> None:
     fake_images = FakeImages([api_response(white_bg_preview_png())])
     fake_client = SimpleNamespace(images=fake_images)

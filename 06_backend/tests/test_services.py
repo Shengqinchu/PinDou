@@ -162,7 +162,6 @@ def test_cdk_redeem_grants_credits_and_rate_limits(db_session: Session) -> None:
     assert redeemed.status == "redeemed"
     assert user.paid_credits == 6
 
-    CDKService._attempts = []
     for index in range(3):
         with pytest.raises(CDKInvalidError):
             service.redeem(
@@ -175,7 +174,28 @@ def test_cdk_redeem_grants_credits_and_rate_limits(db_session: Session) -> None:
         service.redeem(code="MISSING4", user_id=user.openid, ip="10.0.0.1", now=now + timedelta(seconds=4))
 
 
-def test_cdk_ip_velocity_logs_warning(db_session: Session, caplog: pytest.LogCaptureFixture) -> None:
+def test_cdk_redeem_monthly_card_extends_existing_expiry(db_session: Session) -> None:
+    user = add_user(db_session, openid="monthly_cdk_user")
+    user.monthly_card_expires_at = datetime(2026, 5, 30, 12, 0, tzinfo=timezone.utc)
+    db_session.add(user)
+    db_session.commit()
+
+    service = CDKService(db_session)
+    cdk = service.create_cdk(code="MONTHLYABCDEFGHJK", cdk_type="monthly_card", value=15)
+    redeemed = service.redeem(
+        code=cdk.code,
+        user_id=user.openid,
+        ip="10.0.0.2",
+        now=datetime(2026, 5, 25, 12, 0, tzinfo=timezone.utc),
+    )
+    db_session.refresh(user)
+
+    assert redeemed.status == "redeemed"
+    assert user.monthly_card_expires_at is not None
+    assert user.monthly_card_expires_at.date() == date(2026, 6, 14)
+
+
+def test_cdk_ip_velocity_is_rate_limited(db_session: Session, caplog: pytest.LogCaptureFixture) -> None:
     service = CDKService(db_session)
     now = datetime(2026, 5, 25, 12, 0, tzinfo=timezone.utc)
     caplog.set_level(logging.WARNING)
@@ -190,7 +210,15 @@ def test_cdk_ip_velocity_logs_warning(db_session: Session, caplog: pytest.LogCap
                 now=now + timedelta(seconds=index),
             )
 
-    assert "Suspicious CDK redemption velocity" in caplog.text
+    user = add_user(db_session, openid="ip_user_limited")
+    with pytest.raises(CDKRateLimitError):
+        service.redeem(
+            code="MISSING_LIMITED",
+            user_id=user.openid,
+            ip="203.0.113.8",
+            now=now + timedelta(seconds=6),
+        )
+    assert "CDK redemption rate limited" in caplog.text
 
 
 def test_payment_service_customer_service_qr_state_machine(db_session: Session) -> None:

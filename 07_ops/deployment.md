@@ -100,6 +100,7 @@ uvicorn pindou.main:app --host 0.0.0.0 --port 8000
 | `JWT_SECRET` | JWT 签名密钥 |
 | `WECHAT_MP_APPID` / `WECHAT_MP_APPSECRET` | 小程序登录 |
 | `XIAOCHI_GPT_API_KEY` | AI 反代调用 |
+| `RESEND_API_KEY` | 邮箱验证码发送 |
 | `HUPIJIAO_APP_ID` / `HUPIJIAO_APP_SECRET` / `HUPIJIAO_WEBHOOK_SECRET` | 虎皮椒 |
 | `HUPIJIAO_CALLBACK_URL` | 云托管 HTTPS URL + `/api/v1/webhook/hupijiao` |
 
@@ -107,10 +108,14 @@ uvicorn pindou.main:app --host 0.0.0.0 --port 8000
 
 | 变量 | 推荐值 |
 | --- | --- |
-| `APP_CORS_ALLOW_ORIGINS` | 云托管私有协议为主，保留本地调试域 |
+| `APP_CORS_ALLOW_ORIGINS` | 生产只填 `https://pindoupuppy.com` 等 HTTPS 白名单，禁止 `*`/localhost |
 | `COS_PUBLIC_BASE_URL` | 如开 CDN 或自定义访问域则填写 |
+| `MAX_REQUEST_BODY_BYTES` | 默认 `12582912`，请求体硬上限 |
+| `XIAOCHI_GPT_PROMPT_VARIANT` | 默认 `prompt_a_current`；Prompt B 灰度用 `prompt_b_grid_symmetry_20260606` |
 | `ENABLE_REVERSE_PROXY_HEALTH_MONITOR` | `true` |
 | `ENABLE_EXPIRED_ORIGINAL_DELETE_TASK` | `true` |
+
+生产启动会执行安全配置自检：`JWT_SECRET` 缺失/过短、CORS 使用通配或本地域名、生产支付/AI/邮件密钥缺失、虎皮椒回调不是 HTTPS 或指向内网地址，都会直接拒绝启动，避免带开发默认值上线。
 
 ---
 

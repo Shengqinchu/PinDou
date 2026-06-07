@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     app_host: str = Field(default="127.0.0.1", validation_alias="APP_HOST")
     app_port: int = Field(default=8000, validation_alias="APP_PORT")
     app_log_level: str = Field(default="info", validation_alias="APP_LOG_LEVEL")
+    max_request_body_bytes: int = Field(default=12 * 1024 * 1024, validation_alias="MAX_REQUEST_BODY_BYTES")
     app_name: str = "PinDou API"
     app_cors_allow_origins: str = Field(
         default="http://localhost:3000,http://localhost:5173,http://localhost:8000",
@@ -49,6 +50,7 @@ class Settings(BaseSettings):
     )
     xiaochi_gpt_api_key: SecretStr | None = Field(default=None, validation_alias="XIAOCHI_GPT_API_KEY")
     xiaochi_gpt_image_cost_cny: float = Field(default=0.0, validation_alias="XIAOCHI_GPT_IMAGE_COST_CNY")
+    xiaochi_gpt_prompt_variant: str = Field(default="prompt_a_current", validation_alias="XIAOCHI_GPT_PROMPT_VARIANT")
     enable_ai_preview_white_bg_auto_nobead: bool = Field(
         default=True,
         validation_alias="ENABLE_AI_PREVIEW_WHITE_BG_AUTO_NOBEED",
@@ -120,6 +122,10 @@ class Settings(BaseSettings):
         return self.app_env.lower() in {"dev", "development", "local", "test"}
 
     @property
+    def is_production(self) -> bool:
+        return self.app_env.lower() in {"prod", "production"}
+
+    @property
     def cors_allow_origins(self) -> list[str]:
         return [origin.strip() for origin in self.app_cors_allow_origins.split(",") if origin.strip()]
 
@@ -131,7 +137,57 @@ class Settings(BaseSettings):
             if email.strip()
         }
 
+    def validate_production_ready(self) -> None:
+        if not self.is_production:
+            return
+
+        errors: list[str] = []
+        jwt_secret = secret_value(self.jwt_secret)
+        if not jwt_secret or jwt_secret in {"pindou-dev-only-jwt-secret", "pindou-dev-email-code-secret"}:
+            errors.append("JWT_SECRET must be configured to a strong production value.")
+        elif len(jwt_secret) < 32:
+            errors.append("JWT_SECRET must be at least 32 characters.")
+
+        origins = self.cors_allow_origins
+        if not origins:
+            errors.append("APP_CORS_ALLOW_ORIGINS must include the production web origin.")
+        for origin in origins:
+            lowered = origin.lower()
+            if lowered == "*" or "localhost" in lowered or "127.0.0.1" in lowered:
+                errors.append("APP_CORS_ALLOW_ORIGINS must not include wildcard or local origins in production.")
+            if not lowered.startswith("https://"):
+                errors.append("APP_CORS_ALLOW_ORIGINS must use HTTPS origins in production.")
+
+        if self.storage_backend.lower() == "cos":
+            if not (self.cos_secret_id and self.cos_secret_key and self.cos_bucket and self.cos_region):
+                errors.append("COS_SECRET_ID, COS_SECRET_KEY, COS_BUCKET, and COS_REGION are required for COS storage.")
+
+        if not secret_value(self.xiaochi_gpt_api_key):
+            errors.append("XIAOCHI_GPT_API_KEY must be configured for production AI mode.")
+        if not secret_value(self.resend_api_key):
+            errors.append("RESEND_API_KEY must be configured for production email login.")
+        if not self.admin_username or not secret_value(self.admin_password_hash):
+            errors.append("ADMIN_USERNAME and ADMIN_PASSWORD_HASH must be configured in production.")
+
+        if not self.hupijiao_app_id or not secret_value(self.hupijiao_app_secret) or not secret_value(
+            self.hupijiao_webhook_secret
+        ):
+            errors.append("HUPIJIAO_APP_ID, HUPIJIAO_APP_SECRET, and HUPIJIAO_WEBHOOK_SECRET are required.")
+        callback_url = self.hupijiao_callback_url.strip().lower()
+        if not callback_url.startswith("https://"):
+            errors.append("HUPIJIAO_CALLBACK_URL must be an HTTPS public URL in production.")
+        if "192.168." in callback_url or "localhost" in callback_url or "127.0.0.1" in callback_url:
+            errors.append("HUPIJIAO_CALLBACK_URL must not point to a local or private address in production.")
+
+        if errors:
+            joined = "; ".join(dict.fromkeys(errors))
+            raise RuntimeError(f"Production configuration is not safe to start: {joined}")
+
 
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+def secret_value(secret: SecretStr | None) -> str | None:
+    return secret.get_secret_value() if secret else None

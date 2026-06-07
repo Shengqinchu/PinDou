@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.config import get_settings
 from pindou.db.models import EmailCode, as_aware_utc, utc_now
+from pindou.services.rate_limit_service import RateLimitExceeded, RateLimitRule, consume_rate_limits
 
 
 CODE_LENGTH = 6
@@ -109,6 +110,23 @@ class EmailVerificationService:
     async def send_code(self, *, email: str, request_ip: str | None = None) -> dict[str, Any]:
         normalized = validate_email_or_raise(email)
         now = utc_now()
+        try:
+            consume_rate_limits(
+                self.session,
+                [
+                    RateLimitRule("email_send:ip:minute", request_ip, limit=5, window_seconds=60),
+                    RateLimitRule("email_send:ip:day", request_ip, limit=30, window_seconds=24 * 60 * 60),
+                    RateLimitRule("email_send:global:hour", "all", limit=300, window_seconds=60 * 60),
+                ],
+                now=now,
+            )
+        except RateLimitExceeded as exc:
+            raise ApiException(
+                429,
+                "EMAIL_CODE_RATE_LIMITED",
+                "验证码发送太频繁，请稍后再试。",
+                {"retry_after_seconds": exc.retry_after_seconds},
+            ) from exc
         existing = self.session.scalar(select(EmailCode).where(EmailCode.email == normalized))
         if existing is not None:
             sent_at = as_aware_utc(existing.sent_at)
@@ -211,7 +229,12 @@ def _send_verification_email_sync(email: str, code: str) -> tuple[bool, str]:
 
 def _hash_code(email: str, code: str) -> str:
     settings = get_settings()
-    secret = settings.jwt_secret.get_secret_value() if settings.jwt_secret else "pindou-dev-email-code-secret"
+    if settings.jwt_secret:
+        secret = settings.jwt_secret.get_secret_value()
+    elif settings.is_development:
+        secret = "pindou-dev-email-code-secret"
+    else:
+        raise RuntimeError("JWT_SECRET must be configured outside development.")
     message = f"{email}:{code}".encode("utf-8")
     return hmac.new(secret.encode("utf-8"), message, hashlib.sha256).hexdigest()
 

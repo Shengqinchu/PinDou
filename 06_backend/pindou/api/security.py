@@ -98,7 +98,12 @@ def admin_credentials_diagnostics(username: str, password: str) -> dict[str, Any
 
 def _secret() -> bytes:
     settings = get_settings()
-    secret = settings.jwt_secret.get_secret_value() if settings.jwt_secret else "pindou-dev-only-jwt-secret"
+    if settings.jwt_secret:
+        secret = settings.jwt_secret.get_secret_value()
+    elif settings.is_development:
+        secret = "pindou-dev-only-jwt-secret"
+    else:
+        raise RuntimeError("JWT_SECRET must be configured outside development.")
     return secret.encode("utf-8")
 
 

@@ -7,7 +7,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from pindou import __version__
@@ -27,6 +27,7 @@ ADMIN_CONSOLE_PATH = "/Ios235169"
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    settings.validate_production_ready()
     monitor = ReverseProxyHealthMonitor(
         health_url=settings.reverse_proxy_health_url,
         interval_seconds=settings.reverse_proxy_check_interval_seconds,
@@ -68,6 +69,25 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    @app.middleware("http")
+    async def enforce_request_body_size(request, call_next):
+        content_length = request.headers.get("content-length")
+        if content_length:
+            try:
+                length = int(content_length)
+            except ValueError:
+                length = 0
+            if length > settings.max_request_body_bytes:
+                return JSONResponse(
+                    status_code=413,
+                    content={
+                        "error": "REQUEST_TOO_LARGE",
+                        "message_cn": "请求内容太大了，请上传更小的图片。",
+                    },
+                )
+        return await call_next(request)
+
     install_exception_handlers(app)
     ensure_storage_dirs()
     app.mount("/static/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")

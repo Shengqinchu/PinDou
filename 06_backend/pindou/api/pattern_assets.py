@@ -37,5 +37,4 @@ def finalize_artwork_pattern_assets(
     artwork.pattern_json = pattern_data
     artwork.preview_path = preview_path or labeled_url
     db.commit()
-    db.refresh(artwork)
     return pattern_url, labeled_url

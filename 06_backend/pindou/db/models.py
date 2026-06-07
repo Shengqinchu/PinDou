@@ -83,6 +83,33 @@ class EmailCode(Base):
     request_ip: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
 
+class RateLimitBucket(Base):
+    __tablename__ = "rate_limit_buckets"
+    __table_args__ = (
+        UniqueConstraint(
+            "scope",
+            "identity",
+            "window_start",
+            "window_seconds",
+            name="uq_rate_limit_bucket",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    scope: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
+    identity: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
+    window_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True, nullable=False)
+    window_seconds: Mapped[int] = mapped_column(Integer, nullable=False)
+    count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+        onupdate=utc_now,
+        nullable=False,
+    )
+
+
 class Artwork(Base):
     __tablename__ = "artworks"
 
@@ -148,6 +175,8 @@ class GenerationJob(Base):
     result_json: Mapped[dict[str, Any] | None] = mapped_column(SAJSON, nullable=True)
     error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
     error_message_cn: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    ai_credit_reserved: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    ai_credit_refunded: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -221,6 +250,19 @@ class Order(Base):
             "qr_code_url": self.qr_code_path,
             "artwork_id": self.artwork_id,
         }
+
+
+class EntitlementGrant(Base):
+    __tablename__ = "entitlement_grants"
+    __table_args__ = (UniqueConstraint("source_type", "source_id", name="uq_entitlement_grant_source"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    source_type: Mapped[str] = mapped_column(String(32), index=True, nullable=False)
+    source_id: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
+    user_id: Mapped[str] = mapped_column(String(128), ForeignKey("users.openid"), index=True, nullable=False)
+    entitlement_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    value: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
 
 class CDK(Base):

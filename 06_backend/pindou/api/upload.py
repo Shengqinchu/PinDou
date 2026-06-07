@@ -22,5 +22,5 @@ async def upload_image(request: Request, current_user: CurrentUser) -> dict:
     upload = form.get("image") or form.get("file")
     if not isinstance(upload, UploadFile):
         raise ApiException(422, ErrorCode.INVALID_UPLOAD, "请上传一张照片。")
-    result = save_uploaded_image(upload.filename or "upload.png", await upload.read())
+    result = save_uploaded_image(upload.filename or "upload.png", await upload.read(), content_type=upload.content_type)
     return {"image_id": result["image_id"], "image_url": result["image_url"]}

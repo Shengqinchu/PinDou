@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import io
 import random
 import time
@@ -20,6 +21,12 @@ from pindou.providers.base import PreviewProvider, PreviewProviderError, Preview
 
 TARGET_COLOR_COUNT = 6
 IMAGE_SIZE = "1024x1024"
+PROMPT_VARIANT_A = "prompt_a_current"
+PROMPT_VARIANT_B = "prompt_b_grid_symmetry_20260606"
+PROMPT_VERSION_BY_VARIANT = {
+    PROMPT_VARIANT_A: "2026-06-01",
+    PROMPT_VARIANT_B: "2026-06-06",
+}
 
 BEAD_OPTIMIZED_CHIBI_PROMPT = """
 把上传照片变成可爱 Q 版(chibi)卡通贴纸，用于转拼豆图纸：
@@ -29,6 +36,30 @@ BEAD_OPTIMIZED_CHIBI_PROMPT = """
 - 保留关键特征(眼睛/嘴/显著花纹)与辨识度；尽量左右对称、形状干净。
 - 风格：温暖可爱、韩系手绘贴纸感。
 """.strip()
+
+BEAD_OPTIMIZED_CHIBI_PROMPT_B = """
+把上传照片变成可爱 Q 版(chibi)卡通贴纸，用于转拼豆图纸：
+
+主体与防呆：
+- 先自动识别画面真实主体(人/宠物/物体)，按真实主体萌化；即使与所选风格不符，也以真实主体为准(明显是人就出人，不要出成动物)。【静默执行，不向用户提示】
+- 主体居中，占画面大但不要贴边；四周保留清晰安全边距，方便后续裁成拼豆板网格。
+- 输出为正面/正交视角，避免透视、倾斜角度、3D 渲染、强光影和镜头效果。
+
+拼豆友好画法：
+- 使用平涂、硬边、干净色块；不要照片质感、柔边、笔刷纹理、渐变、噪点或细碎材质。
+- 控制颜色数量，通常 3-6 种；简单主体更少。避免大量相近色；阴影最多用 2-4 个相邻色阶表达，不要细腻渐变。
+- 用深色或黑色拼豆感描边强化外轮廓，让主体缩小或远看时仍清晰可读。
+- 眼睛、嘴巴、表情、手、显著花纹、道具等关键特征必须保留，并画得足够大、足够干净，以便低分辨率量化后仍能存活。
+- 形状尽量左右对称、轮廓圆润、边缘干净。
+
+风格：
+- 温暖可爱、韩系手绘贴纸感，适合转成实体拼豆图纸。
+""".strip()
+
+PROMPTS_BY_VARIANT = {
+    PROMPT_VARIANT_A: BEAD_OPTIMIZED_CHIBI_PROMPT,
+    PROMPT_VARIANT_B: BEAD_OPTIMIZED_CHIBI_PROMPT_B,
+}
 
 STYLE_HINTS: dict[StylePreset, str] = {
     StylePreset.Q_PORTRAIT: "人像提示：如果真实主体是人，请重点保留发型、眼镜、脸部朝向、衣服主色和标志性配饰。",
@@ -45,6 +76,8 @@ Hard negative constraints:
 - Prefer 3-6 total flat colors; simple subjects should use only 3-4 colors when possible.
 - Every colored region must be simple enough to become one or more perler bead cells.
 - Output should look like a finished bead-pattern preview, not a realistic cartoon portrait.
+- No perspective view, tilted camera, 3D render, dramatic lighting, or realistic material rendering.
+- Keep facial features and important props large enough to survive a low-resolution bead-grid quantization.
 """.strip()
 
 
@@ -63,6 +96,7 @@ class XiaochiGptProvider(PreviewProvider):
         retry_count: int = 1,
         seed_factory: Callable[[], int] | None = None,
         enable_white_bg_auto_nobead: bool | None = None,
+        prompt_variant: str | None = None,
     ) -> None:
         settings = get_settings()
         secret = settings.xiaochi_gpt_api_key
@@ -71,6 +105,7 @@ class XiaochiGptProvider(PreviewProvider):
         self.timeout_seconds = timeout_seconds
         self.retry_count = retry_count
         self.image_cost_cny = settings.xiaochi_gpt_image_cost_cny
+        self.prompt_variant = normalize_prompt_variant(prompt_variant or settings.xiaochi_gpt_prompt_variant)
         self.enable_white_bg_auto_nobead = (
             settings.enable_ai_preview_white_bg_auto_nobead
             if enable_white_bg_auto_nobead is None
@@ -102,6 +137,7 @@ class XiaochiGptProvider(PreviewProvider):
         for attempt_index in range(attempts):
             attempt_seed = seed if attempt_index == 0 else self.seed_factory()
             prompt = self._build_prompt(style_preset, size_preset, attempt_seed)
+            prompt_hash = prompt_digest(prompt)
             try:
                 preview = self._edit_image(image, prompt)
                 preview, white_bg_detected = self._auto_strip_white_bg(preview)
@@ -118,6 +154,9 @@ class XiaochiGptProvider(PreviewProvider):
                         "size_preset": size_preset.value,
                         "attempts": attempt_index + 1,
                         "seed": attempt_seed,
+                        "prompt_variant": self.prompt_variant,
+                        "prompt_version": PROMPT_VERSION_BY_VARIANT[self.prompt_variant],
+                        "prompt_hash": prompt_hash,
                         "white_bg_auto_nobead_enabled": self.enable_white_bg_auto_nobead,
                         "white_bg_detected": white_bg_detected,
                     },
@@ -133,7 +172,7 @@ class XiaochiGptProvider(PreviewProvider):
             raise PreviewProviderError(f"Unsupported style preset: {style_preset}") from exc
         return "\n\n".join(
             [
-                BEAD_OPTIMIZED_CHIBI_PROMPT,
+                PROMPTS_BY_VARIANT[self.prompt_variant],
                 f"所选风格提示（仅作参考，真实主体识别优先，静默纠偏）：{style_hint}",
                 PERLER_NEGATIVE_CONSTRAINTS,
                 f"Output canvas: {IMAGE_SIZE}. Target bead grid preset: {size_preset.value}.",
@@ -190,3 +229,22 @@ class XiaochiGptProvider(PreviewProvider):
         if isinstance(value, dict):
             return value.get(key)
         return getattr(value, key, None)
+
+
+def normalize_prompt_variant(raw: str) -> str:
+    normalized = (raw or PROMPT_VARIANT_A).strip().lower()
+    aliases = {
+        "a": PROMPT_VARIANT_A,
+        "current": PROMPT_VARIANT_A,
+        "prompt_a": PROMPT_VARIANT_A,
+        PROMPT_VARIANT_A: PROMPT_VARIANT_A,
+        "b": PROMPT_VARIANT_B,
+        "prompt_b": PROMPT_VARIANT_B,
+        "grid_symmetry": PROMPT_VARIANT_B,
+        PROMPT_VARIANT_B: PROMPT_VARIANT_B,
+    }
+    return aliases.get(normalized, PROMPT_VARIANT_A)
+
+
+def prompt_digest(prompt: str) -> str:
+    return hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:12]
