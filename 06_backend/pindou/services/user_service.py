@@ -8,7 +8,17 @@ from datetime import date, datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from pindou.config import get_settings
 from pindou.db.models import ConsentLog, DailyQuota, User, utc_now
+from pindou.services.credit_service import (
+    AI_GENERATION_POINT_COST,
+    REGISTER_GIFT_DAYS,
+    REGISTER_GIFT_POINTS,
+    get_credit_balance,
+    ensure_legacy_paid_credit_grant,
+    grant_points,
+    grant_registration_gift,
+)
 from pindou.services.password_auth import hash_password, verify_password
 
 
@@ -33,6 +43,8 @@ class UserService:
         if user is None:
             user = User(openid=openid, nickname=nickname or "", avatar=avatar or "")
             self.session.add(user)
+            self.session.flush()
+            grant_registration_gift(self.session, user)
         else:
             if nickname is not None:
                 user.nickname = nickname
@@ -54,6 +66,8 @@ class UserService:
                 avatar="",
             )
             self.session.add(user)
+            self.session.flush()
+            grant_registration_gift(self.session, user)
         else:
             user.email = normalized_email
             if not user.nickname:
@@ -124,10 +138,24 @@ class UserService:
         user = self.get_user(user_id)
         if user is None:
             raise ValueError(f"User does not exist: {user_id}")
+        ai_balance = get_credit_balance(self.session, owner_id=user.user_id)
+        email = (user.email or "").strip().lower()
         return {
             "user_id": user.user_id,
             "free_credits_remaining": user.free_credits_remaining,
+            "normal_trial_remaining": user.free_credits_remaining,
             "paid_credits": user.paid_credits,
+            "ai_points_balance": ai_balance.available,
+            "ai_points_paid": ai_balance.paid,
+            "ai_points_gift": ai_balance.gift,
+            "ai_points_reserved": ai_balance.reserved,
+            "ai_generation_cost_points": AI_GENERATION_POINT_COST,
+            "register_gift_points": REGISTER_GIFT_POINTS,
+            "register_gift_days": REGISTER_GIFT_DAYS,
+            "is_unlimited_account": bool(email and email in get_settings().unlimited_credit_email_set),
+            "membership_expires_at": user.membership_expires_at.isoformat()
+            if user.membership_expires_at
+            else None,
             "monthly_card_expires_at": user.monthly_card_expires_at.isoformat()
             if user.monthly_card_expires_at
             else None,
@@ -137,7 +165,15 @@ class UserService:
         user = self.get_user(user_id)
         if user is None:
             raise ValueError(f"User does not exist: {user_id}")
-        user.paid_credits += credits
+        ensure_legacy_paid_credit_grant(self.session, user)
+        grant_points(
+            self.session,
+            owner_id=user.user_id,
+            amount=credits * AI_GENERATION_POINT_COST,
+            kind="paid",
+            source_type="legacy_user_service_grant",
+            source_id=f"{user.user_id}:{credits}:{utc_now().timestamp()}",
+        )
         self.session.commit()
         self.session.refresh(user)
         return user
@@ -151,7 +187,9 @@ class UserService:
         if current_expires and current_expires.tzinfo is None:
             current_expires = current_expires.replace(tzinfo=timestamp.tzinfo)
         base = current_expires if current_expires and current_expires > timestamp else timestamp
-        user.monthly_card_expires_at = base + timedelta(days=days)
+        expires_at = base + timedelta(days=days)
+        user.monthly_card_expires_at = expires_at
+        user.membership_expires_at = expires_at
         self.session.commit()
         self.session.refresh(user)
         return user

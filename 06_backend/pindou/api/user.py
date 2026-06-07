@@ -15,6 +15,7 @@ from pindou.api.errors import ApiException, ErrorCode
 from pindou.api.security import create_access_token
 from pindou.api.request_meta import client_ip
 from pindou.api.storage import MAX_IMAGE_PIXELS
+from pindou.db.models import User
 from pindou.services.storage_util import get_storage_backend
 from pindou.services.cdk_service import CDKAlreadyRedeemedError, CDKInvalidError, CDKRateLimitError, CDKService
 from pindou.services.email_verification import EmailVerificationService, validate_email_or_raise
@@ -88,7 +89,7 @@ def login(payload: LoginRequest, db: DbSession) -> dict:
         nickname=payload.nickname,
         avatar=payload.avatar,
     )
-    return {"token": create_access_token(subject=user.user_id), "user": user.to_frontend_dict()}
+    return {"token": create_access_token(subject=user.user_id), "user": user_payload(db, user)}
 
 
 @router.post("/email/send-code")
@@ -105,7 +106,7 @@ def verify_email_code(payload: EmailVerifyRequest, db: DbSession) -> dict:
     """H5 邮箱登录/注册第二步：验证通过后返回普通用户 JWT。"""
     email = EmailVerificationService(db).verify_code(email=payload.email, code=payload.code)
     user = UserService(db).register_or_login_email(email=email)
-    return {"token": create_access_token(subject=user.user_id), "user": user.to_frontend_dict()}
+    return {"token": create_access_token(subject=user.user_id), "user": user_payload(db, user)}
 
 
 @router.post("/register")
@@ -128,7 +129,7 @@ def register(payload: RegisterRequest, request: Request, db: DbSession) -> dict:
     db.refresh(user)
     return {
         "token": create_access_token(subject=user.user_id),
-        "user": user.to_frontend_dict(),
+        "user": user_payload(db, user),
         "cdk": cdk_result,
     }
 
@@ -144,14 +145,14 @@ def email_password_login(payload: EmailPasswordLoginRequest, db: DbSession) -> d
     authed_user = user_service.authenticate_email_password(email=normalized_email, password=payload.password)
     if authed_user is None:
         raise ApiException(401, "PASSWORD_INVALID", "密码不正确，请重新输入。")
-    return {"token": create_access_token(subject=authed_user.user_id), "user": authed_user.to_frontend_dict()}
+    return {"token": create_access_token(subject=authed_user.user_id), "user": user_payload(db, authed_user)}
 
 
 @router.get("/me")
 @router.get("/profile")
-def get_profile(current_user: CurrentUser) -> dict:
+def get_profile(current_user: CurrentUser, db: DbSession) -> dict:
     """返回前端 User 类型，含额度与 consent 时间。"""
-    return current_user.to_frontend_dict()
+    return user_payload(db, current_user)
 
 
 @router.patch("/profile")
@@ -169,7 +170,7 @@ def update_profile(payload: ProfilePatchRequest, current_user: CurrentUser, db: 
     db.add(current_user)
     db.commit()
     db.refresh(current_user)
-    return current_user.to_frontend_dict()
+    return user_payload(db, current_user)
 
 
 @router.post("/avatar")
@@ -204,7 +205,7 @@ async def upload_avatar(
     db.add(current_user)
     db.commit()
     db.refresh(current_user)
-    return {"avatar_url": avatar_url, "user": current_user.to_frontend_dict()}
+    return {"avatar_url": avatar_url, "user": user_payload(db, current_user)}
 
 
 @router.post("/consent")
@@ -252,6 +253,12 @@ def make_avatar_png(content: bytes, *, expected_format: str) -> bytes:
         output = BytesIO()
         image.save(output, format="PNG", optimize=True)
         return output.getvalue()
+
+
+def user_payload(db: DbSession, user: User) -> dict:
+    payload = user.to_frontend_dict()
+    payload.update(UserService(db).credit_summary(user.user_id))
+    return payload
 
 
 def _try_redeem_register_cdk(*, db: DbSession, cdk_code: str | None, user_id: str, request_ip: str | None) -> dict:

@@ -7,7 +7,7 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, Numeric, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Index, Integer, Numeric, String, Text, UniqueConstraint
 from sqlalchemy import JSON as SAJSON
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -42,8 +42,9 @@ class User(Base):
     nickname: Mapped[str] = mapped_column(String(128), default="")
     avatar: Mapped[str] = mapped_column(String(512), default="")
     free_credits_remaining: Mapped[int] = mapped_column(Integer, default=3, nullable=False)
-    paid_credits: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    paid_credits: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     monthly_card_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    membership_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     privacy_consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     sensitive_consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -65,6 +66,7 @@ class User(Base):
             "free_credits_remaining": self.free_credits_remaining,
             "paid_credits": self.paid_credits,
             "monthly_card_expires_at": iso_or_none(self.monthly_card_expires_at),
+            "membership_expires_at": iso_or_none(self.membership_expires_at or self.monthly_card_expires_at),
             "privacy_consent_at": iso_or_none(self.privacy_consent_at),
             "sensitive_consent_at": iso_or_none(self.sensitive_consent_at),
         }
@@ -177,6 +179,8 @@ class GenerationJob(Base):
     error_message_cn: Mapped[str | None] = mapped_column(String(255), nullable=True)
     ai_credit_reserved: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     ai_credit_refunded: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    ai_points_reserved: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    ai_credit_reservation_key: Mapped[str | None] = mapped_column(String(128), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -263,6 +267,50 @@ class EntitlementGrant(Base):
     entitlement_type: Mapped[str] = mapped_column(String(32), nullable=False)
     value: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+
+class CreditGrant(Base):
+    __tablename__ = "credit_grants"
+    __table_args__ = (
+        UniqueConstraint("idempotency_key", name="uq_credit_grants_idempotency_key"),
+        Index("ix_credit_grants_owner_active", "owner_type", "owner_id", "expires_at"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    owner_type: Mapped[str] = mapped_column(String(16), default="user", index=True, nullable=False)
+    owner_id: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
+    amount_original: Mapped[int] = mapped_column(Integer, nullable=False)
+    amount_remaining: Mapped[int] = mapped_column(Integer, nullable=False)
+    amount_reserved: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    kind: Mapped[str] = mapped_column(String(16), default="paid", nullable=False)
+    source_type: Mapped[str] = mapped_column(String(32), index=True, nullable=False)
+    source_id: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
+    idempotency_key: Mapped[str] = mapped_column(String(160), nullable=False)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+        onupdate=utc_now,
+        nullable=False,
+    )
+
+
+class CreditTransaction(Base):
+    __tablename__ = "credit_transactions"
+    __table_args__ = (UniqueConstraint("idempotency_key", name="uq_credit_transactions_idempotency_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    owner_type: Mapped[str] = mapped_column(String(16), default="user", index=True, nullable=False)
+    owner_id: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
+    direction: Mapped[str] = mapped_column(String(24), nullable=False)
+    amount: Mapped[int] = mapped_column(Integer, nullable=False)
+    balance_after: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    source_type: Mapped[str] = mapped_column(String(32), index=True, nullable=False)
+    source_id: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
+    idempotency_key: Mapped[str] = mapped_column(String(160), nullable=False)
+    metadata_json: Mapped[dict[str, Any] | None] = mapped_column(SAJSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True, nullable=False)
 
 
 class CDK(Base):
