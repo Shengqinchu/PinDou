@@ -521,6 +521,7 @@ async function downloadCurrentPattern(): Promise<void> {
   isDownloading.value = true;
   saveError.value = '';
   clearDownloadStatusTimer();
+  setDownloadStatus('准备下载…', 'busy');
   try {
     let savedForDownload: SaveArtworkPatternResponse | null = null;
     if (savePromise) {
@@ -792,6 +793,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
         v-if="downloadStatus.visible"
         class="editor-download-status"
         :class="`editor-download-status--${downloadStatus.kind}`"
+        role="status"
         aria-live="polite"
       >
         <span class="editor-download-status__dot" aria-hidden="true"></span>
@@ -1053,6 +1055,18 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
   }
 }
 
+@keyframes download-status-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
 .editor-topbar {
   min-width: 0;
   min-height: 62px;
@@ -1177,25 +1191,35 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
 }
 
 .editor-download-status {
-  position: absolute;
-  top: 76px;
+  position: fixed;
+  top: max(86px, calc(env(safe-area-inset-top) + 78px));
   left: 50%;
-  z-index: 12;
+  z-index: 2000;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  max-width: calc(100% - 24px);
-  border: 1px solid rgba(255, 142, 83, 0.22);
-  border-radius: 999px;
-  background: rgba(255, 250, 247, 0.94);
-  box-shadow: 0 14px 32px rgba(45, 45, 45, 0.12);
+  gap: 10px;
+  width: fit-content;
+  max-width: min(360px, calc(100vw - 28px));
+  border: 1px solid rgba(255, 142, 83, 0.28);
+  border-radius: 22px;
+  background: rgba(255, 250, 247, 0.97);
+  box-shadow:
+    0 18px 48px rgba(45, 45, 45, 0.18),
+    0 8px 20px rgba(255, 142, 83, 0.12);
   color: var(--pd-fg-1);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
-  padding: 9px 12px;
+  padding: 13px 16px;
   transform: translateX(-50%);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  pointer-events: auto;
+  animation: download-status-pop 180ms ease-out;
+}
+
+.editor-download-status strong {
+  white-space: nowrap;
 }
 
 .editor-download-status__dot {
