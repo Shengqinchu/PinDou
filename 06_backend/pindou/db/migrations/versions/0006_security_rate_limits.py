@@ -18,14 +18,43 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column(
-        "generation_jobs",
-        sa.Column("ai_credit_reserved", sa.Boolean(), nullable=False, server_default=sa.false()),
-    )
-    op.add_column(
-        "generation_jobs",
-        sa.Column("ai_credit_refunded", sa.Boolean(), nullable=False, server_default=sa.false()),
-    )
+    inspector = sa.inspect(op.get_bind())
+    tables = set(inspector.get_table_names())
+    if "generation_jobs" not in tables:
+        op.create_table(
+            "generation_jobs",
+            sa.Column("job_id", sa.String(length=64), primary_key=True),
+            sa.Column("user_id", sa.String(length=128), nullable=False),
+            sa.Column("status", sa.String(length=32), nullable=False),
+            sa.Column("mode", sa.String(length=32), nullable=False),
+            sa.Column("progress", sa.Integer(), nullable=False),
+            sa.Column("stage", sa.String(length=64), nullable=False),
+            sa.Column("message_cn", sa.String(length=255), nullable=False),
+            sa.Column("result_json", sa.JSON(), nullable=True),
+            sa.Column("error_code", sa.String(length=64), nullable=True),
+            sa.Column("error_message_cn", sa.String(length=255), nullable=True),
+            sa.Column("ai_credit_reserved", sa.Boolean(), nullable=False, server_default=sa.false()),
+            sa.Column("ai_credit_refunded", sa.Boolean(), nullable=False, server_default=sa.false()),
+            sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+            sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
+            sa.Column("completed_at", sa.DateTime(timezone=True), nullable=True),
+            sa.ForeignKeyConstraint(["user_id"], ["users.openid"]),
+        )
+        op.create_index("ix_generation_jobs_user_id", "generation_jobs", ["user_id"])
+        op.create_index("ix_generation_jobs_status", "generation_jobs", ["status"])
+        op.create_index("ix_generation_jobs_created_at", "generation_jobs", ["created_at"])
+    else:
+        columns = {column["name"] for column in inspector.get_columns("generation_jobs")}
+        if "ai_credit_reserved" not in columns:
+            op.add_column(
+                "generation_jobs",
+                sa.Column("ai_credit_reserved", sa.Boolean(), nullable=False, server_default=sa.false()),
+            )
+        if "ai_credit_refunded" not in columns:
+            op.add_column(
+                "generation_jobs",
+                sa.Column("ai_credit_refunded", sa.Boolean(), nullable=False, server_default=sa.false()),
+            )
     op.create_table(
         "rate_limit_buckets",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
