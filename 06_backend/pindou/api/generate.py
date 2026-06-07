@@ -34,7 +34,7 @@ from pindou.api.storage import (
     save_preview_png,
     save_uploaded_image,
 )
-from pindou.db.models import GenerationJob, User, utc_now
+from pindou.db.models import GenerationJob, User, utc_now, uuid_hex
 from pindou.pattern.builder import PatternBuilder
 from pindou.providers.base import PreviewProviderError, SizePreset, StylePreset
 from pindou.providers.chain import PreviewProviderChain
@@ -42,6 +42,7 @@ from pindou.providers.fallback_quantize import FallbackProvider
 from pindou.providers.xiaochi_gpt import XiaochiGptProvider
 from pindou.services.artwork_service import ArtworkService
 from pindou.services.rate_limit_service import RateLimitExceeded, RateLimitRule, consume_rate_limits
+from pindou.services.credit_service import AI_GENERATION_POINT_COST, commit_reservation, grant_points, release_reservation
 
 router = APIRouter(prefix="/generate", tags=["generate"])
 preview_router = APIRouter(prefix="/preview", tags=["generate"])
@@ -59,7 +60,7 @@ async def generate_script(request: Request, current_user: CurrentUser, db: DbSes
     size = parse_size(payload.get("size_preset") or payload.get("size") or "26x26")
     auto_remove_white_bg = parse_bool_default_false(payload.get("auto_remove_white_bg", False))
 
-    consume_script_quota(db, current_user)
+    script_quota_consumed = consume_script_quota(db, current_user)
     try:
         sheet = PatternBuilder().build(
             size=size,
@@ -90,7 +91,7 @@ async def generate_script(request: Request, current_user: CurrentUser, db: DbSes
             pattern_data=pattern_data,
         )
     except Exception as exc:  # noqa: BLE001 - API normalizes build/export failures and refunds consumed quota.
-        refund_script_quota(db, current_user.user_id)
+        refund_script_quota(db, current_user.user_id, consumed=script_quota_consumed)
         raise ApiException(500, ErrorCode.PATTERN_BUILD_FAILED, "图纸生成失败，请换一张照片再试。") from exc
 
     return {
@@ -111,7 +112,8 @@ async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession
     size = parse_size(payload.get("size_preset") or payload.get("size") or "26x26")
     style = parse_style(payload.get("style_preset") or payload.get("style") or "q_portrait")
     seed = int(payload["seed"]) if payload.get("seed") not in (None, "") else None
-    ai_credit_reserved = consume_ai_credit(db, current_user)
+    reservation_key = f"ai_generation:{uuid_hex()}"
+    ai_credit_reservation_key = consume_ai_credit(db, current_user, reservation_key=reservation_key)
     job: GenerationJob | None = None
     job_committed = False
     try:
@@ -121,7 +123,9 @@ async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession
             progress=4,
             stage="queued",
             message_cn="已提交，正在排队生成。",
-            ai_credit_reserved=ai_credit_reserved,
+            ai_credit_reserved=ai_credit_reservation_key is not None,
+            ai_points_reserved=AI_GENERATION_POINT_COST if ai_credit_reservation_key is not None else 0,
+            ai_credit_reservation_key=ai_credit_reservation_key,
         )
         db.add(job)
         db.commit()
@@ -145,7 +149,7 @@ async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession
             },
         )
     except Exception:
-        if ai_credit_reserved:
+        if ai_credit_reservation_key:
             if job_committed and job is not None:
                 update_generation_job(
                     db,
@@ -159,7 +163,7 @@ async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession
                 refund_reserved_ai_credit(db, job_id=job.job_id, user_id=current_user.user_id)
             else:
                 db.rollback()
-                refund_ai_credit(db, current_user.user_id)
+                refund_ai_credit(db, current_user.user_id, reservation_key=ai_credit_reservation_key)
         raise
 
     if job is None:
@@ -277,6 +281,9 @@ def run_ai_generation_job(
                 "pattern": pattern_data,
                 "preview_path": str(preview_path),
             }
+            job = db.get(GenerationJob, job_id)
+            if job is not None and job.ai_credit_reservation_key:
+                commit_reservation(db, reservation_key=job.ai_credit_reservation_key)
             update_generation_job(
                 db,
                 job_id,
@@ -360,12 +367,20 @@ def refund_reserved_ai_credit(db: Session, *, job_id: str, user_id: str) -> None
     if updated_job.rowcount != 1:
         db.rollback()
         return
-    updated_user = db.execute(
-        update(User).where(User.openid == user_id).values(paid_credits=User.paid_credits + 1)
-    )
-    if updated_user.rowcount != 1:
-        db.rollback()
-        return
+    _ = user_id
+    job = db.get(GenerationJob, job_id)
+    if job is not None and job.ai_credit_reservation_key:
+        release_reservation(db, reservation_key=job.ai_credit_reservation_key)
+    elif job is not None:
+        grant_points(
+            db,
+            owner_id=user_id,
+            amount=AI_GENERATION_POINT_COST,
+            kind="paid",
+            source_type="legacy_ai_refund",
+            source_id=job_id,
+            idempotency_key=f"legacy_ai_refund:{job_id}:points",
+        )
     db.commit()
 
 
@@ -429,16 +444,20 @@ async def generate_preview(request: Request, current_user: CurrentUser, db: DbSe
     style = parse_style(payload.get("style_preset") or payload.get("style") or "q_portrait")
     seed = int(payload["seed"]) if payload.get("seed") not in (None, "") else None
 
-    ai_credit_reserved = consume_ai_credit(db, current_user)
+    reservation_key = f"ai_preview:{uuid_hex()}"
+    ai_credit_reservation_key = consume_ai_credit(db, current_user, reservation_key=reservation_key)
     try:
         preview = build_preview_chain().generate(raw_image, style, size, seed=seed)
         if preview.fallback_count > 0 or preview.provider_used == FallbackProvider.name:
             raise PreviewProviderError("AI provider unavailable; refusing script fallback for preview generation.")
         _preview_path, preview_url = save_preview_png(preview.preview_id, preview.image)
         preview = replace(preview, image_url=preview_url)
+        if ai_credit_reservation_key:
+            commit_reservation(db, reservation_key=ai_credit_reservation_key)
+            db.commit()
     except Exception as exc:  # noqa: BLE001 - provider failures are normalized for the client.
-        if ai_credit_reserved:
-            refund_ai_credit(db, current_user.user_id)
+        if ai_credit_reservation_key:
+            refund_ai_credit(db, current_user.user_id, reservation_key=ai_credit_reservation_key)
         raise ApiException(500, ErrorCode.PREVIEW_FAILED, "AI 生成暂时失败，请稍后再试。") from exc
 
     return preview.to_frontend_dict()

@@ -9,7 +9,15 @@ from sqlalchemy.orm import Session
 
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.config import get_settings
-from pindou.db.models import DailyQuota, User, as_aware_utc, utc_now
+from pindou.db.models import DailyQuota, User, as_aware_utc
+from pindou.services.credit_service import (
+    AI_GENERATION_POINT_COST,
+    active_membership_expires_at,
+    ensure_legacy_paid_credit_grant,
+    get_credit_balance,
+    release_reservation,
+    reserve_points,
+)
 
 
 def require_sensitive_consent(user: User) -> None:
@@ -39,9 +47,11 @@ def has_unlimited_credit(user: User) -> bool:
     return bool(email and email in get_settings().unlimited_credit_email_set)
 
 
-def consume_script_quota(session: Session, user: User) -> None:
+def consume_script_quota(session: Session, user: User) -> bool:
     if has_unlimited_credit(user):
-        return
+        return False
+    if active_membership_expires_at(user) is not None:
+        return False
     result = session.execute(
         update(User)
         .where(User.openid == user.user_id, User.free_credits_remaining > 0)
@@ -49,12 +59,15 @@ def consume_script_quota(session: Session, user: User) -> None:
     )
     if result.rowcount != 1:
         session.rollback()
-        raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "普通额度不足，兑换 CDK 或购买额度后再生成吧。")
+        raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "普通额度不足，开通时间卡后可不限次生成。")
     session.commit()
     session.refresh(user)
+    return True
 
 
-def refund_script_quota(session: Session, user_id: str) -> None:
+def refund_script_quota(session: Session, user_id: str, *, consumed: bool = True) -> None:
+    if not consumed:
+        return
     session.execute(
         update(User)
         .where(User.openid == user_id)
@@ -68,50 +81,39 @@ def consume_white_bg_quota(session: Session, user: User) -> None:
     return
 
 
-def consume_ai_credit(session: Session, user: User) -> bool:
-    """Reserve one paid AI credit.
-
-    Returns True when a paid credit was decremented and should be refunded if
-    the paid AI generation fails. Unlimited and monthly-card users return False.
-    """
-
+def consume_ai_credit(session: Session, user: User, *, reservation_key: str) -> str | None:
+    """Reserve 128 AI points. Time cards never satisfy AI generation cost."""
     if has_unlimited_credit(user):
-        return False
-    now = utc_now()
-    if has_ai_credit(user, now=now):
-        monthly_card_expires_at = as_aware_utc(user.monthly_card_expires_at)
-        if monthly_card_expires_at is not None and monthly_card_expires_at > now:
-            return False
-        result = session.execute(
-            update(User)
-            .where(User.openid == user.user_id, User.paid_credits > 0)
-            .values(paid_credits=User.paid_credits - 1)
-        )
-        if result.rowcount == 1:
-            session.commit()
-            session.refresh(user)
-            return True
-        session.rollback()
-    raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "AI 额度不足，兑换 CDK 或购买 AI 额度后再生成吧。")
+        return None
+    ensure_legacy_paid_credit_grant(session, user)
+    reserve_points(
+        session,
+        owner_id=user.user_id,
+        amount=AI_GENERATION_POINT_COST,
+        reservation_key=reservation_key,
+    )
+    session.commit()
+    return reservation_key
 
 
-def refund_ai_credit(session: Session, user_id: str) -> None:
-    session.execute(update(User).where(User.openid == user_id).values(paid_credits=User.paid_credits + 1))
+def refund_ai_credit(session: Session, user_id: str, *, reservation_key: str | None = None) -> None:
+    _ = user_id
+    if not reservation_key:
+        return
+    release_reservation(session, reservation_key=reservation_key)
     session.commit()
 
 
-def require_ai_credit_available(user: User) -> None:
+def require_ai_credit_available(session: Session, user: User) -> None:
     if has_unlimited_credit(user):
         return
-    if not has_ai_credit(user):
-        raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "AI 额度不足，兑换 CDK 或购买 AI 额度后再生成吧。")
+    ensure_legacy_paid_credit_grant(session, user)
+    if get_credit_balance(session, owner_id=user.user_id).available < AI_GENERATION_POINT_COST:
+        raise ApiException(429, ErrorCode.QUOTA_EXCEEDED, "AI 积分不足，兑换 CDK 或购买积分后再生成吧。")
 
 
-def has_ai_credit(user: User, *, now=None) -> bool:
-    now = as_aware_utc(now) or utc_now()
-    monthly_card_expires_at = as_aware_utc(user.monthly_card_expires_at)
-    if monthly_card_expires_at is not None and monthly_card_expires_at > now:
+def has_ai_credit(session: Session, user: User, *, now=None) -> bool:
+    if has_unlimited_credit(user):
         return True
-    if user.paid_credits > 0:
-        return True
-    return False
+    ensure_legacy_paid_credit_grant(session, user, now=as_aware_utc(now))
+    return get_credit_balance(session, owner_id=user.user_id, now=as_aware_utc(now)).available >= AI_GENERATION_POINT_COST
