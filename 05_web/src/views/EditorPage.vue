@@ -73,6 +73,7 @@ const paintRevision = ref(0);
 const lastPatch = ref<CellPatch | null>(null);
 const dirtyVersion = ref(0);
 const savedVersion = ref(0);
+const renderedVersion = ref(0);
 const replaceSourceColor = ref<ColorRef | null>(null);
 const pendingReplace = ref<PendingReplace | null>(null);
 const replaceMessage = ref('');
@@ -119,6 +120,12 @@ const canUndo = computed(() => undoStack.value.length > 0);
 const canRedo = computed(() => redoStack.value.length > 0);
 const paintEnabled = computed(() => activeTool.value !== 'none');
 const canDownload = computed(() => Boolean(pattern.value && artworkId.value && !isDownloading.value));
+const downloadButtonLabel = computed(() => {
+  if (isDownloading.value) {
+    return '处理中';
+  }
+  return shouldPreferNativeShare() ? '存相册' : '下载';
+});
 const downloadFileName = computed(() => `拼豆图纸_${artworkId.value || 'pindou'}.png`);
 const selectedColorUseCount = computed(() => (
   selectedColor.value ? (pattern.value?.color_counts[selectedColor.value.code] || 0) : 0
@@ -205,6 +212,7 @@ function applyLoadedPattern(nextPattern: PatternSheet): void {
   saveError.value = '';
   dirtyVersion.value = 0;
   savedVersion.value = 0;
+  renderedVersion.value = 0;
   lastPatch.value = null;
   paintRevision.value = 0;
   patternKey.value += 1;
@@ -476,6 +484,10 @@ async function saveNow(manual: boolean): Promise<SaveArtworkPatternResponse | nu
       swrCache.setArtwork(saved.artwork);
       swrCache.invalidateGallery();
       generation.applyArtwork(saved.artwork);
+      syncPatternDownloadAssets(saved.pattern);
+      if (manual) {
+        renderedVersion.value = Math.max(renderedVersion.value, versionAtStart);
+      }
       if (dirtyVersion.value === versionAtStart) {
         savedVersion.value = versionAtStart;
         isDirty.value = false;
@@ -510,6 +522,7 @@ async function downloadCurrentPattern(): Promise<void> {
   saveError.value = '';
   clearDownloadStatusTimer();
   try {
+    let savedForDownload: SaveArtworkPatternResponse | null = null;
     if (savePromise) {
       setDownloadStatus('保存中…', 'busy');
       const saveStartedAt = performance.now();
@@ -519,11 +532,12 @@ async function downloadCurrentPattern(): Promise<void> {
         setDownloadStatus('保存失败', 'error', true);
         return;
       }
+      savedForDownload = saved;
       setDownloadStatus('已保存', 'success');
       await stageDelay(180);
     }
 
-    if (isDirty.value || !generation.patternImageUrl) {
+    if (isDirty.value || renderedVersion.value !== dirtyVersion.value || !currentRenderedPatternImageUrl(savedForDownload)) {
       setDownloadStatus('保存中…', 'busy');
       const saveStartedAt = performance.now();
       const saved = await saveNow(true);
@@ -532,23 +546,45 @@ async function downloadCurrentPattern(): Promise<void> {
         setDownloadStatus('保存失败', 'error', true);
         return;
       }
+      savedForDownload = saved;
       setDownloadStatus('已保存', 'success');
       await stageDelay(180);
     }
 
-    const url = generation.patternImageUrl;
+    const url = currentRenderedPatternImageUrl(savedForDownload);
     if (!url) {
-      saveError.value = '图纸图片还没准备好，请先保存后再试。';
+      saveError.value = '高清图纸还没准备好，请先保存后再试。';
       setDownloadStatus('下载失败', 'error', true);
       return;
     }
 
-    setDownloadStatus('下载中…', 'busy');
+    const preferNativeShare = shouldPreferNativeShare();
+    setDownloadStatus(preferNativeShare ? '准备保存到相册…' : '下载中…', 'busy');
     const fetchStartedAt = performance.now();
-    const result = await downloadImage(url, downloadFileName.value);
+    const result = await downloadImage(url, downloadFileName.value, {
+      preferNativeShare,
+      shareTitle: 'PinDou 拼豆图纸',
+      shareText: '保存到相册或分享这张拼豆图纸。'
+    });
     console.info(`[PinDou] 下载 fetch 段 ${Math.round(performance.now() - fetchStartedAt)}ms`);
+    if (result === 'shared') {
+      setDownloadStatus('已打开保存面板 ✓', 'success');
+      hideDownloadStatusLater();
+      return;
+    }
+    if (result === 'cancelled') {
+      setDownloadStatus('已取消', 'success');
+      hideDownloadStatusLater();
+      return;
+    }
     if (result === 'opened') {
-      saveError.value = '图片已在新窗口打开，手机端可长按保存。';
+      saveError.value = '浏览器不支持直接保存相册，已打开高清图纸，可长按保存。';
+      setDownloadStatus('已打开高清图纸', 'success');
+      hideDownloadStatusLater();
+      return;
+    }
+    if (preferNativeShare) {
+      saveError.value = '已下载到文件，若未进入相册，请在下载列表里打开后长按保存。';
     }
     setDownloadStatus('完成 ✓', 'success');
     hideDownloadStatusLater();
@@ -588,6 +624,52 @@ function stageDelay(ms: number): Promise<void> {
   return new Promise((resolve) => {
     window.setTimeout(resolve, ms);
   });
+}
+
+function currentRenderedPatternImageUrl(saved?: SaveArtworkPatternResponse | null): string {
+  return highQualityPatternImageUrl(saved?.pattern || null)
+    || highQualityPatternImageUrl(saved?.artwork?.pattern_data || null)
+    || highQualityPatternImageUrl(editablePattern.value)
+    || highQualityPatternImageUrl(generation.currentPattern);
+}
+
+function highQualityPatternImageUrl(sheet: PatternSheet | null | undefined): string {
+  if (!sheet) {
+    return '';
+  }
+  const metadata = sheet.metadata || {};
+  return metadataString(metadata, 'labeled_image_url') || stringValue(sheet.image_url);
+}
+
+function syncPatternDownloadAssets(savedPattern: PatternSheet): void {
+  const sheet = editablePattern.value;
+  if (!sheet) {
+    return;
+  }
+  editablePattern.value = {
+    ...sheet,
+    image_url: savedPattern.image_url || sheet.image_url,
+    metadata: {
+      ...(sheet.metadata || {}),
+      ...(savedPattern.metadata || {})
+    }
+  };
+}
+
+function metadataString(metadata: Record<string, unknown>, key: string): string {
+  return stringValue(metadata[key]);
+}
+
+function stringValue(value: unknown): string {
+  return typeof value === 'string' && value.trim() ? value.trim() : '';
+}
+
+function shouldPreferNativeShare(): boolean {
+  const nav = navigator as Navigator & { share?: unknown };
+  if (typeof nav.share !== 'function') {
+    return false;
+  }
+  return window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
 }
 
 async function goBackToResult(): Promise<void> {
@@ -698,7 +780,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
               <path d="m7.5 10.5 4.5 4.5 4.5-4.5" />
               <path d="M5 19h14" />
             </svg>
-            <span>{{ isDownloading ? '下载中' : '下载' }}</span>
+            <span>{{ downloadButtonLabel }}</span>
           </button>
           <button type="button" class="editor-save" :disabled="saveStatus === 'saving'" @click="saveNow(true)">
             {{ saveStatus === 'saving' ? '保存中' : '保存' }}
