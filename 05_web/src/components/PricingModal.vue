@@ -696,13 +696,10 @@ function readErrorMessage(error: unknown, fallback: string): string {
   overscroll-behavior: contain;
   display: grid;
   gap: 9px;
-  border: 1px solid rgba(226, 210, 194, 0.94);
+  border: 1px solid rgba(224, 226, 230, 0.96);
   border-radius: 26px;
-  background:
-    radial-gradient(circle at 16% 0%, rgba(255, 176, 136, 0.2), transparent 32%),
-    radial-gradient(circle at 90% 6%, rgba(255, 218, 145, 0.18), transparent 28%),
-    linear-gradient(145deg, rgba(255, 253, 250, 0.99), rgba(255, 244, 237, 0.99));
-  box-shadow: var(--pd-shadow-modal), 0 20px 50px rgba(93, 66, 48, 0.16);
+  background: #f6f7f9;
+  box-shadow: 0 28px 70px rgba(45, 45, 45, 0.2), 0 8px 24px rgba(45, 45, 45, 0.1);
   padding: clamp(14px, 2vw, 20px);
 }
 
@@ -735,7 +732,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
 .pricing-header {
   display: grid;
   gap: 6px;
-  border-bottom: 1px solid rgba(237, 214, 196, 0.72);
+  border-bottom: 1px solid rgba(220, 224, 229, 0.92);
   padding-right: 38px;
   padding-bottom: 9px;
 }
@@ -755,7 +752,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
   gap: 8px;
   width: fit-content;
   max-width: 100%;
-  color: #6e625a;
+  color: #61666d;
   font-size: 13px;
   font-weight: 900;
   line-height: 1.45;
@@ -845,10 +842,10 @@ function readErrorMessage(error: unknown, fallback: string): string {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px;
-  border: 1px solid rgba(255, 142, 83, 0.18);
+  border: 1px solid rgba(220, 224, 229, 0.94);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: inset 0 2px 8px rgba(93, 66, 48, 0.04);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: inset 0 1px 3px rgba(45, 45, 45, 0.04);
   padding: 5px;
 }
 
@@ -870,8 +867,8 @@ function readErrorMessage(error: unknown, fallback: string): string {
 }
 
 .pricing-tabs button:hover:not(.pricing-tab--active) {
-  border-color: rgba(255, 142, 83, 0.18);
-  background: rgba(255, 245, 238, 0.9);
+  border-color: rgba(255, 142, 83, 0.24);
+  background: #fff;
   color: #241f1a;
   transform: translateY(-1px);
 }
@@ -893,9 +890,9 @@ function readErrorMessage(error: unknown, fallback: string): string {
 .pricing-panel,
 .payment-view,
 .cdk-card {
-  border: 1px solid rgba(232, 208, 188, 0.88);
+  border: 1px solid rgba(224, 226, 230, 0.94);
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.86);
+  background: #fff;
 }
 
 .pricing-loading,
@@ -916,9 +913,8 @@ function readErrorMessage(error: unknown, fallback: string): string {
   max-height: min(360px, calc(85dvh - 210px));
   display: grid;
   gap: 10px;
-  background:
-    linear-gradient(180deg, rgba(255, 250, 246, 0.92), rgba(255, 241, 233, 0.92));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 10px 28px rgba(93, 66, 48, 0.06);
+  background: #eef1f5;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 10px 28px rgba(45, 45, 45, 0.05);
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 11px;
@@ -938,32 +934,31 @@ function readErrorMessage(error: unknown, fallback: string): string {
   display: grid;
   grid-template-rows: auto auto auto auto;
   gap: 8px;
-  border: 1px solid rgba(232, 208, 188, 0.92);
+  border: 1px solid rgba(224, 226, 230, 0.96);
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: var(--pd-shadow-card), 0 12px 28px rgba(93, 66, 48, 0.08);
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(45, 45, 45, 0.1);
   padding: 12px;
   transition: transform 180ms var(--pd-ease-out), box-shadow 180ms var(--pd-ease-out), border-color 180ms var(--pd-ease-out), background 180ms var(--pd-ease-out);
 }
 
 .sku-card:hover {
   border-color: rgba(255, 142, 83, 0.56);
-  box-shadow: var(--pd-shadow-card), 0 18px 36px rgba(255, 142, 83, 0.14);
+  box-shadow: 0 14px 32px rgba(45, 45, 45, 0.13), 0 8px 18px rgba(255, 142, 83, 0.12);
   transform: translateY(-2px);
 }
 
 .sku-card--featured {
   z-index: 1;
   border-color: rgba(255, 142, 83, 0.86);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 248, 242, 0.98));
-  box-shadow: 0 20px 42px rgba(255, 142, 83, 0.24), 0 6px 14px rgba(93, 66, 48, 0.1);
-  transform: translateY(-4px) scale(1.018);
+  background: #fff;
+  box-shadow: 0 22px 46px rgba(45, 45, 45, 0.16), 0 10px 24px rgba(255, 142, 83, 0.22);
+  transform: translateY(-5px) scale(1.026);
 }
 
 .sku-card--featured:hover {
-  box-shadow: 0 24px 48px rgba(255, 111, 143, 0.24), 0 8px 16px rgba(93, 66, 48, 0.12);
-  transform: translateY(-6px) scale(1.018);
+  box-shadow: 0 26px 54px rgba(45, 45, 45, 0.18), 0 12px 28px rgba(255, 111, 143, 0.22);
+  transform: translateY(-7px) scale(1.026);
 }
 
 .sku-card--selected {
@@ -1009,15 +1004,11 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
 .sku-price {
   display: block;
-  border-bottom: 1px solid rgba(237, 214, 196, 0.76);
-  border-radius: 14px;
-  background: rgba(255, 247, 241, 0.78);
-  box-shadow: inset 0 1px 4px rgba(93, 66, 48, 0.04);
-  color: var(--pd-fg-1);
+  color: #222;
   font-family: var(--pd-font-display);
   font-size: clamp(28px, 3.6vw, 36px);
   line-height: 1;
-  padding: 7px 8px 9px;
+  padding: 4px 0 2px;
   white-space: nowrap;
 }
 
@@ -1030,7 +1021,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
 .sku-main {
   color: var(--pd-orange);
-  font-size: 15px;
+  font-size: 16px;
   white-space: nowrap;
 }
 
@@ -1082,8 +1073,8 @@ function readErrorMessage(error: unknown, fallback: string): string {
 .cdk-card {
   display: grid;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 10px 26px rgba(93, 66, 48, 0.06);
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(45, 45, 45, 0.07);
   padding: 12px 13px;
 }
 
@@ -1095,10 +1086,8 @@ function readErrorMessage(error: unknown, fallback: string): string {
   place-items: center;
   align-content: center;
   gap: 10px;
-  background:
-    radial-gradient(circle at 50% 22%, rgba(255, 198, 107, 0.18), transparent 34%),
-    rgba(255, 255, 255, 0.94);
-  box-shadow: 0 16px 34px rgba(93, 66, 48, 0.08);
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(45, 45, 45, 0.1);
   overflow: hidden;
   padding: clamp(15px, 2.6vw, 22px);
 }
@@ -1127,37 +1116,41 @@ function readErrorMessage(error: unknown, fallback: string): string {
 }
 
 .wechat-pay-card {
-  width: min(300px, 78vw);
-  overflow: hidden;
-  border: 1px solid rgba(7, 193, 96, 0.34);
-  border-radius: 22px;
+  width: min(292px, 76vw);
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  border: 1px solid rgba(224, 226, 230, 0.98);
+  border-radius: 20px;
   background: #fff;
-  box-shadow: var(--pd-shadow-card), 0 16px 34px rgba(7, 193, 96, 0.12);
+  box-shadow: 0 8px 24px rgba(45, 45, 45, 0.1);
+  padding: 15px 14px 16px;
 }
 
 .wechat-pay-card__head {
-  min-height: 50px;
+  min-height: 28px;
   display: inline-flex;
-  width: 100%;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background: #07c160;
-  color: #fff;
-  font-size: 16px;
+  gap: 6px;
+  border-radius: 999px;
+  background: rgba(7, 193, 96, 0.1);
+  color: #07c160;
+  font-size: 13px;
   font-weight: 900;
+  padding: 4px 10px;
 }
 
 .wechat-pay-card__icon {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   display: grid;
   place-items: center;
 }
 
 .wechat-pay-card__icon svg {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -1166,16 +1159,15 @@ function readErrorMessage(error: unknown, fallback: string): string {
 }
 
 .payment-qr-frame {
-  width: min(228px, 62vw);
+  width: min(214px, 58vw);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  margin: 15px auto 16px;
   border: 1px solid rgba(223, 223, 223, 0.92);
-  border-radius: 18px;
+  border-radius: 16px;
   background: #fff;
-  box-shadow: inset 0 0 0 8px #fff, 0 10px 22px rgba(0, 0, 0, 0.06);
-  padding: 13px;
+  box-shadow: inset 0 0 0 8px #fff;
+  padding: 12px;
 }
 
 .payment-qr-placeholder {
