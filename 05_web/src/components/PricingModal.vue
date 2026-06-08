@@ -1088,6 +1088,8 @@ function readErrorMessage(error: unknown, fallback: string): string {
 }
 
 .payment-view {
+  width: min(100%, 520px);
+  justify-self: center;
   min-height: 0;
   display: grid;
   place-items: center;
