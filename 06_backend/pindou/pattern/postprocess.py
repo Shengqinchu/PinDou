@@ -19,8 +19,11 @@ WHITE_RGB = (255, 255, 255)
 FLOOD_FILL_WHITE_DELTA_E = 18.0
 EDGE_BACKGROUND_BIN_SIZE = 8
 EDGE_BACKGROUND_MIN_DOMINANCE = 0.30
+EDGE_LIGHT_BACKGROUND_MIN_COVERAGE = 0.55
 LIGHT_BACKGROUND_MIN_CHANNEL = 185
 LIGHT_BACKGROUND_MAX_SPREAD = 70
+LIGHT_BACKGROUND_MASK_MIN_CHANNEL = 230
+LIGHT_BACKGROUND_MASK_MAX_SPREAD = 48
 OPAQUE_ALPHA_THRESHOLD = 128
 LOW_GRID_OUTLINE_MIN_DARK_RATIO = 0.025
 SHAPE_CLEANUP_MIN_COMPONENT_SIZE = 4
@@ -32,6 +35,17 @@ FEATURE_NEIGHBOR_CONTRAST = 48.0
 FEATURE_ACCENT_MAX_COMPONENT_SIZE = 12
 SYMMETRY_MAX_MISMATCH_RATIO = 0.22
 SYMMETRY_MAX_OCCUPANCY_MISMATCH_RATIO = 0.12
+CARTOON_EYE_MIN_COMPONENT_SIZE = 3
+CARTOON_EYE_MAX_COMPONENT_FRACTION = 0.035
+CARTOON_EYE_MAX_WIDTH_RATIO = 0.16
+CARTOON_EYE_MAX_HEIGHT_RATIO = 0.20
+CARTOON_EYE_MIN_AXIS_DISTANCE_RATIO = 0.09
+CARTOON_EYE_MAX_AXIS_DISTANCE_RATIO = 0.38
+CARTOON_EYE_BAND_TOP_RATIO = 0.24
+CARTOON_EYE_BAND_BOTTOM_RATIO = 0.70
+CARTOON_EYE_PAIR_MAX_ROW_DELTA_RATIO = 0.12
+CARTOON_EYE_PAIR_MAX_SYMMETRY_ERROR_RATIO = 0.14
+CARTOON_EYE_CLEANUP_MARGIN = 1
 
 
 @dataclass(frozen=True)
@@ -52,6 +66,53 @@ class ShapeCleanupResult:
             "protected_feature_cells": self.protected_feature_cells,
             "symmetry_applied": self.symmetry_applied,
         }
+
+
+@dataclass(frozen=True)
+class CartoonEyeNormalizationResult:
+    codes: GridCodes
+    applied: bool = False
+    changed_cells: int = 0
+    left_cells: int = 0
+    right_cells: int = 0
+    target_width: int = 0
+    target_height: int = 0
+    axis_col: float | None = None
+
+    def to_metadata(self) -> dict[str, object]:
+        return {
+            "enabled": True,
+            "applied": self.applied,
+            "changed_cells": self.changed_cells,
+            "left_cells": self.left_cells,
+            "right_cells": self.right_cells,
+            "target_width": self.target_width,
+            "target_height": self.target_height,
+            "axis_col": None if self.axis_col is None else round(self.axis_col, 3),
+        }
+
+
+@dataclass(frozen=True)
+class CartoonEyeCandidate:
+    cells: tuple[tuple[int, int], ...]
+    min_row: int
+    max_row: int
+    min_col: int
+    max_col: int
+    center_row: float
+    center_col: float
+
+    @property
+    def size(self) -> int:
+        return len(self.cells)
+
+    @property
+    def width(self) -> int:
+        return self.max_col - self.min_col + 1
+
+    @property
+    def height(self) -> int:
+        return self.max_row - self.min_row + 1
 
 
 def merge_small_components(
@@ -303,6 +364,286 @@ def maybe_apply_vertical_symmetry(
     return result, changed, changed > 0
 
 
+def normalize_cartoon_eye_features(
+    codes: GridCodes,
+    palette_by_code: dict[str, ColorRef],
+) -> CartoonEyeNormalizationResult:
+    """Normalize paired cartoon eyes without mirroring the whole character."""
+
+    if not codes or not codes[0]:
+        return CartoonEyeNormalizationResult(codes=codes)
+
+    bbox = foreground_bbox(codes)
+    if bbox is None:
+        return CartoonEyeNormalizationResult(codes=codes)
+
+    black_codes = {code for code, color in palette_by_code.items() if is_black_outline(color)}
+    if not black_codes:
+        return CartoonEyeNormalizationResult(codes=codes)
+
+    candidates = find_cartoon_eye_candidates(codes, palette_by_code, black_codes, bbox)
+    pair = choose_cartoon_eye_pair(candidates, bbox)
+    if pair is None:
+        return CartoonEyeNormalizationResult(codes=codes)
+
+    left, right = pair
+    result = [row[:] for row in codes]
+    cleanup_cells = expanded_eye_cells(codes, left, black_codes) | expanded_eye_cells(codes, right, black_codes)
+    fill_code = choose_eye_fill_code(codes, cleanup_cells, palette_by_code, black_codes)
+    changed = 0
+    if fill_code is not None:
+        for row, col in cleanup_cells:
+            if result[row][col] in black_codes:
+                result[row][col] = fill_code
+                changed += 1
+
+    target_width, target_height = target_eye_dimensions(left, right, len(codes), len(codes[0]))
+    axis_col = (left.center_col + right.center_col) / 2.0
+    center_row = (left.center_row + right.center_row) / 2.0
+    distance = (right.center_col - left.center_col) / 2.0
+    left_cells = draw_solid_eye(result, center_row, axis_col - distance, target_width, target_height, left_code(codes, left))
+    right_cells = draw_solid_eye(result, center_row, axis_col + distance, target_width, target_height, left_code(codes, left))
+    changed += count_code_differences(codes, result)
+
+    # count_code_differences includes the cleanup changes; avoid double-counting
+    # if cleanup happened before drawing.
+    changed = count_code_differences(codes, result)
+    return CartoonEyeNormalizationResult(
+        codes=result,
+        applied=changed > 0,
+        changed_cells=changed,
+        left_cells=left_cells,
+        right_cells=right_cells,
+        target_width=target_width,
+        target_height=target_height,
+        axis_col=axis_col,
+    )
+
+
+def find_cartoon_eye_candidates(
+    codes: GridCodes,
+    palette_by_code: dict[str, ColorRef],
+    black_codes: set[str],
+    bbox: tuple[int, int, int, int],
+) -> list[CartoonEyeCandidate]:
+    height = len(codes)
+    width = len(codes[0])
+    min_row, max_row, min_col, max_col = bbox
+    subject_height = max_row - min_row + 1
+    subject_width = max_col - min_col + 1
+    axis_col = (min_col + max_col) / 2.0
+    max_size = max(CARTOON_EYE_MIN_COMPONENT_SIZE, int(round(width * height * CARTOON_EYE_MAX_COMPONENT_FRACTION)))
+    max_eye_width = max(2, int(round(subject_width * CARTOON_EYE_MAX_WIDTH_RATIO)))
+    max_eye_height = max(2, int(round(subject_height * CARTOON_EYE_MAX_HEIGHT_RATIO)))
+    min_axis_distance = subject_width * CARTOON_EYE_MIN_AXIS_DISTANCE_RATIO
+    max_axis_distance = subject_width * CARTOON_EYE_MAX_AXIS_DISTANCE_RATIO
+    min_eye_row = min_row + subject_height * CARTOON_EYE_BAND_TOP_RATIO
+    max_eye_row = min_row + subject_height * CARTOON_EYE_BAND_BOTTOM_RATIO
+
+    visited = [[False for _ in range(width)] for _ in range(height)]
+    candidates: list[CartoonEyeCandidate] = []
+    for row in range(height):
+        for col in range(width):
+            code = codes[row][col]
+            if code not in black_codes or visited[row][col]:
+                continue
+            component = collect_component(codes, visited, row, col, code)
+            if len(component) < CARTOON_EYE_MIN_COMPONENT_SIZE or len(component) > max_size:
+                continue
+            rows = [cell_row for cell_row, _cell_col in component]
+            cols = [cell_col for _cell_row, cell_col in component]
+            candidate = CartoonEyeCandidate(
+                cells=tuple(component),
+                min_row=min(rows),
+                max_row=max(rows),
+                min_col=min(cols),
+                max_col=max(cols),
+                center_row=sum(rows) / len(rows),
+                center_col=sum(cols) / len(cols),
+            )
+            if candidate.width > max_eye_width or candidate.height > max_eye_height:
+                continue
+            if not (min_eye_row <= candidate.center_row <= max_eye_row):
+                continue
+            axis_distance = abs(candidate.center_col - axis_col)
+            if axis_distance < min_axis_distance or axis_distance > max_axis_distance:
+                continue
+            if not is_eye_like_component(codes, candidate, palette_by_code):
+                continue
+            candidates.append(candidate)
+    return candidates
+
+
+def choose_cartoon_eye_pair(
+    candidates: list[CartoonEyeCandidate],
+    bbox: tuple[int, int, int, int],
+) -> tuple[CartoonEyeCandidate, CartoonEyeCandidate] | None:
+    if len(candidates) < 2:
+        return None
+    min_row, max_row, min_col, max_col = bbox
+    subject_height = max_row - min_row + 1
+    subject_width = max_col - min_col + 1
+    axis_col = (min_col + max_col) / 2.0
+    max_row_delta = max(2.0, subject_height * CARTOON_EYE_PAIR_MAX_ROW_DELTA_RATIO)
+    max_symmetry_error = max(2.0, subject_width * CARTOON_EYE_PAIR_MAX_SYMMETRY_ERROR_RATIO)
+
+    best_pair: tuple[CartoonEyeCandidate, CartoonEyeCandidate] | None = None
+    best_score: float | None = None
+    left_candidates = [candidate for candidate in candidates if candidate.center_col < axis_col]
+    right_candidates = [candidate for candidate in candidates if candidate.center_col > axis_col]
+    for left in left_candidates:
+        for right in right_candidates:
+            row_delta = abs(left.center_row - right.center_row)
+            if row_delta > max_row_delta:
+                continue
+            symmetry_error = abs((axis_col - left.center_col) - (right.center_col - axis_col))
+            if symmetry_error > max_symmetry_error:
+                continue
+            size_delta = abs(left.size - right.size) / max(left.size, right.size)
+            if size_delta > 0.65:
+                continue
+            score = row_delta * 2.0 + symmetry_error * 2.0 + size_delta * 6.0
+            # Cartoon eyes are usually compact, visible components; tiny dust
+            # near the face should lose to real eye blobs.
+            score -= min(left.size, right.size) * 0.04
+            if best_score is None or score < best_score:
+                best_score = score
+                best_pair = (left, right)
+    return best_pair
+
+
+def is_eye_like_component(
+    codes: GridCodes,
+    candidate: CartoonEyeCandidate,
+    palette_by_code: dict[str, ColorRef],
+) -> bool:
+    height = len(codes)
+    width = len(codes[0])
+    component_set = set(candidate.cells)
+    neighbor_codes: list[str] = []
+    for row, col in candidate.cells:
+        for n_row, n_col in neighbors8(row, col, height, width):
+            if (n_row, n_col) in component_set:
+                continue
+            code = codes[n_row][n_col]
+            if code is not None and code in palette_by_code:
+                neighbor_codes.append(code)
+    if not neighbor_codes:
+        return False
+    light_neighbors = 0
+    for code in neighbor_codes:
+        color = palette_by_code.get(code)
+        if color is not None and color_luminance(color) >= 135 and not is_feature_accent_color(color):
+            light_neighbors += 1
+    return light_neighbors / len(neighbor_codes) >= 0.35
+
+
+def expanded_eye_cells(codes: GridCodes, candidate: CartoonEyeCandidate, black_codes: set[str]) -> set[tuple[int, int]]:
+    height = len(codes)
+    width = len(codes[0])
+    min_row = max(0, candidate.min_row - CARTOON_EYE_CLEANUP_MARGIN)
+    max_row = min(height - 1, candidate.max_row + CARTOON_EYE_CLEANUP_MARGIN)
+    min_col = max(0, candidate.min_col - CARTOON_EYE_CLEANUP_MARGIN)
+    max_col = min(width - 1, candidate.max_col + CARTOON_EYE_CLEANUP_MARGIN)
+    return {
+        (row, col)
+        for row in range(min_row, max_row + 1)
+        for col in range(min_col, max_col + 1)
+        if codes[row][col] in black_codes
+    }
+
+
+def choose_eye_fill_code(
+    codes: GridCodes,
+    cleanup_cells: set[tuple[int, int]],
+    palette_by_code: dict[str, ColorRef],
+    black_codes: set[str],
+) -> str | None:
+    height = len(codes)
+    width = len(codes[0])
+    counts: Counter[str] = Counter()
+    for row, col in cleanup_cells:
+        for n_row, n_col in neighbors8(row, col, height, width):
+            if (n_row, n_col) in cleanup_cells:
+                continue
+            code = codes[n_row][n_col]
+            if code is None or code in black_codes:
+                continue
+            color = palette_by_code.get(code)
+            if color is None or is_feature_accent_color(color):
+                continue
+            counts[code] += 1
+    if not counts:
+        return None
+    return counts.most_common(1)[0][0]
+
+
+def target_eye_dimensions(
+    left: CartoonEyeCandidate,
+    right: CartoonEyeCandidate,
+    height: int,
+    width: int,
+) -> tuple[int, int]:
+    mean_width = (left.width + right.width) / 2.0
+    mean_height = (left.height + right.height) / 2.0
+    scale = max(width, height)
+    target_width = max(1, int(round(mean_width * 0.55)))
+    target_height = max(2, int(round(mean_height * 0.72)))
+    if scale <= 56:
+        target_width = min(target_width, 2)
+        target_height = min(target_height, 4)
+    elif scale <= 80:
+        target_width = min(target_width, 3)
+        target_height = min(target_height, 5)
+    else:
+        target_width = min(target_width, max(3, int(round(scale * 0.055))))
+        target_height = min(target_height, max(5, int(round(scale * 0.085))))
+    return target_width, target_height
+
+
+def draw_solid_eye(
+    codes: GridCodes,
+    center_row: float,
+    center_col: float,
+    width: int,
+    height: int,
+    code: str | None,
+) -> int:
+    if code is None:
+        return 0
+    grid_height = len(codes)
+    grid_width = len(codes[0])
+    min_row = int(round(center_row - (height - 1) / 2.0))
+    min_col = int(round(center_col - (width - 1) / 2.0))
+    written = 0
+    for row in range(min_row, min_row + height):
+        if row < 0 or row >= grid_height:
+            continue
+        for col in range(min_col, min_col + width):
+            if col < 0 or col >= grid_width:
+                continue
+            if codes[row][col] != code:
+                codes[row][col] = code
+            written += 1
+    return written
+
+
+def left_code(codes: GridCodes, candidate: CartoonEyeCandidate) -> str | None:
+    if not candidate.cells:
+        return None
+    row, col = candidate.cells[0]
+    return codes[row][col]
+
+
+def count_code_differences(before: GridCodes, after: GridCodes) -> int:
+    return sum(
+        1
+        for row_idx, row in enumerate(before)
+        for col_idx, code in enumerate(row)
+        if after[row_idx][col_idx] != code
+    )
+
+
 def color_luminance(color: ColorRef) -> float:
     r, g, b = color.rgb
     return 0.2126 * r + 0.7152 * g + 0.0722 * b
@@ -488,7 +829,10 @@ def bridge_single_cell_outline_gaps(
 
 def is_feature_accent_color(color: ColorRef) -> bool:
     r, g, b = color.rgb
-    return r >= 150 and r - max(g, b) >= 45 and max(color.rgb) - min(color.rgb) >= 70
+    saturated = max(color.rgb) - min(color.rgb) >= 70
+    red_accent = r >= 150 and r - max(g, b) >= 45
+    yellow_accent = r >= 170 and g >= 130 and b <= 150
+    return saturated and (red_accent or yellow_accent)
 
 
 def detect_and_remove_white_bg(
@@ -553,7 +897,16 @@ def dominant_edge_background(arr: np.ndarray) -> tuple[int, int, int] | None:
     _unique_bins, inverse, counts = np.unique(bins, axis=0, return_inverse=True, return_counts=True)
     best = int(np.argmax(counts))
     if counts[best] / len(edge_pixels) < EDGE_BACKGROUND_MIN_DOMINANCE:
-        return None
+        rgb = edge_pixels[:, :3]
+        minimum = rgb.min(axis=1)
+        maximum = rgb.max(axis=1)
+        spread = maximum.astype(np.int16) - minimum.astype(np.int16)
+        light = (minimum >= LIGHT_BACKGROUND_MIN_CHANNEL) & (spread <= LIGHT_BACKGROUND_MAX_SPREAD)
+        if int(light.sum()) / len(edge_pixels) < EDGE_LIGHT_BACKGROUND_MIN_COVERAGE:
+            return None
+        members = rgb[light].astype(np.float64)
+        mean = np.rint(members.mean(axis=0)).astype(int)
+        return (int(mean[0]), int(mean[1]), int(mean[2]))
     members = edge_pixels[inverse == best, :3].astype(np.float64)
     mean = np.rint(members.mean(axis=0)).astype(int)
     return (int(mean[0]), int(mean[1]), int(mean[2]))
@@ -570,7 +923,15 @@ def background_similarity_mask(arr: np.ndarray, background_rgb: tuple[int, int, 
     lab = rgb_to_lab(rgb)
     background_lab = rgb_to_lab(np.array(background_rgb, dtype=np.float64).reshape(1, 1, 3)).reshape(3)
     distance = delta_e_ciede2000(lab, background_lab)
-    return (arr[:, :, 3] >= OPAQUE_ALPHA_THRESHOLD) & (distance <= tolerance_delta_e)
+    opaque = arr[:, :, 3] >= OPAQUE_ALPHA_THRESHOLD
+    similar = opaque & (distance <= tolerance_delta_e)
+    if is_removable_background(background_rgb, tolerance_delta_e):
+        minimum = arr[:, :, :3].min(axis=2)
+        maximum = arr[:, :, :3].max(axis=2)
+        spread = maximum.astype(np.int16) - minimum.astype(np.int16)
+        light_neutral = (minimum >= LIGHT_BACKGROUND_MASK_MIN_CHANNEL) & (spread <= LIGHT_BACKGROUND_MASK_MAX_SPREAD)
+        similar = similar | (opaque & light_neutral)
+    return similar
 
 
 def average_corner_delta_e_to_white(image: Image.Image, sample_size: int = 5) -> float:

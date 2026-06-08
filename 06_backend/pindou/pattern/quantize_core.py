@@ -159,12 +159,19 @@ def merge_palette_indices_by_delta_e(
     *,
     threshold_delta_e: float,
     metric: str = "ciede2000",
+    protected_indices: set[int] | None = None,
 ) -> np.ndarray:
     """Collapse visually indistinguishable selected bead colors into the larger pixel cluster."""
     if threshold_delta_e <= 0 or len(selected_indices) <= 1:
         return selected_indices
 
     selected_indices = np.array(list(dict.fromkeys(selected_indices.tolist())), dtype=int)
+    protected_indices = protected_indices or set()
+    protected_positions = {
+        position
+        for position, palette_index in enumerate(selected_indices.tolist())
+        if int(palette_index) in protected_indices
+    }
     selected_rgb = palette.rgb[selected_indices]
     assignments = nearest_indices(pixels_rgb, selected_rgb, metric)
     counts = np.bincount(assignments, minlength=len(selected_indices)).astype(np.int64)
@@ -178,6 +185,8 @@ def merge_palette_indices_by_delta_e(
         active_list = sorted(active)
         for pos, left in enumerate(active_list):
             for right in active_list[pos + 1 :]:
+                if left in protected_positions and right in protected_positions:
+                    continue
                 distance = float(delta[left, right])
                 if distance < threshold_delta_e and distance < best_distance:
                     best_distance = distance
@@ -186,7 +195,11 @@ def merge_palette_indices_by_delta_e(
             break
 
         left, right = best_pair
-        if counts[left] > counts[right]:
+        if left in protected_positions and right not in protected_positions:
+            keep, drop = left, right
+        elif right in protected_positions and left not in protected_positions:
+            keep, drop = right, left
+        elif counts[left] > counts[right]:
             keep, drop = left, right
         elif counts[right] > counts[left]:
             keep, drop = right, left

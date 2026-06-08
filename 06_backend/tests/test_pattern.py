@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw
 
 from pindou.pattern.builder import ColorRef, NoBead, PatternBuilder, PatternSheet, fit_to_canvas
 from pindou.pattern.exporter import PatternExporter, fit_cell_code_font, labeled_grid_filename, partition_filename
-from pindou.pattern.postprocess import cleanup_shape_artifacts, detect_and_remove_white_bg
+from pindou.pattern.postprocess import cleanup_shape_artifacts, detect_and_remove_white_bg, normalize_cartoon_eye_features
 from pindou.pattern.quantize import choose_effective_target_colors
 from pindou.pattern.quantize_core import Palette, merge_palette_indices_by_delta_e, rgb_to_lab
 from pindou.providers.base import SizePreset
@@ -401,6 +401,32 @@ def test_shape_cleanup_symmetry_mirrors_tiny_protected_feature() -> None:
     assert cleanup.symmetry_cells == 1
 
 
+def test_cartoon_eye_normalization_makes_paired_eyes_equal_without_global_mirror() -> None:
+    palette = palette_map(
+        ("W", (255, 255, 255)),
+        ("D", (1, 1, 1)),
+        ("R", (230, 40, 50)),
+    )
+    codes: list[list[str | None]] = [[None for _ in range(40)] for _ in range(24)]
+    for row in range(3, 21):
+        for col in range(3, 37):
+            codes[row][col] = "W"
+
+    for row, col in ((10, 10), (10, 11), (11, 10), (11, 11), (12, 10)):
+        codes[row][col] = "D"
+    for row, col in ((10, 29), (10, 30), (11, 29)):
+        codes[row][col] = "D"
+    codes[15][20] = "D"
+    codes[4][31] = "R"
+
+    result = normalize_cartoon_eye_features(codes, palette)
+
+    assert result.applied is True
+    assert result.left_cells == result.right_cells
+    assert result.codes[4][31] == "R"
+    assert result.codes[15][20] == "D"
+
+
 def test_medium_and_large_flat_sticker_do_not_regress() -> None:
     builder = PatternBuilder(target_colors=24)
     raw = flat_rabbit_sticker_bytes()
@@ -417,6 +443,97 @@ def test_medium_and_large_flat_sticker_do_not_regress() -> None:
         assert len(sheet.color_counts) <= 6
         assert sum(sheet.color_counts.get(code, 0) for code in red_codes) > 0
         assert sheet.bead_total + sum(sum(row) for row in sheet.no_bead_mask) == size.width * size.height
+
+
+def test_clean_white_cat_sticker_keeps_white_body_and_continuous_outline() -> None:
+    builder = PatternBuilder(target_colors=24)
+
+    sheet = builder.build(
+        SizePreset.DOUBLE_BOARD_52X52,
+        raw_image=white_cat_sticker_bytes(),
+        mode="script",
+        auto_remove_white_bg=True,
+    )
+
+    white_codes = {
+        color.code
+        for color in sheet.palette_used
+        if min(color.rgb) >= 248 and max(color.rgb) - min(color.rgb) <= 4
+    }
+    dirty_gray_codes = {
+        color.code
+        for color in sheet.palette_used
+        if 180 <= min(color.rgb) < 248 and max(color.rgb) - min(color.rgb) <= 36
+    }
+    black_codes = {
+        color.code
+        for color in sheet.palette_used
+        if max(color.rgb) <= 60 or 0.2126 * color.rgb[0] + 0.7152 * color.rgb[1] + 0.0722 * color.rgb[2] <= 45
+    }
+    red_codes = {
+        color.code
+        for color in sheet.palette_used
+        if color.rgb[0] >= 160 and color.rgb[1] <= 90 and color.rgb[2] <= 100
+    }
+    black_cells = cells_for_codes(sheet, black_codes)
+
+    assert sheet.metadata["white_bg_detected"] is True
+    assert sheet.metadata["quality_preset"] == "clean_cartoon"
+    assert sheet.metadata["preset_feature_priority"] is True
+    assert sheet.metadata["flat_image_detected"] is True
+    assert sheet.metadata["effective_target_colors"] <= 5
+    assert len(sheet.color_counts) <= 6
+    assert sum(sum(row) for row in sheet.no_bead_mask) >= int(52 * 52 * 0.45)
+    assert sum(sheet.color_counts.get(code, 0) for code in white_codes) >= 240
+    assert sum(sheet.color_counts.get(code, 0) for code in dirty_gray_codes) <= 4
+    assert len(black_cells) >= 140
+    assert largest_component(black_cells, 52, 52) >= int(len(black_cells) * 0.62)
+    assert sum(sheet.color_counts.get(code, 0) for code in red_codes) >= 18
+    assert any(
+        count >= 3
+        for color in sheet.palette_used
+        for count in [sheet.color_counts.get(color.code, 0)]
+        if color.rgb[0] >= 170 and color.rgb[1] >= 130 and color.rgb[2] <= 150
+    )
+
+
+def test_clean_cartoon_custom_sizes_keep_preset_and_eye_normalization() -> None:
+    builder = PatternBuilder(target_colors=24)
+    raw = white_cat_sticker_bytes()
+
+    for size_value in ("64x64", "72x72", "104x104"):
+        sheet = builder.build(
+            SizePreset(size_value),
+            raw_image=raw,
+            mode="script",
+            auto_remove_white_bg=True,
+        )
+
+        assert sheet.metadata["quality_preset"] == "clean_cartoon"
+        assert sheet.metadata["preset_feature_priority"] is True
+        assert sheet.metadata["eye_normalization"]["enabled"] is True
+        assert sheet.metadata["eye_normalization"]["applied"] is True
+        assert sheet.metadata["eye_normalization"]["left_cells"] == sheet.metadata["eye_normalization"]["right_cells"]
+
+
+def test_photo_like_input_does_not_use_clean_cartoon_preset() -> None:
+    builder = PatternBuilder(target_colors=24)
+
+    sheet = builder.build(
+        SizePreset.DOUBLE_BOARD_52X52,
+        raw_image=photo_like_gradient_bytes(),
+        mode="script",
+        auto_remove_white_bg=True,
+    )
+
+    assert sheet.metadata["white_bg_detected"] is False
+    assert sheet.metadata["quality_preset"] == "photo"
+    assert sheet.metadata["preset_feature_priority"] is False
+    assert sheet.metadata["eye_normalization"]["enabled"] is False
+    assert sheet.metadata["flat_image_detected"] is False
+    assert sheet.metadata["effective_target_colors"] == 24
+    assert sum(sum(row) for row in sheet.no_bead_mask) == 0
+    assert len(sheet.color_counts) >= 12
 
 
 def test_large_pattern_build_stays_under_two_seconds_after_warmup() -> None:
@@ -577,6 +694,57 @@ def flat_rabbit_sticker_bytes() -> bytes:
     draw.arc([74, 98, 92, 118], start=20, end=155, fill=outline, width=4)
     draw.arc([88, 98, 106, 118], start=25, end=160, fill=outline, width=4)
     draw.rectangle([56, 130, 124, 145], fill=red, outline=outline, width=4)
+    return image_bytes(image)
+
+
+def white_cat_sticker_bytes() -> bytes:
+    image = Image.new("RGB", (220, 220), (250, 250, 246))
+    pixels = image.load()
+    assert pixels is not None
+    for y in range(220):
+        for x in range(220):
+            base = 246 + ((x * 7 + y * 11) % 12)
+            pixels[x, y] = (base, base, max(236, base - 6))
+
+    center_x, center_y = 110, 105
+    for y in range(220):
+        for x in range(220):
+            if ((x - center_x) / 67) ** 2 + ((y - center_y) / 62) ** 2 <= 1:
+                base = 240 + ((x * 5 + y * 3) % 16)
+                pixels[x, y] = (base, base, max(234, base - 4))
+
+    draw = ImageDraw.Draw(image)
+    outline = (18, 18, 18)
+    red = (220, 35, 55)
+    yellow = (245, 205, 72)
+
+    draw.ellipse([43, 43, 177, 167], outline=outline, width=8)
+    draw.polygon([(58, 57), (47, 18), (89, 46)], outline=outline)
+    draw.polygon([(162, 57), (173, 18), (131, 46)], outline=outline)
+    draw.ellipse([78, 90, 92, 104], fill=outline)
+    draw.ellipse([128, 90, 142, 104], fill=outline)
+    draw.ellipse([105, 108, 116, 118], fill=yellow, outline=outline, width=2)
+    draw.line([108, 119, 108, 130], fill=outline, width=3)
+    draw.arc([88, 120, 108, 140], start=0, end=145, fill=outline, width=3)
+    draw.arc([108, 120, 128, 140], start=35, end=180, fill=outline, width=3)
+    draw.ellipse([134, 30, 178, 70], fill=red, outline=outline, width=4)
+    return image_bytes(image)
+
+
+def photo_like_gradient_bytes() -> bytes:
+    image = Image.new("RGB", (96, 72), (0, 0, 0))
+    pixels = image.load()
+    assert pixels is not None
+    for y in range(72):
+        for x in range(96):
+            pixels[x, y] = (
+                int(35 + x * 1.8 + (y % 7) * 4),
+                int(55 + y * 2.3 + (x % 9) * 3),
+                int(70 + ((x * 5 + y * 3) % 150)),
+            )
+    draw = ImageDraw.Draw(image)
+    draw.ellipse([14, 18, 46, 58], fill=(226, 86, 72))
+    draw.polygon([(58, 10), (90, 32), (72, 66)], fill=(62, 155, 112))
     return image_bytes(image)
 
 

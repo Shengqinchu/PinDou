@@ -40,6 +40,7 @@ class FallbackProvider(PreviewProvider):
                 size=size_preset,
                 raw_image=image,
                 mode="fallback_quantize",
+                auto_remove_white_bg=should_auto_remove_white_bg(image),
             )
         except Exception as exc:  # noqa: BLE001 - provider boundary normalizes failures.
             raise PreviewProviderError(f"{self.name} failed: {exc}") from exc
@@ -91,6 +92,15 @@ def render_pattern_sheet(pattern: PatternSheet) -> bytes:
     output = io.BytesIO()
     rendered.save(output, format="PNG")
     return output.getvalue()
+
+
+def should_auto_remove_white_bg(image: bytes) -> bool:
+    try:
+        with Image.open(io.BytesIO(image)) as source:
+            width, height = source.size
+    except Exception:  # noqa: BLE001 - PatternBuilder will surface the real decode error.
+        return True
+    return width * height >= 64
 
 
 def bead_to_rgba(bead: ColorRef | NoBead | Any) -> tuple[int, int, int, int]:

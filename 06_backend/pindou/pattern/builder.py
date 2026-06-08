@@ -26,6 +26,27 @@ SUBJECT_ALIGNMENT_MIN_PIXELS = 4
 SUBJECT_ALIGNMENT_MAX_FOREGROUND_RATIO = 0.98
 SUBJECT_ALIGNMENT_EPSILON = 0.02
 AI_PALETTE_MERGE_DELTA_E = 9.0
+CLEAN_CARTOON_PALETTE_MERGE_DELTA_E = 9.5
+CLEAN_CARTOON_TOP_N = 8
+CLEAN_CARTOON_BIN_SIZE = 16
+CLEAN_CARTOON_COVERAGE_THRESHOLD = 0.82
+CLEAN_CARTOON_SIGNIFICANT_BIN_RATIO = 0.001
+CLEAN_CARTOON_MAX_SIGNIFICANT_BINS = 18
+CLEAN_CARTOON_RELAXED_COVERAGE_THRESHOLD = 0.94
+CLEAN_CARTOON_RELAXED_MAX_SIGNIFICANT_BINS = 36
+CLEAN_CARTOON_MIN_TRANSPARENT_RATIO = 0.20
+CLEAN_CARTOON_MIN_DARK_RATIO = 0.012
+CLEAN_CARTOON_MIN_ACCENT_RATIO = 0.004
+CLEAN_CARTOON_MAX_FEATURE_DIMENSION = 104
+LINE_ART_MAX_SIGNIFICANT_BINS = 10
+LINE_ART_MIN_DARK_RATIO = 0.035
+LINE_ART_MAX_ACCENT_RATIO = 0.018
+PHOTO_MIN_SIGNIFICANT_BINS = 24
+FEATURE_YELLOW_MIN_RED = 175
+FEATURE_YELLOW_MIN_GREEN = 135
+FEATURE_YELLOW_MAX_BLUE = 150
+FEATURE_YELLOW_PIXEL_RATIO = 0.025
+FEATURE_ACCENT_PIXEL_RATIO = 0.035
 
 
 @dataclass(frozen=True)
@@ -151,9 +172,16 @@ def color_ref_from_frontend_dict(data: dict[str, Any]) -> ColorRef:
 
 
 class PatternBuilder:
-    def __init__(self, *, target_colors: int = 24, min_component_size: int = 3) -> None:
+    def __init__(
+        self,
+        *,
+        target_colors: int = 24,
+        min_component_size: int = 3,
+        enable_cartoon_eye_normalization: bool = True,
+    ) -> None:
         self.target_colors = target_colors
         self.min_component_size = min_component_size
+        self.enable_cartoon_eye_normalization = enable_cartoon_eye_normalization
 
     def build(
         self,
@@ -167,7 +195,11 @@ class PatternBuilder:
     ) -> PatternSheet:
         from pindou.colormap.loader import estimate_cost_cny, load_palette
         from pindou.pattern.exporter import PatternExporter
-        from pindou.pattern.postprocess import cleanup_shape_artifacts, reinforce_low_grid_outline
+        from pindou.pattern.postprocess import (
+            cleanup_shape_artifacts,
+            normalize_cartoon_eye_features,
+            reinforce_low_grid_outline,
+        )
         from pindou.pattern.quantize import quantize_to_codes
 
         size = size if isinstance(size, SizePreset) else SizePreset(str(size))
@@ -183,15 +215,47 @@ class PatternBuilder:
             input_mode=input_mode,
             auto_remove_white_bg=auto_remove_white_bg,
         )
+        quality_preset = detect_quality_preset(
+            prepared_image,
+            no_bead_mask,
+            input_mode=input_mode,
+            white_bg_detected=white_bg_detected,
+        )
+        preset_feature_priority = should_use_preset_feature_priority(size, quality_preset)
+        if preset_feature_priority:
+            prepared_image, no_bead_mask, white_bg_detected, subject_alignment = prepare_input_image(
+                image_bytes,
+                size,
+                input_mode=input_mode,
+                auto_remove_white_bg=auto_remove_white_bg,
+                preserve_features_override=True,
+            )
+            refined_preset = detect_quality_preset(
+                prepared_image,
+                no_bead_mask,
+                input_mode=input_mode,
+                white_bg_detected=white_bg_detected,
+            )
+            if refined_preset in {"clean_cartoon", "line_art"}:
+                quality_preset = refined_preset
+            preset_feature_priority = should_use_preset_feature_priority(size, quality_preset)
         quantize_options: dict[str, Any] = {}
         if input_mode == "ai":
             quantize_options["palette_merge_delta_e"] = AI_PALETTE_MERGE_DELTA_E
+        target_colors = self.target_colors
+        if quality_preset in {"clean_cartoon", "line_art"}:
+            target_colors = min(target_colors, 8)
+            quantize_options["palette_merge_delta_e"] = CLEAN_CARTOON_PALETTE_MERGE_DELTA_E
+            quantize_options["snap_neutral_extremes"] = True
+            quantize_options["preserve_feature_colors"] = True
+        elif quality_preset == "photo":
+            target_colors = max(target_colors, 18)
         quantized = quantize_to_codes(
             prepared_image,
             palette,
             size=size,
             no_bead_mask=no_bead_mask,
-            target_colors=self.target_colors,
+            target_colors=target_colors,
             metric="ciede2000",
             dither_mode="none",
             **quantize_options,
@@ -200,12 +264,24 @@ class PatternBuilder:
         shape_cleanup = cleanup_shape_artifacts(
             quantized.codes,
             palette_by_code,
-            min_component_size=max(self.min_component_size, 4),
+            min_component_size=max(self.min_component_size, 5 if quality_preset == "clean_cartoon" else 4),
         )
         processed_codes = shape_cleanup.codes
         low_grid_feature_priority = min(parse_size(size)) <= LOW_GRID_FEATURE_MAX_DIMENSION
         outline_reinforced = False
-        if low_grid_feature_priority and quantized.flat_image_detected:
+        eye_normalization_metadata: dict[str, object] = {"enabled": False}
+        if (
+            self.enable_cartoon_eye_normalization
+            and quality_preset in {"clean_cartoon", "line_art"}
+            and quantized.flat_image_detected
+        ):
+            eye_normalization = normalize_cartoon_eye_features(processed_codes, palette_by_code)
+            processed_codes = eye_normalization.codes
+            eye_normalization_metadata = eye_normalization.to_metadata()
+        if (
+            (low_grid_feature_priority or quality_preset in {"clean_cartoon", "line_art"})
+            and quantized.flat_image_detected
+        ):
             processed_codes, outline_reinforced = reinforce_low_grid_outline(
                 processed_codes,
                 palette_by_code,
@@ -223,14 +299,18 @@ class PatternBuilder:
                 "board_aligned": size.warning is None,
                 "algorithm": "kmeans+ciede2000+none",
                 "target_colors": self.target_colors,
+                "preset_target_colors": target_colors,
                 "effective_target_colors": quantized.effective_target_colors,
                 "flat_image_detected": quantized.flat_image_detected,
+                "quality_preset": quality_preset,
+                "preset_feature_priority": preset_feature_priority,
                 "palette_merge_delta_e": quantized.palette_merge_threshold_delta_e,
                 "quantize_runtime_ms": round(quantized.runtime_ms, 2),
                 "white_bg_detected": white_bg_detected,
                 "auto_remove_white_bg_requested": bool(auto_remove_white_bg and input_mode == "script"),
                 "low_grid_feature_priority": low_grid_feature_priority,
                 "low_grid_outline_reinforced": outline_reinforced,
+                "eye_normalization": eye_normalization_metadata,
                 "subject_grid_alignment": subject_alignment.to_metadata(),
                 "shape_cleanup": shape_cleanup.to_metadata(),
             },
@@ -265,6 +345,7 @@ def prepare_input_image(
     *,
     input_mode: str,
     auto_remove_white_bg: bool = False,
+    preserve_features_override: bool | None = None,
 ) -> tuple[Image.Image, list[list[bool]], bool, SubjectGridAlignment]:
     from pindou.pattern.postprocess import detect_and_remove_white_bg
 
@@ -281,7 +362,11 @@ def prepare_input_image(
         width,
         height,
         background,
-        preserve_features=min(width, height) <= LOW_GRID_FEATURE_MAX_DIMENSION,
+        preserve_features=(
+            preserve_features_override
+            if preserve_features_override is not None
+            else min(width, height) <= LOW_GRID_FEATURE_MAX_DIMENSION
+        ),
     )
     alpha = np.array(fitted.getchannel("A"), dtype=np.uint8)
     if input_mode == "ai" or white_bg_detected:
@@ -465,16 +550,32 @@ def feature_priority_region_rgba(region: np.ndarray, background: tuple[int, int,
         (rgb.max(axis=1).astype(np.int16) - rgb.min(axis=1).astype(np.int16))
         >= SATURATED_COLOR_SPREAD_THRESHOLD
     ) & red_feature_mask
+    yellow_mask = (
+        (rgb[:, 0] >= FEATURE_YELLOW_MIN_RED)
+        & (rgb[:, 1] >= FEATURE_YELLOW_MIN_GREEN)
+        & (rgb[:, 2] <= FEATURE_YELLOW_MAX_BLUE)
+        & (
+            (rgb.max(axis=1).astype(np.int16) - rgb.min(axis=1).astype(np.int16))
+            >= SATURATED_COLOR_SPREAD_THRESHOLD
+        )
+    )
 
     dark_count = int(dark_mask.sum())
     saturated_count = int(saturated_mask.sum())
+    yellow_count = int(yellow_mask.sum())
     total = len(rgb)
     dark_ratio = dark_count / total
     saturated_ratio = saturated_count / total
+    yellow_ratio = yellow_count / total
 
-    if saturated_count >= LOW_GRID_MIN_FEATURE_PIXELS and saturated_ratio >= LOW_GRID_SATURATED_PIXEL_RATIO:
+    if saturated_count >= LOW_GRID_MIN_FEATURE_PIXELS and saturated_ratio >= FEATURE_ACCENT_PIXEL_RATIO:
         if dark_count < LOW_GRID_MIN_FEATURE_PIXELS or saturated_ratio * 1.35 >= dark_ratio:
             best_rgb = dominant_rgb(rgb[saturated_mask])
+            return np.array([int(best_rgb[0]), int(best_rgb[1]), int(best_rgb[2]), 255], dtype=np.uint8)
+
+    if yellow_count >= LOW_GRID_MIN_FEATURE_PIXELS and yellow_ratio >= FEATURE_YELLOW_PIXEL_RATIO:
+        if dark_count < LOW_GRID_MIN_FEATURE_PIXELS or yellow_ratio * 1.35 >= dark_ratio:
+            best_rgb = dominant_rgb(rgb[yellow_mask])
             return np.array([int(best_rgb[0]), int(best_rgb[1]), int(best_rgb[2]), 255], dtype=np.uint8)
 
     if dark_count >= LOW_GRID_MIN_FEATURE_PIXELS and dark_ratio >= LOW_GRID_DARK_PIXEL_RATIO:
@@ -508,6 +609,104 @@ def dominant_rgb(rgb: np.ndarray) -> np.ndarray:
 def parse_size(size: SizePreset) -> tuple[int, int]:
     width_raw, height_raw = size.value.split("x", 1)
     return int(width_raw), int(height_raw)
+
+
+def detect_quality_preset(
+    image: Image.Image,
+    no_bead_mask: list[list[bool]],
+    *,
+    input_mode: str,
+    white_bg_detected: bool,
+) -> str:
+    """Choose internal cleanup intensity without exposing low-level knobs to users."""
+
+    if input_mode != "script" or not white_bg_detected:
+        return "photo" if input_mode == "script" else "default"
+
+    rgba = np.array(image.convert("RGBA"), dtype=np.uint8)
+    height, width = rgba.shape[:2]
+    if height == 0 or width == 0:
+        return "default"
+    mask = np.array(no_bead_mask, dtype=bool)
+    if mask.shape != (height, width):
+        return "default"
+    transparent_ratio = float(mask.sum() / mask.size)
+    if transparent_ratio < CLEAN_CARTOON_MIN_TRANSPARENT_RATIO:
+        return "photo"
+
+    pixels = rgba[:, :, :3][~mask]
+    if len(pixels) == 0:
+        return "photo"
+    bins = (pixels.astype(np.uint16) // CLEAN_CARTOON_BIN_SIZE).astype(np.uint16)
+    _unique, _inverse, counts = np.unique(bins, axis=0, return_inverse=True, return_counts=True)
+    top_counts = np.sort(counts)[-CLEAN_CARTOON_TOP_N:]
+    coverage = float(top_counts.sum() / len(pixels))
+    significant_threshold = max(2, int(round(len(pixels) * CLEAN_CARTOON_SIGNIFICANT_BIN_RATIO)))
+    significant_bins = int(np.count_nonzero(counts >= significant_threshold))
+
+    luma = (
+        0.2126 * pixels[:, 0].astype(np.float64)
+        + 0.7152 * pixels[:, 1].astype(np.float64)
+        + 0.0722 * pixels[:, 2].astype(np.float64)
+    )
+    spread = pixels.max(axis=1).astype(np.int16) - pixels.min(axis=1).astype(np.int16)
+    dark_ratio = float(np.count_nonzero(luma <= LOW_GRID_DARK_LUMINANCE_THRESHOLD) / len(pixels))
+    accent_ratio = float(np.count_nonzero(spread >= SATURATED_COLOR_SPREAD_THRESHOLD) / len(pixels))
+    has_cartoon_features = dark_ratio >= CLEAN_CARTOON_MIN_DARK_RATIO or accent_ratio >= CLEAN_CARTOON_MIN_ACCENT_RATIO
+    edge_density = estimate_visible_edge_density(rgba[:, :, :3], mask)
+
+    if (
+        coverage >= CLEAN_CARTOON_COVERAGE_THRESHOLD
+        and significant_bins <= CLEAN_CARTOON_MAX_SIGNIFICANT_BINS
+        and has_cartoon_features
+    ):
+        if accent_ratio <= LINE_ART_MAX_ACCENT_RATIO and dark_ratio >= LINE_ART_MIN_DARK_RATIO:
+            return "line_art"
+        return "clean_cartoon"
+    if (
+        coverage >= CLEAN_CARTOON_RELAXED_COVERAGE_THRESHOLD
+        and significant_bins <= CLEAN_CARTOON_RELAXED_MAX_SIGNIFICANT_BINS
+        and has_cartoon_features
+    ):
+        if accent_ratio <= LINE_ART_MAX_ACCENT_RATIO and dark_ratio >= LINE_ART_MIN_DARK_RATIO:
+            return "line_art"
+        return "clean_cartoon"
+    if (
+        coverage >= CLEAN_CARTOON_COVERAGE_THRESHOLD
+        and significant_bins <= LINE_ART_MAX_SIGNIFICANT_BINS
+        and dark_ratio >= LINE_ART_MIN_DARK_RATIO
+    ):
+        return "line_art"
+    if significant_bins >= PHOTO_MIN_SIGNIFICANT_BINS or edge_density > 0.18:
+        return "photo"
+    return "photo"
+
+
+def should_use_preset_feature_priority(size: SizePreset, quality_preset: str) -> bool:
+    return (
+        quality_preset in {"clean_cartoon", "line_art"}
+        and max(parse_size(size)) <= CLEAN_CARTOON_MAX_FEATURE_DIMENSION
+    )
+
+
+def estimate_visible_edge_density(rgb: np.ndarray, no_bead_mask: np.ndarray) -> float:
+    if rgb.ndim != 3 or rgb.shape[:2] != no_bead_mask.shape:
+        return 0.0
+    luma = (
+        0.2126 * rgb[:, :, 0].astype(np.float64)
+        + 0.7152 * rgb[:, :, 1].astype(np.float64)
+        + 0.0722 * rgb[:, :, 2].astype(np.float64)
+    )
+    visible = ~no_bead_mask
+    horizontal_visible = visible[:, 1:] & visible[:, :-1]
+    vertical_visible = visible[1:, :] & visible[:-1, :]
+    dx = np.abs(np.diff(luma, axis=1))
+    dy = np.abs(np.diff(luma, axis=0))
+    edge_pixels = int(np.count_nonzero((dx > 28) & horizontal_visible)) + int(
+        np.count_nonzero((dy > 28) & vertical_visible)
+    )
+    possible = int(horizontal_visible.sum() + vertical_visible.sum())
+    return 0.0 if possible == 0 else edge_pixels / possible
 
 
 def color_counts(codes: list[list[str | None]]) -> dict[str, int]:
