@@ -1,8 +1,8 @@
-# PinDou 微信云托管部署运维文档
+# PinDou 生产部署运维文档
 
-> **目标环境**：微信云托管（上海地域优先）  
-> **状态**：Phase 2 已迁移为 Docker + MySQL + COS + `wx.cloud.callContainer` 主路径  
-> **旧部署 fallback**：见 `07_ops/deployment_legacy.md`
+> **当前生产环境（2026-06-08 复核）**：上海移动云 ECS + Nginx + systemd `pindou.service` + SQLite + 本地存储。  
+> **公网入口**：Cloudflare Tunnel `pindou-staging` 暴露移动云源站，源站不直接公开业务端口。  
+> **历史方案**：下方微信云托管 / MySQL / COS 内容是 ADR-012 曾规划的路径，当前不是线上事实；实际发版按 `07_ops/deployment_legacy.md` 的 release + `current` symlink 方式执行。
 
 ---
 
@@ -19,6 +19,31 @@
 ---
 
 ## 1. 架构
+
+### 1.0 当前生产架构（实际）
+
+```text
+[Browser / Mobile Web]
+    |
+    | https://pindoupuppy.com
+    v
+[Cloudflare Tunnel: pindou-staging]
+    |
+    v
+[上海移动云 ECS]
+    |
+    +-- Nginx :443
+    |     +-- /api/* -> 127.0.0.1:8000
+    |     +-- /static/* -> FastAPI static/local storage
+    |     +-- /* -> /opt/pindou/current/05_web/dist
+    |
+    +-- systemd pindou.service
+          WorkingDirectory=/opt/pindou/current/06_backend
+          EnvironmentFile=/opt/pindou/shared/.env
+          SQLite=/opt/pindou/shared/var/pindou.db
+```
+
+### 1.1 历史云托管架构（非当前生产）
 
 ```text
 [微信小程序]
@@ -40,7 +65,7 @@
 [虎皮椒]
 ```
 
-### 1.1 关键差异
+### 1.2 关键差异
 
 | 项目 | 传统部署 | 云托管部署 |
 | --- | --- | --- |
