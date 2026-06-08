@@ -7,6 +7,7 @@ import type { Order, PaymentSku, PaymentSkuCategory, PaymentSkuCatalog, PaymentS
 import { useAuthStore } from '../stores/auth';
 
 type PricingReason = 'manual' | 'ai-low' | 'script-low';
+type PaymentView = 'catalog' | 'payment' | 'success';
 
 const props = withDefaults(defineProps<{
   open: boolean;
@@ -49,6 +50,7 @@ const loadingSkus = ref(false);
 const skuError = ref('');
 const selectedSku = ref<PaymentSku | null>(null);
 const currentOrder = ref<Order | null>(null);
+const paymentView = ref<PaymentView>('catalog');
 const paymentMessage = ref('');
 const paymentError = ref('');
 const isCreatingOrder = ref(false);
@@ -61,7 +63,10 @@ const cdkExpanded = ref(false);
 const cdkInputRef = ref<HTMLInputElement | null>(null);
 
 let pollTimer: number | undefined;
+let countdownTimer: number | undefined;
+let autoCloseTimer: number | undefined;
 let pollDeadline = 0;
+const nowTick = ref(Date.now());
 
 const user = computed(() => auth.user);
 const isLoggedIn = computed(() => auth.isLoggedIn);
@@ -123,7 +128,24 @@ const reasonText = computed(() => {
 });
 const orderRef = computed(() => currentOrder.value?.order_no || currentOrder.value?.order_id || '');
 const qrUrl = computed(() => normalizeQrUrl(currentOrder.value?.qr_code_url || ''));
-const orderExpiresLabel = computed(() => currentOrder.value?.expires_at ? formatTime(currentOrder.value.expires_at) : '');
+const orderCountdown = computed(() => {
+  const expiresAt = currentOrder.value?.expires_at ? Date.parse(currentOrder.value.expires_at) : pollDeadline;
+  if (!Number.isFinite(expiresAt) || expiresAt <= 0) {
+    return '';
+  }
+  const remaining = Math.max(0, expiresAt - nowTick.value);
+  return formatDuration(remaining);
+});
+const paymentResultText = computed(() => {
+  if (!selectedSku.value) {
+    return '权益已到账';
+  }
+  if (selectedSku.value.category === 'points') {
+    return `+${selectedSku.value.points || 0} 积分已到账`;
+  }
+  const gift = selectedSku.value.gift_points ? `，赠 ${selectedSku.value.gift_points} 积分已到账` : '';
+  return `已开通 ${displaySkuName(selectedSku.value)}${gift}`;
+});
 const canSubmitCdk = computed(() => Boolean(cdkCode.value.trim()) && !cdkBusy.value);
 
 watch(
@@ -141,6 +163,7 @@ watch(
       });
     } else {
       stopPolling();
+      clearAutoCloseTimer();
     }
   },
   { immediate: true }
@@ -166,6 +189,7 @@ watch(
 
 onBeforeUnmount(() => {
   stopPolling();
+  clearAutoCloseTimer();
 });
 
 async function loadSkus(): Promise<void> {
@@ -189,6 +213,8 @@ async function loadSkus(): Promise<void> {
 }
 
 function close(): void {
+  stopPolling();
+  clearAutoCloseTimer();
   emit('close');
 }
 
@@ -225,8 +251,10 @@ async function focusCdkInput(): Promise<void> {
 async function buySku(sku: PaymentSku): Promise<void> {
   cdkError.value = '';
   cdkMessage.value = '';
+  clearAutoCloseTimer();
   if (!isLoggedIn.value) {
     paymentError.value = '请先登录/注册后购买，避免换设备后余额丢失。';
+    paymentView.value = 'catalog';
     return;
   }
   stopPolling();
@@ -234,11 +262,12 @@ async function buySku(sku: PaymentSku): Promise<void> {
   currentOrder.value = null;
   paymentError.value = '';
   paymentMessage.value = '正在生成支付二维码…';
+  paymentView.value = 'payment';
   isCreatingOrder.value = true;
   try {
     const order = await createOrder({ sku_id: sku.sku_id as PaymentSkuId });
     currentOrder.value = order;
-    paymentMessage.value = '请使用微信扫码完成支付，支付成功后会自动刷新余额。';
+    paymentMessage.value = '请用微信扫码完成支付，成功后会自动刷新钱包。';
     startPolling();
   } catch (error) {
     paymentError.value = readErrorMessage(error, '下单失败，请稍后再试。');
@@ -283,6 +312,7 @@ function startPolling(): void {
   }
   isPollingOrder.value = true;
   pollDeadline = paymentDeadline();
+  startCountdown();
   void pollOrderOnce();
   pollTimer = window.setInterval(() => {
     void pollOrderOnce();
@@ -295,18 +325,20 @@ async function pollOrderOnce(): Promise<void> {
   }
   if (Date.now() > pollDeadline) {
     stopPolling();
-    paymentError.value = '还没确认到账。若已付款，请保留支付截图和订单号，联系客服补单。';
-    paymentMessage.value = '二维码可能已过期，可重新选择套餐生成新二维码。';
+    paymentError.value = '二维码已过期。若已付款，请保留支付截图和订单号，联系客服补单。';
+    paymentMessage.value = '';
     return;
   }
   try {
     const result = await getOrder(orderRef.value);
     if (result.status === 'paid_confirmed' || result.status === 'paid') {
       stopPolling();
-      paymentMessage.value = '支付成功，余额已刷新。';
       paymentError.value = '';
-      await refreshProfileAfterPayment();
+      const refreshed = await refreshProfileAfterPayment();
+      paymentMessage.value = refreshed ? paymentResultText.value : '支付成功，资料刷新失败，请手动刷新页面。';
+      paymentView.value = 'success';
       emit('success');
+      scheduleAutoClose();
       return;
     }
     if (result.status === 'failed' || result.status === 'cancelled') {
@@ -319,11 +351,13 @@ async function pollOrderOnce(): Promise<void> {
   }
 }
 
-async function refreshProfileAfterPayment(): Promise<void> {
+async function refreshProfileAfterPayment(): Promise<boolean> {
   try {
     await auth.refreshProfile();
+    return true;
   } catch (_error) {
     paymentMessage.value = '权益已处理，资料刷新失败时请手动刷新页面。';
+    return false;
   }
 }
 
@@ -332,18 +366,59 @@ function stopPolling(): void {
     window.clearInterval(pollTimer);
     pollTimer = undefined;
   }
+  if (countdownTimer) {
+    window.clearInterval(countdownTimer);
+    countdownTimer = undefined;
+  }
   isPollingOrder.value = false;
 }
 
 function resetPaymentState(): void {
   selectedSku.value = null;
   currentOrder.value = null;
+  paymentView.value = 'catalog';
   paymentMessage.value = '';
   paymentError.value = '';
   cdkMessage.value = '';
   cdkError.value = '';
   isCreatingOrder.value = false;
   isPollingOrder.value = false;
+  clearAutoCloseTimer();
+}
+
+function returnToCatalog(): void {
+  stopPolling();
+  clearAutoCloseTimer();
+  currentOrder.value = null;
+  paymentMessage.value = '';
+  paymentError.value = '';
+  paymentView.value = 'catalog';
+  isCreatingOrder.value = false;
+  selectRecommendedSku();
+}
+
+function startCountdown(): void {
+  nowTick.value = Date.now();
+  if (countdownTimer) {
+    window.clearInterval(countdownTimer);
+  }
+  countdownTimer = window.setInterval(() => {
+    nowTick.value = Date.now();
+  }, 1000);
+}
+
+function scheduleAutoClose(): void {
+  clearAutoCloseTimer();
+  autoCloseTimer = window.setTimeout(() => {
+    close();
+  }, 1200);
+}
+
+function clearAutoCloseTimer(): void {
+  if (autoCloseTimer) {
+    window.clearTimeout(autoCloseTimer);
+    autoCloseTimer = undefined;
+  }
 }
 
 function displaySkuName(sku: PaymentSku): string {
@@ -425,12 +500,11 @@ function formatMonthDay(value: string): string {
   return `${date.getMonth() + 1}/${date.getDate()}`;
 }
 
-function formatTime(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return '';
-  }
-  return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+function formatDuration(milliseconds: number): string {
+  const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
 function readErrorMessage(error: unknown, fallback: string): string {
@@ -467,7 +541,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
             <p v-if="!isLoggedIn" class="pricing-guest-note">未登录状态暂按 0 余额展示。购买或兑换前请先登录/注册，避免换设备后余额丢失。</p>
           </header>
 
-          <nav class="pricing-tabs" aria-label="充值类型">
+          <nav v-if="paymentView === 'catalog'" class="pricing-tabs" aria-label="充值类型">
             <button
               type="button"
               :class="{ 'pricing-tab--active': activePanel === 'points' }"
@@ -484,10 +558,11 @@ function readErrorMessage(error: unknown, fallback: string): string {
             </button>
           </nav>
 
-          <div v-if="skuError" class="pricing-alert pricing-alert--error">{{ skuError }}</div>
-          <div v-else-if="loadingSkus" class="pricing-loading">正在加载套餐…</div>
+          <div v-if="paymentView === 'catalog' && skuError" class="pricing-alert pricing-alert--error">{{ skuError }}</div>
+          <div v-else-if="paymentView === 'catalog' && loadingSkus" class="pricing-loading">正在加载套餐…</div>
+          <div v-if="paymentView === 'catalog' && !skuError && !loadingSkus && paymentError" class="pricing-alert pricing-alert--error">{{ paymentError }}</div>
 
-          <section v-else class="pricing-panel">
+          <section v-if="paymentView === 'catalog' && !skuError && !loadingSkus" class="pricing-panel">
             <div class="pricing-panel__head">
               <strong>{{ activePanelTitle }}</strong>
               <span>{{ activePanelSubtitle }}</span>
@@ -529,21 +604,44 @@ function readErrorMessage(error: unknown, fallback: string): string {
             </p>
           </section>
 
-          <section v-if="currentOrder || paymentMessage || paymentError" class="payment-box" aria-live="polite">
-            <div class="payment-box__text">
-              <strong>{{ selectedSku ? displaySkuName(selectedSku) : '支付订单' }}</strong>
-              <span v-if="orderRef">订单号 {{ orderRef }}</span>
-              <span v-if="orderExpiresLabel">二维码约 {{ orderExpiresLabel }} 前有效</span>
-            </div>
-            <img v-if="qrUrl" class="payment-qr" :src="qrUrl" alt="支付二维码" />
-            <p v-if="paymentMessage" class="payment-message">{{ paymentMessage }}</p>
-            <p v-if="paymentError" class="payment-error">{{ paymentError }}</p>
-            <button v-if="paymentError && selectedSku" class="payment-retry" type="button" @click="buySku(selectedSku)">
-              重新生成二维码
-            </button>
+          <section v-else-if="paymentView !== 'catalog'" class="payment-view" :class="{ 'payment-view--success': paymentView === 'success' }" aria-live="polite">
+            <template v-if="paymentView === 'success'">
+              <div class="payment-success-mark" aria-hidden="true">✓</div>
+              <h3>支付成功</h3>
+              <p>{{ paymentMessage || paymentResultText }}</p>
+              <span>钱包正在刷新，稍后自动关闭</span>
+            </template>
+
+            <template v-else>
+              <div class="payment-view__summary">
+                <span>扫码支付</span>
+                <strong>{{ selectedSku ? displaySkuName(selectedSku) : '支付订单' }}</strong>
+                <em v-if="selectedSku">{{ formatPrice(selectedSku.amount_cny) }}</em>
+              </div>
+
+              <div class="payment-qr-frame">
+                <img v-if="qrUrl" class="payment-qr" :src="qrUrl" alt="支付二维码" />
+                <div v-else class="payment-qr-placeholder">
+                  {{ isCreatingOrder ? '生成中…' : '暂无二维码' }}
+                </div>
+              </div>
+
+              <p class="payment-instruction">请用微信扫码完成支付</p>
+              <p v-if="orderCountdown && !paymentError" class="payment-countdown">二维码 {{ orderCountdown }} 内有效</p>
+              <p v-if="orderRef" class="payment-order-ref">订单号 {{ orderRef }}</p>
+              <p v-if="paymentMessage" class="payment-message">{{ paymentMessage }}</p>
+              <p v-if="paymentError" class="payment-error">{{ paymentError }}</p>
+
+              <div class="payment-actions">
+                <button class="payment-back" type="button" :disabled="isCreatingOrder" @click="returnToCatalog">返回</button>
+                <button v-if="paymentError && selectedSku" class="payment-retry" type="button" @click="buySku(selectedSku)">
+                  重新生成
+                </button>
+              </div>
+            </template>
           </section>
 
-          <section class="cdk-card" :class="{ 'cdk-card--open': cdkExpanded }">
+          <section v-if="paymentView === 'catalog'" class="cdk-card" :class="{ 'cdk-card--open': cdkExpanded }">
             <button class="cdk-toggle" type="button" @click="cdkExpanded = !cdkExpanded">
               <span>有兑换码？</span>
               <strong>{{ cdkExpanded ? '收起' : '展开兑换' }}</strong>
@@ -577,8 +675,8 @@ function readErrorMessage(error: unknown, fallback: string): string {
 .pricing-modal {
   position: relative;
   width: min(100%, 860px);
-  max-height: min(780px, calc(100dvh - 20px));
-  overflow-y: auto;
+  max-height: min(780px, 85dvh);
+  overflow: hidden;
   overscroll-behavior: contain;
   display: grid;
   gap: 10px;
@@ -777,7 +875,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
 .pricing-loading,
 .pricing-alert,
 .pricing-panel,
-.payment-box,
+.payment-view,
 .cdk-card {
   border: 1px solid rgba(232, 208, 188, 0.88);
   border-radius: 22px;
@@ -799,11 +897,14 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
 .pricing-panel {
   min-width: 0;
+  max-height: min(410px, calc(85dvh - 230px));
   display: grid;
   gap: 11px;
   background:
     linear-gradient(180deg, rgba(255, 250, 246, 0.92), rgba(255, 241, 233, 0.92));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 10px 28px rgba(93, 66, 48, 0.06);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 12px;
 }
 
@@ -1005,7 +1106,6 @@ function readErrorMessage(error: unknown, fallback: string): string {
   transform: none;
 }
 
-.payment-box,
 .cdk-card {
   display: grid;
   gap: 10px;
@@ -1014,23 +1114,75 @@ function readErrorMessage(error: unknown, fallback: string): string {
   padding: 12px 13px;
 }
 
-.payment-box {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-}
-
-.payment-box__text {
+.payment-view {
+  min-height: min(470px, calc(85dvh - 120px));
   display: grid;
-  gap: 3px;
+  place-items: center;
+  align-content: center;
+  gap: 11px;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(255, 198, 107, 0.18), transparent 34%),
+    rgba(255, 255, 255, 0.94);
+  box-shadow: 0 16px 34px rgba(93, 66, 48, 0.08);
+  overflow-y: auto;
+  padding: clamp(16px, 3vw, 24px);
 }
 
-.payment-box__text strong,
+.payment-view__summary {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  text-align: center;
+}
+
+.payment-view__summary span {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--pd-r-tag);
+  background: rgba(255, 198, 107, 0.32);
+  color: var(--pd-fg-1);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 4px 8px;
+}
+
+.payment-view__summary strong,
+.payment-view--success h3,
 .cdk-toggle strong {
   color: var(--pd-fg-1);
   font-weight: 900;
 }
 
-.payment-box__text span,
+.payment-view__summary em {
+  color: var(--pd-orange);
+  font-family: var(--pd-font-display);
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.payment-qr-frame {
+  width: min(220px, 58vw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(237, 214, 196, 0.9);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: var(--pd-shadow-card), 0 16px 34px rgba(93, 66, 48, 0.1);
+  padding: 12px;
+}
+
+.payment-qr-placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--pd-orange);
+  font-weight: 900;
+}
+
+.payment-instruction,
+.payment-countdown,
+.payment-order-ref,
 .payment-message,
 .payment-error,
 .cdk-success,
@@ -1042,19 +1194,90 @@ function readErrorMessage(error: unknown, fallback: string): string {
   font-weight: 800;
 }
 
+.payment-instruction {
+  color: var(--pd-fg-1);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.payment-countdown {
+  border-radius: 999px;
+  background: rgba(255, 241, 232, 0.96);
+  color: #d86131;
+  padding: 5px 10px;
+}
+
+.payment-order-ref {
+  max-width: 100%;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .payment-qr {
-  width: 136px;
-  height: 136px;
-  border: 1px solid rgba(237, 228, 218, 0.9);
-  border-radius: 18px;
-  background: #fff;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  padding: 8px;
+}
+
+.payment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.payment-back,
+.payment-retry {
+  min-height: 42px;
+  border: 1px solid rgba(218, 111, 65, 0.4);
+  border-radius: 999px;
+  background: rgba(255, 249, 245, 0.96);
+  color: #d86131;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 0 16px;
+  transition: transform 180ms var(--pd-ease-out), box-shadow 180ms var(--pd-ease-out), border-color 180ms var(--pd-ease-out);
+}
+
+.payment-back:hover:not(:disabled),
+.payment-retry:hover:not(:disabled) {
+  border-color: rgba(255, 142, 83, 0.54);
+  box-shadow: 0 12px 24px rgba(255, 142, 83, 0.14);
+  transform: translateY(-1px);
+}
+
+.payment-back:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
 }
 
 .payment-retry {
-  width: fit-content;
-  padding: 0 14px;
+  background: var(--pd-gradient);
+  color: #fff;
+}
+
+.payment-success-mark {
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffa16f 0%, #ff6f8f 100%);
+  color: #fff;
+  font-size: 42px;
+  font-weight: 900;
+  box-shadow: var(--pd-shadow-cta);
+}
+
+.payment-view--success h3,
+.payment-view--success p,
+.payment-view--success span {
+  margin: 0;
+  text-align: center;
 }
 
 .cdk-toggle {
@@ -1152,6 +1375,10 @@ function readErrorMessage(error: unknown, fallback: string): string {
     white-space: normal;
   }
 
+  .pricing-panel {
+    max-height: calc(100dvh - 255px);
+  }
+
   .sku-grid {
     grid-template-columns: 1fr;
   }
@@ -1182,14 +1409,13 @@ function readErrorMessage(error: unknown, fallback: string): string {
     padding-inline: 14px;
   }
 
-  .payment-box {
-    grid-template-columns: 1fr;
+  .payment-view {
+    min-height: calc(100dvh - 170px);
+    padding: 14px;
   }
 
-  .payment-qr {
-    width: min(176px, 54vw);
-    height: min(176px, 54vw);
-    justify-self: center;
+  .payment-qr-frame {
+    width: min(204px, 58vw);
   }
 }
 
@@ -1209,6 +1435,15 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
   .pricing-panel {
     padding: 12px;
+  }
+
+  .payment-view {
+    min-height: calc(100dvh - 158px);
+  }
+
+  .payment-qr-frame {
+    width: min(184px, 60vw);
+    border-radius: 20px;
   }
 
   .pricing-panel__head strong {
