@@ -1088,7 +1088,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
 }
 
 .payment-view {
-  min-height: min(420px, calc(85dvh - 112px));
+  min-height: 0;
   display: grid;
   place-items: center;
   align-content: center;
@@ -1392,7 +1392,6 @@ function readErrorMessage(error: unknown, fallback: string): string {
   }
 
   .payment-view {
-    min-height: min(430px, calc(100dvh - 170px));
     padding: 14px;
   }
 
@@ -1420,7 +1419,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
   }
 
   .payment-view {
-    min-height: calc(100dvh - 158px);
+    padding: 12px;
   }
 
   .payment-qr-frame {
