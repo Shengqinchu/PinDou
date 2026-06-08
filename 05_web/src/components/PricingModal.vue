@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 
 import { ApiError, createOrder, getOrder, getSkus, redeemCdk } from '../api';
 import { API_BASE } from '../api/client';
@@ -11,9 +11,11 @@ type PricingReason = 'manual' | 'ai-low' | 'script-low';
 const props = withDefaults(defineProps<{
   open: boolean;
   initialPanel?: PaymentSkuCategory;
+  focusCdk?: boolean;
   reason?: PricingReason;
 }>(), {
   initialPanel: 'points',
+  focusCdk: false,
   reason: 'manual'
 });
 
@@ -21,6 +23,24 @@ const emit = defineEmits<{
   close: [];
   success: [];
 }>();
+
+const SKU_DISPLAY_NAMES: Partial<Record<PaymentSkuId, string>> = {
+  points_trial_099: '体验包',
+  points_standard_990: '标准包',
+  points_value_2990: '超值包',
+  membership_week_990: '周卡',
+  membership_month_1990: '月卡',
+  membership_season_4990: '季卡'
+};
+
+const SKU_DISPLAY_ORDER: Partial<Record<PaymentSkuId, number>> = {
+  points_trial_099: 10,
+  points_standard_990: 20,
+  points_value_2990: 30,
+  membership_week_990: 10,
+  membership_month_1990: 20,
+  membership_season_4990: 30
+};
 
 const auth = useAuthStore();
 const activePanel = ref<PaymentSkuCategory>(props.initialPanel);
@@ -37,6 +57,8 @@ const cdkCode = ref('');
 const cdkMessage = ref('');
 const cdkError = ref('');
 const cdkBusy = ref(false);
+const cdkExpanded = ref(false);
+const cdkInputRef = ref<HTMLInputElement | null>(null);
 
 let pollTimer: number | undefined;
 let pollDeadline = 0;
@@ -81,6 +103,12 @@ const aiGenerationsUnit = computed(() => /^\d+$/.test(String(aiGenerations.value
 const aiShortfall = computed(() => Math.max(0, aiCost.value - aiBalance.value));
 const pointsSkus = computed(() => (catalog.value?.items || []).filter((sku) => sku.category === 'points'));
 const membershipSkus = computed(() => (catalog.value?.items || []).filter((sku) => sku.category === 'membership'));
+const activeSkus = computed(() => {
+  const skus = activePanel.value === 'points' ? pointsSkus.value : membershipSkus.value;
+  return [...skus].sort((left, right) => skuSortRank(left) - skuSortRank(right));
+});
+const activePanelTitle = computed(() => activePanel.value === 'points' ? 'AI 积分' : '时间卡会员');
+const activePanelSubtitle = computed(() => activePanel.value === 'points' ? `${aiCostLabel.value} 积分 / 张` : '普通模式不限次');
 const reasonText = computed(() => {
   if (props.reason === 'ai-low') {
     if (!aiCost.value) {
@@ -104,7 +132,13 @@ watch(
     if (open) {
       activePanel.value = props.initialPanel;
       resetPaymentState();
-      void loadSkus();
+      cdkExpanded.value = props.focusCdk;
+      void loadSkus().then(() => {
+        selectRecommendedSku();
+        if (props.focusCdk) {
+          void focusCdkInput();
+        }
+      });
     } else {
       stopPolling();
     }
@@ -116,6 +150,17 @@ watch(
   () => props.initialPanel,
   (panel) => {
     activePanel.value = panel;
+    selectRecommendedSku();
+  }
+);
+
+watch(
+  () => props.focusCdk,
+  (focusCdk) => {
+    if (props.open && focusCdk) {
+      cdkExpanded.value = true;
+      void focusCdkInput();
+    }
   }
 );
 
@@ -124,13 +169,18 @@ onBeforeUnmount(() => {
 });
 
 async function loadSkus(): Promise<void> {
-  if (catalog.value || loadingSkus.value) {
+  if (catalog.value) {
+    selectRecommendedSku();
+    return;
+  }
+  if (loadingSkus.value) {
     return;
   }
   loadingSkus.value = true;
   skuError.value = '';
   try {
     catalog.value = await getSkus();
+    selectRecommendedSku();
   } catch (error) {
     skuError.value = readErrorMessage(error, '套餐暂时加载失败，请稍后重试。');
   } finally {
@@ -140,6 +190,36 @@ async function loadSkus(): Promise<void> {
 
 function close(): void {
   emit('close');
+}
+
+function selectPanel(panel: PaymentSkuCategory): void {
+  if (activePanel.value === panel) {
+    return;
+  }
+  activePanel.value = panel;
+  resetPaymentState();
+  selectRecommendedSku();
+}
+
+function selectRecommendedSku(): void {
+  if (!catalog.value || currentOrder.value) {
+    return;
+  }
+  const skus = activePanel.value === 'points' ? pointsSkus.value : membershipSkus.value;
+  const currentSku = selectedSku.value;
+  if (currentSku && currentSku.category === activePanel.value) {
+    return;
+  }
+  selectedSku.value = skus.find((sku) => isRecommendedSku(sku)) || skus[0] || null;
+}
+
+function isRecommendedSku(sku: PaymentSku): boolean {
+  return sku.badge === '最受欢迎' || sku.sku_id === 'points_standard_990' || sku.sku_id === 'membership_month_1990';
+}
+
+async function focusCdkInput(): Promise<void> {
+  await nextTick();
+  cdkInputRef.value?.focus();
 }
 
 async function buySku(sku: PaymentSku): Promise<void> {
@@ -267,10 +347,17 @@ function resetPaymentState(): void {
 }
 
 function displaySkuName(sku: PaymentSku): string {
+  if (SKU_DISPLAY_NAMES[sku.sku_id]) {
+    return SKU_DISPLAY_NAMES[sku.sku_id]!;
+  }
   return sku.title
     .replace(/^PinDou\s*/, '')
     .replace('积分包', '包')
     .replace('普通图纸', '');
+}
+
+function skuSortRank(sku: PaymentSku): number {
+  return SKU_DISPLAY_ORDER[sku.sku_id] ?? 999;
 }
 
 function skuAiCount(sku: PaymentSku): number {
@@ -280,11 +367,22 @@ function skuAiCount(sku: PaymentSku): number {
   return Math.floor(Number(sku.points || sku.gift_points || 0) / aiCost.value);
 }
 
-function afterBuyAiCount(sku: PaymentSku): number {
-  if (!aiCost.value) {
-    return 0;
+function skuCoreLine(sku: PaymentSku): string {
+  if (sku.category === 'points') {
+    return `${sku.points || 0} 积分`;
   }
-  return Math.floor((aiBalance.value + Number(sku.points || sku.gift_points || 0)) / aiCost.value);
+  return `${sku.days || 0} 天普通无限`;
+}
+
+function skuValueLine(sku: PaymentSku): string {
+  if (sku.category === 'points') {
+    return `≈ ${skuAiCount(sku)} 张 AI`;
+  }
+  return `赠 ${sku.gift_points || 0} 积分 · ≈ ${skuAiCount(sku)} 张 AI`;
+}
+
+function skuSellLine(sku: PaymentSku): string {
+  return sku.subtitle || (sku.category === 'points' ? 'AI 图纸更精细' : '普通模式放心做');
 }
 
 function normalizeQrUrl(url: string): string {
@@ -354,68 +452,82 @@ function readErrorMessage(error: unknown, fallback: string): string {
           <button class="pricing-close" type="button" aria-label="关闭定价弹窗" @click="close">×</button>
 
           <header class="pricing-header">
-            <span class="pricing-kicker">PinDou 钱包</span>
-            <h2 id="pricing-title">继续做拼豆图纸</h2>
-            <p>{{ reasonText }}</p>
-            <p class="pricing-note">生成成功才扣，失败不扣。时间卡只解锁普通模式不限次；AI 仍按 {{ aiCostLabel }} 积分/张，月卡通过赠积分间接抵 AI。</p>
-            <div class="pricing-balance" aria-label="当前余额">
-              <span>当前 {{ aiBalance }} 积分</span>
-              <span>可生成 AI {{ aiGenerations }}{{ aiGenerationsUnit }}</span>
-              <span>{{ membershipLabel }}</span>
+            <h2 id="pricing-title">充值中心</h2>
+            <div class="pricing-summary">
+              <span>AI {{ aiCostLabel }} 积分/张，成功才扣；时间卡解锁普通不限。</span>
+              <details class="pricing-info">
+                <summary aria-label="查看计费说明">ⓘ</summary>
+                <p>时间卡只解锁普通模式不限次；AI 仍按 {{ aiCostLabel }} 积分/张。月卡会赠送积分，相当于间接抵 AI 生成。</p>
+              </details>
             </div>
+            <p v-if="props.reason !== 'manual'" class="pricing-context">{{ reasonText }} 生成成功才扣，失败不扣。</p>
+            <p v-if="isLoggedIn && !isUnlimitedAccount" class="pricing-wallet-line">
+              当前 {{ aiBalance }} 积分 · 可生成 AI {{ aiGenerations }}{{ aiGenerationsUnit }} · {{ membershipLabel }}
+            </p>
             <p v-if="!isLoggedIn" class="pricing-guest-note">未登录状态暂按 0 余额展示。购买或兑换前请先登录/注册，避免换设备后余额丢失。</p>
           </header>
+
+          <nav class="pricing-tabs" aria-label="充值类型">
+            <button
+              type="button"
+              :class="{ 'pricing-tab--active': activePanel === 'points' }"
+              @click="selectPanel('points')"
+            >
+              AI 积分
+            </button>
+            <button
+              type="button"
+              :class="{ 'pricing-tab--active': activePanel === 'membership' }"
+              @click="selectPanel('membership')"
+            >
+              时间卡会员
+            </button>
+          </nav>
 
           <div v-if="skuError" class="pricing-alert pricing-alert--error">{{ skuError }}</div>
           <div v-else-if="loadingSkus" class="pricing-loading">正在加载套餐…</div>
 
-          <div v-else class="pricing-panels">
-            <section
-              v-for="panel in ['points', 'membership']"
-              :key="panel"
-              class="pricing-panel"
-              :class="{ 'pricing-panel--focus': activePanel === panel }"
-            >
-              <div class="pricing-panel__head">
-                <strong>{{ panel === 'points' ? 'AI 积分充值' : '普通时间卡' }}</strong>
-                <span>{{ panel === 'points' ? `${aiCostLabel} 积分 / 张` : '普通模式不限次' }}</span>
-              </div>
+          <section v-else class="pricing-panel">
+            <div class="pricing-panel__head">
+              <strong>{{ activePanelTitle }}</strong>
+              <span>{{ activePanelSubtitle }}</span>
+            </div>
 
-              <div class="sku-grid" :aria-label="panel === 'points' ? 'AI 积分充值' : '普通时间卡'">
-                <article
-                  v-for="sku in (panel === 'points' ? pointsSkus : membershipSkus)"
-                  :key="sku.sku"
-                  class="sku-card"
-                  :class="{ 'sku-card--featured': sku.badge === '最受欢迎' }"
+            <div class="sku-grid" :aria-label="activePanelTitle">
+              <article
+                v-for="sku in activeSkus"
+                :key="sku.sku"
+                class="sku-card"
+                :class="{
+                  'sku-card--featured': isRecommendedSku(sku),
+                  'sku-card--selected': selectedSku?.sku === sku.sku
+                }"
+              >
+                <div class="sku-card__top">
+                  <span class="sku-name">{{ displaySkuName(sku) }}</span>
+                  <span v-if="sku.badge" class="sku-badge" :class="{ 'sku-badge--glass': sku.badge === '单价最低' }">
+                    {{ sku.badge }}
+                  </span>
+                </div>
+                <strong class="sku-price">{{ formatPrice(sku.amount_cny) }}</strong>
+                <p class="sku-main">{{ skuCoreLine(sku) }}</p>
+                <p class="sku-subtitle">{{ skuSellLine(sku) }}</p>
+                <p class="sku-math">{{ skuValueLine(sku) }}</p>
+                <button
+                  class="sku-buy"
+                  type="button"
+                  :disabled="isCreatingOrder || isPollingOrder"
+                  @click="buySku(sku)"
                 >
-                  <div class="sku-card__badge-row">
-                    <span class="sku-name">{{ displaySkuName(sku) }}</span>
-                    <span v-if="sku.badge" class="sku-badge" :class="{ 'sku-badge--glass': sku.badge === '单价最低' }">
-                      {{ sku.badge }}
-                    </span>
-                  </div>
-                  <strong class="sku-price">{{ formatPrice(sku.amount_cny) }}</strong>
-                  <p v-if="sku.category === 'points'" class="sku-main">{{ sku.points }} 积分</p>
-                  <p v-else class="sku-main">{{ sku.days }} 天普通无限</p>
-                  <p class="sku-subtitle">{{ sku.subtitle }}</p>
-                  <p v-if="sku.category === 'points'" class="sku-math">
-                    约 {{ skuAiCount(sku) }} 张 AI，充值后可生成 {{ afterBuyAiCount(sku) }} 张
-                  </p>
-                  <p v-else class="sku-math">
-                    赠 {{ sku.gift_points }} 积分，约抵 {{ skuAiCount(sku) }} 张 AI
-                  </p>
-                  <button
-                    class="sku-buy"
-                    type="button"
-                    :disabled="isCreatingOrder || isPollingOrder"
-                    @click="buySku(sku)"
-                  >
-                    {{ selectedSku?.sku === sku.sku && isCreatingOrder ? '生成二维码…' : '选择这个套餐' }}
-                  </button>
-                </article>
-              </div>
-            </section>
-          </div>
+                  {{ selectedSku?.sku === sku.sku && isCreatingOrder ? '生成二维码…' : '选择' }}
+                </button>
+              </article>
+            </div>
+
+            <p v-if="activePanel === 'membership'" class="pricing-panel__fineprint">
+              时间卡只影响普通模式；AI 仍按积分扣，随卡赠分会进入钱包。
+            </p>
+          </section>
 
           <section v-if="currentOrder || paymentMessage || paymentError" class="payment-box" aria-live="polite">
             <div class="payment-box__text">
@@ -431,13 +543,13 @@ function readErrorMessage(error: unknown, fallback: string): string {
             </button>
           </section>
 
-          <section class="cdk-card">
-            <div>
-              <strong>已有兑换码？</strong>
-              <span>积分 CDK / 时间卡 CDK 都可在这里兑换</span>
-            </div>
-            <form class="cdk-form" @submit.prevent="submitCdk">
-              <input v-model="cdkCode" type="text" autocomplete="off" placeholder="输入 CDK 兑换码" />
+          <section class="cdk-card" :class="{ 'cdk-card--open': cdkExpanded }">
+            <button class="cdk-toggle" type="button" @click="cdkExpanded = !cdkExpanded">
+              <span>有兑换码？</span>
+              <strong>{{ cdkExpanded ? '收起' : '展开兑换' }}</strong>
+            </button>
+            <form v-if="cdkExpanded" class="cdk-form" @submit.prevent="submitCdk">
+              <input ref="cdkInputRef" v-model="cdkCode" type="text" autocomplete="off" placeholder="输入 CDK 兑换码" />
               <button type="submit" :disabled="!canSubmitCdk">{{ cdkBusy ? '兑换中…' : '立即兑换' }}</button>
             </form>
             <p v-if="cdkMessage" class="cdk-success">{{ cdkMessage }}</p>
@@ -459,38 +571,38 @@ function readErrorMessage(error: unknown, fallback: string): string {
   background: rgba(45, 36, 30, 0.3);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
-  padding: clamp(12px, 3vw, 28px);
+  padding: clamp(10px, 2.4vw, 24px);
 }
 
 .pricing-modal {
   position: relative;
-  width: min(100%, 1040px);
-  max-height: min(860px, calc(100dvh - 24px));
+  width: min(100%, 900px);
+  max-height: min(820px, calc(100dvh - 20px));
   overflow-y: auto;
   overscroll-behavior: contain;
   display: grid;
-  gap: 16px;
+  gap: 12px;
   border: 1px solid rgba(237, 228, 218, 0.92);
-  border-radius: 30px;
+  border-radius: 28px;
   background:
-    radial-gradient(circle at 16% 0%, rgba(255, 176, 136, 0.28), transparent 34%),
-    radial-gradient(circle at 88% 10%, rgba(255, 218, 145, 0.28), transparent 30%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 247, 241, 0.98));
+    radial-gradient(circle at 16% 0%, rgba(255, 176, 136, 0.24), transparent 34%),
+    radial-gradient(circle at 90% 8%, rgba(255, 218, 145, 0.22), transparent 30%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.99), rgba(255, 247, 241, 0.99));
   box-shadow: var(--pd-shadow-modal), 0 18px 44px rgba(255, 142, 83, 0.16);
-  padding: clamp(18px, 3vw, 28px);
+  padding: clamp(16px, 2.6vw, 24px);
 }
 
 .pricing-close {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 13px;
+  right: 13px;
   width: 36px;
   height: 36px;
   display: grid;
   place-items: center;
   border: 1px solid rgba(255, 142, 83, 0.22);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.86);
   color: var(--pd-fg-2);
   cursor: pointer;
   font: inherit;
@@ -509,34 +621,87 @@ function readErrorMessage(error: unknown, fallback: string): string {
 .pricing-header {
   display: grid;
   gap: 8px;
-  padding-right: 40px;
-}
-
-.pricing-kicker {
-  color: var(--pd-orange);
-  font-size: 12px;
-  font-weight: 900;
+  padding-right: 38px;
 }
 
 .pricing-header h2 {
   margin: 0;
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
-  font-size: clamp(30px, 5vw, 44px);
-  line-height: 1.12;
+  font-size: clamp(30px, 4.8vw, 42px);
+  line-height: 1.08;
 }
 
-.pricing-header p {
-  max-width: 760px;
-  margin: 0;
+.pricing-summary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
   color: var(--pd-fg-2);
-  font-size: 14px;
-  font-weight: 800;
-  line-height: 1.6;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.45;
 }
 
-.pricing-note {
-  display: inline-block;
+.pricing-summary > span {
+  min-width: 0;
+}
+
+.pricing-info {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.pricing-info summary {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 142, 83, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--pd-orange);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 900;
+  list-style: none;
+}
+
+.pricing-info summary::-webkit-details-marker {
+  display: none;
+}
+
+.pricing-info p {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 2;
+  width: min(300px, calc(100vw - 48px));
+  margin: 0;
+  border: 1px solid rgba(255, 142, 83, 0.18);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 16px 34px rgba(45, 45, 45, 0.13);
+  color: var(--pd-fg-1);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+  padding: 10px 12px;
+}
+
+.pricing-context,
+.pricing-wallet-line,
+.pricing-guest-note {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.pricing-context,
+.pricing-guest-note {
   width: fit-content;
   max-width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.58);
@@ -544,40 +709,70 @@ function readErrorMessage(error: unknown, fallback: string): string {
   background: rgba(255, 198, 107, 0.3);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
+  color: var(--pd-fg-1);
   padding: 6px 9px;
-  color: var(--pd-fg-1) !important;
 }
 
-.pricing-balance {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px;
+.pricing-wallet-line {
+  color: var(--pd-fg-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.pricing-balance span,
 .pricing-guest-note {
-  border: 1px solid rgba(255, 142, 83, 0.18);
+  color: var(--pd-orange);
+}
+
+.pricing-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  border: 1px solid rgba(255, 142, 83, 0.16);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.78);
-  color: var(--pd-fg-1);
-  font-size: 12px;
-  font-weight: 900;
-  padding: 7px 10px;
+  padding: 5px;
 }
 
-.pricing-guest-note {
-  width: fit-content;
-  max-width: 100%;
-  border-radius: 14px;
-  color: var(--pd-orange) !important;
+.pricing-tabs button {
+  min-width: 0;
+  min-height: 42px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pd-fg-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(14px, 3.5vw, 16px);
+  font-weight: 900;
+  white-space: nowrap;
+  transition: transform 180ms var(--pd-ease-out), box-shadow 180ms var(--pd-ease-out), color 180ms var(--pd-ease-out), background 180ms var(--pd-ease-out);
+}
+
+.pricing-tabs button:hover {
+  color: var(--pd-orange);
+  transform: translateY(-1px);
+}
+
+.pricing-tabs .pricing-tab--active {
+  border-color: rgba(255, 142, 83, 0.26);
+  background: var(--pd-gradient);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(255, 142, 83, 0.2);
+}
+
+.pricing-loading,
+.pricing-alert,
+.pricing-panel,
+.payment-box,
+.cdk-card {
+  border: 1px solid rgba(255, 142, 83, 0.16);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
 }
 
 .pricing-loading,
 .pricing-alert {
-  border: 1px solid rgba(255, 142, 83, 0.16);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.72);
   color: var(--pd-fg-2);
   font-weight: 900;
   padding: 14px;
@@ -589,25 +784,11 @@ function readErrorMessage(error: unknown, fallback: string): string {
   color: #e35151;
 }
 
-.pricing-panels {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
 .pricing-panel {
   min-width: 0;
   display: grid;
   gap: 12px;
-  border: 1px solid rgba(237, 228, 218, 0.86);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.72);
   padding: 14px;
-}
-
-.pricing-panel--focus {
-  border-color: rgba(255, 142, 83, 0.42);
-  box-shadow: 0 16px 34px rgba(255, 142, 83, 0.1);
 }
 
 .pricing-panel__head {
@@ -621,75 +802,101 @@ function readErrorMessage(error: unknown, fallback: string): string {
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
   font-size: 24px;
+  line-height: 1.1;
 }
 
-.pricing-panel__head span {
+.pricing-panel__head span,
+.pricing-panel__fineprint {
   color: var(--pd-orange);
   font-size: 12px;
   font-weight: 900;
   text-align: right;
+  white-space: nowrap;
+}
+
+.pricing-panel__fineprint {
+  margin: 0;
+  color: var(--pd-fg-2);
+  text-align: left;
 }
 
 .sku-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 11px;
   align-items: stretch;
 }
 
 .sku-card {
   position: relative;
   min-width: 0;
+  min-height: 236px;
   display: grid;
-  align-content: start;
+  grid-template-rows: auto auto auto minmax(34px, auto) auto auto;
   gap: 8px;
-  border: 1px solid rgba(255, 142, 83, 0.16);
+  border: 1px solid rgba(255, 142, 83, 0.18);
   border-radius: 20px;
-  background: rgba(255, 250, 247, 0.92);
-  padding: 12px;
-  transition: transform 180ms var(--pd-ease-out), box-shadow 180ms var(--pd-ease-out), border-color 180ms var(--pd-ease-out);
+  background: rgba(255, 250, 247, 0.94);
+  padding: 13px;
+  transition: transform 180ms var(--pd-ease-out), box-shadow 180ms var(--pd-ease-out), border-color 180ms var(--pd-ease-out), background 180ms var(--pd-ease-out);
 }
 
 .sku-card:hover {
-  border-color: rgba(255, 142, 83, 0.5);
+  border-color: rgba(255, 142, 83, 0.52);
   box-shadow: 0 16px 32px rgba(255, 142, 83, 0.14);
   transform: translateY(-2px);
 }
 
 .sku-card--featured {
-  border-color: rgba(255, 142, 83, 0.72);
-  box-shadow: 0 16px 34px rgba(255, 142, 83, 0.18);
-  transform: translateY(-4px);
+  z-index: 1;
+  border-color: rgba(255, 142, 83, 0.78);
+  background: linear-gradient(180deg, rgba(255, 252, 248, 0.98), rgba(255, 244, 236, 0.96));
+  box-shadow: 0 18px 36px rgba(255, 142, 83, 0.2);
+  transform: translateY(-3px) scale(1.015);
 }
 
-.sku-card__badge-row {
-  min-height: 48px;
-  display: grid;
-  gap: 5px;
+.sku-card--featured:hover {
+  transform: translateY(-5px) scale(1.015);
+}
+
+.sku-card--selected {
+  outline: 3px solid rgba(255, 142, 83, 0.12);
+}
+
+.sku-card__top {
+  min-height: 28px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .sku-name {
+  min-width: 0;
   color: var(--pd-fg-1);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .sku-badge {
+  flex: 0 0 auto;
   width: fit-content;
   border-radius: 999px;
   background: var(--pd-gradient);
   color: #fff;
   font-size: 11px;
   font-weight: 900;
-  padding: 4px 8px;
+  line-height: 1;
+  padding: 5px 8px;
   white-space: nowrap;
 }
 
 .sku-badge--glass {
-  border: 1px solid rgba(255, 255, 255, 0.56);
+  border: 1px solid rgba(255, 255, 255, 0.58);
   border-radius: var(--pd-r-tag);
-  background: rgba(255, 198, 107, 0.32);
+  background: rgba(255, 198, 107, 0.34);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   color: var(--pd-fg-1);
@@ -698,42 +905,57 @@ function readErrorMessage(error: unknown, fallback: string): string {
 .sku-price {
   color: var(--pd-fg-1);
   font-family: var(--pd-font-display);
-  font-size: clamp(27px, 4vw, 38px);
+  font-size: clamp(30px, 4vw, 40px);
   line-height: 1;
+  white-space: nowrap;
 }
 
 .sku-main,
 .sku-subtitle,
 .sku-math {
   margin: 0;
-  color: var(--pd-fg-2);
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.45;
+  font-weight: 900;
+  line-height: 1.42;
 }
 
 .sku-main {
   color: var(--pd-orange);
-  font-size: 14px;
-  font-weight: 900;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.sku-subtitle {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.sku-math {
+  color: var(--pd-fg-1);
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .sku-buy,
 .payment-retry,
 .cdk-form button {
-  min-height: 40px;
-  border: 1px solid rgba(255, 142, 83, 0.28);
+  min-height: 42px;
+  border: 1px solid rgba(255, 142, 83, 0.38);
   border-radius: 999px;
-  background: rgba(255, 241, 232, 0.86);
+  background: rgba(255, 241, 232, 0.98);
   color: var(--pd-orange);
   cursor: pointer;
   font: inherit;
   font-size: 13px;
   font-weight: 900;
-  transition: transform 180ms var(--pd-ease-out), box-shadow 180ms var(--pd-ease-out), border-color 180ms var(--pd-ease-out);
+  transition: transform 180ms var(--pd-ease-out), box-shadow 180ms var(--pd-ease-out), border-color 180ms var(--pd-ease-out), background 180ms var(--pd-ease-out);
 }
 
-.sku-card--featured .sku-buy {
+.sku-card--featured .sku-buy,
+.sku-card--selected .sku-buy {
   border-color: transparent;
   background: var(--pd-gradient);
   color: #fff;
@@ -742,8 +964,9 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
 .sku-buy:hover:not(:disabled),
 .payment-retry:hover,
-.cdk-form button:hover:not(:disabled) {
-  border-color: rgba(255, 142, 83, 0.5);
+.cdk-form button:hover:not(:disabled),
+.cdk-toggle:hover {
+  border-color: rgba(255, 142, 83, 0.54);
   box-shadow: 0 12px 24px rgba(255, 142, 83, 0.14);
   transform: translateY(-1px);
 }
@@ -759,10 +982,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
 .cdk-card {
   display: grid;
   gap: 10px;
-  border: 1px solid rgba(255, 142, 83, 0.18);
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 14px;
+  padding: 13px;
 }
 
 .payment-box {
@@ -776,17 +996,17 @@ function readErrorMessage(error: unknown, fallback: string): string {
 }
 
 .payment-box__text strong,
-.cdk-card strong {
+.cdk-toggle strong {
   color: var(--pd-fg-1);
   font-weight: 900;
 }
 
 .payment-box__text span,
-.cdk-card span,
 .payment-message,
 .payment-error,
 .cdk-success,
-.cdk-error {
+.cdk-error,
+.cdk-toggle span {
   margin: 0;
   color: var(--pd-fg-2);
   font-size: 12px;
@@ -794,8 +1014,8 @@ function readErrorMessage(error: unknown, fallback: string): string {
 }
 
 .payment-qr {
-  width: 148px;
-  height: 148px;
+  width: 136px;
+  height: 136px;
   border: 1px solid rgba(237, 228, 218, 0.9);
   border-radius: 18px;
   background: #fff;
@@ -808,9 +1028,25 @@ function readErrorMessage(error: unknown, fallback: string): string {
   padding: 0 14px;
 }
 
-.cdk-card > div {
-  display: grid;
-  gap: 3px;
+.cdk-toggle {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  transition: transform 180ms var(--pd-ease-out), box-shadow 180ms var(--pd-ease-out), border-color 180ms var(--pd-ease-out), background 180ms var(--pd-ease-out);
+}
+
+.cdk-card--open .cdk-toggle {
+  border-color: rgba(255, 142, 83, 0.16);
+  background: rgba(255, 248, 242, 0.72);
+  padding: 0 10px;
 }
 
 .cdk-form {
@@ -824,9 +1060,10 @@ function readErrorMessage(error: unknown, fallback: string): string {
   min-height: 44px;
   border: 1px solid rgba(255, 142, 83, 0.22);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.92);
   color: var(--pd-fg-1);
   font: inherit;
+  font-size: 16px;
   font-weight: 900;
   outline: none;
   padding: 0 13px;
@@ -855,34 +1092,65 @@ function readErrorMessage(error: unknown, fallback: string): string {
   opacity: 0;
 }
 
-@media (max-width: 920px) {
-  .pricing-panels {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
+@media (max-width: 720px) {
   .pricing-backdrop {
     align-items: end;
-    padding: 10px;
+    padding: 9px;
   }
 
   .pricing-modal {
-    max-height: calc(100dvh - 20px);
-    border-radius: 26px;
-    padding: 18px;
+    width: 100%;
+    max-height: calc(100dvh - 18px);
+    border-radius: 24px;
+    gap: 11px;
+    padding: 16px;
   }
 
   .pricing-header {
-    padding-right: 30px;
+    padding-right: 32px;
+  }
+
+  .pricing-summary {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .pricing-wallet-line {
+    white-space: normal;
+  }
+
+  .pricing-panel__head span {
+    white-space: normal;
   }
 
   .sku-grid {
     grid-template-columns: 1fr;
   }
 
-  .sku-card--featured {
+  .sku-card,
+  .sku-card--featured,
+  .sku-card--featured:hover {
+    min-height: auto;
     transform: none;
+  }
+
+  .sku-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto auto;
+    column-gap: 12px;
+  }
+
+  .sku-card__top,
+  .sku-main,
+  .sku-subtitle,
+  .sku-math {
+    grid-column: 1 / -1;
+  }
+
+  .sku-buy {
+    align-self: end;
+    min-width: 88px;
+    padding-inline: 14px;
   }
 
   .payment-box {
@@ -890,9 +1158,40 @@ function readErrorMessage(error: unknown, fallback: string): string {
   }
 
   .payment-qr {
-    width: min(180px, 58vw);
-    height: min(180px, 58vw);
+    width: min(176px, 54vw);
+    height: min(176px, 54vw);
     justify-self: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .pricing-modal {
+    padding: 14px;
+  }
+
+  .pricing-header h2 {
+    font-size: 30px;
+  }
+
+  .pricing-tabs button {
+    min-height: 40px;
+    font-size: 14px;
+  }
+
+  .pricing-panel {
+    padding: 12px;
+  }
+
+  .pricing-panel__head strong {
+    font-size: 21px;
+  }
+
+  .sku-card {
+    padding: 12px;
+  }
+
+  .sku-price {
+    font-size: 31px;
   }
 
   .cdk-form {

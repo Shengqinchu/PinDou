@@ -32,6 +32,7 @@ const menuOpen = ref(false);
 const editOpen = ref(false);
 const pricingOpen = ref(false);
 const pricingPanel = ref<PaymentSkuCategory>('points');
+const pricingFocusCdk = ref(false);
 const draftNickname = ref('');
 const originalNickname = ref('');
 const originalAvatar = ref('');
@@ -87,7 +88,7 @@ const lowBalanceHint = computed(() => {
     return '';
   }
   const shortfall = Math.max(0, aiCost.value - aiPoints.value);
-  return `差 ${shortfall} 积分，再充值就能继续生成 AI 图纸。`;
+  return `差 ${shortfall} 积分，充值后就能继续生成 AI 图纸。`;
 });
 const nicknameCount = computed(() => [...draftNickname.value.trim()].length);
 const normalizedNickname = computed(() => normalizeNickname(draftNickname.value));
@@ -259,14 +260,20 @@ function goWorks(): void {
   void router.push('/works');
 }
 
-function openPricing(panel: PaymentSkuCategory): void {
+function openPricing(panel: PaymentSkuCategory, focusCdk = false): void {
   pricingPanel.value = panel;
+  pricingFocusCdk.value = focusCdk;
   pricingOpen.value = true;
   menuOpen.value = false;
 }
 
+function openCdkPricing(): void {
+  openPricing('points', true);
+}
+
 function closePricing(): void {
   pricingOpen.value = false;
+  pricingFocusCdk.value = false;
 }
 
 function handlePricingSuccess(): void {
@@ -417,9 +424,8 @@ function formatMonthDay(value: string): string {
           </div>
           <p v-if="lowBalanceHint" class="account-low-hint">{{ lowBalanceHint }}</p>
           <div class="account-credit-actions">
-            <button type="button" @click="openPricing('points')">再充值</button>
-            <button type="button" @click="openPricing('points')">兑换 CDK</button>
-            <button type="button" @click="openPricing('membership')">开通时间卡</button>
+            <button class="account-credit-action--primary" type="button" @click="openPricing('points')">充值 / 开通会员</button>
+            <button class="account-credit-action--secondary" type="button" @click="openCdkPricing">兑换 CDK</button>
           </div>
         </div>
 
@@ -507,6 +513,7 @@ function formatMonthDay(value: string): string {
       <PricingModal
         :open="pricingOpen"
         :initial-panel="pricingPanel"
+        :focus-cdk="pricingFocusCdk"
         reason="manual"
         @close="closePricing"
         @success="handlePricingSuccess"
@@ -694,8 +701,7 @@ function formatMonthDay(value: string): string {
   padding: 12px;
 }
 
-.account-credit-card__head,
-.account-credit-actions {
+.account-credit-card__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -757,6 +763,12 @@ function formatMonthDay(value: string): string {
   padding: 7px 9px;
 }
 
+.account-credit-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(96px, 0.75fr);
+  gap: 8px;
+}
+
 .account-credit-actions button,
 .account-menu-list button {
   min-height: 38px;
@@ -775,10 +787,20 @@ function formatMonthDay(value: string): string {
 }
 
 .account-credit-actions button {
-  flex: 1 1 0;
   color: var(--pd-orange);
   padding-inline: 8px;
   white-space: nowrap;
+}
+
+.account-credit-action--primary {
+  border-color: rgba(255, 142, 83, 0.38) !important;
+  background: linear-gradient(135deg, #ffa16f 0%, #ff6f8f 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 24px rgba(255, 111, 143, 0.18);
+}
+
+.account-credit-action--secondary {
+  background: rgba(255, 255, 255, 0.82);
 }
 
 .account-menu-list {
@@ -798,6 +820,12 @@ function formatMonthDay(value: string): string {
   background: #fff;
   box-shadow: 0 12px 24px rgba(255, 142, 83, 0.13);
   transform: translateY(-1px);
+}
+
+.account-credit-action--primary:hover {
+  border-color: rgba(255, 142, 83, 0.56) !important;
+  background: linear-gradient(135deg, #ffad7e 0%, #ff6389 100%) !important;
+  box-shadow: 0 16px 30px rgba(255, 111, 143, 0.24) !important;
 }
 
 .account-menu-list__danger {
