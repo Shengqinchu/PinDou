@@ -76,10 +76,19 @@ def upgrade() -> None:
     if dialect_name == "sqlite":
         now_expr = "CURRENT_TIMESTAMP"
         metadata_expr = "json_object('legacy_paid_credits', paid_credits)"
+        grant_key_expr = "'legacy_paid_credits:' || openid || ':v1'"
+        transaction_key_expr = "'legacy_paid_credits:' || openid || ':v1:grant'"
+    elif dialect_name in {"mysql", "mariadb"}:
+        now_expr = "CURRENT_TIMESTAMP"
+        metadata_expr = "JSON_OBJECT('legacy_paid_credits', paid_credits)"
+        grant_key_expr = "CONCAT('legacy_paid_credits:', openid, ':v1')"
+        transaction_key_expr = "CONCAT('legacy_paid_credits:', openid, ':v1:grant')"
     else:
         now_expr = "CURRENT_TIMESTAMP"
         metadata_expr = "json_build_object('legacy_paid_credits', paid_credits)"
-    op.execute(
+        grant_key_expr = "'legacy_paid_credits:' || openid || ':v1'"
+        transaction_key_expr = "'legacy_paid_credits:' || openid || ':v1:grant'"
+    bind.exec_driver_sql(
         f"""
         INSERT INTO credit_grants (
             owner_type, owner_id, amount_original, amount_remaining, amount_reserved,
@@ -94,7 +103,7 @@ def upgrade() -> None:
             'paid',
             'legacy_paid_credits',
             openid,
-            'legacy_paid_credits:' || openid || ':v1',
+            {grant_key_expr},
             NULL,
             {now_expr},
             {now_expr}
@@ -102,7 +111,7 @@ def upgrade() -> None:
         WHERE paid_credits > 0
         """
     )
-    op.execute(
+    bind.exec_driver_sql(
         f"""
         INSERT INTO credit_transactions (
             owner_type, owner_id, direction, amount, balance_after,
@@ -116,7 +125,7 @@ def upgrade() -> None:
             paid_credits * 128,
             'legacy_paid_credits',
             openid,
-            'legacy_paid_credits:' || openid || ':v1:grant',
+            {transaction_key_expr},
             {metadata_expr},
             {now_expr}
         FROM users
