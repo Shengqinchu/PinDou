@@ -733,6 +733,8 @@ function readErrorMessage(error: unknown, fallback: string): string {
 }
 
 .pricing-header {
+  position: relative;
+  z-index: 5;
   display: grid;
   gap: 6px;
   border-bottom: 1px solid rgba(255, 177, 128, 0.22);
@@ -768,6 +770,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
 .pricing-info {
   position: relative;
   flex: 0 0 auto;
+  z-index: 40;
 }
 
 .pricing-info summary {
@@ -791,9 +794,9 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
 .pricing-info p {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   right: 0;
-  z-index: 2;
+  z-index: 60;
   width: min(300px, calc(100vw - 48px));
   margin: 0;
   border: 1px solid rgba(255, 142, 83, 0.18);
@@ -842,6 +845,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
 .pricing-tabs {
   position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px;
