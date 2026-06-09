@@ -10,7 +10,7 @@ from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from pindou.api.errors import ApiException, ErrorCode
-from pindou.db.models import CreditGrant, CreditTransaction, EntitlementGrant, User, as_aware_utc, utc_now
+from pindou.db.models import CreditGrant, CreditTransaction, EntitlementGrant, MembershipGrant, User, as_aware_utc, utc_now
 
 AI_GENERATION_POINT_COST = 128
 REGISTER_GIFT_POINTS = 188
@@ -89,6 +89,27 @@ def active_membership_expires_at(user: User, *, now: datetime | None = None) -> 
     if expires_at is not None and expires_at > timestamp:
         return expires_at
     return None
+
+
+def active_membership_expires_at_for_owner(
+    session: Session,
+    *,
+    owner_type: str,
+    owner_id: str,
+    now: datetime | None = None,
+) -> datetime | None:
+    timestamp = as_aware_utc(now) or utc_now()
+    expires_at = session.scalar(
+        select(MembershipGrant.expires_at)
+        .where(
+            MembershipGrant.owner_type == owner_type,
+            MembershipGrant.owner_id == owner_id,
+            MembershipGrant.expires_at > timestamp,
+        )
+        .order_by(MembershipGrant.expires_at.desc(), MembershipGrant.id.desc())
+        .limit(1)
+    )
+    return as_aware_utc(expires_at)
 
 
 def has_active_membership(user: User, *, now: datetime | None = None) -> bool:
@@ -395,11 +416,17 @@ def extend_membership(
     if existing is not None:
         return as_aware_utc(user.membership_expires_at or user.monthly_card_expires_at) or timestamp
 
-    current_expires = as_aware_utc(user.membership_expires_at or user.monthly_card_expires_at)
-    base = current_expires if current_expires and current_expires > timestamp else timestamp
-    expires_at = base + timedelta(days=days)
-    user.membership_expires_at = expires_at
-    user.monthly_card_expires_at = expires_at
+    expires_at = extend_membership_for_owner(
+        session,
+        owner_type="user",
+        owner_id=user.user_id,
+        days=days,
+        source_type=source_type,
+        source_id=source_id,
+        idempotency_key=idempotency_key,
+        now=timestamp,
+        user=user,
+    )
     session.add(
         EntitlementGrant(
             source_type=source_type,
@@ -411,6 +438,72 @@ def extend_membership(
         )
     )
     session.add(user)
+    return expires_at
+
+
+def extend_membership_for_owner(
+    session: Session,
+    *,
+    owner_type: str,
+    owner_id: str,
+    days: int,
+    source_type: str,
+    source_id: str,
+    idempotency_key: str,
+    now: datetime | None = None,
+    user: User | None = None,
+) -> datetime:
+    if days <= 0:
+        raise ValueError("Membership days must be positive.")
+    if owner_type not in {"user", "device"}:
+        raise ValueError("Membership owner_type must be 'user' or 'device'.")
+
+    timestamp = as_aware_utc(now) or utc_now()
+    existing = session.scalar(select(MembershipGrant).where(MembershipGrant.idempotency_key == idempotency_key))
+    if existing is not None:
+        expires_at = as_aware_utc(existing.expires_at) or timestamp
+        if owner_type == "user":
+            target_user = user or session.scalar(select(User).where(User.openid == owner_id))
+            user_expires = as_aware_utc(target_user.membership_expires_at) if target_user is not None else None
+            if target_user is not None and (user_expires is None or user_expires < expires_at):
+                target_user.membership_expires_at = expires_at
+                target_user.monthly_card_expires_at = expires_at
+                session.add(target_user)
+        return expires_at
+
+    current_expires = active_membership_expires_at_for_owner(
+        session,
+        owner_type=owner_type,
+        owner_id=owner_id,
+        now=timestamp,
+    )
+    if owner_type == "user":
+        target_user = user or session.scalar(select(User).where(User.openid == owner_id))
+        if target_user is not None:
+            user_expires = as_aware_utc(target_user.membership_expires_at or target_user.monthly_card_expires_at)
+            if user_expires and (current_expires is None or user_expires > current_expires):
+                current_expires = user_expires
+
+    base = current_expires if current_expires and current_expires > timestamp else timestamp
+    expires_at = base + timedelta(days=days)
+    session.add(
+        MembershipGrant(
+            owner_type=owner_type,
+            owner_id=owner_id,
+            days=days,
+            source_type=source_type,
+            source_id=source_id,
+            idempotency_key=idempotency_key,
+            expires_at=expires_at,
+            created_at=timestamp,
+        )
+    )
+    if owner_type == "user":
+        target_user = user or session.scalar(select(User).where(User.openid == owner_id))
+        if target_user is not None:
+            target_user.membership_expires_at = expires_at
+            target_user.monthly_card_expires_at = expires_at
+            session.add(target_user)
     return expires_at
 
 

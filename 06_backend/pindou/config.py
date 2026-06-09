@@ -69,6 +69,7 @@ class Settings(BaseSettings):
     unlimited_credit_emails: str = Field(default="", validation_alias="UNLIMITED_CREDIT_EMAILS")
 
     jwt_secret: SecretStr | None = Field(default=None, validation_alias="JWT_SECRET")
+    device_token_secret: SecretStr | None = Field(default=None, validation_alias="DEVICE_TOKEN_SECRET")
     admin_username: str | None = Field(default=None, validation_alias="ADMIN_USERNAME")
     admin_password_hash: SecretStr | None = Field(default=None, validation_alias="ADMIN_PASSWORD_HASH")
     customer_service_qr_url: str = Field(
@@ -147,6 +148,9 @@ class Settings(BaseSettings):
             errors.append("JWT_SECRET must be configured to a strong production value.")
         elif len(jwt_secret) < 32:
             errors.append("JWT_SECRET must be at least 32 characters.")
+        device_secret = secret_value(self.device_token_secret)
+        if device_secret is not None and len(device_secret) < 32:
+            errors.append("DEVICE_TOKEN_SECRET must be at least 32 characters when configured.")
 
         origins = self.cors_allow_origins
         if not origins:

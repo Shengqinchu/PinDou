@@ -93,7 +93,12 @@ AI 生成采用 reservation 模型：
 - `single_use` / `credit_pack_5` / `credit_pack_10`：按 `value * 128` 转积分。
 - `monthly_card`：按 `value` 天时间卡兑换；`value <= 1` 时按 30 天兼容。
 
-匿名 CDK 和匿名余额迁移到注册账号是后续批次（B4），应绑定设备指纹并在注册时迁移 grant。
+匿名 CDK 采用服务端签名 `device_id` 作为账本 owner：
+
+- `device_id` 通过 HttpOnly cookie 自动携带，同时在钱包接口响应体返回签名 token，供前端 localStorage 保存并用 header 兜底；后端只信任签名 token，不信任明文设备号。
+- 游客无注册礼，只能使用 CDK 获得积分/时间卡；充值仍要求登录，避免真金流绑定到易丢的匿名设备。
+- 注册/登录迁移是后续 B4c：device 资产只迁给第一个认领账号；迁移成功后该 device 作废，后续匿名会话签发新的空 device，避免跨账号资产纠缠。
+- 使用设备标识保存匿名余额/作品需要在隐私政策中披露；上线前与 FUTURE_WORK #2 一起补齐。
 
 ### 7. 支付
 
@@ -132,7 +137,8 @@ AI 生成采用 reservation 模型：
 - **B1 已实施**：积分账本、AI 128 reservation/consume/release、注册礼积分、旧 `paid_credits` 惰性迁移、并发测试。
 - **B2 已实施**：`membership_expires_at` 时间卡、普通模式时间卡不限次、时间卡不抵 AI。
 - **B3 已实施核心规则**：注册赠送积分、赠送积分惰性过期、扣费顺序；清理任务仅作为后续归档优化。
-- **B4 待实施**：匿名 CDK/设备账本、匿名注册迁移。
+- **B4a 已实施**：签名 device 身份、匿名钱包读取、匿名 CDK 入账到 device、device 时间卡 grant。
+- **B4b/B4c 待实施**：生成门“三选一”引导、device → account 余额/会员/作品/未完成任务迁移；迁移后作废 device。
 - **B5 已实施后端**：6 个虎皮椒 SKU 和幂等发放；前端定价弹窗待 UI 批次。
 - **B6 已实施**：web 定价弹窗双面板、账户钱包展示、CDK 兑换入口、生成前低余额拦截。
 

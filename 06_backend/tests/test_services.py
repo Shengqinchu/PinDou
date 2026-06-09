@@ -235,6 +235,8 @@ def test_cdk_redeem_grants_credits_and_rate_limits(db_session: Session) -> None:
     db_session.refresh(user)
 
     assert redeemed.status == "redeemed"
+    assert redeemed.redeemed_owner_type == "user"
+    assert redeemed.redeemed_owner_id == user.openid
     assert user.paid_credits == 5
     assert get_credit_balance(db_session, owner_id=user.user_id).available == 5 * AI_GENERATION_POINT_COST
 

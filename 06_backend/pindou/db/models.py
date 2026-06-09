@@ -269,6 +269,24 @@ class EntitlementGrant(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
 
+class MembershipGrant(Base):
+    __tablename__ = "membership_grants"
+    __table_args__ = (
+        UniqueConstraint("idempotency_key", name="uq_membership_grants_idempotency_key"),
+        Index("ix_membership_grants_owner_active", "owner_type", "owner_id", "expires_at"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    owner_type: Mapped[str] = mapped_column(String(16), default="user", index=True, nullable=False)
+    owner_id: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
+    days: Mapped[int] = mapped_column(Integer, nullable=False)
+    source_type: Mapped[str] = mapped_column(String(32), index=True, nullable=False)
+    source_id: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
+    idempotency_key: Mapped[str] = mapped_column(String(160), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+
 class CreditGrant(Base):
     __tablename__ = "credit_grants"
     __table_args__ = (
@@ -321,6 +339,8 @@ class CDK(Base):
     value: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     status: Mapped[str] = mapped_column(String(32), default="active", index=True, nullable=False)
     redeemed_by: Mapped[str | None] = mapped_column(String(128), ForeignKey("users.openid"), nullable=True)
+    redeemed_owner_type: Mapped[str | None] = mapped_column(String(16), index=True, nullable=True)
+    redeemed_owner_id: Mapped[str | None] = mapped_column(String(128), index=True, nullable=True)
     redeemed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     sales_channel: Mapped[str | None] = mapped_column(String(128), nullable=True)
     batch_id: Mapped[str | None] = mapped_column(String(64), index=True, nullable=True)

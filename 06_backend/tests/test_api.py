@@ -20,7 +20,7 @@ from pindou.api.deps import get_db
 from pindou.api.generate import refund_reserved_ai_credit
 from pindou.config import get_settings
 from pindou.api.security import create_access_token
-from pindou.db.models import AdminAuditLog, Artwork, Base, CDK, DailyQuota, EmailCode, GenerationJob, Order, User
+from pindou.db.models import AdminAuditLog, Artwork, Base, CDK, DailyQuota, EmailCode, GenerationJob, MembershipGrant, Order, User
 from pindou.main import create_app
 from pindou.providers.base import PreviewResult
 from pindou.services.hupijiao_service import sign_params
@@ -1494,3 +1494,69 @@ def test_cdk_redeem_and_admin_batch_generate(api_client) -> None:
         headers=headers_admin,
     )
     assert batch.status_code == 403
+
+
+def test_wallet_profile_issues_signed_device_and_rejects_tampered_token(api_client) -> None:
+    client, _ = api_client
+    first = client.get("/api/wallet/profile")
+    assert first.status_code == 200
+    payload = first.json()
+    assert payload["owner_type"] == "device"
+    assert payload["is_anonymous"] is True
+    assert payload["normal_trial_remaining"] == 0
+    assert payload["device_token"]
+    assert "pd_device=" in first.headers.get("set-cookie", "")
+
+    token = payload["device_token"]
+    repeated = client.get("/api/wallet/profile", headers={"X-PinDou-Device": token})
+    assert repeated.status_code == 200
+    assert repeated.json()["owner_id"] == payload["owner_id"]
+
+    client.cookies.clear()
+    tampered = token[:-1] + ("A" if token[-1] != "A" else "B")
+    forged = client.get("/api/wallet/profile", headers={"X-PinDou-Device": tampered})
+    assert forged.status_code == 200
+    assert forged.json()["owner_type"] == "device"
+    assert forged.json()["owner_id"] != payload["owner_id"]
+    assert forged.json()["ai_points_balance"] == 0
+
+
+def test_anonymous_cdk_redeem_grants_device_wallet(api_client) -> None:
+    client, session_factory = api_client
+    wallet = client.get("/api/wallet/profile")
+    assert wallet.status_code == 200
+    token = wallet.json()["device_token"]
+    device_id = wallet.json()["device_id"]
+
+    with session_factory() as session:
+        service = CDKService(session)
+        service.create_cdk(code="DEVICEPOINTSABCDEFG", cdk_type="points", value=200)
+        service.create_cdk(code="DEVICEMEMBERABCDEFG", cdk_type="membership", value=7)
+
+    headers = {"X-PinDou-Device": token}
+    points = client.post("/api/cdk/redeem", json={"cdk_code": "DEVICEPOINTSABCDEFG"}, headers=headers)
+    assert points.status_code == 200
+    assert points.json()["owner_type"] == "device"
+    assert points.json()["is_anonymous"] is True
+    assert points.json()["device_token"] == token
+
+    membership = client.post("/api/cdk/redeem", json={"cdk_code": "DEVICEMEMBERABCDEFG"}, headers=headers)
+    assert membership.status_code == 200
+
+    refreshed = client.get("/api/wallet/profile", headers=headers).json()
+    assert refreshed["owner_id"] == device_id
+    assert refreshed["ai_points_balance"] == 200
+    assert refreshed["membership_expires_at"] is not None
+
+    with session_factory() as session:
+        balance = get_credit_balance(session, owner_type="device", owner_id=device_id)
+        assert balance.available == 200
+        assert session.get(CDK, "DEVICEPOINTSABCDEFG").redeemed_owner_type == "device"
+        assert session.get(CDK, "DEVICEPOINTSABCDEFG").redeemed_owner_id == device_id
+        assert session.get(CDK, "DEVICEPOINTSABCDEFG").redeemed_by is None
+        assert (
+            session.query(MembershipGrant)
+            .filter(MembershipGrant.owner_type == "device", MembershipGrant.owner_id == device_id)
+            .count()
+            == 1
+        )

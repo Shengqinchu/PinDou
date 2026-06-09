@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from collections.abc import Iterator
 from collections.abc import Callable
 from typing import Annotated, Any
 
-from fastapi import Depends, Header
+from fastapi import Cookie, Depends, Header, Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -14,6 +15,14 @@ from pindou.api.errors import ApiException, ErrorCode
 from pindou.api.security import TokenError, decode_access_token
 from pindou.db.models import User
 from pindou.db.session import get_session
+from pindou.services.device_identity import (
+    DEVICE_COOKIE_NAME,
+    DEVICE_HEADER_NAME,
+    DeviceIdentity,
+    issue_device_identity,
+    parse_device_identity,
+    set_device_cookie,
+)
 
 
 def get_db() -> Iterator[Session]:
@@ -23,6 +32,18 @@ def get_db() -> Iterator[Session]:
 DbSession = Annotated[Session, Depends(get_db)]
 
 
+@dataclass(frozen=True)
+class Actor:
+    owner_type: str
+    owner_id: str
+    user: User | None = None
+    device: DeviceIdentity | None = None
+
+    @property
+    def is_anonymous(self) -> bool:
+        return self.user is None
+
+
 def bearer_token(authorization: str | None = Header(default=None, alias="Authorization")) -> str:
     if not authorization or not authorization.startswith("Bearer "):
         raise ApiException(401, ErrorCode.AUTH_REQUIRED, "请先登录后再继续。")
@@ -30,6 +51,31 @@ def bearer_token(authorization: str | None = Header(default=None, alias="Authori
 
 
 def get_current_user(token: Annotated[str, Depends(bearer_token)], db: DbSession) -> User:
+    return get_current_user_from_token(token, db)
+
+
+def get_current_actor(
+    response: Response,
+    db: DbSession,
+    authorization: str | None = Header(default=None, alias="Authorization"),
+    device_header: str | None = Header(default=None, alias=DEVICE_HEADER_NAME),
+    device_cookie: str | None = Cookie(default=None, alias=DEVICE_COOKIE_NAME),
+) -> Actor:
+    if authorization:
+        if not authorization.startswith("Bearer "):
+            raise ApiException(401, ErrorCode.AUTH_REQUIRED, "登录已过期，请重新登录。")
+        token = authorization.removeprefix("Bearer ").strip()
+        user = get_current_user_from_token(token, db)
+        return Actor(owner_type="user", owner_id=user.user_id, user=user)
+
+    identity = parse_device_identity(device_header) or parse_device_identity(device_cookie)
+    if identity is None:
+        identity = issue_device_identity()
+    set_device_cookie(response, identity)
+    return Actor(owner_type="device", owner_id=identity.device_id, device=identity)
+
+
+def get_current_user_from_token(token: str, db: Session) -> User:
     try:
         payload = decode_access_token(token)
     except TokenError as exc:
@@ -82,4 +128,5 @@ def _role_from_payload(payload: dict[str, Any]) -> str:
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+CurrentActor = Annotated[Actor, Depends(get_current_actor)]
 CurrentAdmin = Annotated[dict, Depends(get_current_admin)]
