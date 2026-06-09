@@ -1397,16 +1397,17 @@ onUnmounted(revokePreview);
 
 .auth-modal__close {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 2;
-  width: 34px;
-  height: 34px;
+  top: clamp(16px, 4vw, 22px);
+  right: clamp(16px, 4vw, 22px);
+  z-index: 30;
+  width: 38px;
+  height: 38px;
   display: grid;
   place-items: center;
   border: 1px solid rgba(255, 142, 83, 0.22);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 24px rgba(45, 36, 30, 0.08);
   color: var(--pd-fg-2);
   cursor: pointer;
   font: inherit;

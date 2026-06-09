@@ -596,7 +596,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
                 </div>
                 <strong class="sku-price">{{ formatPrice(sku.amount_cny) }}</strong>
                 <p class="sku-main">{{ skuCoreLine(sku) }}</p>
-                <p class="sku-math">{{ skuValueLine(sku) }}</p>
+                <p :class="sku.category === 'membership' ? 'sku-gift' : 'sku-math'">{{ skuValueLine(sku) }}</p>
                 <button
                   class="sku-buy"
                   type="button"
@@ -696,10 +696,13 @@ function readErrorMessage(error: unknown, fallback: string): string {
   overscroll-behavior: contain;
   display: grid;
   gap: 9px;
-  border: 1px solid rgba(224, 226, 230, 0.96);
+  border: 1px solid rgba(255, 177, 128, 0.42);
   border-radius: 26px;
-  background: #f6f7f9;
-  box-shadow: 0 28px 70px rgba(45, 45, 45, 0.2), 0 8px 24px rgba(45, 45, 45, 0.1);
+  background:
+    radial-gradient(circle at 12% 4%, rgba(255, 231, 209, 0.92), transparent 34%),
+    radial-gradient(circle at 92% 18%, rgba(255, 226, 235, 0.82), transparent 32%),
+    linear-gradient(155deg, #fff7f0 0%, #ffece1 48%, #fff6ed 100%);
+  box-shadow: 0 30px 74px rgba(143, 75, 44, 0.2), 0 10px 26px rgba(255, 142, 83, 0.14);
   padding: clamp(14px, 2vw, 20px);
 }
 
@@ -732,7 +735,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
 .pricing-header {
   display: grid;
   gap: 6px;
-  border-bottom: 1px solid rgba(220, 224, 229, 0.92);
+  border-bottom: 1px solid rgba(255, 177, 128, 0.22);
   padding-right: 38px;
   padding-bottom: 9px;
 }
@@ -842,10 +845,10 @@ function readErrorMessage(error: unknown, fallback: string): string {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px;
-  border: 1px solid rgba(220, 224, 229, 0.94);
+  border: 1px solid rgba(255, 177, 128, 0.32);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: inset 0 1px 3px rgba(45, 45, 45, 0.04);
+  background: rgba(255, 250, 245, 0.82);
+  box-shadow: inset 0 1px 3px rgba(143, 75, 44, 0.05);
   padding: 5px;
 }
 
@@ -890,7 +893,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
 .pricing-panel,
 .payment-view,
 .cdk-card {
-  border: 1px solid rgba(224, 226, 230, 0.94);
+  border: 1px solid rgba(255, 177, 128, 0.28);
   border-radius: 22px;
   background: #fff;
 }
@@ -910,55 +913,62 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
 .pricing-panel {
   min-width: 0;
-  max-height: min(360px, calc(85dvh - 210px));
+  max-height: min(390px, calc(85dvh - 210px));
   display: grid;
   gap: 10px;
-  background: #eef1f5;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 10px 28px rgba(45, 45, 45, 0.05);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 239, 0.94), rgba(255, 235, 224, 0.72));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 10px 28px rgba(255, 142, 83, 0.07);
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 11px;
+  padding: 18px 14px;
 }
 
 .sku-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  align-items: stretch;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.12fr) minmax(0, 0.9fr);
+  gap: 12px;
+  align-items: center;
 }
 
 .sku-card {
   position: relative;
   min-width: 0;
-  min-height: 190px;
-  display: grid;
-  grid-template-rows: auto auto auto auto;
-  gap: 8px;
-  border: 1px solid rgba(224, 226, 230, 0.96);
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgba(45, 45, 45, 0.1);
-  padding: 12px;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 177, 128, 0.26);
+  border-radius: 24px;
+  background: linear-gradient(180deg, #fff 0%, #fff9f4 100%);
+  box-shadow: 0 14px 30px rgba(143, 75, 44, 0.1), 0 6px 16px rgba(255, 142, 83, 0.08);
+  text-align: center;
+  padding: 18px 14px;
   transition: transform 180ms var(--pd-ease-out), box-shadow 180ms var(--pd-ease-out), border-color 180ms var(--pd-ease-out), background 180ms var(--pd-ease-out);
 }
 
 .sku-card:hover {
   border-color: rgba(255, 142, 83, 0.56);
-  box-shadow: 0 14px 32px rgba(45, 45, 45, 0.13), 0 8px 18px rgba(255, 142, 83, 0.12);
+  box-shadow: 0 18px 38px rgba(143, 75, 44, 0.14), 0 10px 22px rgba(255, 142, 83, 0.14);
   transform: translateY(-2px);
 }
 
 .sku-card--featured {
   z-index: 1;
   border-color: rgba(255, 142, 83, 0.86);
-  background: #fff;
-  box-shadow: 0 22px 46px rgba(45, 45, 45, 0.16), 0 10px 24px rgba(255, 142, 83, 0.22);
-  transform: translateY(-5px) scale(1.026);
+  min-height: 302px;
+  border-width: 2px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 230, 198, 0.88), transparent 38%),
+    linear-gradient(180deg, #fff 0%, #fff5ed 100%);
+  box-shadow: 0 26px 54px rgba(143, 75, 44, 0.18), 0 12px 30px rgba(255, 142, 83, 0.24);
+  transform: translateY(-4px) scale(1.035);
 }
 
 .sku-card--featured:hover {
-  box-shadow: 0 26px 54px rgba(45, 45, 45, 0.18), 0 12px 28px rgba(255, 111, 143, 0.22);
-  transform: translateY(-7px) scale(1.026);
+  box-shadow: 0 30px 62px rgba(143, 75, 44, 0.2), 0 14px 34px rgba(255, 111, 143, 0.22);
+  transform: translateY(-7px) scale(1.035);
 }
 
 .sku-card--selected {
@@ -966,20 +976,25 @@ function readErrorMessage(error: unknown, fallback: string): string {
 }
 
 .sku-card__top {
-  min-height: 28px;
+  min-height: 44px;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
 }
 
 .sku-name {
   min-width: 0;
   color: var(--pd-fg-1);
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 900;
   line-height: 1.2;
   white-space: nowrap;
+}
+
+.sku-card--featured .sku-name {
+  font-size: 19px;
 }
 
 .sku-badge {
@@ -1004,31 +1019,55 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
 .sku-price {
   display: block;
-  color: #222;
+  min-height: 44px;
+  color: var(--pd-orange);
   font-family: var(--pd-font-display);
-  font-size: clamp(28px, 3.6vw, 36px);
+  font-size: clamp(31px, 3.9vw, 39px);
   line-height: 1;
-  padding: 4px 0 2px;
+  padding: 6px 0 2px;
   white-space: nowrap;
+}
+
+.sku-card--featured .sku-price {
+  font-size: clamp(34px, 4.4vw, 44px);
 }
 
 .sku-main,
-.sku-math {
+.sku-math,
+.sku-gift {
   margin: 0;
   font-weight: 900;
   line-height: 1.42;
+  white-space: nowrap;
 }
 
 .sku-main {
-  color: var(--pd-orange);
-  font-size: 16px;
-  white-space: nowrap;
+  min-height: 28px;
+  color: var(--pd-fg-1);
+  font-size: 17px;
+  letter-spacing: 0;
 }
 
 .sku-math {
-  color: var(--pd-fg-1);
+  min-height: 22px;
+  color: var(--pd-fg-2);
   font-size: 13px;
-  white-space: nowrap;
+}
+
+.sku-gift {
+  width: fit-content;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.64);
+  border-radius: var(--pd-r-tag);
+  background: rgba(255, 198, 107, 0.34);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  padding: 3px 9px;
 }
 
 .sku-buy,
@@ -1052,6 +1091,11 @@ function readErrorMessage(error: unknown, fallback: string): string {
   background: var(--pd-gradient);
   color: #fff;
   box-shadow: var(--pd-shadow-cta);
+}
+
+.sku-buy {
+  width: 100%;
+  margin-top: auto;
 }
 
 .sku-buy:hover:not(:disabled),
@@ -1354,34 +1398,27 @@ function readErrorMessage(error: unknown, fallback: string): string {
 
   .pricing-panel {
     max-height: calc(100dvh - 255px);
+    padding: 13px;
   }
 
   .sku-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .sku-card,
   .sku-card--featured,
   .sku-card--featured:hover {
-    min-height: auto;
+    min-height: 218px;
     transform: none;
   }
 
-  .sku-card {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto auto auto auto;
-    column-gap: 12px;
-  }
-
-  .sku-card__top,
-  .sku-main,
-  .sku-math {
-    grid-column: 1 / -1;
+  .sku-card--featured {
+    min-height: 238px;
   }
 
   .sku-buy {
-    align-self: end;
-    min-width: 88px;
+    min-width: 0;
     padding-inline: 14px;
   }
 
