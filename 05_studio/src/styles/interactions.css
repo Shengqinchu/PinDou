@@ -1,0 +1,299 @@
+/* Adapted from T-Check's verified 300ms parent/control motion contract. */
+:root {
+  --control-duration: 300ms;
+  --control-ease: ease-in-out;
+  --control-shadow: 0 8px 18px -8px rgb(99 47 32 / 26%);
+  --control-shadow-hover: 0 14px 26px -10px rgb(99 47 32 / 35%);
+}
+
+.button,
+.icon-button,
+.language-button,
+.bag-button,
+.menu-button,
+.plan-option,
+.photo-tile,
+.copy-contact,
+.text-link,
+.shop-tabs button {
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform var(--control-duration) var(--control-ease),
+    background-color var(--control-duration) var(--control-ease),
+    border-color var(--control-duration) var(--control-ease),
+    color var(--control-duration) var(--control-ease),
+    box-shadow var(--control-duration) var(--control-ease),
+    filter var(--control-duration) var(--control-ease);
+}
+
+.button {
+  min-height: 54px;
+  border-radius: 13px;
+  gap: 20px;
+  padding: 12px 19px 12px 24px;
+  line-height: 1.5;
+}
+
+.button-primary {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 16%),
+    var(--control-shadow);
+}
+
+.button-outline {
+  border-color: #bcc0af;
+  background: rgb(255 253 247 / 42%);
+  box-shadow: 0 2px 4px rgb(52 63 49 / 4%);
+}
+
+.button > svg {
+  box-sizing: content-box;
+  width: 19px;
+  height: 19px;
+  padding: 6px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 12%);
+}
+
+.button-outline > svg {
+  background: rgb(52 63 49 / 6%);
+}
+
+.button > svg,
+.icon-button > svg,
+.bag-button > svg,
+.menu-button > svg,
+.text-link > svg,
+.photo-expand,
+.photo-tile-image > img,
+.desktop-nav a::after {
+  transition:
+    transform var(--control-duration) var(--control-ease),
+    background-color var(--control-duration) var(--control-ease),
+    color var(--control-duration) var(--control-ease);
+}
+
+.icon-button,
+.language-button,
+.bag-button,
+.menu-button {
+  border-radius: 12px;
+}
+
+.text-link {
+  border: 0;
+  position: relative;
+  padding-block: 12px;
+}
+
+.text-link::after {
+  content: "";
+  position: absolute;
+  height: 1px;
+  inset: auto 0 5px;
+  background: currentColor;
+  opacity: 0.4;
+  transform-origin: left;
+  transition:
+    transform var(--control-duration) var(--control-ease),
+    opacity var(--control-duration) var(--control-ease);
+}
+
+.plan-option {
+  border-radius: 12px;
+  background: #fcfaf5;
+  padding: 19px 13px 16px;
+}
+
+.plan-option.selected {
+  border-color: var(--accent);
+  background: #f1e7dc;
+  box-shadow: 0 4px 12px rgb(99 47 32 / 8%);
+}
+
+.plan-option:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.photo-tile-image {
+  border-radius: 9px;
+}
+
+.photo-expand {
+  box-shadow: 0 3px 10px rgb(52 63 49 / 10%);
+}
+
+.shop-tabs button {
+  border-radius: 9px 9px 0 0;
+  padding-inline: 11px;
+}
+
+.shop-tabs button.active {
+  background: #eee6d9;
+}
+
+.field > input,
+.field > select,
+.field > textarea {
+  border-radius: 10px;
+  background-color: #fffef9;
+  transition:
+    background-color var(--control-duration) var(--control-ease),
+    border-color var(--control-duration) var(--control-ease),
+    box-shadow var(--control-duration) var(--control-ease);
+}
+
+.field > input:focus,
+.field > select:focus,
+.field > textarea:focus {
+  outline: 2px solid rgb(149 77 61 / 26%);
+  outline-offset: 2px;
+  background-color: #fff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button:not(:disabled):hover {
+    transform: translate3d(0, -2px, 0);
+    filter: saturate(1.04) brightness(1.025);
+    box-shadow: var(--control-shadow-hover);
+  }
+  .button-primary:not(:disabled):hover {
+    background: var(--accent);
+  }
+  .button-outline:not(:disabled):hover {
+    color: var(--ink);
+    background: #f9f7ed;
+    border-color: #89967d;
+    box-shadow: 0 9px 18px -8px rgb(52 63 49 / 23%);
+  }
+  .button:not(:disabled):hover > svg {
+    transform: translate3d(2px, -1px, 0);
+  }
+  .icon-button:not(:disabled):hover,
+  .language-button:hover,
+  .bag-button:hover,
+  .menu-button:hover {
+    transform: translate3d(0, -2px, 0);
+    background: var(--soft);
+    box-shadow: 0 7px 13px -7px rgb(52 63 49 / 22%);
+  }
+  .icon-button:not(:disabled):hover > svg {
+    transform: translateY(-1px);
+  }
+  .text-link:hover {
+    transform: translateY(-1px);
+    color: var(--accent);
+  }
+  .text-link:hover::after {
+    opacity: 0.8;
+    transform: scaleX(0.92);
+  }
+  .text-link:hover > svg {
+    transform: translate3d(3px, 0, 0);
+  }
+  .plan-option:not(:has(:disabled)):hover,
+  .photo-tile:hover {
+    transform: translate3d(0, -3px, 0) scale(1.006);
+  }
+  .plan-option:not(:has(:disabled)):hover {
+    box-shadow: 0 12px 20px -10px rgb(99 47 32 / 20%);
+    border-color: #bd8b73;
+  }
+  .photo-tile:hover .photo-tile-image > img {
+    transform: scale(1.015);
+  }
+  .photo-tile:hover .photo-expand {
+    transform: translate3d(1px, -1px, 0);
+    color: var(--paper);
+    background: var(--accent);
+  }
+  .shop-tabs button:hover,
+  .copy-contact:hover {
+    color: var(--accent);
+    background: #eee6d9;
+  }
+}
+
+.button:not(:disabled):active {
+  transform: translate3d(0, 1px, 0) scale(0.988);
+  filter: none;
+  box-shadow:
+    inset 0 2px 5px rgb(60 29 17 / 20%),
+    0 3px 7px rgb(99 47 32 / 10%);
+}
+
+.button:not(:disabled):active > svg,
+.icon-button:not(:disabled):active > svg,
+.text-link:active > svg {
+  transform: translate3d(0, 0, 0);
+}
+
+.icon-button:not(:disabled):active,
+.language-button:active,
+.bag-button:active,
+.menu-button:active {
+  transform: translate3d(0, 1px, 0) scale(0.94);
+  box-shadow: inset 0 2px 4px rgb(52 63 49 / 12%);
+}
+
+.text-link:active,
+.shop-tabs button:active,
+.copy-contact:active,
+.plan-option:active,
+.photo-tile:active {
+  transform: translate3d(0, 1px, 0) scale(0.995);
+}
+
+.button:focus-visible,
+.icon-button:focus-visible,
+.language-button:focus-visible,
+.bag-button:focus-visible,
+.menu-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 5px rgb(149 77 61 / 12%);
+}
+
+.button:disabled,
+.icon-button:disabled,
+.plan-option:has(:disabled) {
+  transform: none;
+  filter: grayscale(0.3);
+  box-shadow: none;
+}
+
+@media (hover: none) {
+  .button:hover,
+  .text-link:hover > svg,
+  .photo-tile:hover .photo-tile-image > img {
+    transform: none;
+  }
+  .button:active {
+    transform: translate3d(0, 1px, 0) scale(0.988);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .button > svg,
+  .icon-button,
+  .icon-button > svg,
+  .language-button,
+  .bag-button,
+  .bag-button > svg,
+  .menu-button,
+  .menu-button > svg,
+  .plan-option,
+  .photo-tile,
+  .photo-tile-image > img,
+  .photo-expand,
+  .text-link,
+  .text-link > svg,
+  .text-link::after,
+  .copy-contact,
+  .shop-tabs button {
+    transition: none !important;
+    transform: none !important;
+  }
+}

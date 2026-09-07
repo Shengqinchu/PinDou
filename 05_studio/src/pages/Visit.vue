@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from "vue";
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from "vue";
 import { PhArrowUpRight, PhCheck, PhMapPin } from "@phosphor-icons/vue";
 import InquiryForm, { type BookingDraft } from "../components/InquiryForm.vue";
 import {
@@ -10,9 +17,27 @@ import {
   prettyDate,
   tr,
 } from "../state";
-const today = hamiltonDate();
+const clock = ref(new Date());
+const localNow = computed(() => {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Toronto",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(clock.value);
+  const part = (name: string) =>
+    parts.find((value) => value.type === name)?.value;
+  return {
+    date: `${part("year")}-${part("month")}-${part("day")}`,
+    time: `${part("hour")}:${part("minute")}`,
+  };
+});
+const today = computed(() => localNow.value.date);
 const booking = reactive<BookingDraft>({
-  date: plusDays(today, 1),
+  date: plusDays(hamiltonDate(), 1),
   start: "14:00",
   end: "16:00",
   guests: 1,
@@ -23,6 +48,33 @@ const times = Array.from(
   (_, i) =>
     `${String(10 + Math.floor(i / 2)).padStart(2, "0")}:${i % 2 ? "30" : "00"}`,
 );
+const startTimes = computed(() => {
+  if (!booking.date || booking.date < today.value) return [];
+  return times
+    .slice(0, -1)
+    .filter(
+      (time) => booking.date !== today.value || time > localNow.value.time,
+    );
+});
+const endTimes = computed(() =>
+  booking.start ? times.filter((time) => time > booking.start) : [],
+);
+watch(
+  [startTimes, () => booking.start],
+  () => {
+    if (!startTimes.value.includes(booking.start))
+      booking.start = startTimes.value[0] || "";
+    if (!endTimes.value.includes(booking.end))
+      booking.end =
+        endTimes.value[Math.min(1, endTimes.value.length - 1)] || "";
+  },
+  { immediate: true },
+);
+let clockTimer: ReturnType<typeof setInterval> | undefined;
+onMounted(() => {
+  clockTimer = setInterval(() => (clock.value = new Date()), 30000);
+});
+onBeforeUnmount(() => clearInterval(clockTimer));
 const plans = computed(() => [
   {
     id: "hourly" as const,
@@ -47,6 +99,7 @@ watch(
   () => booking.plan,
   (value) => {
     if (value === "pair") booking.guests = 2;
+    if (value === "day") booking.guests = 1;
   },
 );
 const summary = computed(() => [
@@ -117,7 +170,11 @@ const summary = computed(() => [
       </p>
     </aside>
     <div class="booking-panel">
-      <InquiryForm kind="visit" :booking="booking" :summary="summary"
+      <InquiryForm
+        kind="visit"
+        :booking="booking"
+        :summary="summary"
+        :submit-disabled="!startTimes.length"
         ><template #details>
           <div class="form-section">
             <h2>
@@ -151,7 +208,9 @@ const summary = computed(() => [
           </div>
           <div class="form-section">
             <h2>
-              {{ tr("选一个想来的时间", "When shall we make something?") }}
+              {{
+                tr("日期、时间，再到同行人数", "Your date, time and company.")
+              }}
             </h2>
             <p class="form-help">
               {{
@@ -162,7 +221,7 @@ const summary = computed(() => [
               }}
             </p>
             <div class="form-grid">
-              <label class="field"
+              <label class="field field-full"
                 >{{ tr("希望到店的日期", "Preferred visit date")
                 }}<input
                   v-model="booking.date"
@@ -172,6 +231,20 @@ const summary = computed(() => [
                   :max="plusDays(today, 90)"
                   required /></label
               ><label class="field"
+                >{{ tr("希望开始的时间", "Preferred start")
+                }}<select v-model="booking.start" name="start" required>
+                  <option v-for="time in startTimes" :key="time">
+                    {{ time }}
+                  </option>
+                </select></label
+              ><label class="field"
+                >{{ tr("预计结束的时间", "Estimated finish")
+                }}<select v-model="booking.end" name="end" required>
+                  <option v-for="time in endTimes" :key="time">
+                    {{ time }}
+                  </option>
+                </select></label
+              ><label class="field field-full"
                 >{{ tr("同行人数", "Number of guests")
                 }}<input
                   v-model.number="booking.guests"
@@ -180,28 +253,18 @@ const summary = computed(() => [
                   min="1"
                   max="20"
                   step="1"
-                  :readonly="booking.plan === 'pair'"
-                  required /></label
-              ><label class="field"
-                >{{ tr("希望开始的时间", "Preferred start")
-                }}<select v-model="booking.start" name="start">
-                  <option v-for="time in times.slice(0, -1)" :key="time">
-                    {{ time }}
-                  </option>
-                </select></label
-              ><label class="field"
-                >{{ tr("预计结束的时间", "Estimated finish")
-                }}<select v-model="booking.end" name="end">
-                  <option
-                    v-for="time in times.slice(1)"
-                    :key="time"
-                    :disabled="time <= booking.start"
-                  >
-                    {{ time }}
-                  </option>
-                </select></label
-              >
+                  :readonly="booking.plan !== 'hourly'"
+                  required
+              /></label>
             </div>
+            <p v-if="!startTimes.length" class="form-error" role="status">
+              {{
+                tr(
+                  "这一天已没有可选的到访时间，请换一个日期。",
+                  "There are no remaining times for this date. Please choose another day.",
+                )
+              }}
+            </p>
             <p class="fine-print">
               {{
                 tr(

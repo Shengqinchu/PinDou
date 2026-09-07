@@ -1,0 +1,202 @@
+@font-face {
+  font-family: "PinDou Serif SC";
+  src: url("../assets/fonts/pindou-serif-sc.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PinDou Sans SC";
+  src: url("../assets/fonts/pindou-sans-sc.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  --body: "Outfit Variable", "PinDou Sans SC", "PingFang SC", sans-serif;
+  --chinese-display: "DM Serif Display", "PinDou Serif SC", serif;
+}
+
+/* The English faces stay unchanged. Chinese has separate display and UI roles. */
+:lang(zh-CN) h1,
+:lang(zh-CN) h2 {
+  font-family: var(--chinese-display);
+  font-weight: 500;
+  line-height: 1.42;
+  letter-spacing: 0.005em;
+}
+
+:lang(zh-CN) h1 em,
+:lang(zh-CN) h2 em {
+  font-family: inherit;
+  font-weight: inherit;
+  font-style: normal;
+}
+
+:lang(zh-CN) .hero h1 {
+  font-size: clamp(40px, 4.1vw, 60px);
+  line-height: 1.44;
+  letter-spacing: 0.01em;
+  margin-left: 0;
+}
+
+:lang(zh-CN) .hero-description,
+:lang(zh-CN) .space-copy > p,
+:lang(zh-CN) .shop-teaser-copy p,
+:lang(zh-CN) .page-intro > div > p,
+:lang(zh-CN) .booking-story > p {
+  font-size: 15px;
+  line-height: 1.95;
+  letter-spacing: 0.035em;
+}
+
+:lang(zh-CN) .wordmark-sub {
+  font-size: 11px;
+  letter-spacing: 0.17em;
+  margin-top: 7px;
+}
+
+:lang(zh-CN) .desktop-nav {
+  font-size: 14px;
+  letter-spacing: 0.045em;
+}
+
+:lang(zh-CN) .text-link,
+:lang(zh-CN) .button {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.035em;
+}
+
+:lang(zh-CN) .hero-footnote,
+:lang(zh-CN) .welcome-strip,
+:lang(zh-CN) .work-caption,
+:lang(zh-CN) .photo-tile > span {
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+:lang(zh-CN) .form-section h2,
+:lang(zh-CN) .product h2,
+:lang(zh-CN) .manage-entry h2,
+:lang(zh-CN) .management h1,
+:lang(zh-CN) .admin-login h2 {
+  font-family: var(--body);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+:lang(zh-CN) .field,
+:lang(zh-CN) .form-help,
+:lang(zh-CN) details p {
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+:lang(zh-CN) .plan-option > span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+:lang(zh-CN) .plan-option > small,
+:lang(zh-CN) .plan-options + .fine-print,
+:lang(zh-CN) .privacy-note,
+:lang(zh-CN) .request-summary > .fine-print,
+:lang(zh-CN) .consent {
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+:lang(zh-CN) .request-summary > p,
+:lang(zh-CN) .product > p,
+:lang(zh-CN) .product-price,
+:lang(zh-CN) .cart-line > div > span,
+:lang(zh-CN) .footer-column,
+:lang(zh-CN) .copy-contact {
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+:lang(zh-CN) .announcement,
+:lang(zh-CN) .footer-column > span:first-child {
+  font-size: 12px;
+  letter-spacing: 0.055em;
+}
+
+@media (max-width: 860px) {
+  :lang(zh-CN) .hero h1 {
+    font-size: 36px;
+  }
+  :lang(zh-CN) .hero-description {
+    font-size: 14px;
+  }
+  :lang(zh-CN) .hero-footnote,
+  :lang(zh-CN) .welcome-strip {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  :lang(zh-CN) .hero h1 {
+    font-size: clamp(31px, 9.8vw, 40px);
+    line-height: 1.46;
+    letter-spacing: 0;
+  }
+  :lang(zh-CN) h2,
+  :lang(zh-CN) .space-copy h2,
+  :lang(zh-CN) .shop-teaser-copy h2,
+  :lang(zh-CN) .find-section h2 {
+    font-size: 31px;
+    line-height: 1.5;
+  }
+  :lang(zh-CN) .page-intro h1,
+  :lang(zh-CN) .booking-story h1 {
+    font-size: 37px;
+    line-height: 1.45;
+  }
+  :lang(zh-CN) .hero-description,
+  :lang(zh-CN) .space-copy > p,
+  :lang(zh-CN) .shop-teaser-copy p,
+  :lang(zh-CN) .page-intro > div > p,
+  :lang(zh-CN) .booking-story > p {
+    font-size: 14px;
+    line-height: 1.95;
+    letter-spacing: 0.01em;
+  }
+  :lang(zh-CN) .hero-buttons .button,
+  :lang(zh-CN) .hero-buttons .text-link {
+    font-size: 14px;
+  }
+  :lang(zh-CN) .hero-footnote,
+  :lang(zh-CN) .welcome-strip,
+  :lang(zh-CN) .photo-tile > span,
+  :lang(zh-CN) .journal-grid .photo-tile > span,
+  :lang(zh-CN) .work-caption {
+    font-size: 12px;
+  }
+  :lang(zh-CN) .announcement {
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+  :lang(zh-CN) .form-section h2 {
+    font-size: 21px;
+  }
+  :lang(zh-CN) .plan-option > span {
+    font-size: 12px;
+  }
+  :lang(zh-CN) .plan-option > small {
+    font-size: 11px;
+  }
+  :lang(zh-CN) .product h2 {
+    font-size: 15px !important;
+  }
+  :lang(zh-CN) .shop-tabs button {
+    font-size: 13px;
+  }
+  :lang(zh-CN) .cart-line h3 {
+    font-size: 14px;
+  }
+}

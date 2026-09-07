@@ -4,6 +4,9 @@ import "@fontsource/dm-serif-display/latin-400.css";
 import "@fontsource/dm-serif-display/latin-400-italic.css";
 import "@fontsource-variable/outfit";
 import "./style.css";
+import "./styles/typography.css";
+import "./styles/interactions.css";
+import "./styles/layout.css";
 import App from "./App.vue";
 import Home from "./pages/Home.vue";
 

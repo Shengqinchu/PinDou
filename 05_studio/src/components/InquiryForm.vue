@@ -15,6 +15,7 @@ const props = defineProps<{
   items?: { id: string; quantity: number }[];
   summary: string[];
   disabled?: boolean;
+  submitDisabled?: boolean;
 }>();
 const emit = defineEmits<{ complete: []; busy: [value: boolean] }>();
 const form = reactive({
@@ -35,7 +36,7 @@ let requestKey = "";
 let lastPayload = "";
 
 async function submit() {
-  if (sending.value || props.disabled) return;
+  if (sending.value || props.disabled || props.submitDisabled) return;
   error.value = "";
   if (props.booking && props.booking.end <= props.booking.start) {
     error.value = tr(
@@ -246,7 +247,7 @@ async function copyReceipt() {
       <p v-if="error" class="form-error" role="alert">{{ error }}</p>
       <button
         class="button button-primary submit-button"
-        :disabled="sending || disabled"
+        :disabled="sending || disabled || submitDisabled"
         type="submit"
       >
         {{
