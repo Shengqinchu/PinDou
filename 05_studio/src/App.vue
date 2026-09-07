@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
   PhArrowUpRight,
@@ -10,18 +10,26 @@ import {
 } from "@phosphor-icons/vue";
 import { locale, socialUrl, tr, wechat } from "./state";
 import { bagCount as cartCount } from "./commerce";
+import { gsap } from "gsap";
+import { arrive } from "./motion";
 import StudioToast from "./components/StudioToast.vue";
 
 const route = useRoute();
 const isDesk = computed(() => route.path.startsWith("/manage"));
 const menu = ref(false);
 const main = ref<HTMLElement>();
+let arrival: gsap.core.Tween | undefined;
+onBeforeUnmount(() => arrival?.kill());
 watch(
   () => route.fullPath,
   async () => {
     menu.value = false;
     await nextTick();
     main.value?.focus({ preventScroll: true });
+    if (!isDesk.value && route.path !== "/" && main.value?.firstElementChild) {
+      arrival?.kill();
+      arrival = arrive(main.value.firstElementChild);
+    }
   },
 );
 </script>
@@ -75,10 +83,13 @@ watch(
         "
         ><PhShoppingBagOpen :size="23" weight="light" /><Transition
           name="bag-count"
-          mode="out-in"
-          ><span v-if="cartCount" :key="cartCount" class="bag-count">{{
-            cartCount
-          }}</span></Transition
+          ><span
+            v-if="cartCount"
+            :key="cartCount"
+            class="bag-count"
+            aria-hidden="true"
+            >{{ cartCount }}</span
+          ></Transition
         ></RouterLink
       >
       <button
@@ -120,7 +131,7 @@ watch(
     tabindex="-1"
     :class="{ 'studio-admin-main': isDesk }"
   >
-    <div :key="route.path" :class="{ 'customer-stage': !isDesk }">
+    <div :key="route.path">
       <RouterView />
     </div>
   </main>

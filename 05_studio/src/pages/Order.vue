@@ -8,6 +8,7 @@ import {
   PhClock,
   PhMapPin,
 } from "@phosphor-icons/vue";
+import { handheldCashier, inWeChat } from "../browser";
 import { mapsUrl, prettyDate, tr, wechat } from "../state";
 import {
   addToBag,
@@ -25,7 +26,7 @@ const error = ref("");
 const busy = ref(false);
 const now = ref(Date.now() / 1000);
 const qrError = ref(false);
-const mobile = ref(matchMedia("(max-width: 767px)").matches);
+const mobile = ref(handheldCashier || matchMedia("(max-width: 767px)").matches);
 const id = String(route.params.id);
 const access = orderKey(id);
 const seconds = computed(() =>
@@ -77,12 +78,20 @@ async function poll() {
   await load();
   if (alive && !terminal.value) polling = setTimeout(poll, 8000);
 }
+function resume() {
+  now.value = Date.now() / 1000;
+  if (!document.hidden && !terminal.value) load();
+}
 onMounted(() => {
+  window.addEventListener("pageshow", resume);
+  document.addEventListener("visibilitychange", resume);
   poll();
   timer = setInterval(() => (now.value = Date.now() / 1000), 1000);
 });
 onBeforeUnmount(() => {
   alive = false;
+  window.removeEventListener("pageshow", resume);
+  document.removeEventListener("visibilitychange", resume);
   clearInterval(timer);
   clearTimeout(polling);
 });
@@ -214,7 +223,15 @@ async function tryAgain() {
             </p></template
           >
           <template v-else-if="order.payment_url"
-            ><a
+            ><p v-if="inWeChat" class="form-help">
+              {{
+                tr(
+                  "将在当前微信窗口打开收银台，付款后返回此页查看确认。",
+                  "Checkout opens in this WeChat window. Return here after payment to see your confirmation.",
+                )
+              }}
+            </p>
+            <a
               :href="order.payment_url"
               class="button button-primary full-button"
               rel="noreferrer"

@@ -36,6 +36,11 @@ import {
 } from "../commerce";
 const router = useRouter();
 const quote = ref<Quote>();
+const lastQuote = ref<Quote>();
+const shownQuote = computed(() => quote.value || lastQuote.value);
+watch(quote, (value) => {
+  if (value) lastQuote.value = value;
+});
 const loading = ref(false);
 const error = ref("");
 const contact = reactive({
@@ -70,6 +75,7 @@ async function updateQuote() {
   quote.value = undefined;
   error.value = "";
   if (!bag.value.length) {
+    lastQuote.value = undefined;
     loading.value = false;
     return;
   }
@@ -421,34 +427,46 @@ async function pay(retry = false) {
       <p class="summary-caption">
         {{ tr("加元标价 · 人民币付款", "Priced in CAD · Paid in CNY") }}
       </p>
-      <template v-if="quote"
-        ><dl class="price-breakdown">
+      <div
+        v-if="shownQuote"
+        :class="['pricing-frame', { stale: !quote }]"
+        :aria-busy="!quote"
+      >
+        <dl class="price-breakdown">
           <div>
             <dt>{{ tr("商品与体验", "Items & experiences") }}</dt>
-            <dd>{{ money(quote.subtotal_cents) }}</dd>
+            <dd>{{ money(shownQuote.subtotal_cents) }}</dd>
           </div>
-          <div v-if="quote.tax_mode === 'additional'">
-            <dt>{{ tr("税费", "Tax") }} ({{ quote.tax_bps / 100 }}%)</dt>
-            <dd>{{ money(quote.tax_cents) }}</dd>
+          <div v-if="shownQuote.tax_mode === 'additional'">
+            <dt>{{ tr("税费", "Tax") }} ({{ shownQuote.tax_bps / 100 }}%)</dt>
+            <dd>{{ money(shownQuote.tax_cents) }}</dd>
           </div>
           <div>
             <dt>
               {{ tr("合计", "Total")
-              }}<small v-if="quote.tax_mode === 'included'">{{
+              }}<small v-if="shownQuote.tax_mode === 'included'">{{
                 tr("（已含税）", " (tax included)")
               }}</small>
             </dt>
-            <dd>{{ money(quote.total_cents) }}</dd>
+            <dd>{{ money(shownQuote.total_cents) }}</dd>
           </div>
         </dl>
         <div class="payable-total">
-          <span>{{ tr("本次实付 · 人民币", "You pay · Chinese yuan") }}</span
-          ><strong>{{ money(quote.cny_fen, "CNY") }}</strong
-          ><small>1 CAD = {{ Number(quote.fx_cny_per_cad) }} CNY</small>
-        </div></template
-      >
-      <p v-else-if="loading" class="form-help" role="status">
-        {{ tr("正在核对价格与空位…", "Checking prices and availability…") }}
+          <span>{{
+            quote
+              ? tr("本次实付 · 人民币", "You pay · Chinese yuan")
+              : tr("上次核对金额 · 正在更新", "Previous quote · Updating")
+          }}</span
+          ><strong>{{ money(shownQuote.cny_fen, "CNY") }}</strong
+          ><small>1 CAD = {{ Number(shownQuote.fx_cny_per_cad) }} CNY</small>
+        </div>
+      </div>
+      <p class="price-check-status" role="status">
+        {{
+          !quote && bag.length && !error
+            ? tr("正在核对价格与空位…", "Checking prices and availability…")
+            : ""
+        }}
       </p>
       <p v-if="error" class="form-error" role="alert">{{ error }}</p>
       <button

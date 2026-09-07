@@ -1,86 +1,111 @@
-/* Shared physical controls: derived from the owner's T-Check motion contract. */
+/* The shared CSS/GSAP clocks are installed by motion.ts. */
 :root {
-  --surface-duration: 300ms;
-  --surface-ease: ease-in-out;
+  --control-duration: 480ms;
+  --control-ease: cubic-bezier(0.22, 0.1, 0.22, 1);
+  --surface-duration: 520ms;
+  --surface-ease: cubic-bezier(0.22, 0.68, 0, 1);
+  --layout-duration: 680ms;
+  --exit-duration: 480ms;
 }
+/* Soft elevation, inset press, and nested movement come from T-Check's actual
+   generate.html products/buttons. No hard ledge, sweeping fill or icon wobble. */
 .button-primary {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  border-color: #914835;
   background: #a55842;
+  border-color: #99503b;
   font-weight: 550;
   box-shadow:
     inset 0 1px 0 #ffffff36,
-    0 3px 0 #793c2c,
-    0 8px 16px -7px #71362745;
+    0 4px 10px #71362714,
+    0 1px 3px #71362718;
 }
 .button-primary::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  z-index: -1;
-  background: #a45b46;
-  transform: translateY(104%);
-  transition: transform var(--control-duration) var(--control-ease);
+  content: none;
 }
 .button-primary > svg {
-  background: #fff2;
-  box-shadow: inset 0 1px 0 #fff1;
+  background: #ffffff14;
 }
 .button-outline {
   box-shadow:
-    0 2px 0 #d5d7c9,
-    0 5px 10px -8px #343f3140;
+    inset 0 1px 0 #fff9,
+    0 2px 6px #343f310a;
+}
+.plan-option {
+  isolation: isolate;
+  overflow: visible;
+}
+.plan-option > strong,
+.plan-option > span,
+.plan-option > input {
+  transition:
+    transform var(--control-duration) var(--control-ease),
+    box-shadow var(--control-duration) var(--control-ease);
+}
+.plan-option > input {
+  accent-color: #a55842;
 }
 @media (hover: hover) and (pointer: fine) {
   .button-primary:not(:disabled):hover {
-    background: #a55842;
-    transform: translateY(-3px);
+    background: #ad604a;
+    transform: translateY(-2px);
     box-shadow:
-      inset 0 1px 0 #ffffff36,
-      0 4px 0 #793c2c,
-      0 12px 18px -8px #71362765;
-    filter: none;
-  }
-  .button-primary:not(:disabled):hover::before {
-    transform: translateY(0);
+      inset 0 1px 0 #ffffff45,
+      0 14px 26px -10px #7136274d,
+      0 4px 9px #71362712;
+    filter: saturate(1.035) brightness(1.01);
   }
   .button-primary:not(:disabled):hover > svg {
-    transform: translateX(3px) rotate(-7deg);
+    transform: translateX(3px);
   }
   .button-outline:not(:disabled):hover {
     transform: translateY(-2px);
     box-shadow:
-      0 3px 0 #c8cdbb,
-      0 8px 15px -9px #343f3140;
+      inset 0 1px 0 #fff9,
+      0 12px 24px -11px #343f3140;
+  }
+  .plan-option:hover > strong {
+    transform: translateY(-1px);
+  }
+  .plan-option:hover > input {
+    transform: scale(1.08);
   }
 }
-.button-primary:not(:disabled):active {
-  transform: translateY(2px) scale(0.988);
-  background: #9b503b;
+.button-primary:not(:disabled):is(:active, [data-pressed]),
+.button:not(:disabled)[data-pressed] {
+  transform: translateY(1px) scale(0.988);
+  filter: none;
   box-shadow:
-    inset 0 2px 3px #70332635,
-    0 0 0 #793c2c,
-    0 2px 3px #71362715;
+    inset 0 2px 5px #70332632,
+    0 2px 4px #7136270d;
 }
-.button-primary:not(:disabled):active > svg {
-  transform: translateX(0) rotate(0);
+.button-primary:not(:disabled):is(:active, [data-pressed]) > svg,
+.button[data-pressed] > svg {
+  transform: translateX(0);
+}
+.plan-option[data-pressed],
+.photo-tile[data-pressed] {
+  transform: translateY(-1px) scale(0.995);
+}
+.plan-option:is(:active, [data-pressed]) > strong {
+  transform: translateY(1px);
+}
+.icon-button[data-pressed] {
+  transform: translateY(1px) scale(0.94);
 }
 .button-primary:disabled {
   box-shadow: none;
 }
-.customer-stage {
-  animation: page-arrival 300ms ease-in-out;
+.time-chip:not(:disabled)[data-pressed],
+.date-chip[data-pressed] {
+  transform: translateY(1px) scale(0.975);
 }
-@keyframes page-arrival {
-  from {
-    opacity: 0.6;
-  }
-  to {
-    opacity: 1;
-  }
+.hero-line {
+  display: block;
+  overflow: clip;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+.hero-line > span {
+  display: block;
 }
 .bead-mark {
   display: grid;
@@ -239,8 +264,8 @@
 .bag-count-enter-active,
 .bag-count-leave-active {
   transition:
-    transform 300ms ease-in-out,
-    opacity 300ms ease-in-out;
+    transform var(--surface-duration) var(--surface-ease),
+    opacity var(--surface-duration) var(--surface-ease);
 }
 .bag-count-enter-from {
   transform: translateY(6px) scale(0.7);
@@ -257,8 +282,8 @@
 .field-reveal-enter-active,
 .field-reveal-leave-active {
   transition:
-    transform 300ms ease-in-out,
-    opacity 300ms ease-in-out;
+    transform var(--surface-duration) var(--surface-ease),
+    opacity var(--surface-duration) var(--surface-ease);
 }
 .mobile-menu-enter-from,
 .mobile-menu-leave-to {
@@ -266,11 +291,11 @@
   opacity: 0;
 }
 .photo-swap-enter-from {
-  transform: translateX(10px);
+  transform: translateX(calc(28px * var(--photo-direction))) scale(1.018);
   opacity: 0;
 }
 .photo-swap-leave-to {
-  transform: translateX(-10px);
+  transform: translateX(calc(-18px * var(--photo-direction)));
   opacity: 0;
 }
 .field-reveal-enter-from,
@@ -335,45 +360,133 @@
 .notice-enter-active,
 .notice-leave-active {
   transition:
-    transform 300ms ease-in-out,
-    opacity 300ms ease-in-out;
+    transform var(--surface-duration) var(--surface-ease),
+    opacity var(--surface-duration) var(--surface-ease);
 }
 .notice-enter-from,
 .notice-leave-to {
   opacity: 0;
   transform: translateY(12px) scale(0.97);
 }
-.studio-drawer {
+/* The native dialog supplies focus/escape; its panel and scrim are separate
+   composited layers, driven from a single interruptible GSAP timeline. */
+.modal-shell.studio-drawer,
+.modal-shell.photo-dialog {
   position: fixed;
-  inset: 0 0 0 auto;
+  inset: var(--visible-top, 0px) 0 auto;
   margin: 0;
   padding: 0;
   border: 0;
-  background: #fbfaf5;
+  width: 100%;
+  max-width: none;
+  height: var(--visible-height, 100vh);
+  max-height: none;
+  background: transparent;
   color: var(--ink);
-  width: min(560px, 100%);
-  max-width: 100%;
-  height: 100dvh;
-  max-height: 100dvh;
-  box-shadow: -12px 0 44px #26332126;
   overflow: hidden;
 }
-.studio-drawer[open] {
+.modal-shell::backdrop {
+  background: transparent;
+  backdrop-filter: none;
+  animation: none;
+}
+.modal-shell[open] {
+  display: flex;
+}
+.modal-shade {
+  position: absolute;
+  inset: 0;
+  background: #25312069;
+}
+.modal-panel {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 0;
+}
+.drawer-panel {
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  width: min(560px, 100%);
+  height: 100%;
+  background: #fbfaf5;
+  box-shadow: -16px 0 60px #18251126;
+  overflow: hidden;
+}
+.photo-dialog[open] {
+  align-items: center;
+  justify-content: center;
+}
+.photo-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(1050px, calc(100% - 64px));
+  height: min(880px, calc(100% - 48px));
+  background: #f6f3eb;
+  border-radius: 20px;
+  box-shadow: 0 30px 90px #101b1240;
+  overflow: hidden;
+}
+.photo-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px 10px 24px;
+  flex-shrink: 0;
+}
+.photo-toolbar > span {
+  font-size: 13px;
+  color: #69715f;
+}
+.photo-panel .photo-close {
+  position: static;
+  float: none;
+  margin: 0;
+}
+.photo-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+.photo-stage figure {
+  grid-area: 1 / 1;
+  min-height: 0;
+  min-width: 0;
+  margin: 0;
+  padding: 0 22px;
   display: flex;
   flex-direction: column;
 }
-.studio-drawer::backdrop {
-  background: #29352266;
-  backdrop-filter: blur(3px);
-  animation: backdrop-arrival 300ms ease-in-out;
+.photo-dialog .photo-stage img {
+  display: block;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-height: none;
+  height: 0;
+  object-fit: contain;
+  object-position: center;
 }
-@keyframes backdrop-arrival {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.photo-dialog .photo-stage figcaption {
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 13px;
+  padding: 14px 8px 0;
+  line-height: 1.6;
+}
+.photo-panel .photo-controls {
+  flex-shrink: 0;
+  margin: 0;
+  justify-content: center;
+  gap: 25px;
+  padding: 12px 24px 16px;
+}
+.photo-swap-leave-active {
+  pointer-events: none;
 }
 .drawer-top {
   display: flex;
@@ -454,7 +567,6 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .customer-stage,
   .bead-mark i,
   .studio-drawer::backdrop {
     animation: none !important;

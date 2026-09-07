@@ -48,12 +48,12 @@ try {
     }),
   );
   await p.getByRole("button", { name: "Save product", exact: true }).click();
-  await p.locator(".studio-drawer .desk-error").waitFor();
+  await p.locator(".studio-drawer[open] .desk-error").waitFor();
   await expect(name).toHaveValue("LOCAL QA · preserved after save failure");
-  await expect(p.locator(".studio-drawer")).toBeVisible();
+  await expect(p.locator(".studio-drawer[open]")).toBeVisible();
   await p.unroute("**/studio-api/manage/products/*");
   await p.getByRole("button", { name: "Save product", exact: true }).click();
-  await expect(p.locator(".studio-drawer")).toHaveCount(0);
+  await expect(p.locator(".studio-drawer[open]")).toHaveCount(0);
   result.failedSave = "draft retained; visible error; successful retry";
   await p.screenshot({
     path: "../artifacts/studio-desk/products-mobile-en.png",
@@ -68,7 +68,10 @@ try {
   await page.waitForTimeout(1400);
   const button = page.locator(".hero-buttons .button-primary");
   await button.evaluate((el) =>
-    el.addEventListener("click", (e) => e.preventDefault(), { once: true, capture: true }),
+    el.addEventListener("click", (e) => e.preventDefault(), {
+      once: true,
+      capture: true,
+    }),
   );
   const sample = () =>
     button.evaluate((el) => {
@@ -84,20 +87,20 @@ try {
     });
   const states = { idle: await sample() };
   await button.hover();
-  await page.waitForTimeout(350);
+  await page.waitForTimeout(550);
   states.hover = await sample();
   await page.mouse.down();
-  await page.waitForTimeout(350);
+  await page.waitForTimeout(550);
   states.pressed = await sample();
   await page.mouse.up();
-  await page.waitForTimeout(350);
+  await page.waitForTimeout(550);
   states.released = await sample();
   assert.notEqual(states.idle.transform, states.hover.transform);
   assert.notEqual(states.hover.transform, states.pressed.transform);
   assert.equal(states.hover.transform, states.released.transform);
   assert(
-    states.pressed.duration.includes("0.3s") &&
-      states.pressed.iconDuration.includes("0.3s"),
+    states.pressed.duration.includes("0.48s") &&
+      states.pressed.iconDuration.includes("0.48s"),
   );
   result.controlStates = states;
   await desktop.close();

@@ -8,6 +8,7 @@ import {
   PhMapPin,
 } from "@phosphor-icons/vue";
 import { gsap } from "gsap";
+import { motion as studioMotion } from "../motion";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import PhotoViewer from "../components/PhotoViewer.vue";
 import BeadMark from "../components/BeadMark.vue";
@@ -31,34 +32,64 @@ onMounted(() => {
   motion.add(
     "(prefers-reduced-motion: no-preference)",
     () => {
-      gsap.from(".hero-copy > *", {
-        y: 22,
-        opacity: 0.25,
-        stagger: 0.08,
-        duration: 0.8,
-        ease: "power3.out",
-        clearProps: "all",
-      });
-      gsap.from(".hero-photo", {
-        clipPath: "inset(0 0 12% 0)",
-        duration: 1.1,
-        ease: "power3.out",
-        clearProps: "clipPath",
-      });
-      gsap.fromTo(
-        ".space-photo img",
-        { yPercent: -3 },
-        {
-          yPercent: 3,
-          ease: "none",
-          scrollTrigger: {
-            trigger: ".space-photo",
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
+      const entrance = gsap.timeline({ defaults: { ease: "studio-travel" } });
+      entrance
+        .from(
+          ".hero-line > span",
+          {
+            yPercent: 105,
+            duration: studioMotion.editorial,
+            stagger: 0.13,
+            clearProps: "transform",
           },
-        },
-      );
+          0,
+        )
+        .from(
+          ".hero-location",
+          { opacity: 0, y: 8, duration: 0.9, clearProps: "transform,opacity" },
+          0.08,
+        )
+        .from(
+          ".hero-description, .hero-buttons, .hero-footnote",
+          {
+            opacity: 0,
+            y: 16,
+            duration: 1,
+            stagger: 0.12,
+            clearProps: "transform,opacity",
+          },
+          0.25,
+        )
+        .from(
+          ".hero-photo",
+          {
+            clipPath: "inset(5% 0 9% 0 round 4px)",
+            duration: 1.35,
+            clearProps: "clipPath",
+          },
+          0.08,
+        )
+        .from(
+          ".hero-photo > img",
+          { scale: 1.045, duration: 1.5, clearProps: "transform" },
+          0.08,
+        );
+      if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+        gsap.fromTo(
+          ".space-photo img",
+          { yPercent: -3 },
+          {
+            yPercent: 3,
+            ease: "none",
+            scrollTrigger: {
+              trigger: ".space-photo",
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1.2,
+            },
+          },
+        );
+      }
     },
     page.value,
   );
@@ -86,9 +117,13 @@ async function copyContact() {
           <span class="location-dot"></span>HAMILTON, ONTARIO
         </div>
         <h1>
-          {{ tr("留一点时间，", "A little time.") }}<br /><em>{{
-            tr("给喜欢的小事。", "A little colour.")
-          }}</em>
+          <span class="hero-line"
+            ><span>{{ tr("留一点时间，", "A little time.") }}</span></span
+          ><span class="hero-line"
+            ><span
+              ><em>{{ tr("给喜欢的小事。", "A little colour.") }}</em></span
+            ></span
+          >
         </h1>
         <p class="hero-description">
           {{

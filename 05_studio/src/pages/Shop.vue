@@ -1,10 +1,22 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { PhArrowRight, PhCheck, PhPlus } from "@phosphor-icons/vue";
 import { media, tr } from "../state";
 import SegmentedControl from "../components/SegmentedControl.vue";
+import AutoHeight from "../components/AutoHeight.vue";
+import {
+  pinLeavingItem,
+  clearLeavingItem,
+  snapshotLeavingItems,
+} from "../motion";
 import { addToBag, bagCount, catalog, loadCatalog, money } from "../commerce";
 const category = ref("all");
+const productsSection = ref<HTMLElement>();
+watch(category, () =>
+  snapshotLeavingItems(
+    productsSection.value?.querySelector(".product-grid") || null,
+  ),
+);
 const lastAdded = ref("");
 const error = ref("");
 const categories = computed(() => [
@@ -55,7 +67,7 @@ function add(id: string) {
       /></RouterLink>
     </div>
   </section>
-  <section class="container section-bottom">
+  <section ref="productsSection" class="container section-bottom">
     <SegmentedControl
       class="shop-segments"
       v-model="category"
@@ -63,55 +75,63 @@ function add(id: string) {
       :options="categories.map((c) => ({ value: c.id, label: c.label }))"
     />
     <p v-if="error" class="form-error" role="alert">{{ error }}</p>
-    <TransitionGroup name="product-list" tag="div" class="product-grid">
-      <article v-for="p in visible" :key="p.id" class="product-card">
-        <div class="product-image">
-          <img
-            :src="media(p.image)"
-            width="1080"
-            height="1440"
-            :alt="tr(p.zh, p.en)"
-            loading="lazy"
-          /><span
-            v-if="!p.active || p.price_cents === null"
-            class="product-status"
-            >{{ tr("即将上架", "Coming soon") }}</span
+    <AutoHeight
+      ><TransitionGroup
+        name="product-list"
+        tag="div"
+        class="product-grid"
+        @before-leave="pinLeavingItem"
+        @after-leave="clearLeavingItem"
+        @before-enter="clearLeavingItem"
+      >
+        <article v-for="p in visible" :key="p.id" class="product-card">
+          <div class="product-image">
+            <img
+              :src="media(p.image)"
+              width="1080"
+              height="1440"
+              :alt="tr(p.zh, p.en)"
+              loading="lazy"
+            /><span
+              v-if="!p.active || p.price_cents === null"
+              class="product-status"
+              >{{ tr("即将上架", "Coming soon") }}</span
+            >
+          </div>
+          <div class="product-heading">
+            <h2>{{ tr(p.zh, p.en) }}</h2>
+            <strong
+              v-if="p.active && p.price_cents !== null"
+              class="product-price"
+              >{{ money(p.price_cents) }}</strong
+            >
+          </div>
+          <p>{{ tr(p.detailZh, p.detailEn) }}</p>
+          <button
+            class="button button-outline full-button"
+            :disabled="
+              !p.active ||
+              p.price_cents === null ||
+              !p.available_stock ||
+              !catalog?.checkout_ready
+            "
+            @click="add(p.id)"
           >
-        </div>
-        <div class="product-heading">
-          <h2>{{ tr(p.zh, p.en) }}</h2>
-          <strong
-            v-if="p.active && p.price_cents !== null"
-            class="product-price"
-            >{{ money(p.price_cents) }}</strong
-          >
-        </div>
-        <p>{{ tr(p.detailZh, p.detailEn) }}</p>
-        <button
-          class="button button-outline full-button"
-          :disabled="
-            !p.active ||
-            p.price_cents === null ||
-            !p.available_stock ||
-            !catalog?.checkout_ready
-          "
-          @click="add(p.id)"
-        >
-          <template v-if="lastAdded === p.id"
-            >{{ tr("已加入，再添一件", "Added · Add another")
-            }}<PhCheck /></template
-          ><template v-else-if="p.active && p.price_cents !== null"
-            >{{
-              p.available_stock
-                ? tr("加入购物车", "Add to bag")
-                : tr("暂时售罄", "Sold out")
-            }}<PhPlus /></template
-          ><template v-else
-            >{{ tr("小物整理中", "Getting things ready") }}<PhPlus
-          /></template>
-        </button>
-      </article>
-    </TransitionGroup>
+            <template v-if="lastAdded === p.id"
+              >{{ tr("已加入，再添一件", "Added · Add another")
+              }}<PhCheck /></template
+            ><template v-else-if="p.active && p.price_cents !== null"
+              >{{
+                p.available_stock
+                  ? tr("加入购物车", "Add to bag")
+                  : tr("暂时售罄", "Sold out")
+              }}<PhPlus /></template
+            ><template v-else
+              >{{ tr("小物整理中", "Getting things ready") }}<PhPlus
+            /></template>
+          </button>
+        </article> </TransitionGroup
+    ></AutoHeight>
     <div class="shop-visit-bridge">
       <p>
         {{

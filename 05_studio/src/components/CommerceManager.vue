@@ -25,6 +25,9 @@ import {
   PhCaretRight,
   PhArrowClockwise,
 } from "@phosphor-icons/vue";
+import { gsap } from "gsap";
+import { arrive } from "../motion";
+import { lockPageScroll, pageScrollY } from "../browser";
 import { createDesk, deskKey } from "../admin";
 import { hamiltonDate, locale, tr } from "../state";
 import OverviewPanel from "./admin/OverviewPanel.vue";
@@ -44,7 +47,9 @@ const mobileMenu = ref(false);
 const mobileMedia = matchMedia("(max-width: 900px)");
 const isMobile = ref(mobileMedia.matches);
 const sidebar = ref<HTMLElement>();
-let menuOverflow = "";
+let unlockMenu: (() => void) | undefined;
+let arrival: gsap.core.Tween | undefined;
+const content = ref<HTMLElement>();
 function resizeMenu(event: MediaQueryListEvent) {
   isMobile.value = event.matches;
   mobileMenu.value = false;
@@ -52,9 +57,11 @@ function resizeMenu(event: MediaQueryListEvent) {
 mobileMedia.addEventListener("change", resizeMenu);
 watch(mobileMenu, async (value) => {
   if (value && isMobile.value) {
-    menuOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-  } else document.body.style.overflow = menuOverflow;
+    unlockMenu ||= lockPageScroll();
+  } else {
+    unlockMenu?.();
+    unlockMenu = undefined;
+  }
   await nextTick();
   if (value)
     sidebar.value
@@ -88,7 +95,8 @@ function trapMenu(event: KeyboardEvent) {
 }
 onBeforeUnmount(() => {
   mobileMedia.removeEventListener("change", resizeMenu);
-  if (mobileMenu.value) document.body.style.overflow = menuOverflow;
+  unlockMenu?.();
+  arrival?.kill();
 });
 const navigation = computed(() => [
   { id: "overview", zh: "今日概览", en: "Overview", icon: PhSquaresFour },
@@ -115,7 +123,7 @@ const selectedIndex = computed(() =>
 const selected = computed(() => navigation.value[selectedIndex.value]);
 const scrolls = new Map<string, number>();
 async function navigate(id: string) {
-  scrolls.set(view.value, window.scrollY);
+  scrolls.set(view.value, pageScrollY());
   await router.replace({
     path: "/manage",
     query: id === "overview" ? {} : { view: id },
@@ -123,9 +131,12 @@ async function navigate(id: string) {
   await nextTick();
   scrollTo({ top: scrolls.get(id) || 0, behavior: "instant" });
 }
-watch(view, () => {
+watch(view, async () => {
   mobileMenu.value = false;
   desk.error.value = "";
+  await nextTick();
+  arrival?.progress(1).kill();
+  if (content.value) arrival = arrive(content.value);
 });
 onMounted(desk.initialize);
 const readableDate = computed(() =>
@@ -257,7 +268,7 @@ const readableDate = computed(() =>
           ><span class="desk-avatar">{{ tr("双吉", "P") }}</span>
         </div>
       </header>
-      <div class="desk-content">
+      <div ref="content" class="desk-content">
         <p
           v-if="desk.error.value && !desk.settings.value"
           class="desk-error"

@@ -1,0 +1,383 @@
+/* Continuous sizing, WebView visual viewport and safe-area fallbacks. */
+:root {
+  --visible-height: 100vh;
+  --visible-top: 0px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+@supports (height: 100dvh) {
+  :root {
+    --visible-height: 100dvh;
+  }
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+html.keyboard-open {
+  --safe-bottom: 0px;
+}
+html.modal-open {
+  overscroll-behavior: none;
+}
+body {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+a,
+input,
+select,
+textarea,
+summary {
+  touch-action: manipulation;
+}
+input,
+select,
+textarea {
+  max-width: 100%;
+  min-width: 0;
+}
+input[type="date"],
+input[type="time"] {
+  min-inline-size: 0;
+}
+input::-webkit-date-and-time-value {
+  text-align: left;
+}
+.site-header {
+  padding-left: max(clamp(24px, 4vw, 64px), var(--safe-left));
+  padding-right: max(clamp(24px, 4vw, 64px), var(--safe-right));
+}
+.announcement {
+  padding-top: max(8px, var(--safe-top));
+}
+.site-footer {
+  padding-bottom: max(28px, var(--safe-bottom));
+}
+.mobile-nav {
+  max-height: calc(var(--visible-height) - 110px);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.drawer-panel .drawer-top {
+  padding-top: max(22px, var(--safe-top));
+  padding-right: max(20px, var(--safe-right));
+}
+.drawer-panel .drawer-body {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding-block: 20px;
+  padding-left: max(20px, var(--safe-left));
+  padding-right: max(20px, var(--safe-right));
+}
+.drawer-panel .drawer-bottom {
+  padding-bottom: max(17px, var(--safe-bottom));
+  padding-right: max(20px, var(--safe-right));
+}
+.photo-panel .photo-controls {
+  padding-bottom: max(16px, var(--safe-bottom));
+}
+.notice-region {
+  bottom: max(24px, calc(var(--safe-bottom) + 12px));
+}
+.studio-notice {
+  overflow-wrap: anywhere;
+}
+.drawer-top > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.drawer-top > button {
+  flex-shrink: 0;
+}
+html .desk-sidebar {
+  height: var(--visible-height);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+html .studio-desk,
+html .studio-admin-main,
+html .host-login {
+  min-height: var(--window-height, 100vh);
+}
+html .desk-content {
+  max-width: 1720px;
+  width: 100%;
+  margin-inline: auto;
+}
+html .desk-savebar {
+  bottom: max(16px, var(--safe-bottom));
+}
+html .desk-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding-right: max(20px, var(--safe-right));
+  background: #f6f6f0f2;
+}
+.pricing-frame {
+  transition: opacity var(--control-duration) var(--control-ease);
+}
+.pricing-frame.stale .payable-total {
+  background: #eeeae0;
+}
+.price-check-status {
+  min-height: 40px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #59694d;
+}
+.auto-height {
+  min-width: 0;
+}
+.auto-height-content {
+  display: flow-root;
+}
+.slot-results {
+  position: relative;
+}
+.slot-results .form-help[role="status"] {
+  margin-block: 12px;
+}
+.slot-results[aria-busy="true"] .time-grid {
+  opacity: 0.5;
+}
+.time-grid {
+  transition: opacity var(--control-duration) var(--control-ease);
+}
+.mobile-nav a {
+  min-height: 44px;
+}
+
+@media (pointer: coarse), (max-width: 900px) {
+  /* Includes search, filters and native time fields, not just text form fields. */
+  html input:not([type="checkbox"]):not([type="radio"]),
+  html:root select,
+  html:root textarea {
+    font-size: 16px;
+  }
+  html .desk-icon-button {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
+  .icon-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .quantity-stepper button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .drawer-panel .drawer-bottom {
+    flex-wrap: wrap;
+  }
+  .drawer-footnote {
+    flex: 1;
+    min-width: 90px;
+  }
+  .drawer-bottom .desk-button {
+    min-height: 46px;
+    font-size: 15px;
+  }
+}
+@media (max-width: 900px) {
+  html .desk-sidebar {
+    top: var(--visible-top);
+    padding-left: max(20px, var(--safe-left));
+    padding-top: max(28px, var(--safe-top));
+    padding-bottom: max(20px, var(--safe-bottom));
+  }
+  html .desk-main {
+    padding-left: var(--safe-left);
+    padding-right: var(--safe-right);
+  }
+  html .desk-topbar {
+    padding-top: var(--safe-top);
+    height: calc(65px + var(--safe-top));
+  }
+  .container {
+    padding-left: max(24px, var(--safe-left));
+    padding-right: max(24px, var(--safe-right));
+  }
+}
+@media (max-width: 600px) {
+  .site-header {
+    padding-inline: max(18px, var(--safe-left)) max(18px, var(--safe-right));
+  }
+  .container {
+    padding-inline: max(20px, var(--safe-left)) max(20px, var(--safe-right));
+  }
+  .photo-panel {
+    width: calc(100% - 20px);
+    height: calc(100% - 24px);
+    border-radius: 16px;
+  }
+  .photo-toolbar {
+    padding: 10px 12px 8px 16px;
+  }
+  .photo-stage figure {
+    padding-inline: 12px;
+  }
+  .photo-dialog .photo-stage figcaption {
+    font-size: 12px;
+  }
+  .photo-panel .photo-controls {
+    padding-top: 8px;
+  }
+  .drawer-top h2 {
+    font-size: 21px;
+  }
+  .notice-region {
+    bottom: max(16px, calc(var(--safe-bottom) + 8px));
+  }
+  .studio-notice {
+    flex-wrap: wrap;
+  }
+  .studio-notice > .notice-seal {
+    flex-shrink: 0;
+  }
+  .studio-notice > span:not(.notice-seal) {
+    flex: 1;
+    min-width: 110px;
+  }
+  html .weekly-setting {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    padding-block: 16px;
+  }
+  html .weekly-setting > span {
+    font-size: 14px;
+  }
+  html .weekly-setting > .toggle-switch {
+    justify-self: end;
+    width: 44px;
+    height: 26px;
+    padding: 3px;
+  }
+  html .weekly-setting > .toggle-switch > span {
+    width: 18px;
+    height: 18px;
+  }
+  html .weekly-setting > .toggle-switch.on > span {
+    transform: translateX(17px);
+  }
+  html .weekly-time {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 12px;
+    width: 100%;
+  }
+  html .weekly-time > input {
+    padding: 10px 8px;
+    min-height: 46px;
+  }
+  html .desk-search {
+    min-width: 0;
+  }
+  html .desk-savebar {
+    bottom: max(10px, var(--safe-bottom));
+  }
+  html .desk-savebar > div {
+    max-width: none;
+    flex: 1;
+    min-width: 0;
+  }
+  html .desk-savebar > .desk-button {
+    min-height: 46px;
+    flex-shrink: 0;
+  }
+  html .desk-breadcrumb > span {
+    display: none;
+  }
+  html .calendar-navigation {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .studio-drawer[open] {
+    align-items: flex-end;
+  }
+  .drawer-panel {
+    width: 100%;
+    height: calc(100% - max(12px, var(--safe-top)));
+    border-radius: 22px 22px 0 0;
+  }
+  .drawer-panel .drawer-top {
+    padding-top: 23px;
+  }
+}
+@media (max-height: 650px) {
+  .checkout-summary,
+  .booking-story {
+    position: static;
+  }
+  .drawer-panel .drawer-top {
+    padding-block: max(10px, var(--safe-top)) 10px;
+  }
+  .drawer-panel .drawer-bottom {
+    padding-top: 10px;
+    padding-bottom: max(10px, var(--safe-bottom));
+  }
+  .drawer-panel .drawer-body {
+    padding-block: 16px;
+  }
+  .photo-panel {
+    height: calc(100% - 16px);
+  }
+  .photo-toolbar {
+    padding-block: 5px;
+  }
+  .photo-panel .photo-controls {
+    padding-block: 4px max(4px, var(--safe-bottom));
+  }
+  .photo-dialog .photo-stage figcaption {
+    padding-top: 5px;
+  }
+  html .desk-sidebar {
+    padding-top: 18px;
+  }
+  html .sidebar-section-label {
+    margin-top: 22px;
+  }
+  html .sidebar-bottom {
+    padding-top: 12px;
+  }
+}
+html.keyboard-open .desk-savebar {
+  position: static;
+}
+html.keyboard-open .drawer-top {
+  padding-block: 10px;
+}
+html.keyboard-open .drawer-bottom {
+  padding-block: 10px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .button,
+  .button > svg,
+  .desk-button,
+  .desk-button > svg,
+  .desk-metric,
+  .desk-metric > strong,
+  .desk-metric > span > svg,
+  .plan-option,
+  .plan-option > strong,
+  .plan-option > input,
+  .desk-product-row > img,
+  .desk-product-row > svg,
+  .agenda-row > svg,
+  .readiness-row > svg {
+    transform: none !important;
+  }
+}

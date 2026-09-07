@@ -9,6 +9,10 @@ import "./styles/interactions.css";
 import "./styles/layout.css";
 import "./styles/commerce.css";
 import "./styles/motion.css";
+import "./styles/viewport.css";
+import { installMotion } from "./motion";
+import { installViewport } from "./browser";
+import { reducedMotion } from "./ui";
 import App from "./App.vue";
 import Home from "./pages/Home.vue";
 
@@ -27,11 +31,25 @@ const router = createRouter({
       component: () => import("./pages/NotFound.vue"),
     },
   ],
-  scrollBehavior(to, _from, saved) {
+  scrollBehavior(to, from, saved) {
     if (saved) return saved;
-    if (to.hash) return { el: to.hash, top: 100, behavior: "smooth" };
+    if (to.path === from.path && to.query.view !== from.query.view)
+      return false;
+    if (to.hash)
+      return {
+        el: to.hash,
+        top: 100,
+        behavior: reducedMotion() ? "auto" : "smooth",
+      };
     return { top: 0 };
   },
 });
 
+const stopMotion = installMotion();
+const stopViewport = installViewport();
 createApp(App).use(router).mount("#app");
+if (import.meta.hot)
+  import.meta.hot.dispose(() => {
+    stopMotion();
+    stopViewport();
+  });

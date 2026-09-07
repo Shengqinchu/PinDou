@@ -12,7 +12,7 @@ const errors = [];
 async function scan(page, label) {
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(
-    new URL(page.url()).pathname === "/studio/" ? 1400 : 420,
+    new URL(page.url()).pathname === "/studio/" ? 1700 : 760,
   );
   await page.addScriptTag({ content: axe });
   const audit = await page.evaluate(() =>
@@ -111,7 +111,7 @@ try {
   await page.locator(".studio-drawer[open]").waitFor();
   await scan(page, "order-drawer-desktop");
   await page.keyboard.press("Escape");
-  await expect(page.locator(".studio-drawer")).toHaveCount(0);
+  await expect(page.locator(".studio-drawer[open]")).toHaveCount(0);
   assert.equal(await page.evaluate(() => document.body.style.overflow), "");
   await page.getByRole("button", { name: "商品与体验", exact: true }).click();
   await scan(page, "products-desktop");
@@ -123,7 +123,7 @@ try {
     .getByRole("textbox", { name: "中文名称", exact: true })
     .fill("LOCAL QA · 新的小工具");
   await page.keyboard.press("Escape");
-  await expect(page.locator(".studio-drawer")).toHaveCount(0);
+  await expect(page.locator(".studio-drawer[open]")).toHaveCount(0);
   await page
     .locator(".desk-product-row")
     .filter({ hasText: "给第一幅作品的工具" })
@@ -133,7 +133,7 @@ try {
   ).toHaveValue("LOCAL QA · 新的小工具");
   await scan(page, "product-drawer-desktop");
   await page.getByRole("button", { name: "保存商品", exact: true }).click();
-  await expect(page.locator(".studio-drawer")).toHaveCount(0);
+  await expect(page.locator(".studio-drawer[open]")).toHaveCount(0);
   await page.getByRole("button", { name: "到店排班", exact: true }).click();
   await page.locator('input[name="capacity"]').fill("6");
   await page.getByRole("button", { name: "收款设置", exact: true }).click();
@@ -161,7 +161,7 @@ try {
     icon: getComputedStyle(el.querySelector("svg")).transitionDuration,
     ease: getComputedStyle(el).transitionTimingFunction,
   }));
-  assert(computed.parent.includes("0.3s") && computed.icon.includes("0.3s"));
+  assert(computed.parent.includes("0.48s") && computed.icon.includes("0.48s"));
   results.push({ motion: "shared control timing", ...computed });
   await context.close();
   for (const [width, height, lang, motion] of [
@@ -205,7 +205,7 @@ try {
       await p.locator(".studio-drawer[open]").waitFor();
       await scan(p, "product-drawer-mobile");
       await p.keyboard.press("Escape");
-      await expect(p.locator(".studio-drawer")).toHaveCount(0);
+      await expect(p.locator(".studio-drawer[open]")).toHaveCount(0);
     }
     await p.goto(base + "/studio/");
     await scan(p, `home-${width}-${lang}-${motion}`);

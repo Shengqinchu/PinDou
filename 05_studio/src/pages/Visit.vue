@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import AutoHeight from "../components/AutoHeight.vue";
 import {
   PhArrowRight,
   PhCheck,
@@ -268,65 +269,82 @@ function add() {
             <PhClock />{{ tr("所选时间到打烊", "Arrival until closing") }}
           </div>
         </div>
-        <p v-if="loading" class="form-help" role="status">
-          {{ tr("正在查看可用座位…", "Checking available seats…") }}
-        </p>
-        <div
-          v-else-if="availability?.slots.length"
-          class="time-grid"
-          :aria-label="tr('可用到店时段', 'Available visit times')"
-        >
-          <button
-            v-for="slot in availability.slots"
-            :key="slot.start"
-            :class="['time-chip', { selected: selected?.start === slot.start }]"
-            :disabled="!slot.available"
-            :aria-pressed="selected?.start === slot.start"
-            @click="
-              selected = slot;
-              added = false;
-            "
-          >
-            <strong>{{ slot.start }}</strong
-            ><small>{{
-              slot.available
-                ? tr(`余 ${slot.remaining} 位`, `${slot.remaining} seats left`)
-                : tr("已满", "Full")
-            }}</small>
-          </button>
-        </div>
-        <div v-else-if="!error" class="availability-note" role="status">
-          <PhClock :size="26" />
-          <div>
-            <strong>{{
-              availability?.reason === "not_open"
-                ? tr(
-                    "新的到店时段，正在安排中",
-                    "New studio dates are on their way",
-                  )
-                : tr("这一天暂时没有可选时段", "No times available on this day")
-            }}</strong>
-            <p>
-              {{
-                availability?.reason === "not_open"
-                  ? tr(
-                      "开放后，就可以选时间、加购并直接付款。",
-                      "Once dates open, choose your time, add to your bag and pay here.",
-                    )
-                  : tr(
-                      "试试另一个日期，给喜欢的事留点时间。",
-                      "Try another date and make a little room for something you love.",
-                    )
-              }}
+        <AutoHeight
+          ><div class="slot-results" :aria-busy="loading">
+            <p v-if="loading" class="form-help" role="status">
+              {{ tr("正在查看可用座位…", "Checking available seats…") }}
             </p>
-          </div>
-        </div>
-        <p v-if="error" class="form-error" role="alert">
-          {{ error }}
-          <button class="text-link" @click="refreshSlots">
-            {{ tr("重试", "Try again") }}
-          </button>
-        </p>
+            <div
+              v-if="availability?.slots.length"
+              class="time-grid"
+              :aria-label="tr('可用到店时段', 'Available visit times')"
+            >
+              <button
+                v-for="slot in availability.slots"
+                :key="slot.start"
+                :class="[
+                  'time-chip',
+                  { selected: selected?.start === slot.start },
+                ]"
+                :disabled="loading || !slot.available"
+                :aria-pressed="selected?.start === slot.start"
+                @click="
+                  selected = slot;
+                  added = false;
+                "
+              >
+                <strong>{{ slot.start }}</strong
+                ><small>{{
+                  slot.available
+                    ? tr(
+                        `余 ${slot.remaining} 位`,
+                        `${slot.remaining} seats left`,
+                      )
+                    : tr("已满", "Full")
+                }}</small>
+              </button>
+            </div>
+            <div
+              v-else-if="!error && !loading"
+              class="availability-note"
+              role="status"
+            >
+              <PhClock :size="26" />
+              <div>
+                <strong>{{
+                  availability?.reason === "not_open"
+                    ? tr(
+                        "新的到店时段，正在安排中",
+                        "New studio dates are on their way",
+                      )
+                    : tr(
+                        "这一天暂时没有可选时段",
+                        "No times available on this day",
+                      )
+                }}</strong>
+                <p>
+                  {{
+                    availability?.reason === "not_open"
+                      ? tr(
+                          "开放后，就可以选时间、加购并直接付款。",
+                          "Once dates open, choose your time, add to your bag and pay here.",
+                        )
+                      : tr(
+                          "试试另一个日期，给喜欢的事留点时间。",
+                          "Try another date and make a little room for something you love.",
+                        )
+                  }}
+                </p>
+              </div>
+            </div>
+            <p v-if="error" class="form-error" role="alert">
+              {{ error }}
+              <button class="text-link" @click="refreshSlots">
+                {{ tr("重试", "Try again") }}
+              </button>
+            </p>
+          </div></AutoHeight
+        >
       </div>
       <div class="visit-total">
         <div>
