@@ -41,4 +41,14 @@ Production remains closed to purchases because capacity/hours/tax have not been 
 
 ## Deployment
 
-Recorded after origin and public verification below.
+- Implementation commit: `edaa3f8`.
+- Release: `20260907232410-studio-v1`; 55 packaged files verified.
+- Archive SHA-256: `f5d366a237caee9fd3d8bdadb8409d49fa03bd408655a5d8610feb8e66f59147`.
+- Live entry verified in the browser: `index-DPHaiLyV.js`, stylesheet `index-Co6IqUbs.css`, computed control duration `0.48s`, viewport-fit meta present. Live photo panel/scrim, overlapping crossfade and scroll restoration pass.
+- `verify-live.mjs`: Chinese/English home, normal animation, desktop/mobile menu, manager sign-in and legacy generator pass; no runtime errors.
+- `verify-commerce-live.mjs`: 8 public visit/shop/cart/sign-in pages across desktop/mobile pass; no runtime errors or overflow.
+- Nginx validation and service health passed; both pindou and pindou-studio remain active. Backend version remains 0.3.0 because its implementation was not changed.
+- Origin checks were read-only. Commerce, orders, overview and activity returned 401 for anonymous, 403 for viewer and 200 for a short-lived existing-backend administrator token. Private unknown order stays 404. No synthetic production order/inquiry was written.
+- Merchant configured, checkout closed, capacity 0, tax unconfirmed and FX `5.0000`, as before.
+- Old generator release remains `/opt/pindou/releases/20260615074539-wallet-mode-labels`; index SHA-256 remains `506f9bd2f9f0c37c52f08924f1504286816b93bff3198aea9f1790d0eceb36aa`.
+- Rollback files and pre-release SQLite snapshot: `/opt/pindou/studio/backups/20260907232410-studio-v1/`.
