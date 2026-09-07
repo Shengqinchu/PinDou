@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { PhArrowRight, PhCheck, PhPlus } from "@phosphor-icons/vue";
 import { media, tr } from "../state";
+import SegmentedControl from "../components/SegmentedControl.vue";
 import { addToBag, bagCount, catalog, loadCatalog, money } from "../commerce";
 const category = ref("all");
 const lastAdded = ref("");
@@ -55,19 +56,14 @@ function add(id: string) {
     </div>
   </section>
   <section class="container section-bottom">
-    <div class="shop-tabs" :aria-label="tr('商品分类', 'Product categories')">
-      <button
-        v-for="c in categories"
-        :key="c.id"
-        :class="{ active: category === c.id }"
-        :aria-pressed="category === c.id"
-        @click="category = c.id"
-      >
-        {{ c.label }}
-      </button>
-    </div>
+    <SegmentedControl
+      class="shop-segments"
+      v-model="category"
+      :label="tr('商品分类', 'Product categories')"
+      :options="categories.map((c) => ({ value: c.id, label: c.label }))"
+    />
     <p v-if="error" class="form-error" role="alert">{{ error }}</p>
-    <div class="product-grid">
+    <TransitionGroup name="product-list" tag="div" class="product-grid">
       <article v-for="p in visible" :key="p.id" class="product-card">
         <div class="product-image">
           <img
@@ -115,7 +111,7 @@ function add(id: string) {
           /></template>
         </button>
       </article>
-    </div>
+    </TransitionGroup>
     <div class="shop-visit-bridge">
       <p>
         {{

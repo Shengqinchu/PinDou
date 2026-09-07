@@ -10,6 +10,7 @@ import {
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import PhotoViewer from "../components/PhotoViewer.vue";
+import BeadMark from "../components/BeadMark.vue";
 import { gallery, mapsUrl, media, socialUrl, tr, wechat } from "../state";
 import { catalog, loadCatalog } from "../commerce";
 
@@ -107,9 +108,7 @@ async function copyContact() {
           /></RouterLink>
         </div>
         <div class="hero-footnote">
-          <div class="bead-colours" aria-hidden="true">
-            <i></i><i></i><i></i><i></i><i></i>
-          </div>
+          <BeadMark />
           <span>{{
             tr(
               "不用很擅长，只要很喜欢。",

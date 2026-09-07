@@ -339,7 +339,7 @@ def order_view(row, admin=False):
     if row["status"] in PENDING and row["expires_at"] > time.time():
         result.update(payment_url=row["payment_url"], qr_url=row["qr_url"])
     if admin:
-        result.update(customer=json.loads(row["customer"]), staff_note=row["staff_note"])
+        result.update(customer=json.loads(row["customer"]), staff_note=row["staff_note"], provider_id=row["provider_id"], trade_id=row["trade_id"])
     return result
 
 
@@ -616,7 +616,7 @@ def register(app, admin_actor):
                         fail("capacity_below_reservations")
             value["version"] += 1
             db.execute("UPDATE commerce_settings SET payload=? WHERE id=1", (json.dumps(value, ensure_ascii=False),))
-            audit(db, "settings", "schedule_and_prices_updated", actor)
+            audit(db, "settings", "schedule_and_prices_updated", actor, json.dumps({"before": old, "after": value}, ensure_ascii=False))
         return value
 
     @app.put("/studio-api/manage/products/{product_id}")
@@ -637,17 +637,81 @@ def register(app, admin_actor):
             value = payload.model_dump()
             value["version"] = payload.version + 1
             db.execute("INSERT INTO commerce_products VALUES(?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload", (product_id, json.dumps(value, ensure_ascii=False)))
-            audit(db, product_id, "product_updated", actor)
+            audit(db, product_id, "product_updated", actor, json.dumps({"before": json.loads(row[0]) if row else None, "after": value}, ensure_ascii=False))
         return value
 
     @app.get("/studio-api/manage/orders")
-    def list_orders(_actor: str = Depends(admin_actor), page: int = 1):
+    def list_orders(_actor: str = Depends(admin_actor), page: int = 1, status: str = "all", search: str = "", day: date | None = None, kind: str = "all"):
+        if not 1 <= page <= 10000 or len(search) > 120 or status not in {"all", *PENDING, "paid", "paid_needs_review", "expired", "failed", "refunded"} or kind not in {"all", "visit", "pickup"}:
+            fail("invalid_page", 422)
+        clauses, params = [], []
+        if status != "all":
+            clauses.append("o.status=?"); params.append(status)
+        if search.strip():
+            clauses.append("(o.id LIKE ? OR json_extract(o.customer,'$.name') LIKE ? OR json_extract(o.customer,'$.contact') LIKE ?)")
+            params.extend(["%" + search.strip() + "%"] * 3)
+        if day:
+            clauses.append("EXISTS (SELECT 1 FROM commerce_seats s WHERE s.order_id=o.id AND s.date=?)"); params.append(str(day))
+        if kind == "visit":
+            clauses.append("EXISTS (SELECT 1 FROM commerce_seats s WHERE s.order_id=o.id)")
+        if kind == "pickup":
+            clauses.append("EXISTS (SELECT 1 FROM commerce_stock s WHERE s.order_id=o.id)")
+        where = " WHERE " + " AND ".join(clauses) if clauses else ""
+        with database() as db:
+            rows = db.execute("SELECT o.* FROM commerce_orders o" + where + " ORDER BY o.created_at DESC,o.id DESC LIMIT 30 OFFSET ?", (*params, (page - 1) * 30)).fetchall()
+            total = db.execute("SELECT count(*) FROM commerce_orders o" + where, params).fetchone()[0]
+        return {"items": [order_view(row, True) for row in rows], "total": total}
+
+    @app.get("/studio-api/manage/overview")
+    def overview(_actor: str = Depends(admin_actor), day: date | None = None):
+        selected = day or now_local().date()
+        start = datetime.combine(selected, datetime.min.time(), tzinfo=TORONTO)
+        finish = start + timedelta(days=1)
+        week_end = selected + timedelta(days=7)
+        with database() as db:
+            settings = settings_for(db)
+            totals = db.execute("""SELECT
+              count(CASE WHEN created_at>=? AND created_at<? THEN 1 END) AS orders_today,
+              count(CASE WHEN status='paid_needs_review' THEN 1 END) AS needs_review,
+              count(CASE WHEN status='paid' AND fulfillment='confirmed' THEN 1 END) AS awaiting_fulfillment,
+              coalesce(sum(CASE WHEN paid_at>=? AND paid_at<? AND status IN ('paid','paid_needs_review')
+                THEN CAST(json_extract(quote,'$.cny_fen') AS INTEGER) ELSE 0 END),0) AS received_cny_fen
+              FROM commerce_orders""", (start.timestamp(), finish.timestamp(), start.timestamp(), finish.timestamp())).fetchone()
+            bookings = db.execute("""SELECT s.*,o.status,o.fulfillment,json_extract(o.customer,'$.name') AS name
+              FROM commerce_seats s JOIN commerce_orders o ON o.id=s.order_id
+              WHERE s.date>=? AND s.date<? AND (o.status='paid' OR
+                (o.status IN ('creating','pending','payment_uncertain') AND o.hold_until>?))
+              ORDER BY s.date,s.start,o.created_at""", (str(selected), str(week_end), time.time())).fetchall()
+            days = []
+            for offset in range(7):
+                value = selected + timedelta(days=offset)
+                hours = opening(settings, value)
+                entries = [{"order_id": r["order_id"], "name": r["name"], "start": clock(r["start"]), "end": clock(r["end"]), "guests": r["guests"], "status": r["status"], "fulfillment": r["fulfillment"]} for r in bookings if r["date"] == str(value)]
+                days.append({"date": str(value), "hours": hours, "entries": entries})
+            today_guests = sum(r["guests"] for r in bookings if r["date"] == str(selected) and r["status"] == "paid")
+            recent = db.execute("SELECT * FROM commerce_orders ORDER BY created_at DESC,id DESC LIMIT 5").fetchall()
+            products = products_for(db)
+        return {"date": str(selected), "metrics": {**dict(totals), "guests_today": today_guests}, "days": days,
+                "recent_orders": [order_view(row, True) for row in recent], "catalog": {"published": sum(p["active"] for p in products), "drafts": sum(not p["active"] for p in products), "low_stock": sum(p["active"] and p["kind"] == "physical" and p["stock"] <= 3 for p in products)},
+                "checkout_ready": commerce_ready(settings), "payment_configured": gateway.configured, "timezone": "America/Toronto"}
+
+    @app.get("/studio-api/manage/orders/{order_id}")
+    def order_detail(order_id: str, _actor: str = Depends(admin_actor)):
+        with database() as db:
+            row = db.execute("SELECT * FROM commerce_orders WHERE id=?", (order_id,)).fetchone()
+            if not row:
+                fail("order_not_found", 404)
+            events = db.execute("SELECT id,created_at,event,actor,detail FROM commerce_events WHERE order_id=? ORDER BY created_at DESC,id DESC LIMIT 100", (order_id,)).fetchall()
+        return {**order_view(row, True), "events": [dict(r) for r in events]}
+
+    @app.get("/studio-api/manage/activity")
+    def activity(_actor: str = Depends(admin_actor), page: int = 1):
         if not 1 <= page <= 10000:
             fail("invalid_page", 422)
         with database() as db:
-            rows = db.execute("SELECT * FROM commerce_orders ORDER BY created_at DESC LIMIT 30 OFFSET ?", ((page - 1) * 30,)).fetchall()
-            total = db.execute("SELECT count(*) FROM commerce_orders").fetchone()[0]
-        return {"items": [order_view(row, True) for row in rows], "total": total}
+            total = db.execute("SELECT count(*) FROM commerce_events").fetchone()[0]
+            rows = db.execute("SELECT * FROM commerce_events ORDER BY created_at DESC,id DESC LIMIT 30 OFFSET ?", ((page - 1) * 30,)).fetchall()
+        return {"items": [dict(r) for r in rows], "total": total}
 
     @app.patch("/studio-api/manage/orders/{order_id}")
     def fulfill(order_id: str, payload: Fulfillment, actor: str = Depends(admin_actor)):

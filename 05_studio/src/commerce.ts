@@ -1,5 +1,6 @@
 import { computed, ref, watch } from "vue";
 import { locale, tr } from "./state";
+import { notify } from "./ui";
 
 export type Booking = {
   date: string;
@@ -270,6 +271,12 @@ export function addToBag(product_id: string, booking?: Booking) {
       quantity: 1,
       booking: booking || null,
     });
+  notify(
+    "已放进购物车，一点快乐收好了。",
+    "Added to your bag. A little joy, collected.",
+    "success",
+    "cart",
+  );
 }
 export function removeLine(key: string) {
   if (!checkoutBusy.value) bag.value = bag.value.filter((v) => v.key !== key);

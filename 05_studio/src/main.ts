@@ -8,6 +8,7 @@ import "./styles/typography.css";
 import "./styles/interactions.css";
 import "./styles/layout.css";
 import "./styles/commerce.css";
+import "./styles/motion.css";
 import App from "./App.vue";
 import Home from "./pages/Home.vue";
 

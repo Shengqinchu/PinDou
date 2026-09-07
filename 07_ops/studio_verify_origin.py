@@ -45,6 +45,11 @@ try:
     assert call('/manage/commerce', token=viewer)[0] == 403
     assert call('/manage/commerce', token=admin)[0] == 200
     assert call('/manage/orders', token=admin)[0] == 200
+    for path in ['/manage/overview', '/manage/activity']:
+        assert call(path)[0] == 401
+        assert call(path, token=viewer)[0] == 403
+        assert call(path, token=admin)[0] == 200
+    assert call('/manage/orders/PSDOESNOTEXIST', token=admin)[0] == 404
     catalog = call('/catalog')[1]
     assert catalog['payment_configured'] is True
     assert catalog['settings']['fx_cny_per_cad'] == '5.0000'

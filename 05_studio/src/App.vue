@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
   PhArrowUpRight,
@@ -10,8 +10,10 @@ import {
 } from "@phosphor-icons/vue";
 import { locale, socialUrl, tr, wechat } from "./state";
 import { bagCount as cartCount } from "./commerce";
+import StudioToast from "./components/StudioToast.vue";
 
 const route = useRoute();
+const isDesk = computed(() => route.path.startsWith("/manage"));
 const menu = ref(false);
 const main = ref<HTMLElement>();
 watch(
@@ -28,7 +30,7 @@ watch(
   <a class="skip-link" href="#main">{{
     tr("跳到主要内容", "Skip to content")
   }}</a>
-  <div class="announcement">
+  <div v-if="!isDesk" class="announcement">
     {{
       tr(
         "Hamilton 的小小手作空间 · 提前约好，慢慢拼豆",
@@ -36,7 +38,7 @@ watch(
       )
     }}
   </div>
-  <header class="site-header">
+  <header v-if="!isDesk" class="site-header">
     <RouterLink
       to="/"
       class="wordmark"
@@ -71,10 +73,12 @@ watch(
         :aria-label="
           tr(`购物车，${cartCount} 件`, `Your bag, ${cartCount} items`)
         "
-        ><PhShoppingBagOpen :size="23" weight="light" /><span
-          v-if="cartCount"
-          class="bag-count"
-          >{{ cartCount }}</span
+        ><PhShoppingBagOpen :size="23" weight="light" /><Transition
+          name="bag-count"
+          mode="out-in"
+          ><span v-if="cartCount" :key="cartCount" class="bag-count">{{
+            cartCount
+          }}</span></Transition
         ></RouterLink
       >
       <button
@@ -87,30 +91,41 @@ watch(
         <PhX v-if="menu" :size="25" /><PhList v-else :size="25" />
       </button>
     </div>
-    <nav
-      v-if="menu"
-      id="mobile-nav"
-      class="mobile-nav"
-      :aria-label="tr('手机导航', 'Mobile navigation')"
-      @keydown.esc="menu = false"
-    >
-      <RouterLink to="/#space">{{ tr("我们的空间", "The studio") }}</RouterLink
-      ><RouterLink to="/visit">{{ tr("来拼豆吧", "Come create") }}</RouterLink
-      ><RouterLink to="/shop">{{ tr("拼豆小店", "Little shop") }}</RouterLink
-      ><RouterLink to="/journal">{{
-        tr("小狗日记", "Studio journal")
-      }}</RouterLink
-      ><a href="/upload"
-        >{{ tr("拼豆图纸工具", "Pattern maker") }} <PhArrowUpRight
-      /></a>
-    </nav>
+    <Transition name="mobile-menu"
+      ><nav
+        v-if="menu"
+        id="mobile-nav"
+        class="mobile-nav"
+        :aria-label="tr('手机导航', 'Mobile navigation')"
+        @keydown.esc="menu = false"
+        :inert="!menu"
+      >
+        <RouterLink to="/#space">{{
+          tr("我们的空间", "The studio")
+        }}</RouterLink
+        ><RouterLink to="/visit">{{ tr("来拼豆吧", "Come create") }}</RouterLink
+        ><RouterLink to="/shop">{{ tr("拼豆小店", "Little shop") }}</RouterLink
+        ><RouterLink to="/journal">{{
+          tr("小狗日记", "Studio journal")
+        }}</RouterLink
+        ><a href="/upload"
+          >{{ tr("拼豆图纸工具", "Pattern maker") }} <PhArrowUpRight
+        /></a></nav
+    ></Transition>
   </header>
 
-  <main ref="main" id="main" tabindex="-1">
-    <RouterView :key="route.path" />
+  <main
+    ref="main"
+    id="main"
+    tabindex="-1"
+    :class="{ 'studio-admin-main': isDesk }"
+  >
+    <div :key="route.path" :class="{ 'customer-stage': !isDesk }">
+      <RouterView />
+    </div>
   </main>
 
-  <footer class="site-footer">
+  <footer v-if="!isDesk" class="site-footer">
     <div class="footer-top">
       <div>
         <RouterLink class="footer-brand" to="/">pindou puppy.</RouterLink>
@@ -156,4 +171,5 @@ watch(
       ><RouterLink to="/manage">{{ tr("店主入口", "Studio desk") }}</RouterLink>
     </div>
   </footer>
+  <StudioToast />
 </template>

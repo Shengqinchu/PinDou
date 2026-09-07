@@ -265,68 +265,69 @@ async function pay(retry = false) {
         <h2>{{ tr("我的购物车", "Your bag") }}</h2>
         <span>{{ bagCount }} {{ tr("项心意", "little things") }}</span>
       </div>
-      <article v-for="line in rows" :key="line.key" class="bag-line">
-        <img
-          :src="media(line.product?.image || 'studio-04')"
-          width="1080"
-          height="1440"
-          :alt="line.product ? tr(line.product.zh, line.product.en) : ''"
-        />
-        <div class="bag-line-info">
-          <span class="eyebrow">{{
-            line.booking
-              ? tr("到店体验", "STUDIO VISIT")
-              : tr("到店自提", "STUDIO PICKUP")
-          }}</span>
-          <h3>
-            {{
-              line.product
-                ? tr(line.product.zh, line.product.en)
-                : line.product_id
-            }}
-          </h3>
-          <template v-if="line.booking"
-            ><p>
-              {{ prettyDate(line.booking.date) }}<br />{{
-                line.booking.start
-              }}–{{ line.booking.end }} · {{ line.booking.guests }}
-              {{ tr("人", "guests") }}
-            </p>
-            <RouterLink class="text-link small-link" to="/visit">{{
-              tr("选择其他时段", "Choose another time")
-            }}</RouterLink></template
-          >
-          <div v-else class="quantity-stepper">
-            <button
-              :disabled="checkoutBusy || line.quantity <= 1"
-              :aria-label="tr('减少数量', 'Decrease quantity')"
-              @click="quantityChange(line.key, -1)"
+      <TransitionGroup name="bag-list" tag="div" class="bag-line-list"
+        ><article v-for="line in rows" :key="line.key" class="bag-line">
+          <img
+            :src="media(line.product?.image || 'studio-04')"
+            width="1080"
+            height="1440"
+            :alt="line.product ? tr(line.product.zh, line.product.en) : ''"
+          />
+          <div class="bag-line-info">
+            <span class="eyebrow">{{
+              line.booking
+                ? tr("到店体验", "STUDIO VISIT")
+                : tr("到店自提", "STUDIO PICKUP")
+            }}</span>
+            <h3>
+              {{
+                line.product
+                  ? tr(line.product.zh, line.product.en)
+                  : line.product_id
+              }}
+            </h3>
+            <template v-if="line.booking"
+              ><p>
+                {{ prettyDate(line.booking.date) }}<br />{{
+                  line.booking.start
+                }}–{{ line.booking.end }} · {{ line.booking.guests }}
+                {{ tr("人", "guests") }}
+              </p>
+              <RouterLink class="text-link small-link" to="/visit">{{
+                tr("选择其他时段", "Choose another time")
+              }}</RouterLink></template
             >
-              <PhMinus /></button
-            ><span>{{ line.quantity }}</span
-            ><button
-              :disabled="checkoutBusy || line.quantity >= 20"
-              :aria-label="tr('增加数量', 'Increase quantity')"
-              @click="quantityChange(line.key, 1)"
-            >
-              <PhPlus />
-            </button>
+            <div v-else class="quantity-stepper">
+              <button
+                :disabled="checkoutBusy || line.quantity <= 1"
+                :aria-label="tr('减少数量', 'Decrease quantity')"
+                @click="quantityChange(line.key, -1)"
+              >
+                <PhMinus /></button
+              ><span>{{ line.quantity }}</span
+              ><button
+                :disabled="checkoutBusy || line.quantity >= 20"
+                :aria-label="tr('增加数量', 'Increase quantity')"
+                @click="quantityChange(line.key, 1)"
+              >
+                <PhPlus />
+              </button>
+            </div>
           </div>
-        </div>
-        <div class="bag-line-end">
-          <strong>{{
-            line.priced ? money(line.priced.total_cents) : "—"
-          }}</strong
-          ><button
-            class="icon-button"
-            :disabled="checkoutBusy"
-            :aria-label="tr('从购物车移除', 'Remove from bag')"
-            @click="removeLine(line.key)"
-          >
-            <PhTrash :size="18" />
-          </button>
-        </div>
-      </article>
+          <div class="bag-line-end">
+            <strong>{{
+              line.priced ? money(line.priced.total_cents) : "—"
+            }}</strong
+            ><button
+              class="icon-button"
+              :disabled="checkoutBusy"
+              :aria-label="tr('从购物车移除', 'Remove from bag')"
+              @click="removeLine(line.key)"
+            >
+              <PhTrash :size="18" />
+            </button>
+          </div></article
+      ></TransitionGroup>
       <RouterLink to="/shop" class="text-link"
         >{{ tr("再逛一会儿", "Keep looking around") }}<PhArrowRight
       /></RouterLink>

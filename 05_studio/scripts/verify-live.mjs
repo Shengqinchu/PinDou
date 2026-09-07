@@ -50,7 +50,7 @@ try {
       waitUntil: "networkidle",
     });
     await expect(
-      page.getByRole("heading", { name: "Host sign-in", exact: true }),
+      page.getByRole("heading", { name: "Hello, studio owner.", exact: true }),
     ).toBeVisible();
     await page.goto("https://pindoupuppy.com/upload", {
       waitUntil: "domcontentloaded",

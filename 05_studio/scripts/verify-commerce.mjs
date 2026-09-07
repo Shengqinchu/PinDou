@@ -112,25 +112,7 @@ try {
     await inspect(p, `shop-${width}-${lang}`);
     await ctx.close();
   }
-  const ctx = await browser.newContext({
-    viewport: { width: 1440, height: 1000 },
-  });
-  await ctx.addInitScript(() =>
-    sessionStorage.setItem("puppy-studio-admin", "local-qa"),
-  );
-  const p = await ctx.newPage();
-  await p.goto(`${origin}/studio/manage`);
-  await p.getByRole("button", { name: "营业排班与收款", exact: true }).click();
-  await p.locator('input[name="capacity"]').waitFor();
-  await p.locator('input[name="capacity"]').fill("6");
-  await p.getByRole("button", { name: "保存排班与收款设置" }).click();
-  await p.getByText("排班与结账设置已保存。", { exact: false }).waitFor();
-  await inspect(p, "manager-schedule");
-  await p.getByRole("button", { name: "商品与价格", exact: true }).click();
-  await inspect(p, "manager-products");
-  await p.getByRole("button", { name: "订单与到店安排", exact: true }).click();
-  await inspect(p, "manager-orders");
-  await ctx.close();
+  // Host workspace is covered by verify-desk-motion.mjs.
   await writeFile(
     `${output}/browser-results.json`,
     JSON.stringify(results, null, 2),

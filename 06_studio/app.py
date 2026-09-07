@@ -196,7 +196,7 @@ def admin_actor(authorization: Annotated[str | None, Header()] = None) -> str:
 def health():
     with database() as db:
         db.execute("SELECT 1 FROM studio_requests LIMIT 1")
-    return {"status": "ok", "service": "pindou-studio", "version": "0.2.0"}
+    return {"status": "ok", "service": "pindou-studio", "version": "0.3.0"}
 
 
 @app.post("/studio-api/requests", status_code=201)
