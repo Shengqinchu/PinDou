@@ -34,3 +34,16 @@ Browser automation used Microsoft Edge (Chromium). Viewport emulation is not a p
 This release preserves the existing merchant setup, fixed 1 CAD = 5 CNY rate and current closed-to-purchases settings. It does not invent hours, capacity, tax treatment, inventory or sales. No real payment or refund was executed for this design pass. Old generator code, routes and production service remain outside the change.
 
 Deployment remains additive through `studio_pack.py` / `studio_deploy.py`, with file checksums, SQLite backup and prior-release rollback. Packer includes only production app/commerce/payments modules, never the QA gateway or tests.
+
+## Deployed result
+
+- Implementation commit: `d548ebf`.
+- Release: `20260907223709-studio-v1`; 54 packaged files verified.
+- Archive SHA-256: `0af238e466092a08f2f0770408f205ee44ac576cd74122ab7c424437bed36a0f`.
+- Nginx validation and studio service health passed. Application version: `0.3.0`.
+- Live browser: eight visit/shop/cart/manager pages across desktop and mobile; no JavaScript errors or overflow. Separate home/English/mobile menu/sign-in/legacy generator tests passed.
+- Origin checked real admin authority on commerce, orders, overview and activity; anonymous denied, viewer denied, existing backend admin accepted. Unknown private order is not exposed. Two exact legacy inquiry QA rows were checked and removed.
+- Live merchant remains configured; purchases disabled, capacity 0, tax mode unconfirmed, fixed FX 5.0000. No business configuration changed.
+- Old generator release remains `/opt/pindou/releases/20260615074539-wallet-mode-labels`; index hash remains `506f9bd2f9f0c37c52f08924f1504286816b93bff3198aea9f1790d0eceb36aa`.
+- Rollback and pre-release SQLite snapshot: `/opt/pindou/studio/backups/20260907223709-studio-v1/`.
+- Additional resilience result: mobile hidden navigation is inert, focus stays in the open menu, Escape restores scrolling; a failed product save keeps the draft and retries successfully. Button transforms measured idle (0px), hover (-3px), press (+2px, scale .988), release (-3px), with all parent/icon transitions 0.3s ease-in-out.
