@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import base64
+import asyncio
+import contextlib
 import hashlib
 import json
 import os
@@ -63,12 +65,19 @@ def initialize():
           staff_note TEXT NOT NULL
         );
         """)
+    import commerce
+    commerce.initialize(database)
 
 
 @asynccontextmanager
 async def lifespan(_app):
     initialize()
+    import commerce
+    worker = asyncio.create_task(commerce.reconciliation_loop())
     yield
+    worker.cancel()
+    with contextlib.suppress(asyncio.CancelledError):
+        await worker
 
 
 app = FastAPI(title="PinDou Puppy Studio", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
@@ -187,7 +196,7 @@ def admin_actor(authorization: Annotated[str | None, Header()] = None) -> str:
 def health():
     with database() as db:
         db.execute("SELECT 1 FROM studio_requests LIMIT 1")
-    return {"status": "ok", "service": "pindou-studio", "version": "0.1.0"}
+    return {"status": "ok", "service": "pindou-studio", "version": "0.2.0"}
 
 
 @app.post("/studio-api/requests", status_code=201)
@@ -249,3 +258,7 @@ def update_inquiry(request_id: str, payload: StatusUpdate, actor: Annotated[str,
         db.execute("UPDATE studio_requests SET status=?,staff_note=?,updated_at=?,version=version+1 WHERE id=?", (payload.status, payload.staff_note, now, request_id))
         db.execute("INSERT INTO studio_audit(request_id,changed_at,actor,previous_status,new_status,staff_note) VALUES(?,?,?,?,?,?)", (request_id, now, actor, row["status"], payload.status, payload.staff_note))
     return {"id": request_id, "status": payload.status, "version": row["version"] + 1}
+
+
+import commerce
+commerce.register(app, admin_actor)

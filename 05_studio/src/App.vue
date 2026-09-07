@@ -8,7 +8,8 @@ import {
   PhShoppingBagOpen,
   PhX,
 } from "@phosphor-icons/vue";
-import { cartCount, locale, socialUrl, tr, wechat } from "./state";
+import { locale, socialUrl, tr, wechat } from "./state";
+import { bagCount as cartCount } from "./commerce";
 
 const route = useRoute();
 const menu = ref(false);
@@ -66,9 +67,9 @@ watch(
       </button>
       <RouterLink
         class="bag-button"
-        to="/shop#selection"
+        to="/cart"
         :aria-label="
-          tr(`选购清单，${cartCount} 件`, `Your selection, ${cartCount} items`)
+          tr(`购物车，${cartCount} 件`, `Your bag, ${cartCount} items`)
         "
         ><PhShoppingBagOpen :size="23" weight="light" /><span
           v-if="cartCount"
@@ -105,7 +106,9 @@ watch(
     </nav>
   </header>
 
-  <main ref="main" id="main" tabindex="-1"><RouterView /></main>
+  <main ref="main" id="main" tabindex="-1">
+    <RouterView :key="route.path" />
+  </main>
 
   <footer class="site-footer">
     <div class="footer-top">

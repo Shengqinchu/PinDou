@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from "vue";
 import { PhArrowRight, PhArrowClockwise } from "@phosphor-icons/vue";
 import { api, prettyDate, products, tr } from "../state";
+import CommerceManager from "../components/CommerceManager.vue";
 
 type Entry = {
   id: string;
@@ -154,8 +155,8 @@ function statusLabel(value: string): string {
         <p>
           {{
             tr(
-              "查看预约意向与自提询单，联系顾客后更新安排。",
-              "Review visit and pickup requests. Contact the guest, then update the arrangements.",
+              "管理订单、到店排班、商品与收款。",
+              "Manage orders, studio hours, products and checkout.",
             )
           }}
         </p>
@@ -197,87 +198,23 @@ function statusLabel(value: string): string {
         }}<PhArrowRight />
       </button>
     </form>
-    <template v-else
-      ><div class="manage-toolbar">
-        <label class="field"
-          >{{ tr("请求状态", "Request status")
-          }}<select
-            v-model="status"
-            @change="
-              page = 1;
-              load();
-            "
-          >
-            <option value="all">{{ tr("全部", "All requests") }}</option>
-            <option
-              v-for="(label, value) in statusLabels()"
-              :key="value"
-              :value="value"
-            >
-              {{ label }}
-            </option>
-          </select></label
-        ><button class="button button-outline" :disabled="busy" @click="load">
-          <PhArrowClockwise />{{ tr("刷新", "Refresh") }}</button
-        ><span>{{ total }} {{ tr("条请求", "requests") }}</span>
-      </div>
-      <p class="fine-print">
-        {{
-          tr(
-            "保存状态不会自动通知顾客。请使用请求中留下的联系方式确认，内部备注仅店主可见。",
-            "Saving a status does not notify the guest. Contact them using the details they provided. Staff notes are private.",
-          )
-        }}
-      </p>
-      <p v-if="!entries.length && !busy && !error" class="empty-selection">
-        {{ tr("这里暂时没有请求。", "No requests here yet.") }}
-      </p>
-      <article v-for="entry in entries" :key="entry.id" class="manage-entry">
-        <div class="manage-entry-title">
-          <h2>
-            {{ entry.payload.name }}
-            <small>{{
-              entry.kind === "visit"
-                ? tr("到店预约", "Visit")
-                : tr("自提询单", "Pickup")
-            }}</small>
-          </h2>
-          <span class="status-label">{{ statusLabel(entry.status) }}</span>
-        </div>
-        <p class="fine-print">
-          {{ entry.id }} ·
-          {{
-            new Date(entry.created_at).toLocaleString("en-CA", {
-              timeZone: "America/Toronto",
-            })
-          }}
-          (Hamilton)
-        </p>
-        <p>
-          {{ entry.payload.contact_method }}:
-          <strong>{{ entry.payload.contact }}</strong>
-        </p>
-        <p v-if="entry.payload.booking">
-          {{ prettyDate(entry.payload.booking.date) }} ·
-          {{ entry.payload.booking.start }}–{{ entry.payload.booking.end }} ·
-          {{ entry.payload.booking.guests }} {{ tr("人", "guests") }} ·
-          {{ entry.payload.booking.plan }}
-        </p>
-        <p v-for="item in entry.payload.items" :key="item.id">
-          {{
-            products.find((p) => p.id === item.id)?.[
-              tr("zh", "en") as "zh" | "en"
-            ] || item.id
-          }}
-          × {{ item.quantity }}
-        </p>
-        <p v-if="entry.payload.notes" class="customer-notes">
-          {{ entry.payload.notes }}
-        </p>
-        <div class="form-grid">
+    <template v-else>
+      <CommerceManager :token="token" />
+      <details class="legacy-requests">
+        <summary>
+          {{ tr("历史预约与询单", "Earlier visit and pickup requests") }}
+        </summary>
+        <div class="manage-toolbar">
           <label class="field"
-            >{{ tr("更新状态", "Update status")
-            }}<select v-model="entry.next_status">
+            >{{ tr("请求状态", "Request status")
+            }}<select
+              v-model="status"
+              @change="
+                page = 1;
+                load();
+              "
+            >
+              <option value="all">{{ tr("全部", "All requests") }}</option>
               <option
                 v-for="(label, value) in statusLabels()"
                 :key="value"
@@ -286,47 +223,117 @@ function statusLabel(value: string): string {
                 {{ label }}
               </option>
             </select></label
-          ><label class="field"
-            >{{ tr("内部备注", "Staff note")
-            }}<input
-              v-model="entry.next_note"
-              maxlength="1500"
-              :placeholder="
-                tr(
-                  '确认的费用、时间或处理记录',
-                  'Agreed price, timing or follow-up',
-                )
-              "
-          /></label>
+          ><button class="button button-outline" :disabled="busy" @click="load">
+            <PhArrowClockwise />{{ tr("刷新", "Refresh") }}</button
+          ><span>{{ total }} {{ tr("条请求", "requests") }}</span>
         </div>
-        <button
-          class="button button-outline"
-          @click="save(entry)"
-          :disabled="busy"
-        >
-          {{ tr("保存安排", "Save arrangement") }}
-        </button>
-      </article>
-      <div v-if="total > 50" class="pagination">
-        <button
-          :disabled="page <= 1 || busy"
-          @click="
-            page--;
-            load();
-          "
-        >
-          {{ tr("上一页", "Previous") }}</button
-        ><span>{{ page }}</span
-        ><button
-          :disabled="page * 50 >= total || busy"
-          @click="
-            page++;
-            load();
-          "
-        >
-          {{ tr("下一页", "Next") }}
-        </button>
-      </div></template
+        <p class="fine-print">
+          {{
+            tr(
+              "保存状态不会自动通知顾客。请使用请求中留下的联系方式确认，内部备注仅店主可见。",
+              "Saving a status does not notify the guest. Contact them using the details they provided. Staff notes are private.",
+            )
+          }}
+        </p>
+        <p v-if="!entries.length && !busy && !error" class="empty-selection">
+          {{ tr("这里暂时没有请求。", "No requests here yet.") }}
+        </p>
+        <article v-for="entry in entries" :key="entry.id" class="manage-entry">
+          <div class="manage-entry-title">
+            <h2>
+              {{ entry.payload.name }}
+              <small>{{
+                entry.kind === "visit"
+                  ? tr("到店预约", "Visit")
+                  : tr("自提询单", "Pickup")
+              }}</small>
+            </h2>
+            <span class="status-label">{{ statusLabel(entry.status) }}</span>
+          </div>
+          <p class="fine-print">
+            {{ entry.id }} ·
+            {{
+              new Date(entry.created_at).toLocaleString("en-CA", {
+                timeZone: "America/Toronto",
+              })
+            }}
+            (Hamilton)
+          </p>
+          <p>
+            {{ entry.payload.contact_method }}:
+            <strong>{{ entry.payload.contact }}</strong>
+          </p>
+          <p v-if="entry.payload.booking">
+            {{ prettyDate(entry.payload.booking.date) }} ·
+            {{ entry.payload.booking.start }}–{{ entry.payload.booking.end }} ·
+            {{ entry.payload.booking.guests }} {{ tr("人", "guests") }} ·
+            {{ entry.payload.booking.plan }}
+          </p>
+          <p v-for="item in entry.payload.items" :key="item.id">
+            {{
+              products.find((p) => p.id === item.id)?.[
+                tr("zh", "en") as "zh" | "en"
+              ] || item.id
+            }}
+            × {{ item.quantity }}
+          </p>
+          <p v-if="entry.payload.notes" class="customer-notes">
+            {{ entry.payload.notes }}
+          </p>
+          <div class="form-grid">
+            <label class="field"
+              >{{ tr("更新状态", "Update status")
+              }}<select v-model="entry.next_status">
+                <option
+                  v-for="(label, value) in statusLabels()"
+                  :key="value"
+                  :value="value"
+                >
+                  {{ label }}
+                </option>
+              </select></label
+            ><label class="field"
+              >{{ tr("内部备注", "Staff note")
+              }}<input
+                v-model="entry.next_note"
+                maxlength="1500"
+                :placeholder="
+                  tr(
+                    '确认的费用、时间或处理记录',
+                    'Agreed price, timing or follow-up',
+                  )
+                "
+            /></label>
+          </div>
+          <button
+            class="button button-outline"
+            @click="save(entry)"
+            :disabled="busy"
+          >
+            {{ tr("保存安排", "Save arrangement") }}
+          </button>
+        </article>
+        <div v-if="total > 50" class="pagination">
+          <button
+            :disabled="page <= 1 || busy"
+            @click="
+              page--;
+              load();
+            "
+          >
+            {{ tr("上一页", "Previous") }}</button
+          ><span>{{ page }}</span
+          ><button
+            :disabled="page * 50 >= total || busy"
+            @click="
+              page++;
+              load();
+            "
+          >
+            {{ tr("下一页", "Next") }}
+          </button>
+        </div>
+      </details></template
     >
     <p v-if="error" role="alert" class="form-error">{{ error }}</p>
   </section>

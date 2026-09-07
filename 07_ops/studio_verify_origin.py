@@ -41,7 +41,18 @@ try:
     assert call('/manage/requests')[0] == 401
     assert call('/manage/requests', token=viewer)[0] == 403
     assert call('/manage/requests', token=admin)[0] == 200
+    assert call('/manage/commerce')[0] == 401
+    assert call('/manage/commerce', token=viewer)[0] == 403
+    assert call('/manage/commerce', token=admin)[0] == 200
+    assert call('/manage/orders', token=admin)[0] == 200
+    catalog = call('/catalog')[1]
+    assert catalog['payment_configured'] is True
+    assert catalog['settings']['fx_cny_per_cad'] == '5.0000'
+    assert call('/orders/PSDOESNOTEXIST')[0] == 404
     tomorrow = (datetime.now(ZoneInfo('America/Toronto')) + timedelta(days=1)).date().isoformat()
+    availability = call('/availability?date=' + tomorrow)[1]
+    if not catalog['settings']['enabled']:
+        assert availability['reason'] == 'not_open' and availability['slots'] == []
     for kind in ['visit', 'pickup']:
         payload = {'name': 'DEPLOYMENT QA - DO NOT CONTACT', 'kind': kind, 'contact_method': 'wechat', 'contact': 'local-deploy-test-only', 'consent': True}
         if kind == 'visit': payload['booking'] = {'date': tomorrow, 'start': '14:00', 'end': '15:00', 'guests': 1, 'plan': 'hourly'}
@@ -57,7 +68,7 @@ try:
         update = {'status': 'confirmed', 'staff_note': 'Automated QA; no customer involved.', 'version': 1}
         assert call('/manage/requests/' + ref, 'PATCH', update, token=admin)[0] == 200
         assert call('/manage/requests/' + ref, 'PATCH', update, token=admin)[0] == 409
-    print(json.dumps({'health': 'ok', 'anonymous': 'denied', 'viewer': 'denied', 'admin': 'verified via existing backend', 'visit_and_pickup': 'saved and readable', 'duplicate_retry': 'same id', 'version_conflict': '409', 'qa_rows': len(created)}, indent=2))
+    print(json.dumps({'health': 'ok', 'anonymous': 'denied', 'viewer': 'denied', 'admin': 'verified via existing backend', 'commerce_admin': 'verified', 'merchant_configured': catalog['payment_configured'], 'online_purchases': catalog['settings']['enabled'], 'capacity': catalog['settings']['capacity'], 'fx': catalog['settings']['fx_cny_per_cad'], 'tax_mode': catalog['settings']['tax_mode'], 'private_orders': 'protected', 'availability': availability['reason'], 'visit_and_pickup': 'saved and readable', 'duplicate_retry': 'same id', 'version_conflict': '409', 'qa_rows': len(created)}, indent=2))
 finally:
     with sqlite3.connect('/opt/pindou/studio/shared/studio.sqlite3') as db:
         for ref in created:

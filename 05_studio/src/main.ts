@@ -7,6 +7,7 @@ import "./style.css";
 import "./styles/typography.css";
 import "./styles/interactions.css";
 import "./styles/layout.css";
+import "./styles/commerce.css";
 import App from "./App.vue";
 import Home from "./pages/Home.vue";
 
@@ -16,6 +17,8 @@ const router = createRouter({
     { path: "/", component: Home },
     { path: "/visit", component: () => import("./pages/Visit.vue") },
     { path: "/shop", component: () => import("./pages/Shop.vue") },
+    { path: "/cart", component: () => import("./pages/Cart.vue") },
+    { path: "/order/:id", component: () => import("./pages/Order.vue") },
     { path: "/journal", component: () => import("./pages/Journal.vue") },
     { path: "/manage", component: () => import("./pages/Manage.vue") },
     {

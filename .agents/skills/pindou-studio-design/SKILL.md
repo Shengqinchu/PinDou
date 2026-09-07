@@ -15,7 +15,7 @@ Keep Vue for this project. Source and install a library before importing it; use
 
 Use project colour and typography tokens. Draw imagery and supporting colours from the supplied room and materials. Check Chinese wrapping and English length separately; switching languages must preserve the in-progress form and selection.
 
-Booking dates are Hamilton local dates, with timezone America/Toronto. A requested time is not verified availability. Do not invent seat counts, schedules, parking claims, reviews, inventory, or paid orders. Unknown prices use an inquiry flow and an explicit pending confirmation state.
+Booking dates are Hamilton local dates, with timezone America/Toronto. The owner has requested actual online checkout: select an available time, add to the shopping bag, pay through Hupijiao, then automatically confirm seats. Read `02_product/STUDIO_COMMERCE_V1.md` for the current transaction contract. Do not invent capacity, schedules, inventory or paid orders. Unpriced products remain drafts; unconfigured opening hours expose no available slots. The owner selected a fixed rate of 1 CAD = 5 CNY. Tax treatment still needs an explicit merchant setting. Server quotes own prices; payment confirmation requires provider evidence and atomic inventory fulfillment.
 
 Preserve old generator routes, shared API routes and existing uncommitted work. Deploy studio previews additively under /studio/ on the existing server. Read the current ops runbook and verify the live Nginx rules before routing changes.
 

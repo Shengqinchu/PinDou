@@ -6,6 +6,7 @@ import json
 import os
 import re
 import shutil
+import sqlite3
 import subprocess
 import sys
 import tarfile
@@ -74,10 +75,17 @@ def main():
     old_current = os.readlink(current) if current.is_symlink() else None
     backup = ROOT / "backups" / version
     backup.mkdir(parents=True)
+    backup.chmod(0o700)
     (backup / "nginx.conf").write_text(old_nginx)
     (backup / "state.json").write_text(json.dumps({"previous_current": old_current, "previous_unit": old_unit is not None}, indent=2))
     if old_unit is not None:
         (backup / "pindou-studio.service").write_text(old_unit)
+    studio_db = shared / "studio.sqlite3"
+    if studio_db.exists():
+        with sqlite3.connect(f"file:{studio_db}?mode=ro", uri=True) as source_db:
+            with sqlite3.connect(backup / "studio.sqlite3") as target_db:
+                source_db.backup(target_db)
+        (backup / "studio.sqlite3").chmod(0o600)
     snippet = '''    # PinDou Studio preview (managed by studio_deploy.py)
     location = /studio { return 302 /studio/; }
     location ^~ /studio/studio-assets/ {
@@ -127,6 +135,7 @@ Group=pindou
 WorkingDirectory=/opt/pindou/studio/current/service
 Environment=STUDIO_DB_PATH=/opt/pindou/studio/shared/studio.sqlite3
 Environment=STUDIO_ADMIN_ORIGIN=http://127.0.0.1:8000
+EnvironmentFile=-/opt/pindou/studio/shared/.env
 Environment=PYTHONDONTWRITEBYTECODE=1
 ExecStart=/opt/pindou/studio/venv/bin/uvicorn app:app --host 127.0.0.1 --port 8011 --proxy-headers --forwarded-allow-ips=127.0.0.1 --no-access-log
 Restart=on-failure

@@ -1,49 +1,35 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import {
-  PhArrowDown,
-  PhArrowUpRight,
-  PhCheck,
-  PhMinus,
-  PhPlus,
-  PhShoppingBagOpen,
-} from "@phosphor-icons/vue";
-import InquiryForm from "../components/InquiryForm.vue";
-import { cart, cartCount, changeQuantity, media, products, tr } from "../state";
+import { computed, onMounted, ref } from "vue";
+import { PhArrowRight, PhCheck, PhPlus } from "@phosphor-icons/vue";
+import { media, tr } from "../state";
+import { addToBag, bagCount, catalog, loadCatalog, money } from "../commerce";
 const category = ref("all");
 const lastAdded = ref("");
-const completed = ref(false);
-const submitting = ref(false);
+const error = ref("");
 const categories = computed(() => [
   { id: "all", label: tr("全部小物", "All the little things") },
   { id: "tools", label: tr("工具与配件", "Tools & fittings") },
   { id: "beads", label: tr("拼豆补充装", "Bead refills") },
-  { id: "finished", label: tr("定制成品", "Custom pieces") },
+  { id: "finished", label: tr("手作成品", "Finished pieces") },
 ]);
-const visible = computed(() =>
-  products.filter(
-    (p) => category.value === "all" || p.category === category.value,
-  ),
+const visible = computed(
+  () =>
+    catalog.value?.products.filter(
+      (p) =>
+        p.kind === "physical" &&
+        (category.value === "all" || p.category === category.value),
+    ) || [],
 );
-const selected = computed(() => products.filter((p) => cart.value[p.id]));
-const items = computed(() =>
-  selected.value.map((p) => ({ id: p.id, quantity: cart.value[p.id] })),
-);
-const summary = computed(() => [
-  ...selected.value.map((p) => `${tr(p.zh, p.en)} × ${cart.value[p.id]}`),
-  tr(
-    "到店自提 · 款式、库存及价格待确认",
-    "Studio pickup · Styles, stock and prices to be confirmed",
-  ),
-]);
+onMounted(async () => {
+  try {
+    await loadCatalog();
+  } catch (e) {
+    error.value = (e as Error).message;
+  }
+});
 function add(id: string) {
-  if (submitting.value || completed.value) return;
-  changeQuantity(id, 1);
+  addToBag(id);
   lastAdded.value = id;
-}
-function done() {
-  completed.value = true;
-  cart.value = {};
 }
 </script>
 <template>
@@ -57,159 +43,91 @@ function done() {
       <p>
         {{
           tr(
-            "从第一把镊子，到刚好缺的那个色号。先把心仪的小物放进清单，我们再一起确认款式、价格和自提时间。",
-            "From your first pair of tweezers to that missing shade. Make a little list and we will confirm styles, pricing and a time for you to pick it up.",
+            "从第一把镊子，到刚好缺的那个色号。挑好喜欢的小物，放进购物车，付款后到店带走。",
+            "From your first pair of tweezers to that missing shade. Choose your favourites, pay online and pick them up at the studio.",
           )
         }}
       </p>
-      <a class="text-link" href="#selection"
-        >{{ tr("查看选购清单", "See your selection") }} ({{
-          cartCount
-        }})<PhArrowDown
-      /></a>
+      <RouterLink to="/cart" class="text-link"
+        >{{ tr(`打开购物车 · ${bagCount}`, `Your bag · ${bagCount}`)
+        }}<PhArrowRight
+      /></RouterLink>
     </div>
   </section>
-  <section class="container">
-    <div
-      class="shop-tabs"
-      role="group"
-      :aria-label="tr('按品类浏览', 'Browse by category')"
-    >
+  <section class="container section-bottom">
+    <div class="shop-tabs" :aria-label="tr('商品分类', 'Product categories')">
       <button
-        v-for="tab in categories"
-        :key="tab.id"
-        :class="{ active: category === tab.id }"
-        :aria-pressed="category === tab.id"
-        @click="category = tab.id"
+        v-for="c in categories"
+        :key="c.id"
+        :class="{ active: category === c.id }"
+        :aria-pressed="category === c.id"
+        @click="category = c.id"
       >
-        {{ tab.label }}
+        {{ c.label }}
       </button>
     </div>
+    <p v-if="error" class="form-error" role="alert">{{ error }}</p>
     <div class="product-grid">
-      <article v-for="product in visible" :key="product.id" class="product">
+      <article v-for="p in visible" :key="p.id" class="product-card">
         <div class="product-image">
           <img
-            :src="media(product.image)"
-            :alt="tr(product.zh, product.en)"
-            loading="lazy"
+            :src="media(p.image)"
             width="1080"
             height="1440"
-          /><span>{{ tr("到店自提", "Studio pickup") }}</span>
+            :alt="tr(p.zh, p.en)"
+            loading="lazy"
+          /><span
+            v-if="!p.active || p.price_cents === null"
+            class="product-status"
+            >{{ tr("即将上架", "Coming soon") }}</span
+          >
         </div>
         <div class="product-heading">
-          <h2>{{ tr(product.zh, product.en) }}</h2>
-          <button
-            class="add-product icon-button"
-            @click="add(product.id)"
-            :disabled="(cart[product.id] || 0) >= 20 || completed || submitting"
-            :aria-label="
-              tr(
-                `将${product.zh}加入清单`,
-                `Add ${product.en} to your selection`,
-              )
-            "
+          <h2>{{ tr(p.zh, p.en) }}</h2>
+          <strong
+            v-if="p.active && p.price_cents !== null"
+            class="product-price"
+            >{{ money(p.price_cents) }}</strong
           >
-            <PhCheck v-if="lastAdded === product.id" /><PhPlus v-else />
-          </button>
         </div>
-        <p>{{ tr(product.detailZh, product.detailEn) }}</p>
-        <div class="product-price">
-          {{ tr("款式与价格请询店主", "Ask us about options & pricing") }}
-        </div>
+        <p>{{ tr(p.detailZh, p.detailEn) }}</p>
+        <button
+          class="button button-outline full-button"
+          :disabled="
+            !p.active ||
+            p.price_cents === null ||
+            !p.available_stock ||
+            !catalog?.checkout_ready
+          "
+          @click="add(p.id)"
+        >
+          <template v-if="lastAdded === p.id"
+            >{{ tr("已加入，再添一件", "Added · Add another")
+            }}<PhCheck /></template
+          ><template v-else-if="p.active && p.price_cents !== null"
+            >{{
+              p.available_stock
+                ? tr("加入购物车", "Add to bag")
+                : tr("暂时售罄", "Sold out")
+            }}<PhPlus /></template
+          ><template v-else
+            >{{ tr("小物整理中", "Getting things ready") }}<PhPlus
+          /></template>
+        </button>
       </article>
     </div>
-    <p class="sr-only" role="status">
-      {{ lastAdded ? tr("已加入选购清单", "Added to your selection") : "" }}
-      {{ cartCount }}
-    </p>
-  </section>
-  <section id="selection" class="container selection-section section-space">
-    <div class="selection-heading">
-      <PhShoppingBagOpen :size="35" weight="light" />
-      <h2>{{ tr("你的选购清单", "Your little selection.") }}</h2>
+    <div class="shop-visit-bridge">
       <p>
         {{
           tr(
-            "清单里的小物，等你到店带走。",
-            "A few little things to pick up at the studio.",
+            "想在工作室度过一个下午？",
+            "Rather make a little afternoon of it?",
           )
         }}
       </p>
-      <p class="fine-print">
-        {{
-          tr(
-            "当前按需询单，不在线收款。确认款式、库存和价格后再安排自提。",
-            "This is a pickup inquiry. There is no online payment. We will confirm options, availability and pricing first.",
-          )
-        }}
-      </p>
-    </div>
-    <div class="selection-content">
-      <div v-if="!cartCount && !completed" class="empty-selection">
-        <PhShoppingBagOpen :size="50" weight="light" />
-        <h3>{{ tr("这里还空着。", "A little space for your favourites.") }}</h3>
-        <p>
-          {{
-            tr(
-              "挑到喜欢的，点一下小加号，就会出现在这里。",
-              "Find something you like above and tap the plus to add it here.",
-            )
-          }}
-        </p>
-        <a class="text-link" href="#main"
-          >{{ tr("继续挑选", "Find a little something") }}<PhArrowUpRight
-        /></a>
-      </div>
-      <template v-else
-        ><div v-if="!completed" class="cart-lines">
-          <article
-            v-for="product in selected"
-            :key="product.id"
-            class="cart-line"
-          >
-            <img
-              :src="media(product.image)"
-              :alt="tr(product.zh, product.en)"
-              width="74"
-              height="88"
-            />
-            <div>
-              <h3>{{ tr(product.zh, product.en) }}</h3>
-              <span>{{ tr("价格待店主确认", "Price to be confirmed") }}</span>
-            </div>
-            <div class="quantity">
-              <button
-                type="button"
-                class="icon-button"
-                @click="changeQuantity(product.id, -1)"
-                :disabled="submitting"
-                :aria-label="
-                  tr(`减少${product.zh}的数量`, `Decrease ${product.en}`)
-                "
-              >
-                <PhMinus :size="16" /></button
-              ><span>{{ cart[product.id] }}</span
-              ><button
-                class="icon-button"
-                type="button"
-                @click="changeQuantity(product.id, 1)"
-                :disabled="cart[product.id] >= 20 || submitting"
-                :aria-label="
-                  tr(`增加${product.zh}的数量`, `Increase ${product.en}`)
-                "
-              >
-                <PhPlus :size="16" />
-              </button>
-            </div>
-          </article>
-        </div>
-        <InquiryForm
-          kind="pickup"
-          :items="items"
-          :summary="summary"
-          @complete="done"
-          @busy="submitting = $event"
-      /></template>
+      <RouterLink to="/visit" class="text-link"
+        >{{ tr("选一个到店时段", "Choose a studio visit") }}<PhArrowRight
+      /></RouterLink>
     </div>
   </section>
 </template>

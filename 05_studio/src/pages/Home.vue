@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import {
   PhArrowDown,
   PhArrowRight,
@@ -11,14 +11,21 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import PhotoViewer from "../components/PhotoViewer.vue";
 import { gallery, mapsUrl, media, socialUrl, tr, wechat } from "../state";
+import { catalog, loadCatalog } from "../commerce";
 
 gsap.registerPlugin(ScrollTrigger);
 const page = ref<HTMLElement>();
 const viewer = ref<InstanceType<typeof PhotoViewer>>();
 const copied = ref(false);
+const hourlyPrice = computed(
+  () => catalog.value?.products.find((p) => p.id === "hourly")?.price_cents,
+);
 let motion: gsap.MatchMedia | undefined;
 let copyTimer: ReturnType<typeof setTimeout> | undefined;
 onMounted(() => {
+  loadCatalog().catch(() => {
+    /* The visit page offers a retry if the catalog is unavailable. */
+  });
   motion = gsap.matchMedia();
   motion.add(
     "(prefers-reduced-motion: no-preference)",
@@ -250,9 +257,8 @@ async function copyContact() {
         <div class="visit-price">
           <span>{{ tr("按时体验", "Pay by the hour") }}</span>
           <div>
-            <sup>CA$</sup>8<span>{{
-              tr("/ 人 / 小时", "/ person / hour")
-            }}</span>
+            <sup>CA$</sup>{{ hourlyPrice ? hourlyPrice / 100 : "—"
+            }}<span>{{ tr("/ 人 / 小时", "/ person / hour") }}</span>
           </div>
         </div>
         <div class="visit-inclusions">
@@ -284,8 +290,8 @@ async function copyContact() {
         <p class="fine-print">
           {{
             tr(
-              "也有全天体验。时间、费用与具体服务以店主确认为准。",
-              "Day passes are also available. Timing, pricing and included services are confirmed by the host.",
+              "也有单人和双人全天体验。选好可用时段，付款后即确认座位。",
+              "Day passes for one or two are also available. Choose an available time; payment confirms your seats.",
             )
           }}
         </p>
@@ -316,8 +322,8 @@ async function copyContact() {
         <p>
           {{
             tr(
-              "想在家继续拼？来小店挑工具、补颜色，或聊聊一份专属的手作。先选好，我们再一起确认，到店带走。",
-              "Keep making at home. Explore tools, top up your colours, or ask about a custom piece. Pick your favourites and we will arrange your studio pickup.",
+              "想在家继续拼？来小店挑工具、补颜色，选一份喜欢的手作。放进购物车，付款后到店带走。",
+              "Keep making at home. Explore tools, top up your colours, or choose a handmade piece. Add your favourites to your bag, pay online and collect at the studio.",
             )
           }}
         </p>
@@ -354,8 +360,8 @@ async function copyContact() {
           <p>
             {{
               tr(
-                "这里是预约制的 Home Studio。具体到店时间、楼层和停车安排，请先与店主确认；收到确认后再出发。",
-                "We are a home studio and welcome visits by appointment. Please confirm your time, arrival details and parking with the host before setting off.",
+                "这里是预约制的 Home Studio。请按付款成功后订单中确认的时段到店；楼层和停车安排，请提前联系店主。",
+                "We welcome visits by appointment. Arrive at the time confirmed on your paid order, and check arrival and parking details with the host beforehand.",
               )
             }}
           </p>
