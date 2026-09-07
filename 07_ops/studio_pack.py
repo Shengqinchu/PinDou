@@ -1,0 +1,30 @@
+"""Package only the studio build/service and record hashes for the origin deployer."""
+import hashlib
+import io
+import json
+import tarfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+root = Path(__file__).resolve().parents[1]
+out = root / 'artifacts/studio-release'
+out.mkdir(parents=True, exist_ok=True)
+version = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') + '-studio-v1'
+dist = root / '05_studio/dist'
+if not (dist / 'index.html').is_file():
+    raise SystemExit('Build the studio frontend first.')
+files = {'site/studio/' + p.relative_to(dist).as_posix(): p for p in dist.rglob('*') if p.is_file()}
+for name in ['app.py', 'requirements.txt', 'requirements.lock.txt']:
+    files['service/' + name] = root / '06_studio' / name
+manifest = {'version': version, 'sha256': {name: hashlib.sha256(p.read_bytes()).hexdigest() for name, p in files.items()}}
+archive = out / (version + '.tar.gz')
+with tarfile.open(archive, 'x:gz') as tar:
+    for name, p in files.items():
+        tar.add(p, arcname=name)
+    data = json.dumps(manifest, indent=2).encode()
+    info = tarfile.TarInfo('manifest.json')
+    info.size = len(data)
+    tar.addfile(info, io.BytesIO(data))
+result = {'version': version, 'archive': str(archive), 'sha256': hashlib.sha256(archive.read_bytes()).hexdigest(), 'files': len(files)}
+(out / 'latest.json').write_text(json.dumps(result, indent=2), encoding='utf8')
+print(json.dumps(result, indent=2))

@@ -1,0 +1,24 @@
+---
+name: pindou-studio-design
+description: Design and refine the PinDou Puppy Hamilton studio website, its bilingual visit and pickup flows, and photo-led editorial sections while preserving the existing pattern generator. Use for this project's studio frontend and design reviews.
+---
+
+# PinDou Puppy studio design
+
+The project root is `C:/Users/123/Desktop/PinDou`. Read `02_product/STUDIO_V1.md` for business truth and `03_design/STUDIO_DESIGN.md` for the current visual direction there. The studio frontend lives in `05_studio`; the incumbent generator is in `05_web` and must remain accessible.
+
+Use the owner's actual photographs. Observe their spatial rhythm and colour relationships before choosing layout. A photo plus abstract colour composition may support the page, but must not redraw or misrepresent the studio. Image editing or new bitmap compositions use the available imagegen tool.
+
+Design the landing as an invitation to make something: spacious photography and purposeful text. Design booking and pickup as practical forms: visible labels, clear validation, an honest summary, and a real completion state. These two surfaces need different density.
+
+Keep Vue for this project. Source and install a library before importing it; use GSAP with a scoped context / matchMedia and dispose it on unmount. Preserve native scroll, readable content without animation, and prefers-reduced-motion.
+
+Use project colour and typography tokens. Draw imagery and supporting colours from the supplied room and materials. Check Chinese wrapping and English length separately; switching languages must preserve the in-progress form and selection.
+
+Booking dates are Hamilton local dates, with timezone America/Toronto. A requested time is not verified availability. Do not invent seat counts, schedules, parking claims, reviews, inventory, or paid orders. Unknown prices use an inquiry flow and an explicit pending confirmation state.
+
+Preserve old generator routes, shared API routes and existing uncommitted work. Deploy studio previews additively under /studio/ on the existing server. Read the current ops runbook and verify the live Nginx rules before routing changes.
+
+Verify desktop and phone layouts together, including keyboard focus, modal closing if used, failed submissions, cart persistence and timezone boundaries. Inspect the screenshots, batch fixes, then confirm only the changed or uncertain behavior. Record real unresolved business decisions separately from implementation defects.
+
+Research provenance and upstream sources are in `03_design/STUDIO_DESIGN.md`; this skill is a project-specific adaptation, not a copy of the upstream skill packages.

@@ -1,0 +1,27 @@
+{
+  "name": "pindou-puppy-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@fontsource/dm-serif-display": "^5.2.8",
+    "@fontsource-variable/outfit": "^5.2.8",
+    "@phosphor-icons/vue": "^2.2.1",
+    "gsap": "^3.13.0",
+    "vue": "^3.5.18",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vue-tsc": "^2.2.12",
+    "@playwright/test": "^1.55.0",
+    "@axe-core/playwright": "^4.10.2"
+  }
+}
