@@ -1,0 +1,2721 @@
+{
+  "revision": "be46a3d",
+  "description": "Before VISION2. Exact static tr() text pairs, including accessible names.",
+  "files": {
+    "admin.ts": [
+      [
+        "zh-CN",
+        "en-CA"
+      ]
+    ],
+    "App.vue": [
+      [
+        "首页",
+        "Home"
+      ],
+      [
+        "来拼豆吧",
+        "Come create"
+      ],
+      [
+        "拼豆小店",
+        "Little shop"
+      ],
+      [
+        "小狗日记",
+        "Studio journal"
+      ],
+      [
+        "跳到主要内容",
+        "Skip to content"
+      ],
+      [
+        "汉密尔顿的小小手作空间，请约好时间，欢迎来玩！",
+        "A little creative space in Hamilton. Book a time and come make something!"
+      ],
+      [
+        "小狗拼豆铺首页",
+        "Pindo Puppy home"
+      ],
+      [
+        "小狗拼豆铺",
+        "Pindo Puppy"
+      ],
+      [
+        "主要导航",
+        "Main navigation"
+      ],
+      [
+        "切换为英文",
+        "Switch to Chinese"
+      ],
+      [
+        "英文",
+        "中文"
+      ],
+      [
+        "网站菜单",
+        "Site menu"
+      ],
+      [
+        "慢慢逛，慢慢拼。",
+        "A little time to explore."
+      ],
+      [
+        "关闭菜单",
+        "Close menu"
+      ],
+      [
+        "网站导航",
+        "Site navigation"
+      ],
+      [
+        "拼豆铺详细信息",
+        "Studio details"
+      ],
+      [
+        "拼豆图纸生成器",
+        "Pattern maker"
+      ],
+      [
+        "店主管理",
+        "Studio desk"
+      ],
+      [
+        "小狗拼豆铺",
+        "Pindo Puppy"
+      ],
+      [
+        "属于你，独一无二的拼豆体验",
+        "A bead-making experience, uniquely yours."
+      ],
+      [
+        "来这里",
+        "Come by"
+      ],
+      [
+        "预约到店",
+        "Book a visit"
+      ],
+      [
+        "拼豆铺详细信息",
+        "Studio details"
+      ],
+      [
+        "保持联系",
+        "Say hello"
+      ],
+      [
+        "小红书 · 小狗双吉",
+        "Xiaohongshu"
+      ],
+      [
+        "微信号：",
+        "WeChat: "
+      ],
+      [
+        "小小工具箱",
+        "The toolbox"
+      ],
+      [
+        "拼豆图纸生成器",
+        "Pattern maker"
+      ],
+      [
+        "图纸工具教程",
+        "Pattern maker guide"
+      ]
+    ],
+    "browser.ts": [],
+    "build.d.ts": [],
+    "commerce.ts": [
+      [
+        "暂时连接不上，请检查网络后重试。",
+        "We could not connect. Check your connection and try again."
+      ],
+      [
+        "请使用管理员账号重新登录。",
+        "Please sign in with your administrator account."
+      ],
+      [
+        "操作较多，请稍后再试。",
+        "Too many requests. Please try again later."
+      ],
+      [
+        "请检查必填项、日期和时间，修正后再试。",
+        "Check the required fields, dates and times, then try again."
+      ],
+      [
+        "暂时未能完成，请重试。",
+        "We could not complete this. Please try again."
+      ]
+    ],
+    "components/admin/ActivityPanel.vue": [
+      [
+        "每一次更改，都有来处",
+        "A RECORD OF EVERY CHANGE"
+      ],
+      [
+        "操作记录",
+        "Activity"
+      ],
+      [
+        "查看订单处理、商品调整和排班变更。",
+        "Review order handling, product updates and schedule changes."
+      ],
+      [
+        "刷新",
+        "Refresh"
+      ],
+      [
+        "操作记录会留在这里",
+        "Your activity will appear here"
+      ],
+      [
+        "保存设置、处理订单后，就能看到对应记录。",
+        "After saving settings or handling an order, its record appears here."
+      ],
+      [
+        "自动处理",
+        "Automatic"
+      ],
+      [
+        "查看修改前后",
+        "View before and after"
+      ],
+      [
+        "修改前",
+        "Before"
+      ],
+      [
+        "修改后",
+        "After"
+      ],
+      [
+        "上一页",
+        "Previous page"
+      ],
+      [
+        "下一页",
+        "Next page"
+      ]
+    ],
+    "components/admin/CheckoutPanel.vue": [
+      [
+        "让每一次付款，清清楚楚",
+        "CLEAR PRICES, SIMPLE CHECKOUT"
+      ],
+      [
+        "收款设置",
+        "Checkout settings"
+      ],
+      [
+        "加元标价、人民币付款。确认好最终金额，再开放小店。",
+        "Price in Canadian dollars, collect in Chinese yuan. Confirm the final amounts before opening."
+      ],
+      [
+        "虎皮椒收银台",
+        "Hupijiao checkout"
+      ],
+      [
+        "电脑扫码，手机进入收银台；支付结果自动核实。",
+        "Scan on desktop or open the cashier on mobile. Payment is verified automatically."
+      ],
+      [
+        "已连接",
+        "Connected"
+      ],
+      [
+        "尚未连接",
+        "Not connected"
+      ],
+      [
+        "标价与付款汇率",
+        "Display & payment currency"
+      ],
+      [
+        "每笔订单创建时固定汇率，之后修改不会改变旧订单。",
+        "The rate is locked when an order is created. Later changes do not affect existing orders."
+      ],
+      [
+        "1 加元兑换人民币",
+        "CNY per 1 CAD"
+      ],
+      [
+        "示例标价",
+        "Example listed price"
+      ],
+      [
+        "换算金额",
+        "Converted amount"
+      ],
+      [
+        "售价的税费方式",
+        "How prices include tax"
+      ],
+      [
+        "请选择实际经营使用的计税方式，客人会在结账前看到最终金额。",
+        "Choose the tax treatment you use. Customers see the final amount before payment."
+      ],
+      [
+        "税费方式",
+        "Tax treatment"
+      ],
+      [
+        "尚未确认",
+        "Not confirmed"
+      ],
+      [
+        "标价就是最终价（含税）",
+        "Prices are final (tax included)"
+      ],
+      [
+        "标价另加税费",
+        "Add tax to listed prices"
+      ],
+      [
+        "税率 %",
+        "Tax rate %"
+      ],
+      [
+        "确认后才能开放网上购买。",
+        "Confirm this before opening online purchases."
+      ],
+      [
+        "开放网上购买",
+        "Open online purchases"
+      ],
+      [
+        "体验还需设置真实营业时间和接待人数；实物需要已上架且有库存。",
+        "Visits also require opening hours and capacity. Physical products must be published and in stock."
+      ],
+      [
+        "开放网上购买",
+        "Open online purchases"
+      ],
+      [
+        "排班／收款设置有未保存的修改",
+        "Unsaved schedule or checkout changes"
+      ],
+      [
+        "所有修改已保存",
+        "All changes saved"
+      ],
+      [
+        "保存中…",
+        "Saving…"
+      ],
+      [
+        "保存设置",
+        "Save settings"
+      ]
+    ],
+    "components/admin/OrderDrawer.vue": [
+      [
+        "订单详情",
+        "Order details"
+      ],
+      [
+        "已完成",
+        "Fulfilled"
+      ],
+      [
+        "这笔订单已收款，但原座位或商品无法履约。请联系顾客安排改期或退款。",
+        "Payment was received, but the original seats or stock could not be fulfilled. Contact the customer to reschedule or arrange a refund."
+      ],
+      [
+        "顾客信息",
+        "Customer"
+      ],
+      [
+        "这份订单里",
+        "In this order"
+      ],
+      [
+        "人 · Hamilton 时间",
+        "guests · Hamilton time"
+      ],
+      [
+        "到店自提",
+        "Studio pickup"
+      ],
+      [
+        "加元合计",
+        "CAD total"
+      ],
+      [
+        "人民币实付",
+        "Amount in CNY"
+      ],
+      [
+        "内部备注",
+        "Staff note"
+      ],
+      [
+        "例如：已联系顾客、自提时间、特别安排",
+        "For example: contacted guest, pickup time, special arrangements"
+      ],
+      [
+        "订单记录",
+        "Order timeline"
+      ],
+      [
+        "自动处理",
+        "Automatic"
+      ],
+      [
+        "保存备注",
+        "Save note"
+      ],
+      [
+        "保存中…",
+        "Saving…"
+      ],
+      [
+        "恢复待完成",
+        "Reopen"
+      ],
+      [
+        "标记已到店／自提",
+        "Mark fulfilled"
+      ]
+    ],
+    "components/admin/OrdersPanel.vue": [
+      [
+        "付款日期",
+        "Payment date"
+      ],
+      [
+        "下单日期",
+        "Order date"
+      ],
+      [
+        "到店日期",
+        "Visit date"
+      ],
+      [
+        "每一份期待，都在这里",
+        "EVERY LITTLE PLAN"
+      ],
+      [
+        "订单管理",
+        "Orders"
+      ],
+      [
+        "找到一笔订单，查看到店安排，或记录一次顺利的自提。",
+        "Find an order, check a visit, or mark a happy pickup complete."
+      ],
+      [
+        "刷新订单",
+        "Refresh"
+      ],
+      [
+        "订单状态",
+        "Order status"
+      ],
+      [
+        "全部",
+        "All"
+      ],
+      [
+        "已收款",
+        "Paid"
+      ],
+      [
+        "待付款",
+        "Unpaid"
+      ],
+      [
+        "需跟进",
+        "Follow-up"
+      ],
+      [
+        "搜索订单或顾客",
+        "Search orders or customers"
+      ],
+      [
+        "搜索订单号、名字、联系方式",
+        "Order, name or contact"
+      ],
+      [
+        "清除搜索",
+        "Clear search"
+      ],
+      [
+        "内容",
+        "Type"
+      ],
+      [
+        "订单类型",
+        "Order type"
+      ],
+      [
+        "全部订单",
+        "All orders"
+      ],
+      [
+        "到店体验",
+        "Studio visit"
+      ],
+      [
+        "实物自提",
+        "Pickup items"
+      ],
+      [
+        "日期类型",
+        "Date basis"
+      ],
+      [
+        "日期类型",
+        "Date basis"
+      ],
+      [
+        "到店日期",
+        "Visit date"
+      ],
+      [
+        "下单日期",
+        "Order date"
+      ],
+      [
+        "付款日期",
+        "Payment date"
+      ],
+      [
+        "交付",
+        "Fulfillment"
+      ],
+      [
+        "交付状态",
+        "Fulfillment status"
+      ],
+      [
+        "全部",
+        "All"
+      ],
+      [
+        "待到店／自提",
+        "Awaiting visit / pickup"
+      ],
+      [
+        "已完成",
+        "Completed"
+      ],
+      [
+        "清除筛选",
+        "Clear filters"
+      ],
+      [
+        "正在查找…",
+        "Finding orders…"
+      ],
+      [
+        "重试",
+        "Try again"
+      ],
+      [
+        "没有找到匹配的订单",
+        "No matching orders"
+      ],
+      [
+        "第一份期待，还在路上。",
+        "The first little plan is on its way."
+      ],
+      [
+        "新订单会出现在这里；付款后自动确认座位和商品。",
+        "New orders appear here. Payment automatically confirms seats and items."
+      ],
+      [
+        "顾客 / 订单",
+        "Customer / order"
+      ],
+      [
+        "内容与到店安排",
+        "Items & visit"
+      ],
+      [
+        "状态",
+        "Status"
+      ],
+      [
+        "实付 · 人民币",
+        "Paid amount · CNY"
+      ],
+      [
+        "查看订单",
+        "View order"
+      ],
+      [
+        "人",
+        "guests"
+      ],
+      [
+        "到店自提",
+        "Studio pickup"
+      ],
+      [
+        "已完成",
+        "Fulfilled"
+      ],
+      [
+        "已完成",
+        "Fulfilled"
+      ],
+      [
+        "人",
+        "guests"
+      ],
+      [
+        "第",
+        "Page"
+      ],
+      [
+        "上一页",
+        "Previous page"
+      ],
+      [
+        "下一页",
+        "Next page"
+      ]
+    ],
+    "components/admin/OverviewPanel.vue": [
+      [
+        "连接收款账户",
+        "Connect your payment account"
+      ],
+      [
+        "虎皮椒收银台",
+        "Hupijiao checkout"
+      ],
+      [
+        "安排营业时间和座位",
+        "Set opening hours and seats"
+      ],
+      [
+        "每周排班和接待人数",
+        "Weekly hours and capacity"
+      ],
+      [
+        "确认售价与税费",
+        "Confirm prices and tax"
+      ],
+      [
+        "让客人看到最终实付金额",
+        "Show the final amount customers pay"
+      ],
+      [
+        "小狗拼豆铺 · 店主工作台",
+        "PINDOU PUPPY · STUDIO DESK"
+      ],
+      [
+        "店里的今天",
+        "Today, at puppy."
+      ],
+      [
+        "先看今天的安排，再处理新的订单。",
+        "Today’s visits, new orders and the things that need you."
+      ],
+      [
+        "查看今日排班",
+        "Today’s schedule"
+      ],
+      [
+        "查看付款后需要重新安排的订单。",
+        "Review payments that need a new arrangement."
+      ],
+      [
+        "查看订单",
+        "Review orders"
+      ],
+      [
+        "今日到店人数",
+        "Guests booked today"
+      ],
+      [
+        "已付款确认的座位",
+        "Paid and confirmed seats"
+      ],
+      [
+        "今日新订单",
+        "New orders today"
+      ],
+      [
+        "按 Hamilton 当地日期统计",
+        "Counted by Hamilton local date"
+      ],
+      [
+        "今日已收款",
+        "Payments received today"
+      ],
+      [
+        "人民币 · 已核实到账",
+        "CNY · Verified payments"
+      ],
+      [
+        "待到店／自提",
+        "Awaiting visit or pickup"
+      ],
+      [
+        "已付款，等待到店或自提",
+        "Paid, awaiting visit or pickup"
+      ],
+      [
+        "今日安排",
+        "TODAY AT THE STUDIO"
+      ],
+      [
+        "今天，谁来玩？",
+        "Who is coming by?"
+      ],
+      [
+        "查看排班",
+        "Schedule"
+      ],
+      [
+        "人 · 到店体验",
+        "guests · Studio visit"
+      ],
+      [
+        "已到店",
+        "Visited"
+      ],
+      [
+        "已确认",
+        "Confirmed"
+      ],
+      [
+        "付款中",
+        "Paying"
+      ],
+      [
+        "今天还没有到店安排",
+        "No visits booked for today"
+      ],
+      [
+        "已确认的体验和付款中的座位会显示在这里。",
+        "Confirmed visits and seats held for payment appear here."
+      ],
+      [
+        "去安排营业时间",
+        "Set your studio hours"
+      ],
+      [
+        "最近的订单",
+        "Recent orders"
+      ],
+      [
+        "全部订单",
+        "All orders"
+      ],
+      [
+        "收到第一笔订单后，就会在这里看到它。",
+        "Your first order will appear here when it arrives."
+      ],
+      [
+        "开店配置已完成",
+        "Studio setup complete"
+      ],
+      [
+        "开店前，还需要这些准备",
+        "A few things before opening"
+      ],
+      [
+        "网上购买已开放",
+        "Online purchases are open"
+      ],
+      [
+        "网上购买尚未开放",
+        "Online purchases are not open yet"
+      ]
+    ],
+    "components/admin/ProductsPanel.vue": [
+      [
+        "每件小物，都有自己的位置",
+        "LITTLE THINGS, WELL ARRANGED"
+      ],
+      [
+        "商品与体验",
+        "Products & experiences"
+      ],
+      [
+        "定价、库存、上架状态，在这里一起照看。",
+        "Look after your prices, inventory and published products in one place."
+      ],
+      [
+        "添加商品",
+        "Add product"
+      ],
+      [
+        "商品类别",
+        "Product category"
+      ],
+      [
+        "全部",
+        "All"
+      ],
+      [
+        "到店体验",
+        "Visits"
+      ],
+      [
+        "小物",
+        "Items"
+      ],
+      [
+        "待上架",
+        "Drafts"
+      ],
+      [
+        "搜索商品名称",
+        "Search products"
+      ],
+      [
+        "搜索商品",
+        "Search products"
+      ],
+      [
+        "到店体验",
+        "Studio experience"
+      ],
+      [
+        "到店自提",
+        "Studio pickup"
+      ],
+      [
+        "待定价",
+        "Not priced"
+      ],
+      [
+        "/ 人 / 小时",
+        "/ person / hour"
+      ],
+      [
+        "/ 套餐",
+        "/ pass"
+      ],
+      [
+        "已上架",
+        "Published"
+      ],
+      [
+        "待上架",
+        "Draft"
+      ],
+      [
+        "没有找到这件小物",
+        "No matching products"
+      ],
+      [
+        "换个名字搜搜，或者添加一件新商品。",
+        "Try another name or add a new product."
+      ],
+      [
+        "添加商品",
+        "Add product"
+      ],
+      [
+        "商品编辑 · 关闭后保留本次草稿",
+        "PRODUCT EDITOR · DRAFT KEPT WHILE OPEN IN THIS DESK"
+      ],
+      [
+        "当前商品图片",
+        "Current product photo"
+      ],
+      [
+        "上架出售",
+        "Published for sale"
+      ],
+      [
+        "待上架",
+        "Draft"
+      ],
+      [
+        "使用工作室实拍",
+        "Photographed at the studio"
+      ],
+      [
+        "中文名称",
+        "Chinese name"
+      ],
+      [
+        "英文名称",
+        "English name"
+      ],
+      [
+        "售价 · CA$",
+        "Price · CA$"
+      ],
+      [
+        "剩余库存",
+        "Remaining inventory"
+      ],
+      [
+        "分类",
+        "Category"
+      ],
+      [
+        "工具与配件",
+        "Tools & fittings"
+      ],
+      [
+        "拼豆补充装",
+        "Bead refills"
+      ],
+      [
+        "手作成品",
+        "Finished pieces"
+      ],
+      [
+        "商品照片",
+        "Product photo"
+      ],
+      [
+        "工作室",
+        "Studio"
+      ],
+      [
+        "日记",
+        "Journal"
+      ],
+      [
+        "中文说明",
+        "Chinese description"
+      ],
+      [
+        "英文说明",
+        "English description"
+      ],
+      [
+        "上架出售",
+        "Publish for sale"
+      ],
+      [
+        "填写售价后即可上架；实物还需要有库存。",
+        "Set a price to publish. Physical items also need stock."
+      ],
+      [
+        "上架出售",
+        "Publish for sale"
+      ],
+      [
+        "重新载入已保存版本",
+        "Reload the saved version"
+      ],
+      [
+        "订单中的历史价格保持不变",
+        "Existing order prices stay unchanged"
+      ],
+      [
+        "保存中…",
+        "Saving…"
+      ],
+      [
+        "保存商品",
+        "Save product"
+      ]
+    ],
+    "components/admin/ReservationsPanel.vue": [
+      [
+        "待确认",
+        "Pending"
+      ],
+      [
+        "已确认",
+        "Confirmed"
+      ],
+      [
+        "已完成",
+        "Completed"
+      ],
+      [
+        "已取消",
+        "Cancelled"
+      ],
+      [
+        "照顾好每一次期待",
+        "A LITTLE CARE FOR EVERY VISIT"
+      ],
+      [
+        "预约日历",
+        "Reservation calendar"
+      ],
+      [
+        "预约管理",
+        "Studio reservations"
+      ],
+      [
+        "先核对时间和同行人数，再联系客人确认。这里的预约无需在线付款。",
+        "Review the time and group size, then contact your guest and confirm. These reservations do not require online payment."
+      ],
+      [
+        "刷新",
+        "Refresh"
+      ],
+      [
+        "等待确认",
+        "Waiting for you"
+      ],
+      [
+        "已确认预约",
+        "Confirmed visits"
+      ],
+      [
+        "已完成到访",
+        "Completed visits"
+      ],
+      [
+        "选择预约日期",
+        "Choose reservation date"
+      ],
+      [
+        "同一时段只接待一组",
+        "One group at a time"
+      ],
+      [
+        "开启后，确认一组会关闭重叠时段；待确认申请不会占用时段。",
+        "When enabled, a confirmed group closes overlapping times. Pending requests do not hold a time."
+      ],
+      [
+        "同一时段只接待一组",
+        "One group at a time"
+      ],
+      [
+        "预约状态",
+        "Status"
+      ],
+      [
+        "全部",
+        "All"
+      ],
+      [
+        "到店日期",
+        "Visit date"
+      ],
+      [
+        "姓名或预约编号",
+        "Name or reference"
+      ],
+      [
+        "清除筛选",
+        "Clear filters"
+      ],
+      [
+        "正在查看预约……",
+        "Loading reservations…"
+      ],
+      [
+        "这里还没有预约",
+        "No reservations here yet"
+      ],
+      [
+        "顾客提交后，就可以在这里核对并确认安排。",
+        "When a guest submits a request, you can review and confirm it here."
+      ],
+      [
+        "人",
+        "guests"
+      ],
+      [
+        "上一页",
+        "Previous"
+      ],
+      [
+        "共",
+        "Total"
+      ],
+      [
+        "份预约",
+        "reservations"
+      ],
+      [
+        "下一页",
+        "Next"
+      ],
+      [
+        "预约详情",
+        "Reservation details"
+      ],
+      [
+        "到访",
+        "Visit"
+      ],
+      [
+        "体验与人数",
+        "Experience and guests"
+      ],
+      [
+        "全天体验",
+        "Day visit"
+      ],
+      [
+        "按时体验",
+        "Hourly visit"
+      ],
+      [
+        "人",
+        "guests"
+      ],
+      [
+        "联系方式",
+        "Contact"
+      ],
+      [
+        "微信",
+        "WeChat"
+      ],
+      [
+        "电话",
+        "Phone"
+      ],
+      [
+        "邮箱",
+        "Email"
+      ],
+      [
+        "其他",
+        "Other"
+      ],
+      [
+        "客人留言",
+        "Guest note"
+      ],
+      [
+        "保存会更新客人结果页；请用以上联系方式另行通知客人。",
+        "Saving updates the guest's result page. Please also contact the guest using the details above."
+      ],
+      [
+        "更新预约状态",
+        "Update reservation status"
+      ],
+      [
+        "更新预约状态",
+        "Update reservation status"
+      ],
+      [
+        "店内备注（客人不可见）",
+        "Staff note (private)"
+      ],
+      [
+        "暂不更改",
+        "Close"
+      ],
+      [
+        "保存中……",
+        "Saving…"
+      ],
+      [
+        "保存安排",
+        "Save arrangement"
+      ]
+    ],
+    "components/admin/SchedulePanel.vue": [
+      [
+        "zh-CN",
+        "en-CA"
+      ],
+      [
+        "给每一位客人，留好位置",
+        "A PLACE FOR EVERY GUEST"
+      ],
+      [
+        "到店排班",
+        "Studio schedule"
+      ],
+      [
+        "营业时间决定可选时段，已确认的订单会自动出现在日历里。",
+        "Opening hours determine available times. Confirmed orders appear in your calendar automatically."
+      ],
+      [
+        "当地时间",
+        "Local time"
+      ],
+      [
+        "未来七天",
+        "Seven days at a glance"
+      ],
+      [
+        "前七天",
+        "Previous seven days"
+      ],
+      [
+        "日历开始日期",
+        "Calendar start date"
+      ],
+      [
+        "后七天",
+        "Next seven days"
+      ],
+      [
+        "未开放",
+        "Not open"
+      ],
+      [
+        "人",
+        "guests"
+      ],
+      [
+        "已到店",
+        "Visited"
+      ],
+      [
+        "已确认",
+        "Confirmed"
+      ],
+      [
+        "付款中暂留",
+        "Payment hold"
+      ],
+      [
+        "已确认到店",
+        "Confirmed visit"
+      ],
+      [
+        "付款中暂留",
+        "Held during payment"
+      ],
+      [
+        "每周营业安排",
+        "Weekly opening hours"
+      ],
+      [
+        "开启营业日，再设定开始与结束时间。",
+        "Open a day, then set its start and finish time."
+      ],
+      [
+        "营业",
+        "Open"
+      ],
+      [
+        "不开放",
+        "Closed"
+      ],
+      [
+        "接待安排",
+        "Seating & notice"
+      ],
+      [
+        "最多同时接待人数",
+        "Maximum guests at a time"
+      ],
+      [
+        "还没确定时保持 0，不会开放可购买座位。",
+        "Leave at 0 until decided. No seats will be available to buy."
+      ],
+      [
+        "至少提前多少分钟预订",
+        "Minimum booking notice (minutes)"
+      ],
+      [
+        "特别日期",
+        "Date exceptions"
+      ],
+      [
+        "添加特别日期",
+        "Add a date exception"
+      ],
+      [
+        "临时休息、节假日营业，都可以单独安排。",
+        "Add a day off or special opening hours for a holiday."
+      ],
+      [
+        "特别日期",
+        "Exception date"
+      ],
+      [
+        "该日期营业",
+        "Open on this date"
+      ],
+      [
+        "移除特别日期",
+        "Remove exception"
+      ],
+      [
+        "特别日期开门时间",
+        "Special opening time"
+      ],
+      [
+        "特别日期打烊时间",
+        "Special closing time"
+      ],
+      [
+        "这一天不开放预订",
+        "Bookings are closed on this date"
+      ],
+      [
+        "排班／收款设置有未保存的修改",
+        "Unsaved schedule or checkout changes"
+      ],
+      [
+        "所有修改已保存",
+        "All changes saved"
+      ],
+      [
+        "保存中…",
+        "Saving…"
+      ],
+      [
+        "保存设置",
+        "Save settings"
+      ]
+    ],
+    "components/AutoHeight.vue": [],
+    "components/BeadMark.vue": [],
+    "components/CommerceManager.vue": [
+      [
+        "zh-CN",
+        "en-CA"
+      ],
+      [
+        "店主工作台导航",
+        "Studio desk navigation"
+      ],
+      [
+        "小狗拼豆铺",
+        "Pindo Puppy"
+      ],
+      [
+        "小狗拼豆铺 · 店主工作台",
+        "YOUR STUDIO, IN GOOD HANDS"
+      ],
+      [
+        "关闭后台导航",
+        "Close desk navigation"
+      ],
+      [
+        "我的工作室",
+        "YOUR WORKSPACE"
+      ],
+      [
+        "后台导航",
+        "Studio desk navigation"
+      ],
+      [
+        "预约由店主确认",
+        "Visits confirmed by the host"
+      ],
+      [
+        "看看我的网站",
+        "View your website"
+      ],
+      [
+        "退出登录",
+        "Sign out"
+      ],
+      [
+        "店主工作台",
+        "Studio desk"
+      ],
+      [
+        "关闭导航",
+        "Close navigation"
+      ],
+      [
+        "打开后台导航",
+        "Open desk navigation"
+      ],
+      [
+        "店主工作台",
+        "Studio desk"
+      ],
+      [
+        "刷新概览",
+        "Refresh overview"
+      ],
+      [
+        "切换为英文",
+        "Switch to Chinese"
+      ],
+      [
+        "双吉",
+        "P"
+      ],
+      [
+        "商城暂缓开放，这里保留交易资料。新版到店安排请在预约管理和预约日历处理。",
+        "The shop is paused. Commerce records remain here; manage new visits in Reservations and Visit calendar."
+      ],
+      [
+        "重新加载",
+        "Try again"
+      ],
+      [
+        "保留从前的安排",
+        "EARLIER ARRANGEMENTS"
+      ],
+      [
+        "历史预约与询单",
+        "Earlier requests"
+      ],
+      [
+        "上线购物车之前留下的预约和自提意向。",
+        "Visit and pickup inquiries received before online checkout."
+      ]
+    ],
+    "components/InquiryForm.vue": [
+      [
+        "结束时间需要晚于开始时间，请调整后提交。",
+        "Please choose an end time after your start time."
+      ],
+      [
+        "提交失败，请稍后重试。",
+        "Please try again in a moment."
+      ],
+      [
+        "收到你的小计划了。",
+        "Your little plan is with us."
+      ],
+      [
+        "这是待店主确认的意向。请保留编号，我们会通过你填写的联系方式确认安排。",
+        "This is a request awaiting the host’s confirmation. Keep your reference. We will use the contact details you provided to confirm the arrangements."
+      ],
+      [
+        "复制意向编号",
+        "Copy request reference"
+      ],
+      [
+        "尚未锁定座位或库存，也未收取费用。需要补充信息时，可微信联系：",
+        "No seats or stock have been reserved and no payment has been taken. To add anything, find us on WeChat: "
+      ],
+      [
+        "回小屋逛逛",
+        "Back to the studio"
+      ],
+      [
+        "怎么称呼你？",
+        "A little about you."
+      ],
+      [
+        "你的称呼",
+        "Your name"
+      ],
+      [
+        "让我们知道怎么称呼你",
+        "What should we call you?"
+      ],
+      [
+        "联系途径",
+        "Contact me by"
+      ],
+      [
+        "微信",
+        "WeChat"
+      ],
+      [
+        "电子邮箱",
+        "Email"
+      ],
+      [
+        "电话 / 短信",
+        "Phone / text"
+      ],
+      [
+        "微信号",
+        "WeChat ID"
+      ],
+      [
+        "电子邮箱",
+        "Email address"
+      ],
+      [
+        "联系电话",
+        "Phone number"
+      ],
+      [
+        "仅用于联系并确认这次安排",
+        "Only used to arrange this request"
+      ],
+      [
+        "想提前告诉我们的事（选填）",
+        "Anything else? (optional)"
+      ],
+      [
+        "第一次拼豆、想做的图案、同行安排，或其他需要……",
+        "Your first visit, a pattern you have in mind, or anything you need…"
+      ],
+      [
+        "色号、数量、喜欢的款式、希望自提的时间……",
+        "Colour codes, preferred styles, quantities or a pickup date…"
+      ],
+      [
+        "提交前，再看一眼",
+        "Your request at a glance"
+      ],
+      [
+        "价格、时间及具体安排，以店主后续确认为准。",
+        "Prices, timing and details are subject to the host’s confirmation."
+      ],
+      [
+        "我理解这是一份待确认的意向，并同意店主使用上述联系方式沟通本次安排。",
+        "I understand this is a request, and agree that the host may use my contact details to arrange this visit or pickup."
+      ],
+      [
+        "正在提交…",
+        "Sending…"
+      ],
+      [
+        "提交预约意向",
+        "Send visit request"
+      ],
+      [
+        "提交自提询单",
+        "Send pickup inquiry"
+      ],
+      [
+        "联系信息仅供店主处理本次请求。提交后无需在线付款；收到确认后再到店。",
+        "Contact details are only used by the host to handle this request. No online payment is required. Please wait for confirmation before visiting."
+      ]
+    ],
+    "components/PhotoViewer.vue": [
+      [
+        "这张照片暂时没能加载，请重试。",
+        "This photo could not load. Please try again."
+      ],
+      [
+        "工作室照片",
+        "Studio photograph"
+      ],
+      [
+        "小屋里的日常",
+        "A little look around"
+      ],
+      [
+        "关闭照片",
+        "Close photograph"
+      ],
+      [
+        "重试",
+        "Try again"
+      ],
+      [
+        "正在载入照片…",
+        "Loading photo…"
+      ],
+      [
+        "上一张",
+        "Previous photo"
+      ],
+      [
+        "下一张",
+        "Next photo"
+      ]
+    ],
+    "components/ReleaseNotice.vue": [
+      [
+        "重新载入",
+        "Reload page"
+      ]
+    ],
+    "components/ReservationCalendar.vue": [
+      [
+        "zh-CN",
+        "en-CA"
+      ],
+      [
+        "这里无法安排至少两小时，请选择更早或其他可用时段。",
+        "Choose an earlier or another available time for a visit of at least two hours."
+      ],
+      [
+        "上一周",
+        "Previous week"
+      ],
+      [
+        "未来两周",
+        "The next two weeks"
+      ],
+      [
+        "下一周",
+        "Next week"
+      ],
+      [
+        "可以申请",
+        "Available to request"
+      ],
+      [
+        "已选时段",
+        "Your selection"
+      ],
+      [
+        "不可预约",
+        "Unavailable"
+      ],
+      [
+        "点击开始时间，默认选择两小时；再点同一天较晚的格子可延长。手机可左右滑动查看日期。",
+        "Choose a start time for a two-hour visit, then a later cell to extend it. Swipe sideways on a phone to see more dates."
+      ],
+      [
+        "预约时间表，使用方向键移动，回车选择",
+        "Reservation timetable. Use arrow keys to move and Enter to select."
+      ],
+      [
+        "时间",
+        "Time"
+      ],
+      [
+        "可选",
+        "available"
+      ],
+      [
+        "不可预约",
+        "unavailable"
+      ],
+      [
+        "开始",
+        "Start"
+      ],
+      [
+        "结束",
+        "End"
+      ],
+      [
+        "均为汉密尔顿当地时间。每天 10:00–22:00；周三 16:00 后、周四 18:00 后不可预约。",
+        "All times are local to Hamilton. Daily 10am–10pm; unavailable after 4pm on Wednesdays and 6pm on Thursdays."
+      ]
+    ],
+    "components/SegmentedControl.vue": [],
+    "components/SlideOver.vue": [
+      [
+        "关闭详情",
+        "Close details"
+      ]
+    ],
+    "components/StudioCarousel.vue": [
+      [
+        "工作室照片，可左右滑动",
+        "Studio photographs. Swipe or use the arrow keys."
+      ],
+      [
+        "放大这张照片",
+        "Enlarge this photograph"
+      ],
+      [
+        "上一张空间照片",
+        "Previous studio photo"
+      ],
+      [
+        "下一张空间照片",
+        "Next studio photo"
+      ]
+    ],
+    "components/StudioToast.vue": [
+      [
+        "去看看",
+        "View bag"
+      ],
+      [
+        "关闭提示",
+        "Dismiss notification"
+      ]
+    ],
+    "components/ToggleSwitch.vue": [],
+    "main.ts": [],
+    "modal.ts": [],
+    "motion.ts": [],
+    "pages/Cart.vue": [
+      [
+        "你的购物车",
+        "Your bag."
+      ],
+      [
+        "一个下午，几件小物。所有期待，一起结账。",
+        "An afternoon, a few little things. Everything you are looking forward to, together."
+      ],
+      [
+        "上次结账尚未返回结果，请先恢复订单。",
+        "Your previous checkout has not returned a result. Please recover it first."
+      ],
+      [
+        "恢复刚才的结账",
+        "Resume checkout"
+      ],
+      [
+        "可爱的拼豆作品",
+        "Little handmade bead creations"
+      ],
+      [
+        "还空着，刚刚好。",
+        "Room for something lovely."
+      ],
+      [
+        "从一次到店体验，或一件喜欢的小物开始。",
+        "Start with a studio visit, or a little thing you love."
+      ],
+      [
+        "选到店体验",
+        "Choose a visit"
+      ],
+      [
+        "逛逛小店",
+        "Browse the shop"
+      ],
+      [
+        "查看最近的订单",
+        "View your recent order"
+      ],
+      [
+        "我的购物车",
+        "Your bag"
+      ],
+      [
+        "项心意",
+        "little things"
+      ],
+      [
+        "到店体验",
+        "STUDIO VISIT"
+      ],
+      [
+        "到店自提",
+        "STUDIO PICKUP"
+      ],
+      [
+        "人",
+        "guests"
+      ],
+      [
+        "选择其他时段",
+        "Choose another time"
+      ],
+      [
+        "减少数量",
+        "Decrease quantity"
+      ],
+      [
+        "增加数量",
+        "Increase quantity"
+      ],
+      [
+        "从购物车移除",
+        "Remove from bag"
+      ],
+      [
+        "再逛一会儿",
+        "Keep looking around"
+      ],
+      [
+        "留个名字，见面时好认出你。",
+        "A name, so we know who to welcome."
+      ],
+      [
+        "你的称呼",
+        "Your name"
+      ],
+      [
+        "联系方式",
+        "Contact method"
+      ],
+      [
+        "微信",
+        "WeChat"
+      ],
+      [
+        "电子邮箱",
+        "Email"
+      ],
+      [
+        "电话",
+        "Phone"
+      ],
+      [
+        "微信号",
+        "WeChat ID"
+      ],
+      [
+        "邮箱地址",
+        "Email address"
+      ],
+      [
+        "电话号码",
+        "Phone number"
+      ],
+      [
+        "想提前告诉我们的事（选填）",
+        "Anything you would like us to know? (Optional)"
+      ],
+      [
+        "小物采用到店自提；购买后联系店主安排取货。",
+        "Shop items are for studio pickup. Contact the host after purchase to arrange collection."
+      ],
+      [
+        "我已核对时段、商品及实付金额，同意使用以上联系方式处理本次订单。",
+        "I have checked the time, items and payment total, and agree to be contacted about this order."
+      ],
+      [
+        "准备好，就出发。",
+        "Ready when you are."
+      ],
+      [
+        "加元标价 · 人民币付款",
+        "Priced in CAD · Paid in CNY"
+      ],
+      [
+        "商品与体验",
+        "Items & experiences"
+      ],
+      [
+        "税费",
+        "Tax"
+      ],
+      [
+        "合计",
+        "Total"
+      ],
+      [
+        "（已含税）",
+        " (tax included)"
+      ],
+      [
+        "本次实付 · 人民币",
+        "You pay · Chinese yuan"
+      ],
+      [
+        "上次核对金额 · 正在更新",
+        "Previous quote · Updating"
+      ],
+      [
+        "正在核对价格与空位…",
+        "Checking prices and availability…"
+      ],
+      [
+        "重新核对",
+        "Check again"
+      ],
+      [
+        "正在准备收银台…",
+        "Preparing your payment…"
+      ],
+      [
+        "去付款",
+        "Continue to payment"
+      ],
+      [
+        "恢复刚才的结账",
+        "Resume checkout"
+      ],
+      [
+        "虎皮椒收银台",
+        "Hupijiao checkout"
+      ],
+      [
+        "座位在付款期间短暂保留。付款成功后，订单和到店时段立即确认。",
+        "Your seats are held briefly during payment. Successful payment confirms your order and visit time."
+      ]
+    ],
+    "pages/Details.vue": [
+      [
+        "到访之前，先认识一下小屋",
+        "A LITTLE KNOW-HOW BEFORE YOU VISIT"
+      ],
+      [
+        "拼豆铺详细信息",
+        "A little guide to the studio"
+      ],
+      [
+        "怎么来、在哪里停车，以及来拼豆时我们为你准备的小事。",
+        "Getting here, finding parking, and the little things we have ready for you."
+      ],
+      [
+        "店铺信息目录",
+        "Studio information sections"
+      ],
+      [
+        "地址与交通",
+        "Getting here"
+      ],
+      [
+        "停车指引",
+        "Parking"
+      ],
+      [
+        "拼豆铺服务",
+        "At the studio"
+      ],
+      [
+        "温馨提示",
+        "Good to know"
+      ],
+      [
+        "在市中心，等你来。",
+        "Find us downtown."
+      ],
+      [
+        "位于汉密尔顿市中心，公交与城际公共交通可达。",
+        "In downtown Hamilton, accessible by local buses and GO Transit."
+      ],
+      [
+        "预约到访，可比约定时间稍早一点到。",
+        "Visits are by appointment. You are welcome to arrive a little before your confirmed time."
+      ],
+      [
+        "窗边明亮的拼豆工作台",
+        "Light-filled worktables by the studio window"
+      ],
+      [
+        "来时路上的小安排",
+        "ON YOUR WAY HERE"
+      ],
+      [
+        "停车指引",
+        "A place to park"
+      ],
+      [
+        "楼下有免费的访客停车位，一般工作日有空位，实际以到访时情况为准。",
+        "Free visitor parking is available downstairs, usually with space on weekdays. Availability can vary when you arrive."
+      ],
+      [
+        "访客停车入口",
+        "Visitor parking entrance"
+      ],
+      [
+        "访客停车位置",
+        "Visitor parking location"
+      ],
+      [
+        "指引照片即将补充",
+        "Photograph to follow"
+      ],
+      [
+        "附近也可以停车",
+        "Nearby parking options"
+      ],
+      [
+        "带上喜欢的图，其他慢慢来",
+        "BRING A PATTERN YOU LOVE"
+      ],
+      [
+        "拼豆铺服务",
+        "Made comfortable, made yours"
+      ],
+      [
+        "自己的座位与工具",
+        "Your own place to create"
+      ],
+      [
+        "舒适的老板椅、独立座位，一组客人一套拼豆，无需拼桌或共用豆子。桌上配齐工具，操作台的备用工具也可自行取用；缺豆时告诉店主即可。",
+        "A comfortable chair, an individual seat and a set of beads for your group. Tools are ready on the table, with spares at the workbench. Ask the host whenever you need more beads."
+      ],
+      [
+        "特殊烫与不同纹理",
+        "Textures and finishing touches"
+      ],
+      [
+        "店主持续研究不同烫法。中小图熨烫、小图特殊烫免费；超过 78 格的大图需额外收费。想要的风格，可以先一起聊聊。",
+        "We keep exploring different ironing techniques. Small and medium pieces, including special finishes for small pieces, are ironed free. Larger pieces over 78 grid spaces carry an extra charge, discussed beforehand."
+      ],
+      [
+        "把作品变成小物",
+        "Little things to take with you"
+      ],
+      [
+        "常规冰箱贴、手机链和挂件制作免费，风铃等复杂款式另计费用。店里也有相框、毛毡板等可现场选购。额外收费都会事先说明，征得你的同意后再做。",
+        "Standard magnets, phone straps and charms are finished free. Complex pieces such as wind chimes cost extra. Frames and felt boards are also available in the studio. We explain any extra charge and ask you before proceeding."
+      ],
+      [
+        "自在待一会儿",
+        "Settle in for a while"
+      ],
+      [
+        "店里备有零食、水果和饮用水。当天没拼完的图案，可以在店内存放，最长保留 5 天。",
+        "Snacks, fruit and drinking water are available. If you do not finish your pattern that day, we can keep it in the studio for up to five days."
+      ],
+      [
+        "温馨提示",
+        "A few little notes"
+      ],
+      [
+        "关于豆子和手作纹理",
+        "Beads and handmade finishes"
+      ],
+      [
+        "个别豆子可能有混色、毛刺或静电等出厂情况，通常不影响熨烫。手作熨烫可能留下少量纤维或纹理痕迹；很在意细节的话，可以自行烫豆，店里提供工具。",
+        "Occasional mixed colours, burrs or static are normal material variations and usually do not affect ironing. Handmade finishes may have small fibres or texture marks. If you prefer to iron your own piece, tools are available."
+      ],
+      [
+        "让工作台保持整齐",
+        "Keeping the worktable lovely"
+      ],
+      [
+        "请采用正常逐颗拼豆的方式，不使用撒豆等非常规操作。撒落或混合的豆子需自行整理，或另付清洁费用；如需收费，会先和你确认。",
+        "Please place beads individually rather than scattering them. Spilled or mixed beads need to be sorted, or a cleaning fee may apply. Any fee is discussed with you first."
+      ],
+      [
+        "实际时长与分享优惠",
+        "Time and sharing perks"
+      ],
+      [
+        "计时以实际拼豆时长为准，超出 15 分钟按半小时计。介绍新朋友消费、分享体验（例如小红书）有九折或小礼物等安排，具体适用方式请与店主确认。",
+        "Hourly visits are measured by actual making time; more than 15 minutes counts as half an hour. Referring a new friend or sharing your experience can qualify for a 10% discount or a small gift. Ask the host which offer applies."
+      ],
+      [
+        "小红书 · 小狗双吉",
+        "Find our journal on Xiaohongshu"
+      ],
+      [
+        "微信号：",
+        "WeChat: "
+      ]
+    ],
+    "pages/Home.vue": [
+      [
+        "加拿大 · 安大略省 · 汉密尔顿",
+        "Hamilton, Ontario, Canada"
+      ],
+      [
+        "属于你的",
+        "A little time. All yours."
+      ],
+      [
+        "全新拼豆手作体验",
+        "Make something lovely."
+      ],
+      [
+        "也许是一个下午，几件小物，与自己独处的温馨时间。",
+        "An afternoon, a few little things, and a warm moment to yourself."
+      ],
+      [
+        "欢迎光临小狗拼豆铺。也许是某个下午吧，选自己喜欢的图，坐进阳光里，把一颗颗豆子，变成独属于你的快乐。",
+        "Welcome to Pindo Puppy. Spend an afternoon in the sunshine, choose a pattern you love, and turn tiny beads into a little happiness of your own."
+      ],
+      [
+        "小狗拼豆铺的白色工作台、拼豆作品墙与自然光",
+        "Sunlit worktables and a wall of bead art at Pindo Puppy"
+      ],
+      [
+        "来拼豆吧",
+        "Come create"
+      ],
+      [
+        "拼豆小店",
+        "Little shop"
+      ],
+      [
+        "一人放空",
+        "Time for yourself"
+      ],
+      [
+        "朋友一起",
+        "Friends together"
+      ],
+      [
+        "手工制作",
+        "Made by hand"
+      ],
+      [
+        "欢迎来到小狗拼豆铺",
+        "WELCOME TO PINDO PUPPY"
+      ],
+      [
+        "小小工作坊，",
+        "A little workshop."
+      ],
+      [
+        "创造无限可爱手作。",
+        "Endless lovely possibilities."
+      ],
+      [
+        "这是一个家庭工作坊，我们把家里的一个房间，慢慢变成了拼豆小屋。",
+        "We turned a room in our home into a little workshop for making things with beads."
+      ],
+      [
+        "你可以来体验拼豆，也可以购置自己的拼豆工具；你可以买下拼豆作品，也可以定制独一无二的图案。",
+        "Come for a bead-making experience, pick up tools for home, choose a handmade piece, or talk to us about a pattern made just for you."
+      ],
+      [
+        "一个人来，安安静静地拼；或者约上朋友，边聊边做。",
+        "Come alone for a quiet moment, or bring a friend and catch up while you create."
+      ],
+      [
+        "在小狗拼豆铺慢下来吧，感受手工的快乐。",
+        "Slow down at Pindo Puppy and enjoy the simple pleasure of making by hand."
+      ],
+      [
+        "拼豆铺详细信息",
+        "Studio details"
+      ],
+      [
+        "快乐，有很多种形状。",
+        "Happiness takes many shapes."
+      ],
+      [
+        "翻翻小狗日记",
+        "Browse the studio journal"
+      ],
+      [
+        "给自己一点手作时间",
+        "MAKE A LITTLE TIME"
+      ],
+      [
+        "不如",
+        "How about"
+      ],
+      [
+        "来体验一下",
+        "giving it a try?"
+      ],
+      [
+        "预约一次拼豆",
+        "Book a bead-making visit"
+      ],
+      [
+        "独立座位，舒适的老板椅",
+        "A seat of your own and a comfortable chair"
+      ],
+      [
+        "一组客人一套拼豆，自由轻松",
+        "Your group, your own set of beads"
+      ],
+      [
+        "工具齐全，选好图纸慢慢拼",
+        "All the tools you need; choose a pattern and take your time"
+      ],
+      [
+        "多种特殊烫，实现不同纹理",
+        "Special ironing techniques for different textures"
+      ],
+      [
+        "工作室的挂件与手作配件",
+        "Charms and craft fittings in the studio"
+      ],
+      [
+        "拼豆小店",
+        "THE LITTLE SHOP"
+      ],
+      [
+        "或者",
+        "Or take a little"
+      ],
+      [
+        "直接带回家",
+        "happiness home."
+      ],
+      [
+        "功能尚在开发中，敬请期待……",
+        "Our little shop is still taking shape. Coming soon…"
+      ],
+      [
+        "看看小店",
+        "Visit the little shop"
+      ]
+    ],
+    "pages/Journal.vue": [
+      [
+        "小屋里的，",
+        "Life in our"
+      ],
+      [
+        "那些小快乐。",
+        "little studio."
+      ],
+      [
+        "墙上的新作品、桌上的新颜色，以及每一个认真拼豆的下午。这里的照片，都是小狗拼豆铺的真实日常。",
+        "New pieces on the wall, new colours on the table, and afternoons well spent. Real photographs from everyday life at Pindo Puppy."
+      ],
+      [
+        "去小红书看更多日常",
+        "More stories on Xiaohongshu"
+      ],
+      [
+        "工作室相册",
+        "Studio gallery"
+      ]
+    ],
+    "pages/Manage.vue": [
+      [
+        "待确认",
+        "Pending"
+      ],
+      [
+        "已确认",
+        "Confirmed"
+      ],
+      [
+        "已完成",
+        "Completed"
+      ],
+      [
+        "已取消",
+        "Cancelled"
+      ],
+      [
+        "登录失败，请检查现有后台账号和密码。",
+        "Sign-in failed. Check your existing administrator credentials."
+      ],
+      [
+        "暂时无法登录。",
+        "Could not sign in."
+      ],
+      [
+        "加载失败。",
+        "Could not load requests."
+      ],
+      [
+        "未能保存。记录可能已在另一处更新，请刷新核对后重试。",
+        "Could not save. This request may have changed elsewhere. Refresh and check before retrying."
+      ],
+      [
+        "小狗拼豆铺",
+        "Pindo Puppy"
+      ],
+      [
+        "小狗拼豆铺",
+        "A LITTLE CREATIVE STUDIO"
+      ],
+      [
+        "小狗拼豆铺工作室",
+        "Pindo Puppy studio"
+      ],
+      [
+        "每一份期待，值得好好照顾。",
+        "Every little plan deserves a little care."
+      ],
+      [
+        "汉密尔顿 · 安大略省",
+        "Hamilton, Ontario"
+      ],
+      [
+        "欢迎回到小狗拼豆铺",
+        "WELCOME BACK TO YOUR STUDIO"
+      ],
+      [
+        "你好，店主。",
+        "Hello, studio owner."
+      ],
+      [
+        "登录后，照看订单、安排座位，再给小店添一点可爱。",
+        "Sign in to look after orders, arrange seats and add something lovely to your little shop."
+      ],
+      [
+        "管理员账号",
+        "Administrator account"
+      ],
+      [
+        "密码",
+        "Password"
+      ],
+      [
+        "正在登录…",
+        "Signing in…"
+      ],
+      [
+        "进入工作台",
+        "Open studio desk"
+      ],
+      [
+        "使用现有拼豆后台的管理员账号。",
+        "Use your existing PinDou administrator account."
+      ],
+      [
+        "返回网站",
+        "Back to the website"
+      ],
+      [
+        "请求状态",
+        "Request status"
+      ],
+      [
+        "全部",
+        "All requests"
+      ],
+      [
+        "刷新",
+        "Refresh"
+      ],
+      [
+        "条请求",
+        "requests"
+      ],
+      [
+        "保存状态不会自动通知顾客。请使用请求中留下的联系方式确认，内部备注仅店主可见。",
+        "Saving a status does not notify the guest. Contact them using the details they provided. Staff notes are private."
+      ],
+      [
+        "这里暂时没有请求。",
+        "No requests here yet."
+      ],
+      [
+        "到店预约",
+        "Visit"
+      ],
+      [
+        "自提询单",
+        "Pickup"
+      ],
+      [
+        "人",
+        "guests"
+      ],
+      [
+        "zh",
+        "en"
+      ],
+      [
+        "更新状态",
+        "Update status"
+      ],
+      [
+        "内部备注",
+        "Staff note"
+      ],
+      [
+        "确认的费用、时间或处理记录",
+        "Agreed price, timing or follow-up"
+      ],
+      [
+        "保存安排",
+        "Save arrangement"
+      ],
+      [
+        "上一页",
+        "Previous"
+      ],
+      [
+        "下一页",
+        "Next"
+      ]
+    ],
+    "pages/NotFound.vue": [
+      [
+        "这颗豆子，",
+        "This little bead"
+      ],
+      [
+        "好像滚远了。",
+        "rolled away."
+      ],
+      [
+        "没有找到这个页面。回小屋看看吧。",
+        "We could not find that page. Let us take you back to the studio."
+      ],
+      [
+        "回到小屋",
+        "Back to the studio"
+      ]
+    ],
+    "pages/Order.vue": [
+      [
+        "请在下单时使用的浏览器中查看这个订单。",
+        "Please use the browser in which you placed this order."
+      ],
+      [
+        "返回购物车",
+        "Back to your bag"
+      ],
+      [
+        "重试",
+        "Try again"
+      ],
+      [
+        "已经为你，",
+        "A little joy,"
+      ],
+      [
+        "留好了。",
+        "all yours."
+      ],
+      [
+        "最后一步，",
+        "One last step,"
+      ],
+      [
+        "快乐就近了。",
+        "then something lovely."
+      ],
+      [
+        "款项已收到，但付款确认时原时段或库存已不可用。请联系店主安排改期或退款，不要重复付款。",
+        "Payment was received, but the original time or stock was no longer available when confirmed. Contact the host to reschedule or arrange a refund. Please do not pay again."
+      ],
+      [
+        "付款窗口已关闭，座位已释放。若已经扣款，请联系店主核实后再尝试。",
+        "The payment window has closed and the seats have been released. If you were charged, contact the host before trying again."
+      ],
+      [
+        "正在核实付款结果，请稍候。已付款的话无需再付一次。",
+        "We are checking the payment result. If you have already paid, please do not pay again."
+      ],
+      [
+        "暂未能创建收银台，可以回到购物车重新尝试。",
+        "The cashier could not be created. You can return to your bag and try again."
+      ],
+      [
+        "人民币实付",
+        "Total in Chinese yuan"
+      ],
+      [
+        "虎皮椒付款二维码",
+        "Hupijiao payment QR code"
+      ],
+      [
+        "二维码暂时无法加载，请稍后刷新。",
+        "The payment QR could not load. Please refresh shortly."
+      ],
+      [
+        "用手机扫描二维码付款，完成后本页会自动确认。",
+        "Scan with your phone to pay. This page will confirm automatically."
+      ],
+      [
+        "将在当前微信窗口打开收银台，付款后返回此页查看确认。",
+        "Checkout opens in this WeChat window. Return here after payment to see your confirmation."
+      ],
+      [
+        "打开虎皮椒收银台",
+        "Open Hupijiao checkout"
+      ],
+      [
+        "付款完成后返回此页查看确认。",
+        "Return here after paying to view confirmation."
+      ],
+      [
+        "请在电脑端打开此订单，扫描二维码付款。",
+        "Open this order on a desktop to scan the payment QR."
+      ],
+      [
+        "重新核对购物车",
+        "Review your bag again"
+      ],
+      [
+        "刷新付款状态",
+        "Refresh payment status"
+      ],
+      [
+        "联系店主 · 微信",
+        "Contact the host · WeChat"
+      ],
+      [
+        "订单明细",
+        "Order details"
+      ],
+      [
+        "人",
+        "guests"
+      ],
+      [
+        "Hamilton 当地时间",
+        "Hamilton local time"
+      ],
+      [
+        "到店自提 · 请联系店主安排取货",
+        "Studio pickup · Contact the host to arrange collection"
+      ],
+      [
+        "税费",
+        "Tax"
+      ],
+      [
+        "加元合计",
+        "CAD total"
+      ],
+      [
+        "人民币实付",
+        "Payment in CNY"
+      ],
+      [
+        "汇率已固定",
+        "Rate locked for this order"
+      ],
+      [
+        "正在读取订单…",
+        "Loading your order…"
+      ]
+    ],
+    "pages/ReservationReceipt.vue": [
+      [
+        "已提交预约，",
+        "Your request is in."
+      ],
+      [
+        "等待店主确认",
+        "The host will confirm it."
+      ],
+      [
+        "预约成功，",
+        "Your visit is confirmed."
+      ],
+      [
+        "等你来玩！",
+        "See you at the studio!"
+      ],
+      [
+        "谢谢你来，",
+        "Thank you for coming."
+      ],
+      [
+        "下次再一起拼。",
+        "Let's make again soon."
+      ],
+      [
+        "这次预约已取消",
+        "This reservation was cancelled"
+      ],
+      [
+        "店主会尽快查看安排，确认后即预约成功。把这页留在当前浏览器，可以随时查看状态。",
+        "The host will review your plans as soon as possible. Your visit is booked once confirmed. Keep this page in the same browser to check its status."
+      ],
+      [
+        "客人",
+        "Guest"
+      ],
+      [
+        "到店时间",
+        "Visit time"
+      ],
+      [
+        "汉密尔顿当地时间",
+        "Hamilton local time"
+      ],
+      [
+        "同行人数",
+        "Guests"
+      ],
+      [
+        "人",
+        "guests"
+      ],
+      [
+        "体验",
+        "Experience"
+      ],
+      [
+        "全天体验",
+        "Day visit"
+      ],
+      [
+        "按时体验",
+        "Hourly visit"
+      ],
+      [
+        "欢迎来玩，先看看小屋的到访和停车信息吧。",
+        "We look forward to seeing you. Take a look at the studio and parking details before you come."
+      ],
+      [
+        "拼豆铺详细信息",
+        "Studio details"
+      ],
+      [
+        "正在查看预约……",
+        "Loading your reservation…"
+      ],
+      [
+        "刷新预约状态",
+        "Refresh reservation"
+      ],
+      [
+        "如需调整安排，请联系店主。微信号：",
+        "For changes, contact the host on WeChat: "
+      ]
+    ],
+    "pages/Shop.vue": [
+      [
+        "拼豆小店",
+        "THE LITTLE SHOP"
+      ],
+      [
+        "把小小的喜欢，",
+        "Little things,"
+      ],
+      [
+        "慢慢准备好。",
+        "worth waiting for."
+      ],
+      [
+        "尚在开发，敬请期待。",
+        "Still in the making. Coming soon."
+      ],
+      [
+        "回首页逛逛",
+        "Back to the studio"
+      ],
+      [
+        "拼豆铺里分类收纳的手作配件",
+        "A collection of little craft fittings in the studio"
+      ]
+    ],
+    "pages/Visit.vue": [
+      [
+        "之前选择的时段已不可预约，请重新选择。",
+        "Your previous time is no longer available. Please choose again."
+      ],
+      [
+        "留一点时间，做喜欢的小事",
+        "A LITTLE TIME FOR SOMETHING YOU LOVE"
+      ],
+      [
+        "来拼豆吧",
+        "Come make something"
+      ],
+      [
+        "选好体验和时间，告诉我们你和谁一起来。店主确认后，预约就安排好了。",
+        "Choose your experience and a time, then tell us who is coming. Your visit is booked when the host confirms it."
+      ],
+      [
+        "先选一种体验",
+        "Choose your experience"
+      ],
+      [
+        "按时体验",
+        "By the hour"
+      ],
+      [
+        "至少两小时，慢慢拼出喜欢的样子。",
+        "At least two hours to make something you love."
+      ],
+      [
+        "全天体验",
+        "A day of making"
+      ],
+      [
+        "从所选时间，拼到当天可预约时段结束。",
+        "From your chosen arrival until the end of that day's available hours."
+      ],
+      [
+        "储值优惠 · 到店了解",
+        "PREPAID HOURS · ASK IN THE STUDIO"
+      ],
+      [
+        "7 加元／小时",
+        "CA$7 / hour"
+      ],
+      [
+        "10 小时起，且储值时长不少于当日使用总时长的 2 倍。可当天使用，可多人共同使用。",
+        "Prepay at least 10 hours and at least twice the total hours used that day. Use them the same day and share them with your group."
+      ],
+      [
+        "仅作优惠说明，无需在此选择。",
+        "For information only; this is not a selectable plan."
+      ],
+      [
+        "挑一个合适的时间",
+        "Pick a time that feels right"
+      ],
+      [
+        "刷新时间表",
+        "Refresh timetable"
+      ],
+      [
+        "正在整理未来两周的时间……",
+        "Loading the next two weeks…"
+      ],
+      [
+        "重新加载",
+        "Try again"
+      ],
+      [
+        "你的时间",
+        "Your time"
+      ],
+      [
+        "请在时间表中选择",
+        "Choose a time in the timetable"
+      ],
+      [
+        "和谁一起来？",
+        "Who is coming along?"
+      ],
+      [
+        "同行人数（包括你自己）",
+        "Number of guests, including you"
+      ],
+      [
+        "我们会根据同行人数，由店主确认具体安排。",
+        "The host will confirm arrangements for your group."
+      ],
+      [
+        "客人名称",
+        "Guest name"
+      ],
+      [
+        "如已添加店主微信，可以填写微信名称，方便联系。",
+        "If you have added the host on WeChat, your WeChat name is helpful."
+      ],
+      [
+        "联系方式",
+        "Contact method"
+      ],
+      [
+        "微信",
+        "WeChat"
+      ],
+      [
+        "电话",
+        "Phone"
+      ],
+      [
+        "电子邮箱",
+        "Email"
+      ],
+      [
+        "其他方式",
+        "Another way"
+      ],
+      [
+        "微信号",
+        "WeChat ID"
+      ],
+      [
+        "电话号码",
+        "Phone number"
+      ],
+      [
+        "电子邮箱地址",
+        "Email address"
+      ],
+      [
+        "联系信息",
+        "Contact details"
+      ],
+      [
+        "想提前告诉我们的事（可选）",
+        "Anything you would like us to know? (optional)"
+      ],
+      [
+        "同意将以上信息用于本次预约联系。",
+        "I agree to use these details to arrange this visit."
+      ],
+      [
+        "已保留这次提交内容。请恢复预约结果，避免重复提交；如浏览器数据已清除，请联系店主查询。",
+        "Your submission is saved. Recover its result to avoid a duplicate. If browser data was cleared, ask the host to look it up."
+      ],
+      [
+        "正在提交……",
+        "Sending…"
+      ],
+      [
+        "恢复预约结果",
+        "Recover reservation"
+      ],
+      [
+        "提交预约",
+        "Request this visit"
+      ],
+      [
+        "提交后等待店主确认，无需在此付款。",
+        "Your request will wait for the host's confirmation. No payment is needed here."
+      ],
+      [
+        "店主微信：",
+        "Host WeChat: "
+      ]
+    ],
+    "reservations.ts": [],
+    "state.ts": [
+      [
+        "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
+        "Pindo Puppy · A little creative studio in Hamilton"
+      ],
+      [
+        "提交次数较多，请稍后再试，或通过微信联系店主。",
+        "Too many requests. Please try again later or contact us on WeChat."
+      ],
+      [
+        "请检查日期、时间和联系信息，再试一次。",
+        "Please check the date, time and contact details, then try again."
+      ],
+      [
+        "登录已过期或账号无管理权限，请重新登录。",
+        "Please sign in with an administrator account."
+      ],
+      [
+        "暂时未能提交，请重试或通过微信联系店主。",
+        "We could not complete that request. Please try again or contact us on WeChat."
+      ]
+    ],
+    "ui.ts": []
+  }
+}
