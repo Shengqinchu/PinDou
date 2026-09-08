@@ -46,7 +46,7 @@
 后端：在 `06_studio` 安装 requirements，设置 `STUDIO_DB_PATH` 后执行 `python -m uvicorn app:app --host 127.0.0.1 --port 8011`。
 测试：`python -m pytest -q`；交易界面完整测试使用本地 `python qa_server.py` 加 `node scripts/verify-commerce.mjs`，数据库与网关均为隔离测试。此测试入口只绑定 loopback，不打包到服务器。旧 `verify.mjs` / `verify-refinement.mjs` 部分选择器对应历史询单页；当前交易验收使用 `verify-commerce.mjs`。
 
-店主工作台与动效验收：`node scripts/verify-desk-motion.mjs`、`node scripts/verify-desk-resilience.mjs`，使用独立本地 QA 网关；前者包含测试数据写入，不能用于生产域名。生产只读检查使用 `verify-live.mjs` 和 `verify-commerce-live.mjs`，当前动效与微信适配细节见 `STUDIO_MOTION_V2_VERIFICATION.md`。补充检查：`verify-responsive-motion.mjs` 覆盖多引擎与断点，`verify-webview-lifecycle.mjs` 覆盖键盘／安全区／横竖屏与收银台入口，`verify-list-continuity.mjs` 检查快速筛选时的卡片位置。
+店主工作台与动效验收：`node scripts/verify-desk-motion.mjs`、`node scripts/verify-desk-resilience.mjs`，使用独立本地 QA 网关；前者包含测试数据写入，不能用于生产域名。生产只读检查使用 `verify-live.mjs` 和 `verify-commerce-live.mjs`。当前独立审查修正与发布记录见 `STUDIO_0830_VERIFICATION.md`；`STUDIO_MOTION_V2_VERIFICATION.md` 保留上一版历史。补充检查：`verify-responsive-motion.mjs` 覆盖多引擎与断点，`verify-webview-lifecycle.mjs` 覆盖键盘／安全区／横竖屏与收银台入口，`verify-list-continuity.mjs` 检查快速筛选时的卡片位置。0830 的具体复现与修正检查为 `verify-0830-fixes.mjs`、`verify-0830-layout.mjs`、`verify-0830-inputs.mjs`、`verify-0830-polish.mjs`；最后一项也可设置 `STUDIO_BROWSER=webkit` 检查 WebKit，均只用于本地 QA。
 
 开发机没有运行旧管理 API 时，本地管理员登录需要转发旧 `/api/v1/admin/login`；线上部署同源即可使用。
 
