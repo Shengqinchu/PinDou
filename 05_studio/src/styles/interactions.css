@@ -6,7 +6,7 @@
   min-height: 54px;
   padding: 12px 19px 12px 24px;
   border: 1px solid transparent;
-  border-radius: 13px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 450;
   line-height: 1.5;
@@ -22,8 +22,8 @@
 :root {
   --control-duration: 300ms;
   --control-ease: cubic-bezier(0.42, 0, 0.58, 1);
-  --control-shadow: 0 8px 18px -8px rgb(39 73 86 / 26%);
-  --control-shadow-hover: 0 14px 26px -10px rgb(39 73 86 / 35%);
+  --control-shadow: 0 8px 18px -8px rgb(41 42 43 / 26%);
+  --control-shadow-hover: 0 14px 26px -10px rgb(41 42 43 / 35%);
 }
 
 .button,
@@ -47,19 +47,18 @@
 }
 
 .button-primary {
-  color: var(--white);
-  background: #416f7d;
-  border-color: #365e69;
+  color: var(--ink);
+  background: #e7e4f4;
+  border-color: transparent;
   font-weight: 550;
   box-shadow:
-    inset 0 1px 0 #ffffff36,
-    0 4px 10px #29495614,
-    0 1px 3px #29495618;
+    inset 0 1px 0 #ffffffa6,
+    0 4px 10px #292a2b08;
 }
 .button-outline {
-  border-color: #b8cbd1;
-  background: rgb(255 253 247 / 42%);
-  box-shadow: 0 2px 4px rgb(39 63 72 / 4%);
+  border-color: #dddde2;
+  background: #fff;
+  box-shadow: 0 2px 4px rgb(41 42 43 / 4%);
 }
 
 .button > svg {
@@ -68,11 +67,11 @@
   height: 19px;
   padding: 6px;
   border-radius: 50%;
-  background: rgb(255 255 255 / 12%);
+  background: rgb(255 255 255 / 60%);
 }
 
 .button-outline > svg {
-  background: rgb(39 63 72 / 6%);
+  background: rgb(41 42 43 / 6%);
 }
 
 .button > svg,
@@ -124,7 +123,7 @@
 .plan-option.selected {
   border-color: var(--accent);
   background: #f1e7dc;
-  box-shadow: 0 4px 12px rgb(39 73 86 / 8%);
+  box-shadow: 0 4px 12px rgb(41 42 43 / 8%);
 }
 
 .plan-option:focus-within {
@@ -137,7 +136,7 @@
 }
 
 .photo-expand {
-  box-shadow: 0 3px 10px rgb(39 63 72 / 10%);
+  box-shadow: 0 3px 10px rgb(41 42 43 / 10%);
 }
 
 .shop-tabs button {
@@ -163,7 +162,7 @@
 .field > input:focus,
 .field > select:focus,
 .field > textarea:focus {
-  outline: 2px solid rgb(149 77 61 / 26%);
+  outline: 2px solid #a5a0b9;
   outline-offset: 2px;
   background-color: #fff;
 }
@@ -178,7 +177,7 @@
     box-shadow: var(--control-shadow-hover);
   }
   .button-primary:not(:disabled):hover {
-    background: #497c8a;
+    background: #ded9ef;
     box-shadow:
       inset 0 1px 0 #ffffff45,
       0 14px 26px -10px #2949564d,
@@ -186,9 +185,9 @@
   }
   .button-outline:not(:disabled):hover {
     color: var(--ink);
-    background: #f4f9fa;
-    border-color: #819fa9;
-    box-shadow: 0 9px 18px -8px rgb(39 63 72 / 23%);
+    background: #f7f6fa;
+    border-color: #b7b3c3;
+    box-shadow: 0 9px 18px -8px rgb(41 42 43 / 23%);
   }
   .button:not(:disabled):hover > svg {
     transform: translate3d(2px, -1px, 0);
@@ -199,7 +198,7 @@
   .menu-button:hover {
     transform: translate3d(0, -2px, 0);
     background: var(--soft);
-    box-shadow: 0 7px 13px -7px rgb(39 63 72 / 22%);
+    box-shadow: 0 7px 13px -7px rgb(41 42 43 / 22%);
   }
   .icon-button:not(:disabled):hover > svg {
     transform: translateY(-1px);
@@ -220,7 +219,7 @@
     transform: translate3d(0, -3px, 0) scale(1.006);
   }
   .plan-option:not(:has(:disabled)):hover {
-    box-shadow: 0 12px 20px -10px rgb(39 73 86 / 20%);
+    box-shadow: 0 12px 20px -10px rgb(41 42 43 / 20%);
     border-color: #bd8b73;
   }
   .photo-tile:hover .photo-tile-image > img {
@@ -243,7 +242,7 @@
   filter: none;
   box-shadow:
     inset 0 2px 5px rgb(60 29 17 / 20%),
-    0 3px 7px rgb(39 73 86 / 10%);
+    0 3px 7px rgb(41 42 43 / 10%);
 }
 
 .button:not(:disabled):active > svg,
@@ -257,7 +256,7 @@
 .bag-button:active,
 .menu-button:active {
   transform: translate3d(0, 1px, 0) scale(0.94);
-  box-shadow: inset 0 2px 4px rgb(39 63 72 / 12%);
+  box-shadow: inset 0 2px 4px rgb(41 42 43 / 12%);
 }
 
 .text-link:active,

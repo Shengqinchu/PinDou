@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import rates from "../content/experience-rates.json";
+import copyText from "../content/pages-Visit.json";
+import { say } from "../state";
+
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import {
@@ -8,7 +12,7 @@ import {
   PhSun,
 } from "@phosphor-icons/vue";
 import { commerceApi, CommerceError } from "../commerce";
-import { locale, prettyDate, tr, wechat } from "../state";
+import { locale, prettyDate, tr, wechat, phone, phoneHref } from "../state";
 import {
   reservationDraft as draft,
   readSession,
@@ -19,6 +23,7 @@ import {
   type Reservation,
 } from "../reservations";
 import ReservationCalendar from "../components/ReservationCalendar.vue";
+import AutoHeight from "../components/AutoHeight.vue";
 const router = useRouter(),
   calendar = ref<Calendar | null>(null),
   loading = ref(false),
@@ -31,6 +36,17 @@ const attempt = ref(
 );
 const locked = computed(() => sending.value || !!attempt.value);
 const selected = computed(() => validSelection(calendar.value, draft.booking));
+const dayClosing = computed(
+  () =>
+    calendar.value?.days.find((d) => d.date === draft.booking.date)?.close ||
+    "22:00",
+);
+watch(
+  () => draft.booking.guests,
+  () => {
+    if (!locked.value) load();
+  },
+);
 let sequence = 0,
   timer: ReturnType<typeof setInterval>,
   alive = true;
@@ -38,7 +54,12 @@ async function load() {
   const seq = ++sequence;
   loading.value = true;
   try {
-    const value = await commerceApi<Calendar>("/reservation-calendar");
+    const value = await commerceApi<Calendar>(
+      "/reservation-calendar?guests=" +
+        (Number.isInteger(draft.booking.guests) && draft.booking.guests > 0
+          ? draft.booking.guests
+          : 1),
+    );
     if (!alive || seq !== sequence) return;
     calendar.value = value;
     if (
@@ -48,9 +69,8 @@ async function load() {
     ) {
       draft.booking.start = "";
       draft.booking.end = "";
-      error.value = tr(
-        "之前选择的时段已不可预约，请重新选择。",
-        "Your previous time is no longer available. Please choose again.",
+      error.value = say(
+        copyText.your_previous_time_is_no_longer_available_9b5681,
       );
     }
   } catch (e) {
@@ -146,84 +166,108 @@ async function submit() {
 <template>
   <section class="reservation-page container">
     <header class="reservation-heading">
-      <p class="vision-eyebrow">
-        {{
-          tr("留一点时间，做喜欢的小事", "A LITTLE TIME FOR SOMETHING YOU LOVE")
-        }}
-      </p>
-      <h1>{{ tr("来拼豆吧", "Come make something") }}</h1>
+      <h1>{{ say(copyText.come_make_something_f834ec) }}</h1>
       <p>
-        {{
-          tr(
-            "选好体验和时间，告诉我们你和谁一起来。店主确认后，预约就安排好了。",
-            "Choose your experience and a time, then tell us who is coming. Your visit is booked when the host confirms it.",
-          )
-        }}
+        {{ say(copyText.choose_your_time_and_group_size_once_a1fdf7) }}
       </p>
     </header>
     <form @submit.prevent="submit" class="reservation-form">
       <fieldset class="reservation-plans" :disabled="locked">
-        <legend>{{ tr("先选一种体验", "Choose your experience") }}</legend>
+        <legend>{{ say(copyText.choose_your_experience_3c37df) }}</legend>
         <label :class="{ selected: draft.booking.plan === 'hourly' }"
           ><input
             v-model="draft.booking.plan"
             type="radio"
             value="hourly"
           /><PhClock :size="28" weight="light" /><strong>{{
-            tr("按时体验", "By the hour")
+            say(copyText.by_the_hour_5300b2)
           }}</strong
-          ><span>{{
-            tr(
-              "至少两小时，慢慢拼出喜欢的样子。",
-              "At least two hours to make something you love.",
-            )
-          }}</span></label
+          ><span>{{ say(copyText.at_least_two_hours_9f144b) }}</span
+          ><AutoHeight class="plan-price-reveal"
+            ><div
+              v-if="draft.booking.plan === 'hourly'"
+              class="reservation-plan-price"
+            >
+              <strong>CA${{ rates.hourly }}</strong
+              ><span>{{ say(copyText.hour_person_7ea78f) }}</span>
+            </div></AutoHeight
+          ></label
         ><label :class="{ selected: draft.booking.plan === 'day' }"
           ><input v-model="draft.booking.plan" type="radio" value="day" /><PhSun
             :size="28"
             weight="light"
-          /><strong>{{ tr("全天体验", "A day of making") }}</strong
-          ><span>{{
-            tr(
-              "从所选时间，拼到当天可预约时段结束。",
-              "From your chosen arrival until the end of that day's available hours.",
-            )
-          }}</span></label
+          /><strong>{{ say(copyText.a_day_of_making_01d6e2) }}</strong
+          ><span
+            >{{ say(copyText.make_from_your_chosen_arrival_until_37196a) }}
+            {{ dayClosing === "22:00" ? "10pm" : dayClosing
+            }}{{ say(copyText.label_1efc6a) }}</span
+          ><AutoHeight class="plan-price-reveal"
+            ><dl
+              v-if="draft.booking.plan === 'day'"
+              class="reservation-day-prices"
+            >
+              <div>
+                <dt>{{ say(copyText.one_guest_684bef) }}</dt>
+                <dd>CA${{ rates.day_one }}</dd>
+              </div>
+              <div>
+                <dt>{{ say(copyText.two_guests_65a259) }}</dt>
+                <dd>CA${{ rates.day_two }}</dd>
+              </div>
+              <div>
+                <dt>{{ say(copyText.three_guests_032d3f) }}</dt>
+                <dd>CA${{ rates.day_three }}</dd>
+              </div>
+            </dl></AutoHeight
+          ></label
         >
-        <aside class="reservation-credit">
-          <span class="vision-eyebrow">{{
-            tr("储值优惠 · 到店了解", "PREPAID HOURS · ASK IN THE STUDIO")
-          }}</span
-          ><strong>{{ tr("7 加元／小时", "CA$7 / hour") }}</strong>
-          <p>
-            {{
-              tr(
-                "10 小时起，且储值时长不少于当日使用总时长的 2 倍。可当天使用，可多人共同使用。",
-                "Prepay at least 10 hours and at least twice the total hours used that day. Use them the same day and share them with your group.",
-              )
-            }}
-          </p>
-          <small>{{
-            tr(
-              "仅作优惠说明，无需在此选择。",
-              "For information only; this is not a selectable plan.",
-            )
-          }}</small>
-        </aside>
+        <div class="reservation-offers">
+          <aside class="reservation-credit">
+            <span class="vision-eyebrow">{{
+              say(copyText.prepaid_hours_ask_in_the_studio_f180a7)
+            }}</span
+            ><strong>{{ say(copyText.ca7_hour_c87a20) }}</strong>
+            <p>
+              {{ say(copyText.prepay_at_least_10_hours_and_at_8815bf) }}
+            </p>
+            <small>{{
+              say(copyText.for_information_only_this_is_not_a_09a580)
+            }}</small>
+          </aside>
+          <aside class="reservation-credit reservation-school">
+            <span class="vision-eyebrow">{{
+              say(copyText.backtoschool_until_october_1_42119e)
+            }}</span
+            ><strong>CA${{ rates.school_two_four_hours }}</strong>
+            <p>{{ say(copyText.four_hours_of_making_for_two_8bb2b0) }}</p>
+            <strong
+              >CA${{ rates.school_card_holder }}
+              <small>{{ say(copyText.piece_ef469b) }}</small></strong
+            >
+            <p>
+              {{
+                say(copyText.bead_cardholder_package_no_makingtime_limit_92105b)
+              }}
+            </p>
+            <small>{{
+              say(copyText.for_information_only_this_is_not_a_09a580)
+            }}</small>
+          </aside>
+        </div>
       </fieldset>
       <section class="reservation-time">
         <div class="reservation-section-title">
           <div>
             <span>01</span>
             <h2>
-              {{ tr("挑一个合适的时间", "Pick a time that feels right") }}
+              {{ say(copyText.pick_a_time_that_feels_right_4b2e92) }}
             </h2>
           </div>
           <button
             type="button"
             class="icon-button"
             :disabled="loading || locked"
-            :aria-label="tr('刷新时间表', 'Refresh timetable')"
+            :aria-label="say(copyText.refresh_timetable_491b53)"
             @click="load"
           >
             <PhArrowClockwise :class="{ spinning: loading }" />
@@ -234,29 +278,29 @@ async function submit() {
           class="reservation-loading"
           role="status"
         >
-          {{ tr("正在整理未来两周的时间……", "Loading the next two weeks…") }}
+          {{ say(copyText.loading_the_next_two_weeks_842416) }}
         </p>
         <ReservationCalendar
           v-if="calendar"
           :calendar="calendar"
           :booking="draft.booking"
-          :disabled="loading || locked"
+          :disabled="loading || locked || !draft.booking.plan"
           @select="select"
         />
         <p v-if="!calendar && !loading" class="form-error" role="alert">
           {{ error }}
           <button type="button" class="text-link" @click="load">
-            {{ tr("重新加载", "Try again") }}
+            {{ say(copyText.try_again_014aa4) }}
           </button>
         </p>
         <div class="reservation-selection" aria-live="polite">
-          <span>{{ tr("你的时间", "Your time") }}</span
+          <span>{{ say(copyText.your_time_278568) }}</span
           ><strong v-if="selected"
             >{{ prettyDate(draft.booking.date) }} · {{ draft.booking.start }}–{{
               draft.booking.end
             }}</strong
           ><strong v-else>{{
-            tr("请在时间表中选择", "Choose a time in the timetable")
+            say(copyText.choose_a_time_in_the_timetable_d988a8)
           }}</strong>
         </div>
       </section>
@@ -264,30 +308,23 @@ async function submit() {
         <div class="reservation-section-title">
           <div>
             <span>02</span>
-            <h2>{{ tr("和谁一起来？", "Who is coming along?") }}</h2>
+            <h2>{{ say(copyText.who_is_coming_along_aa3fd9) }}</h2>
           </div>
         </div>
         <label class="field reservation-guests"
-          >{{ tr("同行人数（包括你自己）", "Number of guests, including you")
+          >{{ say(copyText.number_of_guests_including_you_fadbc4)
           }}<input
             v-model.number="draft.booking.guests"
             type="number"
             min="1"
-            max="20"
+            :max="calendar?.max_guests_per_group || 4"
             required
             :disabled="locked"
         /></label>
-        <p class="fine-print">
-          {{
-            tr(
-              "我们会根据同行人数，由店主确认具体安排。",
-              "The host will confirm arrangements for your group.",
-            )
-          }}
-        </p>
+
         <div class="reservation-contact-fields">
           <label class="field"
-            >{{ tr("客人名称", "Guest name")
+            >{{ say(copyText.guest_name_e468f6)
             }}<input
               v-model.trim="draft.name"
               autocomplete="name"
@@ -295,28 +332,27 @@ async function submit() {
               required
               :disabled="locked"
             /><small>{{
-              tr(
-                "如已添加店主微信，可以填写微信名称，方便联系。",
-                "If you have added the host on WeChat, your WeChat name is helpful.",
-              )
+              say(copyText.if_you_have_added_the_host_on_e3e883)
             }}</small></label
           ><label class="field"
-            >{{ tr("联系方式", "Contact method")
+            >{{ say(copyText.contact_method_73d70a)
             }}<select v-model="draft.contact_method" :disabled="locked">
-              <option value="wechat">{{ tr("微信", "WeChat") }}</option>
-              <option value="phone">{{ tr("电话", "Phone") }}</option>
-              <option value="email">{{ tr("电子邮箱", "Email") }}</option>
-              <option value="other">{{ tr("其他方式", "Another way") }}</option>
+              <option value="wechat">{{ say(copyText.wechat_2941d2) }}</option>
+              <option value="phone">{{ say(copyText.phone_ac7a62) }}</option>
+              <option value="email">{{ say(copyText.email_b6d15f) }}</option>
+              <option value="other">
+                {{ say(copyText.another_way_f489b4) }}
+              </option>
             </select></label
           ><label class="field"
             >{{
               draft.contact_method === "wechat"
-                ? tr("微信号", "WeChat ID")
+                ? say(copyText.wechat_id_7a6e86)
                 : draft.contact_method === "phone"
-                  ? tr("电话号码", "Phone number")
+                  ? say(copyText.phone_number_15447d)
                   : draft.contact_method === "email"
-                    ? tr("电子邮箱地址", "Email address")
-                    : tr("联系信息", "Contact details")
+                    ? say(copyText.email_address_a61e0e)
+                    : say(copyText.contact_details_3b7403)
             }}<input
               v-model.trim="draft.contact"
               :type="
@@ -331,11 +367,7 @@ async function submit() {
               required
               :disabled="locked" /></label
           ><label class="field"
-            >{{
-              tr(
-                "想提前告诉我们的事（可选）",
-                "Anything you would like us to know? (optional)",
-              )
+            >{{ say(copyText.anything_you_would_like_us_to_know_eef3ab)
             }}<textarea
               v-model="draft.notes"
               rows="3"
@@ -351,10 +383,7 @@ async function submit() {
             required
             :disabled="locked"
           /><span>{{
-            tr(
-              "同意将以上信息用于本次预约联系。",
-              "I agree to use these details to arrange this visit.",
-            )
+            say(copyText.i_agree_to_use_these_details_to_5469c9)
           }}</span></label
         >
       </section>
@@ -363,12 +392,7 @@ async function submit() {
           {{ error }}
         </p>
         <p v-if="attempt && !sending" role="status">
-          {{
-            tr(
-              "已保留这次提交内容。请恢复预约结果，避免重复提交；如浏览器数据已清除，请联系店主查询。",
-              "Your submission is saved. Recover its result to avoid a duplicate. If browser data was cleared, ask the host to look it up.",
-            )
-          }}
+          {{ say(copyText.your_submission_is_saved_recover_its_result_8504a5) }}
         </p>
         <button
           class="button button-primary"
@@ -378,22 +402,18 @@ async function submit() {
         >
           {{
             sending
-              ? tr("正在提交……", "Sending…")
+              ? say(copyText.sending_c40370)
               : attempt
-                ? tr("恢复预约结果", "Recover reservation")
-                : tr("提交预约", "Request this visit")
+                ? say(copyText.recover_reservation_12c189)
+                : say(copyText.request_this_visit_611e11)
           }}<PhArrowRight />
         </button>
         <p>
-          {{
-            tr(
-              "提交后等待店主确认，无需在此付款。",
-              "Your request will wait for the host's confirmation. No payment is needed here.",
-            )
-          }}
+          {{ say(copyText.your_request_will_wait_for_the_hosts_cd36bf) }}
         </p>
         <span v-if="attempt" class="fine-print"
-          >{{ tr("店主微信：", "Host WeChat: ") }}{{ wechat }}</span
+          >{{ say(copyText.host_wechat_ac7b7e) }}{{ wechat }} ·
+          <a :href="phoneHref">{{ phone }}</a></span
         >
       </div>
     </form>

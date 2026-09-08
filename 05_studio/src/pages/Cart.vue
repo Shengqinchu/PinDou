@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "../content/pages-Cart.json";
+import { say } from "../state";
+
 import {
   computed,
   onBeforeUnmount,
@@ -200,31 +203,21 @@ async function pay(retry = false) {
 <template>
   <section class="container cart-intro">
     <span class="eyebrow">YOUR LITTLE COLLECTION</span>
-    <h1>{{ tr("你的购物车", "Your bag.") }}</h1>
+    <h1>{{ say(copyText.your_bag_fe50f1) }}</h1>
     <p>
-      {{
-        tr(
-          "一个下午，几件小物。所有期待，一起结账。",
-          "An afternoon, a few little things. Everything you are looking forward to, together.",
-        )
-      }}
+      {{ say(copyText.an_afternoon_a_few_little_things_everything_f3f96f) }}
     </p>
   </section>
   <div v-if="retryPayload && !bag.length" class="container admin-feedback">
     <p>
-      {{
-        tr(
-          "上次结账尚未返回结果，请先恢复订单。",
-          "Your previous checkout has not returned a result. Please recover it first.",
-        )
-      }}
+      {{ say(copyText.your_previous_checkout_has_not_returned_a_b40b17) }}
     </p>
     <button
       class="button button-outline"
       :disabled="checkoutBusy"
       @click="pay(true)"
     >
-      {{ tr("恢复刚才的结账", "Resume checkout") }}<PhArrowRight />
+      {{ say(copyText.resume_checkout_b2cc6f) }}<PhArrowRight />
     </button>
   </div>
   <section v-if="!bag.length" class="container empty-bag section-bottom">
@@ -233,40 +226,35 @@ async function pay(retry = false) {
         :src="media('studio-11')"
         width="1080"
         height="1440"
-        :alt="tr('可爱的拼豆作品', 'Little handmade bead creations')"
+        :alt="say(copyText.little_handmade_bead_creations_d6f442)"
       />
     </div>
     <div>
       <PhShoppingBagOpen :size="38" weight="light" />
-      <h2>{{ tr("还空着，刚刚好。", "Room for something lovely.") }}</h2>
+      <h2>{{ say(copyText.room_for_something_lovely_ded35b) }}</h2>
       <p>
-        {{
-          tr(
-            "从一次到店体验，或一件喜欢的小物开始。",
-            "Start with a studio visit, or a little thing you love.",
-          )
-        }}
+        {{ say(copyText.start_with_a_studio_visit_or_a_becf32) }}
       </p>
       <div class="empty-actions">
         <RouterLink to="/visit" class="button button-primary"
-          >{{ tr("选到店体验", "Choose a visit") }}<PhArrowRight /></RouterLink
+          >{{ say(copyText.choose_a_visit_6a7efd) }}<PhArrowRight /></RouterLink
         ><RouterLink to="/shop" class="text-link"
-          >{{ tr("逛逛小店", "Browse the shop") }}<PhArrowRight
+          >{{ say(copyText.browse_the_shop_b03c6f) }}<PhArrowRight
         /></RouterLink>
       </div>
       <RouterLink
         v-if="recentOrder"
         :to="`/order/${recentOrder}`"
         class="text-link"
-        >{{ tr("查看最近的订单", "View your recent order") }}<PhArrowRight
+        >{{ say(copyText.view_your_recent_order_d58124) }}<PhArrowRight
       /></RouterLink>
     </div>
   </section>
   <div v-else class="container cart-layout section-bottom">
     <div class="cart-details">
       <div class="cart-list-title">
-        <h2>{{ tr("我的购物车", "Your bag") }}</h2>
-        <span>{{ bagCount }} {{ tr("项心意", "little things") }}</span>
+        <h2>{{ say(copyText.your_bag_5af126) }}</h2>
+        <span>{{ bagCount }} {{ say(copyText.little_things_5d8e28) }}</span>
       </div>
       <TransitionGroup name="bag-list" tag="div" class="bag-line-list"
         ><article v-for="line in rows" :key="line.key" class="bag-line">
@@ -279,8 +267,8 @@ async function pay(retry = false) {
           <div class="bag-line-info">
             <span class="eyebrow">{{
               line.booking
-                ? tr("到店体验", "STUDIO VISIT")
-                : tr("到店自提", "STUDIO PICKUP")
+                ? say(copyText.studio_visit_6ac62b)
+                : say(copyText.studio_pickup_b0a250)
             }}</span>
             <h3>
               {{
@@ -294,23 +282,23 @@ async function pay(retry = false) {
                 {{ prettyDate(line.booking.date) }}<br />{{
                   line.booking.start
                 }}–{{ line.booking.end }} · {{ line.booking.guests }}
-                {{ tr("人", "guests") }}
+                {{ say(copyText.guests_24bfb5) }}
               </p>
               <RouterLink class="text-link small-link" to="/visit">{{
-                tr("选择其他时段", "Choose another time")
+                say(copyText.choose_another_time_08ddad)
               }}</RouterLink></template
             >
             <div v-else class="quantity-stepper">
               <button
                 :disabled="checkoutBusy || line.quantity <= 1"
-                :aria-label="tr('减少数量', 'Decrease quantity')"
+                :aria-label="say(copyText.decrease_quantity_4c6078)"
                 @click="quantityChange(line.key, -1)"
               >
                 <PhMinus /></button
               ><span>{{ line.quantity }}</span
               ><button
                 :disabled="checkoutBusy || line.quantity >= 20"
-                :aria-label="tr('增加数量', 'Increase quantity')"
+                :aria-label="say(copyText.increase_quantity_bf2b16)"
                 @click="quantityChange(line.key, 1)"
               >
                 <PhPlus />
@@ -324,7 +312,7 @@ async function pay(retry = false) {
             ><button
               class="icon-button"
               :disabled="checkoutBusy"
-              :aria-label="tr('从购物车移除', 'Remove from bag')"
+              :aria-label="say(copyText.remove_from_bag_6e3287)"
               @click="removeLine(line.key)"
             >
               <PhTrash :size="18" />
@@ -332,21 +320,16 @@ async function pay(retry = false) {
           </div></article
       ></TransitionGroup>
       <RouterLink to="/shop" class="text-link"
-        >{{ tr("再逛一会儿", "Keep looking around") }}<PhArrowRight
+        >{{ say(copyText.keep_looking_around_d52bb5) }}<PhArrowRight
       /></RouterLink>
       <form id="checkout-form" class="checkout-contact" @submit.prevent="pay()">
         <fieldset :disabled="checkoutBusy">
           <legend>
-            {{
-              tr(
-                "留个名字，见面时好认出你。",
-                "A name, so we know who to welcome.",
-              )
-            }}
+            {{ say(copyText.a_name_so_we_know_who_to_5eae58) }}
           </legend>
           <div class="form-grid">
             <label class="field"
-              >{{ tr("你的称呼", "Your name")
+              >{{ say(copyText.your_name_691e1f)
               }}<input
                 v-model="contact.name"
                 name="name"
@@ -354,19 +337,21 @@ async function pay(retry = false) {
                 maxlength="80"
                 required /></label
             ><label class="field"
-              >{{ tr("联系方式", "Contact method")
+              >{{ say(copyText.contact_method_73d70a)
               }}<select v-model="contact.contact_method">
-                <option value="wechat">{{ tr("微信", "WeChat") }}</option>
-                <option value="email">{{ tr("电子邮箱", "Email") }}</option>
-                <option value="phone">{{ tr("电话", "Phone") }}</option>
+                <option value="wechat">
+                  {{ say(copyText.wechat_2941d2) }}
+                </option>
+                <option value="email">{{ say(copyText.email_b6d15f) }}</option>
+                <option value="phone">{{ say(copyText.phone_ac7a62) }}</option>
               </select></label
             ><label class="field field-full"
               >{{
                 contact.contact_method === "wechat"
-                  ? tr("微信号", "WeChat ID")
+                  ? say(copyText.wechat_id_7a6e86)
                   : contact.contact_method === "email"
-                    ? tr("邮箱地址", "Email address")
-                    : tr("电话号码", "Phone number")
+                    ? say(copyText.email_address_1f1559)
+                    : say(copyText.phone_number_15447d)
               }}<input
                 v-model="contact.contact"
                 name="contact"
@@ -381,11 +366,7 @@ async function pay(retry = false) {
                 minlength="3"
                 required /></label
             ><label class="field field-full"
-              >{{
-                tr(
-                  "想提前告诉我们的事（选填）",
-                  "Anything you would like us to know? (Optional)",
-                )
+              >{{ say(copyText.anything_you_would_like_us_to_know_4e9264)
               }}<textarea v-model="contact.notes" rows="3" maxlength="1500" />
             </label>
           </div>
@@ -396,12 +377,7 @@ async function pay(retry = false) {
               autocomplete="off"
           /></label>
           <p v-if="containsGoods" class="pickup-note">
-            {{
-              tr(
-                "小物采用到店自提；购买后联系店主安排取货。",
-                "Shop items are for studio pickup. Contact the host after purchase to arrange collection.",
-              )
-            }}
+            {{ say(copyText.shop_items_are_for_studio_pickup_contact_74d4c2) }}
           </p>
           <label class="consent-label"
             ><input
@@ -409,10 +385,7 @@ async function pay(retry = false) {
               type="checkbox"
               required
             /><span>{{
-              tr(
-                "我已核对时段、商品及实付金额，同意使用以上联系方式处理本次订单。",
-                "I have checked the time, items and payment total, and agree to be contacted about this order.",
-              )
+              say(copyText.i_have_checked_the_time_items_and_2a0218)
             }}</span></label
           >
         </fieldset>
@@ -420,9 +393,9 @@ async function pay(retry = false) {
     </div>
     <aside class="checkout-summary">
       <span class="eyebrow">A LOVELY LITTLE PLAN</span>
-      <h2>{{ tr("准备好，就出发。", "Ready when you are.") }}</h2>
+      <h2>{{ say(copyText.ready_when_you_are_408829) }}</h2>
       <p class="summary-caption">
-        {{ tr("加元标价 · 人民币付款", "Priced in CAD · Paid in CNY") }}
+        {{ say(copyText.priced_in_cad_paid_in_cny_53d8c7) }}
       </p>
       <div
         v-if="shownQuote"
@@ -431,18 +404,20 @@ async function pay(retry = false) {
       >
         <dl class="price-breakdown">
           <div>
-            <dt>{{ tr("商品与体验", "Items & experiences") }}</dt>
+            <dt>{{ say(copyText.items_experiences_f45837) }}</dt>
             <dd>{{ money(shownQuote.subtotal_cents) }}</dd>
           </div>
           <div v-if="shownQuote.tax_mode === 'additional'">
-            <dt>{{ tr("税费", "Tax") }} ({{ shownQuote.tax_bps / 100 }}%)</dt>
+            <dt>
+              {{ say(copyText.tax_d7bdd7) }} ({{ shownQuote.tax_bps / 100 }}%)
+            </dt>
             <dd>{{ money(shownQuote.tax_cents) }}</dd>
           </div>
           <div>
             <dt>
-              {{ tr("合计", "Total")
+              {{ say(copyText.total_fe87d0)
               }}<small v-if="shownQuote.tax_mode === 'included'">{{
-                tr("（已含税）", " (tax included)")
+                say(copyText.tax_included_991ba9)
               }}</small>
             </dt>
             <dd>{{ money(shownQuote.total_cents) }}</dd>
@@ -451,8 +426,8 @@ async function pay(retry = false) {
         <div class="payable-total">
           <span>{{
             quote
-              ? tr("本次实付 · 人民币", "You pay · Chinese yuan")
-              : tr("上次核对金额 · 正在更新", "Previous quote · Updating")
+              ? say(copyText.you_pay_chinese_yuan_0f3d48)
+              : say(copyText.previous_quote_updating_d762aa)
           }}</span
           ><strong>{{ money(shownQuote.cny_fen, "CNY") }}</strong
           ><small>1 CAD = {{ Number(shownQuote.fx_cny_per_cad) }} CNY</small>
@@ -461,7 +436,7 @@ async function pay(retry = false) {
       <p class="price-check-status" role="status">
         {{
           !quote && bag.length && !error
-            ? tr("正在核对价格与空位…", "Checking prices and availability…")
+            ? say(copyText.checking_prices_and_availability_af0663)
             : ""
         }}
       </p>
@@ -471,7 +446,7 @@ async function pay(retry = false) {
         class="text-link"
         @click="updateQuote"
       >
-        {{ tr("重新核对", "Check again") }}</button
+        {{ say(copyText.check_again_4ba3ee) }}</button
       ><button
         class="button button-primary full-button"
         form="checkout-form"
@@ -480,8 +455,8 @@ async function pay(retry = false) {
       >
         {{
           checkoutBusy
-            ? tr("正在准备收银台…", "Preparing your payment…")
-            : tr("去付款", "Continue to payment")
+            ? say(copyText.preparing_your_payment_d4dce2)
+            : say(copyText.continue_to_payment_f29c00)
         }}<PhArrowRight /></button
       ><button
         v-if="retryPayload"
@@ -489,18 +464,13 @@ async function pay(retry = false) {
         :disabled="checkoutBusy"
         @click="pay(true)"
       >
-        {{ tr("恢复刚才的结账", "Resume checkout") }}<PhArrowRight />
+        {{ say(copyText.resume_checkout_b2cc6f) }}<PhArrowRight />
       </button>
       <p class="payment-provider">
-        <PhLockSimple :size="16" />{{ tr("虎皮椒收银台", "Hupijiao checkout") }}
+        <PhLockSimple :size="16" />{{ say(copyText.hupijiao_checkout_017d75) }}
       </p>
       <p class="fine-print">
-        {{
-          tr(
-            "座位在付款期间短暂保留。付款成功后，订单和到店时段立即确认。",
-            "Your seats are held briefly during payment. Successful payment confirms your order and visit time.",
-          )
-        }}
+        {{ say(copyText.your_seats_are_held_briefly_during_payment_7f7bb0) }}
       </p>
     </aside>
   </div>

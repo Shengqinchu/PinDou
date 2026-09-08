@@ -1,16 +1,16 @@
 @charset "UTF-8";
 :root {
-  --paper: #f3f7f8;
-  --white: #fcfefe;
-  --ink: #273f48;
-  --muted: #4d626b;
-  --line: #cedade;
-  --accent: #416f7d;
-  --soft: #e5eef1;
-  --sage: #e7f0ee;
-  --blue: #deeaf1;
+  --paper: #ffffff;
+  --white: #ffffff;
+  --ink: #292a2b;
+  --muted: #626366;
+  --line: #e1e2e4;
+  --accent: #494b51;
+  --soft: #f3f4f6;
+  --sage: #eef5ef;
+  --blue: #edf1fa;
   --body: "Outfit Variable", "PingFang SC", "Microsoft YaHei", sans-serif;
-  --display: "DM Serif Display", "PinDou Serif SC", "Songti SC", serif;
+  --display: "DM Serif Display", "PinDou Sans SC", "PingFang SC", sans-serif;
   font-family: var(--body);
   color: var(--ink);
   background: var(--paper);

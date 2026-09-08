@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "../content/pages-Order.json";
+import { say } from "../state";
+
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
@@ -53,10 +56,7 @@ let alive = true;
 async function load() {
   if (busy.value || !alive) return;
   if (!access) {
-    error.value = tr(
-      "请在下单时使用的浏览器中查看这个订单。",
-      "Please use the browser in which you placed this order.",
-    );
+    error.value = say(copyText.please_use_the_browser_in_which_you_972d7e);
     return;
   }
   busy.value = true;
@@ -111,12 +111,12 @@ async function tryAgain() {
 <template>
   <section class="container order-page section-bottom">
     <RouterLink to="/cart" class="text-link">{{
-      tr("返回购物车", "Back to your bag")
+      say(copyText.back_to_your_bag_1d6e14)
     }}</RouterLink>
     <p v-if="error" class="form-error" role="alert">
       {{ error }}
       <button class="text-link" :disabled="busy" @click="load">
-        {{ tr("重试", "Try again") }}
+        {{ say(copyText.try_again_c3273b) }}
       </button>
     </p>
     <div v-if="order" class="order-layout">
@@ -129,43 +129,29 @@ async function tryAgain() {
         </div>
         <span class="eyebrow">{{ statusText(order.status) }}</span>
         <h1 v-if="order.status === 'paid'">
-          {{ tr("已经为你，", "A little joy,") }}<br /><em>{{
-            tr("留好了。", "all yours.")
+          {{ say(copyText.a_little_joy_dd360a) }}<br /><em>{{
+            say(copyText.all_yours_a7d095)
           }}</em>
         </h1>
         <h1 v-else-if="payable">
-          {{ tr("最后一步，", "One last step,") }}<br /><em>{{
-            tr("快乐就近了。", "then something lovely.")
+          {{ say(copyText.one_last_step_c893db) }}<br /><em>{{
+            say(copyText.then_something_lovely_98b831)
           }}</em>
         </h1>
         <h1 v-else class="order-state-title">{{ statusText(order.status) }}</h1>
         <p v-if="order.status === 'paid'">
           {{
             tr(
-              hasVisit
-                ? "付款已收到，到店座位已确认。带着你的期待，我们工作室见。"
-                : "付款已收到，订单已确认。请联系店主安排到店自提。",
-              hasVisit
-                ? "Payment received and your studio seats are confirmed. Bring a little inspiration. We will see you here."
-                : "Payment received and your order is confirmed. Contact the host to arrange studio pickup.",
+              hasVisit ? copyText.literal_77352916 : copyText.literal_ee5000bb,
+              hasVisit ? copyText.literal_2f14e161 : copyText.literal_975ac3ac,
             )
           }}
         </p>
         <p v-else-if="order.status === 'paid_needs_review'" class="form-error">
-          {{
-            tr(
-              "款项已收到，但付款确认时原时段或库存已不可用。请联系店主安排改期或退款，不要重复付款。",
-              "Payment was received, but the original time or stock was no longer available when confirmed. Contact the host to reschedule or arrange a refund. Please do not pay again.",
-            )
-          }}
+          {{ say(copyText.payment_was_received_but_the_original_time_b82219) }}
         </p>
         <p v-else-if="order.status === 'expired'">
-          {{
-            tr(
-              "付款窗口已关闭，座位已释放。若已经扣款，请联系店主核实后再尝试。",
-              "The payment window has closed and the seats have been released. If you were charged, contact the host before trying again.",
-            )
-          }}
+          {{ say(copyText.the_payment_window_has_closed_and_the_327666) }}
         </p>
         <p
           v-else-if="
@@ -173,24 +159,14 @@ async function tryAgain() {
             (!payable && order.status === 'pending')
           "
         >
-          {{
-            tr(
-              "正在核实付款结果，请稍候。已付款的话无需再付一次。",
-              "We are checking the payment result. If you have already paid, please do not pay again.",
-            )
-          }}
+          {{ say(copyText.we_are_checking_the_payment_result_if_c5b772) }}
         </p>
         <p v-else-if="order.status === 'failed'">
-          {{
-            tr(
-              "暂未能创建收银台，可以回到购物车重新尝试。",
-              "The cashier could not be created. You can return to your bag and try again.",
-            )
-          }}
+          {{ say(copyText.the_cashier_could_not_be_created_you_81cadc) }}
         </p>
         <div v-if="payable" class="cashier-panel">
           <div class="cashier-heading">
-            <strong>{{ tr("人民币实付", "Total in Chinese yuan") }}</strong
+            <strong>{{ say(copyText.total_in_chinese_yuan_175a2f) }}</strong
             ><span><PhClock />{{ countdown }}</span>
           </div>
           <strong class="cashier-amount">{{
@@ -201,59 +177,39 @@ async function tryAgain() {
               v-if="!qrError"
               class="payment-qr"
               :src="order.qr_url"
-              :alt="tr('虎皮椒付款二维码', 'Hupijiao payment QR code')"
+              :alt="say(copyText.hupijiao_payment_qr_code_5f9260)"
               referrerpolicy="no-referrer"
               @error="qrError = true"
             />
             <p v-if="qrError" class="form-error">
-              {{
-                tr(
-                  "二维码暂时无法加载，请稍后刷新。",
-                  "The payment QR could not load. Please refresh shortly.",
-                )
-              }}
+              {{ say(copyText.the_payment_qr_could_not_load_please_383cf4) }}
             </p>
             <p>
-              {{
-                tr(
-                  "用手机扫描二维码付款，完成后本页会自动确认。",
-                  "Scan with your phone to pay. This page will confirm automatically.",
-                )
-              }}
+              {{ say(copyText.scan_with_your_phone_to_pay_this_8d75b2) }}
             </p></template
           >
           <template v-else-if="order.payment_url"
             ><p v-if="inWeChat" class="form-help">
               {{
-                tr(
-                  "将在当前微信窗口打开收银台，付款后返回此页查看确认。",
-                  "Checkout opens in this WeChat window. Return here after payment to see your confirmation.",
-                )
+                say(copyText.checkout_opens_in_this_wechat_window_return_ad1e2a)
               }}
             </p>
             <a
               :href="order.payment_url"
               class="button button-primary full-button"
               rel="noreferrer"
-              >{{ tr("打开虎皮椒收银台", "Open Hupijiao checkout")
-              }}<PhArrowRight
+              >{{ say(copyText.open_hupijiao_checkout_d57642) }}<PhArrowRight
             /></a>
             <p class="fine-print">
               {{
-                tr(
-                  "付款完成后返回此页查看确认。",
-                  "Return here after paying to view confirmation.",
+                say(
+                  copyText.return_here_after_paying_to_view_confirmation_9e3a3b,
                 )
               }}
             </p></template
           >
           <p v-else class="form-help">
-            {{
-              tr(
-                "请在电脑端打开此订单，扫描二维码付款。",
-                "Open this order on a desktop to scan the payment QR.",
-              )
-            }}
+            {{ say(copyText.open_this_order_on_a_desktop_to_a8ae91) }}
           </p>
         </div>
         <button
@@ -261,7 +217,7 @@ async function tryAgain() {
           class="button button-outline"
           @click="tryAgain"
         >
-          {{ tr("重新核对购物车", "Review your bag again") }}<PhArrowRight />
+          {{ say(copyText.review_your_bag_again_293dbb) }}<PhArrowRight />
         </button>
         <button
           v-if="!terminal"
@@ -269,21 +225,21 @@ async function tryAgain() {
           :disabled="busy"
           @click="load"
         >
-          <PhArrowClockwise />{{ tr("刷新付款状态", "Refresh payment status") }}
+          <PhArrowClockwise />{{ say(copyText.refresh_payment_status_18e1f5) }}
         </button>
         <div class="order-contact">
           <a :href="mapsUrl" class="text-link" target="_blank" rel="noreferrer"
             ><PhMapPin />8 Hughson St N, Hamilton</a
           >
           <p>
-            {{ tr("联系店主 · 微信", "Contact the host · WeChat") }}
+            {{ say(copyText.contact_the_host_wechat_11a64c) }}
             {{ wechat }}
           </p>
         </div>
       </div>
       <aside class="receipt">
         <span class="eyebrow">YOUR LITTLE PLAN</span>
-        <h2>{{ tr("订单明细", "Order details") }}</h2>
+        <h2>{{ say(copyText.order_details_ef4c47) }}</h2>
         <p class="order-number">{{ order.id }}</p>
         <article
           v-for="(line, i) in order.quote.lines"
@@ -299,16 +255,13 @@ async function tryAgain() {
               {{ prettyDate(line.booking.date) }}<br />{{
                 line.booking.start
               }}–{{ line.booking.end }} · {{ line.booking.guests }}
-              {{ tr("人", "guests") }}<br />{{
-                tr("Hamilton 当地时间", "Hamilton local time")
+              {{ say(copyText.guests_24bfb5) }}<br />{{
+                say(copyText.hamilton_local_time_b04d8a)
               }}
             </p>
             <p v-else>
               {{
-                tr(
-                  "到店自提 · 请联系店主安排取货",
-                  "Studio pickup · Contact the host to arrange collection",
-                )
+                say(copyText.studio_pickup_contact_the_host_to_arrange_0cf43a)
               }}
             </p>
           </div>
@@ -316,26 +269,26 @@ async function tryAgain() {
         </article>
         <dl class="price-breakdown">
           <div v-if="order.quote.tax_mode === 'additional'">
-            <dt>{{ tr("税费", "Tax") }}</dt>
+            <dt>{{ say(copyText.tax_d7bdd7) }}</dt>
             <dd>{{ money(order.quote.tax_cents) }}</dd>
           </div>
           <div>
-            <dt>{{ tr("加元合计", "CAD total") }}</dt>
+            <dt>{{ say(copyText.cad_total_0fc8b6) }}</dt>
             <dd>{{ money(order.quote.total_cents) }}</dd>
           </div>
           <div>
-            <dt>{{ tr("人民币实付", "Payment in CNY") }}</dt>
+            <dt>{{ say(copyText.payment_in_cny_66e946) }}</dt>
             <dd>{{ money(order.quote.cny_fen, "CNY") }}</dd>
           </div>
         </dl>
         <p class="fine-print">
           1 CAD = {{ Number(order.quote.fx_cny_per_cad) }} CNY ·
-          {{ tr("汇率已固定", "Rate locked for this order") }}
+          {{ say(copyText.rate_locked_for_this_order_114f47) }}
         </p>
       </aside>
     </div>
     <p v-else-if="!error" class="form-help" role="status">
-      {{ tr("正在读取订单…", "Loading your order…") }}
+      {{ say(copyText.loading_your_order_d79415) }}
     </p>
   </section>
 </template>

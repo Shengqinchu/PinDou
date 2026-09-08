@@ -1,24 +1,22 @@
 <script setup lang="ts">
+import copyText from "../content/pages-NotFound.json";
+import { say } from "../state";
+
 import { tr } from "../state";
 </script>
 <template>
   <section class="container page-intro">
     <div>
       <h1>
-        {{ tr("这颗豆子，", "This little bead") }}<br /><em>{{
-          tr("好像滚远了。", "rolled away.")
+        {{ say(copyText.this_little_bead_6335af) }}<br /><em>{{
+          say(copyText.rolled_away_9759a2)
         }}</em>
       </h1>
       <p>
-        {{
-          tr(
-            "没有找到这个页面。回小屋看看吧。",
-            "We could not find that page. Let us take you back to the studio.",
-          )
-        }}
+        {{ say(copyText.we_could_not_find_that_page_let_05f3f9) }}
       </p>
       <RouterLink class="button button-primary" to="/">{{
-        tr("回到小屋", "Back to the studio")
+        say(copyText.back_to_the_studio_9f318a)
       }}</RouterLink>
     </div>
   </section>

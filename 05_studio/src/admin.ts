@@ -1,3 +1,5 @@
+import copyText from "./content/admin.json";
+import { say } from "./state";
 import { computed, inject, ref, type InjectionKey } from "vue";
 import {
   CommerceError,
@@ -151,7 +153,7 @@ export function createDesk(token: string, expired: () => void) {
         body: JSON.stringify(settings.value),
       });
       savedSettings.value = JSON.stringify(settings.value);
-      notify("设置已保存", "Settings saved");
+      notify(copyText.message_88704412[0], copyText.message_88704412[1]);
       await loadOverview();
       await loadCalendar();
       return true;
@@ -176,7 +178,7 @@ export function createDesk(token: string, expired: () => void) {
           p.id === result.id ? result : p,
         );
       else products.value.push(result);
-      notify("商品已保存", "Product saved");
+      notify(copyText.message_450b75db[0], copyText.message_450b75db[1]);
       await loadOverview();
       return result;
     } catch (e) {
@@ -218,8 +220,8 @@ export function createDesk(token: string, expired: () => void) {
       order.value = { ...order.value, ...result };
       orderRevision.value++;
       notify(
-        completed ? "已标记完成" : "订单已更新",
-        completed ? "Marked as fulfilled" : "Order updated",
+        completed ? copyText.literal_9594c825 : copyText.literal_1888eeef,
+        completed ? copyText.literal_ee776f3d : copyText.literal_00f955c3,
       );
       await loadOverview();
       await loadCalendar();
@@ -265,7 +267,7 @@ export function useDesk() {
   return desk;
 }
 export function localTime(timestamp: number) {
-  return new Intl.DateTimeFormat(tr("zh-CN", "en-CA"), {
+  return new Intl.DateTimeFormat(say(copyText.enca_9cd218), {
     timeZone: "America/Toronto",
     month: "short",
     day: "numeric",

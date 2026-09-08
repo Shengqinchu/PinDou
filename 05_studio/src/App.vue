@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "./content/App.json";
+import { say } from "./state";
+
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
@@ -7,22 +10,24 @@ import {
   PhFlower,
   PhList,
 } from "@phosphor-icons/vue";
-import { locale, socialUrl, tr, wechat } from "./state";
+import { locale, socialUrl, tr, wechat, phone, phoneHref } from "./state";
 import { gsap } from "gsap";
 import { arrive } from "./motion";
 import StudioToast from "./components/StudioToast.vue";
 import SlideOver from "./components/SlideOver.vue";
 import ReleaseNotice from "./components/ReleaseNotice.vue";
+import BrandMark from "./components/BrandMark.vue";
+import BrandMotif from "./components/BrandMotif.vue";
 const route = useRoute();
 const isDesk = computed(() => route.path.startsWith("/manage"));
 const menu = ref(false);
 const main = ref<HTMLElement>();
 let arrival: gsap.core.Tween | undefined;
 const navigation = computed(() => [
-  { path: "/", label: tr("首页", "Home") },
-  { path: "/visit", label: tr("来拼豆吧", "Come create") },
-  { path: "/shop", label: tr("拼豆小店", "Little shop") },
-  { path: "/journal", label: tr("小狗日记", "Studio journal") },
+  { path: "/", label: say(copyText.home_76c92b) },
+  { path: "/visit", label: say(copyText.come_create_2eee81) },
+  { path: "/shop", label: say(copyText.little_shop_c97261) },
+  { path: "/journal", label: say(copyText.studio_journal_7b860e) },
 ]);
 onBeforeUnmount(() => arrival?.kill());
 watch(
@@ -40,28 +45,22 @@ watch(
 </script>
 <template>
   <a class="skip-link" href="#main">{{
-    tr("跳到主要内容", "Skip to content")
+    say(copyText.skip_to_content_1760ff)
   }}</a>
   <div v-if="!isDesk" class="vision-announcement">
-    {{
-      tr(
-        "汉密尔顿的小小手作空间，请约好时间，欢迎来玩！",
-        "A little creative space in Hamilton. Book a time and come make something!",
-      )
-    }}
+    {{ say(copyText.a_little_creative_space_in_hamilton_book_5cf34e) }}
   </div>
   <header v-if="!isDesk" class="vision-header">
     <RouterLink
       to="/"
       class="vision-brand"
-      :aria-label="tr('小狗拼豆铺首页', 'Pindo Puppy home')"
+      :aria-label="say(copyText.pindo_puppy_home_69051e)"
     >
-      <PhFlower :size="30" weight="light" aria-hidden="true" />
-      <span>{{ tr("小狗拼豆铺", "Pindo Puppy") }}</span>
+      <BrandMotif kind="puppy" /><BrandMark compact />
     </RouterLink>
     <nav
       class="vision-navigation"
-      :aria-label="tr('主要导航', 'Main navigation')"
+      :aria-label="say(copyText.main_navigation_b48c67)"
     >
       <RouterLink
         v-for="item in navigation"
@@ -75,13 +74,13 @@ watch(
       <button
         class="language-button"
         @click="locale = locale === 'zh' ? 'en' : 'zh'"
-        :aria-label="tr('切换为英文', 'Switch to Chinese')"
+        :aria-label="say(copyText.switch_to_chinese_6c04c2)"
       >
-        {{ tr("英文", "中文") }}
+        {{ say(copyText.label_dd0e77) }}
       </button>
       <button
         class="icon-button"
-        :aria-label="tr('网站菜单', 'Site menu')"
+        :aria-label="say(copyText.site_menu_40ed87)"
         :aria-expanded="menu"
         @click="menu = true"
       >
@@ -91,10 +90,10 @@ watch(
   </header>
   <SlideOver
     v-model="menu"
-    :title="tr('慢慢逛，慢慢拼。', 'A little time to explore.')"
-    :close-label="tr('关闭菜单', 'Close menu')"
+    :title="say(copyText.a_little_time_to_explore_7313f5)"
+    :close-label="say(copyText.close_menu_d36a12)"
   >
-    <nav class="vision-menu" :aria-label="tr('网站导航', 'Site navigation')">
+    <nav class="vision-menu" :aria-label="say(copyText.site_navigation_d091f4)">
       <RouterLink
         v-for="(item, index) in navigation"
         :key="item.path"
@@ -108,15 +107,15 @@ watch(
         ><PhArrowRight :size="20" />
       </RouterLink>
       <RouterLink to="/details" @click="menu = false"
-        >{{ tr("拼豆铺详细信息", "Studio details") }}<PhArrowUpRight :size="20"
+        >{{ say(copyText.studio_details_7c4089) }}<PhArrowUpRight :size="20"
       /></RouterLink>
     </nav>
     <div class="vision-menu-extra">
       <a href="/upload"
-        >{{ tr("拼豆图纸生成器", "Pattern maker") }}<PhArrowUpRight
+        >{{ say(copyText.pattern_maker_7db57b) }}<PhArrowUpRight
       /></a>
       <RouterLink to="/manage" @click="menu = false"
-        >{{ tr("店主管理", "Studio desk") }}<PhArrowRight
+        >{{ say(copyText.studio_desk_4f230e) }}<PhArrowRight
       /></RouterLink>
     </div>
   </SlideOver>
@@ -131,46 +130,36 @@ watch(
   <footer v-if="!isDesk" class="vision-footer">
     <div class="vision-footer-inner container">
       <div class="vision-footer-brand">
-        <RouterLink to="/"
-          >{{ tr("小狗拼豆铺", "Pindo Puppy")
-          }}<PhFlower :size="28" weight="light"
-        /></RouterLink>
+        <RouterLink to="/"><BrandMark /></RouterLink>
         <p>
-          {{
-            tr(
-              "属于你，独一无二的拼豆体验",
-              "A bead-making experience, uniquely yours.",
-            )
-          }}
+          {{ say(copyText.a_beadmaking_experience_uniquely_yours_cf90ad) }}
         </p>
       </div>
       <div class="vision-footer-links">
-        <span>{{ tr("来这里", "Come by") }}</span>
+        <span>{{ say(copyText.come_by_6b27fe) }}</span>
         <RouterLink to="/visit">{{
-          tr("预约到店", "Book a visit")
+          say(copyText.book_a_visit_8c72a6)
         }}</RouterLink>
         <RouterLink to="/details">{{
-          tr("拼豆铺详细信息", "Studio details")
+          say(copyText.studio_details_7c4089)
         }}</RouterLink>
       </div>
       <div class="vision-footer-links">
-        <span>{{ tr("保持联系", "Say hello") }}</span>
+        <span>{{ say(copyText.say_hello_bdf90f) }}</span>
         <a :href="socialUrl" target="_blank" rel="noreferrer"
-          >{{ tr("小红书 · 小狗双吉", "Xiaohongshu")
-          }}<PhArrowUpRight :size="16"
+          >{{ say(copyText.xiaohongshu_e1e6c0) }}<PhArrowUpRight :size="16"
         /></a>
         <span class="contact-id"
-          >{{ tr("微信号：", "WeChat: ") }}{{ wechat }}</span
-        >
+          >{{ say(copyText.wechat_b2cc69) }}{{ wechat }}</span
+        ><a :href="phoneHref">{{ phone }}</a>
       </div>
       <div class="vision-footer-links">
-        <span>{{ tr("小小工具箱", "The toolbox") }}</span>
+        <span>{{ say(copyText.the_toolbox_df33f0) }}</span>
         <a href="/upload"
-          >{{ tr("拼豆图纸生成器", "Pattern maker")
-          }}<PhArrowUpRight :size="16"
+          >{{ say(copyText.pattern_maker_7db57b) }}<PhArrowUpRight :size="16"
         /></a>
         <a href="/tutorial"
-          >{{ tr("图纸工具教程", "Pattern maker guide")
+          >{{ say(copyText.pattern_maker_guide_c1f795)
           }}<PhArrowUpRight :size="16"
         /></a>
       </div>

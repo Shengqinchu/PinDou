@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview --host 127.0.0.1"
+    "build": "npm run check:copy && vue-tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "check:copy": "node scripts/content-catalog.mjs"
   },
   "dependencies": {
     "@fontsource/dm-serif-display": "^5.2.8",

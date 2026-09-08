@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "../../content/components-admin-ReservationsPanel.json";
+import { say } from "../../state";
+
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import {
   PhArrowRight,
@@ -12,7 +15,7 @@ import { useDesk } from "../../admin";
 import { hamiltonDate, plusDays, prettyDate, tr } from "../../state";
 import type { Reservation, ReservationPayload } from "../../reservations";
 import SlideOver from "../SlideOver.vue";
-import ToggleSwitch from "../ToggleSwitch.vue";
+import ReservationSettings from "./ReservationSettings.vue";
 type Entry = Reservation & { payload: ReservationPayload; staff_note: string };
 const props = defineProps<{ active: boolean; calendar?: boolean }>();
 const { request } = useDesk();
@@ -39,10 +42,10 @@ const days = computed(() =>
 let sequence = 0,
   debounce: ReturnType<typeof setTimeout>;
 const labels = computed<Record<string, string>>(() => ({
-  pending: tr("待确认", "Pending"),
-  confirmed: tr("已确认", "Confirmed"),
-  completed: tr("已完成", "Completed"),
-  cancelled: tr("已取消", "Cancelled"),
+  pending: say(copyText.pending_5c3b18),
+  confirmed: say(copyText.confirmed_b1c92b),
+  completed: say(copyText.completed_ff8af6),
+  cancelled: say(copyText.cancelled_8c9064),
 }));
 async function load() {
   const seq = ++sequence;
@@ -151,46 +154,43 @@ defineExpose({ refresh: load });
     <header class="desk-page-heading">
       <div>
         <p class="desk-eyebrow">
-          {{ tr("照顾好每一次期待", "A LITTLE CARE FOR EVERY VISIT") }}
+          {{ say(copyText.a_little_care_for_every_visit_4e8c5b) }}
         </p>
         <h1>
           {{
             calendar
-              ? tr("预约日历", "Reservation calendar")
-              : tr("预约管理", "Studio reservations")
+              ? say(copyText.reservation_calendar_79ec67)
+              : say(copyText.studio_reservations_4896a2)
           }}
         </h1>
         <p>
-          {{
-            tr(
-              "先核对时间和同行人数，再联系客人确认。这里的预约无需在线付款。",
-              "Review the time and group size, then contact your guest and confirm. These reservations do not require online payment.",
-            )
-          }}
+          {{ say(copyText.review_the_time_and_group_size_then_6af55f) }}
         </p>
       </div>
       <button class="desk-button secondary" :disabled="busy" @click="load">
         <PhArrowClockwise :class="{ spinning: busy }" />{{
-          tr("刷新", "Refresh")
+          say(copyText.refresh_5efb82)
         }}
       </button>
     </header>
     <div v-if="!calendar" class="reservation-desk-metrics">
       <button @click="status = 'pending'">
-        <PhClock /><span>{{ tr("等待确认", "Waiting for you") }}</span
+        <PhClock /><span>{{ say(copyText.waiting_for_you_41a255) }}</span
         ><strong>{{ counts.pending || 0 }}</strong></button
       ><button @click="status = 'confirmed'">
-        <PhCalendarDots /><span>{{ tr("已确认预约", "Confirmed visits") }}</span
+        <PhCalendarDots /><span>{{
+          say(copyText.confirmed_visits_305c18)
+        }}</span
         ><strong>{{ counts.confirmed || 0 }}</strong></button
       ><button @click="status = 'completed'">
-        <PhCheck /><span>{{ tr("已完成到访", "Completed visits") }}</span
+        <PhCheck /><span>{{ say(copyText.completed_visits_1cdc52) }}</span
         ><strong>{{ counts.completed || 0 }}</strong>
       </button>
     </div>
     <div
       v-if="calendar"
       class="reservation-desk-days"
-      :aria-label="tr('选择预约日期', 'Choose reservation date')"
+      :aria-label="say(copyText.choose_reservation_date_ae55e6)"
     >
       <button
         v-for="date in days"
@@ -202,39 +202,21 @@ defineExpose({ refresh: load });
         ><PhCalendarDots :size="17" />
       </button>
     </div>
-    <div class="reservation-desk-policy">
-      <div>
-        <strong>{{ tr("同一时段只接待一组", "One group at a time") }}</strong>
-        <p>
-          {{
-            tr(
-              "开启后，确认一组会关闭重叠时段；待确认申请不会占用时段。",
-              "When enabled, a confirmed group closes overlapping times. Pending requests do not hold a time.",
-            )
-          }}
-        </p>
-      </div>
-      <ToggleSwitch
-        :model-value="policy.exclusive_groups"
-        :disabled="policyBusy"
-        :label="tr('同一时段只接待一组', 'One group at a time')"
-        @update:model-value="changePolicy"
-      />
-    </div>
+    <ReservationSettings :active="active" @saved="load" />
     <div class="reservation-desk-filters">
       <label class="desk-field"
-        >{{ tr("预约状态", "Status")
+        >{{ say(copyText.status_4434e2)
         }}<select v-model="status">
-          <option value="all">{{ tr("全部", "All") }}</option>
+          <option value="all">{{ say(copyText.all_902ec4) }}</option>
           <option v-for="(label, key) in labels" :key="key" :value="key">
             {{ label }}
           </option>
         </select></label
       ><label class="desk-field"
-        >{{ tr("到店日期", "Visit date")
+        >{{ say(copyText.visit_date_270402)
         }}<input v-model="day" type="date" /></label
       ><label class="desk-field"
-        >{{ tr("姓名或预约编号", "Name or reference")
+        >{{ say(copyText.name_or_reference_c2f162)
         }}<input v-model.trim="search" type="search" /></label
       ><button
         class="desk-link"
@@ -244,23 +226,18 @@ defineExpose({ refresh: load });
           search = '';
         "
       >
-        {{ tr("清除筛选", "Clear filters") }}
+        {{ say(copyText.clear_filters_0a6c6f) }}
       </button>
     </div>
     <p v-if="error" class="desk-error" role="alert">{{ error }}</p>
     <p v-if="busy && !items.length" class="reservation-loading" role="status">
-      {{ tr("正在查看预约……", "Loading reservations…") }}
+      {{ say(copyText.loading_reservations_adb99a) }}
     </p>
     <div v-else-if="!items.length" class="reservation-desk-empty">
       <PhCalendarDots :size="35" weight="light" />
-      <h2>{{ tr("这里还没有预约", "No reservations here yet") }}</h2>
+      <h2>{{ say(copyText.no_reservations_here_yet_1ffd1c) }}</h2>
       <p>
-        {{
-          tr(
-            "顾客提交后，就可以在这里核对并确认安排。",
-            "When a guest submits a request, you can review and confirm it here.",
-          )
-        }}
+        {{ say(copyText.when_a_guest_submits_a_request_you_d10e4b) }}
       </p>
     </div>
     <div v-else class="reservation-desk-list">
@@ -278,7 +255,7 @@ defineExpose({ refresh: load });
           <span>{{ prettyDate(item.booking.date) }}</span
           ><small
             >{{ item.booking.start }}–{{ item.booking.end }} ·
-            {{ item.booking.guests }} {{ tr("人", "guests") }}</small
+            {{ item.booking.guests }} {{ say(copyText.guests_24bfb5) }}</small
           >
         </div>
         <span :class="['reservation-status', item.status]">{{
@@ -296,10 +273,10 @@ defineExpose({ refresh: load });
           load();
         "
       >
-        {{ tr("上一页", "Previous") }}</button
+        {{ say(copyText.previous_94c671) }}</button
       ><span
-        >{{ tr("共", "Total") }} {{ total }}
-        {{ tr("份预约", "reservations") }}</span
+        >{{ say(copyText.total_74beb1) }} {{ total }}
+        {{ say(copyText.reservations_718784) }}</span
       ><button
         class="desk-button secondary"
         :disabled="page * 30 >= total || busy"
@@ -308,18 +285,18 @@ defineExpose({ refresh: load });
           load();
         "
       >
-        {{ tr("下一页", "Next") }}
+        {{ say(copyText.next_05635e) }}
       </button>
     </div>
     <SlideOver
       v-model="open"
-      :title="entry?.name || tr('预约详情', 'Reservation details')"
+      :title="entry?.name || say(copyText.reservation_details_d248c4)"
       :subtitle="entry?.id"
       :busy="saving"
       ><template v-if="entry"
         ><dl class="reservation-desk-summary">
           <div>
-            <dt>{{ tr("到访", "Visit") }}</dt>
+            <dt>{{ say(copyText.visit_f29981) }}</dt>
             <dd>
               {{ prettyDate(entry.booking.date) }}<br />{{
                 entry.booking.start
@@ -327,56 +304,53 @@ defineExpose({ refresh: load });
             </dd>
           </div>
           <div>
-            <dt>{{ tr("体验与人数", "Experience and guests") }}</dt>
+            <dt>{{ say(copyText.experience_and_guests_369b9e) }}</dt>
             <dd>
               {{
                 entry.booking.plan === "day"
-                  ? tr("全天体验", "Day visit")
-                  : tr("按时体验", "Hourly visit")
+                  ? say(copyText.day_visit_aad886)
+                  : say(copyText.hourly_visit_681491)
               }}
-              · {{ entry.booking.guests }} {{ tr("人", "guests") }}
+              · {{ entry.booking.guests }} {{ say(copyText.guests_24bfb5) }}
             </dd>
           </div>
           <div>
-            <dt>{{ tr("联系方式", "Contact") }}</dt>
+            <dt>{{ say(copyText.contact_b87aac) }}</dt>
             <dd>
               {{
                 entry.payload.contact_method === "wechat"
-                  ? tr("微信", "WeChat")
+                  ? say(copyText.wechat_2941d2)
                   : entry.payload.contact_method === "phone"
-                    ? tr("电话", "Phone")
+                    ? say(copyText.phone_ac7a62)
                     : entry.payload.contact_method === "email"
-                      ? tr("邮箱", "Email")
-                      : tr("其他", "Other")
+                      ? say(copyText.email_8501ec)
+                      : say(copyText.other_8b6752)
               }}：{{ entry.payload.contact }}
             </dd>
           </div>
           <div v-if="entry.payload.notes">
-            <dt>{{ tr("客人留言", "Guest note") }}</dt>
+            <dt>{{ say(copyText.guest_note_a101f4) }}</dt>
             <dd>{{ entry.payload.notes }}</dd>
           </div>
         </dl>
         <p class="fine-print">
           {{
-            tr(
-              "保存会更新客人结果页；请用以上联系方式另行通知客人。",
-              "Saving updates the guest's result page. Please also contact the guest using the details above.",
-            )
+            say(copyText.saving_updates_the_guests_result_page_please_6140a1)
           }}
         </p>
         <label class="desk-field"
-          >{{ tr("更新预约状态", "Update reservation status")
+          >{{ say(copyText.update_reservation_status_0ddee8)
           }}<select
             v-model="nextStatus"
             :disabled="saving"
-            :aria-label="tr('更新预约状态', 'Update reservation status')"
+            :aria-label="say(copyText.update_reservation_status_0ddee8)"
           >
             <option v-for="(label, key) in labels" :key="key" :value="key">
               {{ label }}
             </option>
           </select></label
         ><label class="desk-field"
-          >{{ tr("店内备注（客人不可见）", "Staff note (private)")
+          >{{ say(copyText.staff_note_private_53d294)
           }}<textarea
             v-model="note"
             rows="4"
@@ -393,12 +367,12 @@ defineExpose({ refresh: load });
           :disabled="saving"
           @click="open = false"
         >
-          {{ tr("暂不更改", "Close") }}</button
+          {{ say(copyText.close_accb35) }}</button
         ><button class="desk-button primary" :disabled="saving" @click="save">
           {{
             saving
-              ? tr("保存中……", "Saving…")
-              : tr("保存安排", "Save arrangement")
+              ? say(copyText.saving_9a40ec)
+              : say(copyText.save_arrangement_87aa75)
           }}<PhCheck /></button></template
     ></SlideOver>
   </section>

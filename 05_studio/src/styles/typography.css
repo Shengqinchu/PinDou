@@ -1,12 +1,4 @@
 @font-face {
-  font-family: "PinDou Serif SC";
-  src: url("../assets/fonts/pindou-serif-sc.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 200 900;
-  font-display: swap;
-}
-
-@font-face {
   font-family: "PinDou Sans SC";
   src: url("../assets/fonts/pindou-sans-sc.woff2") format("woff2");
   font-style: normal;
@@ -18,16 +10,19 @@
   --body:
     "Outfit Variable", "PinDou Sans SC", "PingFang SC", "Microsoft YaHei",
     sans-serif;
-  --chinese-display: "DM Serif Display", "PinDou Serif SC", serif;
+  --chinese-display:
+    "Outfit Variable", "PinDou Sans SC", "PingFang SC", "Microsoft YaHei",
+    sans-serif;
 }
 
-/* The English faces stay unchanged. Chinese has separate display and UI roles. */
+/* VISION2: Chinese headings and UI share the same locally hosted sans family.
+   The owner's handwritten lettering lives in BrandMark, never in form labels. */
 :lang(zh-CN) h1,
 :lang(zh-CN) h2 {
   font-family: var(--chinese-display);
   font-weight: 500;
   line-height: 1.42;
-  letter-spacing: 0.005em;
+  letter-spacing: -0.025em;
 }
 
 :lang(zh-CN) h1 em,

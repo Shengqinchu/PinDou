@@ -1,0 +1,13 @@
+{
+  "this_photo_could_not_load_please_try_b36e40": [
+    "这张照片暂时没能加载，请重试。",
+    "This photo could not load. Please try again."
+  ],
+  "studio_photograph_909fb3": ["工作室照片", "Studio photograph"],
+  "a_little_look_around_6f038a": ["小屋里的日常", "A little look around"],
+  "close_photograph_ce9f1a": ["关闭照片", "Close photograph"],
+  "try_again_c3273b": ["重试", "Try again"],
+  "loading_photo_dcfa95": ["正在载入照片…", "Loading photo…"],
+  "previous_photo_3c78a4": ["上一张", "Previous photo"],
+  "next_photo_8feb3d": ["下一张", "Next photo"]
+}

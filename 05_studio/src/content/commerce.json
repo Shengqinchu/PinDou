@@ -1,0 +1,26 @@
+{
+  "we_could_not_connect_check_your_connection_b4bde6": [
+    "暂时连接不上，请检查网络后重试。",
+    "We could not connect. Check your connection and try again."
+  ],
+  "please_sign_in_with_your_administrator_account_e74731": [
+    "请使用管理员账号重新登录。",
+    "Please sign in with your administrator account."
+  ],
+  "too_many_requests_please_try_again_later_e30269": [
+    "操作较多，请稍后再试。",
+    "Too many requests. Please try again later."
+  ],
+  "check_the_required_fields_dates_and_times_29fdcf": [
+    "请检查必填项、日期和时间，修正后再试。",
+    "Check the required fields, dates and times, then try again."
+  ],
+  "we_could_not_complete_this_please_try_928dc4": [
+    "暂时未能完成，请重试。",
+    "We could not complete this. Please try again."
+  ],
+  "message_1186a6e2": [
+    "已放进购物车，一点快乐收好了。",
+    "Added to your bag. A little joy, collected."
+  ]
+}

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "../content/components-InquiryForm.json";
+import { say } from "../state";
+
 import { reactive, ref } from "vue";
 import { PhArrowRight, PhCheck, PhCopy } from "@phosphor-icons/vue";
 import { api, locale, tr, wechat } from "../state";
@@ -39,10 +42,7 @@ async function submit() {
   if (sending.value || props.disabled || props.submitDisabled) return;
   error.value = "";
   if (props.booking && props.booking.end <= props.booking.start) {
-    error.value = tr(
-      "结束时间需要晚于开始时间，请调整后提交。",
-      "Please choose an end time after your start time.",
-    );
+    error.value = say(copyText.please_choose_an_end_time_after_your_e99e5b);
     return;
   }
   const payload = JSON.stringify({
@@ -77,7 +77,7 @@ async function submit() {
     error.value =
       e instanceof Error
         ? e.message
-        : tr("提交失败，请稍后重试。", "Please try again in a moment.");
+        : say(copyText.please_try_again_in_a_moment_d66e30);
   } finally {
     sending.value = false;
     emit("busy", false);
@@ -98,22 +98,17 @@ async function copyReceipt() {
   <section v-if="receipt" class="receipt" aria-live="polite">
     <div class="receipt-check"><PhCheck :size="28" /></div>
     <h2 ref="receiptHeading" tabindex="-1">
-      {{ tr("收到你的小计划了。", "Your little plan is with us.") }}
+      {{ say(copyText.your_little_plan_is_with_us_04bf13) }}
     </h2>
     <p>
-      {{
-        tr(
-          "这是待店主确认的意向。请保留编号，我们会通过你填写的联系方式确认安排。",
-          "This is a request awaiting the host’s confirmation. Keep your reference. We will use the contact details you provided to confirm the arrangements.",
-        )
-      }}
+      {{ say(copyText.this_is_a_request_awaiting_the_hosts_5f4744) }}
     </p>
     <div class="receipt-number">
       <span>{{ receipt }}</span
       ><button
         class="icon-button"
         @click="copyReceipt"
-        :aria-label="tr('复制意向编号', 'Copy request reference')"
+        :aria-label="say(copyText.copy_request_reference_f802cb)"
       >
         <PhCheck v-if="copied" /><PhCopy v-else />
       </button>
@@ -122,26 +117,21 @@ async function copyReceipt() {
       <li v-for="line in receiptSummary" :key="line">{{ line }}</li>
     </ul>
     <p class="fine-print">
-      {{
-        tr(
-          "尚未锁定座位或库存，也未收取费用。需要补充信息时，可微信联系：",
-          "No seats or stock have been reserved and no payment has been taken. To add anything, find us on WeChat: ",
-        )
-      }}
+      {{ say(copyText.no_seats_or_stock_have_been_reserved_dd3eb5) }}
       {{ wechat }}
     </p>
     <RouterLink to="/" class="text-link"
-      >{{ tr("回小屋逛逛", "Back to the studio") }}<PhArrowRight
+      >{{ say(copyText.back_to_the_studio_2d6b10) }}<PhArrowRight
     /></RouterLink>
   </section>
   <form v-else @submit.prevent="submit" class="inquiry-form">
     <fieldset :disabled="sending || disabled">
       <slot name="details" />
       <div class="form-section">
-        <h2>{{ tr("怎么称呼你？", "A little about you.") }}</h2>
+        <h2>{{ say(copyText.a_little_about_you_aaea3d) }}</h2>
         <div class="form-grid">
           <label class="field"
-            >{{ tr("你的称呼", "Your name")
+            >{{ say(copyText.your_name_691e1f)
             }}<input
               v-model.trim="form.name"
               name="name"
@@ -149,15 +139,15 @@ async function copyReceipt() {
               required
               maxlength="80"
               :placeholder="
-                tr('让我们知道怎么称呼你', 'What should we call you?')
+                say(copyText.what_should_we_call_you_6d8359)
               " /></label
           ><label class="field"
-            >{{ tr("联系途径", "Contact me by")
+            >{{ say(copyText.contact_me_by_f0e9c0)
             }}<select v-model="form.contact_method" name="contact_method">
-              <option value="wechat">{{ tr("微信", "WeChat") }}</option>
-              <option value="email">{{ tr("电子邮箱", "Email") }}</option>
+              <option value="wechat">{{ say(copyText.wechat_2941d2) }}</option>
+              <option value="email">{{ say(copyText.email_b6d15f) }}</option>
               <option value="phone">
-                {{ tr("电话 / 短信", "Phone / text") }}
+                {{ say(copyText.phone_text_b1c5c8) }}
               </option>
             </select></label
           >
@@ -165,10 +155,10 @@ async function copyReceipt() {
         <label class="field"
           >{{
             form.contact_method === "wechat"
-              ? tr("微信号", "WeChat ID")
+              ? say(copyText.wechat_id_7a6e86)
               : form.contact_method === "email"
-                ? tr("电子邮箱", "Email address")
-                : tr("联系电话", "Phone number")
+                ? say(copyText.email_address_5e4a2c)
+                : say(copyText.phone_number_19a4c0)
           }}<input
             v-model.trim="form.contact"
             name="contact"
@@ -190,13 +180,10 @@ async function copyReceipt() {
             minlength="3"
             maxlength="180"
             :placeholder="
-              tr(
-                '仅用于联系并确认这次安排',
-                'Only used to arrange this request',
-              )
+              say(copyText.only_used_to_arrange_this_request_828bd2)
             " /></label
         ><label class="field"
-          >{{ tr("想提前告诉我们的事（选填）", "Anything else? (optional)")
+          >{{ say(copyText.anything_else_optional_6ee301)
           }}<textarea
             v-model.trim="form.notes"
             name="notes"
@@ -204,13 +191,9 @@ async function copyReceipt() {
             maxlength="1500"
             :placeholder="
               kind === 'visit'
-                ? tr(
-                    '第一次拼豆、想做的图案、同行安排，或其他需要……',
-                    'Your first visit, a pattern you have in mind, or anything you need…',
-                  )
-                : tr(
-                    '色号、数量、喜欢的款式、希望自提的时间……',
-                    'Colour codes, preferred styles, quantities or a pickup date…',
+                ? say(copyText.your_first_visit_a_pattern_you_have_bcba21)
+                : say(
+                    copyText.colour_codes_preferred_styles_quantities_or_a_e133a6,
                   )
             "
           ></textarea>
@@ -225,23 +208,15 @@ async function copyReceipt() {
         /></label>
       </div>
       <div class="request-summary">
-        <h3>{{ tr("提交前，再看一眼", "Your request at a glance") }}</h3>
+        <h3>{{ say(copyText.your_request_at_a_glance_5bba9e) }}</h3>
         <p v-for="line in summary" :key="line">{{ line }}</p>
         <p class="fine-print">
-          {{
-            tr(
-              "价格、时间及具体安排，以店主后续确认为准。",
-              "Prices, timing and details are subject to the host’s confirmation.",
-            )
-          }}
+          {{ say(copyText.prices_timing_and_details_are_subject_to_8b7d42) }}
         </p>
       </div>
       <label class="consent"
         ><input v-model="form.consent" type="checkbox" required /><span>{{
-          tr(
-            "我理解这是一份待确认的意向，并同意店主使用上述联系方式沟通本次安排。",
-            "I understand this is a request, and agree that the host may use my contact details to arrange this visit or pickup.",
-          )
+          say(copyText.i_understand_this_is_a_request_and_bde9b7)
         }}</span></label
       >
       <p v-if="error" class="form-error" role="alert">{{ error }}</p>
@@ -252,19 +227,14 @@ async function copyReceipt() {
       >
         {{
           sending
-            ? tr("正在提交…", "Sending…")
+            ? say(copyText.sending_0b6530)
             : kind === "visit"
-              ? tr("提交预约意向", "Send visit request")
-              : tr("提交自提询单", "Send pickup inquiry")
+              ? say(copyText.send_visit_request_3b2fc0)
+              : say(copyText.send_pickup_inquiry_9e7c67)
         }}<PhArrowRight v-if="!sending" />
       </button>
       <p class="fine-print privacy-note">
-        {{
-          tr(
-            "联系信息仅供店主处理本次请求。提交后无需在线付款；收到确认后再到店。",
-            "Contact details are only used by the host to handle this request. No online payment is required. Please wait for confirmation before visiting.",
-          )
-        }}
+        {{ say(copyText.contact_details_are_only_used_by_the_145329) }}
       </p>
     </fieldset>
   </form>

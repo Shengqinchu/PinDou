@@ -35,7 +35,7 @@ onMounted(() => {
       {
         height,
         duration: motion.state,
-        ease: "studio-travel",
+        ease: "studio-control",
         clearProps: "height,overflow",
       },
     );

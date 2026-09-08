@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "../content/pages-ReservationReceipt.json";
+import { say } from "../state";
+
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import {
@@ -8,7 +11,7 @@ import {
   PhArrowClockwise,
 } from "@phosphor-icons/vue";
 import { commerceApi } from "../commerce";
-import { prettyDate, tr, wechat } from "../state";
+import { prettyDate, tr, wechat, phone, phoneHref } from "../state";
 import type { Reservation } from "../reservations";
 const route = useRoute(),
   result = ref<Reservation>(),
@@ -62,88 +65,79 @@ onBeforeUnmount(() => {
       </div>
       <p class="vision-eyebrow">{{ result.id }}</p>
       <h1 v-if="result.status === 'pending'">
-        {{ tr("已提交预约，", "Your request is in.") }}<br /><em>{{
-          tr("等待店主确认", "The host will confirm it.")
+        {{ say(copyText.your_request_is_in_4ebd77) }}<br /><em>{{
+          say(copyText.the_host_will_confirm_it_ae62ce)
         }}</em>
       </h1>
       <h1 v-else-if="result.status === 'confirmed'">
-        {{ tr("预约成功，", "Your visit is confirmed.") }}<br /><em>{{
-          tr("等你来玩！", "See you at the studio!")
+        {{ say(copyText.your_visit_is_confirmed_94453d) }}<br /><em>{{
+          say(copyText.see_you_at_the_studio_add3a5)
         }}</em>
       </h1>
       <h1 v-else-if="result.status === 'completed'">
-        {{ tr("谢谢你来，", "Thank you for coming.") }}<br /><em>{{
-          tr("下次再一起拼。", "Let's make again soon.")
+        {{ say(copyText.thank_you_for_coming_285672) }}<br /><em>{{
+          say(copyText.lets_make_again_soon_12f0b9)
         }}</em>
       </h1>
       <h1 v-else>
-        {{ tr("这次预约已取消", "This reservation was cancelled") }}
+        {{ say(copyText.this_reservation_was_cancelled_54b1d2) }}
       </h1>
       <p v-if="result.status === 'pending'">
-        {{
-          tr(
-            "店主会尽快查看安排，确认后即预约成功。把这页留在当前浏览器，可以随时查看状态。",
-            "The host will review your plans as soon as possible. Your visit is booked once confirmed. Keep this page in the same browser to check its status.",
-          )
-        }}
+        {{ say(copyText.the_host_will_review_your_plans_as_fec716) }}
+      </p>
+      <p v-if="result.status === 'pending'" class="reservation-urgent">
+        {{ say(copyText.if_your_visit_starts_in_less_than_4b8a93) }}
       </p>
       <dl>
         <div>
-          <dt>{{ tr("客人", "Guest") }}</dt>
+          <dt>{{ say(copyText.guest_9302c0) }}</dt>
           <dd>{{ result.name }}</dd>
         </div>
         <div>
-          <dt>{{ tr("到店时间", "Visit time") }}</dt>
+          <dt>{{ say(copyText.visit_time_9fc550) }}</dt>
           <dd>
             {{ prettyDate(result.booking.date) }}<br />{{
               result.booking.start
             }}–{{ result.booking.end }} ·
-            {{ tr("汉密尔顿当地时间", "Hamilton local time") }}
+            {{ say(copyText.hamilton_local_time_496f95) }}
           </dd>
         </div>
         <div>
-          <dt>{{ tr("同行人数", "Guests") }}</dt>
-          <dd>{{ result.booking.guests }} {{ tr("人", "guests") }}</dd>
+          <dt>{{ say(copyText.guests_c77186) }}</dt>
+          <dd>{{ result.booking.guests }} {{ say(copyText.guests_24bfb5) }}</dd>
         </div>
         <div>
-          <dt>{{ tr("体验", "Experience") }}</dt>
+          <dt>{{ say(copyText.experience_cc25a0) }}</dt>
           <dd>
             {{
               result.booking.plan === "day"
-                ? tr("全天体验", "Day visit")
-                : tr("按时体验", "Hourly visit")
+                ? say(copyText.day_visit_aad886)
+                : say(copyText.hourly_visit_681491)
             }}
           </dd>
         </div>
       </dl>
-      <p>
-        {{
-          tr(
-            "欢迎来玩，先看看小屋的到访和停车信息吧。",
-            "We look forward to seeing you. Take a look at the studio and parking details before you come.",
-          )
-        }}
+      <p class="reservation-details-link">
+        {{ say(copyText.come_along_and_read_our_ad449d)
+        }}<RouterLink to="/details">{{
+          say(copyText.studio_details_fbed84)
+        }}</RouterLink
+        >{{ say(copyText.before_your_visit_1e5e77) }}
       </p>
-      <RouterLink class="button button-primary" to="/details"
-        >{{ tr("拼豆铺详细信息", "Studio details") }}<PhArrowRight
-      /></RouterLink>
     </template>
     <p v-else-if="busy" role="status">
-      {{ tr("正在查看预约……", "Loading your reservation…") }}
+      {{ say(copyText.loading_your_reservation_9f91f7) }}
     </p>
     <p v-if="error" class="form-error" role="alert">{{ error }}</p>
     <button type="button" class="text-link" :disabled="busy" @click="refresh">
       <PhArrowClockwise :class="{ spinning: busy }" />{{
-        tr("刷新预约状态", "Refresh reservation")
+        say(copyText.refresh_reservation_30af18)
       }}
     </button>
     <p class="fine-print">
-      {{
-        tr(
-          "如需调整安排，请联系店主。微信号：",
-          "For changes, contact the host on WeChat: ",
-        )
-      }}{{ wechat }}
+      {{ say(copyText.for_changes_contact_the_host_on_wechat_2921d8)
+      }}{{ wechat }} · {{ say(copyText.phone_0614da)
+      }}<a :href="phoneHref">{{ phone }}</a>
     </p>
   </section>
 </template>

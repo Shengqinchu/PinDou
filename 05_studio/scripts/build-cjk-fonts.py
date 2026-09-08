@@ -13,7 +13,7 @@ output.mkdir(parents=True, exist_ok=True)
 licenses = web / "public/font-licenses"
 licenses.mkdir(parents=True, exist_ok=True)
 
-text = "".join(p.read_text(encoding="utf8") for p in (web / "src").rglob("*") if p.suffix in {".vue", ".ts"})
+text = "".join(p.read_text(encoding="utf8") for p in (web / "src").rglob("*") if p.suffix in {".vue", ".ts", ".json"})
 # Include all static UI CJK characters, punctuation and common numerals used in dates.
 characters = {ord(c) for c in text if ord(c) > 127}
 characters.update(range(0x3000, 0x3040))

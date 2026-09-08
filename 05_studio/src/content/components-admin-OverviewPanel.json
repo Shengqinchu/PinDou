@@ -1,0 +1,94 @@
+{
+  "connect_your_payment_account_a57502": [
+    "连接收款账户",
+    "Connect your payment account"
+  ],
+  "hupijiao_checkout_017d75": ["虎皮椒收银台", "Hupijiao checkout"],
+  "set_opening_hours_and_seats_4ed29a": [
+    "安排营业时间和座位",
+    "Set opening hours and seats"
+  ],
+  "weekly_hours_and_capacity_e99e57": [
+    "每周排班和接待人数",
+    "Weekly hours and capacity"
+  ],
+  "confirm_prices_and_tax_0c4728": ["确认售价与税费", "Confirm prices and tax"],
+  "show_the_final_amount_customers_pay_45b703": [
+    "让客人看到最终实付金额",
+    "Show the final amount customers pay"
+  ],
+  "pindou_puppy_studio_desk_c23194": [
+    "小狗拼豆铺 · 店主工作台",
+    "PINDOU PUPPY · STUDIO DESK"
+  ],
+  "today_at_puppy_fa2258": ["店里的今天", "Today, at puppy."],
+  "todays_visits_new_orders_and_the_things_8c7be3": [
+    "先看今天的安排，再处理新的订单。",
+    "Today’s visits, new orders and the things that need you."
+  ],
+  "todays_schedule_51eea7": ["查看今日排班", "Today’s schedule"],
+  "review_payments_that_need_a_new_arrangement_eba4af": [
+    "查看付款后需要重新安排的订单。",
+    "Review payments that need a new arrangement."
+  ],
+  "review_orders_424b4e": ["查看订单", "Review orders"],
+  "guests_booked_today_fd4fc5": ["今日到店人数", "Guests booked today"],
+  "paid_and_confirmed_seats_05d4d4": [
+    "已付款确认的座位",
+    "Paid and confirmed seats"
+  ],
+  "new_orders_today_39b386": ["今日新订单", "New orders today"],
+  "counted_by_hamilton_local_date_948b87": [
+    "按 Hamilton 当地日期统计",
+    "Counted by Hamilton local date"
+  ],
+  "payments_received_today_3c2886": ["今日已收款", "Payments received today"],
+  "cny_verified_payments_7ad2e0": [
+    "人民币 · 已核实到账",
+    "CNY · Verified payments"
+  ],
+  "awaiting_visit_or_pickup_eeb3c4": [
+    "待到店／自提",
+    "Awaiting visit or pickup"
+  ],
+  "paid_awaiting_visit_or_pickup_e82d5f": [
+    "已付款，等待到店或自提",
+    "Paid, awaiting visit or pickup"
+  ],
+  "today_at_the_studio_3ac0d6": ["今日安排", "TODAY AT THE STUDIO"],
+  "who_is_coming_by_31fe9f": ["今天，谁来玩？", "Who is coming by?"],
+  "schedule_2cc1af": ["查看排班", "Schedule"],
+  "guests_studio_visit_ea3db0": ["人 · 到店体验", "guests · Studio visit"],
+  "visited_f3f354": ["已到店", "Visited"],
+  "confirmed_b1c92b": ["已确认", "Confirmed"],
+  "paying_575d26": ["付款中", "Paying"],
+  "no_visits_booked_for_today_66fab4": [
+    "今天还没有到店安排",
+    "No visits booked for today"
+  ],
+  "confirmed_visits_and_seats_held_for_payment_1a367b": [
+    "已确认的体验和付款中的座位会显示在这里。",
+    "Confirmed visits and seats held for payment appear here."
+  ],
+  "set_your_studio_hours_4b6048": ["去安排营业时间", "Set your studio hours"],
+  "recent_orders_1e2c3b": ["最近的订单", "Recent orders"],
+  "all_orders_442e68": ["全部订单", "All orders"],
+  "your_first_order_will_appear_here_when_61c238": [
+    "收到第一笔订单后，就会在这里看到它。",
+    "Your first order will appear here when it arrives."
+  ],
+  "studio_setup_complete_3dbd85": ["开店配置已完成", "Studio setup complete"],
+  "a_few_things_before_opening_2124b3": [
+    "开店前，还需要这些准备",
+    "A few things before opening"
+  ],
+  "online_purchases_are_open_f76789": [
+    "网上购买已开放",
+    "Online purchases are open"
+  ],
+  "online_purchases_are_not_open_yet_1dc20d": [
+    "网上购买尚未开放",
+    "Online purchases are not open yet"
+  ],
+  "message_c5021d52": ["{v0} 笔订单需要跟进", "{v0} orders need a follow-up"]
+}

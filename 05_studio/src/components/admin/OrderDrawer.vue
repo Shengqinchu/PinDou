@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "../../content/components-admin-OrderDrawer.json";
+import { say } from "../../state";
+
 import {
   PhCheck,
   PhClock,
@@ -15,16 +18,16 @@ async function copy() {
   if (!order.value) return;
   try {
     await navigator.clipboard.writeText(order.value.id);
-    notify("订单号已复制", "Order number copied");
+    notify(copyText.message_a1acbedd[0], copyText.message_a1acbedd[1]);
   } catch {
-    notify("请选中订单号复制", "Select the order number to copy it", "error");
+    notify(copyText.message_3d2221e9[0], copyText.message_3d2221e9[1], "error");
   }
 }
 </script>
 <template>
   <SlideOver
     v-model="orderOpen"
-    :title="tr('订单详情', 'Order details')"
+    :title="say(copyText.order_details_07f28a)"
     :subtitle="order?.customer?.name"
     :busy="saving"
     ><div v-if="orderBusy" class="drawer-loading" aria-busy="true">
@@ -34,7 +37,7 @@ async function copy() {
       ><div class="order-drawer-status">
         <span :class="['desk-status', order.status]">{{
           order.fulfillment === "completed"
-            ? tr("已完成", "Fulfilled")
+            ? say(copyText.fulfilled_bf1ec7)
             : statusText(order.status)
         }}</span
         ><small>{{ localTime(order.created_at) }}</small>
@@ -43,15 +46,10 @@ async function copy() {
         {{ order.id }}<PhCopy />
       </button>
       <p v-if="order.status === 'paid_needs_review'" class="desk-error">
-        {{
-          tr(
-            "这笔订单已收款，但原座位或商品无法履约。请联系顾客安排改期或退款。",
-            "Payment was received, but the original seats or stock could not be fulfilled. Contact the customer to reschedule or arrange a refund.",
-          )
-        }}
+        {{ say(copyText.payment_was_received_but_the_original_seats_72b31b) }}
       </p>
       <section class="drawer-section">
-        <h3>{{ tr("顾客信息", "Customer") }}</h3>
+        <h3>{{ say(copyText.customer_76be83) }}</h3>
         <div class="drawer-customer">
           <span class="customer-monogram">{{
             order.customer?.name.slice(0, 1)
@@ -69,7 +67,7 @@ async function copy() {
         </p>
       </section>
       <section class="drawer-section">
-        <h3>{{ tr("这份订单里", "In this order") }}</h3>
+        <h3>{{ say(copyText.in_this_order_38d926) }}</h3>
         <article
           v-for="(line, i) in order.quote.lines"
           :key="i"
@@ -84,34 +82,33 @@ async function copy() {
               {{ prettyDate(line.booking.date) }}<br />{{
                 line.booking.start
               }}–{{ line.booking.end }} · {{ line.booking.guests }}
-              {{ tr("人 · Hamilton 时间", "guests · Hamilton time") }}
+              {{ say(copyText.guests_hamilton_time_a7aa80) }}
             </p>
-            <p v-else>{{ tr("到店自提", "Studio pickup") }}</p>
+            <p v-else>{{ say(copyText.studio_pickup_c13b87) }}</p>
           </div>
           <strong>{{ money(line.total_cents) }}</strong>
         </article>
         <dl class="drawer-totals">
           <div>
-            <dt>{{ tr("加元合计", "CAD total") }}</dt>
+            <dt>{{ say(copyText.cad_total_0fc8b6) }}</dt>
             <dd>{{ money(order.quote.total_cents) }}</dd>
           </div>
           <div>
-            <dt>{{ tr("人民币实付", "Amount in CNY") }}</dt>
+            <dt>{{ say(copyText.amount_in_cny_62da3c) }}</dt>
             <dd>{{ money(order.quote.cny_fen, "CNY") }}</dd>
           </div>
         </dl>
       </section>
       <section class="drawer-section">
         <label class="desk-field"
-          >{{ tr("内部备注", "Staff note")
+          >{{ say(copyText.staff_note_0d849e)
           }}<textarea
             v-model="order.staff_note"
             rows="3"
             maxlength="1500"
             :placeholder="
-              tr(
-                '例如：已联系顾客、自提时间、特别安排',
-                'For example: contacted guest, pickup time, special arrangements',
+              say(
+                copyText.for_example_contacted_guest_pickup_time_special_be0f3b,
               )
             "
           />
@@ -119,7 +116,7 @@ async function copy() {
         <p v-if="error" class="desk-error" role="alert">{{ error }}</p>
       </section>
       <section class="drawer-section">
-        <h3>{{ tr("订单记录", "Order timeline") }}</h3>
+        <h3>{{ say(copyText.order_timeline_0fd9c3) }}</h3>
         <ol class="order-timeline">
           <li v-for="event in order.events" :key="event.id">
             <span class="timeline-dot"
@@ -133,7 +130,7 @@ async function copy() {
                 >{{ localTime(event.created_at) }} ·
                 {{
                   event.actor === "system"
-                    ? tr("自动处理", "Automatic")
+                    ? say(copyText.automatic_ad54d8)
                     : event.actor
                 }}</small
               >
@@ -149,7 +146,7 @@ async function copy() {
         :disabled="saving"
         @click="saveOrder(order.fulfillment === 'completed')"
       >
-        {{ tr("保存备注", "Save note") }}</button
+        {{ say(copyText.save_note_449101) }}</button
       ><button
         v-if="order.status === 'paid'"
         class="desk-button primary"
@@ -160,10 +157,10 @@ async function copy() {
           v-if="order.fulfillment === 'completed'"
         /><PhCheck v-else />{{
           saving
-            ? tr("保存中…", "Saving…")
+            ? say(copyText.saving_1bd9fd)
             : order.fulfillment === "completed"
-              ? tr("恢复待完成", "Reopen")
-              : tr("标记已到店／自提", "Mark fulfilled")
+              ? say(copyText.reopen_766aae)
+              : say(copyText.mark_fulfilled_d8eac2)
         }}
       </button></template
     ></SlideOver

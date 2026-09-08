@@ -1,53 +1,77 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { PhArrowUpRight } from "@phosphor-icons/vue";
-import PhotoViewer from "../components/PhotoViewer.vue";
-import { gallery, media, socialUrl, tr } from "../state";
-const viewer = ref<InstanceType<typeof PhotoViewer>>();
+import copyText from "../content/pages-Journal.json";
+import { say } from "../state";
+
+import { PhArrowUpRight, PhArrowRight } from "@phosphor-icons/vue";
+import { socialUrl, tr } from "../state";
+import journal from "../content/journal-posts.json";
+import BrandMotif from "../components/BrandMotif.vue";
+const base = import.meta.env.BASE_URL;
 </script>
 <template>
-  <section class="container page-intro">
+  <section class="container page-intro journal-intro">
     <h1>
-      {{ tr("小屋里的，", "Life in our") }}<br /><em>{{
-        tr("那些小快乐。", "little studio.")
+      {{ say(copyText.life_in_our_1d9155) }}<br /><em>{{
+        say(copyText.little_studio_902113)
       }}</em>
     </h1>
     <div>
-      <p>
-        {{
-          tr(
-            "墙上的新作品、桌上的新颜色，以及每一个认真拼豆的下午。这里的照片，都是小狗拼豆铺的真实日常。",
-            "New pieces on the wall, new colours on the table, and afternoons well spent. Real photographs from everyday life at Pindo Puppy.",
-          )
-        }}
-      </p>
+      <p>{{ say(copyText.new_pieces_on_the_wall_new_colours_0e0a4b) }}</p>
       <a class="text-link" :href="socialUrl" target="_blank" rel="noreferrer"
-        >{{ tr("去小红书看更多日常", "More stories on Xiaohongshu")
-        }}<PhArrowUpRight
+        >{{ say(copyText.more_stories_on_xiaohongshu_d10ec3) }}<PhArrowUpRight
       /></a>
     </div>
   </section>
   <section
-    class="container journal-grid section-bottom"
-    :aria-label="tr('工作室相册', 'Studio gallery')"
+    class="container journal-stories section-bottom"
+    :aria-label="say(copyText.beadmaking_stories_by_xiaogou_shuangji_efb72f)"
   >
-    <button
-      class="photo-tile"
-      v-for="(photo, i) in gallery"
-      :key="photo.image"
-      @click="viewer?.open(i)"
+    <article
+      v-for="(post, i) in journal.posts"
+      :key="post.id"
+      class="journal-story"
+      :class="{ featured: i === 0 }"
     >
-      <div class="photo-tile-image">
-        <img
-          :src="media(photo.image)"
-          :alt="tr(photo.zh, photo.en)"
-          width="1080"
-          height="1440"
-          :loading="i < 2 ? 'eager' : 'lazy'"
-        /><span class="photo-expand"><PhArrowUpRight /></span>
-      </div>
-      <span>{{ tr(photo.zh, photo.en) }}</span>
-    </button>
+      <RouterLink :to="'/journal/' + post.id" class="journal-story-link">
+        <div class="journal-story-cover">
+          <img
+            :src="base + post.images[0].src"
+            :alt="post.title"
+            :width="post.images[0].width"
+            :height="post.images[0].height"
+            :loading="i < 2 ? 'eager' : 'lazy'"
+          />
+        </div>
+        <div class="journal-story-copy">
+          <span class="journal-story-source"
+            >{{ say(copyText.xiaogou_shuangji_xiaohongshu_380bde)
+            }}<span v-if="post.kind === 'excerpt'">{{
+              say(copyText.excerpt_040d41)
+            }}</span></span
+          >
+          <h2>{{ post.title }}</h2>
+          <p>
+            {{
+              post.body
+                .replace(/\[.*?R\]/g, "")
+                .slice(0, post.kind === "full" ? 90 : 60)
+            }}{{ post.kind === "full" ? "…" : "" }}
+          </p>
+          <span class="journal-read"
+            >{{ say(copyText.open_this_story_b4bd90) }}<PhArrowRight
+          /></span>
+        </div>
+      </RouterLink>
+    </article>
+    <a
+      class="journal-collection"
+      :href="journal.collection_url"
+      target="_blank"
+      rel="noreferrer"
+      ><BrandMotif kind="heart" /><span>{{ journal.collection_title }}</span
+      ><span class="text-link"
+        >{{ say(copyText.browse_the_full_collection_on_xiaohongshu_f762be)
+        }}<PhArrowUpRight /></span
+    ></a>
   </section>
-  <PhotoViewer ref="viewer" :photos="gallery" />
 </template>

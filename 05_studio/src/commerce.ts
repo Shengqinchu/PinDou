@@ -1,3 +1,7 @@
+import contentLabels from "./content/data-commerce-labels.json";
+import contentMessages from "./content/data-commerce-messages.json";
+import copyText from "./content/commerce.json";
+import { say } from "./state";
 import { computed, ref, watch } from "vue";
 import { locale, tr } from "./state";
 import { notify } from "./ui";
@@ -104,100 +108,10 @@ export type Order = {
   };
 };
 
-const messages: Record<string, [string, string]> = {
-  shop_paused: [
-    "拼豆小店尚在开发，暂不开放购买。",
-    "The little shop is still in development and is not open for purchases.",
-  ],
-  reservation_outside_window: [
-    "目前仅接受未来两周的预约，请重新选择日期。",
-    "Please choose a date within the next two weeks.",
-  ],
-  reservation_interval_unavailable: [
-    "这个时段无法安排，请选择其他至少两小时的时段。",
-    "This time cannot be arranged. Choose another interval of at least two hours.",
-  ],
-  reservation_in_past: [
-    "这个开始时间已过去，请重新选择。",
-    "This start time has passed. Please choose another.",
-  ],
-  reservation_day_end: [
-    "全天体验需在当天可预约时段结束时结束。",
-    "A day visit ends at the end of that day's available hours.",
-  ],
-  reservation_session_missing: [
-    "请重新加载时间表后恢复提交。",
-    "Reload the timetable before recovering this submission.",
-  ],
-  reservation_request_changed: [
-    "无法核对原提交，请联系店主查询，避免重复预约。",
-    "We could not verify the original submission. Contact the host to avoid a duplicate.",
-  ],
-  reservation_not_found: [
-    "无法读取这份预约，请使用提交时的浏览器，或联系店主查询。",
-    "Open this reservation in the browser used to submit it, or contact the host.",
-  ],
-  reservation_confirmation_conflict: [
-    "此时段已有已确认预约，请先处理重叠安排。",
-    "A confirmed reservation overlaps this time. Resolve the overlap first.",
-  ],
-  reservation_not_confirmed: [
-    "请先确认预约，再标记为已完成。",
-    "Confirm the reservation before marking it complete.",
-  ],
-  invalid_reservation_time: [
-    "请选择整点或半点时间。",
-    "Choose a time on the hour or half hour.",
-  ],
-  checkout_not_open: [
-    "网上购买即将开放，请稍后再来。",
-    "Online purchases will open soon. Please check back.",
-  ],
-  slot_unavailable: [
-    "这个时段的座位不足或已过期，请重新选择。",
-    "This time is no longer available. Please choose another.",
-  ],
-  stock_unavailable: [
-    "有商品库存不足，请调整数量。",
-    "An item has insufficient stock. Please update the quantity.",
-  ],
-  product_unavailable: [
-    "有商品暂未上架，请将它移出购物车。",
-    "An item is unavailable. Please remove it from your bag.",
-  ],
-  price_changed: [
-    "价格已更新，请核对新的金额后再次结账。",
-    "Prices have changed. Review the updated total before paying.",
-  ],
-  version_conflict: [
-    "其他操作已更新这份资料，请刷新后再保存。",
-    "This was updated elsewhere. Refresh before saving.",
-  ],
-  capacity_below_reservations: [
-    "人数上限不能低于已经确认或暂留的座位数。",
-    "Capacity cannot be lower than existing reservations.",
-  ],
-  stock_below_holds: [
-    "库存不能低于付款中的暂留数量。",
-    "Stock cannot be lower than the quantity held for payment.",
-  ],
-  order_not_found: [
-    "无法读取订单，请用下单的浏览器打开。",
-    "Please open this order in the browser you used to purchase.",
-  ],
-  request_changed: [
-    "这次结账内容已变化，请刷新购物车。",
-    "Checkout details changed. Please refresh your bag.",
-  ],
-  order_not_paid: [
-    "订单尚未完成付款，不能标记为已交付。",
-    "This order has not been paid and cannot be fulfilled.",
-  ],
-  order_amount_limit: [
-    "本单金额超出在线支付范围，请分开购买。",
-    "This order exceeds the online limit. Please split your purchase.",
-  ],
-};
+const messages: Record<string, string[]> = contentMessages as Record<
+  string,
+  string[]
+>;
 
 export class CommerceError extends Error {
   constructor(
@@ -224,10 +138,7 @@ export async function commerceApi<T>(
       throw error;
     // No HTTP response: keep checkout's uncertain-result recovery semantics.
     throw new CommerceError(
-      tr(
-        "暂时连接不上，请检查网络后重试。",
-        "We could not connect. Check your connection and try again.",
-      ),
+      say(copyText.we_could_not_connect_check_your_connection_b4bde6),
       0,
     );
   }
@@ -235,36 +146,24 @@ export async function commerceApi<T>(
   if (!response.ok) {
     const words = messages[data.detail];
     if (words)
-      throw new CommerceError(tr(...words), response.status, data.detail);
+      throw new CommerceError(say(words), response.status, data.detail);
     if (response.status === 401 || response.status === 403)
       throw new CommerceError(
-        tr(
-          "请使用管理员账号重新登录。",
-          "Please sign in with your administrator account.",
-        ),
+        say(copyText.please_sign_in_with_your_administrator_account_e74731),
         response.status,
       );
     if (response.status === 429)
       throw new CommerceError(
-        tr(
-          "操作较多，请稍后再试。",
-          "Too many requests. Please try again later.",
-        ),
+        say(copyText.too_many_requests_please_try_again_later_e30269),
         response.status,
       );
     if (response.status === 422)
       throw new CommerceError(
-        tr(
-          "请检查必填项、日期和时间，修正后再试。",
-          "Check the required fields, dates and times, then try again.",
-        ),
+        say(copyText.check_the_required_fields_dates_and_times_29fdcf),
         response.status,
       );
     throw new CommerceError(
-      tr(
-        "暂时未能完成，请重试。",
-        "We could not complete this. Please try again.",
-      ),
+      say(copyText.we_could_not_complete_this_please_try_928dc4),
       response.status,
     );
   }
@@ -332,8 +231,8 @@ export function addToBag(product_id: string, booking?: Booking) {
       booking: booking || null,
     });
   notify(
-    "已放进购物车，一点快乐收好了。",
-    "Added to your bag. A little joy, collected.",
+    copyText.message_1186a6e2[0],
+    copyText.message_1186a6e2[1],
     "success",
     "cart",
   );
@@ -370,18 +269,9 @@ export function rememberOrder(id: string, key: string) {
 }
 export const recentOrder = ref(stored<string>("puppy-recent-order-v2", ""));
 export function statusText(status: string) {
-  const labels: Record<string, [string, string]> = {
-    creating: ["正在准备付款", "Preparing payment"],
-    pending: ["等待付款", "Awaiting payment"],
-    payment_uncertain: ["正在核实支付状态", "Checking payment status"],
-    paid: ["付款成功 · 已确认", "Paid · Confirmed"],
-    paid_needs_review: [
-      "已付款 · 需要店主处理",
-      "Paid · Host assistance needed",
-    ],
-    expired: ["付款时间已过", "Payment time expired"],
-    failed: ["付款页面未能打开", "Payment could not be opened"],
-    refunded: ["已退款", "Refunded"],
-  };
-  return tr(...(labels[status] || [status, status]));
+  const labels: Record<string, string[]> = contentLabels as Record<
+    string,
+    string[]
+  >;
+  return say(labels[status] || [status, status]);
 }

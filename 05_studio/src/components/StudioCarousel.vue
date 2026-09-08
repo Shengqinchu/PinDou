@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import contentPhotos from "../content/data-components-StudioCarousel-photos.json";
+
+import copyText from "../content/components-StudioCarousel.json";
+import { say } from "../state";
+
 import { nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import {
   PhArrowLeft,
@@ -8,38 +13,7 @@ import {
 import { media, tr } from "../state";
 import { reducedMotion } from "../ui";
 import PhotoViewer from "./PhotoViewer.vue";
-const photos = [
-  {
-    image: "studio-04",
-    zh: "窗边的一张桌子，留给慢慢做手工的你",
-    en: "A table by the window, and time to make",
-  },
-  {
-    image: "studio-02",
-    zh: "白色工作台与越拼越满的作品墙",
-    en: "White worktables and a wall full of things we love",
-  },
-  {
-    image: "studio-08",
-    zh: "藏在小屋角落里的可爱",
-    en: "Lovely little things around the room",
-  },
-  {
-    image: "studio-06",
-    zh: "选一抹喜欢的颜色开始",
-    en: "Start with a colour you love",
-  },
-  {
-    image: "studio-07",
-    zh: "准备好工具，慢慢拼",
-    en: "Tools ready, take your time",
-  },
-  {
-    image: "studio-11",
-    zh: "把作品变成随身小物",
-    en: "Turn your piece into something to carry with you",
-  },
-];
+const photos = contentPhotos;
 const viewport = ref<HTMLElement>();
 const viewer = ref<InstanceType<typeof PhotoViewer>>();
 const current = ref(0);
@@ -91,10 +65,7 @@ onBeforeUnmount(() => {
       tabindex="0"
       role="region"
       :aria-label="
-        tr(
-          '工作室照片，可左右滑动',
-          'Studio photographs. Swipe or use the arrow keys.',
-        )
+        say(copyText.studio_photographs_swipe_or_use_the_arrow_9442fa)
       "
       @scroll.passive="scrolled"
       @pointerdown="intended = current"
@@ -112,20 +83,13 @@ onBeforeUnmount(() => {
         />
       </figure>
     </div>
-    <button
-      class="vision-carousel-expand icon-button"
-      :aria-label="tr('放大这张照片', 'Enlarge this photograph')"
-      @click="viewer?.open(current)"
-    >
-      <PhArrowsOutSimple :size="22" />
-    </button>
+
     <div class="vision-carousel-bottom">
-      <p>{{ tr(photos[current].zh, photos[current].en) }}</p>
       <div class="vision-carousel-controls">
         <button
           class="icon-button"
           :disabled="current === 0"
-          :aria-label="tr('上一张空间照片', 'Previous studio photo')"
+          :aria-label="say(copyText.previous_studio_photo_d0e31b)"
           @click="move(-1)"
         >
           <PhArrowLeft /></button
@@ -133,7 +97,7 @@ onBeforeUnmount(() => {
         ><button
           class="icon-button"
           :disabled="current === 5"
-          :aria-label="tr('下一张空间照片', 'Next studio photo')"
+          :aria-label="say(copyText.next_studio_photo_c276c9)"
           @click="move(1)"
         >
           <PhArrowRight />

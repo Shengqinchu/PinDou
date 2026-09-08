@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { formatCopy } from "../../state";
+
+import copyText from "../../content/components-admin-ProductsPanel.json";
+import { say } from "../../state";
+
 import { computed, ref } from "vue";
 import {
   PhPlus,
@@ -93,38 +98,35 @@ async function reloadSaved() {
     <header class="desk-page-heading">
       <div>
         <p class="desk-eyebrow">
-          {{ tr("每件小物，都有自己的位置", "LITTLE THINGS, WELL ARRANGED") }}
+          {{ say(copyText.little_things_well_arranged_cc4680) }}
         </p>
-        <h1>{{ tr("商品与体验", "Products & experiences") }}</h1>
+        <h1>{{ say(copyText.products_experiences_13735c) }}</h1>
         <p>
           {{
-            tr(
-              "定价、库存、上架状态，在这里一起照看。",
-              "Look after your prices, inventory and published products in one place.",
-            )
+            say(copyText.look_after_your_prices_inventory_and_published_2a98fe)
           }}
         </p>
       </div>
       <button class="desk-button primary" @click="create">
-        <PhPlus />{{ tr("添加商品", "Add product") }}
+        <PhPlus />{{ say(copyText.add_product_439e17) }}
       </button>
     </header>
     <section class="desk-surface product-workspace">
       <div class="order-filterbar">
         <SegmentedControl
           v-model="category"
-          :label="tr('商品类别', 'Product category')"
+          :label="say(copyText.product_category_6dec25)"
           :options="[
-            { value: 'all', label: tr('全部', 'All') },
-            { value: 'experience', label: tr('到店体验', 'Visits') },
-            { value: 'physical', label: tr('小物', 'Items') },
-            { value: 'draft', label: tr('待上架', 'Drafts') },
+            { value: 'all', label: say(copyText.all_902ec4) },
+            { value: 'experience', label: say(copyText.visits_3059b2) },
+            { value: 'physical', label: say(copyText.items_b2522f) },
+            { value: 'draft', label: say(copyText.drafts_034400) },
           ]"
         /><label class="desk-search"
           ><PhMagnifyingGlass /><input
             v-model="search"
-            :placeholder="tr('搜索商品名称', 'Search products')"
-            :aria-label="tr('搜索商品', 'Search products')"
+            :placeholder="say(copyText.search_products_1bc725)"
+            :aria-label="say(copyText.search_products_2ea3aa)"
         /></label>
       </div>
       <TransitionGroup name="product-list" tag="div" class="desk-product-list"
@@ -143,49 +145,41 @@ async function reloadSaved() {
             ><strong>{{ tr(p.zh, p.en) }}</strong
             ><small>{{
               p.kind === "experience"
-                ? tr("到店体验", "Studio experience")
-                : tr("到店自提", "Studio pickup")
+                ? say(copyText.studio_experience_8cbb77)
+                : say(copyText.studio_pickup_c13b87)
             }}</small></span
           ><span class="desk-product-price"
             ><strong>{{
               p.price_cents === null
-                ? tr("待定价", "Not priced")
+                ? say(copyText.not_priced_b9f3bb)
                 : money(p.price_cents)
             }}</strong
             ><small>{{
               p.id === "hourly"
-                ? tr("/ 人 / 小时", "/ person / hour")
+                ? say(copyText.person_hour_07ef59)
                 : p.kind === "experience"
-                  ? tr("/ 套餐", "/ pass")
-                  : tr(`库存 ${p.stock}`, `${p.stock} in stock`)
+                  ? say(copyText.pass_63a44a)
+                  : formatCopy(copyText.message_f4149935, { v0: p.stock })
             }}</small></span
           ><span :class="['desk-status', p.active ? 'paid' : 'draft']">{{
-            p.active ? tr("已上架", "Published") : tr("待上架", "Draft")
+            p.active
+              ? say(copyText.published_34899d)
+              : say(copyText.draft_e2df44)
           }}</span
           ><PhArrowUpRight /></button
       ></TransitionGroup>
       <div v-if="!visible.length" class="desk-empty">
         <PhPackage :size="30" />
-        <h3>{{ tr("没有找到这件小物", "No matching products") }}</h3>
+        <h3>{{ say(copyText.no_matching_products_0e35fb) }}</h3>
         <p>
-          {{
-            tr(
-              "换个名字搜搜，或者添加一件新商品。",
-              "Try another name or add a new product.",
-            )
-          }}
+          {{ say(copyText.try_another_name_or_add_a_new_b5ae79) }}
         </p>
       </div>
     </section>
     <SlideOver
       v-model="open"
-      :title="edit?.zh || tr('添加商品', 'Add product')"
-      :subtitle="
-        tr(
-          '商品编辑 · 关闭后保留本次草稿',
-          'PRODUCT EDITOR · DRAFT KEPT WHILE OPEN IN THIS DESK',
-        )
-      "
+      :title="edit?.zh || say(copyText.add_product_439e17)"
+      :subtitle="say(copyText.product_editor_draft_kept_while_open_in_e4715a)"
       :busy="saving"
       ><form
         v-if="edit"
@@ -196,26 +190,26 @@ async function reloadSaved() {
         <div class="product-editor-preview">
           <img
             :src="media(edit.image)"
-            :alt="tr('当前商品图片', 'Current product photo')"
+            :alt="say(copyText.current_product_photo_cae790)"
           />
           <div>
             <span :class="['desk-status', edit.active ? 'paid' : 'draft']">{{
               edit.active
-                ? tr("上架出售", "Published for sale")
-                : tr("待上架", "Draft")
+                ? say(copyText.published_for_sale_ecea53)
+                : say(copyText.draft_e2df44)
             }}</span>
-            <p>{{ tr("使用工作室实拍", "Photographed at the studio") }}</p>
+            <p>{{ say(copyText.photographed_at_the_studio_e4b259) }}</p>
           </div>
         </div>
         <div class="desk-form-grid">
           <label class="desk-field product-name-field"
-            >{{ tr("中文名称", "Chinese name")
+            >{{ say(copyText.chinese_name_9df9b3)
             }}<input v-model="edit.zh" maxlength="90" required /></label
           ><label class="desk-field product-name-field"
-            >{{ tr("英文名称", "English name")
+            >{{ say(copyText.english_name_63f9e2)
             }}<input v-model="edit.en" maxlength="140" required /></label
           ><label class="desk-field"
-            >{{ tr("售价 · CA$", "Price · CA$")
+            >{{ say(copyText.price_ca_d65afe)
             }}<input
               :value="edit.price_cents === null ? '' : edit.price_cents / 100"
               type="number"
@@ -225,7 +219,7 @@ async function reloadSaved() {
               :required="edit.active"
               @input="price" /></label
           ><label v-if="edit.kind === 'physical'" class="desk-field"
-            >{{ tr("剩余库存", "Remaining inventory")
+            >{{ say(copyText.remaining_inventory_5b9914)
             }}<input
               v-model.number="edit.stock"
               type="number"
@@ -233,34 +227,34 @@ async function reloadSaved() {
               max="100000"
               required /></label
           ><label v-if="edit.kind === 'physical'" class="desk-field"
-            >{{ tr("分类", "Category")
+            >{{ say(copyText.category_f7fc04)
             }}<select v-model="edit.category">
               <option value="tools">
-                {{ tr("工具与配件", "Tools & fittings") }}
+                {{ say(copyText.tools_fittings_02d81e) }}
               </option>
               <option value="beads">
-                {{ tr("拼豆补充装", "Bead refills") }}
+                {{ say(copyText.bead_refills_4d7505) }}
               </option>
               <option value="finished">
-                {{ tr("手作成品", "Finished pieces") }}
+                {{ say(copyText.finished_pieces_35b338) }}
               </option>
             </select></label
           ><label class="desk-field"
-            >{{ tr("商品照片", "Product photo")
+            >{{ say(copyText.product_photo_2024ac)
             }}<select v-model="edit.image">
               <option
                 v-for="n in 15"
                 :key="n"
                 :value="`studio-${String(n).padStart(2, '0')}`"
               >
-                {{ tr("工作室", "Studio") }} {{ n }}
+                {{ say(copyText.studio_108de6) }} {{ n }}
               </option>
               <option
                 v-for="n in ['02', '04', '05', '07', '10', '11', '13', '20']"
                 :key="n"
                 :value="`journal-${n}`"
               >
-                {{ tr("日记", "Journal") }} {{ n }}
+                {{ say(copyText.journal_ba5107) }} {{ n }}
               </option>
             </select></label
           >
@@ -271,7 +265,7 @@ async function reloadSaved() {
             :key="photo"
             type="button"
             :class="{ selected: edit.image === photo }"
-            :aria-label="tr(`选择照片 ${photo}`, `Choose photo ${photo}`)"
+            :aria-label="formatCopy(copyText.message_5872baff, { v0: photo })"
             :aria-pressed="edit.image === photo"
             @click="edit.image = photo"
           >
@@ -279,27 +273,22 @@ async function reloadSaved() {
           </button>
         </div>
         <label class="desk-field"
-          >{{ tr("中文说明", "Chinese description")
+          >{{ say(copyText.chinese_description_052a41)
           }}<textarea v-model="edit.detailZh" rows="3" maxlength="500" /></label
         ><label class="desk-field"
-          >{{ tr("英文说明", "English description")
+          >{{ say(copyText.english_description_4b3b3f)
           }}<textarea v-model="edit.detailEn" rows="3" maxlength="700" />
         </label>
         <div class="setting-switch-row">
           <div>
-            <strong>{{ tr("上架出售", "Publish for sale") }}</strong>
+            <strong>{{ say(copyText.publish_for_sale_75afac) }}</strong>
             <p>
-              {{
-                tr(
-                  "填写售价后即可上架；实物还需要有库存。",
-                  "Set a price to publish. Physical items also need stock.",
-                )
-              }}
+              {{ say(copyText.set_a_price_to_publish_physical_items_01ffc8) }}
             </p>
           </div>
           <ToggleSwitch
             v-model="edit.active"
-            :label="tr('上架出售', 'Publish for sale')"
+            :label="say(copyText.publish_for_sale_75afac)"
           />
         </div>
         <p v-if="error" class="desk-error" role="alert">{{ error }}</p>
@@ -309,12 +298,12 @@ async function reloadSaved() {
           class="desk-link"
           @click="reloadSaved"
         >
-          {{ tr("重新载入已保存版本", "Reload the saved version") }}
+          {{ say(copyText.reload_the_saved_version_ca095e) }}
         </button>
       </form>
       <template #footer
         ><span class="drawer-footnote">{{
-          tr("订单中的历史价格保持不变", "Existing order prices stay unchanged")
+          say(copyText.existing_order_prices_stay_unchanged_9345aa)
         }}</span
         ><button
           class="desk-button primary"
@@ -323,7 +312,9 @@ async function reloadSaved() {
           :disabled="saving"
         >
           <PhCheck />{{
-            saving ? tr("保存中…", "Saving…") : tr("保存商品", "Save product")
+            saving
+              ? say(copyText.saving_1bd9fd)
+              : say(copyText.save_product_4bb744)
           }}
         </button></template
       ></SlideOver

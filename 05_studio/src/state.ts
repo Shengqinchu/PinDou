@@ -1,3 +1,7 @@
+import profile from "./content/studio-profile.json";
+import contentGallery from "./content/data-state-gallery.json";
+import contentProducts from "./content/data-state-products.json";
+import copyText from "./content/state.json";
 import { computed, ref, watch } from "vue";
 
 export type Locale = "zh" | "en";
@@ -19,14 +23,22 @@ export const locale = ref<Locale>(
   read("puppy-studio-locale") === "en" ? "en" : "zh",
 );
 export const tr = (zh: string, en: string) => (locale.value === "zh" ? zh : en);
+export function say(pair: readonly string[]) {
+  return tr(pair[0], pair[1]);
+}
+export function formatCopy(
+  pair: readonly string[],
+  values: Record<string, unknown>,
+) {
+  return say(pair).replace(/\{(v\d+)\}/g, (_, key) => String(values[key]));
+}
 watch(
   locale,
   (value) => {
     write("puppy-studio-locale", value);
     document.documentElement.lang = value === "zh" ? "zh-CN" : "en-CA";
-    document.title = tr(
-      "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
-      "Pindo Puppy · A little creative studio in Hamilton",
+    document.title = say(
+      copyText.pindo_puppy_a_little_creative_studio_in_d8b24c,
     );
   },
   { immediate: true },
@@ -34,60 +46,15 @@ watch(
 
 export const media = (name: string) =>
   `${import.meta.env.BASE_URL}studio-media/${name}.jpg`;
-export const socialUrl =
-  "https://www.xiaohongshu.com/user/profile/65f8375c000000000b00c921";
-export const noteUrl = "https://xhslink.cn/o/8HFIo1pstmk";
+export const socialUrl = profile.social_url;
+export const noteUrl = profile.original_post;
 export const mapsUrl =
   "https://www.google.com/maps/search/?api=1&query=8+Hughson+St+N+Hamilton+ON";
-export const wechat = "xiaogoushuangji";
+export const wechat = profile.wechat;
+export const phone = profile.phone;
+export const phoneHref = profile.phone_href;
 
-export const products = [
-  {
-    id: "starter",
-    category: "tools",
-    zh: "给第一幅作品的工具",
-    en: "Your first little toolkit",
-    detailZh: "告诉我们你想做什么，一起选底板、镊子和需要的工具。",
-    detailEn:
-      "Tell us what you would like to make. We will help you choose boards, tweezers and tools.",
-    image: "studio-07",
-    price: null,
-  },
-  {
-    id: "beads",
-    category: "beads",
-    zh: "刚好缺的那一抹颜色",
-    en: "A little more colour",
-    detailZh: "补齐下一幅图纸需要的豆子。请在备注里留下色号、品牌或图纸。",
-    detailEn:
-      "Top up for your next pattern. Include your colour codes, bead brand or pattern in the notes.",
-    image: "studio-06",
-    price: null,
-  },
-  {
-    id: "findings",
-    category: "tools",
-    zh: "让拼豆变成随身小物",
-    en: "The finishing touches",
-    detailZh: "挂绳、钥匙扣、冰箱贴配件等。款式与数量由店主确认。",
-    detailEn:
-      "Straps, key rings and magnet fittings. We will confirm styles and quantities with you.",
-    image: "studio-11",
-    price: null,
-  },
-  {
-    id: "custom",
-    category: "finished",
-    zh: "一份专属的手作心意",
-    en: "Something made for you",
-    detailZh:
-      "把你的想法告诉我们，聊聊定制的尺寸、配色和交付时间。图片为作品展示。",
-    detailEn:
-      "Share an idea for a custom piece. We will discuss size, colours and timing. Photo shows example work.",
-    image: "journal-05",
-    price: null,
-  },
-] as const;
+export const products = contentProducts;
 
 const productIds = new Set(products.map((p) => p.id as string));
 function loadCart(): Record<string, number> {
@@ -154,60 +121,21 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!response.ok) {
     if (response.status === 429)
       throw new Error(
-        tr(
-          "提交次数较多，请稍后再试，或通过微信联系店主。",
-          "Too many requests. Please try again later or contact us on WeChat.",
-        ),
+        say(copyText.too_many_requests_please_try_again_later_7d3a95),
       );
     if (response.status === 422)
       throw new Error(
-        tr(
-          "请检查日期、时间和联系信息，再试一次。",
-          "Please check the date, time and contact details, then try again.",
-        ),
+        say(copyText.please_check_the_date_time_and_contact_baa037),
       );
     if (response.status === 401 || response.status === 403)
       throw new Error(
-        tr(
-          "登录已过期或账号无管理权限，请重新登录。",
-          "Please sign in with an administrator account.",
-        ),
+        say(copyText.please_sign_in_with_an_administrator_account_801902),
       );
     throw new Error(
-      tr(
-        "暂时未能提交，请重试或通过微信联系店主。",
-        "We could not complete that request. Please try again or contact us on WeChat.",
-      ),
+      say(copyText.we_could_not_complete_that_request_please_967586),
     );
   }
   return data as T;
 }
 
-export const gallery = [
-  {
-    image: "studio-02",
-    zh: "阳光、白桌，和一个属于你的座位",
-    en: "Daylight, a white desk, a place for you",
-  },
-  {
-    image: "studio-08",
-    zh: "让可爱挂在每一个角落",
-    en: "Little things, everywhere",
-  },
-  {
-    image: "journal-05",
-    zh: "一颗一颗，拼出落日的颜色",
-    en: "A sunset, one bead at a time",
-  },
-  {
-    image: "studio-04",
-    zh: "今天也想在这里待久一点",
-    en: "Stay a little longer",
-  },
-  {
-    image: "studio-11",
-    zh: "做冰箱贴，也做小挂件",
-    en: "Magnets, charms, and possibilities",
-  },
-  { image: "journal-13", zh: "用手作装饰日常", en: "Make yourself at home" },
-];
+export const gallery = contentGallery;

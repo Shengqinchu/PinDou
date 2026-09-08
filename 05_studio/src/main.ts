@@ -13,6 +13,7 @@ import "./styles/motion.css";
 import "./styles/viewport.css";
 import "./styles/vision.css";
 import "./styles/reservations.css";
+import "./styles/journal.css";
 import { installMotion } from "./motion";
 import { installViewport } from "./browser";
 import { reducedMotion } from "./ui";
@@ -24,12 +25,19 @@ const router = createRouter({
   routes: [
     { path: "/", component: Home },
     { path: "/visit", component: () => import("./pages/Visit.vue") },
-    { path: "/reservation/:id", component: () => import("./pages/ReservationReceipt.vue") },
+    {
+      path: "/reservation/:id",
+      component: () => import("./pages/ReservationReceipt.vue"),
+    },
     { path: "/details", component: () => import("./pages/Details.vue") },
     { path: "/shop", component: () => import("./pages/Shop.vue") },
     { path: "/cart", redirect: "/shop" },
     { path: "/order/:id", component: () => import("./pages/Order.vue") },
     { path: "/journal", component: () => import("./pages/Journal.vue") },
+    {
+      path: "/journal/:id",
+      component: () => import("./pages/JournalEntry.vue"),
+    },
     { path: "/manage", component: () => import("./pages/Manage.vue") },
     {
       path: "/:pathMatch(.*)*",

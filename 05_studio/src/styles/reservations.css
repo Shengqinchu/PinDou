@@ -1,8 +1,203 @@
-/* Manual reservation flow and its host workspace. No price or payment surfaces. */
+/* Manual reservation flow. Display prices are informational; no online payment. */
+.reservation-offers {
+  grid-column: 1/-1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 4px;
+}
+.reservation-offers .reservation-credit {
+  background: #f4f6f2;
+}
+.reservation-offers .reservation-school {
+  background: #faf4f0;
+}
+.reservation-school > strong:not(:first-child) {
+  display: block;
+}
+.reservation-school > strong ~ strong {
+  margin-top: 18px;
+}
+.reservation-school strong small {
+  display: inline;
+  font-size: 13px;
+}
+.plan-price-reveal {
+  width: 100%;
+}
+.reservation-plan-price,
+.reservation-day-prices {
+  padding-top: 18px;
+  border-top: 1px solid #d8d4e2;
+  margin: 0;
+  width: 100%;
+}
+.reservation-plan-price > strong {
+  font-size: 31px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.reservation-plan-price > span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+.reservation-day-prices > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 5px 0;
+}
+.reservation-day-prices dt {
+  font-size: 14px;
+  white-space: nowrap;
+}
+.reservation-day-prices dd {
+  font-size: 22px;
+  margin: 0;
+  font-weight: 500;
+}
+.reservation-plans > label {
+  align-self: start;
+  transition:
+    transform var(--control-duration) var(--control-ease),
+    background-color var(--control-duration) var(--control-ease),
+    border-color var(--control-duration) var(--control-ease),
+    box-shadow var(--control-duration) var(--control-ease);
+}
+.reservation-plans > label:active {
+  transform: translateY(1px) scale(0.995);
+}
+.reservation-urgent {
+  background: #faf2e9;
+  color: var(--ink);
+  padding: 22px 26px;
+  border-radius: 16px;
+  font-size: 17px;
+  font-weight: 500;
+  margin-block: 24px;
+}
+.reservation-details-link > a {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+  display: inline;
+  line-height: 2;
+  padding-block: 13px;
+}
+.reservation-receipt .fine-print a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  display: inline-block;
+  padding-block: 12px;
+}
+.reservation-settings-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 23px;
+  margin-block: 24px;
+  background: #f7f6fa;
+  border-radius: 16px;
+}
+.reservation-settings-entry strong {
+  font-weight: 550;
+  margin-left: 10px;
+}
+.reservation-settings-entry p {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 9px;
+}
+.reservation-settings-saved {
+  flex-basis: 100%;
+  font-size: 13px;
+}
+.reservation-settings-form {
+  display: grid;
+  gap: 25px;
+}
+.reservation-settings-form section {
+  display: grid;
+  gap: 18px;
+}
+.reservation-settings-form h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.reservation-settings-form p {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.reservation-hours-row {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 10px 16px;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 18px;
+}
+.reservation-hours-row > strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+.reservation-hours-inputs {
+  grid-column: 1/-1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.reservation-hours-inputs label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+.reservation-hours-inputs select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px;
+  font-size: 16px;
+  color: var(--ink);
+}
+@media (hover: hover) and (pointer: fine) {
+  .reservation-plans:not(:disabled) > label:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px -16px #292a2b44;
+  }
+  .reservation-plans:not(:disabled) > label:active {
+    transform: translateY(1px) scale(0.995);
+  }
+}
+@media (max-width: 600px) {
+  .reservation-offers {
+    grid-template-columns: 1fr;
+  }
+  .reservation-settings-entry {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .reservation-urgent {
+    font-size: 16px;
+    padding: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reservation-plans > label {
+    transition: none;
+  }
+}
 .reservation-commerce-note {
   padding: 18px 22px;
   margin-bottom: 28px;
-  background: #e3eef3;
+  background: #f3f2f7;
   border: 1px solid var(--line);
   border-radius: 12px;
   color: var(--muted);
@@ -33,7 +228,7 @@
   border: 0;
   margin: 0 0 50px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1.2fr;
+  grid-template-columns: 1fr 1fr;
   gap: 18px;
 }
 .reservation-plans legend {
@@ -53,14 +248,16 @@
   background: var(--white);
   cursor: pointer;
   transition:
-    border-color 0.3s ease-in-out,
-    background-color 0.3s ease-in-out;
+    transform var(--control-duration) var(--control-ease),
+    border-color var(--control-duration) var(--control-ease),
+    background-color var(--control-duration) var(--control-ease),
+    box-shadow var(--control-duration) var(--control-ease);
 }
 .reservation-plans > label.selected {
-  background: #e3eff3;
+  background: #f0edf8;
   border-color: var(--accent);
 }
-.reservation-plans > label:focus-within {
+.reservation-plans > label:has(input:focus-visible) {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
 }
@@ -187,8 +384,9 @@
 }
 .reservation-grid-scroll {
   max-height: 560px;
-  overflow: auto;
-  overscroll-behavior: contain;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
   border: 1px solid var(--line);
   border-radius: 12px;
   isolation: isolate;
@@ -196,7 +394,7 @@
 }
 .reservation-grid {
   width: 100%;
-  min-width: 785px;
+  min-width: 0;
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed;
@@ -207,7 +405,7 @@
   width: 58px;
 }
 .reservation-grid thead th {
-  background: #e6f0f3;
+  background: #f2f0f7;
   position: sticky;
   top: 0;
   z-index: 3;
@@ -226,7 +424,7 @@
   margin-top: 6px;
 }
 .reservation-grid tbody th {
-  background: #f0f5f7;
+  background: #f7f7f8;
   position: sticky;
   left: 0;
   z-index: 2;
@@ -248,7 +446,7 @@
   display: block;
   width: 100%;
   min-height: 44px;
-  background: #fcfefe;
+  background: #fff;
   color: var(--muted);
   font-size: 13px;
   transition:
@@ -256,25 +454,19 @@
     color 0.3s ease-in-out;
 }
 .reservation-grid td > button.chosen {
-  background: #d3e6ed;
-  color: #273f48;
+  background: #e8e3f4;
+  color: #292a2b;
   box-shadow:
-    inset 2px 0 #416f7d,
-    inset -2px 0 #416f7d;
+    inset 2px 0 #898298,
+    inset -2px 0 #898298;
 }
 .reservation-grid td > button.start {
-  background: #b9d4df;
-  color: #203e4c;
+  background: #d8d0ea;
+  color: #292a2b;
 }
 .reservation-grid td > button.unavailable {
-  background: repeating-linear-gradient(
-    135deg,
-    #e7edef,
-    #e7edef 6px,
-    #e2e9ec 6px,
-    #e2e9ec 7px
-  );
-  color: #91a3aa;
+  background: #f0f0f1;
+  color: #747477;
   opacity: 1;
 }
 .reservation-grid td > button:focus-visible {
@@ -283,7 +475,7 @@
 }
 .reservation-selection {
   padding: 22px 25px;
-  background: #e2eef3;
+  background: #f1f5ef;
   border-radius: 12px;
   display: flex;
   gap: 25px;
@@ -448,7 +640,7 @@
   gap: 25px;
   padding: 22px;
   border: 1px solid var(--line);
-  background: #e6f0f3;
+  background: #f2f0f7;
   border-radius: 13px;
   margin-bottom: 25px;
 }
@@ -603,6 +795,12 @@
   }
   .reservation-plans > label {
     padding: 22px 17px;
+  }
+  .reservation-day-prices > div {
+    gap: 6px;
+  }
+  .reservation-day-prices dd {
+    font-size: clamp(16px, 4.5vw, 21px);
   }
   .reservation-plans > label > strong {
     font-size: 18px;

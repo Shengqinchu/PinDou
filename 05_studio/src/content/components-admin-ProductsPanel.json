@@ -1,0 +1,71 @@
+{
+  "little_things_well_arranged_cc4680": [
+    "每件小物，都有自己的位置",
+    "LITTLE THINGS, WELL ARRANGED"
+  ],
+  "products_experiences_13735c": ["商品与体验", "Products & experiences"],
+  "look_after_your_prices_inventory_and_published_2a98fe": [
+    "定价、库存、上架状态，在这里一起照看。",
+    "Look after your prices, inventory and published products in one place."
+  ],
+  "add_product_439e17": ["添加商品", "Add product"],
+  "product_category_6dec25": ["商品类别", "Product category"],
+  "all_902ec4": ["全部", "All"],
+  "visits_3059b2": ["到店体验", "Visits"],
+  "items_b2522f": ["小物", "Items"],
+  "drafts_034400": ["待上架", "Drafts"],
+  "search_products_1bc725": ["搜索商品名称", "Search products"],
+  "search_products_2ea3aa": ["搜索商品", "Search products"],
+  "studio_experience_8cbb77": ["到店体验", "Studio experience"],
+  "studio_pickup_c13b87": ["到店自提", "Studio pickup"],
+  "not_priced_b9f3bb": ["待定价", "Not priced"],
+  "person_hour_07ef59": ["/ 人 / 小时", "/ person / hour"],
+  "pass_63a44a": ["/ 套餐", "/ pass"],
+  "published_34899d": ["已上架", "Published"],
+  "draft_e2df44": ["待上架", "Draft"],
+  "no_matching_products_0e35fb": ["没有找到这件小物", "No matching products"],
+  "try_another_name_or_add_a_new_b5ae79": [
+    "换个名字搜搜，或者添加一件新商品。",
+    "Try another name or add a new product."
+  ],
+  "product_editor_draft_kept_while_open_in_e4715a": [
+    "商品编辑 · 关闭后保留本次草稿",
+    "PRODUCT EDITOR · DRAFT KEPT WHILE OPEN IN THIS DESK"
+  ],
+  "current_product_photo_cae790": ["当前商品图片", "Current product photo"],
+  "published_for_sale_ecea53": ["上架出售", "Published for sale"],
+  "photographed_at_the_studio_e4b259": [
+    "使用工作室实拍",
+    "Photographed at the studio"
+  ],
+  "chinese_name_9df9b3": ["中文名称", "Chinese name"],
+  "english_name_63f9e2": ["英文名称", "English name"],
+  "price_ca_d65afe": ["售价 · CA$", "Price · CA$"],
+  "remaining_inventory_5b9914": ["剩余库存", "Remaining inventory"],
+  "category_f7fc04": ["分类", "Category"],
+  "tools_fittings_02d81e": ["工具与配件", "Tools & fittings"],
+  "bead_refills_4d7505": ["拼豆补充装", "Bead refills"],
+  "finished_pieces_35b338": ["手作成品", "Finished pieces"],
+  "product_photo_2024ac": ["商品照片", "Product photo"],
+  "studio_108de6": ["工作室", "Studio"],
+  "journal_ba5107": ["日记", "Journal"],
+  "chinese_description_052a41": ["中文说明", "Chinese description"],
+  "english_description_4b3b3f": ["英文说明", "English description"],
+  "publish_for_sale_75afac": ["上架出售", "Publish for sale"],
+  "set_a_price_to_publish_physical_items_01ffc8": [
+    "填写售价后即可上架；实物还需要有库存。",
+    "Set a price to publish. Physical items also need stock."
+  ],
+  "reload_the_saved_version_ca095e": [
+    "重新载入已保存版本",
+    "Reload the saved version"
+  ],
+  "existing_order_prices_stay_unchanged_9345aa": [
+    "订单中的历史价格保持不变",
+    "Existing order prices stay unchanged"
+  ],
+  "saving_1bd9fd": ["保存中…", "Saving…"],
+  "save_product_4bb744": ["保存商品", "Save product"],
+  "message_f4149935": ["库存 {v0}", "{v0} in stock"],
+  "message_5872baff": ["选择照片 {v0}", "Choose photo {v0}"]
+}

@@ -1,0 +1,61 @@
+{
+  "clear_prices_simple_checkout_3d511f": [
+    "让每一次付款，清清楚楚",
+    "CLEAR PRICES, SIMPLE CHECKOUT"
+  ],
+  "checkout_settings_b08011": ["收款设置", "Checkout settings"],
+  "price_in_canadian_dollars_collect_in_chinese_35f2a3": [
+    "加元标价、人民币付款。确认好最终金额，再开放小店。",
+    "Price in Canadian dollars, collect in Chinese yuan. Confirm the final amounts before opening."
+  ],
+  "hupijiao_checkout_017d75": ["虎皮椒收银台", "Hupijiao checkout"],
+  "scan_on_desktop_or_open_the_cashier_e2fe8b": [
+    "电脑扫码，手机进入收银台；支付结果自动核实。",
+    "Scan on desktop or open the cashier on mobile. Payment is verified automatically."
+  ],
+  "connected_bd103c": ["已连接", "Connected"],
+  "not_connected_238174": ["尚未连接", "Not connected"],
+  "display_payment_currency_9d99f4": [
+    "标价与付款汇率",
+    "Display & payment currency"
+  ],
+  "the_rate_is_locked_when_an_order_b8c1b7": [
+    "每笔订单创建时固定汇率，之后修改不会改变旧订单。",
+    "The rate is locked when an order is created. Later changes do not affect existing orders."
+  ],
+  "cny_per_1_cad_e11b72": ["1 加元兑换人民币", "CNY per 1 CAD"],
+  "example_listed_price_7fc44a": ["示例标价", "Example listed price"],
+  "converted_amount_5871b3": ["换算金额", "Converted amount"],
+  "how_prices_include_tax_bcd6c4": ["售价的税费方式", "How prices include tax"],
+  "choose_the_tax_treatment_you_use_customers_4bb4b9": [
+    "请选择实际经营使用的计税方式，客人会在结账前看到最终金额。",
+    "Choose the tax treatment you use. Customers see the final amount before payment."
+  ],
+  "tax_treatment_b619a7": ["税费方式", "Tax treatment"],
+  "not_confirmed_bf61ba": ["尚未确认", "Not confirmed"],
+  "prices_are_final_tax_included_dc93af": [
+    "标价就是最终价（含税）",
+    "Prices are final (tax included)"
+  ],
+  "add_tax_to_listed_prices_e4cb3b": [
+    "标价另加税费",
+    "Add tax to listed prices"
+  ],
+  "tax_rate_16a67f": ["税率 %", "Tax rate %"],
+  "confirm_this_before_opening_online_purchases_adcdf0": [
+    "确认后才能开放网上购买。",
+    "Confirm this before opening online purchases."
+  ],
+  "open_online_purchases_d4629b": ["开放网上购买", "Open online purchases"],
+  "visits_also_require_opening_hours_and_capacity_e05e70": [
+    "体验还需设置真实营业时间和接待人数；实物需要已上架且有库存。",
+    "Visits also require opening hours and capacity. Physical products must be published and in stock."
+  ],
+  "unsaved_schedule_or_checkout_changes_dbb518": [
+    "排班／收款设置有未保存的修改",
+    "Unsaved schedule or checkout changes"
+  ],
+  "all_changes_saved_05df19": ["所有修改已保存", "All changes saved"],
+  "saving_1bd9fd": ["保存中…", "Saving…"],
+  "save_settings_3a2a2e": ["保存设置", "Save settings"]
+}

@@ -1,0 +1,82 @@
+{
+  "please_use_the_browser_in_which_you_972d7e": [
+    "请在下单时使用的浏览器中查看这个订单。",
+    "Please use the browser in which you placed this order."
+  ],
+  "back_to_your_bag_1d6e14": ["返回购物车", "Back to your bag"],
+  "try_again_c3273b": ["重试", "Try again"],
+  "a_little_joy_dd360a": ["已经为你，", "A little joy,"],
+  "all_yours_a7d095": ["留好了。", "all yours."],
+  "one_last_step_c893db": ["最后一步，", "One last step,"],
+  "then_something_lovely_98b831": ["快乐就近了。", "then something lovely."],
+  "payment_was_received_but_the_original_time_b82219": [
+    "款项已收到，但付款确认时原时段或库存已不可用。请联系店主安排改期或退款，不要重复付款。",
+    "Payment was received, but the original time or stock was no longer available when confirmed. Contact the host to reschedule or arrange a refund. Please do not pay again."
+  ],
+  "the_payment_window_has_closed_and_the_327666": [
+    "付款窗口已关闭，座位已释放。若已经扣款，请联系店主核实后再尝试。",
+    "The payment window has closed and the seats have been released. If you were charged, contact the host before trying again."
+  ],
+  "we_are_checking_the_payment_result_if_c5b772": [
+    "正在核实付款结果，请稍候。已付款的话无需再付一次。",
+    "We are checking the payment result. If you have already paid, please do not pay again."
+  ],
+  "the_cashier_could_not_be_created_you_81cadc": [
+    "暂未能创建收银台，可以回到购物车重新尝试。",
+    "The cashier could not be created. You can return to your bag and try again."
+  ],
+  "total_in_chinese_yuan_175a2f": ["人民币实付", "Total in Chinese yuan"],
+  "hupijiao_payment_qr_code_5f9260": [
+    "虎皮椒付款二维码",
+    "Hupijiao payment QR code"
+  ],
+  "the_payment_qr_could_not_load_please_383cf4": [
+    "二维码暂时无法加载，请稍后刷新。",
+    "The payment QR could not load. Please refresh shortly."
+  ],
+  "scan_with_your_phone_to_pay_this_8d75b2": [
+    "用手机扫描二维码付款，完成后本页会自动确认。",
+    "Scan with your phone to pay. This page will confirm automatically."
+  ],
+  "checkout_opens_in_this_wechat_window_return_ad1e2a": [
+    "将在当前微信窗口打开收银台，付款后返回此页查看确认。",
+    "Checkout opens in this WeChat window. Return here after payment to see your confirmation."
+  ],
+  "open_hupijiao_checkout_d57642": [
+    "打开虎皮椒收银台",
+    "Open Hupijiao checkout"
+  ],
+  "return_here_after_paying_to_view_confirmation_9e3a3b": [
+    "付款完成后返回此页查看确认。",
+    "Return here after paying to view confirmation."
+  ],
+  "open_this_order_on_a_desktop_to_a8ae91": [
+    "请在电脑端打开此订单，扫描二维码付款。",
+    "Open this order on a desktop to scan the payment QR."
+  ],
+  "review_your_bag_again_293dbb": ["重新核对购物车", "Review your bag again"],
+  "refresh_payment_status_18e1f5": ["刷新付款状态", "Refresh payment status"],
+  "contact_the_host_wechat_11a64c": [
+    "联系店主 · 微信",
+    "Contact the host · WeChat"
+  ],
+  "order_details_ef4c47": ["订单明细", "Order details"],
+  "guests_24bfb5": ["人", "guests"],
+  "hamilton_local_time_b04d8a": ["Hamilton 当地时间", "Hamilton local time"],
+  "studio_pickup_contact_the_host_to_arrange_0cf43a": [
+    "到店自提 · 请联系店主安排取货",
+    "Studio pickup · Contact the host to arrange collection"
+  ],
+  "tax_d7bdd7": ["税费", "Tax"],
+  "cad_total_0fc8b6": ["加元合计", "CAD total"],
+  "payment_in_cny_66e946": ["人民币实付", "Payment in CNY"],
+  "rate_locked_for_this_order_114f47": [
+    "汇率已固定",
+    "Rate locked for this order"
+  ],
+  "loading_your_order_d79415": ["正在读取订单…", "Loading your order…"],
+  "literal_77352916": "付款已收到，到店座位已确认。带着你的期待，我们工作室见。",
+  "literal_ee5000bb": "付款已收到，订单已确认。请联系店主安排到店自提。",
+  "literal_2f14e161": "Payment received and your studio seats are confirmed. Bring a little inspiration. We will see you here.",
+  "literal_975ac3ac": "Payment received and your order is confirmed. Contact the host to arrange studio pickup."
+}

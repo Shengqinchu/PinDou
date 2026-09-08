@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "../content/components-ReleaseNotice.json";
+import { say } from "../state";
+
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { tr } from "../state";
 import { useRoute } from "vue-router";
@@ -54,15 +57,15 @@ onBeforeUnmount(() => {
     <span>{{
       tr(
         route.path.startsWith("/manage")
-          ? "工作台有更新，请先保存当前更改，再重新载入。"
-          : "页面有更新，方便时重新载入即可。",
+          ? copyText.literal_0fa103ec
+          : copyText.literal_c09c9616,
         route.path.startsWith("/manage")
-          ? "An update is ready. Save your changes before reloading."
-          : "An updated page is ready when you are.",
+          ? copyText.literal_68796c00
+          : copyText.literal_cbd7655c,
       )
     }}</span
     ><button class="text-link" @click="reload">
-      {{ tr("重新载入", "Reload page") }}
+      {{ say(copyText.reload_page_062f91) }}
     </button>
   </aside>
 </template>

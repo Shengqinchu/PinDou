@@ -1,0 +1,72 @@
+{
+  "please_choose_an_end_time_after_your_e99e5b": [
+    "结束时间需要晚于开始时间，请调整后提交。",
+    "Please choose an end time after your start time."
+  ],
+  "please_try_again_in_a_moment_d66e30": [
+    "提交失败，请稍后重试。",
+    "Please try again in a moment."
+  ],
+  "your_little_plan_is_with_us_04bf13": [
+    "收到你的小计划了。",
+    "Your little plan is with us."
+  ],
+  "this_is_a_request_awaiting_the_hosts_5f4744": [
+    "这是待店主确认的意向。请保留编号，我们会通过你填写的联系方式确认安排。",
+    "This is a request awaiting the host’s confirmation. Keep your reference. We will use the contact details you provided to confirm the arrangements."
+  ],
+  "copy_request_reference_f802cb": ["复制意向编号", "Copy request reference"],
+  "no_seats_or_stock_have_been_reserved_dd3eb5": [
+    "尚未锁定座位或库存，也未收取费用。需要补充信息时，可微信联系：",
+    "No seats or stock have been reserved and no payment has been taken. To add anything, find us on WeChat: "
+  ],
+  "back_to_the_studio_2d6b10": ["回小屋逛逛", "Back to the studio"],
+  "a_little_about_you_aaea3d": ["怎么称呼你？", "A little about you."],
+  "your_name_691e1f": ["你的称呼", "Your name"],
+  "what_should_we_call_you_6d8359": [
+    "让我们知道怎么称呼你",
+    "What should we call you?"
+  ],
+  "contact_me_by_f0e9c0": ["联系途径", "Contact me by"],
+  "wechat_2941d2": ["微信", "WeChat"],
+  "email_b6d15f": ["电子邮箱", "Email"],
+  "phone_text_b1c5c8": ["电话 / 短信", "Phone / text"],
+  "wechat_id_7a6e86": ["微信号", "WeChat ID"],
+  "email_address_5e4a2c": ["电子邮箱", "Email address"],
+  "phone_number_19a4c0": ["联系电话", "Phone number"],
+  "only_used_to_arrange_this_request_828bd2": [
+    "仅用于联系并确认这次安排",
+    "Only used to arrange this request"
+  ],
+  "anything_else_optional_6ee301": [
+    "想提前告诉我们的事（选填）",
+    "Anything else? (optional)"
+  ],
+  "your_first_visit_a_pattern_you_have_bcba21": [
+    "第一次拼豆、想做的图案、同行安排，或其他需要……",
+    "Your first visit, a pattern you have in mind, or anything you need…"
+  ],
+  "colour_codes_preferred_styles_quantities_or_a_e133a6": [
+    "色号、数量、喜欢的款式、希望自提的时间……",
+    "Colour codes, preferred styles, quantities or a pickup date…"
+  ],
+  "your_request_at_a_glance_5bba9e": [
+    "提交前，再看一眼",
+    "Your request at a glance"
+  ],
+  "prices_timing_and_details_are_subject_to_8b7d42": [
+    "价格、时间及具体安排，以店主后续确认为准。",
+    "Prices, timing and details are subject to the host’s confirmation."
+  ],
+  "i_understand_this_is_a_request_and_bde9b7": [
+    "我理解这是一份待确认的意向，并同意店主使用上述联系方式沟通本次安排。",
+    "I understand this is a request, and agree that the host may use my contact details to arrange this visit or pickup."
+  ],
+  "sending_0b6530": ["正在提交…", "Sending…"],
+  "send_visit_request_3b2fc0": ["提交预约意向", "Send visit request"],
+  "send_pickup_inquiry_9e7c67": ["提交自提询单", "Send pickup inquiry"],
+  "contact_details_are_only_used_by_the_145329": [
+    "联系信息仅供店主处理本次请求。提交后无需在线付款；收到确认后再到店。",
+    "Contact details are only used by the host to handle this request. No online payment is required. Please wait for confirmation before visiting."
+  ]
+}

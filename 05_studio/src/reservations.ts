@@ -3,7 +3,7 @@ export type ReservationBooking = {
   date: string;
   start: string;
   end: string;
-  plan: "hourly" | "day";
+  plan: "hourly" | "day" | "";
   guests: number;
 };
 export type ReservationSlot = {
@@ -14,6 +14,8 @@ export type ReservationSlot = {
 };
 export type ReservationDay = {
   date: string;
+  open: string;
+  closed: boolean;
   close: string;
   slots: ReservationSlot[];
 };
@@ -21,6 +23,14 @@ export type ReservationCalendar = {
   today: string;
   timezone: string;
   minimum_minutes: number;
+  max_guests_per_group: number;
+  weekly_hours: {
+    weekday: number;
+    enabled: boolean;
+    open: string;
+    close: string;
+  }[];
+  policy_version: number;
   days: ReservationDay[];
 };
 export type ReservationPayload = {
@@ -58,7 +68,7 @@ export function saveSession(key: string, value: unknown) {
   }
 }
 const initial: Omit<ReservationPayload, "locale" | "website"> = {
-  booking: { date: "", start: "", end: "", plan: "hourly", guests: 1 },
+  booking: { date: "", start: "", end: "", plan: "", guests: 1 },
   name: "",
   contact_method: "wechat",
   contact: "",
@@ -96,10 +106,15 @@ export function validSelection(
     end = minutes(booking.end);
   if (
     !day ||
+    day.closed ||
+    !booking.plan ||
+    !Number.isInteger(booking.guests) ||
+    booking.guests < 1 ||
+    booking.guests > (calendar?.max_guests_per_group || 4) ||
     !Number.isFinite(start) ||
     !Number.isFinite(end) ||
     end - start < 120 ||
-    start < 600 ||
+    start < minutes(day.open || "10:00") ||
     end > minutes(day.close)
   )
     return false;

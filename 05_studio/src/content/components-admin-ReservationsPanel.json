@@ -1,0 +1,66 @@
+{
+  "pending_5c3b18": ["待确认", "Pending"],
+  "confirmed_b1c92b": ["已确认", "Confirmed"],
+  "completed_ff8af6": ["已完成", "Completed"],
+  "cancelled_8c9064": ["已取消", "Cancelled"],
+  "a_little_care_for_every_visit_4e8c5b": [
+    "照顾好每一次期待",
+    "A LITTLE CARE FOR EVERY VISIT"
+  ],
+  "reservation_calendar_79ec67": ["预约日历", "Reservation calendar"],
+  "studio_reservations_4896a2": ["预约管理", "Studio reservations"],
+  "review_the_time_and_group_size_then_6af55f": [
+    "先核对时间和同行人数，再联系客人确认。这里的预约无需在线付款。",
+    "Review the time and group size, then contact your guest and confirm. These reservations do not require online payment."
+  ],
+  "refresh_5efb82": ["刷新", "Refresh"],
+  "waiting_for_you_41a255": ["等待确认", "Waiting for you"],
+  "confirmed_visits_305c18": ["已确认预约", "Confirmed visits"],
+  "completed_visits_1cdc52": ["已完成到访", "Completed visits"],
+  "choose_reservation_date_ae55e6": ["选择预约日期", "Choose reservation date"],
+  "status_4434e2": ["预约状态", "Status"],
+  "all_902ec4": ["全部", "All"],
+  "visit_date_270402": ["到店日期", "Visit date"],
+  "name_or_reference_c2f162": ["姓名或预约编号", "Name or reference"],
+  "clear_filters_0a6c6f": ["清除筛选", "Clear filters"],
+  "loading_reservations_adb99a": ["正在查看预约……", "Loading reservations…"],
+  "no_reservations_here_yet_1ffd1c": [
+    "这里还没有预约",
+    "No reservations here yet"
+  ],
+  "when_a_guest_submits_a_request_you_d10e4b": [
+    "顾客提交后，就可以在这里核对并确认安排。",
+    "When a guest submits a request, you can review and confirm it here."
+  ],
+  "guests_24bfb5": ["人", "guests"],
+  "previous_94c671": ["上一页", "Previous"],
+  "total_74beb1": ["共", "Total"],
+  "reservations_718784": ["份预约", "reservations"],
+  "next_05635e": ["下一页", "Next"],
+  "reservation_details_d248c4": ["预约详情", "Reservation details"],
+  "visit_f29981": ["到访", "Visit"],
+  "experience_and_guests_369b9e": ["体验与人数", "Experience and guests"],
+  "day_visit_aad886": ["全天体验", "Day visit"],
+  "hourly_visit_681491": ["按时体验", "Hourly visit"],
+  "contact_b87aac": ["联系方式", "Contact"],
+  "wechat_2941d2": ["微信", "WeChat"],
+  "phone_ac7a62": ["电话", "Phone"],
+  "email_8501ec": ["邮箱", "Email"],
+  "other_8b6752": ["其他", "Other"],
+  "guest_note_a101f4": ["客人留言", "Guest note"],
+  "saving_updates_the_guests_result_page_please_6140a1": [
+    "保存会更新客人结果页；请用以上联系方式另行通知客人。",
+    "Saving updates the guest's result page. Please also contact the guest using the details above."
+  ],
+  "update_reservation_status_0ddee8": [
+    "更新预约状态",
+    "Update reservation status"
+  ],
+  "staff_note_private_53d294": [
+    "店内备注（客人不可见）",
+    "Staff note (private)"
+  ],
+  "close_accb35": ["暂不更改", "Close"],
+  "saving_9a40ec": ["保存中……", "Saving…"],
+  "save_arrangement_87aa75": ["保存安排", "Save arrangement"]
+}

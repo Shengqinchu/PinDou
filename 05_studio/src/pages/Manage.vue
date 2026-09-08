@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import BrandMotif from "../components/BrandMotif.vue";
+import copyText from "../content/pages-Manage.json";
+import { say } from "../state";
+
 import "../styles/desk.css";
 import { onMounted, reactive, ref } from "vue";
 import { PhArrowRight, PhArrowClockwise, PhFlower } from "@phosphor-icons/vue";
@@ -39,10 +43,10 @@ const busy = ref(false);
 const total = ref(0);
 const page = ref(1);
 const statusLabels = () => ({
-  pending: tr("待确认", "Pending"),
-  confirmed: tr("已确认", "Confirmed"),
-  completed: tr("已完成", "Completed"),
-  cancelled: tr("已取消", "Cancelled"),
+  pending: say(copyText.pending_5c3b18),
+  confirmed: say(copyText.confirmed_b1c92b),
+  completed: say(copyText.completed_ff8af6),
+  cancelled: say(copyText.cancelled_8c9064),
 });
 function saveToken(value: string) {
   token.value = value;
@@ -73,9 +77,8 @@ async function signIn() {
     const access = result.token || result.data?.token;
     if (!response.ok || typeof access !== "string")
       throw new Error(
-        tr(
-          "登录失败，请检查现有后台账号和密码。",
-          "Sign-in failed. Check your existing administrator credentials.",
+        say(
+          copyText.signin_failed_check_your_existing_administrator_credentials_2e7049,
         ),
       );
     saveToken(access);
@@ -85,9 +88,7 @@ async function signIn() {
     if (e instanceof CommerceError && (e.status === 401 || e.status === 403))
       saveToken("");
     error.value =
-      e instanceof Error
-        ? e.message
-        : tr("暂时无法登录。", "Could not sign in.");
+      e instanceof Error ? e.message : say(copyText.could_not_sign_in_4e21bb);
   } finally {
     busy.value = false;
   }
@@ -112,7 +113,7 @@ async function load() {
     error.value =
       e instanceof Error
         ? e.message
-        : tr("加载失败。", "Could not load requests.");
+        : say(copyText.could_not_load_requests_bd1427);
   } finally {
     busy.value = false;
   }
@@ -132,10 +133,7 @@ async function save(entry: Entry) {
     });
     await load();
   } catch {
-    error.value = tr(
-      "未能保存。记录可能已在另一处更新，请刷新核对后重试。",
-      "Could not save. This request may have changed elsewhere. Refresh and check before retrying.",
-    );
+    error.value = say(copyText.could_not_save_this_request_may_have_c04e66);
   } finally {
     busy.value = false;
   }
@@ -154,50 +152,41 @@ function statusLabel(value: string): string {
   <div v-if="!token" class="host-login">
     <div class="host-login-story">
       <RouterLink to="/" class="desk-brand"
-        ><PhFlower :size="32" weight="light" /><span
-          >{{ tr("小狗拼豆铺", "Pindo Puppy") }}<small>{{
-            tr("小狗拼豆铺", "A LITTLE CREATIVE STUDIO")
+        ><BrandMotif /><span
+          >{{ say(copyText.pindo_puppy_08aa61)
+          }}<small>{{
+            say(copyText.a_little_creative_studio_72779b)
           }}</small></span
         ></RouterLink
       ><img
         :src="media('studio-04')"
-        :alt="tr('小狗拼豆铺工作室', 'Pindo Puppy studio')"
+        :alt="say(copyText.pindo_puppy_studio_98f0bc)"
       />
       <div>
         <p>
-          {{
-            tr(
-              "每一份期待，值得好好照顾。",
-              "Every little plan deserves a little care.",
-            )
-          }}
+          {{ say(copyText.every_little_plan_deserves_a_little_care_12f43a) }}
         </p>
-        <span>{{ tr("汉密尔顿 · 安大略省", "Hamilton, Ontario") }}</span>
+        <span>{{ say(copyText.hamilton_ontario_1f281c) }}</span>
       </div>
     </div>
     <div class="host-login-form">
       <form @submit.prevent="signIn">
         <span class="desk-eyebrow">{{
-          tr("欢迎回到小狗拼豆铺", "WELCOME BACK TO YOUR STUDIO")
+          say(copyText.welcome_back_to_your_studio_5785ce)
         }}</span>
-        <h1>{{ tr("你好，店主。", "Hello, studio owner.") }}</h1>
+        <h1>{{ say(copyText.hello_studio_owner_3dd59b) }}</h1>
         <p>
-          {{
-            tr(
-              "登录后，照看订单、安排座位，再给小店添一点可爱。",
-              "Sign in to look after orders, arrange seats and add something lovely to your little shop.",
-            )
-          }}
+          {{ say(copyText.sign_in_to_look_after_orders_arrange_961ef3) }}
         </p>
         <label class="desk-field"
-          >{{ tr("管理员账号", "Administrator account")
+          >{{ say(copyText.administrator_account_61308e)
           }}<input
             v-model.trim="login.username"
             name="username"
             autocomplete="username"
             required /></label
         ><label class="desk-field"
-          >{{ tr("密码", "Password")
+          >{{ say(copyText.password_db2477)
           }}<input
             v-model="login.password"
             name="password"
@@ -209,20 +198,17 @@ function statusLabel(value: string): string {
         <button class="desk-button primary" :disabled="busy">
           {{
             busy
-              ? tr("正在登录…", "Signing in…")
-              : tr("进入工作台", "Open studio desk")
+              ? say(copyText.signing_in_f2f0b2)
+              : say(copyText.open_studio_desk_d62008)
           }}<PhArrowRight />
         </button>
         <p class="login-note">
           {{
-            tr(
-              "使用现有拼豆后台的管理员账号。",
-              "Use your existing PinDou administrator account.",
-            )
+            say(copyText.use_your_existing_pindou_administrator_account_ac1b0a)
           }}
         </p>
         <RouterLink to="/" class="desk-link"
-          >{{ tr("返回网站", "Back to the website") }}<PhArrowRight
+          >{{ say(copyText.back_to_the_website_19fd8b) }}<PhArrowRight
         /></RouterLink>
       </form>
     </div>
@@ -231,7 +217,7 @@ function statusLabel(value: string): string {
     ><template #legacy>
       <div class="manage-toolbar">
         <label class="field"
-          >{{ tr("请求状态", "Request status")
+          >{{ say(copyText.request_status_f5815f)
           }}<select
             v-model="status"
             @change="
@@ -239,7 +225,7 @@ function statusLabel(value: string): string {
               load();
             "
           >
-            <option value="all">{{ tr("全部", "All requests") }}</option>
+            <option value="all">{{ say(copyText.all_requests_26d41f) }}</option>
             <option
               v-for="(label, value) in statusLabels()"
               :key="value"
@@ -249,19 +235,14 @@ function statusLabel(value: string): string {
             </option>
           </select></label
         ><button class="button button-outline" :disabled="busy" @click="load">
-          <PhArrowClockwise />{{ tr("刷新", "Refresh") }}</button
-        ><span>{{ total }} {{ tr("条请求", "requests") }}</span>
+          <PhArrowClockwise />{{ say(copyText.refresh_5efb82) }}</button
+        ><span>{{ total }} {{ say(copyText.requests_be865b) }}</span>
       </div>
       <p class="fine-print">
-        {{
-          tr(
-            "保存状态不会自动通知顾客。请使用请求中留下的联系方式确认，内部备注仅店主可见。",
-            "Saving a status does not notify the guest. Contact them using the details they provided. Staff notes are private.",
-          )
-        }}
+        {{ say(copyText.saving_a_status_does_not_notify_the_c16998) }}
       </p>
       <p v-if="!entries.length && !busy && !error" class="empty-selection">
-        {{ tr("这里暂时没有请求。", "No requests here yet.") }}
+        {{ say(copyText.no_requests_here_yet_ce9b61) }}
       </p>
       <article v-for="entry in entries" :key="entry.id" class="manage-entry">
         <div class="manage-entry-title">
@@ -269,8 +250,8 @@ function statusLabel(value: string): string {
             {{ entry.payload.name }}
             <small>{{
               entry.kind === "visit"
-                ? tr("到店预约", "Visit")
-                : tr("自提询单", "Pickup")
+                ? say(copyText.visit_111717)
+                : say(copyText.pickup_eb8e71)
             }}</small>
           </h2>
           <span class="status-label">{{ statusLabel(entry.status) }}</span>
@@ -291,13 +272,13 @@ function statusLabel(value: string): string {
         <p v-if="entry.payload.booking">
           {{ prettyDate(entry.payload.booking.date) }} ·
           {{ entry.payload.booking.start }}–{{ entry.payload.booking.end }} ·
-          {{ entry.payload.booking.guests }} {{ tr("人", "guests") }} ·
+          {{ entry.payload.booking.guests }} {{ say(copyText.guests_24bfb5) }} ·
           {{ entry.payload.booking.plan }}
         </p>
         <p v-for="item in entry.payload.items" :key="item.id">
           {{
             products.find((p) => p.id === item.id)?.[
-              tr("zh", "en") as "zh" | "en"
+              say(copyText.en_1ac02c) as "zh" | "en"
             ] || item.id
           }}
           × {{ item.quantity }}
@@ -307,7 +288,7 @@ function statusLabel(value: string): string {
         </p>
         <div class="form-grid">
           <label class="field"
-            >{{ tr("更新状态", "Update status")
+            >{{ say(copyText.update_status_89e527)
             }}<select v-model="entry.next_status">
               <option
                 v-for="(label, value) in statusLabels()"
@@ -318,15 +299,12 @@ function statusLabel(value: string): string {
               </option>
             </select></label
           ><label class="field"
-            >{{ tr("内部备注", "Staff note")
+            >{{ say(copyText.staff_note_0d849e)
             }}<input
               v-model="entry.next_note"
               maxlength="1500"
               :placeholder="
-                tr(
-                  '确认的费用、时间或处理记录',
-                  'Agreed price, timing or follow-up',
-                )
+                say(copyText.agreed_price_timing_or_followup_8826ab)
               "
           /></label>
         </div>
@@ -335,7 +313,7 @@ function statusLabel(value: string): string {
           @click="save(entry)"
           :disabled="busy"
         >
-          {{ tr("保存安排", "Save arrangement") }}
+          {{ say(copyText.save_arrangement_87aa75) }}
         </button>
       </article>
       <div v-if="total > 50" class="pagination">
@@ -346,7 +324,7 @@ function statusLabel(value: string): string {
             load();
           "
         >
-          {{ tr("上一页", "Previous") }}</button
+          {{ say(copyText.previous_94c671) }}</button
         ><span>{{ page }}</span
         ><button
           :disabled="page * 50 >= total || busy"
@@ -355,7 +333,7 @@ function statusLabel(value: string): string {
             load();
           "
         >
-          {{ tr("下一页", "Next") }}
+          {{ say(copyText.next_05635e) }}
         </button>
       </div>
 

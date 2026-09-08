@@ -1,0 +1,42 @@
+[
+  {
+    "id": "starter",
+    "category": "tools",
+    "zh": "给第一幅作品的工具",
+    "en": "Your first little toolkit",
+    "detailZh": "告诉我们你想做什么，一起选底板、镊子和需要的工具。",
+    "detailEn": "Tell us what you would like to make. We will help you choose boards, tweezers and tools.",
+    "image": "studio-07",
+    "price": null
+  },
+  {
+    "id": "beads",
+    "category": "beads",
+    "zh": "刚好缺的那一抹颜色",
+    "en": "A little more colour",
+    "detailZh": "补齐下一幅图纸需要的豆子。请在备注里留下色号、品牌或图纸。",
+    "detailEn": "Top up for your next pattern. Include your colour codes, bead brand or pattern in the notes.",
+    "image": "studio-06",
+    "price": null
+  },
+  {
+    "id": "findings",
+    "category": "tools",
+    "zh": "让拼豆变成随身小物",
+    "en": "The finishing touches",
+    "detailZh": "挂绳、钥匙扣、冰箱贴配件等。款式与数量由店主确认。",
+    "detailEn": "Straps, key rings and magnet fittings. We will confirm styles and quantities with you.",
+    "image": "studio-11",
+    "price": null
+  },
+  {
+    "id": "custom",
+    "category": "finished",
+    "zh": "一份专属的手作心意",
+    "en": "Something made for you",
+    "detailZh": "把你的想法告诉我们，聊聊定制的尺寸、配色和交付时间。图片为作品展示。",
+    "detailEn": "Share an idea for a custom piece. We will discuss size, colours and timing. Photo shows example work.",
+    "image": "journal-05",
+    "price": null
+  }
+]

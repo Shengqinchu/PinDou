@@ -1,0 +1,26 @@
+{
+  "source": "vision2.pdf",
+  "pdf_sha256": "35dd867f9b757146fe99fb90827a3494ee3f68429615b06718f4fc5a786856c5",
+  "files": {
+    "contact-zh.jpg": {
+      "page": 4,
+      "sha256": "10164867c393a0fe564b4b4a2954b1c1bca63bedd2d10644ab305f1181eb6eca",
+      "method": "Original embedded JPEG, unchanged; CSS viewport only."
+    },
+    "contact-en.jpg": {
+      "page": 5,
+      "sha256": "c29772817479946d552079abd31b5635acea6fce96b29f20b4e419c5c0412354",
+      "method": "Original embedded JPEG, unchanged; CSS viewport only."
+    },
+    "logo-zh.jpg": {
+      "page": 6,
+      "sha256": "00203abf579759a90019bf3bc796f03378688d32c715963911ed9787482d7e66",
+      "method": "Original embedded JPEG, unchanged; CSS viewport only."
+    },
+    "logo-en.jpg": {
+      "page": 7,
+      "sha256": "1cb014996ebdf9f773d1021e30e6a199c08cf5608397ce092dba7a3dcaa26320",
+      "method": "Original embedded JPEG, unchanged; CSS viewport only."
+    }
+  }
+}

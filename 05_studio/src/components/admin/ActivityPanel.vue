@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "../../content/components-admin-ActivityPanel.json";
+import { say } from "../../state";
+
 import { onMounted, ref, watch } from "vue";
 import {
   PhClockCounterClockwise,
@@ -58,21 +61,20 @@ function move(delta: number) {
     <header class="desk-page-heading">
       <div>
         <p class="desk-eyebrow">
-          {{ tr("每一次更改，都有来处", "A RECORD OF EVERY CHANGE") }}
+          {{ say(copyText.a_record_of_every_change_3437dd) }}
         </p>
-        <h1>{{ tr("操作记录", "Activity") }}</h1>
+        <h1>{{ say(copyText.activity_78a156) }}</h1>
         <p>
           {{
-            tr(
-              "查看订单处理、商品调整和排班变更。",
-              "Review order handling, product updates and schedule changes.",
+            say(
+              copyText.review_order_handling_product_updates_and_schedule_f41605,
             )
           }}
         </p>
       </div>
       <button class="desk-button secondary" :disabled="busy" @click="load">
         <PhArrowClockwise :class="{ spinning: busy }" />{{
-          tr("刷新", "Refresh")
+          say(copyText.refresh_5efb82)
         }}
       </button>
     </header>
@@ -81,15 +83,10 @@ function move(delta: number) {
       <div v-else-if="!entries.length && !busy" class="desk-empty">
         <PhClockCounterClockwise :size="34" weight="light" />
         <h2>
-          {{ tr("操作记录会留在这里", "Your activity will appear here") }}
+          {{ say(copyText.your_activity_will_appear_here_5f333b) }}
         </h2>
         <p>
-          {{
-            tr(
-              "保存设置、处理订单后，就能看到对应记录。",
-              "After saving settings or handling an order, its record appears here.",
-            )
-          }}
+          {{ say(copyText.after_saving_settings_or_handling_an_order_fa9b4e) }}
         </p>
       </div>
       <article v-for="event in entries" :key="event.id" class="activity-row">
@@ -102,22 +99,22 @@ function move(delta: number) {
             {{ localTime(event.created_at) }} ·
             {{
               event.actor === "system"
-                ? tr("自动处理", "Automatic")
+                ? say(copyText.automatic_ad54d8)
                 : event.actor
             }}
           </p>
           <small>{{ event.order_id }}</small>
           <details v-if="changes(event.detail)" class="audit-changes">
-            <summary>{{ tr("查看修改前后", "View before and after") }}</summary>
+            <summary>{{ say(copyText.view_before_and_after_1d0446) }}</summary>
             <div>
               <section>
-                <h3>{{ tr("修改前", "Before") }}</h3>
+                <h3>{{ say(copyText.before_d1233a) }}</h3>
                 <pre>{{
                   JSON.stringify(changes(event.detail).before, null, 2)
                 }}</pre>
               </section>
               <section>
-                <h3>{{ tr("修改后", "After") }}</h3>
+                <h3>{{ say(copyText.after_3953d8) }}</h3>
                 <pre>{{
                   JSON.stringify(changes(event.detail).after, null, 2)
                 }}</pre>
@@ -138,14 +135,14 @@ function move(delta: number) {
           <button
             class="desk-icon-button"
             :disabled="page <= 1 || busy"
-            :aria-label="tr('上一页', 'Previous page')"
+            :aria-label="say(copyText.previous_page_e70a7e)"
             @click="move(-1)"
           >
             <PhArrowLeft /></button
           ><button
             class="desk-icon-button"
             :disabled="page * 30 >= total || busy"
-            :aria-label="tr('下一页', 'Next page')"
+            :aria-label="say(copyText.next_page_5354f3)"
             @click="move(1)"
           >
             <PhArrowRight />

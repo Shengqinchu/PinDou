@@ -1,0 +1,30 @@
+{
+  "order_details_07f28a": ["订单详情", "Order details"],
+  "fulfilled_bf1ec7": ["已完成", "Fulfilled"],
+  "payment_was_received_but_the_original_seats_72b31b": [
+    "这笔订单已收款，但原座位或商品无法履约。请联系顾客安排改期或退款。",
+    "Payment was received, but the original seats or stock could not be fulfilled. Contact the customer to reschedule or arrange a refund."
+  ],
+  "customer_76be83": ["顾客信息", "Customer"],
+  "in_this_order_38d926": ["这份订单里", "In this order"],
+  "guests_hamilton_time_a7aa80": [
+    "人 · Hamilton 时间",
+    "guests · Hamilton time"
+  ],
+  "studio_pickup_c13b87": ["到店自提", "Studio pickup"],
+  "cad_total_0fc8b6": ["加元合计", "CAD total"],
+  "amount_in_cny_62da3c": ["人民币实付", "Amount in CNY"],
+  "staff_note_0d849e": ["内部备注", "Staff note"],
+  "for_example_contacted_guest_pickup_time_special_be0f3b": [
+    "例如：已联系顾客、自提时间、特别安排",
+    "For example: contacted guest, pickup time, special arrangements"
+  ],
+  "order_timeline_0fd9c3": ["订单记录", "Order timeline"],
+  "automatic_ad54d8": ["自动处理", "Automatic"],
+  "save_note_449101": ["保存备注", "Save note"],
+  "saving_1bd9fd": ["保存中…", "Saving…"],
+  "reopen_766aae": ["恢复待完成", "Reopen"],
+  "mark_fulfilled_d8eac2": ["标记已到店／自提", "Mark fulfilled"],
+  "message_a1acbedd": ["订单号已复制", "Order number copied"],
+  "message_3d2221e9": ["请选中订单号复制", "Select the order number to copy it"]
+}

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "../content/components-StudioToast.json";
+import { say } from "../state";
+
 import {
   PhCheck,
   PhWarningCircle,
@@ -29,11 +32,11 @@ const route = useRoute();
           to="/cart"
           class="notice-action"
           @click="dismissNotice"
-          >{{ tr("去看看", "View bag") }}<PhArrowRight
+          >{{ say(copyText.view_bag_6caa85) }}<PhArrowRight
         /></RouterLink>
         <button
           class="icon-button"
-          :aria-label="tr('关闭提示', 'Dismiss notification')"
+          :aria-label="say(copyText.dismiss_notification_a43888)"
           @click="dismissNotice"
         >
           <PhX :size="17" />

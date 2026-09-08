@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "../content/components-SlideOver.json";
+import { say } from "../state";
+
 import { ref, useId, watch } from "vue";
 import { PhX } from "@phosphor-icons/vue";
 import { tr } from "../state";
@@ -41,7 +44,7 @@ function dismiss() {
           <button
             class="icon-button"
             :disabled="busy"
-            :aria-label="closeLabel || tr('关闭详情', 'Close details')"
+            :aria-label="closeLabel || say(copyText.close_details_643b07)"
             @click="dismiss"
           >
             <PhX :size="21" />

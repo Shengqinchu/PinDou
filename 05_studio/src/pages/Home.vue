@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import copyText from "../content/pages-Home.json";
+import { say } from "../state";
+
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { PhArrowUpRight, PhArrowRight, PhFlower } from "@phosphor-icons/vue";
 import { gsap } from "gsap";
 import PhotoViewer from "../components/PhotoViewer.vue";
 import StudioCarousel from "../components/StudioCarousel.vue";
+import BrandMotif from "../components/BrandMotif.vue";
 import { gallery, media, tr } from "../state";
 const page = ref<HTMLElement>();
 const viewer = ref<InstanceType<typeof PhotoViewer>>();
@@ -25,6 +29,23 @@ onMounted(() => {
             clearProps: "transform,opacity",
           },
           0,
+        )
+        .from(
+          ".hero-puppy",
+          { rotation: -8, y: 10, opacity: 0, duration: 1.2, clearProps: "all" },
+          0.3,
+        )
+        .from(
+          ".hero-star, .hero-heart",
+          {
+            scale: 0.75,
+            rotation: 12,
+            opacity: 0,
+            duration: 1.1,
+            stagger: 0.16,
+            clearProps: "all",
+          },
+          0.55,
         )
         .from(
           ".vision-hero-description",
@@ -50,37 +71,28 @@ onBeforeUnmount(() => animation?.revert());
   <div ref="page" class="vision-home">
     <section class="vision-hero container">
       <p class="vision-location">
-        {{ tr("加拿大 · 安大略省 · 汉密尔顿", "Hamilton, Ontario, Canada") }}
+        {{ say(copyText.hamilton_ontario_canada_fbf034) }}
       </p>
-      <h1 class="vision-title">
-        <span>{{ tr("属于你的", "A little time. All yours.") }}</span
-        ><span>{{ tr("全新拼豆手作体验", "Make something lovely.") }}</span>
-      </h1>
+      <div class="vision-hero-lettering">
+        <BrandMotif class="hero-puppy" /><BrandMotif
+          kind="star"
+          class="hero-star"
+        /><BrandMotif kind="heart" class="hero-heart" />
+        <h1 class="vision-title">
+          <span>{{ say(copyText.a_little_time_all_yours_9e9d60) }}</span
+          ><span>{{ say(copyText.make_something_lovely_04db64) }}</span>
+        </h1>
+      </div>
       <p class="vision-hero-description vision-mobile-copy">
-        {{
-          tr(
-            "也许是一个下午，几件小物，与自己独处的温馨时间。",
-            "An afternoon, a few little things, and a warm moment to yourself.",
-          )
-        }}
+        {{ say(copyText.welcome_to_pindo_puppychoose_an_afternoon_and_247303) }}
       </p>
       <p class="vision-hero-description vision-desktop-copy">
-        {{
-          tr(
-            "欢迎光临小狗拼豆铺。也许是某个下午吧，选自己喜欢的图，坐进阳光里，把一颗颗豆子，变成独属于你的快乐。",
-            "Welcome to Pindo Puppy. Spend an afternoon in the sunshine, choose a pattern you love, and turn tiny beads into a little happiness of your own.",
-          )
-        }}
+        {{ say(copyText.welcome_to_pindo_puppychoose_an_afternoon_and_247303) }}
       </p>
       <figure class="vision-hero-photo">
         <img
           :src="media('studio-02')"
-          :alt="
-            tr(
-              '小狗拼豆铺的白色工作台、拼豆作品墙与自然光',
-              'Sunlit worktables and a wall of bead art at Pindo Puppy',
-            )
-          "
+          :alt="say(copyText.sunlit_worktables_and_a_wall_of_bead_46e326)"
           width="1080"
           height="1440"
           fetchpriority="high"
@@ -88,67 +100,47 @@ onBeforeUnmount(() => animation?.revert());
       </figure>
       <div class="vision-hero-actions">
         <RouterLink class="button button-primary" to="/visit"
-          >{{ tr("来拼豆吧", "Come create") }}<PhArrowUpRight
+          >{{ say(copyText.come_create_2eee81) }}<PhArrowUpRight
         /></RouterLink>
         <RouterLink class="button button-outline" to="/shop"
-          >{{ tr("拼豆小店", "Little shop") }}<PhArrowUpRight
+          >{{ say(copyText.little_shop_c97261) }}<PhArrowUpRight
         /></RouterLink>
       </div>
     </section>
     <div class="vision-welcome">
-      <span>{{ tr("一人放空", "Time for yourself") }}</span
-      ><PhFlower aria-hidden="true" /><span>{{
-        tr("朋友一起", "Friends together")
+      <span>{{ say(copyText.time_for_yourself_9e1db5) }}</span
+      ><BrandMotif kind="star" /><span>{{
+        say(copyText.friends_together_71ba0c)
       }}</span
-      ><PhFlower aria-hidden="true" /><span>{{
-        tr("手工制作", "Made by hand")
+      ><BrandMotif kind="star" /><span>{{
+        say(copyText.made_by_hand_f4654d)
       }}</span>
     </div>
     <section id="space" class="vision-space container">
       <StudioCarousel />
       <div class="vision-space-copy">
         <p class="vision-eyebrow">
-          {{ tr("欢迎来到小狗拼豆铺", "WELCOME TO PINDO PUPPY") }}
+          {{ say(copyText.welcome_to_pindo_puppy_2b7fcf) }}
         </p>
         <h2>
-          {{ tr("小小工作坊，", "A little workshop.") }}<br /><em>{{
-            tr("创造无限可爱手作。", "Endless lovely possibilities.")
+          {{ say(copyText.a_little_workshop_32499a) }}<br /><em>{{
+            say(copyText.endless_lovely_possibilities_b5a1fa)
           }}</em>
         </h2>
         <p>
-          {{
-            tr(
-              "这是一个家庭工作坊，我们把家里的一个房间，慢慢变成了拼豆小屋。",
-              "We turned a room in our home into a little workshop for making things with beads.",
-            )
-          }}
+          {{ say(copyText.we_turned_a_room_in_our_home_3b9cec) }}
         </p>
         <p>
-          {{
-            tr(
-              "你可以来体验拼豆，也可以购置自己的拼豆工具；你可以买下拼豆作品，也可以定制独一无二的图案。",
-              "Come for a bead-making experience, pick up tools for home, choose a handmade piece, or talk to us about a pattern made just for you.",
-            )
-          }}
+          {{ say(copyText.come_for_a_beadmaking_experience_pick_up_061846) }}
         </p>
         <p>
-          {{
-            tr(
-              "一个人来，安安静静地拼；或者约上朋友，边聊边做。",
-              "Come alone for a quiet moment, or bring a friend and catch up while you create.",
-            )
-          }}
+          {{ say(copyText.come_alone_for_a_quiet_moment_or_6cec34) }}
         </p>
         <p>
-          {{
-            tr(
-              "在小狗拼豆铺慢下来吧，感受手工的快乐。",
-              "Slow down at Pindo Puppy and enjoy the simple pleasure of making by hand.",
-            )
-          }}
+          {{ say(copyText.slow_down_at_pindo_puppy_and_enjoy_8b796a) }}
         </p>
         <RouterLink class="text-link" to="/details"
-          >{{ tr("拼豆铺详细信息", "Studio details") }}<PhArrowRight
+          >{{ say(copyText.studio_details_7c4089) }}<PhArrowRight
         /></RouterLink>
       </div>
     </section>
@@ -156,10 +148,10 @@ onBeforeUnmount(() => animation?.revert());
       <div class="container">
         <div class="vision-section-heading">
           <h2>
-            {{ tr("快乐，有很多种形状。", "Happiness takes many shapes.") }}
+            {{ say(copyText.happiness_takes_many_shapes_c5b449) }}
           </h2>
           <RouterLink class="text-link" to="/journal"
-            >{{ tr("翻翻小狗日记", "Browse the studio journal")
+            >{{ say(copyText.browse_the_studio_journal_39842d)
             }}<PhArrowUpRight
           /></RouterLink>
         </div>
@@ -186,52 +178,33 @@ onBeforeUnmount(() => animation?.revert());
     </section>
     <section class="vision-experience container">
       <div>
-        <p class="vision-eyebrow">
-          {{ tr("给自己一点手作时间", "MAKE A LITTLE TIME") }}
-        </p>
+        <BrandMotif kind="bone" class="experience-motif" />
         <h2>
-          {{ tr("不如", "How about") }}<br /><em>{{
-            tr("来体验一下", "giving it a try?")
+          {{ say(copyText.how_about_bf459e) }}<br /><em>{{
+            say(copyText.giving_it_a_try_9e9961)
           }}</em>
         </h2>
         <RouterLink class="button button-primary" to="/visit"
-          >{{ tr("预约一次拼豆", "Book a bead-making visit") }}<PhArrowUpRight
+          >{{ say(copyText.book_a_beadmaking_visit_ec7a0a) }}<PhArrowUpRight
         /></RouterLink>
       </div>
       <ul>
         <li>
-          <span>01</span
-          >{{
-            tr(
-              "独立座位，舒适的老板椅",
-              "A seat of your own and a comfortable chair",
-            )
-          }}
+          <span>01</span>{{ say(copyText.a_seat_of_your_own_and_a_f9a329) }}
         </li>
         <li>
           <span>02</span
-          >{{
-            tr(
-              "一组客人一套拼豆，自由轻松",
-              "Your group, your own set of beads",
-            )
-          }}
+          >{{ say(copyText.your_group_your_own_set_of_beads_c2a8a9) }}
         </li>
         <li>
           <span>03</span
-          >{{
-            tr(
-              "工具齐全，选好图纸慢慢拼",
-              "All the tools you need; choose a pattern and take your time",
-            )
-          }}
+          >{{ say(copyText.all_the_tools_you_need_choose_a_198a68) }}
         </li>
         <li>
           <span>04</span
           >{{
-            tr(
-              "多种特殊烫，实现不同纹理",
-              "Special ironing techniques for different textures",
+            say(
+              copyText.special_ironing_techniques_for_different_textures_dffbdd,
             )
           }}
         </li>
@@ -240,33 +213,22 @@ onBeforeUnmount(() => animation?.revert());
     <section class="vision-shop-teaser container">
       <img
         :src="media('studio-11')"
-        :alt="
-          tr(
-            '工作室的挂件与手作配件',
-            'Charms and craft fittings in the studio',
-          )
-        "
+        :alt="say(copyText.charms_and_craft_fittings_in_the_studio_183b2f)"
         width="1080"
         height="1440"
         loading="lazy"
       />
       <div>
-        <p class="vision-eyebrow">{{ tr("拼豆小店", "THE LITTLE SHOP") }}</p>
         <h2>
-          {{ tr("或者", "Or take a little") }}<br /><em>{{
-            tr("直接带回家", "happiness home.")
+          {{ say(copyText.or_take_a_little_38633e) }}<br /><em>{{
+            say(copyText.happiness_home_4ed870)
           }}</em>
         </h2>
         <p>
-          {{
-            tr(
-              "功能尚在开发中，敬请期待……",
-              "Our little shop is still taking shape. Coming soon…",
-            )
-          }}
+          {{ say(copyText.our_little_shop_is_still_taking_shape_bf9bb8) }}
         </p>
         <RouterLink class="text-link" to="/shop"
-          >{{ tr("看看小店", "Visit the little shop") }}<PhArrowRight
+          >{{ say(copyText.visit_the_little_shop_b5f393) }}<PhArrowRight
         /></RouterLink>
       </div>
     </section>

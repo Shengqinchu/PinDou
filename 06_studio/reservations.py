@@ -42,6 +42,8 @@ def initialize(database):
         );
         INSERT OR IGNORE INTO reservation_policy(id) VALUES(1);
         """)
+        if "settings" not in {row[1] for row in db.execute("PRAGMA table_info(reservation_policy)")}:
+            db.execute("ALTER TABLE reservation_policy ADD COLUMN settings TEXT NOT NULL DEFAULT '{}'")
 
 def clock(value):
     return f"{value // 60:02d}:{value % 60:02d}"
@@ -55,8 +57,21 @@ def minute(value):
     except (ValueError, AttributeError):
         raise HTTPException(422, "invalid_reservation_time")
 
-def closing(day):
-    return 960 if day.weekday() == 2 else 1080 if day.weekday() == 3 else 1320
+def default_hours():
+    return [{"weekday": i, "enabled": True, "open": "10:00", "close": "22:00"} for i in range(7)]
+
+def read_policy(db):
+    row = dict(db.execute("SELECT * FROM reservation_policy WHERE id=1").fetchone())
+    values = {"max_guests_per_group": 4, "max_concurrent_groups": None,
+              "max_concurrent_guests": None, "weekly_hours": default_hours()}
+    values.update(json.loads(row["settings"]))
+    return values | {"exclusive_groups": bool(row["exclusive_groups"]), "version": row["version"]}
+
+def hours(day, policy=None):
+    return (policy or {"weekly_hours": default_hours()})["weekly_hours"][day.weekday()]
+
+def closing(day, policy=None):
+    return minute(hours(day, policy)["close"])
 
 def visitor(request, response=None):
     token = request.cookies.get(COOKIE, "")
@@ -76,7 +91,7 @@ class Visit(Strict):
     start: str = Field(pattern=r"^\d{2}:\d{2}$")
     end: str = Field(pattern=r"^\d{2}:\d{2}$")
     plan: Literal["hourly", "day"]
-    guests: int = Field(ge=1, le=20, strict=True)
+    guests: int = Field(ge=1, le=99, strict=True)
 
 class Submission(Strict):
     booking: Visit
@@ -96,13 +111,16 @@ class Submission(Strict):
             raise ValueError("Invalid email")
         return self
 
-def validate_interval(booking, current):
+def validate_interval(booking, current, policy=None):
     start, end = minute(booking.start), minute(booking.end)
+    opening = hours(booking.date, policy)
     if not current.date() <= booking.date < current.date() + timedelta(days=14):
         raise HTTPException(422, "reservation_outside_window")
-    if start < 600 or end > closing(booking.date) or end - start < 120:
+    if not opening["enabled"] or start < minute(opening["open"]) or end > closing(booking.date, policy) or end - start < 120:
         raise HTTPException(422, "reservation_interval_unavailable")
-    if booking.plan == "day" and end != closing(booking.date):
+    if policy and booking.guests > policy["max_guests_per_group"]:
+        raise HTTPException(422, "reservation_group_limit")
+    if booking.plan == "day" and end != closing(booking.date, policy):
         raise HTTPException(422, "reservation_day_end")
     if datetime.combine(booking.date, datetime.min.time(), tzinfo=ZONE) + timedelta(minutes=start) <= current:
         raise HTTPException(422, "reservation_in_past")
@@ -111,6 +129,21 @@ def overlaps(db, booking, exclude=""):
     rows = db.execute("SELECT id,payload FROM studio_reservations WHERE status='confirmed' AND id!=? AND json_extract(payload,'$.booking.date')=?", (exclude, str(booking.date))).fetchall()
     return any(minute(json.loads(r["payload"])["booking"]["start"]) < minute(booking.end)
                and minute(json.loads(r["payload"])["booking"]["end"]) > minute(booking.start) for r in rows)
+
+def capacity_available(confirmed, day, start, end, guests, policy):
+    group_limit = 1 if policy["exclusive_groups"] else policy["max_concurrent_groups"]
+    people_limit = policy["max_concurrent_guests"]
+    for at in range(start, end, 30):
+        present = [b for b in confirmed if b["date"] == str(day) and minute(b["start"]) < at + 30 and minute(b["end"]) > at]
+        if group_limit is not None and len(present) + 1 > group_limit:
+            return False
+        if people_limit is not None and sum(b["guests"] for b in present) + guests > people_limit:
+            return False
+    return True
+
+def has_capacity(db, booking, policy, exclude=""):
+    confirmed = [json.loads(r[0])["booking"] for r in db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed' AND id!=? AND json_extract(payload,'$.booking.date')=?", (exclude, str(booking.date)))]
+    return capacity_available(confirmed, booking.date, minute(booking.start), minute(booking.end), booking.guests, policy)
 
 def public_row(row):
     data = json.loads(row["payload"])
@@ -121,29 +154,59 @@ class ReservationUpdate(Strict):
     staff_note: str = Field(default="", max_length=1500)
     version: int = Field(ge=1)
 
+class DayHours(Strict):
+    weekday: int = Field(ge=0, le=6, strict=True)
+    enabled: bool
+    open: str = Field(pattern=r"^(?:[01]\d|2[0-3]):(?:00|30)$")
+    close: str = Field(pattern=r"^(?:[01]\d|2[0-3]):(?:00|30)$")
+
+    @model_validator(mode="after")
+    def ordered(self):
+        if self.enabled and minute(self.close) - minute(self.open) < 120:
+            raise ValueError("Opening hours need at least two hours")
+        return self
+
 class ReservationPolicy(Strict):
-    exclusive_groups: bool
+    exclusive_groups: bool = False  # Kept for old desk clients; new desk edits explicit limits.
+    max_guests_per_group: int = Field(default=4, ge=1, le=99, strict=True)
+    max_concurrent_groups: int | None = Field(default=None, ge=1, le=999, strict=True)
+    max_concurrent_guests: int | None = Field(default=None, ge=1, le=999, strict=True)
+    weekly_hours: list[DayHours] = Field(default_factory=lambda: [DayHours(**v) for v in default_hours()], min_length=7, max_length=7)
     version: int = Field(ge=1)
+
+    @model_validator(mode="after")
+    def weekdays(self):
+        if sorted(day.weekday for day in self.weekly_hours) != list(range(7)):
+            raise ValueError("Provide each weekday exactly once")
+        self.weekly_hours.sort(key=lambda day: day.weekday)
+        return self
 
 def register(app, database, admin_actor):
     @app.get("/studio-api/reservation-calendar")
-    def calendar(request: Request, response: Response):
+    def calendar(request: Request, response: Response, guests: int = 1):
         visitor(request, response)
         current = now_local()
+        if not 1 <= guests <= 99:
+            raise HTTPException(422, "reservation_group_limit")
         with database() as db:
-            exclusive = bool(db.execute("SELECT exclusive_groups FROM reservation_policy WHERE id=1").fetchone()[0])
-            confirmed = [json.loads(r[0])["booking"] for r in db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed'")] if exclusive else []
+            settings = read_policy(db)
+            confirmed = [json.loads(r[0])["booking"] for r in db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed' AND json_extract(payload,'$.booking.date')>=?", (str(current.date()),))]
+        enabled = [h for h in settings["weekly_hours"] if h["enabled"]]
+        grid_start = min((minute(h["open"]) for h in enabled), default=600)
+        grid_end = max((minute(h["close"]) for h in enabled), default=1320)
         days = []
         for n in range(14):
             day = current.date() + timedelta(days=n)
             slots = []
-            for start in range(600, 1320, 30):
+            opening = hours(day, settings)
+            for start in range(grid_start, grid_end, 30):
                 past = datetime.combine(day, datetime.min.time(), tzinfo=ZONE) + timedelta(minutes=start) <= current
-                busy = any(b["date"] == str(day) and minute(b["start"]) < start + 30 and minute(b["end"]) > start for b in confirmed)
-                reason = "closed" if start >= closing(day) else "past" if past else "confirmed" if busy else None
+                busy = not capacity_available(confirmed, day, start, start + 30, guests, settings)
+                closed = not opening["enabled"] or start < minute(opening["open"]) or start >= minute(opening["close"])
+                reason = "closed" if closed else "past" if past else "capacity" if busy or guests > settings["max_guests_per_group"] else None
                 slots.append({"start": clock(start), "end": clock(start + 30), "available": reason is None, "reason": reason})
-            days.append({"date": str(day), "close": clock(closing(day)), "slots": slots})
-        return {"today": str(current.date()), "timezone": "America/Toronto", "minimum_minutes": 120, "days": days}
+            days.append({"date": str(day), "open": opening["open"], "close": opening["close"], "closed": not opening["enabled"], "slots": slots})
+        return {"today": str(current.date()), "timezone": "America/Toronto", "minimum_minutes": 120, "max_guests_per_group": settings["max_guests_per_group"], "weekly_hours": settings["weekly_hours"], "policy_version": settings["version"], "days": days}
 
     @app.post("/studio-api/reservations", status_code=201)
     def submit(payload: Submission, request: Request, idempotency_key: Annotated[str, Header()]):
@@ -162,9 +225,9 @@ def register(app, database, admin_actor):
                 if existing["visitor_hash"] != actor or existing["payload_hash"] != digest:
                     raise HTTPException(409, "reservation_request_changed")
                 return public_row(existing)
-            validate_interval(payload.booking, current)
-            exclusive = db.execute("SELECT exclusive_groups FROM reservation_policy WHERE id=1").fetchone()[0]
-            if exclusive and overlaps(db, payload.booking):
+            settings = read_policy(db)
+            validate_interval(payload.booking, current, settings)
+            if not has_capacity(db, payload.booking, settings):
                 raise HTTPException(409, "reservation_interval_unavailable")
             bucket = int(time.time()) // 3600
             client = "reservation:" + hashlib.sha256((request.client.host if request.client else "unknown").encode()).hexdigest()
@@ -204,7 +267,7 @@ def register(app, database, admin_actor):
             count = db.execute("SELECT count(*) FROM studio_reservations"+where, params).fetchone()[0]
             rows = db.execute("SELECT * FROM studio_reservations"+where+" ORDER BY created_at DESC,id DESC LIMIT 30 OFFSET ?", (*params,(page-1)*30)).fetchall()
             counts = dict(db.execute("SELECT status,count(*) FROM studio_reservations GROUP BY status").fetchall())
-            policy = dict(db.execute("SELECT exclusive_groups,version FROM reservation_policy WHERE id=1").fetchone())
+            policy = read_policy(db)
         return {"items":[public_row(r) | {"payload":json.loads(r["payload"]),"staff_note":r["staff_note"]} for r in rows], "total":count,"counts":counts,"policy":policy}
 
     @app.patch("/studio-api/manage/reservations/{reference}")
@@ -217,8 +280,9 @@ def register(app, database, admin_actor):
             if row["version"] != payload.version: raise HTTPException(409,"version_conflict")
             if payload.status == "confirmed" and row["status"] != "confirmed":
                 booking = Visit(**json.loads(row["payload"])["booking"])
-                validate_interval(booking, current)
-                if db.execute("SELECT exclusive_groups FROM reservation_policy WHERE id=1").fetchone()[0] and overlaps(db, booking, reference):
+                settings = read_policy(db)
+                validate_interval(booking, current, settings)
+                if not has_capacity(db, booking, settings, reference):
                     raise HTTPException(409,"reservation_confirmation_conflict")
             if payload.status == "completed" and row["status"] not in ("confirmed","completed"):
                 raise HTTPException(409,"reservation_not_confirmed")
@@ -226,15 +290,24 @@ def register(app, database, admin_actor):
             db.execute("INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)", (reference,actor,current.isoformat(),payload.status,payload.staff_note))
         return {"id":reference,"status":payload.status,"version":payload.version+1}
 
+    @app.get("/studio-api/manage/reservation-policy")
+    def get_policy(_actor=Depends(admin_actor)):
+        with database() as db:
+            return read_policy(db)
+
     @app.put("/studio-api/manage/reservation-policy")
     def policy(payload: ReservationPolicy, _actor=Depends(admin_actor)):
         with database() as db:
             db.execute("BEGIN IMMEDIATE")
-            current = db.execute("SELECT * FROM reservation_policy WHERE id=1").fetchone()
+            current = read_policy(db)
             if current["version"] != payload.version: raise HTTPException(409,"version_conflict")
-            if payload.exclusive_groups:
-                rows = db.execute("SELECT id,payload FROM studio_reservations WHERE status='confirmed'").fetchall()
-                if any(overlaps(db, Visit(**json.loads(r["payload"])["booking"]), r["id"]) for r in rows):
-                    raise HTTPException(409,"reservation_confirmation_conflict")
-            db.execute("UPDATE reservation_policy SET exclusive_groups=?,version=version+1 WHERE id=1", (payload.exclusive_groups,))
-        return {"exclusive_groups":payload.exclusive_groups,"version":payload.version+1}
+            settings = ReservationPolicy(**(current | payload.model_dump(exclude_unset=True))).model_dump()
+            future = db.execute("SELECT id,payload FROM studio_reservations WHERE status='confirmed' AND json_extract(payload,'$.booking.date')>=?", (str(now_local().date()),)).fetchall()
+            for row in future:
+                booking = Visit(**json.loads(row["payload"])["booking"])
+                opening = hours(booking.date, settings)
+                if (not opening["enabled"] or booking.start < opening["open"] or booking.end > opening["close"] or booking.guests > settings["max_guests_per_group"] or not has_capacity(db, booking, settings, row["id"])):
+                    raise HTTPException(409, "reservation_policy_conflict")
+            encoded = {k:v for k,v in settings.items() if k not in ("exclusive_groups", "version")}
+            db.execute("UPDATE reservation_policy SET exclusive_groups=?,settings=?,version=version+1 WHERE id=1", (settings["exclusive_groups"], json.dumps(encoded)))
+            return read_policy(db)

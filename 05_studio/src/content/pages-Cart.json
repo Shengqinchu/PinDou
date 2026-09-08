@@ -1,0 +1,93 @@
+{
+  "your_bag_fe50f1": ["你的购物车", "Your bag."],
+  "an_afternoon_a_few_little_things_everything_f3f96f": [
+    "一个下午，几件小物。所有期待，一起结账。",
+    "An afternoon, a few little things. Everything you are looking forward to, together."
+  ],
+  "your_previous_checkout_has_not_returned_a_b40b17": [
+    "上次结账尚未返回结果，请先恢复订单。",
+    "Your previous checkout has not returned a result. Please recover it first."
+  ],
+  "resume_checkout_b2cc6f": ["恢复刚才的结账", "Resume checkout"],
+  "little_handmade_bead_creations_d6f442": [
+    "可爱的拼豆作品",
+    "Little handmade bead creations"
+  ],
+  "room_for_something_lovely_ded35b": [
+    "还空着，刚刚好。",
+    "Room for something lovely."
+  ],
+  "start_with_a_studio_visit_or_a_becf32": [
+    "从一次到店体验，或一件喜欢的小物开始。",
+    "Start with a studio visit, or a little thing you love."
+  ],
+  "choose_a_visit_6a7efd": ["选到店体验", "Choose a visit"],
+  "browse_the_shop_b03c6f": ["逛逛小店", "Browse the shop"],
+  "view_your_recent_order_d58124": ["查看最近的订单", "View your recent order"],
+  "your_bag_5af126": ["我的购物车", "Your bag"],
+  "little_things_5d8e28": ["项心意", "little things"],
+  "studio_visit_6ac62b": ["到店体验", "STUDIO VISIT"],
+  "studio_pickup_b0a250": ["到店自提", "STUDIO PICKUP"],
+  "guests_24bfb5": ["人", "guests"],
+  "choose_another_time_08ddad": ["选择其他时段", "Choose another time"],
+  "decrease_quantity_4c6078": ["减少数量", "Decrease quantity"],
+  "increase_quantity_bf2b16": ["增加数量", "Increase quantity"],
+  "remove_from_bag_6e3287": ["从购物车移除", "Remove from bag"],
+  "keep_looking_around_d52bb5": ["再逛一会儿", "Keep looking around"],
+  "a_name_so_we_know_who_to_5eae58": [
+    "留个名字，见面时好认出你。",
+    "A name, so we know who to welcome."
+  ],
+  "your_name_691e1f": ["你的称呼", "Your name"],
+  "contact_method_73d70a": ["联系方式", "Contact method"],
+  "wechat_2941d2": ["微信", "WeChat"],
+  "email_b6d15f": ["电子邮箱", "Email"],
+  "phone_ac7a62": ["电话", "Phone"],
+  "wechat_id_7a6e86": ["微信号", "WeChat ID"],
+  "email_address_1f1559": ["邮箱地址", "Email address"],
+  "phone_number_15447d": ["电话号码", "Phone number"],
+  "anything_you_would_like_us_to_know_4e9264": [
+    "想提前告诉我们的事（选填）",
+    "Anything you would like us to know? (Optional)"
+  ],
+  "shop_items_are_for_studio_pickup_contact_74d4c2": [
+    "小物采用到店自提；购买后联系店主安排取货。",
+    "Shop items are for studio pickup. Contact the host after purchase to arrange collection."
+  ],
+  "i_have_checked_the_time_items_and_2a0218": [
+    "我已核对时段、商品及实付金额，同意使用以上联系方式处理本次订单。",
+    "I have checked the time, items and payment total, and agree to be contacted about this order."
+  ],
+  "ready_when_you_are_408829": ["准备好，就出发。", "Ready when you are."],
+  "priced_in_cad_paid_in_cny_53d8c7": [
+    "加元标价 · 人民币付款",
+    "Priced in CAD · Paid in CNY"
+  ],
+  "items_experiences_f45837": ["商品与体验", "Items & experiences"],
+  "tax_d7bdd7": ["税费", "Tax"],
+  "total_fe87d0": ["合计", "Total"],
+  "tax_included_991ba9": ["（已含税）", " (tax included)"],
+  "you_pay_chinese_yuan_0f3d48": [
+    "本次实付 · 人民币",
+    "You pay · Chinese yuan"
+  ],
+  "previous_quote_updating_d762aa": [
+    "上次核对金额 · 正在更新",
+    "Previous quote · Updating"
+  ],
+  "checking_prices_and_availability_af0663": [
+    "正在核对价格与空位…",
+    "Checking prices and availability…"
+  ],
+  "check_again_4ba3ee": ["重新核对", "Check again"],
+  "preparing_your_payment_d4dce2": [
+    "正在准备收银台…",
+    "Preparing your payment…"
+  ],
+  "continue_to_payment_f29c00": ["去付款", "Continue to payment"],
+  "hupijiao_checkout_017d75": ["虎皮椒收银台", "Hupijiao checkout"],
+  "your_seats_are_held_briefly_during_payment_7f7bb0": [
+    "座位在付款期间短暂保留。付款成功后，订单和到店时段立即确认。",
+    "Your seats are held briefly during payment. Successful payment confirms your order and visit time."
+  ]
+}

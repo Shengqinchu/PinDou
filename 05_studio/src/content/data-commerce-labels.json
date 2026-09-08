@@ -1,0 +1,13 @@
+{
+  "creating": ["正在准备付款", "Preparing payment"],
+  "pending": ["等待付款", "Awaiting payment"],
+  "payment_uncertain": ["正在核实支付状态", "Checking payment status"],
+  "paid": ["付款成功 · 已确认", "Paid · Confirmed"],
+  "paid_needs_review": [
+    "已付款 · 需要店主处理",
+    "Paid · Host assistance needed"
+  ],
+  "expired": ["付款时间已过", "Payment time expired"],
+  "failed": ["付款页面未能打开", "Payment could not be opened"],
+  "refunded": ["已退款", "Refunded"]
+}

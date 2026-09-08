@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "../../content/components-admin-CheckoutPanel.json";
+import { say } from "../../state";
+
 import { computed } from "vue";
 import {
   PhCheck,
@@ -33,15 +36,12 @@ function setTax(e: Event) {
     <header class="desk-page-heading">
       <div>
         <p class="desk-eyebrow">
-          {{ tr("让每一次付款，清清楚楚", "CLEAR PRICES, SIMPLE CHECKOUT") }}
+          {{ say(copyText.clear_prices_simple_checkout_3d511f) }}
         </p>
-        <h1>{{ tr("收款设置", "Checkout settings") }}</h1>
+        <h1>{{ say(copyText.checkout_settings_b08011) }}</h1>
         <p>
           {{
-            tr(
-              "加元标价、人民币付款。确认好最终金额，再开放小店。",
-              "Price in Canadian dollars, collect in Chinese yuan. Confirm the final amounts before opening.",
-            )
+            say(copyText.price_in_canadian_dollars_collect_in_chinese_35f2a3)
           }}
         </p>
       </div>
@@ -54,35 +54,25 @@ function setTax(e: Event) {
       <section class="desk-surface provider-setting">
         <div class="provider-symbol"><PhWallet :size="30" /></div>
         <div>
-          <h2>{{ tr("虎皮椒收银台", "Hupijiao checkout") }}</h2>
+          <h2>{{ say(copyText.hupijiao_checkout_017d75) }}</h2>
           <p>
-            {{
-              tr(
-                "电脑扫码，手机进入收银台；支付结果自动核实。",
-                "Scan on desktop or open the cashier on mobile. Payment is verified automatically.",
-              )
-            }}
+            {{ say(copyText.scan_on_desktop_or_open_the_cashier_e2fe8b) }}
           </p>
         </div>
         <span :class="['desk-status', paymentConfigured ? 'paid' : 'draft']">{{
           paymentConfigured
-            ? tr("已连接", "Connected")
-            : tr("尚未连接", "Not connected")
+            ? say(copyText.connected_bd103c)
+            : say(copyText.not_connected_238174)
         }}</span>
       </section>
       <div class="checkout-settings-grid">
         <section class="desk-surface">
-          <h2>{{ tr("标价与付款汇率", "Display & payment currency") }}</h2>
+          <h2>{{ say(copyText.display_payment_currency_9d99f4) }}</h2>
           <p class="desk-muted">
-            {{
-              tr(
-                "每笔订单创建时固定汇率，之后修改不会改变旧订单。",
-                "The rate is locked when an order is created. Later changes do not affect existing orders.",
-              )
-            }}
+            {{ say(copyText.the_rate_is_locked_when_an_order_b8c1b7) }}
           </p>
           <label class="desk-field"
-            >{{ tr("1 加元兑换人民币", "CNY per 1 CAD")
+            >{{ say(copyText.cny_per_1_cad_e11b72)
             }}<input
               v-model="settings.fx_cny_per_cad"
               name="fx"
@@ -92,12 +82,12 @@ function setTax(e: Event) {
           /></label>
           <div class="currency-example">
             <div>
-              <small>{{ tr("示例标价", "Example listed price") }}</small
+              <small>{{ say(copyText.example_listed_price_7fc44a) }}</small
               ><strong>CA$10.00</strong>
             </div>
             <PhArrowRight />
             <div>
-              <small>{{ tr("换算金额", "Converted amount") }}</small
+              <small>{{ say(copyText.converted_amount_5871b3) }}</small
               ><strong>{{
                 Number.isFinite(example) ? money(example, "CNY") : "—"
               }}</strong>
@@ -105,36 +95,28 @@ function setTax(e: Event) {
           </div>
         </section>
         <section class="desk-surface">
-          <h2>{{ tr("售价的税费方式", "How prices include tax") }}</h2>
+          <h2>{{ say(copyText.how_prices_include_tax_bcd6c4) }}</h2>
           <p class="desk-muted">
             {{
-              tr(
-                "请选择实际经营使用的计税方式，客人会在结账前看到最终金额。",
-                "Choose the tax treatment you use. Customers see the final amount before payment.",
-              )
+              say(copyText.choose_the_tax_treatment_you_use_customers_4bb4b9)
             }}
           </p>
           <label class="desk-field"
-            >{{ tr("税费方式", "Tax treatment")
+            >{{ say(copyText.tax_treatment_b619a7)
             }}<select v-model="settings.tax_mode" name="tax_mode">
               <option value="unconfirmed">
-                {{ tr("尚未确认", "Not confirmed") }}
+                {{ say(copyText.not_confirmed_bf61ba) }}
               </option>
               <option value="included">
-                {{
-                  tr(
-                    "标价就是最终价（含税）",
-                    "Prices are final (tax included)",
-                  )
-                }}
+                {{ say(copyText.prices_are_final_tax_included_dc93af) }}
               </option>
               <option value="additional">
-                {{ tr("标价另加税费", "Add tax to listed prices") }}
+                {{ say(copyText.add_tax_to_listed_prices_e4cb3b) }}
               </option>
             </select></label
           ><Transition name="field-reveal"
             ><label v-if="settings.tax_mode === 'additional'" class="desk-field"
-              >{{ tr("税率 %", "Tax rate %")
+              >{{ say(copyText.tax_rate_16a67f)
               }}<input
                 :value="settings.tax_bps / 100"
                 type="number"
@@ -146,40 +128,33 @@ function setTax(e: Event) {
           ></Transition>
           <p v-if="settings.tax_mode === 'unconfirmed'" class="settings-hint">
             {{
-              tr(
-                "确认后才能开放网上购买。",
-                "Confirm this before opening online purchases.",
-              )
+              say(copyText.confirm_this_before_opening_online_purchases_adcdf0)
             }}
           </p>
         </section>
       </div>
       <section class="desk-surface setting-switch-row storefront-switch">
         <div>
-          <h2>{{ tr("开放网上购买", "Open online purchases") }}</h2>
+          <h2>{{ say(copyText.open_online_purchases_d4629b) }}</h2>
           <p>
             {{
-              tr(
-                "体验还需设置真实营业时间和接待人数；实物需要已上架且有库存。",
-                "Visits also require opening hours and capacity. Physical products must be published and in stock.",
+              say(
+                copyText.visits_also_require_opening_hours_and_capacity_e05e70,
               )
             }}
           </p>
         </div>
         <ToggleSwitch
           v-model="settings.enabled"
-          :label="tr('开放网上购买', 'Open online purchases')"
+          :label="say(copyText.open_online_purchases_d4629b)"
         />
       </section>
       <div class="desk-savebar">
         <div>
           <span :class="['save-state-dot', { dirty: settingsDirty }]" />{{
             settingsDirty
-              ? tr(
-                  "排班／收款设置有未保存的修改",
-                  "Unsaved schedule or checkout changes",
-                )
-              : tr("所有修改已保存", "All changes saved")
+              ? say(copyText.unsaved_schedule_or_checkout_changes_dbb518)
+              : say(copyText.all_changes_saved_05df19)
           }}
         </div>
         <button
@@ -188,7 +163,9 @@ function setTax(e: Event) {
           :disabled="saving || !settingsDirty"
         >
           <PhCheck />{{
-            saving ? tr("保存中…", "Saving…") : tr("保存设置", "Save settings")
+            saving
+              ? say(copyText.saving_1bd9fd)
+              : say(copyText.save_settings_3a2a2e)
           }}
         </button>
         <p v-if="error" class="desk-error" role="alert">{{ error }}</p>

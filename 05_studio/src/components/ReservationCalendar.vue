@@ -1,5 +1,15 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from "vue";
+import copyText from "../content/components-ReservationCalendar.json";
+import { say } from "../state";
+
+import {
+  computed,
+  nextTick,
+  ref,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+} from "vue";
 import { PhArrowLeft, PhArrowRight } from "@phosphor-icons/vue";
 import { prettyDate, tr } from "../state";
 import {
@@ -17,18 +27,35 @@ const props = defineProps<{
 const emit = defineEmits<{
   select: [value: { date: string; start: string; end: string }];
 }>();
-const week = ref(0),
+const offset = ref(0),
+  pageSize = ref(7),
   focusIndex = ref(-1),
   choosingEnd = ref(false),
   message = ref("");
 const table = ref<HTMLElement>();
 const days = computed(() =>
-  props.calendar.days.slice(week.value * 7, week.value * 7 + 7),
+  props.calendar.days.slice(offset.value, offset.value + pageSize.value),
 );
-const rows = Array.from({ length: 24 }, (_, i) => clock(600 + i * 30));
+const columns = computed(() => days.value.length);
+const rows = computed(
+  () => props.calendar.days[0]?.slots.map((s) => s.start) || [],
+);
+let resize: ResizeObserver | undefined;
+onMounted(() => {
+  resize = new ResizeObserver(([entry]) => {
+    const size =
+      entry.contentRect.width < 420 ? 3 : entry.contentRect.width < 720 ? 4 : 7;
+    if (size !== pageSize.value) {
+      offset.value = Math.floor(offset.value / size) * size;
+      pageSize.value = size;
+    }
+  });
+  if (table.value) resize.observe(table.value);
+});
+onBeforeUnmount(() => resize?.disconnect());
 function weekday(day: string) {
   const date = new Date(day + "T12:00:00Z");
-  return new Intl.DateTimeFormat(tr("zh-CN", "en-CA"), {
+  return new Intl.DateTimeFormat(say(copyText.enca_9cd218), {
     weekday: "short",
     timeZone: "UTC",
   }).format(date);
@@ -63,9 +90,8 @@ function choose(di: number, ri: number) {
     choosingEnd.value = false;
   } else choosingEnd.value = true;
   if (!validSelection(props.calendar, booking)) {
-    message.value = tr(
-      "这里无法安排至少两小时，请选择更早或其他可用时段。",
-      "Choose an earlier or another available time for a visit of at least two hours.",
+    message.value = say(
+      copyText.choose_an_earlier_or_another_available_time_f98d07,
     );
     return;
   }
@@ -77,14 +103,21 @@ function choose(di: number, ri: number) {
   });
 }
 async function moveWeek(delta: number) {
-  week.value = Math.max(0, Math.min(1, week.value + delta));
+  offset.value = Math.max(
+    0,
+    Math.min(
+      Math.floor((props.calendar.days.length - 1) / pageSize.value) *
+        pageSize.value,
+      offset.value + delta * pageSize.value,
+    ),
+  );
   await nextTick();
   resetFocus();
 }
 function resetFocus() {
   focusIndex.value =
-    Array.from({ length: 168 }, (_, i) => i).find((i) =>
-      available(i % 7, Math.floor(i / 7)),
+    Array.from({ length: rows.value.length * columns.value }, (_, i) => i).find(
+      (i) => available(i % columns.value, Math.floor(i / columns.value)),
     ) ?? -1;
 }
 function keyboard(event: KeyboardEvent, index: number) {
@@ -94,20 +127,20 @@ function keyboard(event: KeyboardEvent, index: number) {
       : event.key === "ArrowLeft"
         ? -1
         : event.key === "ArrowDown"
-          ? 7
+          ? columns.value
           : event.key === "ArrowUp"
-            ? -7
+            ? -columns.value
             : 0;
   if (!delta) return;
   event.preventDefault();
   let target = index + delta;
-  while (target >= 0 && target < 168) {
+  while (target >= 0 && target < rows.value.length * columns.value) {
     if (
       Math.abs(delta) === 1 &&
-      Math.floor(target / 7) !== Math.floor(index / 7)
+      Math.floor(target / columns.value) !== Math.floor(index / columns.value)
     )
       break;
-    if (available(target % 7, Math.floor(target / 7))) {
+    if (available(target % columns.value, Math.floor(target / columns.value))) {
       focusIndex.value = target;
       table.value
         ?.querySelector<HTMLButtonElement>('[data-cell="' + target + '"]')
@@ -117,7 +150,9 @@ function keyboard(event: KeyboardEvent, index: number) {
     target += delta;
   }
 }
-watch(() => [props.calendar, props.disabled], resetFocus, { immediate: true });
+watch(() => [props.calendar, props.disabled, columns.value], resetFocus, {
+  immediate: true,
+});
 watch(
   () => props.booking.plan,
   () => {
@@ -128,58 +163,50 @@ watch(
 </script>
 <template>
   <div class="reservation-calendar">
+    <div class="reservation-legend">
+      <span><i />{{ say(copyText.available_to_book_9bb918) }}</span
+      ><span><i class="chosen" />{{ say(copyText.your_selection_0fc834) }}</span
+      ><span><i class="closed" />{{ say(copyText.unavailable_fb3489) }}</span>
+    </div>
     <div class="reservation-week-nav">
       <button
         class="icon-button"
-        :disabled="week === 0 || disabled"
-        :aria-label="tr('上一周', 'Previous week')"
+        :disabled="offset === 0 || disabled"
+        :aria-label="say(copyText.previous_dates_314fc5)"
         @click="moveWeek(-1)"
       >
         <PhArrowLeft />
       </button>
       <div>
-        <strong>{{ tr("未来两周", "The next two weeks") }}</strong
+        <strong>{{ say(copyText.the_next_two_weeks_59cce3) }}</strong
         ><span
           >{{ days[0]?.date.slice(5).replace("-", "/") }} —
-          {{ days[6]?.date.slice(5).replace("-", "/") }}</span
+          {{ days[days.length - 1]?.date.slice(5).replace("-", "/") }}</span
         >
       </div>
       <button
         class="icon-button"
-        :disabled="week === 1 || disabled"
-        :aria-label="tr('下一周', 'Next week')"
+        :disabled="offset + pageSize >= calendar.days.length || disabled"
+        :aria-label="say(copyText.next_dates_4c8209)"
         @click="moveWeek(1)"
       >
         <PhArrowRight />
       </button>
     </div>
-    <div class="reservation-legend">
-      <span><i />{{ tr("可以申请", "Available to request") }}</span
-      ><span><i class="chosen" />{{ tr("已选时段", "Your selection") }}</span
-      ><span><i class="closed" />{{ tr("不可预约", "Unavailable") }}</span>
-    </div>
     <p class="reservation-grid-help">
-      {{
-        tr(
-          "点击开始时间，默认选择两小时；再点同一天较晚的格子可延长。手机可左右滑动查看日期。",
-          "Choose a start time for a two-hour visit, then a later cell to extend it. Swipe sideways on a phone to see more dates.",
-        )
-      }}
+      {{ say(copyText.choose_a_start_time_for_a_twohour_a3470d) }}
     </p>
     <div ref="table" class="reservation-grid-scroll">
       <table
         class="reservation-grid"
         role="grid"
         :aria-label="
-          tr(
-            '预约时间表，使用方向键移动，回车选择',
-            'Reservation timetable. Use arrow keys to move and Enter to select.',
-          )
+          say(copyText.reservation_timetable_use_arrow_keys_to_move_3bb451)
         "
       >
         <thead>
           <tr>
-            <th scope="col">{{ tr("时间", "Time") }}</th>
+            <th scope="col">{{ say(copyText.time_296653) }}</th>
             <th v-for="day in days" :key="day.date" scope="col">
               <span>{{ weekday(day.date) }}</span
               ><strong>{{ day.date.slice(5).replace("-", "/") }}</strong>
@@ -196,8 +223,10 @@ watch(
             >
               <button
                 type="button"
-                :data-cell="ri * 7 + di"
-                :tabindex="focusIndex === ri * 7 + di ? 0 : -1"
+                :data-cell="ri * columns + di"
+                :data-date="day.date"
+                :data-time="time"
+                :tabindex="focusIndex === ri * columns + di ? 0 : -1"
                 :disabled="!available(di, ri)"
                 :class="{
                   chosen: selected(day.date, time),
@@ -212,22 +241,22 @@ watch(
                   day.slots[ri]?.end +
                   ' ' +
                   (day.slots[ri]?.available
-                    ? tr('可选', 'available')
-                    : tr('不可预约', 'unavailable'))
+                    ? say(copyText.available_d07da8)
+                    : say(copyText.unavailable_e939b7))
                 "
-                @focus="focusIndex = ri * 7 + di"
-                @keydown="keyboard($event, ri * 7 + di)"
+                @focus="focusIndex = ri * columns + di"
+                @keydown="keyboard($event, ri * columns + di)"
                 @click="choose(di, ri)"
               >
                 <span
                   v-if="selected(day.date, time) && booking.start === time"
-                  >{{ tr("开始", "Start") }}</span
+                  >{{ say(copyText.start_ba3401) }}</span
                 ><span
                   v-else-if="
                     selected(day.date, time) &&
                     booking.end === day.slots[ri]?.end
                   "
-                  >{{ tr("结束", "End") }}</span
+                  >{{ say(copyText.end_c4265b) }}</span
                 ><span v-else aria-hidden="true">{{
                   day.slots[ri]?.available ? "·" : "—"
                 }}</span>
@@ -239,12 +268,7 @@ watch(
     </div>
     <p v-if="message" class="form-error" role="alert">{{ message }}</p>
     <p class="reservation-hours">
-      {{
-        tr(
-          "均为汉密尔顿当地时间。每天 10:00–22:00；周三 16:00 后、周四 18:00 后不可预约。",
-          "All times are local to Hamilton. Daily 10am–10pm; unavailable after 4pm on Wednesdays and 6pm on Thursdays.",
-        )
-      }}
+      {{ say(copyText.all_times_are_local_to_hamilton_the_8a3607) }}
     </p>
   </div>
 </template>

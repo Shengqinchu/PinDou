@@ -1,0 +1,30 @@
+{
+  "enca_9cd218": ["zh-CN", "en-CA"],
+  "choose_an_earlier_or_another_available_time_f98d07": [
+    "这里无法安排至少两小时，请选择更早或其他可用时段。",
+    "Choose an earlier or another available time for a visit of at least two hours."
+  ],
+  "available_to_book_9bb918": ["可以预约", "Available to book"],
+  "your_selection_0fc834": ["已选时段", "Your selection"],
+  "unavailable_fb3489": ["不可预约", "Unavailable"],
+  "previous_dates_314fc5": ["上一组日期", "Previous dates"],
+  "the_next_two_weeks_59cce3": ["未来两周", "The next two weeks"],
+  "next_dates_4c8209": ["下一组日期", "Next dates"],
+  "choose_a_start_time_for_a_twohour_a3470d": [
+    "点击开始时间，默认选择两小时；再点同一天较晚的格子可延长。使用日期上方箭头查看其他日期。",
+    "Choose a start time for a two-hour visit, then a later cell to extend it. Use the date arrows to see other days."
+  ],
+  "reservation_timetable_use_arrow_keys_to_move_3bb451": [
+    "预约时间表，使用方向键移动，回车选择",
+    "Reservation timetable. Use arrow keys to move and Enter to select."
+  ],
+  "time_296653": ["时间", "Time"],
+  "available_d07da8": ["可选", "available"],
+  "unavailable_e939b7": ["不可预约", "unavailable"],
+  "start_ba3401": ["开始", "Start"],
+  "end_c4265b": ["结束", "End"],
+  "all_times_are_local_to_hamilton_the_8a3607": [
+    "均为汉密尔顿当地时间，营业时间以当前时间表为准。",
+    "All times are local to Hamilton. The timetable shows the current opening hours."
+  ]
+}

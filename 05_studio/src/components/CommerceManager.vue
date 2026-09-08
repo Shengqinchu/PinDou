@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import BrandMotif from "./BrandMotif.vue";
+
+import copyText from "../content/components-CommerceManager.json";
+import { say } from "../state";
+
 import {
   computed,
   nextTick,
@@ -102,35 +107,60 @@ onBeforeUnmount(() => {
   arrival?.kill();
 });
 const navigation = computed(() => [
-  { id: "reservations", zh: "预约管理", en: "Reservations", icon: PhReceipt },
+  {
+    id: "reservations",
+    zh: copyText.nav_c557d2fc[0],
+    en: copyText.nav_c557d2fc[1],
+    icon: PhReceipt,
+  },
   {
     id: "reservation-calendar",
-    zh: "预约日历",
-    en: "Visit calendar",
+    zh: copyText.nav_b72b465f[0],
+    en: copyText.nav_b72b465f[1],
     icon: PhCalendarDots,
   },
   {
     id: "overview",
-    zh: "交易概览",
-    en: "Commerce overview",
+    zh: copyText.nav_2acebe6d[0],
+    en: copyText.nav_2acebe6d[1],
     icon: PhSquaresFour,
   },
-  { id: "orders", zh: "交易订单", en: "Payment orders", icon: PhReceipt },
+  {
+    id: "orders",
+    zh: copyText.nav_f88bbd41[0],
+    en: copyText.nav_f88bbd41[1],
+    icon: PhReceipt,
+  },
   {
     id: "schedule",
-    zh: "原交易排班",
-    en: "Commerce schedule",
+    zh: copyText.nav_fd3e0b4a[0],
+    en: copyText.nav_fd3e0b4a[1],
     icon: PhCalendarDots,
   },
-  { id: "products", zh: "商品与体验", en: "Products", icon: PhPackage },
-  { id: "checkout", zh: "收款设置", en: "Checkout", icon: PhWallet },
+  {
+    id: "products",
+    zh: copyText.nav_f526fd3f[0],
+    en: copyText.nav_f526fd3f[1],
+    icon: PhPackage,
+  },
+  {
+    id: "checkout",
+    zh: copyText.nav_d8f7beee[0],
+    en: copyText.nav_d8f7beee[1],
+    icon: PhWallet,
+  },
   {
     id: "activity",
-    zh: "操作记录",
-    en: "Activity",
+    zh: copyText.nav_ced4db80[0],
+    en: copyText.nav_ced4db80[1],
     icon: PhClockCounterClockwise,
   },
-  { id: "legacy", zh: "历史询单", en: "Earlier requests", icon: PhArchive },
+  {
+    id: "legacy",
+    zh: copyText.nav_096839b5[0],
+    en: copyText.nav_096839b5[1],
+    icon: PhArchive,
+  },
 ]);
 const view = computed(() =>
   navigation.value.some((n) => n.id === route.query.view)
@@ -173,7 +203,7 @@ function refreshCurrent() {
   else desk.loadOverview();
 }
 const readableDate = computed(() =>
-  new Intl.DateTimeFormat(tr("zh-CN", "en-CA"), {
+  new Intl.DateTimeFormat(say(copyText.enca_9cd218), {
     month: "long",
     day: "numeric",
     weekday: "short",
@@ -192,30 +222,30 @@ const readableDate = computed(() =>
       :aria-hidden="isMobile && !mobileMenu ? true : undefined"
       :role="isMobile && mobileMenu ? 'dialog' : undefined"
       :aria-modal="isMobile && mobileMenu ? true : undefined"
-      :aria-label="tr('店主工作台导航', 'Studio desk navigation')"
+      :aria-label="say(copyText.studio_desk_navigation_28a348)"
       @keydown="trapMenu"
       @keydown.esc.stop="mobileMenu = false"
     >
       <RouterLink to="/" class="desk-brand"
-        ><PhFlower :size="29" weight="light" /><span
-          >{{ tr("小狗拼豆铺", "Pindo Puppy")
+        ><BrandMotif /><span
+          >{{ say(copyText.pindo_puppy_08aa61)
           }}<small>{{
-            tr("小狗拼豆铺 · 店主工作台", "YOUR STUDIO, IN GOOD HANDS")
+            say(copyText.your_studio_in_good_hands_272ef4)
           }}</small></span
         ></RouterLink
       ><button
         class="desk-mobile-close desk-icon-button"
-        :aria-label="tr('关闭后台导航', 'Close desk navigation')"
+        :aria-label="say(copyText.close_desk_navigation_f2d087)"
         @click="mobileMenu = false"
       >
         <PhX />
       </button>
       <p class="sidebar-section-label">
-        {{ tr("我的工作室", "YOUR WORKSPACE") }}
+        {{ say(copyText.your_workspace_2c12d8) }}
       </p>
       <nav
         class="desk-navigation"
-        :aria-label="tr('后台导航', 'Studio desk navigation')"
+        :aria-label="say(copyText.studio_desk_navigation_e9ec2c)"
         :style="{ '--nav-index': selectedIndex }"
       >
         <span class="desk-nav-indicator" aria-hidden="true" /><button
@@ -242,16 +272,16 @@ const readableDate = computed(() =>
       <div class="sidebar-bottom">
         <div class="sidebar-shop-state">
           <span class="state-dot live" /><span>{{
-            tr("预约由店主确认", "Visits confirmed by the host")
+            say(copyText.visits_confirmed_by_the_host_471d39)
           }}</span>
         </div>
         <RouterLink to="/" class="sidebar-store-link"
-          >{{ tr("看看我的网站", "View your website")
+          >{{ say(copyText.view_your_website_60949c)
           }}<PhArrowUpRight /></RouterLink
         ><button class="sidebar-signout" @click="emit('logout')">
-          <PhSignOut />{{ tr("退出登录", "Sign out") }}</button
+          <PhSignOut />{{ say(copyText.sign_out_e59c73) }}</button
         ><small class="desk-version"
-          >{{ tr("店主工作台", "Studio desk") }} · 0.4</small
+          >{{ say(copyText.studio_desk_4be24d) }} · 0.4</small
         >
       </div>
     </aside>
@@ -259,7 +289,7 @@ const readableDate = computed(() =>
       ><button
         v-if="mobileMenu"
         class="desk-mobile-shade"
-        :aria-label="tr('关闭导航', 'Close navigation')"
+        :aria-label="say(copyText.close_navigation_9b4ac8)"
         @click="mobileMenu = false"
     /></Transition>
     <div class="desk-main" :inert="isMobile && mobileMenu">
@@ -267,12 +297,12 @@ const readableDate = computed(() =>
         <div class="desk-breadcrumb">
           <button
             class="desk-menu-button desk-icon-button"
-            :aria-label="tr('打开后台导航', 'Open desk navigation')"
+            :aria-label="say(copyText.open_desk_navigation_2319be)"
             :aria-expanded="mobileMenu"
             @click="mobileMenu = !mobileMenu"
           >
             <PhList :size="22" /></button
-          ><span>{{ tr("店主工作台", "Studio desk") }}</span
+          ><span>{{ say(copyText.studio_desk_4be24d) }}</span
           ><PhCaretRight :size="12" /><strong>{{
             tr(selected.zh, selected.en)
           }}</strong>
@@ -282,7 +312,7 @@ const readableDate = computed(() =>
           ><button
             class="desk-icon-button"
             :disabled="desk.overviewBusy.value"
-            :aria-label="tr('刷新概览', 'Refresh overview')"
+            :aria-label="say(copyText.refresh_overview_07412b)"
             @click="refreshCurrent"
           >
             <PhArrowClockwise
@@ -290,11 +320,15 @@ const readableDate = computed(() =>
             /></button
           ><button
             class="desk-language"
-            :aria-label="tr('切换为英文', 'Switch to Chinese')"
+            :aria-label="say(copyText.switch_to_chinese_6c04c2)"
             @click="locale = locale === 'zh' ? 'en' : 'zh'"
           >
-            {{ locale === "zh" ? "英文" : "中文" }}</button
-          ><span class="desk-avatar">{{ tr("双吉", "P") }}</span>
+            {{
+              locale === "zh"
+                ? copyText.literal_348ea84c
+                : copyText.literal_72726d88
+            }}</button
+          ><span class="desk-avatar">{{ say(copyText.p_18d98d) }}</span>
         </div>
       </header>
       <div ref="content" class="desk-content">
@@ -304,12 +338,7 @@ const readableDate = computed(() =>
           "
           class="reservation-commerce-note"
         >
-          {{
-            tr(
-              "商城暂缓开放，这里保留交易资料。新版到店安排请在预约管理和预约日历处理。",
-              "The shop is paused. Commerce records remain here; manage new visits in Reservations and Visit calendar.",
-            )
-          }}
+          {{ say(copyText.the_shop_is_paused_commerce_records_remain_b78ead) }}
         </p>
         <ReservationsPanel
           ref="reservationList"
@@ -329,7 +358,7 @@ const readableDate = computed(() =>
         >
           {{ desk.error.value
           }}<button class="desk-link" @click="desk.initialize">
-            {{ tr("重新加载", "Try again") }}
+            {{ say(copyText.try_again_014aa4) }}
           </button>
         </p>
         <OverviewPanel
@@ -346,14 +375,13 @@ const readableDate = computed(() =>
             <header class="desk-page-heading">
               <div>
                 <p class="desk-eyebrow">
-                  {{ tr("保留从前的安排", "EARLIER ARRANGEMENTS") }}
+                  {{ say(copyText.earlier_arrangements_902f91) }}
                 </p>
-                <h1>{{ tr("历史预约与询单", "Earlier requests") }}</h1>
+                <h1>{{ say(copyText.earlier_requests_620a53) }}</h1>
                 <p>
                   {{
-                    tr(
-                      "上线购物车之前留下的预约和自提意向。",
-                      "Visit and pickup inquiries received before online checkout.",
+                    say(
+                      copyText.visit_and_pickup_inquiries_received_before_online_514cd1,
                     )
                   }}
                 </p>

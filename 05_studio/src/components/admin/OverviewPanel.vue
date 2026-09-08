@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { formatCopy } from "../../state";
+
+import copyText from "../../content/components-admin-OverviewPanel.json";
+import { say } from "../../state";
+
 import { computed, ref, watch } from "vue";
 import {
   PhArrowUpRight,
@@ -24,22 +29,22 @@ const todayEntries = computed(() => overview.value?.days[0]?.entries || []);
 const readiness = computed(() => [
   {
     done: paymentConfigured.value,
-    label: tr("连接收款账户", "Connect your payment account"),
-    detail: tr("虎皮椒收银台", "Hupijiao checkout"),
+    label: say(copyText.connect_your_payment_account_a57502),
+    detail: say(copyText.hupijiao_checkout_017d75),
     view: "checkout",
   },
   {
     done:
       !!settings.value?.capacity &&
       !!settings.value?.weekly.some((d) => d.enabled),
-    label: tr("安排营业时间和座位", "Set opening hours and seats"),
-    detail: tr("每周排班和接待人数", "Weekly hours and capacity"),
+    label: say(copyText.set_opening_hours_and_seats_4ed29a),
+    detail: say(copyText.weekly_hours_and_capacity_e99e57),
     view: "schedule",
   },
   {
     done: !!settings.value && settings.value.tax_mode !== "unconfirmed",
-    label: tr("确认售价与税费", "Confirm prices and tax"),
-    detail: tr("让客人看到最终实付金额", "Show the final amount customers pay"),
+    label: say(copyText.confirm_prices_and_tax_0c4728),
+    detail: say(copyText.show_the_final_amount_customers_pay_45b703),
     view: "checkout",
   },
 ]);
@@ -56,47 +61,36 @@ watch(
     <header class="desk-welcome">
       <div>
         <p class="desk-eyebrow">
-          {{ tr("小狗拼豆铺 · 店主工作台", "PINDOU PUPPY · STUDIO DESK") }}
+          {{ say(copyText.pindou_puppy_studio_desk_c23194) }}
         </p>
-        <h1>{{ tr("店里的今天", "Today, at puppy.") }}</h1>
+        <h1>{{ say(copyText.today_at_puppy_fa2258) }}</h1>
         <p>
-          {{
-            tr(
-              "先看今天的安排，再处理新的订单。",
-              "Today’s visits, new orders and the things that need you.",
-            )
-          }}
+          {{ say(copyText.todays_visits_new_orders_and_the_things_8c7be3) }}
         </p>
       </div>
       <button
         class="desk-button secondary"
         @click="emit('navigate', 'schedule', 'today-visits')"
       >
-        <PhCalendarDots />{{ tr("查看今日排班", "Today’s schedule") }}
+        <PhCalendarDots />{{ say(copyText.todays_schedule_51eea7) }}
       </button>
     </header>
     <div v-if="overview?.metrics.needs_review" class="desk-review-callout">
       <div>
         <strong>{{
-          tr(
-            `${overview.metrics.needs_review} 笔订单需要跟进`,
-            `${overview.metrics.needs_review} orders need a follow-up`,
-          )
+          formatCopy(copyText.message_c5021d52, {
+            v0: overview.metrics.needs_review,
+          })
         }}</strong>
         <p>
-          {{
-            tr(
-              "查看付款后需要重新安排的订单。",
-              "Review payments that need a new arrangement.",
-            )
-          }}
+          {{ say(copyText.review_payments_that_need_a_new_arrangement_eba4af) }}
         </p>
       </div>
       <button
         class="desk-button secondary"
         @click="emit('navigate', 'orders', 'needs-review')"
       >
-        {{ tr("查看订单", "Review orders") }}<PhArrowRight />
+        {{ say(copyText.review_orders_424b4e) }}<PhArrowRight />
       </button>
     </div>
     <div v-if="overview" class="desk-metrics">
@@ -105,47 +99,43 @@ watch(
         @click="emit('navigate', 'schedule', 'today-visits')"
       >
         <span
-          ><PhUsers />{{ tr("今日到店人数", "Guests booked today")
+          ><PhUsers />{{ say(copyText.guests_booked_today_fd4fc5)
           }}<PhArrowUpRight /></span
         ><strong>{{ overview.metrics.guests_today }}</strong
         ><small>{{
-          tr("已付款确认的座位", "Paid and confirmed seats")
+          say(copyText.paid_and_confirmed_seats_05d4d4)
         }}</small></button
       ><button
         class="desk-metric"
         @click="emit('navigate', 'orders', 'today-orders')"
       >
         <span
-          ><PhReceipt />{{ tr("今日新订单", "New orders today")
+          ><PhReceipt />{{ say(copyText.new_orders_today_39b386)
           }}<PhArrowUpRight /></span
         ><strong>{{ overview.metrics.orders_today }}</strong
         ><small>{{
-          tr("按 Hamilton 当地日期统计", "Counted by Hamilton local date")
+          say(copyText.counted_by_hamilton_local_date_948b87)
         }}</small></button
       ><button
         class="desk-metric"
         @click="emit('navigate', 'orders', 'today-received')"
       >
         <span
-          ><PhWallet />{{ tr("今日已收款", "Payments received today")
+          ><PhWallet />{{ say(copyText.payments_received_today_3c2886)
           }}<PhArrowUpRight /></span
         ><strong class="metric-money">{{
           money(overview.metrics.received_cny_fen, "CNY")
         }}</strong
-        ><small>{{
-          tr("人民币 · 已核实到账", "CNY · Verified payments")
-        }}</small></button
+        ><small>{{ say(copyText.cny_verified_payments_7ad2e0) }}</small></button
       ><button
         class="desk-metric"
         @click="emit('navigate', 'orders', 'awaiting')"
       >
         <span
-          ><PhCalendarDots />{{ tr("待到店／自提", "Awaiting visit or pickup")
+          ><PhCalendarDots />{{ say(copyText.awaiting_visit_or_pickup_eeb3c4)
           }}<PhArrowUpRight /></span
         ><strong>{{ overview.metrics.awaiting_fulfillment }}</strong
-        ><small>{{
-          tr("已付款，等待到店或自提", "Paid, awaiting visit or pickup")
-        }}</small>
+        ><small>{{ say(copyText.paid_awaiting_visit_or_pickup_e82d5f) }}</small>
       </button>
     </div>
     <div v-else-if="overviewBusy" class="desk-metrics" aria-busy="true">
@@ -156,15 +146,15 @@ watch(
         <header class="desk-section-heading">
           <div>
             <p class="desk-eyebrow">
-              {{ tr("今日安排", "TODAY AT THE STUDIO") }}
+              {{ say(copyText.today_at_the_studio_3ac0d6) }}
             </p>
-            <h2>{{ tr("今天，谁来玩？", "Who is coming by?") }}</h2>
+            <h2>{{ say(copyText.who_is_coming_by_31fe9f) }}</h2>
           </div>
           <button
             class="desk-link"
             @click="emit('navigate', 'schedule', 'today-visits')"
           >
-            {{ tr("查看排班", "Schedule") }}<PhArrowUpRight />
+            {{ say(copyText.schedule_2cc1af) }}<PhArrowUpRight />
           </button>
         </header>
         <div v-if="todayEntries.length" class="agenda-list">
@@ -180,14 +170,14 @@ watch(
               ><strong>{{ entry.name }}</strong
               ><small
                 >{{ entry.guests }}
-                {{ tr("人 · 到店体验", "guests · Studio visit") }}</small
+                {{ say(copyText.guests_studio_visit_ea3db0) }}</small
               ></span
             ><span :class="['desk-status', entry.status]">{{
               entry.fulfillment === "completed"
-                ? tr("已到店", "Visited")
+                ? say(copyText.visited_f3f354)
                 : entry.status === "paid"
-                  ? tr("已确认", "Confirmed")
-                  : tr("付款中", "Paying")
+                  ? say(copyText.confirmed_b1c92b)
+                  : say(copyText.paying_575d26)
             }}</span
             ><PhArrowUpRight />
           </button>
@@ -195,32 +185,29 @@ watch(
         <div v-else class="desk-empty agenda-empty">
           <PhCalendarDots :size="32" weight="light" />
           <h3>
-            {{ tr("今天还没有到店安排", "No visits booked for today") }}
+            {{ say(copyText.no_visits_booked_for_today_66fab4) }}
           </h3>
           <p>
             {{
-              tr(
-                "已确认的体验和付款中的座位会显示在这里。",
-                "Confirmed visits and seats held for payment appear here.",
-              )
+              say(copyText.confirmed_visits_and_seats_held_for_payment_1a367b)
             }}
           </p>
           <button
             class="desk-link"
             @click="emit('navigate', 'schedule', 'today-visits')"
           >
-            {{ tr("去安排营业时间", "Set your studio hours") }}<PhArrowRight />
+            {{ say(copyText.set_your_studio_hours_4b6048) }}<PhArrowRight />
           </button>
         </div>
       </section>
       <section class="desk-surface recent-orders">
         <header class="desk-section-heading">
-          <h2>{{ tr("最近的订单", "Recent orders") }}</h2>
+          <h2>{{ say(copyText.recent_orders_1e2c3b) }}</h2>
           <button
             class="desk-link"
             @click="emit('navigate', 'orders', 'all-orders')"
           >
-            {{ tr("全部订单", "All orders") }}<PhArrowUpRight />
+            {{ say(copyText.all_orders_442e68) }}<PhArrowUpRight />
           </button>
         </header>
         <div v-if="overview?.recent_orders.length" class="recent-order-list">
@@ -244,12 +231,7 @@ watch(
           </button>
         </div>
         <p v-else class="desk-inline-empty">
-          {{
-            tr(
-              "收到第一笔订单后，就会在这里看到它。",
-              "Your first order will appear here when it arrives.",
-            )
-          }}
+          {{ say(copyText.your_first_order_will_appear_here_when_61c238) }}
         </p>
       </section>
     </div>
@@ -264,13 +246,13 @@ watch(
         ><span
           ><strong>{{
             setupComplete
-              ? tr("开店配置已完成", "Studio setup complete")
-              : tr("开店前，还需要这些准备", "A few things before opening")
+              ? say(copyText.studio_setup_complete_3dbd85)
+              : say(copyText.a_few_things_before_opening_2124b3)
           }}</strong
           ><small>{{
             overview?.checkout_ready
-              ? tr("网上购买已开放", "Online purchases are open")
-              : tr("网上购买尚未开放", "Online purchases are not open yet")
+              ? say(copyText.online_purchases_are_open_f76789)
+              : say(copyText.online_purchases_are_not_open_yet_1dc20d)
           }}</small></span
         ><PhArrowRight :class="{ 'setup-arrow-open': setupExpanded }" />
       </button>

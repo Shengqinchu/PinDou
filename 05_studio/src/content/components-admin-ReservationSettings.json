@@ -1,0 +1,58 @@
+{
+  "reload_saved_rules": ["重新读取已保存规则", "Reload saved rules"],
+  "monday_c0af44": ["周一", "Monday"],
+  "tuesday_b7e702": ["周二", "Tuesday"],
+  "wednesday_ae3438": ["周三", "Wednesday"],
+  "thursday_17b143": ["周四", "Thursday"],
+  "friday_5c2815": ["周五", "Friday"],
+  "saturday_89cac3": ["周六", "Saturday"],
+  "sunday_c768eb": ["周日", "Sunday"],
+  "hours_and_capacity_74e6d9": ["营业时间与接待人数", "Hours and capacity"],
+  "up_to_bbd6b1": ["每组最多", "Up to"],
+  "guests_per_group_522fa9": ["人", "guests per group"],
+  "group_capacity_set_83fa08": ["已设置同时接待组数", "Group capacity set"],
+  "no_total_group_limit_d1d059": ["总组数不限", "No total group limit"],
+  "guest_capacity_set_dba600": ["已设置总人数", "Guest capacity set"],
+  "no_total_guest_limit_d480a4": ["总人数不限", "No total guest limit"],
+  "edit_reservation_rules_ea43c9": ["编辑预约规则", "Edit reservation rules"],
+  "saved_the_customer_timetable_is_updated_3d6687": [
+    "已保存，客户时间表已同步",
+    "Saved. The customer timetable is updated."
+  ],
+  "capacity_d705b2": ["接待人数", "Capacity"],
+  "maximum_guests_per_group_8220ef": [
+    "每组最多人数",
+    "Maximum guests per group"
+  ],
+  "maximum_simultaneous_groups_c08860": [
+    "同一时段最多组数",
+    "Maximum simultaneous groups"
+  ],
+  "leave_blank_for_no_limit_e87065": [
+    "留空表示不限",
+    "Leave blank for no limit"
+  ],
+  "maximum_simultaneous_guests_1b4f9f": [
+    "同一时段最多总人数",
+    "Maximum simultaneous guests"
+  ],
+  "confirmed_reservations_count_toward_capacity_pending_requests_a5fb9b": [
+    "已确认预约计入容量；待确认申请不占位。新规则会同时用于客户时间表、提交和店主确认。",
+    "Confirmed reservations count toward capacity. Pending requests do not hold spaces. These rules apply to the timetable, requests and host confirmation."
+  ],
+  "weekly_opening_hours_d55313": ["每周营业时间", "Weekly opening hours"],
+  "hamilton_local_time_turn_off_a_day_b50f66": [
+    "汉密尔顿当地时间。关闭某天即可设为休息日，开放时段至少两小时。",
+    "Hamilton local time. Turn off a day to close it. An open day needs at least two hours."
+  ],
+  "open_281aec": ["开始", "Open"],
+  "opening_time_c36b8f": ["开始时间", " opening time"],
+  "close_15f8ae": ["结束", "Close"],
+  "closing_time_57b7cd": ["结束时间", " closing time"],
+  "saving_does_not_change_confirmed_reservations_if_824304": [
+    "保存不会改变已确认的预约。若新规则与现有预约冲突，请先联系客人调整安排。",
+    "Saving does not change confirmed reservations. If the new rules conflict with an existing visit, contact the guest to rearrange it first."
+  ],
+  "saving_f3d3eb": ["正在保存…", "Saving…"],
+  "save_reservation_rules_70acc7": ["保存预约规则", "Save reservation rules"]
+}

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import copyText from "../content/components-PhotoViewer.json";
+import { say } from "../state";
+
 import { computed, nextTick, onBeforeUnmount, ref, useId } from "vue";
 import { gsap } from "gsap";
 import { PhArrowLeft, PhArrowRight, PhX } from "@phosphor-icons/vue";
@@ -135,10 +138,7 @@ async function showLatest() {
     await blendTo(1, version);
   } catch {
     if (version === revision) {
-      error.value = tr(
-        "这张照片暂时没能加载，请重试。",
-        "This photo could not load. Please try again.",
-      );
+      error.value = say(copyText.this_photo_could_not_load_please_try_b36e40);
     }
   } finally {
     if (version === revision) loading.value = false;
@@ -157,7 +157,7 @@ defineExpose({ open });
     <dialog
       ref="dialog"
       class="photo-dialog modal-shell"
-      :aria-label="tr('工作室照片', 'Studio photograph')"
+      :aria-label="say(copyText.studio_photograph_909fb3)"
       :aria-describedby="caption"
       @cancel.prevent="close"
       @keydown.left="move(-1)"
@@ -166,11 +166,11 @@ defineExpose({ open });
       <div class="modal-shade" aria-hidden="true" @click="close" />
       <section class="photo-panel modal-panel">
         <div class="photo-toolbar">
-          <span>{{ tr("小屋里的日常", "A little look around") }}</span
+          <span>{{ say(copyText.a_little_look_around_6f038a) }}</span
           ><button
             class="photo-close icon-button"
             @click="close"
-            :aria-label="tr('关闭照片', 'Close photograph')"
+            :aria-label="say(copyText.close_photograph_ce9f1a)"
           >
             <PhX :size="24" />
           </button>
@@ -193,17 +193,17 @@ defineExpose({ open });
           <template v-if="error"
             >{{ error }}
             <button class="text-link" @click="showLatest">
-              {{ tr("重试", "Try again") }}
+              {{ say(copyText.try_again_c3273b) }}
             </button></template
           ><template v-else-if="loading">{{
-            tr("正在载入照片…", "Loading photo…")
+            say(copyText.loading_photo_dcfa95)
           }}</template>
         </p>
         <div class="photo-controls">
           <button
             class="icon-button"
             @click="move(-1)"
-            :aria-label="tr('上一张', 'Previous photo')"
+            :aria-label="say(copyText.previous_photo_3c78a4)"
           >
             <PhArrowLeft /></button
           ><span aria-live="polite"
@@ -211,7 +211,7 @@ defineExpose({ open });
           ><button
             class="icon-button"
             @click="move(1)"
-            :aria-label="tr('下一张', 'Next photo')"
+            :aria-label="say(copyText.next_photo_8feb3d)"
           >
             <PhArrowRight />
           </button>

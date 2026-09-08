@@ -1,0 +1,61 @@
+{
+  "payment_date_046349": ["付款日期", "Payment date"],
+  "order_date_af2fcf": ["下单日期", "Order date"],
+  "visit_date_270402": ["到店日期", "Visit date"],
+  "every_little_plan_d56b7b": ["每一份期待，都在这里", "EVERY LITTLE PLAN"],
+  "orders_9499a1": ["订单管理", "Orders"],
+  "find_an_order_check_a_visit_or_99d0a8": [
+    "找到一笔订单，查看到店安排，或记录一次顺利的自提。",
+    "Find an order, check a visit, or mark a happy pickup complete."
+  ],
+  "refresh_45153b": ["刷新订单", "Refresh"],
+  "order_status_ec140f": ["订单状态", "Order status"],
+  "all_902ec4": ["全部", "All"],
+  "paid_571199": ["已收款", "Paid"],
+  "unpaid_20b341": ["待付款", "Unpaid"],
+  "followup_37bef2": ["需跟进", "Follow-up"],
+  "search_orders_or_customers_de1a23": [
+    "搜索订单或顾客",
+    "Search orders or customers"
+  ],
+  "order_name_or_contact_fbb5e2": [
+    "搜索订单号、名字、联系方式",
+    "Order, name or contact"
+  ],
+  "clear_search_79db5a": ["清除搜索", "Clear search"],
+  "type_a30db3": ["内容", "Type"],
+  "order_type_04c7f1": ["订单类型", "Order type"],
+  "all_orders_442e68": ["全部订单", "All orders"],
+  "studio_visit_7d3186": ["到店体验", "Studio visit"],
+  "pickup_items_13e9b1": ["实物自提", "Pickup items"],
+  "date_basis_86ba44": ["日期类型", "Date basis"],
+  "fulfillment_819fae": ["交付", "Fulfillment"],
+  "fulfillment_status_357064": ["交付状态", "Fulfillment status"],
+  "awaiting_visit_pickup_1345f1": ["待到店／自提", "Awaiting visit / pickup"],
+  "completed_ff8af6": ["已完成", "Completed"],
+  "clear_filters_0a6c6f": ["清除筛选", "Clear filters"],
+  "finding_orders_84576e": ["正在查找…", "Finding orders…"],
+  "try_again_c3273b": ["重试", "Try again"],
+  "no_matching_orders_80085b": ["没有找到匹配的订单", "No matching orders"],
+  "the_first_little_plan_is_on_its_5a73c4": [
+    "第一份期待，还在路上。",
+    "The first little plan is on its way."
+  ],
+  "new_orders_appear_here_payment_automatically_confirms_9920cd": [
+    "新订单会出现在这里；付款后自动确认座位和商品。",
+    "New orders appear here. Payment automatically confirms seats and items."
+  ],
+  "customer_order_0709d1": ["顾客 / 订单", "Customer / order"],
+  "items_visit_fd0411": ["内容与到店安排", "Items & visit"],
+  "status_6c4e92": ["状态", "Status"],
+  "paid_amount_cny_bd0d44": ["实付 · 人民币", "Paid amount · CNY"],
+  "view_order_cf9a8a": ["查看订单", "View order"],
+  "guests_24bfb5": ["人", "guests"],
+  "studio_pickup_c13b87": ["到店自提", "Studio pickup"],
+  "fulfilled_bf1ec7": ["已完成", "Fulfilled"],
+  "page_0bd3e3": ["第", "Page"],
+  "previous_page_e70a7e": ["上一页", "Previous page"],
+  "next_page_5354f3": ["下一页", "Next page"],
+  "message_27173e79": ["{v0} 笔订单", "{v0} orders"],
+  "message_a88a0e90": ["查看 {v0} 的订单", "View order for {v0}"]
+}

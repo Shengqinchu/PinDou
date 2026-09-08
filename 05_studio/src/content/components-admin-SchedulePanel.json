@@ -1,0 +1,69 @@
+{
+  "enca_9cd218": ["zh-CN", "en-CA"],
+  "a_place_for_every_guest_4abf35": [
+    "给每一位客人，留好位置",
+    "A PLACE FOR EVERY GUEST"
+  ],
+  "studio_schedule_436d7b": ["到店排班", "Studio schedule"],
+  "opening_hours_determine_available_times_confirmed_orders_5bec41": [
+    "营业时间决定可选时段，已确认的订单会自动出现在日历里。",
+    "Opening hours determine available times. Confirmed orders appear in your calendar automatically."
+  ],
+  "local_time_28dec1": ["当地时间", "Local time"],
+  "seven_days_at_a_glance_70abf4": ["未来七天", "Seven days at a glance"],
+  "previous_seven_days_7128fc": ["前七天", "Previous seven days"],
+  "calendar_start_date_4d308a": ["日历开始日期", "Calendar start date"],
+  "next_seven_days_8ef1e1": ["后七天", "Next seven days"],
+  "not_open_2cdc61": ["未开放", "Not open"],
+  "guests_24bfb5": ["人", "guests"],
+  "visited_f3f354": ["已到店", "Visited"],
+  "confirmed_b1c92b": ["已确认", "Confirmed"],
+  "payment_hold_d762cc": ["付款中暂留", "Payment hold"],
+  "confirmed_visit_be14c6": ["已确认到店", "Confirmed visit"],
+  "held_during_payment_94e609": ["付款中暂留", "Held during payment"],
+  "weekly_opening_hours_5a17fa": ["每周营业安排", "Weekly opening hours"],
+  "open_a_day_then_set_its_start_28436a": [
+    "开启营业日，再设定开始与结束时间。",
+    "Open a day, then set its start and finish time."
+  ],
+  "open_72485d": ["营业", "Open"],
+  "closed_f28824": ["不开放", "Closed"],
+  "seating_notice_a3af02": ["接待安排", "Seating & notice"],
+  "maximum_guests_at_a_time_9a31d9": [
+    "最多同时接待人数",
+    "Maximum guests at a time"
+  ],
+  "leave_at_0_until_decided_no_seats_eb04a3": [
+    "还没确定时保持 0，不会开放可购买座位。",
+    "Leave at 0 until decided. No seats will be available to buy."
+  ],
+  "minimum_booking_notice_minutes_6a76ff": [
+    "至少提前多少分钟预订",
+    "Minimum booking notice (minutes)"
+  ],
+  "date_exceptions_b30a54": ["特别日期", "Date exceptions"],
+  "add_a_date_exception_e95e09": ["添加特别日期", "Add a date exception"],
+  "add_a_day_off_or_special_opening_08b4dd": [
+    "临时休息、节假日营业，都可以单独安排。",
+    "Add a day off or special opening hours for a holiday."
+  ],
+  "exception_date_9adaf0": ["特别日期", "Exception date"],
+  "open_on_this_date_d51331": ["该日期营业", "Open on this date"],
+  "remove_exception_ad1b96": ["移除特别日期", "Remove exception"],
+  "special_opening_time_ababdd": ["特别日期开门时间", "Special opening time"],
+  "special_closing_time_d82538": ["特别日期打烊时间", "Special closing time"],
+  "bookings_are_closed_on_this_date_baf656": [
+    "这一天不开放预订",
+    "Bookings are closed on this date"
+  ],
+  "unsaved_schedule_or_checkout_changes_dbb518": [
+    "排班／收款设置有未保存的修改",
+    "Unsaved schedule or checkout changes"
+  ],
+  "all_changes_saved_05df19": ["所有修改已保存", "All changes saved"],
+  "saving_1bd9fd": ["保存中…", "Saving…"],
+  "save_settings_3a2a2e": ["保存设置", "Save settings"],
+  "message_2570f7b0": ["{v0}营业", "Open on {v1}"],
+  "message_4c078feb": ["{v0}开门时间", "{v1} opening time"],
+  "message_dd378f3a": ["{v0}打烊时间", "{v1} closing time"]
+}

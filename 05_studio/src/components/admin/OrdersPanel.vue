@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { formatCopy } from "../../state";
+
+import copyText from "../../content/components-admin-OrdersPanel.json";
+import { say } from "../../state";
+
 import {
   computed,
   nextTick,
@@ -36,10 +41,10 @@ const route = useRoute();
 let applyingIntent = false;
 const dayLabel = computed(() =>
   dayKind.value === "paid"
-    ? tr("付款日期", "Payment date")
+    ? say(copyText.payment_date_046349)
     : dayKind.value === "created"
-      ? tr("下单日期", "Order date")
-      : tr("到店日期", "Visit date"),
+      ? say(copyText.order_date_af2fcf)
+      : say(copyText.visit_date_270402),
 );
 const page = ref(1);
 let sequence = 0;
@@ -149,21 +154,16 @@ function reset() {
     <header class="desk-page-heading">
       <div>
         <p class="desk-eyebrow">
-          {{ tr("每一份期待，都在这里", "EVERY LITTLE PLAN") }}
+          {{ say(copyText.every_little_plan_d56b7b) }}
         </p>
-        <h1>{{ tr("订单管理", "Orders") }}</h1>
+        <h1>{{ say(copyText.orders_9499a1) }}</h1>
         <p>
-          {{
-            tr(
-              "找到一笔订单，查看到店安排，或记录一次顺利的自提。",
-              "Find an order, check a visit, or mark a happy pickup complete.",
-            )
-          }}
+          {{ say(copyText.find_an_order_check_a_visit_or_99d0a8) }}
         </p>
       </div>
       <button class="desk-button secondary" :disabled="loading" @click="load">
         <PhArrowClockwise :class="{ spinning: loading }" />{{
-          tr("刷新订单", "Refresh")
+          say(copyText.refresh_45153b)
         }}
       </button>
     </header>
@@ -171,23 +171,24 @@ function reset() {
       <div class="order-filterbar">
         <SegmentedControl
           v-model="status"
-          :label="tr('订单状态', 'Order status')"
+          :label="say(copyText.order_status_ec140f)"
           :options="[
-            { value: 'all', label: tr('全部', 'All') },
-            { value: 'received', label: tr('已收款', 'Paid') },
-            { value: 'pending', label: tr('待付款', 'Unpaid') },
-            { value: 'paid_needs_review', label: tr('需跟进', 'Follow-up') },
+            { value: 'all', label: say(copyText.all_902ec4) },
+            { value: 'received', label: say(copyText.paid_571199) },
+            { value: 'pending', label: say(copyText.unpaid_20b341) },
+            {
+              value: 'paid_needs_review',
+              label: say(copyText.followup_37bef2),
+            },
           ]"
         /><label class="desk-search"
           ><PhMagnifyingGlass /><input
             v-model="search"
-            :aria-label="tr('搜索订单或顾客', 'Search orders or customers')"
-            :placeholder="
-              tr('搜索订单号、名字、联系方式', 'Order, name or contact')
-            "
+            :aria-label="say(copyText.search_orders_or_customers_de1a23)"
+            :placeholder="say(copyText.order_name_or_contact_fbb5e2)"
             maxlength="120" /><button
             v-if="search"
-            :aria-label="tr('清除搜索', 'Clear search')"
+            :aria-label="say(copyText.clear_search_79db5a)"
             @click="search = ''"
           >
             <PhX /></button
@@ -195,36 +196,49 @@ function reset() {
       </div>
       <div class="order-secondary-filters">
         <label
-          >{{ tr("内容", "Type")
-          }}<select v-model="kind" :aria-label="tr('订单类型', 'Order type')">
-            <option value="all">{{ tr("全部订单", "All orders") }}</option>
-            <option value="visit">{{ tr("到店体验", "Studio visit") }}</option>
-            <option value="pickup">{{ tr("实物自提", "Pickup items") }}</option>
+          >{{ say(copyText.type_a30db3)
+          }}<select
+            v-model="kind"
+            :aria-label="say(copyText.order_type_04c7f1)"
+          >
+            <option value="all">{{ say(copyText.all_orders_442e68) }}</option>
+            <option value="visit">
+              {{ say(copyText.studio_visit_7d3186) }}
+            </option>
+            <option value="pickup">
+              {{ say(copyText.pickup_items_13e9b1) }}
+            </option>
           </select></label
         ><label
-          >{{ tr("日期类型", "Date basis")
+          >{{ say(copyText.date_basis_86ba44)
           }}<select
             v-model="dayKind"
-            :aria-label="tr('日期类型', 'Date basis')"
+            :aria-label="say(copyText.date_basis_86ba44)"
           >
-            <option value="visit">{{ tr("到店日期", "Visit date") }}</option>
-            <option value="created">{{ tr("下单日期", "Order date") }}</option>
-            <option value="paid">{{ tr("付款日期", "Payment date") }}</option>
+            <option value="visit">{{ say(copyText.visit_date_270402) }}</option>
+            <option value="created">
+              {{ say(copyText.order_date_af2fcf) }}
+            </option>
+            <option value="paid">
+              {{ say(copyText.payment_date_046349) }}
+            </option>
           </select></label
         ><label
           >{{ dayLabel
           }}<input v-model="day" type="date" :aria-label="dayLabel" /></label
         ><label
-          >{{ tr("交付", "Fulfillment")
+          >{{ say(copyText.fulfillment_819fae)
           }}<select
             v-model="fulfillment"
-            :aria-label="tr('交付状态', 'Fulfillment status')"
+            :aria-label="say(copyText.fulfillment_status_357064)"
           >
-            <option value="all">{{ tr("全部", "All") }}</option>
+            <option value="all">{{ say(copyText.all_902ec4) }}</option>
             <option value="confirmed">
-              {{ tr("待到店／自提", "Awaiting visit / pickup") }}
+              {{ say(copyText.awaiting_visit_pickup_1345f1) }}
             </option>
-            <option value="completed">{{ tr("已完成", "Completed") }}</option>
+            <option value="completed">
+              {{ say(copyText.completed_ff8af6) }}
+            </option>
           </select></label
         ><button
           v-if="
@@ -237,17 +251,17 @@ function reset() {
           class="desk-link"
           @click="reset"
         >
-          {{ tr("清除筛选", "Clear filters") }}</button
+          {{ say(copyText.clear_filters_0a6c6f) }}</button
         ><span>{{
           loading
-            ? tr("正在查找…", "Finding orders…")
-            : tr(`${total} 笔订单`, `${total} orders`)
+            ? say(copyText.finding_orders_84576e)
+            : formatCopy(copyText.message_27173e79, { v0: total })
         }}</span>
       </div>
       <p v-if="error" class="desk-error" role="alert">
         {{ error
         }}<button class="desk-link" @click="load">
-          {{ tr("重试", "Try again") }}
+          {{ say(copyText.try_again_c3273b) }}
         </button>
       </p>
       <div
@@ -262,18 +276,14 @@ function reset() {
         <h2>
           {{
             search || status !== "all" || kind !== "all" || day
-              ? tr("没有找到匹配的订单", "No matching orders")
-              : tr(
-                  "第一份期待，还在路上。",
-                  "The first little plan is on its way.",
-                )
+              ? say(copyText.no_matching_orders_80085b)
+              : say(copyText.the_first_little_plan_is_on_its_5a73c4)
           }}
         </h2>
         <p>
           {{
-            tr(
-              "新订单会出现在这里；付款后自动确认座位和商品。",
-              "New orders appear here. Payment automatically confirms seats and items.",
+            say(
+              copyText.new_orders_appear_here_payment_automatically_confirms_9920cd,
             )
           }}
         </p>
@@ -283,15 +293,15 @@ function reset() {
           <table class="desk-table">
             <thead>
               <tr>
-                <th>{{ tr("顾客 / 订单", "Customer / order") }}</th>
-                <th>{{ tr("内容与到店安排", "Items & visit") }}</th>
-                <th>{{ tr("状态", "Status") }}</th>
+                <th>{{ say(copyText.customer_order_0709d1) }}</th>
+                <th>{{ say(copyText.items_visit_fd0411) }}</th>
+                <th>{{ say(copyText.status_6c4e92) }}</th>
                 <th class="money-cell">
-                  {{ tr("实付 · 人民币", "Paid amount · CNY") }}
+                  {{ say(copyText.paid_amount_cny_bd0d44) }}
                 </th>
                 <th>
                   <span class="sr-only">{{
-                    tr("查看订单", "View order")
+                    say(copyText.view_order_cf9a8a)
                   }}</span>
                 </th>
               </tr>
@@ -321,15 +331,15 @@ function reset() {
                   ><span v-if="visit(item)" class="table-subline"
                     >{{ prettyDate(visit(item)!.date) }} ·
                     {{ visit(item)!.start }} · {{ visit(item)!.guests }}
-                    {{ tr("人", "guests") }}</span
+                    {{ say(copyText.guests_24bfb5) }}</span
                   ><span v-else class="table-subline">{{
-                    tr("到店自提", "Studio pickup")
+                    say(copyText.studio_pickup_c13b87)
                   }}</span>
                 </td>
                 <td>
                   <span :class="['desk-status', item.status]">{{
                     item.fulfillment === "completed"
-                      ? tr("已完成", "Fulfilled")
+                      ? say(copyText.fulfilled_bf1ec7)
                       : statusText(item.status)
                   }}</span>
                 </td>
@@ -343,10 +353,9 @@ function reset() {
                   <button
                     class="desk-icon-button"
                     :aria-label="
-                      tr(
-                        `查看 ${item.customer?.name} 的订单`,
-                        `View order for ${item.customer?.name}`,
-                      )
+                      formatCopy(copyText.message_a88a0e90, {
+                        v0: item.customer?.name,
+                      })
                     "
                     @click="openOrder(item.id)"
                   >
@@ -368,7 +377,7 @@ function reset() {
               ><strong>{{ item.customer?.name }}</strong
               ><span :class="['desk-status', item.status]">{{
                 item.fulfillment === "completed"
-                  ? tr("已完成", "Fulfilled")
+                  ? say(copyText.fulfilled_bf1ec7)
                   : statusText(item.status)
               }}</span></span
             ><span>{{
@@ -376,7 +385,7 @@ function reset() {
             }}</span
             ><small v-if="visit(item)"
               >{{ prettyDate(visit(item)!.date) }} · {{ visit(item)!.start }} ·
-              {{ visit(item)!.guests }} {{ tr("人", "guests") }}</small
+              {{ visit(item)!.guests }} {{ say(copyText.guests_24bfb5) }}</small
             ><span class="mobile-order-bottom"
               ><small>{{ localTime(item.created_at) }}</small
               ><strong
@@ -387,21 +396,21 @@ function reset() {
       ></template>
       <footer class="desk-pagination">
         <span
-          >{{ tr("第", "Page") }} {{ page }} /
+          >{{ say(copyText.page_0bd3e3) }} {{ page }} /
           {{ Math.max(1, Math.ceil(total / 30)) }}</span
         >
         <div>
           <button
             class="desk-icon-button"
             :disabled="page <= 1 || loading"
-            :aria-label="tr('上一页', 'Previous page')"
+            :aria-label="say(copyText.previous_page_e70a7e)"
             @click="move(-1)"
           >
             <PhArrowLeft /></button
           ><button
             class="desk-icon-button"
             :disabled="page * 30 >= total || loading"
-            :aria-label="tr('下一页', 'Next page')"
+            :aria-label="say(copyText.next_page_5354f3)"
             @click="move(1)"
           >
             <PhArrowRight />

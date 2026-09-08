@@ -1,5 +1,7 @@
 # 小狗拼豆铺 Studio V1 运维
 
+> 2026-09-08 VISION2 更新：当前以 02_product/STUDIO_VISION2_PROGRESS.md、03_design/STUDIO_DESIGN.md 和 02_product/copy/STUDIO_COPY_RULES.md 为准。中文无衬线/白底手绘品牌；每组4人、总量不限、每日10–22点，营业时间与容量均后台可编辑；展示价格但保持人工确认。下文旧字段/视觉/固定周三四限制仅作历史参考。
+
 ## 当前 VISION 版本
 
 当前路径与业务规则见仓库中的 02_product/STUDIO_VISION.md 和 STUDIO_VISION_VERIFICATION.md。到店页改为两周时间表与人工确认；结果为 /studio/reservation/:id，详情为 /studio/details。商城开发中，/cart 转向小店。下面交易部分保留历史与后续运维用途，当前不开放新购买。

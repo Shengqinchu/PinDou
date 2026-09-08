@@ -34,9 +34,9 @@ defineEmits<{ "update:modelValue": [value: boolean] }>();
   display: block;
   width: 44px;
   height: 26px;
-  border: 1px solid #bbcfd7;
+  border: 1px solid #cecbd7;
   border-radius: 20px;
-  background: #d6e2e7;
+  background: #e6e4ec;
   transition:
     background-color var(--control-duration) var(--control-ease),
     border-color var(--control-duration) var(--control-ease),
@@ -54,17 +54,17 @@ defineEmits<{ "update:modelValue": [value: boolean] }>();
   transition: transform var(--control-duration) var(--control-ease);
 }
 .on .switch-track {
-  background: #596e4b;
-  border-color: #596e4b;
+  background: #595660;
+  border-color: #595660;
 }
 .on .switch-thumb {
   transform: translateX(18px);
 }
 .toggle-switch:active .switch-track {
-  box-shadow: 0 0 0 3px #596e4b19;
+  box-shadow: 0 0 0 3px #59566019;
 }
 .toggle-switch:focus-visible {
-  outline: 2px solid #61754e;
+  outline: 2px solid #595660;
   outline-offset: 2px;
 }
 .toggle-switch:disabled {

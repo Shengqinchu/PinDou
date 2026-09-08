@@ -1,4 +1,11 @@
 <script setup lang="ts">
+import { formatCopy } from "../../state";
+
+import contentLabels from "../../content/data-components-admin-SchedulePanel-labels.json";
+
+import copyText from "../../content/components-admin-SchedulePanel.json";
+import { say } from "../../state";
+
 import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
@@ -40,15 +47,7 @@ watch(
   },
   { immediate: true },
 );
-const labels = [
-  ["周一", "Monday"],
-  ["周二", "Tuesday"],
-  ["周三", "Wednesday"],
-  ["周四", "Thursday"],
-  ["周五", "Friday"],
-  ["周六", "Saturday"],
-  ["周日", "Sunday"],
-];
+const labels = contentLabels;
 watch(start, (day) => {
   if (day) loadCalendar(day);
 });
@@ -59,7 +58,7 @@ function shift(days: number) {
   start.value = plusDays(start.value || hamiltonDate(), days);
 }
 function weekday(value: string) {
-  return new Intl.DateTimeFormat(tr("zh-CN", "en-CA"), {
+  return new Intl.DateTimeFormat(say(copyText.enca_9cd218), {
     weekday: "short",
     timeZone: "UTC",
   }).format(new Date(value + "T12:00:00Z"));
@@ -78,40 +77,39 @@ function addException() {
     <header class="desk-page-heading">
       <div>
         <p class="desk-eyebrow">
-          {{ tr("给每一位客人，留好位置", "A PLACE FOR EVERY GUEST") }}
+          {{ say(copyText.a_place_for_every_guest_4abf35) }}
         </p>
-        <h1>{{ tr("到店排班", "Studio schedule") }}</h1>
+        <h1>{{ say(copyText.studio_schedule_436d7b) }}</h1>
         <p>
           {{
-            tr(
-              "营业时间决定可选时段，已确认的订单会自动出现在日历里。",
-              "Opening hours determine available times. Confirmed orders appear in your calendar automatically.",
+            say(
+              copyText.opening_hours_determine_available_times_confirmed_orders_5bec41,
             )
           }}
         </p>
       </div>
       <span class="timezone-label"
-        ><PhClock />Hamilton · {{ tr("当地时间", "Local time") }}</span
+        ><PhClock />Hamilton · {{ say(copyText.local_time_28dec1) }}</span
       >
     </header>
     <section class="desk-surface calendar-surface">
       <header class="desk-section-heading">
-        <h2>{{ tr("未来七天", "Seven days at a glance") }}</h2>
+        <h2>{{ say(copyText.seven_days_at_a_glance_70abf4) }}</h2>
         <div class="calendar-navigation">
           <button
             class="desk-icon-button"
-            :aria-label="tr('前七天', 'Previous seven days')"
+            :aria-label="say(copyText.previous_seven_days_7128fc)"
             @click="shift(-7)"
           >
             <PhArrowLeft /></button
           ><label
             ><span class="sr-only">{{
-              tr("日历开始日期", "Calendar start date")
+              say(copyText.calendar_start_date_4d308a)
             }}</span
             ><input v-model="start" type="date" /></label
           ><button
             class="desk-icon-button"
-            :aria-label="tr('后七天', 'Next seven days')"
+            :aria-label="say(copyText.next_seven_days_8ef1e1)"
             @click="shift(7)"
           >
             <PhArrowRight />
@@ -130,7 +128,7 @@ function addException() {
             ><span>{{
               day.hours
                 ? `${day.hours.start}–${day.hours.end}`
-                : tr("未开放", "Not open")
+                : say(copyText.not_open_2cdc61)
             }}</span>
           </header>
           <div class="day-appointments">
@@ -142,14 +140,14 @@ function addException() {
             >
               <span
                 >{{ entry.start }} · {{ entry.guests }}
-                {{ tr("人", "guests") }}</span
+                {{ say(copyText.guests_24bfb5) }}</span
               ><strong>{{ entry.name }}</strong
               ><small>{{
                 entry.fulfillment === "completed"
-                  ? tr("已到店", "Visited")
+                  ? say(copyText.visited_f3f354)
                   : entry.status === "paid"
-                    ? tr("已确认", "Confirmed")
-                    : tr("付款中暂留", "Payment hold")
+                    ? say(copyText.confirmed_b1c92b)
+                    : say(copyText.payment_hold_d762cc)
               }}</small></button
             ><span
               v-if="!day.entries.length"
@@ -161,9 +159,9 @@ function addException() {
         </div>
       </div>
       <p class="calendar-footnote">
-        <span class="legend-dot" />{{ tr("已确认到店", "Confirmed visit") }}
+        <span class="legend-dot" />{{ say(copyText.confirmed_visit_be14c6) }}
         <span class="legend-dot hold" />{{
-          tr("付款中暂留", "Held during payment")
+          say(copyText.held_during_payment_94e609)
         }}
       </p>
     </section>
@@ -175,14 +173,9 @@ function addException() {
       <section class="desk-surface weekly-settings">
         <header class="desk-section-heading">
           <div>
-            <h2>{{ tr("每周营业安排", "Weekly opening hours") }}</h2>
+            <h2>{{ say(copyText.weekly_opening_hours_5a17fa) }}</h2>
             <p>
-              {{
-                tr(
-                  "开启营业日，再设定开始与结束时间。",
-                  "Open a day, then set its start and finish time.",
-                )
-              }}
+              {{ say(copyText.open_a_day_then_set_its_start_28436a) }}
             </p>
           </div>
           <PhCalendarDots :size="22" />
@@ -199,7 +192,10 @@ function addException() {
             ><ToggleSwitch
               v-model="row.enabled"
               :label="
-                tr(`${labels[row.day][0]}营业`, `Open on ${labels[row.day][1]}`)
+                formatCopy(copyText.message_2570f7b0, {
+                  v0: labels[row.day][0],
+                  v1: labels[row.day][1],
+                })
               "
             />
             <div class="weekly-time">
@@ -209,10 +205,10 @@ function addException() {
                 step="1800"
                 :disabled="!row.enabled"
                 :aria-label="
-                  tr(
-                    `${labels[row.day][0]}开门时间`,
-                    `${labels[row.day][1]} opening time`,
-                  )
+                  formatCopy(copyText.message_4c078feb, {
+                    v0: labels[row.day][0],
+                    v1: labels[row.day][1],
+                  })
                 "
                 required
               /><span>–</span
@@ -222,25 +218,27 @@ function addException() {
                 step="1800"
                 :disabled="!row.enabled"
                 :aria-label="
-                  tr(
-                    `${labels[row.day][0]}打烊时间`,
-                    `${labels[row.day][1]} closing time`,
-                  )
+                  formatCopy(copyText.message_dd378f3a, {
+                    v0: labels[row.day][0],
+                    v1: labels[row.day][1],
+                  })
                 "
                 required
               />
             </div>
             <small>{{
-              row.enabled ? tr("营业", "Open") : tr("不开放", "Closed")
+              row.enabled
+                ? say(copyText.open_72485d)
+                : say(copyText.closed_f28824)
             }}</small>
           </div>
         </div>
       </section>
       <div class="schedule-side">
         <section class="desk-surface capacity-settings">
-          <h2>{{ tr("接待安排", "Seating & notice") }}</h2>
+          <h2>{{ say(copyText.seating_notice_a3af02) }}</h2>
           <label class="desk-field"
-            >{{ tr("最多同时接待人数", "Maximum guests at a time")
+            >{{ say(copyText.maximum_guests_at_a_time_9a31d9)
             }}<input
               v-model.number="settings.capacity"
               name="capacity"
@@ -249,13 +247,10 @@ function addException() {
               max="100"
               required
             /><small>{{
-              tr(
-                "还没确定时保持 0，不会开放可购买座位。",
-                "Leave at 0 until decided. No seats will be available to buy.",
-              )
+              say(copyText.leave_at_0_until_decided_no_seats_eb04a3)
             }}</small></label
           ><label class="desk-field"
-            >{{ tr("至少提前多少分钟预订", "Minimum booking notice (minutes)")
+            >{{ say(copyText.minimum_booking_notice_minutes_6a76ff)
             }}<input
               v-model.number="settings.notice_minutes"
               type="number"
@@ -266,23 +261,18 @@ function addException() {
         </section>
         <section class="desk-surface exception-settings">
           <header class="desk-section-heading">
-            <h2>{{ tr("特别日期", "Date exceptions") }}</h2>
+            <h2>{{ say(copyText.date_exceptions_b30a54) }}</h2>
             <button
               type="button"
               class="desk-icon-button"
-              :aria-label="tr('添加特别日期', 'Add a date exception')"
+              :aria-label="say(copyText.add_a_date_exception_e95e09)"
               @click="addException"
             >
               <PhPlus />
             </button>
           </header>
           <p v-if="!settings.overrides.length" class="desk-muted">
-            {{
-              tr(
-                "临时休息、节假日营业，都可以单独安排。",
-                "Add a day off or special opening hours for a holiday.",
-              )
-            }}
+            {{ say(copyText.add_a_day_off_or_special_opening_08b4dd) }}
           </p>
           <div
             v-for="(row, i) in settings.overrides"
@@ -292,16 +282,16 @@ function addException() {
             <div>
               <label class="desk-field"
                 ><span class="sr-only">{{
-                  tr("特别日期", "Exception date")
+                  say(copyText.exception_date_9adaf0)
                 }}</span
                 ><input v-model="row.date" type="date" required /></label
               ><ToggleSwitch
                 v-model="row.enabled"
-                :label="tr('该日期营业', 'Open on this date')"
+                :label="say(copyText.open_on_this_date_d51331)"
               /><button
                 type="button"
                 class="desk-icon-button"
-                :aria-label="tr('移除特别日期', 'Remove exception')"
+                :aria-label="say(copyText.remove_exception_ad1b96)"
                 @click="settings.overrides.splice(i, 1)"
               >
                 <PhTrash />
@@ -312,19 +302,19 @@ function addException() {
                 v-model="row.start"
                 type="time"
                 step="1800"
-                :aria-label="tr('特别日期开门时间', 'Special opening time')"
+                :aria-label="say(copyText.special_opening_time_ababdd)"
                 required
               /><span>–</span
               ><input
                 v-model="row.end"
                 type="time"
                 step="1800"
-                :aria-label="tr('特别日期打烊时间', 'Special closing time')"
+                :aria-label="say(copyText.special_closing_time_d82538)"
                 required
               />
             </div>
             <small v-else>{{
-              tr("这一天不开放预订", "Bookings are closed on this date")
+              say(copyText.bookings_are_closed_on_this_date_baf656)
             }}</small>
           </div>
         </section>
@@ -333,11 +323,8 @@ function addException() {
         <div>
           <span :class="['save-state-dot', { dirty: settingsDirty }]" />{{
             settingsDirty
-              ? tr(
-                  "排班／收款设置有未保存的修改",
-                  "Unsaved schedule or checkout changes",
-                )
-              : tr("所有修改已保存", "All changes saved")
+              ? say(copyText.unsaved_schedule_or_checkout_changes_dbb518)
+              : say(copyText.all_changes_saved_05df19)
           }}
         </div>
         <button
@@ -346,7 +333,9 @@ function addException() {
           :disabled="saving || !settingsDirty"
         >
           <PhCheck />{{
-            saving ? tr("保存中…", "Saving…") : tr("保存设置", "Save settings")
+            saving
+              ? say(copyText.saving_1bd9fd)
+              : say(copyText.save_settings_3a2a2e)
           }}
         </button>
         <p v-if="error" class="desk-error" role="alert">{{ error }}</p>

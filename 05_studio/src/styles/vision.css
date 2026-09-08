@@ -1,4 +1,80 @@
 /* VISION public composition. Shared controls remain in interactions.css. */
+.vision-hero-lettering {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding-top: 46px;
+}
+.vision-hero-lettering .hero-puppy {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 70px;
+  transform: translateX(-50%) rotate(-4deg);
+}
+.vision-hero-lettering .hero-star {
+  position: absolute;
+  left: -86px;
+  top: 72px;
+  width: 45px;
+  transform: rotate(-12deg);
+}
+.vision-hero-lettering .hero-heart {
+  position: absolute;
+  right: -66px;
+  bottom: 18px;
+  width: 32px;
+  transform: rotate(10deg);
+}
+.vision-brand > .puppy-motif {
+  width: 44px;
+}
+.vision-welcome > .puppy-motif {
+  width: 22px;
+}
+.experience-motif {
+  margin-bottom: 28px;
+  transform: rotate(-7deg);
+}
+.vision-notes details p {
+  white-space: pre-line;
+}
+.vision-space-copy h2 em,
+.vision-experience h2 em,
+.vision-shop-teaser h2 em,
+.vision-coming h1 em {
+  color: var(--ink);
+}
+@media (max-width: 760px) {
+  .vision-hero-lettering {
+    padding-top: 36px;
+    width: 100%;
+  }
+  .vision-hero-lettering .hero-puppy {
+    top: -12px;
+    width: 55px;
+  }
+  .vision-hero-lettering .hero-star {
+    left: 3px;
+    top: 9px;
+    width: 26px;
+  }
+  .vision-hero-lettering .hero-heart {
+    right: 6px;
+    top: 14px;
+    width: 23px;
+  }
+  .vision-brand {
+    gap: 7px;
+  }
+  .vision-brand > .puppy-motif {
+    width: 34px;
+  }
+  .vision-brand > .puppy-brandmark.compact {
+    width: 140px;
+  }
+}
 .vision-details {
   padding-block: 65px 80px;
 }
@@ -206,7 +282,7 @@
   }
 }
 .vision-announcement {
-  background: var(--soft);
+  background: #f2f0f8;
   color: var(--muted);
   padding: max(10px, var(--safe-top)) max(20px, var(--safe-right)) 10px
     max(20px, var(--safe-left));
@@ -215,7 +291,7 @@
   line-height: 1.6;
 }
 .vision-header {
-  padding: 24px max(24px, 4.5vw, var(--safe-right)) 24px
+  padding: 19px max(24px, 4.5vw, var(--safe-right)) 19px
     max(24px, 4.5vw, var(--safe-left));
   display: flex;
   align-items: center;
@@ -323,19 +399,20 @@
   display: block;
 }
 .vision-title > span:last-child {
-  color: var(--accent);
+  color: var(--ink);
 }
 :lang(zh-CN) .vision-title {
   font-size: clamp(36px, 4.7vw, 64px);
   line-height: 1.42;
-  letter-spacing: 0.025em;
+  letter-spacing: -0.025em;
 }
 .vision-hero-description {
-  max-width: 620px;
+  max-width: 760px;
   margin: 26px auto 40px;
   font-size: 16px;
   line-height: 1.9;
   text-wrap: pretty;
+  white-space: pre-line;
 }
 .vision-mobile-copy {
   display: none;
@@ -442,7 +519,7 @@
 .vision-carousel-bottom {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 16px;
   padding-top: 15px;
 }
@@ -464,7 +541,7 @@
   font-variant-numeric: tabular-nums;
 }
 .vision-journal {
-  background: var(--sage);
+  background: #fafbf9;
   padding-block: 70px;
 }
 .vision-section-heading {
@@ -527,7 +604,7 @@
   border-radius: 14px 0 0 14px;
 }
 .vision-shop-teaser > div {
-  background: var(--blue);
+  background: #f2f0f8;
   padding: clamp(32px, 5vw, 70px);
   display: flex;
   flex-direction: column;
@@ -541,8 +618,9 @@
   margin-top: 20px;
 }
 .vision-footer {
-  background: #294b57;
-  color: #f1f7f8;
+  background: #fff;
+  color: var(--ink);
+  border-top: 1px solid var(--line);
   padding: 65px 0 72px;
 }
 .vision-footer-inner {
@@ -563,7 +641,7 @@
 .vision-footer-brand p {
   font-size: 13px;
   margin-top: 12px;
-  color: #d1e0e5;
+  color: var(--muted);
 }
 .vision-footer-links {
   display: flex;
@@ -573,7 +651,7 @@
   font-size: 13px;
 }
 .vision-footer-links > span:first-child {
-  color: #b6cfd8;
+  color: var(--muted);
   margin-bottom: 12px;
 }
 .vision-footer-links > a {
@@ -640,7 +718,7 @@
     color: var(--accent);
   }
   .vision-footer-links a:hover {
-    color: #fff;
+    color: var(--ink);
     text-decoration: underline;
     text-underline-offset: 6px;
   }
@@ -689,7 +767,7 @@
   :lang(zh-CN) .vision-title {
     font-size: clamp(28px, 6.8vw, 44px);
     line-height: 1.55;
-    letter-spacing: 0.025em;
+    letter-spacing: -0.025em;
   }
   .vision-hero-description {
     font-size: 14px;
@@ -833,7 +911,7 @@
     align-items: flex-start;
   }
   .vision-carousel-controls {
-    align-self: flex-end;
+    align-self: center;
   }
 }
 @media (prefers-reduced-motion: reduce) {

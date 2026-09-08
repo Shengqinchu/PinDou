@@ -1,0 +1,25 @@
+{
+  "created_and_held": [
+    "订单已创建，暂留座位／库存",
+    "Order created; seats and stock held"
+  ],
+  "cashier_created": ["收银台已准备好", "Cashier ready"],
+  "paid": ["付款已核实，订单已确认", "Payment verified; order confirmed"],
+  "paid_needs_review": [
+    "已收款，需要跟进处理",
+    "Payment received; follow-up needed"
+  ],
+  "expired": ["付款窗口已关闭", "Payment window closed"],
+  "payment_uncertain": ["等待核实付款结果", "Awaiting payment verification"],
+  "failed": ["收银台未能创建", "Cashier could not be created"],
+  "provider_refund_confirmed": ["退款已核实", "Refund verified"],
+  "fulfillment_updated": [
+    "交付状态／备注已更新",
+    "Fulfillment or note updated"
+  ],
+  "product_updated": ["商品资料已更新", "Product updated"],
+  "schedule_and_prices_updated": [
+    "排班／收款设置已更新",
+    "Schedule or checkout settings updated"
+  ]
+}
