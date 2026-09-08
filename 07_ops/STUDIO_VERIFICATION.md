@@ -1,5 +1,19 @@
 # Studio V1 开发预览验收
 
+## 2026-09-08 模块浮起与短按反馈（已发布）
+
+- 代码提交：`c4b606b`（统一模块与按压）及 `088433c`（触屏松手事件修正），均已推送 `codex/studio-v1-20260907`。代码对照、当前技能规则和验收细节见 `03_design/STUDIO_TACTILE_UPGRADE.md`。
+- 实际发布：`20260908142146-studio-v2`；构建标识 `2026-09-08T14:21:28.238Z`。此前的 `20260908141143-studio-v2` 是复核前候选，只上传过，未切换上线。
+- 发布包 20,070,579 字节、158 个清单文件，SHA-256 `27ff3d7c8ff6a22c165f8585aa35cf7f235123c52b727da7298f9f81d02c8a9a`；服务端完整清单校验通过。
+- 源站 current：`/opt/pindou/studio/releases/20260908142146-studio-v2`；回滚备份：`/opt/pindou/studio/backups/20260908142146-studio-v2`。
+- 公网 HTML、`version.json` 和主资源已核对：`index-C8ScD3FE.js` / `index-RrppPU8S.css`。计算样式为 300ms cubic-bezier(.4,0,.2,1)。
+- 公网实际帧：桌面短按峰值约 +2.99976px，回到悬停 -2px；WebKit 触屏短按峰值约 +2.997951px，回到静止 0px；最终反馈动画数均为 0，过程中最多 1 个。日记卡片悬停 -4px，桌面/手机无横向溢出，管理登录入口正常。
+- 本地 23 组交互检查、94 组布局组合及 1 个后台设置流程、2 组微信 WebView 流程均通过。补测嵌套进度同步、触摸滚动不触发点击；文案锁 43 模块、类型检查与正式构建通过。触屏修正后重跑交互与 WebView 检查；布局尺寸未再改变。
+- 公网无应用运行异常。WebKit 模拟记录了 2 条 Cloudflare `/cdn-cgi/rum` 访问统计跨域警告，已原样归入 `live-verification.json` 的 `telemetryWarnings`，未修改生产统计配置，也未把它伪称为零控制台错误。
+- 微信/小红书/加拿大国旗、头像和许可共 5 个素材来源文件的公网 SHA-256 仍一致。原生成器 JS 标识未变，源站原 HTML SHA-256 仍为 `506f9bd2f9f0c37c52f08924f1504286816b93bff3198aea9f1790d0eceb36aa`；`pindou` 与 `pindou-studio` 均 active，Studio 健康检查 200。
+- 全部真实页面验证只读；本地使用隔离 QA 数据库。未创建真实预约/支付订单，后端代码、经营配置、文案、头像及品牌资产未改变。
+- 最终本地录屏：`artifacts/studio-tactile/video/tactile-20260908142146-desktop.webm`、`tactile-20260908142146-touch.webm`。公网证据：`artifacts/studio-tactile/live-verification.json`；以上目录均被 Git 忽略。微信结果属于 UA/引擎模拟，未冒称真机测试。
+
 ## 2026-09-08 社交素材与头像（已发布）
 
 - 代码提交：`98b395b`；分支 `codex/studio-v1-20260907` 已推送 GitHub。
