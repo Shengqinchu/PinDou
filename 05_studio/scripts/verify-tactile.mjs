@@ -292,8 +292,30 @@ for (const [engine, launcher] of [
       );
       const frames = await sample(p, el, () => el.tap());
       noQueue(frames);
+      assert(
+        Math.max(...frames.map((f) => f.y)) > 2.5,
+        "Touch pointerout cancelled the press response",
+      );
       assert(Math.abs(frames.at(-1).y) < 0.04, "Touch left a floating control");
       assert(!(await el.evaluate((e) => e.matches(":active"))));
+      const metric = p.locator(".reservation-desk-metrics > button").first();
+      await metric.evaluate((e) =>
+        e.addEventListener(
+          "click",
+          (event) => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          },
+          { capture: true },
+        ),
+      );
+      const metricFrames = await sample(p, metric, () => metric.tap());
+      assert(
+        Math.max(...metricFrames.map((f) => f.y)) > 0.75,
+        "Touch card does not depress",
+      );
+      assert(Math.abs(metricFrames.at(-1).y) < 0.04);
+      noQueue(metricFrames);
       await p.goto(base + "visit");
       await p.locator(".reservation-grid").waitFor();
       await p.locator("input[value=day]").check();

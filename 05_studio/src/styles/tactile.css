@@ -273,6 +273,19 @@
   transition: none;
 }
 
+@media (hover: none), (pointer: coarse) {
+  :is(
+    .reservation-plans > label,
+    .photo-tile,
+    .journal-story-link,
+    .desk-metric,
+    .reservation-desk-metrics > button,
+    .reservation-desk-row
+  ) {
+    --tactile-press-transform: translate3d(0, 1px, 0) scale(0.996);
+  }
+}
+
 /* No sticky hover on touch; no positional effect when reduced motion is set. */
 @media (prefers-reduced-motion: reduce) {
   :is(

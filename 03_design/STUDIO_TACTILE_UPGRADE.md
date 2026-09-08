@@ -29,6 +29,7 @@
 - `src/press.ts` 使用原生 Web Animations 为普通短按补全回弹。CSS 继续负责悬停和持续按压，指针/键盘释放后短按反馈总长 300ms，每个元素最多一个反馈效果。再次按下、移出或重新进入时从当前画面接续，禁止叠加队列。
 - 点击、路由、表单提交均按原生事件立即执行；没有拦截默认事件、没有等待动画的业务计时器，也没有延迟松开 `.pressed` 一类状态。出现 disabled、inert、DOM 移除、页面隐藏、窗口失焦或降动效变化时清理反馈。
 - 触摸移动超过阈值即放弃点击反馈，遵循原生滚动。键盘 Space/Enter 可使用；`prefers-reduced-motion` 下位移及回弹关闭，聚焦和状态仍可读。
+- 触摸松手自动产生的 `pointerout` 不当作鼠标移走处理，否则短按反馈会被提前取消。最终测试同时断言触屏按钮达到约 +3px、触屏卡片达到约 +1px，并回到 0；不能只检查“没有残留”。
 - 头像、平台图标、日记原文、品牌字标与 43 个批准内容模块未改；购物和预约业务规则未改。
 
 普通 CSS 过渡在反向播放时可能缩短剩余时长，见 [CSS Transitions 的反向过渡规则](https://www.w3.org/TR/css-transitions-1/#reversing)。本次短按反馈的创建/中断使用 [Element.animate](https://developer.mozilla.org/en-US/docs/Web/API/Element/animate) 与 [Animation.cancel](https://developer.mozilla.org/en-US/docs/Web/API/Animation/cancel)，仅作用于视觉，不代替事件和业务状态。

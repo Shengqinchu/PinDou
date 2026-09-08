@@ -132,6 +132,8 @@ export function installPressFeedback(clock: {
     if (press) release(press.element, press.at, false);
   }
   function boundary(event: PointerEvent) {
+    // Touch sends pointerout on every lift; it is not a hover destination change.
+    if (event.pointerType === "touch") return;
     const element = target(event);
     if (
       !element ||
