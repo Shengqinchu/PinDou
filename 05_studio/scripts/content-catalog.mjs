@@ -155,7 +155,7 @@ if (process.argv.includes("--capture-baseline")) {
     }
     lines.push('');
   }
-  fs.writeFileSync(path.join(archive,'STUDIO_COPY_CATALOG.md'),lines.join('\n')+'\n');
+  fs.writeFileSync(path.join(archive,'STUDIO_COPY_CATALOG.md'),lines.join('\n').trimEnd()+'\n');
   console.log('Rendered current copy catalog');
 } else {
   const approved = JSON.parse(

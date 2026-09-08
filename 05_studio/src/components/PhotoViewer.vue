@@ -9,8 +9,9 @@ import { media, tr } from "../state";
 import { reducedMotion } from "../ui";
 import { useStudioModal } from "../modal";
 const props = defineProps<{
-  photos: { image: string; zh: string; en: string }[];
+  photos: { image: string; zh: string; en: string; src?: string }[];
 }>();
+const photoSource = (item: { image: string; src?: string }) => item.src || media(item.image);
 const dialog = ref<HTMLDialogElement>();
 const incomingElement = ref<HTMLElement>();
 const selected = ref(0);
@@ -72,7 +73,7 @@ function preload(index: number, version: number): Promise<boolean> {
       cleanup();
       reject(new Error("photo unavailable"));
     };
-    img.src = media(props.photos[index].image);
+    img.src = photoSource(props.photos[index]);
   });
 }
 function blendTo(opacity: 0 | 1, version: number): Promise<boolean> {
@@ -177,7 +178,7 @@ defineExpose({ open });
         </div>
         <div class="photo-stage" :aria-busy="loading">
           <figure class="photo-current">
-            <img :src="media(photo.image)" :alt="tr(photo.zh, photo.en)" />
+            <img :src="photoSource(photo)" :alt="tr(photo.zh, photo.en)" />
           </figure>
           <figure
             v-if="incoming !== null"
@@ -185,7 +186,7 @@ defineExpose({ open });
             class="photo-incoming"
             aria-hidden="true"
           >
-            <img :src="media(photos[incoming].image)" alt="" />
+            <img :src="photoSource(photos[incoming])" alt="" />
           </figure>
         </div>
         <p :id="caption" class="viewer-caption">{{ tr(photo.zh, photo.en) }}</p>

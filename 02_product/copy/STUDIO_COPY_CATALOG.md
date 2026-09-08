@@ -1008,4 +1008,3 @@
 | phone_href | tel:+14373624360 | |
 | social_url | https://www.xiaohongshu.com/user/profile/65f8375c000000000b00c921 | |
 | original_post | https://xhslink.cn/o/8HFIo1pstmk | |
-

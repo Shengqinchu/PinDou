@@ -127,8 +127,13 @@
 }
 .journal-entry-photos {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
   gap: 30px;
 }
+.journal-entry-photos figure:first-child {grid-column:1/-1;}
+.journal-image-button {display:block;width:100%;padding:0;border-radius:12px;overflow:hidden;}
+.journal-entry-photos figure:not(:first-child) img {aspect-ratio:1;object-fit:cover;}
+.journal-image-button:focus-visible {outline:2px solid var(--ink);outline-offset:4px;}
 .journal-entry-photos img {
   width: 100%;
   height: auto;

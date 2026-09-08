@@ -2,16 +2,19 @@
 import copyText from "../content/pages-JournalEntry.json";
 import { say } from "../state";
 
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 import { PhArrowLeft, PhArrowUpRight } from "@phosphor-icons/vue";
 import journal from "../content/journal-posts.json";
+import PhotoViewer from "../components/PhotoViewer.vue";
 import { tr } from "../state";
 const route = useRoute();
 const post = computed(() =>
   journal.posts.find((p) => p.id === route.params.id),
 );
 const base = import.meta.env.BASE_URL;
+const viewer = ref<InstanceType<typeof PhotoViewer>>();
+const photographs = computed(() => post.value?.images.map((photo, i) => ({image: photo.src, src: base + photo.src, zh: post.value!.title + ' · ' + (i+1), en: post.value!.title + ' · ' + (i+1)})) || []);
 // Decode platform markup; the original source stays archived verbatim.
 const body = computed(() =>
   post.value?.body
@@ -50,6 +53,7 @@ const body = computed(() =>
       </div>
       <div class="journal-entry-photos">
         <figure v-for="(photo, i) in post.images" :key="photo.src">
+          <button class="journal-image-button" @click="viewer?.open(i)">
           <img
             :src="base + photo.src"
             :alt="post.title + ' · ' + (i + 1)"
@@ -57,6 +61,7 @@ const body = computed(() =>
             :height="photo.height"
             :loading="i === 0 ? 'eager' : 'lazy'"
           />
+          </button>
           <figcaption>{{ i + 1 }} / {{ post.images.length }}</figcaption>
         </figure>
       </div>
@@ -68,4 +73,5 @@ const body = computed(() =>
       say(copyText.back_to_the_journal_b75447)
     }}</RouterLink>
   </section>
+  <PhotoViewer v-if="post" ref="viewer" :photos="photographs" />
 </template>

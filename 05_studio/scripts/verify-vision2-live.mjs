@@ -67,7 +67,7 @@ try {
         );
         assert.equal(await p.locator('a[href*="google.com/maps"]').count(), 3);
       }
-      if (route === "journal") assert.equal(await p.locator(".journal-story").count(), 11);
+      if (route === "journal") assert.equal(await p.locator(".journal-story").count(), 19);
       if (route.startsWith("journal/")) assert.equal(await p.locator(".journal-entry-photos img").count(), 15);
       if (route === "manage")
         await expect(
