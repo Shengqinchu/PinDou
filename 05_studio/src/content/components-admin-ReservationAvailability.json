@@ -1,0 +1,21 @@
+{
+  "title": ["不可预约时段", "Unavailable times"],
+  "intro": ["临时休息或另有安排时，选择日期与时间封闭。已确认的预约会受到保护。", "Block a date and time for a break or other plans. Confirmed reservations are protected."],
+  "date": ["日期", "Date"],
+  "start": ["开始", "From"],
+  "end": ["结束", "Until"],
+  "note": ["备注（仅店主可见）", "Note (only visible to you)"],
+  "block": ["封闭此时段", "Block this time"],
+  "restore": ["恢复可预约", "Reopen this time"],
+  "empty": ["暂无临时封闭时段。每周营业时间仍按营业设置执行。", "No temporary blocks. Weekly opening hours still apply."],
+  "notification": ["新预约提醒", "New reservation alerts"],
+  "enable": ["开启浏览器提醒", "Enable browser notifications"],
+  "enabled": ["浏览器提醒已开启", "Browser notifications enabled"],
+  "pending": ["待确认", "Pending"],
+  "new": ["有新的到店预约，请到预约列表查看。", "A new studio reservation is waiting. Open your reservation list."],
+  "noteNotification": ["工作台打开时持续检查；浏览器提醒需你允许通知。", "Checked while the desk is open. Browser alerts require your permission."],
+  "unsupported": ["此浏览器暂不支持系统通知，工作台内仍会提醒。", "System notifications are unavailable in this browser. In-desk alerts still work."],
+  "denied": ["浏览器未允许通知；可在网站权限中开启。工作台内提醒仍可用。", "Notifications are not allowed. Enable them in site permissions; in-desk alerts remain available."],
+  "refresh": ["刷新时段", "Refresh times"],
+  "saved": ["时段已更新", "Availability updated"]
+}

@@ -4,9 +4,9 @@
 :root {
   --control-ease: cubic-bezier(0.4, 0, 0.2, 1);
   --surface-ease: var(--control-ease);
-  --tactile-edge: #d2cce5;
+  --tactile-edge: #cbdce9;
   --tactile-card-shadow: 0 25px 50px -12px rgb(41 42 43 / 20%);
-  --tactile-card-border: #d4cfe6;
+  --tactile-card-border: #d0e0ec;
 }
 
 :is(.button, .desk-button.primary, .desk-button.secondary) {
@@ -118,7 +118,7 @@
   :is(.button-primary, .desk-button.primary):not(:disabled):not(
       [aria-disabled="true"]
     ):hover {
-    background: #eeebf8;
+    background: #edf6fc;
   }
   :is(.button-outline, .desk-button.secondary):not(:disabled):not(
       [aria-disabled="true"]
@@ -142,10 +142,10 @@
   :is(.icon-button, .desk-icon-button, .language-button, .desk-language):not(
       :disabled
     ):hover {
-    background: #f2eff8;
+    background: #f2f8fc;
   }
   .reservation-grid td > button:not(:disabled):not(.chosen):hover {
-    background: #eeebf8;
+    background: #edf6fc;
   }
   .reservation-desk-days > button:not(.selected):hover {
     background: #faf9fc;

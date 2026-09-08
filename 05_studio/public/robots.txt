@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /manage
+Disallow: /reservation/
+Disallow: /order/
+Disallow: /studio-api/
+Sitemap: https://pindoupuppy.com/sitemap.xml

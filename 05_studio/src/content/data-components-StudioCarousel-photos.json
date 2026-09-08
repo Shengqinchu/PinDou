@@ -1,32 +1,62 @@
 [
   {
-    "image": "studio-04",
-    "zh": "窗边的一张桌子，留给慢慢做手工的你",
-    "en": "A table by the window, and time to make"
+    "image": "space-01",
+    "zh": "走进拼豆小屋",
+    "en": "Step into the studio"
   },
   {
-    "image": "studio-02",
-    "zh": "白色工作台与越拼越满的作品墙",
-    "en": "White worktables and a wall full of things we love"
+    "image": "space-02",
+    "zh": "小狗作品墙",
+    "en": "The puppy art wall"
   },
   {
-    "image": "studio-08",
-    "zh": "藏在小屋角落里的可爱",
-    "en": "Lovely little things around the room"
+    "image": "space-03",
+    "zh": "拼豆作品展示",
+    "en": "Beadwork on display"
   },
   {
-    "image": "studio-06",
-    "zh": "选一抹喜欢的颜色开始",
-    "en": "Start with a colour you love"
+    "image": "space-04",
+    "zh": "靠墙的工作桌",
+    "en": "A worktable by the wall"
   },
   {
-    "image": "studio-07",
-    "zh": "准备好工具，慢慢拼",
-    "en": "Tools ready, take your time"
+    "image": "space-05",
+    "zh": "阳光下的拼豆座位",
+    "en": "Sunlit beadwork seats"
   },
   {
-    "image": "studio-11",
-    "zh": "把作品变成随身小物",
-    "en": "Turn your piece into something to carry with you"
+    "image": "space-06",
+    "zh": "甜点与小狗作品",
+    "en": "Treats and puppies in beads"
+  },
+  {
+    "image": "space-07",
+    "zh": "颜色与工具",
+    "en": "Colours and tools"
+  },
+  {
+    "image": "space-08",
+    "zh": "准备好开始拼豆",
+    "en": "Ready to start creating"
+  },
+  {
+    "image": "space-09",
+    "zh": "窗边的作品展示",
+    "en": "The display by the window"
+  },
+  {
+    "image": "space-10",
+    "zh": "收纳角落",
+    "en": "The storage corner"
+  },
+  {
+    "image": "space-11",
+    "zh": "配件与装饰",
+    "en": "Findings and decorations"
+  },
+  {
+    "image": "space-12",
+    "zh": "客人的拼豆作品",
+    "en": "Our guests’ beadwork"
   }
 ]

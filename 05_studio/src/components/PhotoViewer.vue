@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../content/components-PhotoViewer.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("components-PhotoViewer", copyTextDefault);
+
+import copyTextDefault from "../content/components-PhotoViewer.json";
 import { say } from "../state";
 
 import { computed, nextTick, onBeforeUnmount, ref, useId } from "vue";
@@ -18,6 +21,7 @@ const selected = ref(0);
 const current = ref(0);
 const incoming = ref<number | null>(null);
 const loading = ref(false);
+const hasOpened = ref(false);
 const error = ref("");
 const photo = computed(() => props.photos[current.value]);
 const caption = useId();
@@ -33,6 +37,7 @@ function interruptSwap() {
   cancelPreload = undefined;
 }
 function open(index: number) {
+  hasOpened.value = true;
   interruptSwap();
   incoming.value = null;
   loading.value = false;
@@ -178,7 +183,7 @@ defineExpose({ open });
         </div>
         <div class="photo-stage" :aria-busy="loading">
           <figure class="photo-current">
-            <img :src="photoSource(photo)" :alt="tr(photo.zh, photo.en)" />
+            <img v-if="hasOpened" :src="photoSource(photo)" :alt="tr(photo.zh, photo.en)" />
           </figure>
           <figure
             v-if="incoming !== null"

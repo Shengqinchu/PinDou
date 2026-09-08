@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { contentModule } from "../../content-store";
+const copyText = contentModule("components-admin-SchedulePanel", copyTextDefault);
+
 import { formatCopy } from "../../state";
 
 import contentLabels from "../../content/data-components-admin-SchedulePanel-labels.json";
 
-import copyText from "../../content/components-admin-SchedulePanel.json";
+import copyTextDefault from "../../content/components-admin-SchedulePanel.json";
 import { say } from "../../state";
 
 import { onMounted, ref, watch } from "vue";

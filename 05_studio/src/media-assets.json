@@ -1,0 +1,221 @@
+{
+  "hero-illustration": {
+    "src": "/studio-media/v3/hero-illustration-1269.webp",
+    "width": 1269,
+    "height": 952,
+    "srcset": "/studio-media/v3/hero-illustration-640.webp 640w, /studio-media/v3/hero-illustration-1269.webp 1269w"
+  },
+  "shop-collage": {
+    "src": "/studio-media/v3/shop-collage-1202.webp",
+    "width": 1202,
+    "height": 1603,
+    "srcset": "/studio-media/v3/shop-collage-640.webp 640w, /studio-media/v3/shop-collage-1202.webp 1202w"
+  },
+  "space-01": {
+    "src": "/studio-media/v3/space-01-1280.webp",
+    "width": 1920,
+    "height": 2560,
+    "srcset": "/studio-media/v3/space-01-640.webp 640w, /studio-media/v3/space-01-1280.webp 1280w, /studio-media/v3/space-01-1920.webp 1920w"
+  },
+  "space-02": {
+    "src": "/studio-media/v3/space-02-1280.webp",
+    "width": 4284,
+    "height": 5712,
+    "srcset": "/studio-media/v3/space-02-640.webp 640w, /studio-media/v3/space-02-1280.webp 1280w, /studio-media/v3/space-02-1920.webp 1920w"
+  },
+  "space-03": {
+    "src": "/studio-media/v3/space-03-1280.webp",
+    "width": 5560,
+    "height": 7414,
+    "srcset": "/studio-media/v3/space-03-640.webp 640w, /studio-media/v3/space-03-1280.webp 1280w, /studio-media/v3/space-03-1920.webp 1920w"
+  },
+  "space-04": {
+    "src": "/studio-media/v3/space-04-1280.webp",
+    "width": 3766,
+    "height": 5022,
+    "srcset": "/studio-media/v3/space-04-640.webp 640w, /studio-media/v3/space-04-1280.webp 1280w, /studio-media/v3/space-04-1920.webp 1920w"
+  },
+  "space-05": {
+    "src": "/studio-media/v3/space-05-1280.webp",
+    "width": 4284,
+    "height": 5712,
+    "srcset": "/studio-media/v3/space-05-640.webp 640w, /studio-media/v3/space-05-1280.webp 1280w, /studio-media/v3/space-05-1920.webp 1920w"
+  },
+  "space-06": {
+    "src": "/studio-media/v3/space-06-1280.webp",
+    "width": 3958,
+    "height": 5278,
+    "srcset": "/studio-media/v3/space-06-640.webp 640w, /studio-media/v3/space-06-1280.webp 1280w, /studio-media/v3/space-06-1920.webp 1920w"
+  },
+  "space-07": {
+    "src": "/studio-media/v3/space-07-1280.webp",
+    "width": 4284,
+    "height": 5712,
+    "srcset": "/studio-media/v3/space-07-640.webp 640w, /studio-media/v3/space-07-1280.webp 1280w, /studio-media/v3/space-07-1920.webp 1920w"
+  },
+  "space-08": {
+    "src": "/studio-media/v3/space-08-1280.webp",
+    "width": 4284,
+    "height": 5712,
+    "srcset": "/studio-media/v3/space-08-640.webp 640w, /studio-media/v3/space-08-1280.webp 1280w, /studio-media/v3/space-08-1920.webp 1920w"
+  },
+  "space-09": {
+    "src": "/studio-media/v3/space-09-1280.webp",
+    "width": 4284,
+    "height": 5712,
+    "srcset": "/studio-media/v3/space-09-640.webp 640w, /studio-media/v3/space-09-1280.webp 1280w, /studio-media/v3/space-09-1920.webp 1920w"
+  },
+  "space-10": {
+    "src": "/studio-media/v3/space-10-1206.webp",
+    "width": 1206,
+    "height": 1608,
+    "srcset": "/studio-media/v3/space-10-640.webp 640w, /studio-media/v3/space-10-1206.webp 1206w"
+  },
+  "space-11": {
+    "src": "/studio-media/v3/space-11-1088.webp",
+    "width": 1088,
+    "height": 1450,
+    "srcset": "/studio-media/v3/space-11-640.webp 640w, /studio-media/v3/space-11-1088.webp 1088w"
+  },
+  "space-12": {
+    "src": "/studio-media/v3/space-12-1202.webp",
+    "width": 1202,
+    "height": 1603,
+    "srcset": "/studio-media/v3/space-12-640.webp 640w, /studio-media/v3/space-12-1202.webp 1202w"
+  },
+  "journal-02": {
+    "src": "/studio-media/journal-02.jpg",
+    "width": 640,
+    "height": 853
+  },
+  "journal-04": {
+    "src": "/studio-media/journal-04.jpg",
+    "width": 640,
+    "height": 853
+  },
+  "journal-05": {
+    "src": "/studio-media/journal-05.jpg",
+    "width": 640,
+    "height": 853
+  },
+  "journal-07": {
+    "src": "/studio-media/journal-07.jpg",
+    "width": 640,
+    "height": 853
+  },
+  "journal-10": {
+    "src": "/studio-media/journal-10.jpg",
+    "width": 640,
+    "height": 853
+  },
+  "journal-11": {
+    "src": "/studio-media/journal-11.jpg",
+    "width": 640,
+    "height": 853
+  },
+  "journal-13": {
+    "src": "/studio-media/journal-13.jpg",
+    "width": 640,
+    "height": 853
+  },
+  "journal-20": {
+    "src": "/studio-media/journal-20.jpg",
+    "width": 640,
+    "height": 853
+  },
+  "studio-01": {
+    "src": "/studio-media/studio-01.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-02": {
+    "src": "/studio-media/studio-02.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-03": {
+    "src": "/studio-media/studio-03.jpg",
+    "width": 1080,
+    "height": 2066
+  },
+  "studio-04": {
+    "src": "/studio-media/studio-04.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-05": {
+    "src": "/studio-media/studio-05.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-06": {
+    "src": "/studio-media/studio-06.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-07": {
+    "src": "/studio-media/studio-07.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-08": {
+    "src": "/studio-media/studio-08.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-09": {
+    "src": "/studio-media/studio-09.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-10": {
+    "src": "/studio-media/studio-10.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-11": {
+    "src": "/studio-media/studio-11.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-12": {
+    "src": "/studio-media/studio-12.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-13": {
+    "src": "/studio-media/studio-13.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-14": {
+    "src": "/studio-media/studio-14.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "studio-15": {
+    "src": "/studio-media/studio-15.jpg",
+    "width": 1080,
+    "height": 1440
+  },
+  "brand-zh": {
+    "src": "/studio-brand/full-zh-v3.jpg",
+    "width": 458,
+    "height": 458
+  },
+  "brand-en": {
+    "src": "/studio-brand/full-en-v3.jpg",
+    "width": 509,
+    "height": 509
+  },
+  "brand-puppy": {
+    "src": "/studio-brand/puppy-v3.jpg",
+    "width": 556,
+    "height": 556
+  },
+  "owner-avatar": {
+    "src": "/studio-brand/xiaogou-shuangji-avatar.png",
+    "width": 376,
+    "height": 376
+  }
+}

@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../content/pages-Order.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("pages-Order", copyTextDefault);
+
+import copyTextDefault from "../content/pages-Order.json";
 import { say } from "../state";
 
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";

@@ -282,7 +282,7 @@
   }
 }
 .vision-announcement {
-  background: #f2f0f8;
+  background: #f0f7fc;
   color: var(--muted);
   padding: max(10px, var(--safe-top)) max(20px, var(--safe-right)) 10px
     max(20px, var(--safe-left));
@@ -604,7 +604,7 @@
   border-radius: 14px 0 0 14px;
 }
 .vision-shop-teaser > div {
-  background: #f2f0f8;
+  background: #f0f7fc;
   padding: clamp(32px, 5vw, 70px);
   display: flex;
   flex-direction: column;

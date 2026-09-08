@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { contentModule } from "../content-store";
+const copyText = contentModule("pages-Manage", copyTextDefault);
+
 import BrandMotif from "../components/BrandMotif.vue";
-import copyText from "../content/pages-Manage.json";
+import copyTextDefault from "../content/pages-Manage.json";
 import { say } from "../state";
 
 import { onMounted, reactive, ref } from "vue";

@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../content/pages-ReservationReceipt.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("pages-ReservationReceipt", copyTextDefault);
+
+import copyTextDefault from "../content/pages-ReservationReceipt.json";
 import { say } from "../state";
 
 import { onBeforeUnmount, onMounted, ref } from "vue";

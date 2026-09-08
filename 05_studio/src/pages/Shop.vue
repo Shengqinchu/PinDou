@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import copyText from "../content/pages-Shop.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("pages-Shop", copyTextDefault);
+
+import copyTextDefault from "../content/pages-Shop.json";
 import { say } from "../state";
 
+import BrandMotif from "../components/BrandMotif.vue";
 import { PhArrowRight, PhFlower } from "@phosphor-icons/vue";
 import { media, tr } from "../state";
 </script>
 <template>
   <section class="vision-coming container">
     <div class="vision-coming-copy">
-      <PhFlower :size="40" weight="light" />
+      <BrandMotif />
       <p class="vision-eyebrow">{{ say(copyText.the_little_shop_915927) }}</p>
       <h1>
         {{ say(copyText.little_things_01bed6) }}<br /><em>{{

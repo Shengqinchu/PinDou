@@ -98,5 +98,89 @@
   "order_amount_limit": [
     "本单金额超出在线支付范围，请分开购买。",
     "This order exceeds the online limit. Please split your purchase."
+  ],
+  "content_placeholders_required": [
+    "请保留原文中的动态占位符，例如 {v0}。",
+    "Keep the original dynamic placeholders, such as {v0}."
+  ],
+  "content_invalid_media": [
+    "图片地址或格式不正确，请重新上传。",
+    "This image could not be used. Upload it again."
+  ],
+  "image_invalid": [
+    "请选择有效的 JPG、PNG 或 WebP 图片。",
+    "Choose a valid JPG, PNG or WebP image."
+  ],
+  "image_too_large": [
+    "图片不能超过 12 MB。",
+    "Images must be 12 MB or smaller."
+  ],
+  "import_url_not_supported": [
+    "请粘贴小红书的帖子分享链接。",
+    "Paste a Xiaohongshu post share link."
+  ],
+  "import_source_unavailable": [
+    "小红书暂未提供可读取的完整内容。请从帖子重新复制分享链接后重试，或手动添加图文。",
+    "Xiaohongshu did not provide the complete post. Copy a fresh share link and retry, or add the text and images manually."
+  ],
+  "import_author_mismatch": [
+    "这篇帖子不属于小狗双吉账号，请检查链接。",
+    "This post is not from the Xiaogou Shuangji account. Check the link."
+  ],
+  "import_incomplete": [
+    "原帖信息不完整，未生成日记。请重新分享链接或手动添加。",
+    "The original post was incomplete. No story was created. Share it again or add it manually."
+  ],
+  "journal_already_exists": [
+    "这篇日记已经导入，请在列表中选择它继续编辑。",
+    "This story is already imported. Select it in the list to edit."
+  ],
+  "journal_before_cutoff": [
+    "这里只收录 2026 年 6 月 24 日之后的帖子。",
+    "Only posts after June 24, 2026 are included."
+  ],
+  "journal_english_required": [
+    "发布前请补充英文标题与正文，可以使用“生成英文”。",
+    "Add an English title and body before publishing. You can use Generate English."
+  ],
+  "journal_invalid_date": [
+    "请填写有效的原帖日期。",
+    "Enter a valid original post date."
+  ],
+  "block_confirmed_conflict": [
+    "此时段有已确认预约，不能直接封闭。请先处理对应预约。",
+    "This time contains a confirmed reservation. Resolve that reservation before blocking the time."
+  ],
+  "block_invalid_date": [
+    "请选择今天至未来一年内的日期。",
+    "Choose a date between today and one year from now."
+  ],
+  "block_not_found": [
+    "这个封闭时段已被其他窗口移除，请刷新。",
+    "This block was already removed. Refresh the list."
+  ],
+  "translation_unavailable": [
+    "英文翻译暂不可用，中文和图片已保留，可以手动填写英文。",
+    "English translation is unavailable. Chinese text and images are safe; you can enter English manually."
+  ],
+  "translation_failed": [
+    "本次翻译未完成，原文保持不变。请重试或手动填写英文。",
+    "Translation did not finish. The original is unchanged. Retry or enter English manually."
+  ],
+  "translation_rate_limit": [
+    "本小时的翻译次数已用完，请稍后重试。",
+    "The hourly translation limit was reached. Try again later."
+  ],
+  "import_rate_limit": [
+    "本小时导入次数已用完，请稍后重试。",
+    "The hourly import limit was reached. Try again later."
+  ],
+  "journal_incomplete": [
+    "发布前请补充中文标题、正文和至少一张图片。草稿已经保存。",
+    "Add a Chinese title, body and at least one image before publishing. Your draft is saved."
+  ],
+  "content_invalid_price": [
+    "请输入不超过两位小数的非负价格，中英文价格应一致。",
+    "Enter a non-negative price with up to two decimal places. Both language values must match."
   ]
 }

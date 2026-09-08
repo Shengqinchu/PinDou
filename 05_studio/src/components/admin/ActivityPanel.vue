@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../../content/components-admin-ActivityPanel.json";
+import { contentModule } from "../../content-store";
+const copyText = contentModule("components-admin-ActivityPanel", copyTextDefault);
+
+import copyTextDefault from "../../content/components-admin-ActivityPanel.json";
 import { say } from "../../state";
 
 import { onMounted, ref, watch } from "vue";

@@ -1,3 +1,5 @@
+> 2026-09-08 VISION3 当前规范见 `STUDIO_VISION3_DESIGN.md`，覆盖本文冲突的字体、品牌、颜色、营业时段、编辑与根路径规则。下文保留 VISION2 设计来源。
+
 # PinDou Studio 当前设计规范
 
 2026-09-08，VISION2。逐项需求和店主澄清见 `02_product/STUDIO_VISION2_PROGRESS.md`。本文件替代上一版蓝灰底/衬线中文的视觉规则；历史方向可在 Git be46a3d 查看。

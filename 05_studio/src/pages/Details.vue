@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import profile from "../content/studio-profile.json";
-import copyText from "../content/pages-Details.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("pages-Details", copyTextDefault);
+
+import { computed } from "vue";
+import { contacts } from "../state";
+import copyTextDefault from "../content/pages-Details.json";
 import { say } from "../state";
 
 import {
@@ -15,8 +19,8 @@ import { media, socialUrl, tr, wechat } from "../state";
 const map = (address: string) =>
   "https://www.google.com/maps/search/?api=1&query=" +
   encodeURIComponent(address);
-const address = profile.address;
-const parking = profile.nearby_parking;
+const address = computed(() => say(contacts.address));
+const parking = computed(() => [say(contacts.parking_1),say(contacts.parking_2)]);
 </script>
 <template>
   <div class="vision-details container">

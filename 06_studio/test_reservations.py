@@ -30,9 +30,9 @@ def test_calendar_window_and_blocked_hours(client):
     assert len(result["days"])==14
     assert result["days"][0]["date"]=="2026-09-07" and result["days"][-1]["date"]=="2026-09-20"
     wed=result["days"][2]; thu=result["days"][3]
-    assert wed["close"]=="22:00" and thu["close"]=="22:00"
-    assert all(s["available"] for s in wed["slots"])
-    assert all(s["available"] for s in thu["slots"])
+    assert wed["close"]=="16:00" and thu["close"]=="18:00"
+    assert all(s["available"] == (s["start"] < "16:00") for s in wed["slots"])
+    assert all(s["available"] == (s["start"] < "18:00") for s in thu["slots"])
     assert result["max_guests_per_group"] == 4
     assert "remaining" not in str(result)
 
@@ -44,7 +44,7 @@ def test_calendar_window_and_blocked_hours(client):
     ("2026-09-10","17:00","17:30","hourly"),
     ("2026-09-08","21:00","23:00","hourly"),
     ("2026-09-08","10:15","12:15","hourly"),
-    ("2026-09-09","10:00","16:00","day"),
+    ("2026-09-09","10:00","22:00","day"),
 ])
 def test_reject_unbookable_intervals(client,day,start,end,plan):
     assert submit(client,body(day,start,end,plan)).status_code==422
@@ -90,7 +90,7 @@ def test_optional_exclusive_groups_is_transactional(client):
     assert submit(client).status_code==201
 
 def test_day_pass_and_sales_pause(client, monkeypatch):
-    result=submit(client,body("2026-09-09","10:00","22:00","day"))
+    result=submit(client,body("2026-09-09","10:00","16:00","day"))
     assert result.status_code==201
     monkeypatch.setattr(commerce,"PUBLIC_SALES_ENABLED",False)
     assert client.get("/studio-api/catalog").json()["checkout_ready"] is False

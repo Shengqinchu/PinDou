@@ -1,0 +1,206 @@
+{
+  "title": [
+    "网站编辑",
+    "Website editor"
+  ],
+  "intro": [
+    "选择页面，修改文字或图片。先预览，发布后客人才会看到。",
+    "Choose a page, edit its text or images, then preview. Visitors see changes only after you publish."
+  ],
+  "choose": [
+    "选择内容",
+    "Choose content"
+  ],
+  "search": [
+    "查找文字",
+    "Find text"
+  ],
+  "zh": [
+    "中文",
+    "Chinese"
+  ],
+  "en": [
+    "英文",
+    "English"
+  ],
+  "draft": [
+    "保存草稿",
+    "Save draft"
+  ],
+  "publish": [
+    "发布此页",
+    "Publish this page"
+  ],
+  "saved": [
+    "草稿已保存",
+    "Draft saved"
+  ],
+  "published": [
+    "已发布，页面已更新",
+    "Published. The page is updated."
+  ],
+  "preview": [
+    "页面预览",
+    "Page preview"
+  ],
+  "edit": [
+    "编辑",
+    "Edit"
+  ],
+  "mobile": [
+    "手机",
+    "Phone"
+  ],
+  "desktop": [
+    "电脑",
+    "Desktop"
+  ],
+  "history": [
+    "历史版本",
+    "Version history"
+  ],
+  "restore": [
+    "载入为草稿",
+    "Load as draft"
+  ],
+  "reload": [
+    "重新读取服务器版本",
+    "Reload server version"
+  ],
+  "replace": [
+    "替换图片",
+    "Replace image"
+  ],
+  "imageHelp": [
+    "上传 JPG、PNG 或 WebP，最大 12 MB；按原比例显示。",
+    "Upload JPG, PNG or WebP up to 12 MB. Images keep their proportions."
+  ],
+  "loading": [
+    "正在读取内容…",
+    "Loading content…"
+  ],
+  "unsaved": [
+    "有未保存的修改",
+    "Unsaved changes"
+  ],
+  "empty": [
+    "没有找到对应文字",
+    "No matching text"
+  ],
+  "home": [
+    "首页",
+    "Home"
+  ],
+  "visit": [
+    "来拼豆吧",
+    "Visit"
+  ],
+  "details": [
+    "拼豆铺详细信息",
+    "Studio details"
+  ],
+  "shop": [
+    "拼豆小店",
+    "Little shop"
+  ],
+  "journal": [
+    "小狗日记",
+    "Journal"
+  ],
+  "receipt": [
+    "预约回执",
+    "Reservation receipt"
+  ],
+  "navigation": [
+    "导航与页脚",
+    "Navigation and footer"
+  ],
+  "media": [
+    "图片与品牌",
+    "Images and branding"
+  ],
+  "shared": [
+    "其他界面与提示",
+    "Other screens and messages"
+  ],
+  "hero": [
+    "首页插画",
+    "Home illustration"
+  ],
+  "collage": [
+    "首页小店预告",
+    "Home shop preview"
+  ],
+  "brandZh": [
+    "中文品牌标识",
+    "Chinese brand mark"
+  ],
+  "brandEn": [
+    "英文品牌标识",
+    "English brand mark"
+  ],
+  "puppy": [
+    "独立小狗标识",
+    "Puppy symbol"
+  ],
+  "space": [
+    "空间轮播图",
+    "Studio carousel photo"
+  ],
+  "photo": [
+    "页面图片",
+    "Page image"
+  ],
+  "previewHelp": [
+    "预览中的链接和表单不执行操作。",
+    "Links and forms are inactive in this preview."
+  ],
+  "restoreHelp": [
+    "载入后可继续编辑，保存并发布才会更新网站。",
+    "Keep editing after loading. Save and publish to update the website."
+  ],
+  "conflict": [
+    "内容已在另一个窗口更新。你的修改仍在，请先保存副本，再重新读取服务器版本。",
+    "Another window updated this content. Your edits are still here. Copy them before reloading the server version."
+  ],
+  "placeholders": [
+    "请保留文字中的 {v0} 等动态占位符。",
+    "Keep dynamic placeholders such as {v0} in the text."
+  ],
+  "uploading": [
+    "正在上传图片…",
+    "Uploading image…"
+  ],
+  "contacts": [
+    "联系信息",
+    "Contact details"
+  ],
+  "rates": [
+    "体验价格说明",
+    "Experience price display"
+  ],
+  "hourly": [
+    "每小时／人（加元）",
+    "Per hour / person (CAD)"
+  ],
+  "day_one": [
+    "单人全天（加元）",
+    "One person, day (CAD)"
+  ],
+  "day_two": [
+    "双人全天（加元）",
+    "Two people, day (CAD)"
+  ],
+  "day_three": [
+    "三人全天（加元）",
+    "Three people, day (CAD)"
+  ],
+  "school_two_four_hours": [
+    "开学优惠 · 双人四小时（加元）",
+    "School offer · two people, four hours (CAD)"
+  ],
+  "school_card_holder": [
+    "卡套套餐／个（加元）",
+    "Card holder package / each (CAD)"
+  ]
+}

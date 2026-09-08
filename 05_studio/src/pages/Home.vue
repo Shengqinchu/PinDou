@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import copyText from "../content/pages-Home.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("pages-Home", copyTextDefault);
+
+import copyTextDefault from "../content/pages-Home.json";
 import { say } from "../state";
 
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { PhArrowUpRight, PhArrowRight, PhFlower } from "@phosphor-icons/vue";
 import { gsap } from "gsap";
 import PhotoViewer from "../components/PhotoViewer.vue";
+import StudioImage from "../components/StudioImage.vue";
 import StudioCarousel from "../components/StudioCarousel.vue";
 import BrandMotif from "../components/BrandMotif.vue";
 import { gallery, media, tr } from "../state";
@@ -97,13 +101,7 @@ onBeforeUnmount(() => {
         {{ say(copyText.welcome_to_pindo_puppychoose_an_afternoon_and_247303) }}
       </p>
       <figure class="vision-hero-photo">
-        <img
-          :src="media('studio-02')"
-          :alt="say(copyText.sunlit_worktables_and_a_wall_of_bead_46e326)"
-          width="1080"
-          height="1440"
-          fetchpriority="high"
-        />
+        <StudioImage name="hero-illustration" :alt="say(copyText.sunlit_worktables_and_a_wall_of_bead_46e326)" sizes="(max-width: 760px) 100vw, 1136px" loading="eager" priority="high" />
       </figure>
       <div class="vision-hero-actions">
         <RouterLink class="button button-primary" to="/visit"
@@ -218,13 +216,7 @@ onBeforeUnmount(() => {
       </ul>
     </section>
     <section class="vision-shop-teaser container">
-      <img
-        :src="media('studio-11')"
-        :alt="say(copyText.charms_and_craft_fittings_in_the_studio_183b2f)"
-        width="1080"
-        height="1440"
-        loading="lazy"
-      />
+      <StudioImage name="shop-collage" :alt="say(copyText.charms_and_craft_fittings_in_the_studio_183b2f)" />
       <div>
         <h2>
           {{ say(copyText.or_take_a_little_38633e) }}<br /><em>{{

@@ -1,0 +1,51 @@
+/* VISION3: owner's handwriting, supplied illustration, white + pale blue. */
+:root { --chinese-display: "Outfit Variable", "PinDou Hand SC", "PinDou Sans SC", "Microsoft YaHei", sans-serif; }
+:lang(zh-CN) :is(h1,h2,h3,h4,h5,h6),
+:lang(zh-CN) :is(.vision-title,.vision-detail-heading h1,.reservation-intro h1),
+:lang(zh-CN) .studio-desk :is(h1,h2,h3),
+:lang(zh-CN) .host-login h1 {
+  font-family: var(--chinese-display);
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: .015em;
+  line-height: 1.42;
+  text-wrap: balance;
+}
+:lang(zh-CN) :is(h1,h2,h3) em { font: inherit; }
+.vision-brand .puppy-brandmark.compact { width: 184px; }
+.vision-header { min-height: 100px; }
+.vision-hero { padding-top: clamp(44px,5vw,78px); }
+.vision-hero-lettering { padding-top: 65px; }
+.vision-hero-lettering .hero-puppy { width: 78px; top: -8px; }
+.vision-title, :lang(zh-CN) .vision-title { font-size: clamp(36px,4.6vw,66px); }
+.vision-hero-photo { aspect-ratio: 1269/952; border-radius: 16px; background: #fbfaf7; }
+.vision-hero-photo img { display:block; width:100%; height:auto; aspect-ratio:1269/952; object-fit:contain; }
+.vision-hero-actions .button { background: #fff; border-color: var(--line); }
+@media (hover:hover) and (pointer:fine) { .vision-hero-actions .button:hover { background:#f7fbfe; } }
+.vision-announcement { background: #f0f7fc; }
+.vision-carousel-window { background: #f8fafb; }
+.vision-carousel-window > figure { aspect-ratio:3/4; display:grid; place-items:center; }
+.vision-carousel-window img { display:block; width:100%; height:100%; object-fit:contain; }
+.vision-shop-teaser > img { height:auto; width:100%; object-fit:contain; }
+.vision-shop-teaser > div { background:#f0f7fc; }
+.vision-coming-copy > .puppy-motif { width:70px; margin-bottom:20px; }
+.journal-story-cover { aspect-ratio:auto; background:transparent; }
+.journal-story-cover img { display:block; width:100%; height:auto; object-fit:contain; }
+.journal-story.featured .journal-story-cover { aspect-ratio:auto; }
+.journal-story.featured .journal-story-cover img { height:auto; max-height:680px; object-fit:contain; }
+.journal-story-source { font-variant-numeric:tabular-nums; }
+.journal-entry-text { max-width:65ch; }
+.reservation-grid .chosen { background:#dcecf8; }
+@media(max-width:760px) {
+  .vision-header { min-height:88px; }
+  .vision-brand .puppy-brandmark.compact { width:150px; }
+  .vision-hero-lettering { padding-top:50px; }
+  .vision-hero-lettering .hero-puppy { width:64px; }
+  .vision-title, :lang(zh-CN) .vision-title { font-size:clamp(28px,7.5vw,46px); }
+  .vision-carousel-window img { height:100%; }
+  .vision-hero-photo img { height:auto; }
+}
+
+.journal-story-cover img, .journal-story.featured .journal-story-cover img { aspect-ratio:auto; }
+
+.journal-story:hover .journal-story-cover img { transform:none; }

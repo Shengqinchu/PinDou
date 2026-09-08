@@ -1,7 +1,11 @@
-import profile from "./content/studio-profile.json";
+import contactDefaults from "./content/contact-fields.json";
+import { contentModule } from "./content-store";
+const copyText = contentModule("state", copyTextDefault);
+import { contentPhotos, asset } from "./content-store";
+import profileDefault from "./content/studio-profile.json";
 import contentGallery from "./content/data-state-gallery.json";
 import contentProducts from "./content/data-state-products.json";
-import copyText from "./content/state.json";
+import copyTextDefault from "./content/state.json";
 import { computed, ref, watch } from "vue";
 
 export type Locale = "zh" | "en";
@@ -20,7 +24,7 @@ function write(key: string, value: string) {
   }
 }
 export const locale = ref<Locale>(
-  read("puppy-studio-locale") === "en" ? "en" : "zh",
+  (new URLSearchParams(location.search).get("preview-locale") || read("puppy-studio-locale")) === "en" ? "en" : "zh",
 );
 export const tr = (zh: string, en: string) => (locale.value === "zh" ? zh : en);
 export function say(pair: readonly string[]) {
@@ -35,7 +39,7 @@ export function formatCopy(
 watch(
   locale,
   (value) => {
-    write("puppy-studio-locale", value);
+    if (!new URLSearchParams(location.search).has("content-preview")) write("puppy-studio-locale", value);
     document.documentElement.lang = value === "zh" ? "zh-CN" : "en-CA";
     document.title = say(
       copyText.pindo_puppy_a_little_creative_studio_in_d8b24c,
@@ -45,14 +49,14 @@ watch(
 );
 
 export const media = (name: string) =>
-  `${import.meta.env.BASE_URL}studio-media/${name}.jpg`;
-export const socialUrl = profile.social_url;
-export const noteUrl = profile.original_post;
-export const mapsUrl =
-  "https://www.google.com/maps/search/?api=1&query=8+Hughson+St+N+Hamilton+ON";
-export const wechat = profile.wechat;
-export const phone = profile.phone;
-export const phoneHref = profile.phone_href;
+  asset(name).src;
+export const contacts = contentModule("contact-fields",contactDefaults);
+export const socialUrl = computed(() => say(contacts.social_url));
+export const noteUrl = computed(() => say(contacts.original_post));
+export const mapsUrl = computed(() => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(say(contacts.address)));
+export const wechat = computed(() => say(contacts.wechat));
+export const phone = computed(() => say(contacts.phone));
+export const phoneHref = computed(() => say(contacts.phone_href));
 
 export const products = contentProducts;
 
@@ -138,4 +142,4 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   return data as T;
 }
 
-export const gallery = contentGallery;
+export const gallery = contentPhotos("gallery-labels", contentGallery);

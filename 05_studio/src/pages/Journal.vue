@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import copyText from "../content/pages-Journal.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("pages-Journal", copyTextDefault);
+
+import copyTextDefault from "../content/pages-Journal.json";
 import { say } from "../state";
 
 import { PhArrowUpRight, PhArrowRight } from "@phosphor-icons/vue";
 import { socialUrl, tr } from "../state";
-import journal from "../content/journal-posts.json";
+import { onMounted, onBeforeUnmount } from "vue";
+import { journalPosts, refreshJournal, journalSource } from "../journal";
+import journalMeta from "../journal-meta.json";
 import BrandMotif from "../components/BrandMotif.vue";
 import FlagText from "../components/FlagText.vue";
 const base = import.meta.env.BASE_URL;
+let refresh: ReturnType<typeof setInterval>;
+onMounted(() => { void refreshJournal(); refresh=setInterval(() => { if(document.visibilityState==='visible') void refreshJournal(); },60000); });
+onBeforeUnmount(() => clearInterval(refresh));
 </script>
 <template>
   <section class="container page-intro journal-intro">
@@ -28,7 +36,7 @@ const base = import.meta.env.BASE_URL;
     :aria-label="say(copyText.beadmaking_stories_by_xiaogou_shuangji_efb72f)"
   >
     <article
-      v-for="(post, i) in journal.posts"
+      v-for="(post, i) in journalPosts"
       :key="post.id"
       class="journal-story"
       :class="{ featured: i === 0 }"
@@ -36,29 +44,24 @@ const base = import.meta.env.BASE_URL;
       <RouterLink :to="'/journal/' + post.id" class="journal-story-link">
         <div class="journal-story-cover">
           <img
-            :src="base + post.images[0].src"
-            :alt="post.title"
+            :src="journalSource(post.images[0].src)"
+            :alt="tr(post.title, post.title_en)"
             :width="post.images[0].width"
             :height="post.images[0].height"
             :loading="i < 2 ? 'eager' : 'lazy'"
           />
         </div>
         <div class="journal-story-copy">
-          <span class="journal-story-source"
-            >{{ say(copyText.xiaogou_shuangji_xiaohongshu_380bde)
-            }}<span v-if="post.kind === 'excerpt'">{{
-              say(copyText.excerpt_040d41)
-            }}</span></span
-          >
-          <h2><FlagText :text="post.title" /></h2>
+          <time class="journal-story-source" :datetime="post.date">{{ post.date.slice(5) }}</time>
+          <h2><FlagText :text="tr(post.title, post.title_en)" /></h2>
           <p>
             <FlagText
               :text="
-                post.body
+                tr(post.body,post.body_en)
                   .replace(/\[.*?R\]/g, '')
-                  .slice(0, post.kind === 'full' ? 90 : 60)
+                  .slice(0, 100)
               "
-            />{{ post.kind === "full" ? "…" : "" }}
+            />…
           </p>
           <span class="journal-read"
             >{{ say(copyText.open_this_story_b4bd90) }}<PhArrowRight
@@ -68,10 +71,10 @@ const base = import.meta.env.BASE_URL;
     </article>
     <a
       class="journal-collection"
-      :href="journal.collection_url"
+      :href="journalMeta.collection_url"
       target="_blank"
       rel="noreferrer"
-      ><BrandMotif kind="heart" /><span>{{ journal.collection_title }}</span
+      ><BrandMotif kind="heart" /><span>{{ tr(journalMeta.collection_title, journalMeta.collection_title_en) }}</span
       ><span class="text-link"
         >{{ say(copyText.browse_the_full_collection_on_xiaohongshu_f762be)
         }}<PhArrowUpRight /></span

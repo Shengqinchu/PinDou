@@ -400,7 +400,7 @@
   width: 58px;
 }
 .reservation-grid thead th {
-  background: #f2f0f7;
+  background: #f0f6fa;
   position: sticky;
   top: 0;
   z-index: 3;
@@ -635,7 +635,7 @@
   gap: 25px;
   padding: 22px;
   border: 1px solid var(--line);
-  background: #f2f0f7;
+  background: #f0f6fa;
   border-radius: 13px;
   margin-bottom: 25px;
 }

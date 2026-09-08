@@ -36,7 +36,7 @@ def switch_link(link, target):
 
 def main():
     archive, version, expected_hash = sys.argv[1:4]
-    if not re.fullmatch(r"[0-9]{14}-studio-v[12]", version):
+    if not re.fullmatch(r"[0-9]{14}-studio-v[123]", version):
         raise RuntimeError("Invalid release name")
     package = Path(archive)
     if hashlib.sha256(package.read_bytes()).hexdigest() != expected_hash:
@@ -87,34 +87,79 @@ def main():
                 source_db.backup(target_db)
         (backup / "studio.sqlite3").chmod(0o600)
     snippet = '''    # PinDou Studio preview (managed by studio_deploy.py)
-    location = /studio { return 302 /studio/; }
+    # VISION3: the public studio owns the homepage; generator paths remain below.
+    location = / {
+        if ($host = www.pindoupuppy.com) { return 308 https://pindoupuppy.com$request_uri; }
+        rewrite ^ /studio-api/site break;
+        proxy_pass http://127.0.0.1:8011;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header Cache-Control "no-store" always;
+    }
+    # Keep existing www visit drafts and reservation cookies on their origin.
+    location = /visit {
+        rewrite ^ /studio-api/site break;
+        proxy_pass http://127.0.0.1:8011;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header Cache-Control "no-store" always;
+    }
+    location ~ ^/(visit|details|shop|cart|journal)(/.*)?$ {
+        if ($host = www.pindoupuppy.com) { return 308 https://pindoupuppy.com$request_uri; }
+        rewrite ^ /studio-api/site break;
+        proxy_pass http://127.0.0.1:8011;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header Cache-Control "no-store" always;
+    }
+    location ~ ^/(manage|reservation|order)(/.*)?$ {
+        rewrite ^ /studio-api/site break;
+        proxy_pass http://127.0.0.1:8011;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header Cache-Control "no-store" always;
+        add_header X-Robots-Tag "noindex, nofollow" always;
+    }
+    location = /version.json {
+        root /opt/pindou/studio/current/site/studio;
+        try_files $uri =404;
+        add_header Cache-Control "no-store" always;
+    }
     location = /studio/version.json {
         root /opt/pindou/studio/current/site;
         try_files $uri =404;
         add_header Cache-Control "no-store" always;
-        add_header X-Content-Type-Options nosniff;
     }
-    location ^~ /studio/studio-assets/ {
-        root /opt/pindou/studio/current/site;
+    location ~ ^/(studio-assets|studio-fonts)/ {
+        root /opt/pindou/studio/current/site/studio;
         try_files $uri =404;
-        expires 1y;
-        add_header Cache-Control "public, immutable";
+        add_header Cache-Control "public, max-age=31536000, immutable";
         add_header X-Content-Type-Options nosniff;
     }
-    location ^~ /studio/studio-media/ {
+    location ~ ^/(studio-media|studio-brand|studio-journal)/ {
+        root /opt/pindou/studio/current/site/studio;
+        try_files $uri =404;
+        add_header Cache-Control "no-cache";
+        add_header X-Content-Type-Options nosniff;
+    }
+    location ~ ^/studio/(studio-assets|studio-fonts|studio-media|studio-brand|studio-journal)/ {
         root /opt/pindou/studio/current/site;
         try_files $uri =404;
         add_header Cache-Control "no-cache";
         add_header X-Content-Type-Options nosniff;
     }
-    location /studio/ {
-        root /opt/pindou/studio/current/site;
-        try_files $uri $uri/ /studio/index.html;
-        add_header Cache-Control "no-store";
-        add_header X-Robots-Tag "noindex, nofollow" always;
+    location = /studio { return 308 /$is_args$args; }
+    location ~ ^/studio/(.*)$ { return 308 /$1$is_args$args; }
+    location = /robots.txt {
+        root /opt/pindou/studio/current/site/studio;
+        try_files $uri =404;
+    }
+    location = /sitemap.xml {
+        root /opt/pindou/studio/current/site/studio;
+        try_files $uri =404;
     }
     location /studio-api/ {
-        client_max_body_size 16k;
+        client_max_body_size 13m;
         proxy_pass http://127.0.0.1:8011;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

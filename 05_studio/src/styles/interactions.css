@@ -48,7 +48,7 @@
 
 .button-primary {
   color: var(--ink);
-  background: #e7e4f4;
+  background: #e7f1f9;
   border-color: transparent;
   font-weight: 550;
   box-shadow:
@@ -177,7 +177,7 @@
     box-shadow: var(--control-shadow-hover);
   }
   .button-primary:not(:disabled):hover {
-    background: #ded9ef;
+    background: #dcebf6;
     box-shadow:
       inset 0 1px 0 #ffffff45,
       0 14px 26px -10px #2949564d,

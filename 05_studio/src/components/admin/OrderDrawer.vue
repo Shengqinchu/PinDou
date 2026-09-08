@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../../content/components-admin-OrderDrawer.json";
+import { contentModule } from "../../content-store";
+const copyText = contentModule("components-admin-OrderDrawer", copyTextDefault);
+
+import copyTextDefault from "../../content/components-admin-OrderDrawer.json";
 import { say } from "../../state";
 
 import {

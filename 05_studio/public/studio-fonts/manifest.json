@@ -1,0 +1,348 @@
+{
+  "source": "https://github.com/lxgw/kose-font/releases/tag/v3.126",
+  "sha256": "e2f68daf0e72777a8cf58bc83de1b98634b251e537ddbfca24b0ae50d1802da2",
+  "parts": [
+    {
+      "file": "xiaolai-00-ffa9c8da77.woff2",
+      "bytes": 69556,
+      "glyphs": 414,
+      "core": true
+    },
+    {
+      "file": "xiaolai-01-4c3f501dd8.woff2",
+      "bytes": 62280,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-02-e49246c6e1.woff2",
+      "bytes": 112724,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-03-85b4781b16.woff2",
+      "bytes": 169200,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-04-86c6450591.woff2",
+      "bytes": 182256,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-05-6df0c110a6.woff2",
+      "bytes": 179328,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-06-fee4625a86.woff2",
+      "bytes": 198536,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-07-7f4cf94d57.woff2",
+      "bytes": 197420,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-08-1ded1e4611.woff2",
+      "bytes": 191524,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-09-14dde9c1c6.woff2",
+      "bytes": 187960,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-10-9dddab4cf4.woff2",
+      "bytes": 207272,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-11-e0ef385ed6.woff2",
+      "bytes": 204104,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-12-a49bec9d68.woff2",
+      "bytes": 206956,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-13-3e6f87e4ce.woff2",
+      "bytes": 214940,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-14-c2a73fabb0.woff2",
+      "bytes": 237356,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-15-11abb08de7.woff2",
+      "bytes": 219224,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-16-2389ab375c.woff2",
+      "bytes": 107504,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-17-ab467b98fd.woff2",
+      "bytes": 133912,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-18-5b21e6e9b3.woff2",
+      "bytes": 103944,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-19-f9e4a5896e.woff2",
+      "bytes": 134004,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-20-cfa5a0fb1f.woff2",
+      "bytes": 125740,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-21-ff5b9ce184.woff2",
+      "bytes": 136020,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-22-971ec37b1a.woff2",
+      "bytes": 135148,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-23-165ca0d68b.woff2",
+      "bytes": 132148,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-24-621b4982b8.woff2",
+      "bytes": 123452,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-25-aa676b7935.woff2",
+      "bytes": 139608,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-26-dfa1e8b6f4.woff2",
+      "bytes": 148940,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-27-d38a3de440.woff2",
+      "bytes": 134364,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-28-321c9e7078.woff2",
+      "bytes": 114624,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-29-7f0f5bc467.woff2",
+      "bytes": 159780,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-30-043bf00b80.woff2",
+      "bytes": 122432,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-31-548a5522f2.woff2",
+      "bytes": 133572,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-32-01e0d54e6c.woff2",
+      "bytes": 156640,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-33-74540a4279.woff2",
+      "bytes": 149304,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-34-0e7611ec83.woff2",
+      "bytes": 141100,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-35-c65449b31a.woff2",
+      "bytes": 125656,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-36-f836f5164a.woff2",
+      "bytes": 134480,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-37-0d11ceb5a9.woff2",
+      "bytes": 133236,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-38-69da5acdd9.woff2",
+      "bytes": 150348,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-39-ea48b741a3.woff2",
+      "bytes": 149784,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-40-836ac9ce30.woff2",
+      "bytes": 123460,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-41-0bb4959f83.woff2",
+      "bytes": 128184,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-42-e2a9e678c3.woff2",
+      "bytes": 136664,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-43-1121a9ce56.woff2",
+      "bytes": 158948,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-44-77956a0bf0.woff2",
+      "bytes": 185552,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-45-cef5c94e5e.woff2",
+      "bytes": 183516,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-46-a0997988bc.woff2",
+      "bytes": 153996,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-47-1dc42b7d01.woff2",
+      "bytes": 178556,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-48-af812935c3.woff2",
+      "bytes": 150288,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-49-1f5cba99c5.woff2",
+      "bytes": 190708,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-50-460b62afc5.woff2",
+      "bytes": 182276,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-51-aeeb96dd8d.woff2",
+      "bytes": 165848,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-52-6269715d02.woff2",
+      "bytes": 180320,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-53-97c983a0fe.woff2",
+      "bytes": 206532,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-54-86bac05b82.woff2",
+      "bytes": 204028,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-55-e1c8c6b827.woff2",
+      "bytes": 215368,
+      "glyphs": 512,
+      "core": false
+    },
+    {
+      "file": "xiaolai-56-4ae7395a94.woff2",
+      "bytes": 56468,
+      "glyphs": 324,
+      "core": false
+    }
+  ]
+}

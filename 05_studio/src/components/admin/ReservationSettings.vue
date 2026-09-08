@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../../content/components-admin-ReservationSettings.json";
+import { contentModule } from "../../content-store";
+const copyText = contentModule("components-admin-ReservationSettings", copyTextDefault);
+
+import copyTextDefault from "../../content/components-admin-ReservationSettings.json";
 import { say } from "../../state";
 
 import { computed, ref, watch } from "vue";

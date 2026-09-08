@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { asset } from "../content-store";
 withDefaults(defineProps<{ kind?: "puppy" | "star" | "heart" | "bone" }>(), {
   kind: "puppy",
 });
@@ -7,7 +8,7 @@ const base = import.meta.env.BASE_URL;
 <template>
   <span class="puppy-motif" :class="kind" aria-hidden="true"
     ><img
-      :src="`${base}studio-brand/logo-zh.jpg`"
+      :src="kind === 'puppy' ? asset('brand-puppy').src : `${base}studio-brand/logo-zh.jpg`"
       alt=""
       width="1267"
       height="1267"
@@ -31,6 +32,8 @@ const base = import.meta.env.BASE_URL;
   left: -67%;
   height: auto;
 }
+.puppy { aspect-ratio: 1.62; }
+.puppy img { width: 148%; left: -22%; top: -72%; }
 :where(.star) {
   width: 48px;
   aspect-ratio: 190/190;

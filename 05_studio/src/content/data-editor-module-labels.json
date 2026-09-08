@@ -1,0 +1,186 @@
+{
+  "App": [
+    "导航与页脚",
+    "Navigation and footer"
+  ],
+  "pages-Home": [
+    "首页",
+    "Home"
+  ],
+  "pages-Visit": [
+    "来拼豆吧",
+    "Visit"
+  ],
+  "pages-Details": [
+    "拼豆铺详细信息",
+    "Studio details"
+  ],
+  "pages-Shop": [
+    "拼豆小店",
+    "Little shop"
+  ],
+  "pages-Journal": [
+    "小狗日记",
+    "Journal"
+  ],
+  "pages-JournalEntry": [
+    "日记正文页",
+    "Journal reading page"
+  ],
+  "pages-ReservationReceipt": [
+    "预约回执",
+    "Reservation receipt"
+  ],
+  "pages-Manage": [
+    "管理员登录",
+    "Owner sign-in"
+  ],
+  "pages-Order": [
+    "历史订单详情",
+    "Past order details"
+  ],
+  "pages-Cart": [
+    "历史结账界面",
+    "Past checkout screen"
+  ],
+  "pages-NotFound": [
+    "页面未找到提示",
+    "Page not found"
+  ],
+  "components-BrandMark": [
+    "品牌辅助文字",
+    "Brand accessibility text"
+  ],
+  "components-PhotoViewer": [
+    "图片查看器",
+    "Photo viewer"
+  ],
+  "components-StudioCarousel": [
+    "空间轮播控件",
+    "Studio carousel controls"
+  ],
+  "components-ReservationCalendar": [
+    "预约日历",
+    "Reservation calendar"
+  ],
+  "components-InquiryForm": [
+    "早期询单表单",
+    "Earlier inquiry form"
+  ],
+  "components-SlideOver": [
+    "抽屉与菜单控件",
+    "Drawer and menu controls"
+  ],
+  "components-StudioToast": [
+    "操作通知",
+    "Action notifications"
+  ],
+  "components-ReleaseNotice": [
+    "页面更新提示",
+    "Website update notices"
+  ],
+  "components-CommerceManager": [
+    "工作台导航",
+    "Desk navigation"
+  ],
+  "components-admin-ContentEditor": [
+    "网站编辑界面",
+    "Website editor interface"
+  ],
+  "components-admin-JournalEditor": [
+    "日记编辑界面",
+    "Journal editor interface"
+  ],
+  "components-admin-ReservationAvailability": [
+    "封闭时段与提醒",
+    "Blocked times and alerts"
+  ],
+  "components-admin-ReservationsPanel": [
+    "预约管理",
+    "Reservation management"
+  ],
+  "components-admin-ReservationSettings": [
+    "营业时间与人数设置",
+    "Opening hours and group settings"
+  ],
+  "components-admin-OverviewPanel": [
+    "工作台概览",
+    "Desk overview"
+  ],
+  "components-admin-OrdersPanel": [
+    "历史订单列表",
+    "Past orders"
+  ],
+  "components-admin-OrderDrawer": [
+    "历史订单详情面板",
+    "Past order panel"
+  ],
+  "components-admin-SchedulePanel": [
+    "历史交易排班",
+    "Commerce schedule"
+  ],
+  "components-admin-ProductsPanel": [
+    "商品管理",
+    "Product management"
+  ],
+  "components-admin-CheckoutPanel": [
+    "交易设置",
+    "Commerce settings"
+  ],
+  "components-admin-ActivityPanel": [
+    "操作记录",
+    "Activity log"
+  ],
+  "data-components-admin-SchedulePanel-labels": [
+    "交易时段标签",
+    "Commerce schedule labels"
+  ],
+  "data-commerce-messages": [
+    "错误与恢复提示",
+    "Errors and recovery"
+  ],
+  "data-commerce-labels": [
+    "交易状态名称",
+    "Commerce status labels"
+  ],
+  "data-ui-labels": [
+    "操作记录名称",
+    "Activity names"
+  ],
+  "state": [
+    "网站名称与通用提示",
+    "Website name and shared messages"
+  ],
+  "admin": [
+    "后台操作提示",
+    "Desk messages"
+  ],
+  "commerce": [
+    "交易操作提示",
+    "Commerce messages"
+  ],
+  "contact-fields": [
+    "联系信息",
+    "Contact details"
+  ],
+  "media": [
+    "图片与品牌",
+    "Images and branding"
+  ],
+  "rate-fields": [
+    "体验价格说明",
+    "Experience prices"
+  ],
+  "gallery-labels": [
+    "作品图片说明",
+    "Artwork captions"
+  ],
+  "carousel-labels": [
+    "空间图片说明",
+    "Studio photo captions"
+  ],
+  "data-editor-module-labels": [
+    "编辑目录名称",
+    "Editor section names"
+  ]
+}

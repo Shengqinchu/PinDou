@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import copyText from "./content/App.json";
+import { contentModule } from "./content-store";
+const copyText = contentModule("App", copyTextDefault);
+
+import copyTextDefault from "./content/App.json";
 import { say } from "./state";
 
+import { asset } from "./content-store";
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
@@ -19,8 +23,7 @@ import ReleaseNotice from "./components/ReleaseNotice.vue";
 import BrandMark from "./components/BrandMark.vue";
 import BrandMotif from "./components/BrandMotif.vue";
 import BrandIcon from "./components/BrandIcon.vue";
-const avatar =
-  import.meta.env.BASE_URL + "studio-brand/xiaogou-shuangji-avatar.png";
+const avatar = computed(() => asset("owner-avatar").src);
 const route = useRoute();
 const isDesk = computed(() => route.path.startsWith("/manage"));
 const menu = ref(false);
@@ -59,7 +62,7 @@ watch(
       class="vision-brand"
       :aria-label="say(copyText.pindo_puppy_home_69051e)"
     >
-      <BrandMotif kind="puppy" /><BrandMark compact />
+      <BrandMark compact />
     </RouterLink>
     <nav
       class="vision-navigation"

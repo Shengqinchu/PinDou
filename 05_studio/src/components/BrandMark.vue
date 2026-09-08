@@ -1,23 +1,27 @@
 <script setup lang="ts">
-import copyText from "../content/components-BrandMark.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("components-BrandMark", copyTextDefault);
+
+import copyTextDefault from "../content/components-BrandMark.json";
 import { say } from "../state";
 
 import { locale, tr } from "../state";
+import { asset, publishedModules } from "../content-store";
 withDefaults(defineProps<{ compact?: boolean }>(), { compact: false });
 const base = import.meta.env.BASE_URL;
 </script>
 <template>
   <span
     class="puppy-brandmark"
-    :class="{ compact }"
+    :class="{ compact, 'custom-brand': asset(`brand-${locale}`).src.startsWith('/studio-api/media/') }"
     role="img"
     :aria-label="say(copyText.pindo_puppy_08aa61)"
   >
     <img
-      :src="`${base}studio-brand/logo-${locale}.jpg`"
+      :src="asset(`brand-${locale}`).src"
       alt=""
-      width="1267"
-      height="1267"
+      width="509"
+      height="509"
     />
   </span>
 </template>
@@ -27,7 +31,7 @@ const base = import.meta.env.BASE_URL;
   position: relative;
   display: block;
   width: 290px;
-  aspect-ratio: 1267 / 510;
+  aspect-ratio: 2.65;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -36,16 +40,17 @@ const base = import.meta.env.BASE_URL;
   width: 100%;
   max-width: none;
   height: auto;
-  top: -88%;
+  top: -93%;
   left: 0;
 }
 :where(.compact) {
-  width: 174px;
-  aspect-ratio: 710 / 160;
+  width: 184px;
+  aspect-ratio: 2.65;
 }
 .compact img {
-  width: 178.45%;
-  top: -490%;
-  left: -67.6%;
+  width: 100%;
+  top: -93%;
+  left: 0;
 }
+.custom-brand img { position: static; width: 100%; height: 100%; object-fit: contain; }
 </style>

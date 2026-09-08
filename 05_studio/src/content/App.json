@@ -1,36 +1,102 @@
 {
-  "home_76c92b": ["首页", "Home"],
-  "come_create_2eee81": ["来拼豆吧", "Come create"],
-  "little_shop_c97261": ["拼豆小店", "Little shop"],
-  "studio_journal_7b860e": ["小狗日记", "Studio journal"],
-  "skip_to_content_1760ff": ["跳到主要内容", "Skip to content"],
-  "a_little_creative_space_in_hamilton_book_5cf34e": [
-    "汉密尔顿的小小手作空间，请约好时间，欢迎来玩！",
-    "A little creative space in Hamilton. Book a time and come make something!"
+  "home_76c92b": [
+    "首页",
+    "Home"
   ],
-  "pindo_puppy_home_69051e": ["小狗拼豆铺首页", "Pindo Puppy home"],
-  "main_navigation_b48c67": ["主要导航", "Main navigation"],
-  "switch_to_chinese_6c04c2": ["切换为英文", "Switch to Chinese"],
-  "label_dd0e77": ["英文", "中文"],
-  "site_menu_40ed87": ["网站菜单", "Site menu"],
+  "come_create_2eee81": [
+    "来拼豆吧",
+    "Come create"
+  ],
+  "little_shop_c97261": [
+    "拼豆小店",
+    "Little shop"
+  ],
+  "studio_journal_7b860e": [
+    "小狗日记",
+    "Studio journal"
+  ],
+  "skip_to_content_1760ff": [
+    "跳到主要内容",
+    "Skip to content"
+  ],
+  "a_little_creative_space_in_hamilton_book_5cf34e": [
+    "汉密尔顿的小小手作空间，欢迎来到小狗拼豆铺！",
+    "A little creative space in Hamilton. Welcome to Pindo Puppy!"
+  ],
+  "pindo_puppy_home_69051e": [
+    "小狗拼豆铺首页",
+    "Pindo Puppy home"
+  ],
+  "main_navigation_b48c67": [
+    "主要导航",
+    "Main navigation"
+  ],
+  "switch_to_chinese_6c04c2": [
+    "切换为英文",
+    "Switch to Chinese"
+  ],
+  "label_dd0e77": [
+    "英文",
+    "中文"
+  ],
+  "site_menu_40ed87": [
+    "网站菜单",
+    "Site menu"
+  ],
   "a_little_time_to_explore_7313f5": [
     "慢慢逛，慢慢拼。",
     "A little time to explore."
   ],
-  "close_menu_d36a12": ["关闭菜单", "Close menu"],
-  "site_navigation_d091f4": ["网站导航", "Site navigation"],
-  "studio_details_7c4089": ["拼豆铺详细信息", "Studio details"],
-  "pattern_maker_7db57b": ["拼豆图纸生成器", "Pattern maker"],
-  "studio_desk_4f230e": ["店主管理", "Studio desk"],
+  "close_menu_d36a12": [
+    "关闭菜单",
+    "Close menu"
+  ],
+  "site_navigation_d091f4": [
+    "网站导航",
+    "Site navigation"
+  ],
+  "studio_details_7c4089": [
+    "拼豆铺详细信息",
+    "Studio details"
+  ],
+  "pattern_maker_7db57b": [
+    "拼豆图纸生成器",
+    "Pattern maker"
+  ],
+  "studio_desk_4f230e": [
+    "店主管理",
+    "Studio desk"
+  ],
   "a_beadmaking_experience_uniquely_yours_cf90ad": [
     "属于你，独一无二的拼豆体验",
     "A bead-making experience, uniquely yours."
   ],
-  "come_by_6b27fe": ["来这里", "Come by"],
-  "book_a_visit_8c72a6": ["预约到店", "Book a visit"],
-  "say_hello_bdf90f": ["保持联系", "Say hello"],
-  "xiaohongshu_e1e6c0": ["小红书 · 小狗双吉", "Xiaohongshu"],
-  "wechat_b2cc69": ["微信号：", "WeChat: "],
-  "the_toolbox_df33f0": ["小小工具箱", "The toolbox"],
-  "pattern_maker_guide_c1f795": ["图纸工具教程", "Pattern maker guide"]
+  "come_by_6b27fe": [
+    "来这里",
+    "Come by"
+  ],
+  "book_a_visit_8c72a6": [
+    "预约到店",
+    "Book a visit"
+  ],
+  "say_hello_bdf90f": [
+    "保持联系",
+    "Say hello"
+  ],
+  "xiaohongshu_e1e6c0": [
+    "小红书 · 小狗双吉",
+    "Xiaohongshu"
+  ],
+  "wechat_b2cc69": [
+    "微信号：",
+    "WeChat: "
+  ],
+  "the_toolbox_df33f0": [
+    "小小工具箱",
+    "The toolbox"
+  ],
+  "pattern_maker_guide_c1f795": [
+    "图纸工具教程",
+    "Pattern maker guide"
+  ]
 }

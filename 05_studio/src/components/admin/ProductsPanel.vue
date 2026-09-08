@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { contentModule } from "../../content-store";
+const copyText = contentModule("components-admin-ProductsPanel", copyTextDefault);
+
 import { formatCopy } from "../../state";
 
-import copyText from "../../content/components-admin-ProductsPanel.json";
+import copyTextDefault from "../../content/components-admin-ProductsPanel.json";
 import { say } from "../../state";
 
 import { computed, ref } from "vue";

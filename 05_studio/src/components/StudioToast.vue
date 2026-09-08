@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../content/components-StudioToast.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("components-StudioToast", copyTextDefault);
+
+import copyTextDefault from "../content/components-StudioToast.json";
 import { say } from "../state";
 
 import {

@@ -3,7 +3,7 @@ import vue from "@vitejs/plugin-vue";
 const build = new Date().toISOString();
 
 export default defineConfig({
-  base: "/studio/",
+  base: "/",
   define: { __STUDIO_BUILD__: JSON.stringify(build) },
   plugins: [
     vue(),
@@ -34,6 +34,6 @@ export default defineConfig({
       "/studio-api": { target: "http://127.0.0.1:8011", changeOrigin: false },
     },
   },
-  preview: { port: 4184, strictPort: true },
+  preview: { port: 4184, strictPort: true, proxy: {"/studio-api": {target:"http://127.0.0.1:8011",changeOrigin:false}} },
   build: { assetsDir: "studio-assets" },
 });

@@ -1,4 +1,6 @@
-import contentLabels from "./content/data-ui-labels.json";
+import { contentModule } from "./content-store";
+const contentLabels = contentModule("data-ui-labels", contentLabelsDefault);
+import contentLabelsDefault from "./content/data-ui-labels.json";
 import { ref } from "vue";
 
 export const notice = ref<{

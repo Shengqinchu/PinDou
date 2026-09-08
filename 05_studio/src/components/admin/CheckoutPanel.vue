@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../../content/components-admin-CheckoutPanel.json";
+import { contentModule } from "../../content-store";
+const copyText = contentModule("components-admin-CheckoutPanel", copyTextDefault);
+
+import copyTextDefault from "../../content/components-admin-CheckoutPanel.json";
 import { say } from "../../state";
 
 import { computed } from "vue";

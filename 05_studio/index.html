@@ -1,13 +1,28 @@
 <!doctype html>
 <html lang="zh-CN">
   <head>
+    <link rel="canonical" href="https://pindoupuppy.com/" />
     <meta charset="UTF-8" />
+    <script>
+      (() => {
+        const preload = (attrs) => { const link = document.createElement('link'); Object.assign(link, {rel:'preload'}, attrs); document.head.appendChild(link); };
+        let chinese = true;
+        try { chinese = localStorage.getItem('puppy-studio-locale') !== 'en'; } catch {}
+        if (chinese) preload({as:'font',href:'/studio-fonts/xiaolai-00-ffa9c8da77.woff2',type:'font/woff2',crossOrigin:'anonymous'});
+        if (/^\/(?:studio\/?)?$/.test(location.pathname)) {
+          let hero;
+          try { hero=JSON.parse(document.getElementById('studio-published-content')?.textContent || '{}').modules?.media?.['hero-illustration']; } catch {}
+          preload(hero ? {as:'image',href:hero.src,fetchPriority:'high'} : {as:'image',href:'/studio-media/v3/hero-illustration-1269.webp',imageSrcset:'/studio-media/v3/hero-illustration-640.webp 640w, /studio-media/v3/hero-illustration-1269.webp 1269w',imageSizes:'(max-width: 760px) 100vw, 1136px',fetchPriority:'high'});
+        }
+      })();
+    </script>
+    <link rel="icon" href="/studio-brand/puppy-v3.jpg" type="image/jpeg" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
     />
     <meta name="theme-color" content="#ffffff" />
-    <meta name="robots" content="noindex, nofollow" />
+    
     <meta
       name="description"
       content="汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"

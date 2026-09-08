@@ -1,47 +1,98 @@
 {
-  "your_request_is_in_4ebd77": ["已提交预约，", "Your request is in."],
+  "your_request_is_in_4ebd77": [
+    "已提交预约，",
+    "Your request is in."
+  ],
   "the_host_will_confirm_it_ae62ce": [
     "等待店主确认",
     "The host will confirm it."
   ],
-  "your_visit_is_confirmed_94453d": ["预约成功，", "Your visit is confirmed."],
-  "see_you_at_the_studio_add3a5": ["等你来玩！", "See you at the studio!"],
-  "thank_you_for_coming_285672": ["谢谢你来，", "Thank you for coming."],
-  "lets_make_again_soon_12f0b9": ["下次再一起拼。", "Let's make again soon."],
+  "your_visit_is_confirmed_94453d": [
+    "预约成功，",
+    "Your visit is confirmed."
+  ],
+  "see_you_at_the_studio_add3a5": [
+    "等你来玩！",
+    "See you at the studio!"
+  ],
+  "thank_you_for_coming_285672": [
+    "谢谢你来，",
+    "Thank you for coming."
+  ],
+  "lets_make_again_soon_12f0b9": [
+    "下次再一起拼。",
+    "Let's make again soon."
+  ],
   "this_reservation_was_cancelled_54b1d2": [
     "这次预约已取消",
     "This reservation was cancelled"
   ],
   "the_host_will_review_your_plans_as_fec716": [
-    "店主会尽快查看安排，确认后将主动联系你，即预约成功。",
-    "The host will review your plans as soon as possible and contact you to confirm your reservation."
+    "店主正在赶来查看，确认后将主动联系你，收到消息即表示预约成功。",
+    "The host is coming to review your request and will contact you once it is confirmed. Your reservation is confirmed when you receive that message."
   ],
   "if_your_visit_starts_in_less_than_4b8a93": [
     "如果距离预约玩耍时间小于 2h，请主动联系店主，谢谢合作！",
     "If your visit starts in less than 2 hours, please contact the host directly. Thank you!"
   ],
-  "guest_9302c0": ["客人", "Guest"],
-  "visit_time_9fc550": ["到店时间", "Visit time"],
-  "hamilton_local_time_496f95": ["汉密尔顿当地时间", "Hamilton local time"],
-  "guests_c77186": ["同行人数", "Guests"],
-  "guests_24bfb5": ["人", "guests"],
-  "experience_cc25a0": ["体验", "Experience"],
-  "day_visit_aad886": ["全天体验", "Day visit"],
-  "hourly_visit_681491": ["按时体验", "Hourly visit"],
+  "guest_9302c0": [
+    "客人",
+    "Guest"
+  ],
+  "visit_time_9fc550": [
+    "到店时间",
+    "Visit time"
+  ],
+  "hamilton_local_time_496f95": [
+    "汉密尔顿当地时间",
+    "Hamilton local time"
+  ],
+  "guests_c77186": [
+    "同行人数",
+    "Guests"
+  ],
+  "guests_24bfb5": [
+    "人",
+    "guests"
+  ],
+  "experience_cc25a0": [
+    "体验",
+    "Experience"
+  ],
+  "day_visit_aad886": [
+    "全天体验",
+    "Day visit"
+  ],
+  "hourly_visit_681491": [
+    "按时体验",
+    "Hourly visit"
+  ],
   "come_along_and_read_our_ad449d": [
     "欢迎来玩，先看看",
     "Come along, and read our "
   ],
-  "studio_details_fbed84": ["拼豆铺详细信息", "studio details"],
-  "before_your_visit_1e5e77": ["吧！", " before your visit!"],
+  "studio_details_fbed84": [
+    "拼豆铺详细信息",
+    "studio details"
+  ],
+  "before_your_visit_1e5e77": [
+    "吧！",
+    " before your visit!"
+  ],
   "loading_your_reservation_9f91f7": [
     "正在查看预约……",
     "Loading your reservation…"
   ],
-  "refresh_reservation_30af18": ["刷新预约状态", "Refresh reservation"],
+  "refresh_reservation_30af18": [
+    "刷新预约状态",
+    "Refresh reservation"
+  ],
   "for_changes_contact_the_host_on_wechat_2921d8": [
     "如需调整安排，请联系店主。微信号：",
     "For changes, contact the host on WeChat: "
   ],
-  "phone_0614da": ["手机号：", "Phone: "]
+  "phone_0614da": [
+    "手机号：",
+    "Phone: "
+  ]
 }

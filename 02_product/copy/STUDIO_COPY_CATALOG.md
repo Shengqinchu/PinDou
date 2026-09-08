@@ -23,7 +23,7 @@
 | little_shop_c97261 | 拼豆小店 | Little shop |
 | studio_journal_7b860e | 小狗日记 | Studio journal |
 | skip_to_content_1760ff | 跳到主要内容 | Skip to content |
-| a_little_creative_space_in_hamilton_book_5cf34e | 汉密尔顿的小小手作空间，请约好时间，欢迎来玩！ | A little creative space in Hamilton. Book a time and come make something! |
+| a_little_creative_space_in_hamilton_book_5cf34e | 汉密尔顿的小小手作空间，欢迎来到小狗拼豆铺！ | A little creative space in Hamilton. Welcome to Pindo Puppy! |
 | pindo_puppy_home_69051e | 小狗拼豆铺首页 | Pindo Puppy home |
 | main_navigation_b48c67 | 主要导航 | Main navigation |
 | switch_to_chinese_6c04c2 | 切换为英文 | Switch to Chinese |
@@ -43,6 +43,23 @@
 | wechat_b2cc69 | 微信号： | WeChat:  |
 | the_toolbox_df33f0 | 小小工具箱 | The toolbox |
 | pattern_maker_guide_c1f795 | 图纸工具教程 | Pattern maker guide |
+
+## carousel-labels.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| space-01 | 走进拼豆小屋 | Step into the studio |
+| space-02 | 小狗作品墙 | The puppy art wall |
+| space-03 | 拼豆作品展示 | Beadwork on display |
+| space-04 | 靠墙的工作桌 | A worktable by the wall |
+| space-05 | 阳光下的拼豆座位 | Sunlit beadwork seats |
+| space-06 | 甜点与小狗作品 | Treats and puppies in beads |
+| space-07 | 颜色与工具 | Colours and tools |
+| space-08 | 准备好开始拼豆 | Ready to start creating |
+| space-09 | 窗边的作品展示 | The display by the window |
+| space-10 | 收纳角落 | The storage corner |
+| space-11 | 配件与装饰 | Findings and decorations |
+| space-12 | 客人的拼豆作品 | Our guests’ beadwork |
 
 ## commerce.json
 
@@ -102,6 +119,103 @@
 | all_changes_saved_05df19 | 所有修改已保存 | All changes saved |
 | saving_1bd9fd | 保存中… | Saving… |
 | save_settings_3a2a2e | 保存设置 | Save settings |
+
+## components-admin-ContentEditor.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| title | 网站编辑 | Website editor |
+| intro | 选择页面，修改文字或图片。先预览，发布后客人才会看到。 | Choose a page, edit its text or images, then preview. Visitors see changes only after you publish. |
+| choose | 选择内容 | Choose content |
+| search | 查找文字 | Find text |
+| zh | 中文 | Chinese |
+| en | 英文 | English |
+| draft | 保存草稿 | Save draft |
+| publish | 发布此页 | Publish this page |
+| saved | 草稿已保存 | Draft saved |
+| published | 已发布，页面已更新 | Published. The page is updated. |
+| preview | 页面预览 | Page preview |
+| edit | 编辑 | Edit |
+| mobile | 手机 | Phone |
+| desktop | 电脑 | Desktop |
+| history | 历史版本 | Version history |
+| restore | 载入为草稿 | Load as draft |
+| reload | 重新读取服务器版本 | Reload server version |
+| replace | 替换图片 | Replace image |
+| imageHelp | 上传 JPG、PNG 或 WebP，最大 12 MB；按原比例显示。 | Upload JPG, PNG or WebP up to 12 MB. Images keep their proportions. |
+| loading | 正在读取内容… | Loading content… |
+| unsaved | 有未保存的修改 | Unsaved changes |
+| empty | 没有找到对应文字 | No matching text |
+| home | 首页 | Home |
+| visit | 来拼豆吧 | Visit |
+| details | 拼豆铺详细信息 | Studio details |
+| shop | 拼豆小店 | Little shop |
+| journal | 小狗日记 | Journal |
+| receipt | 预约回执 | Reservation receipt |
+| navigation | 导航与页脚 | Navigation and footer |
+| media | 图片与品牌 | Images and branding |
+| shared | 其他界面与提示 | Other screens and messages |
+| hero | 首页插画 | Home illustration |
+| collage | 首页小店预告 | Home shop preview |
+| brandZh | 中文品牌标识 | Chinese brand mark |
+| brandEn | 英文品牌标识 | English brand mark |
+| puppy | 独立小狗标识 | Puppy symbol |
+| space | 空间轮播图 | Studio carousel photo |
+| photo | 页面图片 | Page image |
+| previewHelp | 预览中的链接和表单不执行操作。 | Links and forms are inactive in this preview. |
+| restoreHelp | 载入后可继续编辑，保存并发布才会更新网站。 | Keep editing after loading. Save and publish to update the website. |
+| conflict | 内容已在另一个窗口更新。你的修改仍在，请先保存副本，再重新读取服务器版本。 | Another window updated this content. Your edits are still here. Copy them before reloading the server version. |
+| placeholders | 请保留文字中的 {v0} 等动态占位符。 | Keep dynamic placeholders such as {v0} in the text. |
+| uploading | 正在上传图片… | Uploading image… |
+| contacts | 联系信息 | Contact details |
+| rates | 体验价格说明 | Experience price display |
+| hourly | 每小时／人（加元） | Per hour / person (CAD) |
+| day_one | 单人全天（加元） | One person, day (CAD) |
+| day_two | 双人全天（加元） | Two people, day (CAD) |
+| day_three | 三人全天（加元） | Three people, day (CAD) |
+| school_two_four_hours | 开学优惠 · 双人四小时（加元） | School offer · two people, four hours (CAD) |
+| school_card_holder | 卡套套餐／个（加元） | Card holder package / each (CAD) |
+
+## components-admin-JournalEditor.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| title | 日记编辑 | Journal editor |
+| intro | 粘贴小红书分享链接，导入原文与全部配图。补充英文、预览后发布。 | Paste a Xiaohongshu share link to import the full text and every image. Add English, preview, then publish. |
+| link | 小红书分享内容或链接 | Xiaohongshu share text or link |
+| import | 导入日记 | Import story |
+| importing | 正在读取原帖和图片… | Reading the original post and images… |
+| new | 手动新增 | Create manually |
+| draft | 草稿 | Draft |
+| live | 已发布 | Published |
+| changes | 有待发布修改 | Unpublished changes |
+| date | 原帖日期 | Original post date |
+| titleZh | 中文标题 | Chinese title |
+| titleEn | 英文标题 | English title |
+| bodyZh | 中文正文 | Chinese text |
+| bodyEn | 英文正文 | English text |
+| source | 原帖链接 | Original post link |
+| photos | 全部配图 | All images |
+| photoHelp | 按原顺序保留完整图片及水印。可调整顺序、添加或移除图片。 | Keep complete images and watermarks in their original order. Reorder, add or remove images here. |
+| add | 添加图片 | Add images |
+| previous | 前移图片 | Move image earlier |
+| next | 后移图片 | Move image later |
+| remove | 移除图片 | Remove image |
+| save | 保存草稿 | Save draft |
+| publish | 发布日记 | Publish story |
+| unpublish | 转为草稿 | Unpublish |
+| saved | 日记草稿已保存 | Story draft saved |
+| published | 日记已发布，最新一篇会自动显示在最前面 | Published. The newest story appears first automatically. |
+| preview | 预览 | Preview |
+| edit | 编辑 | Edit |
+| choose | 选择一篇日记，或导入新的小红书帖子。 | Choose a story or import a new Xiaohongshu post. |
+| retry | 重新读取日记列表 | Reload story list |
+| translate | 生成英文 | Generate English |
+| translating | 正在翻译，原文会保留… | Translating while keeping the original… |
+| translationReview | 英文已生成，请检查后发布。 | English is ready. Please review it before publishing. |
+| conflict | 另一处更新了这篇日记。你的编辑保留在这里，请复制后再重新读取。 | This story changed in another window. Your edits remain here; copy them before reloading. |
+| emptyTitle | 新的小狗日记 | A new studio story |
+| loadDraft | 读取未保存草稿 | Restore unsaved draft |
 
 ## components-admin-OrderDrawer.json
 
@@ -268,6 +382,30 @@
 | save_product_4bb744 | 保存商品 | Save product |
 | message_f4149935 | 库存 {v0} | {v0} in stock |
 | message_5872baff | 选择照片 {v0} | Choose photo {v0} |
+
+## components-admin-ReservationAvailability.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| title | 不可预约时段 | Unavailable times |
+| intro | 临时休息或另有安排时，选择日期与时间封闭。已确认的预约会受到保护。 | Block a date and time for a break or other plans. Confirmed reservations are protected. |
+| date | 日期 | Date |
+| start | 开始 | From |
+| end | 结束 | Until |
+| note | 备注（仅店主可见） | Note (only visible to you) |
+| block | 封闭此时段 | Block this time |
+| restore | 恢复可预约 | Reopen this time |
+| empty | 暂无临时封闭时段。每周营业时间仍按营业设置执行。 | No temporary blocks. Weekly opening hours still apply. |
+| notification | 新预约提醒 | New reservation alerts |
+| enable | 开启浏览器提醒 | Enable browser notifications |
+| enabled | 浏览器提醒已开启 | Browser notifications enabled |
+| pending | 待确认 | Pending |
+| new | 有新的到店预约，请到预约列表查看。 | A new studio reservation is waiting. Open your reservation list. |
+| noteNotification | 工作台打开时持续检查；浏览器提醒需你允许通知。 | Checked while the desk is open. Browser alerts require your permission. |
+| unsupported | 此浏览器暂不支持系统通知，工作台内仍会提醒。 | System notifications are unavailable in this browser. In-desk alerts still work. |
+| denied | 浏览器未允许通知；可在网站权限中开启。工作台内提醒仍可用。 | Notifications are not allowed. Enable them in site permissions; in-desk alerts remain available. |
+| refresh | 刷新时段 | Refresh times |
+| saved | 时段已更新 | Availability updated |
 
 ## components-admin-ReservationSettings.json
 
@@ -441,6 +579,8 @@
 | nav_096839b5 | 历史询单 | Earlier requests |
 | literal_348ea84c | 英文 | |
 | literal_72726d88 | 中文 | |
+| editor_content | 网站编辑 | Website editor |
+| editor_journal | 日记编辑 | Journal editor |
 
 ## components-InquiryForm.json
 
@@ -540,6 +680,19 @@
 | view_bag_6caa85 | 去看看 | View bag |
 | dismiss_notification_a43888 | 关闭提示 | Dismiss notification |
 
+## contact-fields.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| address | 8 Hughson St N, Hamilton, ON L8R 0B1 | 8 Hughson St N, Hamilton, ON L8R 0B1 |
+| wechat | xiaogoushuangji | xiaogoushuangji |
+| phone | +1 4373624360 | +1 4373624360 |
+| phone_href | tel:+14373624360 | tel:+14373624360 |
+| social_url | https://www.xiaohongshu.com/user/profile/65f8375c000000000b00c921 | https://www.xiaohongshu.com/user/profile/65f8375c000000000b00c921 |
+| original_post | https://xhslink.cn/o/8HFIo1pstmk | https://xhslink.cn/o/8HFIo1pstmk |
+| parking_1 | 75 John St N, Hamilton, ON L8R 1H7 | 75 John St N, Hamilton, ON L8R 1H7 |
+| parking_2 | 115 King William St, Hamilton, ON L8R 1H8 | 115 King William St, Hamilton, ON L8R 1H8 |
+
 ## data-commerce-labels.json
 
 | 键 | 中文 | English |
@@ -582,6 +735,27 @@
 | request_changed | 这次结账内容已变化，请刷新购物车。 | Checkout details changed. Please refresh your bag. |
 | order_not_paid | 订单尚未完成付款，不能标记为已交付。 | This order has not been paid and cannot be fulfilled. |
 | order_amount_limit | 本单金额超出在线支付范围，请分开购买。 | This order exceeds the online limit. Please split your purchase. |
+| content_placeholders_required | 请保留原文中的动态占位符，例如 {v0}。 | Keep the original dynamic placeholders, such as {v0}. |
+| content_invalid_media | 图片地址或格式不正确，请重新上传。 | This image could not be used. Upload it again. |
+| image_invalid | 请选择有效的 JPG、PNG 或 WebP 图片。 | Choose a valid JPG, PNG or WebP image. |
+| image_too_large | 图片不能超过 12 MB。 | Images must be 12 MB or smaller. |
+| import_url_not_supported | 请粘贴小红书的帖子分享链接。 | Paste a Xiaohongshu post share link. |
+| import_source_unavailable | 小红书暂未提供可读取的完整内容。请从帖子重新复制分享链接后重试，或手动添加图文。 | Xiaohongshu did not provide the complete post. Copy a fresh share link and retry, or add the text and images manually. |
+| import_author_mismatch | 这篇帖子不属于小狗双吉账号，请检查链接。 | This post is not from the Xiaogou Shuangji account. Check the link. |
+| import_incomplete | 原帖信息不完整，未生成日记。请重新分享链接或手动添加。 | The original post was incomplete. No story was created. Share it again or add it manually. |
+| journal_already_exists | 这篇日记已经导入，请在列表中选择它继续编辑。 | This story is already imported. Select it in the list to edit. |
+| journal_before_cutoff | 这里只收录 2026 年 6 月 24 日之后的帖子。 | Only posts after June 24, 2026 are included. |
+| journal_english_required | 发布前请补充英文标题与正文，可以使用“生成英文”。 | Add an English title and body before publishing. You can use Generate English. |
+| journal_invalid_date | 请填写有效的原帖日期。 | Enter a valid original post date. |
+| block_confirmed_conflict | 此时段有已确认预约，不能直接封闭。请先处理对应预约。 | This time contains a confirmed reservation. Resolve that reservation before blocking the time. |
+| block_invalid_date | 请选择今天至未来一年内的日期。 | Choose a date between today and one year from now. |
+| block_not_found | 这个封闭时段已被其他窗口移除，请刷新。 | This block was already removed. Refresh the list. |
+| translation_unavailable | 英文翻译暂不可用，中文和图片已保留，可以手动填写英文。 | English translation is unavailable. Chinese text and images are safe; you can enter English manually. |
+| translation_failed | 本次翻译未完成，原文保持不变。请重试或手动填写英文。 | Translation did not finish. The original is unchanged. Retry or enter English manually. |
+| translation_rate_limit | 本小时的翻译次数已用完，请稍后重试。 | The hourly translation limit was reached. Try again later. |
+| import_rate_limit | 本小时导入次数已用完，请稍后重试。 | The hourly import limit was reached. Try again later. |
+| journal_incomplete | 发布前请补充中文标题、正文和至少一张图片。草稿已经保存。 | Add a Chinese title, body and at least one image before publishing. Your draft is saved. |
+| content_invalid_price | 请输入不超过两位小数的非负价格，中英文价格应一致。 | Enter a non-negative price with up to two decimal places. Both language values must match. |
 
 ## data-components-admin-SchedulePanel-labels.json
 
@@ -599,6 +773,57 @@
 
 | 键 | 中文 | English |
 |---|---|---|
+
+## data-editor-module-labels.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| App | 导航与页脚 | Navigation and footer |
+| pages-Home | 首页 | Home |
+| pages-Visit | 来拼豆吧 | Visit |
+| pages-Details | 拼豆铺详细信息 | Studio details |
+| pages-Shop | 拼豆小店 | Little shop |
+| pages-Journal | 小狗日记 | Journal |
+| pages-JournalEntry | 日记正文页 | Journal reading page |
+| pages-ReservationReceipt | 预约回执 | Reservation receipt |
+| pages-Manage | 管理员登录 | Owner sign-in |
+| pages-Order | 历史订单详情 | Past order details |
+| pages-Cart | 历史结账界面 | Past checkout screen |
+| pages-NotFound | 页面未找到提示 | Page not found |
+| components-BrandMark | 品牌辅助文字 | Brand accessibility text |
+| components-PhotoViewer | 图片查看器 | Photo viewer |
+| components-StudioCarousel | 空间轮播控件 | Studio carousel controls |
+| components-ReservationCalendar | 预约日历 | Reservation calendar |
+| components-InquiryForm | 早期询单表单 | Earlier inquiry form |
+| components-SlideOver | 抽屉与菜单控件 | Drawer and menu controls |
+| components-StudioToast | 操作通知 | Action notifications |
+| components-ReleaseNotice | 页面更新提示 | Website update notices |
+| components-CommerceManager | 工作台导航 | Desk navigation |
+| components-admin-ContentEditor | 网站编辑界面 | Website editor interface |
+| components-admin-JournalEditor | 日记编辑界面 | Journal editor interface |
+| components-admin-ReservationAvailability | 封闭时段与提醒 | Blocked times and alerts |
+| components-admin-ReservationsPanel | 预约管理 | Reservation management |
+| components-admin-ReservationSettings | 营业时间与人数设置 | Opening hours and group settings |
+| components-admin-OverviewPanel | 工作台概览 | Desk overview |
+| components-admin-OrdersPanel | 历史订单列表 | Past orders |
+| components-admin-OrderDrawer | 历史订单详情面板 | Past order panel |
+| components-admin-SchedulePanel | 历史交易排班 | Commerce schedule |
+| components-admin-ProductsPanel | 商品管理 | Product management |
+| components-admin-CheckoutPanel | 交易设置 | Commerce settings |
+| components-admin-ActivityPanel | 操作记录 | Activity log |
+| data-components-admin-SchedulePanel-labels | 交易时段标签 | Commerce schedule labels |
+| data-commerce-messages | 错误与恢复提示 | Errors and recovery |
+| data-commerce-labels | 交易状态名称 | Commerce status labels |
+| data-ui-labels | 操作记录名称 | Activity names |
+| state | 网站名称与通用提示 | Website name and shared messages |
+| admin | 后台操作提示 | Desk messages |
+| commerce | 交易操作提示 | Commerce messages |
+| contact-fields | 联系信息 | Contact details |
+| media | 图片与品牌 | Images and branding |
+| rate-fields | 体验价格说明 | Experience prices |
+| gallery-labels | 作品图片说明 | Artwork captions |
+| carousel-labels | 空间图片说明 | Studio photo captions |
+| data-editor-module-labels | 编辑目录名称 | Editor section names |
 
 ## data-state-gallery.json
 
@@ -639,6 +864,17 @@
 | school_card_holder | 26.6 | |
 | school_offer_until | 2026-10-01 | |
 | purpose | Owner-supplied informational prices; no online charge. VISION2 pp9-10. | |
+
+## gallery-labels.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| studio-02 | 阳光、白桌，和一个属于你的座位 | Daylight, a white desk, a place for you |
+| studio-08 | 让可爱挂在每一个角落 | Little things, everywhere |
+| journal-05 | 一颗一颗，拼出落日的颜色 | A sunset, one bead at a time |
+| studio-04 | 今天也想在这里待久一点 | Stay a little longer |
+| studio-11 | 做冰箱贴，也做小挂件 | Magnets, charms, and possibilities |
+| journal-13 | 用手作装饰日常 | Make yourself at home |
 
 ## journal-posts.json
 
@@ -753,7 +989,7 @@
 | time_for_yourself_9e1db5 | 一人放空 | Time for yourself |
 | friends_together_71ba0c | 朋友一起 | Friends together |
 | made_by_hand_f4654d | 手工制作 | Made by hand |
-| welcome_to_pindo_puppy_2b7fcf | 欢迎来到小狗拼豆铺 | WELCOME TO PINDO PUPPY |
+| welcome_to_pindo_puppy_2b7fcf | 让我们走进拼豆小屋 | LET’S STEP INTO THE STUDIO |
 | a_little_workshop_32499a | 小小工作坊， | A little workshop. |
 | endless_lovely_possibilities_b5a1fa | 创造无限可爱手作。 | Endless lovely possibilities. |
 | we_turned_a_room_in_our_home_3b9cec | 这是一个家庭工作坊，我们把家里的一个房间，慢慢变成了拼豆小屋。 | We turned a room in our home into a little workshop for making things with beads. |
@@ -905,7 +1141,7 @@
 | thank_you_for_coming_285672 | 谢谢你来， | Thank you for coming. |
 | lets_make_again_soon_12f0b9 | 下次再一起拼。 | Let's make again soon. |
 | this_reservation_was_cancelled_54b1d2 | 这次预约已取消 | This reservation was cancelled |
-| the_host_will_review_your_plans_as_fec716 | 店主会尽快查看安排，确认后将主动联系你，即预约成功。 | The host will review your plans as soon as possible and contact you to confirm your reservation. |
+| the_host_will_review_your_plans_as_fec716 | 店主正在赶来查看，确认后将主动联系你，收到消息即表示预约成功。 | The host is coming to review your request and will contact you once it is confirmed. Your reservation is confirmed when you receive that message. |
 | if_your_visit_starts_in_less_than_4b8a93 | 如果距离预约玩耍时间小于 2h，请主动联系店主，谢谢合作！ | If your visit starts in less than 2 hours, please contact the host directly. Thank you! |
 | guest_9302c0 | 客人 | Guest |
 | visit_time_9fc550 | 到店时间 | Visit time |
@@ -986,6 +1222,17 @@
 | request_this_visit_611e11 | 提交预约 | Request this visit |
 | your_request_will_wait_for_the_hosts_cd36bf | 提交后等待店主确认，无需在此付款。 | Your request will wait for the host's confirmation. No payment is needed here. |
 | host_wechat_ac7b7e | 店主微信： | Host WeChat:  |
+
+## rate-fields.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| hourly | 8.88 | 8.88 |
+| day_one | 49.9 | 49.9 |
+| day_two | 88.8 | 88.8 |
+| day_three | 129.9 | 129.9 |
+| school_two_four_hours | 59.9 | 59.9 |
+| school_card_holder | 26.6 | 26.6 |
 
 ## state.json
 

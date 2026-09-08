@@ -5,6 +5,7 @@ import "@fontsource/dm-serif-display/latin-400-italic.css";
 import "@fontsource-variable/outfit";
 import "./style.css";
 import "./styles/typography.css";
+import "./styles/handwriting-fonts.css";
 import "./styles/interactions.css";
 import "./styles/layout.css";
 import "./styles/commerce.css";
@@ -16,7 +17,11 @@ import "./styles/reservations.css";
 import "./styles/journal.css";
 import "./styles/desk.css";
 import "./styles/tactile.css";
+import "./styles/vision3.css";
+import "./styles/editor.css";
 import "./styles/reduced-motion.css";
+import { installContent } from "./content-store";
+import { installRoutePrefetch, routeLoaders } from "./route-loaders";
 import { installMotionPreference } from "./motion-preference";
 import { installMotion } from "./motion";
 import { installViewport } from "./browser";
@@ -25,19 +30,20 @@ import App from "./App.vue";
 import Home from "./pages/Home.vue";
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory("/"),
   routes: [
+    { path: "/studio/:pathMatch(.*)*", redirect: to => ({path: to.path.replace(/^\/studio/, "") || "/", query: to.query, hash: to.hash}) },
     { path: "/", component: Home },
-    { path: "/visit", component: () => import("./pages/Visit.vue") },
+    { path: "/visit", component: routeLoaders.visit },
     {
       path: "/reservation/:id",
       component: () => import("./pages/ReservationReceipt.vue"),
     },
-    { path: "/details", component: () => import("./pages/Details.vue") },
-    { path: "/shop", component: () => import("./pages/Shop.vue") },
+    { path: "/details", component: routeLoaders.details },
+    { path: "/shop", component: routeLoaders.shop },
     { path: "/cart", redirect: "/shop" },
     { path: "/order/:id", component: () => import("./pages/Order.vue") },
-    { path: "/journal", component: () => import("./pages/Journal.vue") },
+    { path: "/journal", component: routeLoaders.journal },
     {
       path: "/journal/:id",
       component: () => import("./pages/JournalEntry.vue"),
@@ -62,12 +68,23 @@ const router = createRouter({
   },
 });
 
+const stopContent = installContent();
+const stopPrefetch = installRoutePrefetch();
+router.afterEach(to => {
+  const canonical=document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if(canonical)canonical.href="https://pindoupuppy.com"+to.path;
+  let robots=document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+  if(!robots){robots=document.createElement("meta");robots.name="robots";document.head.appendChild(robots);}
+  robots.content=/^\/(manage|reservation|order)(\/|$)/.test(to.path)?"noindex, nofollow":"index, follow";
+});
 const stopPreference = installMotionPreference();
 const stopMotion = installMotion();
 const stopViewport = installViewport();
 createApp(App).use(router).mount("#app");
 if (import.meta.hot)
   import.meta.hot.dispose(() => {
+    stopContent();
+    stopPrefetch();
     stopMotion();
     stopPreference();
     stopViewport();

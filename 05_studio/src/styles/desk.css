@@ -37,7 +37,7 @@
   position: sticky;
   top: 0;
   height: 100dvh;
-  background: #f2f0f7;
+  background: #f0f6fa;
   border-right: 1px solid #dee2d5;
   padding: 30px 20px 20px;
   display: flex;
@@ -89,7 +89,7 @@
   left: 0;
   right: 0;
   height: 46px;
-  background: #e9e5f4;
+  background: #e8f2fa;
   border-radius: 10px;
   transform: translateY(calc(var(--nav-index) * 52px));
   transition: transform var(--surface-duration) var(--surface-ease);
@@ -218,7 +218,7 @@
   place-items: center;
   width: 34px;
   height: 34px;
-  background: #e9e5f4;
+  background: #e8f2fa;
   border: 1px solid #d0dcc5;
   border-radius: 50%;
   font-size: 10px;
@@ -669,9 +669,9 @@
     color var(--control-duration) var(--control-ease);
 }
 .desk-button.primary {
-  background: #e7e4f4;
+  background: #e7f1f9;
   color: var(--ink);
-  border-color: #e7e4f4;
+  border-color: #e7f1f9;
   box-shadow:
     inset 0 1px 0 #ffffff29,
     0 4px 10px #273a2014,

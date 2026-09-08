@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { contentModule } from "../content-store";
+const copyText = contentModule("components-CommerceManager", copyTextDefault);
+
 import BrandMotif from "./BrandMotif.vue";
 
-import copyText from "../content/components-CommerceManager.json";
+import copyTextDefault from "../content/components-CommerceManager.json";
 import { say } from "../state";
 
 import {
@@ -42,6 +45,9 @@ import ProductsPanel from "./admin/ProductsPanel.vue";
 import CheckoutPanel from "./admin/CheckoutPanel.vue";
 import ActivityPanel from "./admin/ActivityPanel.vue";
 import OrderDrawer from "./admin/OrderDrawer.vue";
+import ContentEditor from "./admin/ContentEditor.vue";
+import JournalEditor from "./admin/JournalEditor.vue";
+import ReservationNotifications from "./admin/ReservationNotifications.vue";
 import ReservationsPanel from "./admin/ReservationsPanel.vue";
 const props = defineProps<{ token: string }>();
 const emit = defineEmits<{ logout: []; expired: [] }>();
@@ -107,6 +113,8 @@ onBeforeUnmount(() => {
   arrival?.kill();
 });
 const navigation = computed(() => [
+  {id:"content",zh:copyText.editor_content[0],en:copyText.editor_content[1],icon:PhSquaresFour},
+  {id:"journal-editor",zh:copyText.editor_journal[0],en:copyText.editor_journal[1],icon:PhArchive},
   {
     id: "reservations",
     zh: copyText.nav_c557d2fc[0],
@@ -332,9 +340,12 @@ const readableDate = computed(() =>
         </div>
       </header>
       <div ref="content" class="desk-content">
+        <ReservationNotifications />
+        <KeepAlive><ContentEditor v-if="view === 'content'" :active="view === 'content'" /></KeepAlive>
+        <KeepAlive><JournalEditor v-if="view === 'journal-editor'" :active="view === 'journal-editor'" /></KeepAlive>
         <p
           v-if="
-            !['reservations', 'reservation-calendar', 'legacy'].includes(view)
+            !['reservations', 'reservation-calendar', 'legacy', 'content', 'journal-editor'].includes(view)
           "
           class="reservation-commerce-note"
         >

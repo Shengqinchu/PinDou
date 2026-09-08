@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../content/components-SlideOver.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("components-SlideOver", copyTextDefault);
+
+import copyTextDefault from "../content/components-SlideOver.json";
 import { say } from "../state";
 
 import { ref, useId, watch } from "vue";

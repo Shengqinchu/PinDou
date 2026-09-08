@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../content/pages-Cart.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("pages-Cart", copyTextDefault);
+
+import copyTextDefault from "../content/pages-Cart.json";
 import { say } from "../state";
 
 import {

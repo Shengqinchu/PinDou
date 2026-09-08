@@ -1,4 +1,6 @@
-import copyText from "./content/admin.json";
+import { contentModule } from "./content-store";
+const copyText = contentModule("admin", copyTextDefault);
+import copyTextDefault from "./content/admin.json";
 import { say } from "./state";
 import { computed, inject, ref, type InjectionKey } from "vue";
 import {

@@ -1,46 +1,132 @@
 {
-  "enca_9cd218": ["zh-CN", "en-CA"],
-  "studio_desk_navigation_28a348": ["店主工作台导航", "Studio desk navigation"],
-  "pindo_puppy_08aa61": ["小狗拼豆铺", "Pindo Puppy"],
+  "enca_9cd218": [
+    "zh-CN",
+    "en-CA"
+  ],
+  "studio_desk_navigation_28a348": [
+    "店主工作台导航",
+    "Studio desk navigation"
+  ],
+  "pindo_puppy_08aa61": [
+    "小狗拼豆铺",
+    "Pindo Puppy"
+  ],
   "your_studio_in_good_hands_272ef4": [
     "小狗拼豆铺 · 店主工作台",
     "YOUR STUDIO, IN GOOD HANDS"
   ],
-  "close_desk_navigation_f2d087": ["关闭后台导航", "Close desk navigation"],
-  "your_workspace_2c12d8": ["我的工作室", "YOUR WORKSPACE"],
-  "studio_desk_navigation_e9ec2c": ["后台导航", "Studio desk navigation"],
+  "close_desk_navigation_f2d087": [
+    "关闭后台导航",
+    "Close desk navigation"
+  ],
+  "your_workspace_2c12d8": [
+    "我的工作室",
+    "YOUR WORKSPACE"
+  ],
+  "studio_desk_navigation_e9ec2c": [
+    "后台导航",
+    "Studio desk navigation"
+  ],
   "visits_confirmed_by_the_host_471d39": [
     "预约由店主确认",
     "Visits confirmed by the host"
   ],
-  "view_your_website_60949c": ["看看我的网站", "View your website"],
-  "sign_out_e59c73": ["退出登录", "Sign out"],
-  "studio_desk_4be24d": ["店主工作台", "Studio desk"],
-  "close_navigation_9b4ac8": ["关闭导航", "Close navigation"],
-  "open_desk_navigation_2319be": ["打开后台导航", "Open desk navigation"],
-  "refresh_overview_07412b": ["刷新概览", "Refresh overview"],
-  "switch_to_chinese_6c04c2": ["切换为英文", "Switch to Chinese"],
-  "p_18d98d": ["双吉", "P"],
+  "view_your_website_60949c": [
+    "看看我的网站",
+    "View your website"
+  ],
+  "sign_out_e59c73": [
+    "退出登录",
+    "Sign out"
+  ],
+  "studio_desk_4be24d": [
+    "店主工作台",
+    "Studio desk"
+  ],
+  "close_navigation_9b4ac8": [
+    "关闭导航",
+    "Close navigation"
+  ],
+  "open_desk_navigation_2319be": [
+    "打开后台导航",
+    "Open desk navigation"
+  ],
+  "refresh_overview_07412b": [
+    "刷新概览",
+    "Refresh overview"
+  ],
+  "switch_to_chinese_6c04c2": [
+    "切换为英文",
+    "Switch to Chinese"
+  ],
+  "p_18d98d": [
+    "双吉",
+    "P"
+  ],
   "the_shop_is_paused_commerce_records_remain_b78ead": [
     "商城暂缓开放，这里保留交易资料。新版到店安排请在预约管理和预约日历处理。",
     "The shop is paused. Commerce records remain here; manage new visits in Reservations and Visit calendar."
   ],
-  "try_again_014aa4": ["重新加载", "Try again"],
-  "earlier_arrangements_902f91": ["保留从前的安排", "EARLIER ARRANGEMENTS"],
-  "earlier_requests_620a53": ["历史预约与询单", "Earlier requests"],
+  "try_again_014aa4": [
+    "重新加载",
+    "Try again"
+  ],
+  "earlier_arrangements_902f91": [
+    "保留从前的安排",
+    "EARLIER ARRANGEMENTS"
+  ],
+  "earlier_requests_620a53": [
+    "历史预约与询单",
+    "Earlier requests"
+  ],
   "visit_and_pickup_inquiries_received_before_online_514cd1": [
     "上线购物车之前留下的预约和自提意向。",
     "Visit and pickup inquiries received before online checkout."
   ],
-  "nav_c557d2fc": ["预约管理", "Reservations"],
-  "nav_b72b465f": ["预约日历", "Visit calendar"],
-  "nav_2acebe6d": ["交易概览", "Commerce overview"],
-  "nav_f88bbd41": ["交易订单", "Payment orders"],
-  "nav_fd3e0b4a": ["原交易排班", "Commerce schedule"],
-  "nav_f526fd3f": ["商品与体验", "Products"],
-  "nav_d8f7beee": ["收款设置", "Checkout"],
-  "nav_ced4db80": ["操作记录", "Activity"],
-  "nav_096839b5": ["历史询单", "Earlier requests"],
+  "nav_c557d2fc": [
+    "预约管理",
+    "Reservations"
+  ],
+  "nav_b72b465f": [
+    "预约日历",
+    "Visit calendar"
+  ],
+  "nav_2acebe6d": [
+    "交易概览",
+    "Commerce overview"
+  ],
+  "nav_f88bbd41": [
+    "交易订单",
+    "Payment orders"
+  ],
+  "nav_fd3e0b4a": [
+    "原交易排班",
+    "Commerce schedule"
+  ],
+  "nav_f526fd3f": [
+    "商品与体验",
+    "Products"
+  ],
+  "nav_d8f7beee": [
+    "收款设置",
+    "Checkout"
+  ],
+  "nav_ced4db80": [
+    "操作记录",
+    "Activity"
+  ],
+  "nav_096839b5": [
+    "历史询单",
+    "Earlier requests"
+  ],
   "literal_348ea84c": "英文",
-  "literal_72726d88": "中文"
+  "literal_72726d88": "中文",
+  "editor_content": [
+    "网站编辑",
+    "Website editor"
+  ],
+  "editor_journal": [
+    "日记编辑",
+    "Journal editor"
+  ]
 }

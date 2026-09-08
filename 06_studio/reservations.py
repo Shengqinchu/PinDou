@@ -41,6 +41,11 @@ def initialize(database):
           version INTEGER NOT NULL DEFAULT 1
         );
         INSERT OR IGNORE INTO reservation_policy(id) VALUES(1);
+        CREATE TABLE IF NOT EXISTS reservation_blocks (
+          id TEXT PRIMARY KEY, date TEXT NOT NULL, start TEXT NOT NULL, end TEXT NOT NULL,
+          note TEXT NOT NULL DEFAULT '', actor TEXT NOT NULL, version INTEGER NOT NULL DEFAULT 1,
+          created_at TEXT NOT NULL);
+        CREATE INDEX IF NOT EXISTS blocks_day ON reservation_blocks(date,start);
         """)
         if "settings" not in {row[1] for row in db.execute("PRAGMA table_info(reservation_policy)")}:
             db.execute("ALTER TABLE reservation_policy ADD COLUMN settings TEXT NOT NULL DEFAULT '{}'")
@@ -58,7 +63,7 @@ def minute(value):
         raise HTTPException(422, "invalid_reservation_time")
 
 def default_hours():
-    return [{"weekday": i, "enabled": True, "open": "10:00", "close": "22:00"} for i in range(7)]
+    return [{"weekday": i, "enabled": True, "open": "10:00", "close": {2:'16:00',3:'18:00'}.get(i,'22:00')} for i in range(7)]
 
 def read_policy(db):
     row = dict(db.execute("SELECT * FROM reservation_policy WHERE id=1").fetchone())
@@ -142,6 +147,8 @@ def capacity_available(confirmed, day, start, end, guests, policy):
     return True
 
 def has_capacity(db, booking, policy, exclude=""):
+    if db.execute('SELECT 1 FROM reservation_blocks WHERE date=? AND start<? AND end>? LIMIT 1', (str(booking.date),booking.end,booking.start)).fetchone():
+        return False
     confirmed = [json.loads(r[0])["booking"] for r in db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed' AND id!=? AND json_extract(payload,'$.booking.date')=?", (exclude, str(booking.date)))]
     return capacity_available(confirmed, booking.date, minute(booking.start), minute(booking.end), booking.guests, policy)
 
@@ -181,6 +188,17 @@ class ReservationPolicy(Strict):
         self.weekly_hours.sort(key=lambda day: day.weekday)
         return self
 
+class Block(Strict):
+    date: date
+    start: str = Field(pattern=r'^(?:[01]\d|2[0-3]):(?:00|30)$')
+    end: str = Field(pattern=r'^(?:[01]\d|2[0-3]):(?:00|30)$')
+    note: str = Field(default='',max_length=200)
+
+    @model_validator(mode='after')
+    def ordered(self):
+        if minute(self.end)<=minute(self.start):raise ValueError('End must follow start')
+        return self
+
 def register(app, database, admin_actor):
     @app.get("/studio-api/reservation-calendar")
     def calendar(request: Request, response: Response, guests: int = 1):
@@ -191,6 +209,7 @@ def register(app, database, admin_actor):
         with database() as db:
             settings = read_policy(db)
             confirmed = [json.loads(r[0])["booking"] for r in db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed' AND json_extract(payload,'$.booking.date')>=?", (str(current.date()),))]
+            blocks = [dict(r) for r in db.execute('SELECT date,start,end FROM reservation_blocks WHERE date>=?', (str(current.date()),))]
         enabled = [h for h in settings["weekly_hours"] if h["enabled"]]
         grid_start = min((minute(h["open"]) for h in enabled), default=600)
         grid_end = max((minute(h["close"]) for h in enabled), default=1320)
@@ -202,7 +221,7 @@ def register(app, database, admin_actor):
             for start in range(grid_start, grid_end, 30):
                 past = datetime.combine(day, datetime.min.time(), tzinfo=ZONE) + timedelta(minutes=start) <= current
                 busy = not capacity_available(confirmed, day, start, start + 30, guests, settings)
-                closed = not opening["enabled"] or start < minute(opening["open"]) or start >= minute(opening["close"])
+                closed = not opening["enabled"] or start < minute(opening["open"]) or start >= minute(opening["close"]) or any(b['date']==str(day) and minute(b['start'])<start+30 and minute(b['end'])>start for b in blocks)
                 reason = "closed" if closed else "past" if past else "capacity" if busy or guests > settings["max_guests_per_group"] else None
                 slots.append({"start": clock(start), "end": clock(start + 30), "available": reason is None, "reason": reason})
             days.append({"date": str(day), "open": opening["open"], "close": opening["close"], "closed": not opening["enabled"], "slots": slots})
@@ -294,6 +313,45 @@ def register(app, database, admin_actor):
     def get_policy(_actor=Depends(admin_actor)):
         with database() as db:
             return read_policy(db)
+
+    @app.get('/studio-api/manage/reservation-blocks')
+    def list_blocks(_actor=Depends(admin_actor)):
+        with database() as db:
+            rows=[dict(r) for r in db.execute('SELECT * FROM reservation_blocks WHERE date>=? ORDER BY date,start LIMIT 1000',(str(now_local().date()),))]
+        return {'items':rows}
+
+    @app.post('/studio-api/manage/reservation-blocks',status_code=201)
+    def add_block(payload:Block,actor=Depends(admin_actor)):
+        if not now_local().date()<=payload.date<=now_local().date()+timedelta(days=365):raise HTTPException(422,'block_invalid_date')
+        with database() as db:
+            db.execute('BEGIN IMMEDIATE')
+            confirmed=db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed' AND json_extract(payload,'$.booking.date')=?",(str(payload.date),)).fetchall()
+            if any(json.loads(r[0])['booking']['start']<payload.end and json.loads(r[0])['booking']['end']>payload.start for r in confirmed):
+                raise HTTPException(409,'block_confirmed_conflict')
+            ident=uuid.uuid4().hex
+            db.execute('INSERT INTO reservation_blocks(id,date,start,end,note,actor,created_at) VALUES(?,?,?,?,?,?,?)',(ident,str(payload.date),payload.start,payload.end,payload.note,actor,now_local().isoformat()))
+            db.execute("UPDATE reservation_policy SET version=version+1 WHERE id=1")
+        return {'id':ident,'version':1}
+
+    @app.delete('/studio-api/manage/reservation-blocks/{ident}')
+    def remove_block(ident:str,version:int,actor=Depends(admin_actor)):
+        with database() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row=db.execute('SELECT version FROM reservation_blocks WHERE id=?',(ident,)).fetchone()
+            if not row:raise HTTPException(404,'block_not_found')
+            if row[0]!=version:raise HTTPException(409,'version_conflict')
+            db.execute('DELETE FROM reservation_blocks WHERE id=?',(ident,))
+            db.execute("UPDATE reservation_policy SET version=version+1 WHERE id=1")
+        return {'removed':True}
+
+    @app.get('/studio-api/manage/reservation-notifications')
+    def notifications(after:int=0,_actor=Depends(admin_actor)):
+        if after<0:raise HTTPException(422,'invalid_filter')
+        with database() as db:
+            latest=db.execute('SELECT coalesce(max(rowid),0) FROM studio_reservations').fetchone()[0]
+            new=db.execute('SELECT count(*) FROM studio_reservations WHERE rowid>?',(after,)).fetchone()[0]
+            pending=db.execute("SELECT count(*) FROM studio_reservations WHERE status='pending'").fetchone()[0]
+        return {'cursor':latest,'new_count':new,'pending':pending}
 
     @app.put("/studio-api/manage/reservation-policy")
     def policy(payload: ReservationPolicy, _actor=Depends(admin_actor)):

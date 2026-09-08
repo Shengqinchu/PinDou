@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../content/components-ReservationCalendar.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("components-ReservationCalendar", copyTextDefault);
+
+import copyTextDefault from "../content/components-ReservationCalendar.json";
 import { say } from "../state";
 
 import {
@@ -256,7 +259,7 @@ watch(
                     selected(day.date, time) &&
                     booking.end === day.slots[ri]?.end
                   "
-                  >{{ say(copyText.end_c4265b) }}</span
+                  >{{ booking.end }} {{ say(copyText.end_c4265b) }}</span
                 ><span v-else aria-hidden="true">{{
                   day.slots[ri]?.available ? "·" : "—"
                 }}</span>

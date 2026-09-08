@@ -7,7 +7,7 @@ from pathlib import Path
 import hashlib, json, re, shutil, sys
 
 version, count, expected = sys.argv[1:4]
-if not re.fullmatch(r'[0-9]{14}-studio-v[12]', version) or not re.fullmatch(r'[a-f0-9]{64}', expected):
+if not re.fullmatch(r'[0-9]{14}-studio-v[123]', version) or not re.fullmatch(r'[a-f0-9]{64}', expected):
     raise SystemExit('Invalid release arguments')
 count=int(count)
 if not 1 <= count <= 50: raise SystemExit('Invalid part count')

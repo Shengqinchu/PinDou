@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import rates from "../content/experience-rates.json";
-import copyText from "../content/pages-Visit.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("pages-Visit", copyTextDefault);
+
+import rateDefaults from "../content/experience-rates.json";
+import { contentValues } from "../content-store";
+const rates = contentValues("rate-fields",rateDefaults);
+import copyTextDefault from "../content/pages-Visit.json";
 import { say } from "../state";
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";

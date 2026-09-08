@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../content/components-InquiryForm.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("components-InquiryForm", copyTextDefault);
+
+import copyTextDefault from "../content/components-InquiryForm.json";
 import { say } from "../state";
 
 import { reactive, ref } from "vue";

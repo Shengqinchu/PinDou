@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../content/components-ReleaseNotice.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("components-ReleaseNotice", copyTextDefault);
+
+import copyTextDefault from "../content/components-ReleaseNotice.json";
 import { say } from "../state";
 
 import { onBeforeUnmount, onMounted, ref } from "vue";

@@ -1,0 +1,86 @@
+{
+  "hero-illustration": {
+    "source": "page3-0-Image23.jpg",
+    "sha256": "f580fc08436af06c140a163e2fa9033a55db04ef396315dbf5903f3d107c07b7",
+    "width": 1269,
+    "height": 952
+  },
+  "shop-collage": {
+    "source": "space-12.jpg",
+    "sha256": "b702468d2ac2bed9279bc1c205b0aafb060f3fb98c177f2ccb67322bbdea71eb",
+    "width": 1202,
+    "height": 1603
+  },
+  "space-01": {
+    "source": "space-01.jpg",
+    "sha256": "de1d3b60eff6dc68e3825f708a28b244d8d8f7fbc8c60e4916a8c7d2432448da",
+    "width": 1920,
+    "height": 2560
+  },
+  "space-02": {
+    "source": "space-02.jpg",
+    "sha256": "aa42b1da0635ad93c2ffd01b7f95ec36aef8470088fd6ab64625691e699be30b",
+    "width": 4284,
+    "height": 5712
+  },
+  "space-03": {
+    "source": "space-03.jpg",
+    "sha256": "41d5748129f41c56f7e594eb81125583d5a2ffb9d548f66b3e1f58095cd41f2e",
+    "width": 5560,
+    "height": 7414
+  },
+  "space-04": {
+    "source": "space-04.jpg",
+    "sha256": "eb615ce064906859d7370bb0c0a5852b6367db13505b4d31988bcf9e160251d5",
+    "width": 3766,
+    "height": 5022
+  },
+  "space-05": {
+    "source": "space-05.jpg",
+    "sha256": "39ebc318ed2f3cec499eb2e71ea68a2b2ef249d53f89e93ac1864d61fc055f37",
+    "width": 4284,
+    "height": 5712
+  },
+  "space-06": {
+    "source": "space-06.jpg",
+    "sha256": "f40a30883810d264bdab43d81ddf70a983687cbf8a246ea006a85853c1dbda51",
+    "width": 3958,
+    "height": 5278
+  },
+  "space-07": {
+    "source": "space-07.jpg",
+    "sha256": "c86a6b175a9114d125de9e181f0b578f158420583bb1a17049fd3dd86a965a48",
+    "width": 4284,
+    "height": 5712
+  },
+  "space-08": {
+    "source": "space-08.jpg",
+    "sha256": "ae7b3a7ebec44acd22e3f6d7e5df701dc2bbf136bf19ffd1c68e1860572b72c3",
+    "width": 4284,
+    "height": 5712
+  },
+  "space-09": {
+    "source": "space-09.jpg",
+    "sha256": "cf8f30dbbe6c32dd4fd124ad425dba3f1cf30f4a29c99dbeb2f927c8d4a4b64c",
+    "width": 4284,
+    "height": 5712
+  },
+  "space-10": {
+    "source": "space-10.jpg",
+    "sha256": "8febd09c6759a651db36d203ce5f5f19f3cff79c1b0284fba5de5d8388f66ec0",
+    "width": 1206,
+    "height": 1608
+  },
+  "space-11": {
+    "source": "space-11.jpg",
+    "sha256": "de1650ddb0ebaf1dde80be69e43eda4612ed6d10855c2b07b0ebc902391cc7e3",
+    "width": 1088,
+    "height": 1450
+  },
+  "space-12": {
+    "source": "space-12.jpg",
+    "sha256": "b702468d2ac2bed9279bc1c205b0aafb060f3fb98c177f2ccb67322bbdea71eb",
+    "width": 1202,
+    "height": 1603
+  }
+}

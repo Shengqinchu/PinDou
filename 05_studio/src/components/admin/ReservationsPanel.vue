@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../../content/components-admin-ReservationsPanel.json";
+import { contentModule } from "../../content-store";
+const copyText = contentModule("components-admin-ReservationsPanel", copyTextDefault);
+
+import copyTextDefault from "../../content/components-admin-ReservationsPanel.json";
 import { say } from "../../state";
 
 import { computed, onBeforeUnmount, ref, watch } from "vue";
@@ -15,6 +18,7 @@ import { useDesk } from "../../admin";
 import { hamiltonDate, plusDays, prettyDate, tr } from "../../state";
 import type { Reservation, ReservationPayload } from "../../reservations";
 import SlideOver from "../SlideOver.vue";
+import ReservationAvailability from "./ReservationAvailability.vue";
 import ReservationSettings from "./ReservationSettings.vue";
 type Entry = Reservation & { payload: ReservationPayload; staff_note: string };
 const props = defineProps<{ active: boolean; calendar?: boolean }>();
@@ -173,6 +177,7 @@ defineExpose({ refresh: load });
         }}
       </button>
     </header>
+    <ReservationAvailability v-if="calendar" :active="active" />
     <div v-if="!calendar" class="reservation-desk-metrics">
       <button @click="status = 'pending'">
         <PhClock /><span>{{ say(copyText.waiting_for_you_41a255) }}</span

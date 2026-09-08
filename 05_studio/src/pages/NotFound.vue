@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import copyText from "../content/pages-NotFound.json";
+import { contentModule } from "../content-store";
+const copyText = contentModule("pages-NotFound", copyTextDefault);
+
+import copyTextDefault from "../content/pages-NotFound.json";
 import { say } from "../state";
 
 import { tr } from "../state";

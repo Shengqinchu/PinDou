@@ -1,6 +1,10 @@
-import contentLabels from "./content/data-commerce-labels.json";
-import contentMessages from "./content/data-commerce-messages.json";
-import copyText from "./content/commerce.json";
+import { contentModule } from "./content-store";
+const contentLabels = contentModule("data-commerce-labels", contentLabelsDefault);
+const contentMessages = contentModule("data-commerce-messages", contentMessagesDefault);
+const copyText = contentModule("commerce", copyTextDefault);
+import contentLabelsDefault from "./content/data-commerce-labels.json";
+import contentMessagesDefault from "./content/data-commerce-messages.json";
+import copyTextDefault from "./content/commerce.json";
 import { say } from "./state";
 import { computed, ref, watch } from "vue";
 import { locale, tr } from "./state";

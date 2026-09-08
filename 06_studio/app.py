@@ -69,6 +69,8 @@ def initialize():
     commerce.initialize(database)
     import reservations
     reservations.initialize(database)
+    import content
+    content.initialize(database, DB_PATH)
 
 
 @asynccontextmanager
@@ -88,11 +90,13 @@ app = FastAPI(title="PinDou Puppy Studio", docs_url=None, redoc_url=None, openap
 @app.middleware("http")
 async def response_controls(request: Request, call_next):
     length = request.headers.get("content-length", "0")
-    if not length.isdigit() or int(length) > 16000:
+    limit = 12 * 1024 * 1024 if request.url.path == "/studio-api/manage/media" else 2 * 1024 * 1024 if request.url.path.startswith(("/studio-api/manage/content", "/studio-api/manage/journal")) else 16000
+    if not length.isdigit() or int(length) > limit:
         from fastapi.responses import JSONResponse
         return JSONResponse({"detail": "Request too large"}, status_code=413)
     response = await call_next(request)
-    response.headers["Cache-Control"] = "no-store"
+    if not request.url.path.startswith("/studio-api/media/"):
+        response.headers["Cache-Control"] = "no-store"
     response.headers["X-Content-Type-Options"] = "nosniff"
     return response
 
@@ -198,7 +202,7 @@ def admin_actor(authorization: Annotated[str | None, Header()] = None) -> str:
 def health():
     with database() as db:
         db.execute("SELECT 1 FROM studio_requests LIMIT 1")
-    return {"status": "ok", "service": "pindou-studio", "version": "0.5.0"}
+    return {"status": "ok", "service": "pindou-studio", "version": "0.6.0"}
 
 
 @app.post("/studio-api/requests", status_code=201)
@@ -266,3 +270,6 @@ import commerce
 commerce.register(app, admin_actor)
 import reservations
 reservations.register(app, database, admin_actor)
+
+import content
+content.register(app, database, admin_actor)

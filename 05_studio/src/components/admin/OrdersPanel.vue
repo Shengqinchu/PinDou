@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { contentModule } from "../../content-store";
+const copyText = contentModule("components-admin-OrdersPanel", copyTextDefault);
+
 import { formatCopy } from "../../state";
 
-import copyText from "../../content/components-admin-OrdersPanel.json";
+import copyTextDefault from "../../content/components-admin-OrdersPanel.json";
 import { say } from "../../state";
 
 import {
