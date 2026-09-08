@@ -95,14 +95,14 @@
 |---|---|---|
 | clear_prices_simple_checkout_3d511f | 让每一次付款，清清楚楚 | CLEAR PRICES, SIMPLE CHECKOUT |
 | checkout_settings_b08011 | 收款设置 | Checkout settings |
-| price_in_canadian_dollars_collect_in_chinese_35f2a3 | 加元标价、人民币付款。确认好最终金额，再开放小店。 | Price in Canadian dollars, collect in Chinese yuan. Confirm the final amounts before opening. |
+| price_in_canadian_dollars_collect_in_chinese_35f2a3 | CAD 标价、人民币付款。确认好最终金额，再开放小店。 | Price in CAD, collect in Chinese yuan. Confirm the final amounts before opening. |
 | hupijiao_checkout_017d75 | 虎皮椒收银台 | Hupijiao checkout |
 | scan_on_desktop_or_open_the_cashier_e2fe8b | 电脑扫码，手机进入收银台；支付结果自动核实。 | Scan on desktop or open the cashier on mobile. Payment is verified automatically. |
 | connected_bd103c | 已连接 | Connected |
 | not_connected_238174 | 尚未连接 | Not connected |
 | display_payment_currency_9d99f4 | 标价与付款汇率 | Display & payment currency |
 | the_rate_is_locked_when_an_order_b8c1b7 | 每笔订单创建时固定汇率，之后修改不会改变旧订单。 | The rate is locked when an order is created. Later changes do not affect existing orders. |
-| cny_per_1_cad_e11b72 | 1 加元兑换人民币 | CNY per 1 CAD |
+| cny_per_1_cad_e11b72 | 1 CAD 兑换人民币 | CNY per 1 CAD |
 | example_listed_price_7fc44a | 示例标价 | Example listed price |
 | converted_amount_5871b3 | 换算金额 | Converted amount |
 | how_prices_include_tax_bcd6c4 | 售价的税费方式 | How prices include tax |
@@ -169,12 +169,12 @@
 | uploading | 正在上传图片… | Uploading image… |
 | contacts | 联系信息 | Contact details |
 | rates | 体验价格说明 | Experience price display |
-| hourly | 每小时／人（加元） | Per hour / person (CAD) |
-| day_one | 单人全天（加元） | One person, day (CAD) |
-| day_two | 双人全天（加元） | Two people, day (CAD) |
-| day_three | 三人全天（加元） | Three people, day (CAD) |
-| school_two_four_hours | 开学优惠 · 双人四小时（加元） | School offer · two people, four hours (CAD) |
-| school_card_holder | 卡套套餐／个（加元） | Card holder package / each (CAD) |
+| hourly | 每小时／人（CAD） | Per hour / person (CAD) |
+| day_one | 单人全天（CAD） | One person, day (CAD) |
+| day_two | 双人全天（CAD） | Two people, day (CAD) |
+| day_three | 三人全天（CAD） | Three people, day (CAD) |
+| school_two_four_hours | 开学优惠 · 双人四小时（CAD） | School offer · two people, four hours (CAD) |
+| school_card_holder | 卡套套餐／个（CAD） | Card holder package / each (CAD) |
 
 ## components-admin-JournalEditor.json
 
@@ -228,7 +228,7 @@
 | in_this_order_38d926 | 这份订单里 | In this order |
 | guests_hamilton_time_a7aa80 | 人 · Hamilton 时间 | guests · Hamilton time |
 | studio_pickup_c13b87 | 到店自提 | Studio pickup |
-| cad_total_0fc8b6 | 加元合计 | CAD total |
+| cad_total_0fc8b6 | CAD 合计 | CAD total |
 | amount_in_cny_62da3c | 人民币实付 | Amount in CNY |
 | staff_note_0d849e | 内部备注 | Staff note |
 | for_example_contacted_guest_pickup_time_special_be0f3b | 例如：已联系顾客、自提时间、特别安排 | For example: contacted guest, pickup time, special arrangements |
@@ -363,7 +363,7 @@
 | photographed_at_the_studio_e4b259 | 使用工作室实拍 | Photographed at the studio |
 | chinese_name_9df9b3 | 中文名称 | Chinese name |
 | english_name_63f9e2 | 英文名称 | English name |
-| price_ca_d65afe | 售价 · CA$ | Price · CA$ |
+| price_ca_d65afe | 售价 · CAD | Price · CAD |
 | remaining_inventory_5b9914 | 剩余库存 | Remaining inventory |
 | category_f7fc04 | 分类 | Category |
 | tools_fittings_02d81e | 工具与配件 | Tools & fittings |
@@ -921,7 +921,7 @@
 | shop_items_are_for_studio_pickup_contact_74d4c2 | 小物采用到店自提；购买后联系店主安排取货。 | Shop items are for studio pickup. Contact the host after purchase to arrange collection. |
 | i_have_checked_the_time_items_and_2a0218 | 我已核对时段、商品及实付金额，同意使用以上联系方式处理本次订单。 | I have checked the time, items and payment total, and agree to be contacted about this order. |
 | ready_when_you_are_408829 | 准备好，就出发。 | Ready when you are. |
-| priced_in_cad_paid_in_cny_53d8c7 | 加元标价 · 人民币付款 | Priced in CAD · Paid in CNY |
+| priced_in_cad_paid_in_cny_53d8c7 | CAD 标价 · 人民币付款 | Priced in CAD · Paid in CNY |
 | items_experiences_f45837 | 商品与体验 | Items & experiences |
 | tax_d7bdd7 | 税费 | Tax |
 | total_fe87d0 | 合计 | Total |
@@ -1121,7 +1121,7 @@
 | hamilton_local_time_b04d8a | Hamilton 当地时间 | Hamilton local time |
 | studio_pickup_contact_the_host_to_arrange_0cf43a | 到店自提 · 请联系店主安排取货 | Studio pickup · Contact the host to arrange collection |
 | tax_d7bdd7 | 税费 | Tax |
-| cad_total_0fc8b6 | 加元合计 | CAD total |
+| cad_total_0fc8b6 | CAD 合计 | CAD total |
 | payment_in_cny_66e946 | 人民币实付 | Payment in CNY |
 | rate_locked_for_this_order_114f47 | 汇率已固定 | Rate locked for this order |
 | loading_your_order_d79415 | 正在读取订单… | Loading your order… |
@@ -1188,7 +1188,7 @@
 | two_guests_65a259 | 双人 | Two guests |
 | three_guests_032d3f | 三人 | Three guests |
 | prepaid_hours_ask_in_the_studio_f180a7 | 储值优惠 · 到店了解 | PREPAID HOURS · ASK IN THE STUDIO |
-| ca7_hour_c87a20 | 7 加元／小时 | CA$7 / hour |
+| ca7_hour_c87a20 | CAD 7／小时 | CAD 7 / hour |
 | prepay_at_least_10_hours_and_at_8815bf | 10 小时起，且储值时长不少于当日使用总时长的 2 倍。可当天使用，可多人共同使用。 | Prepay at least 10 hours and at least twice the total hours used that day. Use them the same day and share them with your group. |
 | for_information_only_this_is_not_a_09a580 | 仅作优惠说明，无需在此选择。 | For information only; this is not a selectable plan. |
 | backtoschool_until_october_1_42119e | 开学优惠 · 至 10 月 1 日 | BACK-TO-SCHOOL · UNTIL OCTOBER 1 |

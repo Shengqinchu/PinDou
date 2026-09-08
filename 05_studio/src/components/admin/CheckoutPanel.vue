@@ -86,7 +86,7 @@ function setTax(e: Event) {
           <div class="currency-example">
             <div>
               <small>{{ say(copyText.example_listed_price_7fc44a) }}</small
-              ><strong>CA$10.00</strong>
+              ><strong>{{ money(1000) }}</strong>
             </div>
             <PhArrowRight />
             <div>

@@ -5,8 +5,8 @@
   ],
   "checkout_settings_b08011": ["收款设置", "Checkout settings"],
   "price_in_canadian_dollars_collect_in_chinese_35f2a3": [
-    "加元标价、人民币付款。确认好最终金额，再开放小店。",
-    "Price in Canadian dollars, collect in Chinese yuan. Confirm the final amounts before opening."
+    "CAD 标价、人民币付款。确认好最终金额，再开放小店。",
+    "Price in CAD, collect in Chinese yuan. Confirm the final amounts before opening."
   ],
   "hupijiao_checkout_017d75": ["虎皮椒收银台", "Hupijiao checkout"],
   "scan_on_desktop_or_open_the_cashier_e2fe8b": [
@@ -23,7 +23,7 @@
     "每笔订单创建时固定汇率，之后修改不会改变旧订单。",
     "The rate is locked when an order is created. Later changes do not affect existing orders."
   ],
-  "cny_per_1_cad_e11b72": ["1 加元兑换人民币", "CNY per 1 CAD"],
+  "cny_per_1_cad_e11b72": ["1 CAD 兑换人民币", "CNY per 1 CAD"],
   "example_listed_price_7fc44a": ["示例标价", "Example listed price"],
   "converted_amount_5871b3": ["换算金额", "Converted amount"],
   "how_prices_include_tax_bcd6c4": ["售价的税费方式", "How prices include tax"],

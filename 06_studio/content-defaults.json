@@ -251,8 +251,8 @@
       "Checkout settings"
     ],
     "price_in_canadian_dollars_collect_in_chinese_35f2a3": [
-      "加元标价、人民币付款。确认好最终金额，再开放小店。",
-      "Price in Canadian dollars, collect in Chinese yuan. Confirm the final amounts before opening."
+      "CAD 标价、人民币付款。确认好最终金额，再开放小店。",
+      "Price in CAD, collect in Chinese yuan. Confirm the final amounts before opening."
     ],
     "hupijiao_checkout_017d75": [
       "虎皮椒收银台",
@@ -279,7 +279,7 @@
       "The rate is locked when an order is created. Later changes do not affect existing orders."
     ],
     "cny_per_1_cad_e11b72": [
-      "1 加元兑换人民币",
+      "1 CAD 兑换人民币",
       "CNY per 1 CAD"
     ],
     "example_listed_price_7fc44a": [
@@ -529,27 +529,27 @@
       "Experience price display"
     ],
     "hourly": [
-      "每小时／人（加元）",
+      "每小时／人（CAD）",
       "Per hour / person (CAD)"
     ],
     "day_one": [
-      "单人全天（加元）",
+      "单人全天（CAD）",
       "One person, day (CAD)"
     ],
     "day_two": [
-      "双人全天（加元）",
+      "双人全天（CAD）",
       "Two people, day (CAD)"
     ],
     "day_three": [
-      "三人全天（加元）",
+      "三人全天（CAD）",
       "Three people, day (CAD)"
     ],
     "school_two_four_hours": [
-      "开学优惠 · 双人四小时（加元）",
+      "开学优惠 · 双人四小时（CAD）",
       "School offer · two people, four hours (CAD)"
     ],
     "school_card_holder": [
-      "卡套套餐／个（加元）",
+      "卡套套餐／个（CAD）",
       "Card holder package / each (CAD)"
     ]
   },
@@ -729,7 +729,7 @@
       "Studio pickup"
     ],
     "cad_total_0fc8b6": [
-      "加元合计",
+      "CAD 合计",
       "CAD total"
     ],
     "amount_in_cny_62da3c": [
@@ -1215,8 +1215,8 @@
       "English name"
     ],
     "price_ca_d65afe": [
-      "售价 · CA$",
-      "Price · CA$"
+      "售价 · CAD",
+      "Price · CAD"
     ],
     "remaining_inventory_5b9914": [
       "剩余库存",
@@ -2867,7 +2867,7 @@
       "Ready when you are."
     ],
     "priced_in_cad_paid_in_cny_53d8c7": [
-      "加元标价 · 人民币付款",
+      "CAD 标价 · 人民币付款",
       "Priced in CAD · Paid in CNY"
     ],
     "items_experiences_f45837": [
@@ -3541,7 +3541,7 @@
       "Tax"
     ],
     "cad_total_0fc8b6": [
-      "加元合计",
+      "CAD 合计",
       "CAD total"
     ],
     "payment_in_cny_66e946": [
@@ -3739,8 +3739,8 @@
       "PREPAID HOURS · ASK IN THE STUDIO"
     ],
     "ca7_hour_c87a20": [
-      "7 加元／小时",
-      "CA$7 / hour"
+      "CAD 7／小时",
+      "CAD 7 / hour"
     ],
     "prepay_at_least_10_hours_and_at_8815bf": [
       "10 小时起，且储值时长不少于当日使用总时长的 2 倍。可当天使用，可多人共同使用。",

@@ -257,7 +257,7 @@ export function money(cents: number, currency = "CAD") {
   return new Intl.NumberFormat(locale.value === "zh" ? "zh-CN" : "en-CA", {
     style: "currency",
     currency,
-    currencyDisplay: "symbol",
+    currencyDisplay: currency === "CAD" ? "code" : "symbol",
     minimumFractionDigits: 2,
   }).format(cents / 100);
 }

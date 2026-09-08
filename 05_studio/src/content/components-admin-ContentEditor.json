@@ -180,27 +180,27 @@
     "Experience price display"
   ],
   "hourly": [
-    "每小时／人（加元）",
+    "每小时／人（CAD）",
     "Per hour / person (CAD)"
   ],
   "day_one": [
-    "单人全天（加元）",
+    "单人全天（CAD）",
     "One person, day (CAD)"
   ],
   "day_two": [
-    "双人全天（加元）",
+    "双人全天（CAD）",
     "Two people, day (CAD)"
   ],
   "day_three": [
-    "三人全天（加元）",
+    "三人全天（CAD）",
     "Three people, day (CAD)"
   ],
   "school_two_four_hours": [
-    "开学优惠 · 双人四小时（加元）",
+    "开学优惠 · 双人四小时（CAD）",
     "School offer · two people, four hours (CAD)"
   ],
   "school_card_holder": [
-    "卡套套餐／个（加元）",
+    "卡套套餐／个（CAD）",
     "Card holder package / each (CAD)"
   ]
 }

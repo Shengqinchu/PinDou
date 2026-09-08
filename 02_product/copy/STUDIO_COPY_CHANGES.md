@@ -36,3 +36,12 @@
 - p7“自行更改每个界面的文字与图片”：`contact-fields`、`rate-fields`、`gallery-labels`、`carousel-labels` 仅将现有值按双语模块登记以供店主编辑，不改变联系方式、价格与原有图注。运行时 owner overrides 与不可变源码默认值分开保存。发布内容由店主的明确操作授权；普通构建不批准新文字、不重置已发布文字。
 
 批准记录应仅覆盖本次有来源的模块；既有 approved 基线中的其余模块哈希必须保持。
+
+## 2026-09-08 / 加元单位统一为 CAD
+
+来源：店主原话“把单位都统一一下CAD吧”，附到店页价格截图。
+
+- `pages-Visit.ca7_hour_c87a20`：中文 `7 加元／小时`、英文 `CA$7 / hour` 分别改为 `CAD 7／小时`、`CAD 7 / hour`。到店页按时、全天及开学优惠价格的展示前缀同步使用 `CAD `。
+- `components-admin-ProductsPanel.price_ca_d65afe`、`components-admin-OrderDrawer.cad_total_0fc8b6`、`pages-Order.cad_total_0fc8b6`、`pages-Cart.priced_in_cad_paid_in_cny_53d8c7`：加元标识改为 `CAD`。
+- `components-admin-CheckoutPanel.price_in_canadian_dollars_collect_in_chinese_35f2a3` / `cny_per_1_cad_e11b72`，以及 `components-admin-ContentEditor` 的六个体验售价字段：加元单位改为 `CAD`，对应英文同步。
+- 共享金额格式器的 CAD 分支使用货币代码；后台汇率示例也使用该格式器。金额数值、精度、税费、汇率与人民币付款币种均未调整。其他宣传文案、日记原文和不可变基线保持。

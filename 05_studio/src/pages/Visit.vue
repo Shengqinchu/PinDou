@@ -193,7 +193,7 @@ async function submit() {
               v-if="draft.booking.plan === 'hourly'"
               class="reservation-plan-price"
             >
-              <strong>CA${{ rates.hourly }}</strong
+              <strong>CAD {{ rates.hourly }}</strong
               ><span>{{ say(copyText.hour_person_7ea78f) }}</span>
             </div></AutoHeight
           ></label
@@ -213,15 +213,15 @@ async function submit() {
             >
               <div>
                 <dt>{{ say(copyText.one_guest_684bef) }}</dt>
-                <dd>CA${{ rates.day_one }}</dd>
+                <dd>CAD {{ rates.day_one }}</dd>
               </div>
               <div>
                 <dt>{{ say(copyText.two_guests_65a259) }}</dt>
-                <dd>CA${{ rates.day_two }}</dd>
+                <dd>CAD {{ rates.day_two }}</dd>
               </div>
               <div>
                 <dt>{{ say(copyText.three_guests_032d3f) }}</dt>
-                <dd>CA${{ rates.day_three }}</dd>
+                <dd>CAD {{ rates.day_three }}</dd>
               </div>
             </dl></AutoHeight
           ></label
@@ -243,10 +243,10 @@ async function submit() {
             <span class="vision-eyebrow">{{
               say(copyText.backtoschool_until_october_1_42119e)
             }}</span
-            ><strong>CA${{ rates.school_two_four_hours }}</strong>
+            ><strong>CAD {{ rates.school_two_four_hours }}</strong>
             <p>{{ say(copyText.four_hours_of_making_for_two_8bb2b0) }}</p>
             <strong
-              >CA${{ rates.school_card_holder }}
+              >CAD {{ rates.school_card_holder }}
               <small>{{ say(copyText.piece_ef469b) }}</small></strong
             >
             <p>
