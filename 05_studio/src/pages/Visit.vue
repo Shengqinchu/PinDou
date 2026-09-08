@@ -200,7 +200,7 @@ function add() {
       <p>
         {{
           tr(
-            "选一个有空的日子，把喜欢的颜色慢慢拼成生活里的小小快乐。",
+            "选个有空的日子，来慢慢拼豆。",
             "Choose a day. Pull up a chair. Turn the colours you love into a little everyday joy.",
           )
         }}

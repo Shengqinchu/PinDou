@@ -34,8 +34,22 @@ export function installMotion() {
 }
 
 /** Animate a workspace in place, without remounting its state or form fields. */
-export function arrive(element: Element) {
+export function arrive(
+  element: Element,
+  options: { stationary?: boolean } = {},
+) {
   if (reducedMotion()) return;
+  if (options.stationary)
+    return gsap.fromTo(
+      element,
+      { opacity: 0.9 },
+      {
+        opacity: 1,
+        duration: motion.state,
+        ease: "studio-control",
+        clearProps: "opacity",
+      },
+    );
   return gsap.fromTo(
     element,
     { y: 14, opacity: 0.65 },

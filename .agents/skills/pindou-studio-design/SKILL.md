@@ -24,3 +24,5 @@ Preserve old generator routes, shared API routes and existing uncommitted work. 
 Verify desktop and phone layouts together, including keyboard focus, modal closing if used, failed submissions, cart persistence and timezone boundaries. Inspect the screenshots, batch fixes, then confirm only the changed or uncertain behavior. Record real unresolved business decisions separately from implementation defects.
 
 Research provenance and upstream sources are in `03_design/STUDIO_DESIGN.md`; this skill is a project-specific adaptation, not a copy of the upstream skill packages.
+
+The second review is `03_design/STUDIO_0830_REREVIEW.md`. Its N1–N6 establish specific finishing rules: fine-pointer-only hover; stationary host content coordinated with navigation; continuous photo reversal from the current opacity; same-item mobile navigation must close; inspect actual Chinese line endings; localize transport failures and accessible names without discarding meaningful business errors. Preserve the frozen reviewer evidence and verify these states directly after changes.

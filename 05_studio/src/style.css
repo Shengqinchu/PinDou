@@ -154,13 +154,6 @@ html {
   border-bottom: 1px solid currentColor;
   width: fit-content;
 }
-.text-link svg {
-  transition: transform 0.25s;
-}
-.text-link:hover svg {
-  transform: translate(3px, -2px);
-}
-
 .fine-print {
   font-size: 13px;
   color: var(--muted);
@@ -247,7 +240,6 @@ html {
   transition: transform 0.2s;
   transform-origin: left;
 }
-.desktop-nav a:hover::after,
 .desktop-nav a.router-link-active::after {
   transform: scaleX(1);
 }
@@ -507,10 +499,6 @@ html {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.55s ease;
-}
-.photo-tile:hover .photo-tile-image > img {
-  transform: scale(1.035);
 }
 .photo-tile > span {
   display: block;

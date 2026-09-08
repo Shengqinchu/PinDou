@@ -124,6 +124,8 @@ const selected = computed(() => navigation.value[selectedIndex.value]);
 const scrolls = new Map<string, number>();
 async function navigate(id: string, intent?: DeskIntent) {
   scrolls.set(view.value, pageScrollY());
+  // Choosing the current view must also release the mobile menu's focus/scroll lock.
+  mobileMenu.value = false;
   await router.replace({
     path: "/manage",
     query: {
@@ -141,7 +143,7 @@ watch(view, async () => {
   desk.error.value = "";
   await nextTick();
   arrival?.progress(1).kill();
-  if (content.value) arrival = arrive(content.value);
+  if (content.value) arrival = arrive(content.value, { stationary: true });
 });
 onMounted(desk.initialize);
 const readableDate = computed(() =>

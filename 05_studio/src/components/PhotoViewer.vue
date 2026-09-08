@@ -20,80 +20,128 @@ const caption = useId();
 const modal = useStudioModal(dialog, "photo");
 let revision = 0;
 let transition: gsap.core.Tween | undefined;
-let preloader: HTMLImageElement | undefined;
-function cancelSwap() {
+let cancelPreload: (() => void) | undefined;
+function interruptSwap() {
   revision++;
   transition?.kill();
-  preloader?.removeAttribute("src");
-  preloader = undefined;
-  // On interruption retain one dominant frame, rather than queueing old exits.
-  if (
-    incoming.value !== null &&
-    incomingElement.value &&
-    Number(getComputedStyle(incomingElement.value).opacity) >= 0.5
-  )
-    current.value = incoming.value;
-  incoming.value = null;
-  loading.value = false;
+  transition = undefined;
+  cancelPreload?.();
+  cancelPreload = undefined;
 }
 function open(index: number) {
-  cancelSwap();
+  interruptSwap();
+  incoming.value = null;
+  loading.value = false;
   selected.value = current.value = index;
   error.value = "";
   modal.open();
 }
 function close() {
-  cancelSwap();
+  // Preserve the visible blend while the modal itself leaves.
+  interruptSwap();
+  loading.value = false;
   modal.close();
 }
+function preload(index: number, version: number): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const cleanup = () => {
+      img.onload = img.onerror = null;
+      if (cancelPreload === cancel) cancelPreload = undefined;
+    };
+    const cancel = () => {
+      cleanup();
+      img.removeAttribute("src");
+      resolve(false);
+    };
+    cancelPreload = cancel;
+    img.onload = async () => {
+      try {
+        if (typeof img.decode === "function") await img.decode();
+        cleanup();
+        resolve(version === revision);
+      } catch {
+        cleanup();
+        reject(new Error("photo unavailable"));
+      }
+    };
+    img.onerror = () => {
+      cleanup();
+      reject(new Error("photo unavailable"));
+    };
+    img.src = media(props.photos[index].image);
+  });
+}
+function blendTo(opacity: 0 | 1, version: number): Promise<boolean> {
+  const element = incomingElement.value;
+  const index = incoming.value;
+  if (!element || index === null) return Promise.resolve(true);
+  const distance = Math.abs(
+    opacity - Number(getComputedStyle(element).opacity),
+  );
+  return new Promise((resolve) => {
+    const finish = () => {
+      if (version !== revision) return resolve(false);
+      if (opacity === 1) current.value = index;
+      incoming.value = null;
+      resolve(true);
+    };
+    if (distance < 0.001 || reducedMotion()) return finish();
+    transition = gsap.to(element, {
+      opacity,
+      duration: Math.max(0.16, 0.38 * Math.sqrt(distance)),
+      ease: "studio-control",
+      onComplete: finish,
+      onInterrupt: () => resolve(false),
+    });
+  });
+}
 async function showLatest() {
-  cancelSwap();
+  interruptSwap();
   const version = revision;
   const target = selected.value;
-  if (target === current.value && !error.value) return;
   loading.value = true;
   error.value = "";
   try {
-    const img = new Image();
-    preloader = img;
-    await new Promise<void>((resolve, reject) => {
-      img.onload = () => resolve();
-      img.onerror = () => reject(new Error("photo unavailable"));
-      img.src = media(props.photos[target].image);
-    });
-    if (typeof img.decode === "function") await img.decode();
-    if (version !== revision) return;
+    // Reverse/continue the existing composition from its current opacity.
+    if (incoming.value !== null && target === current.value) {
+      await blendTo(0, version);
+      return;
+    }
+    if (incoming.value === target) {
+      await blendTo(1, version);
+      return;
+    }
+    if (incoming.value === null && target === current.value) return;
+
+    // For a third image, settle the current blend while preloading only the latest
+    // intent. Neither visible layer is discarded in the middle of its movement.
+    const opacity = incomingElement.value
+      ? Number(getComputedStyle(incomingElement.value).opacity)
+      : 0;
+    const [loaded, settled] = await Promise.all([
+      preload(target, version),
+      blendTo(opacity >= 0.5 ? 1 : 0, version),
+    ]);
+    if (version !== revision || !loaded || !settled) return;
     if (reducedMotion()) {
       current.value = target;
-      loading.value = false;
       return;
     }
     incoming.value = target;
     await nextTick();
     if (version !== revision || !incomingElement.value) return;
-    transition = gsap.fromTo(
-      incomingElement.value,
-      { opacity: 0 },
-      {
-        opacity: 1,
-        duration: 0.38,
-        ease: "studio-control",
-        onComplete() {
-          if (version !== revision) return;
-          current.value = target;
-          incoming.value = null;
-          loading.value = false;
-        },
-      },
-    );
+    gsap.set(incomingElement.value, { opacity: 0 });
+    await blendTo(1, version);
   } catch {
     if (version === revision) {
       error.value = tr(
         "这张照片暂时没能加载，请重试。",
         "This photo could not load. Please try again.",
       );
-      loading.value = false;
     }
+  } finally {
+    if (version === revision) loading.value = false;
   }
 }
 function move(delta: number) {
@@ -101,7 +149,7 @@ function move(delta: number) {
     (selected.value + delta + props.photos.length) % props.photos.length;
   showLatest();
 }
-onBeforeUnmount(cancelSwap);
+onBeforeUnmount(interruptSwap);
 defineExpose({ open });
 </script>
 <template>
@@ -175,6 +223,7 @@ defineExpose({ open });
 <style scoped>
 .photo-incoming {
   pointer-events: none;
+  opacity: 0;
 }
 .viewer-caption {
   flex-shrink: 0;

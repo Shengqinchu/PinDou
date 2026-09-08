@@ -167,11 +167,25 @@ export async function commerceApi<T>(
   path: string,
   init: RequestInit = {},
 ): Promise<T> {
-  const response = await fetch(`/studio-api${path}`, {
-    ...init,
-    headers: { "Content-Type": "application/json", ...init.headers },
-    cache: "no-store",
-  });
+  let response: Response;
+  try {
+    response = await fetch(`/studio-api${path}`, {
+      ...init,
+      headers: { "Content-Type": "application/json", ...init.headers },
+      cache: "no-store",
+    });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError")
+      throw error;
+    // No HTTP response: keep checkout's uncertain-result recovery semantics.
+    throw new CommerceError(
+      tr(
+        "暂时连接不上，请检查网络后重试。",
+        "We could not connect. Check your connection and try again.",
+      ),
+      0,
+    );
+  }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const words = messages[data.detail];

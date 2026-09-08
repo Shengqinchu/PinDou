@@ -1,4 +1,4 @@
-# Response to 最新项目0830 — implementation awaiting independent re-review
+# Response to 最新项目0830
 
 Baseline: `edaa3f8`; review: `STUDIO_0830_REVIEW.md`. The review and its `artifacts/studio-0830-review` evidence are preserved. This document maps the changes to the findings; it does not equate automated checks with design acceptance.
 
@@ -31,6 +31,19 @@ Completed implementation checks:
 
 Real iOS Safari, iOS WeChat and Android WeChat device tests are still unperformed. Browser engines, UA, safe-area and virtual-keyboard simulations are explicitly labelled as simulations. No real payment/refund or merchant settings were changed for this review. The public site stays closed to purchases until the owner supplies business settings.
 
-## Re-review and deployment
+## Second independent review and local corrections
 
-To be filled after the reviewer examines the new implementation and after any resulting corrections. Production is still on the baseline release while this review is pending.
+The second review examined commit `e34120e42ed83cf374684efa1d1c4ab41b3e4412`. `STUDIO_0830_REREVIEW.md` confirms the core function/rendering/layout corrections and identifies six remaining P2 details. The reviewer explicitly recommends keeping the new structure and making these local corrections.
+
+| Finding | Final correction |
+|---|---|
+| N1 | Removed the old unconditional hover rules and their compensating touch overrides. The existing fine-pointer hover rules remain. Both successful and rejected copying return to the idle touch color. |
+| N2 | Host content stays in place and changes opacity from 0.9 to 1 using the same control curve as its navigation indicator. Public page/panel travel is independent. |
+| N3 | Existing photo layers remain until their blend completes. Reverse input fades the incoming layer back from its actual opacity. A third target preloads while the current blend settles; new intent cancels previous work without adding layers. Canceled loads and tweens resolve their waiting work. Closing the viewer preserves the current blend during the modal exit. |
+| N4 | Every navigation action closes the mobile menu, including the currently selected destination. Existing focus, scroll and draft restoration are reused. |
+| N5 | Shortened the two Chinese introductions, retaining font sizes and English copy. Actual line fragments are checked at 320/390/1080/1440. |
+| N6 | Transport failure maps to friendly Chinese/English text in the shared API client. HTTP/business errors retain their mappings; status 0 retains checkout's uncertain-result recovery. Order type has a localized accessible name. |
+
+`verify-0830-polish.mjs` covers these states, including photo reversals around 25/50/75 percent and real touch release after successful/failed copying. `verify-0830-fixes.mjs`, input/slow-image checks, checkout lost-response recovery and host draft resilience were repeated after these corrections and pass. Focused final evidence is in `artifacts/studio-0830-polish`.
+
+A narrow independent closure check and production verification follow these corrections. Neither review authorizes opening sales or establishes physical WeChat compatibility.

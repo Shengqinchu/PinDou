@@ -196,7 +196,7 @@ function reset() {
       <div class="order-secondary-filters">
         <label
           >{{ tr("内容", "Type")
-          }}<select v-model="kind" aria-label="Order type">
+          }}<select v-model="kind" :aria-label="tr('订单类型', 'Order type')">
             <option value="all">{{ tr("全部订单", "All orders") }}</option>
             <option value="visit">{{ tr("到店体验", "Studio visit") }}</option>
             <option value="pickup">{{ tr("实物自提", "Pickup items") }}</option>

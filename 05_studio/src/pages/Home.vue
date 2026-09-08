@@ -167,7 +167,7 @@ async function copyContact() {
         <p class="hero-description">
           {{
             tr(
-              "选一幅喜欢的图，坐进阳光里，把小豆子变成属于自己的快乐。",
+              "带上喜欢的图，在阳光里慢慢拼。",
               "Pull up a chair in our little bead studio. Pick a pattern, play with colour, and make something yours.",
             )
           }}
