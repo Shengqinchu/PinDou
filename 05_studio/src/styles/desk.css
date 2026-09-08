@@ -1,17 +1,17 @@
 .studio-admin-main {
-  background: #f6f6f0;
+  background: #f3f7f8;
   min-height: 100dvh;
 }
 .studio-desk {
-  --desk-line: #e0e4d9;
-  --desk-muted: #697261;
-  --desk-green: #48623e;
+  --desk-line: #d1e0e4;
+  --desk-muted: #607880;
+  --desk-green: #3f6e7a;
   display: grid;
   grid-template-columns: 232px minmax(0, 1fr);
   min-height: 100dvh;
   font-family: var(--body);
   font-size: 14px;
-  color: #303d2c;
+  color: #273f48;
 }
 .studio-desk h1,
 .studio-desk h2,
@@ -37,7 +37,7 @@
   position: sticky;
   top: 0;
   height: 100dvh;
-  background: #eeefe6;
+  background: #e8f0f3;
   border-right: 1px solid #dee2d5;
   padding: 30px 20px 20px;
   display: flex;
@@ -52,7 +52,7 @@
   font-size: 24px;
   line-height: 1;
   letter-spacing: -0.03em;
-  color: #34432d;
+  color: #294b57;
   white-space: nowrap;
 }
 .desk-brand small {
@@ -68,7 +68,7 @@
 .sidebar-section-label {
   font-size: 10px;
   letter-spacing: 0.12em;
-  color: #5b6b50;
+  color: #536f79;
   margin: 44px 11px 14px;
 }
 .desk-navigation {
@@ -89,7 +89,7 @@
   left: 0;
   right: 0;
   height: 46px;
-  background: #dce4d4;
+  background: #dcebf0;
   border-radius: 10px;
   transform: translateY(calc(var(--nav-index) * 52px));
   transition: transform var(--surface-duration) var(--surface-ease);
@@ -104,13 +104,13 @@
   border-radius: 10px;
   text-align: left;
   font-size: 14px;
-  color: #5b6b50;
+  color: #536f79;
   transition:
     color var(--control-duration) var(--control-ease),
     transform var(--control-duration) var(--control-ease);
 }
 .desk-navigation > button.active {
-  color: #2f4726;
+  color: #2e5968;
   font-weight: 550;
 }
 .desk-navigation > button > svg {
@@ -169,7 +169,7 @@
 .desk-version {
   display: block;
   font-size: 10px;
-  color: #59694d;
+  color: #516d78;
   margin: 16px 9px 0;
 }
 .desk-main {
@@ -183,7 +183,7 @@
   gap: 16px;
   padding: 0 38px;
   border-bottom: 1px solid var(--desk-line);
-  background: #f9f9f4;
+  background: #f8fbfc;
 }
 .desk-breadcrumb {
   display: flex;
@@ -218,7 +218,7 @@
   place-items: center;
   width: 34px;
   height: 34px;
-  background: #dde5d5;
+  background: #dcebf0;
   border: 1px solid #d0dcc5;
   border-radius: 50%;
   font-size: 10px;
@@ -240,7 +240,7 @@
   font-family: var(--body);
   font-size: 10px !important;
   letter-spacing: 0.11em;
-  color: #59694d;
+  color: #516d78;
   margin: 0 0 12px;
   line-height: 1.6;
 }
@@ -317,7 +317,7 @@
   display: block;
   font-size: 12px;
   margin-top: 5px;
-  color: #59694d;
+  color: #516d78;
 }
 .setup-summary-trigger > svg {
   flex-shrink: 0;
@@ -380,7 +380,7 @@
 .desk-metric {
   display: block;
   text-align: left;
-  background: #fffef9;
+  background: #fcfefe;
   border: 1px solid #e1e6d9;
   border-radius: 13px;
   padding: 20px;
@@ -395,7 +395,7 @@
   align-items: center;
   gap: 7px;
   font-size: 13px;
-  color: #59694d;
+  color: #516d78;
 }
 .desk-metric > span > svg:last-child {
   margin-left: auto;
@@ -413,12 +413,12 @@
 }
 .desk-metric > small {
   font-size: 12px;
-  color: #59694d;
+  color: #516d78;
   display: block;
   line-height: 1.5;
 }
 .desk-surface {
-  background: #fffef9;
+  background: #fcfefe;
   border: 1px solid var(--desk-line);
   border-radius: 14px;
   min-width: 0;
@@ -470,7 +470,7 @@
   color: #6b775f;
 }
 .desk-empty > svg {
-  color: #59694d;
+  color: #516d78;
   margin-bottom: 18px;
 }
 .desk-empty h2,
@@ -506,7 +506,7 @@
   place-items: center;
   background: #f1ecdf;
   border-radius: 50%;
-  color: #59694d;
+  color: #516d78;
   flex-shrink: 0;
 }
 .readiness-icon.done {
@@ -525,12 +525,12 @@
 .readiness-row small {
   display: block;
   font-size: 12px;
-  color: #59694d;
+  color: #516d78;
   margin-top: 5px;
   line-height: 1.5;
 }
 .readiness-row > svg {
-  color: #59694d;
+  color: #516d78;
 }
 .launch-note {
   display: flex;
@@ -557,7 +557,7 @@
 .agenda-hour small {
   display: block;
   font-size: 10px;
-  color: #59694d;
+  color: #516d78;
   margin-top: 5px;
   font-weight: 400;
 }
@@ -572,7 +572,7 @@
 }
 .agenda-person small {
   font-size: 11px;
-  color: #59694d;
+  color: #516d78;
   display: block;
   margin-top: 4px;
 }
@@ -585,7 +585,7 @@
   font-weight: 450;
   line-height: 1.5;
   background: #eeefe8;
-  color: #59694d;
+  color: #516d78;
   border-radius: 6px;
   padding: 4px 7px;
   white-space: nowrap;
@@ -627,7 +627,7 @@
   flex-shrink: 0;
   border-radius: 50%;
   background: #efede3;
-  color: #59694d;
+  color: #516d78;
   font-size: 12px;
   font-weight: 500;
 }
@@ -638,7 +638,7 @@
 .recent-order-row small {
   display: block;
   font-size: 12px;
-  color: #59694d;
+  color: #516d78;
   margin-top: 4px;
 }
 .recent-order-row > strong {
@@ -646,7 +646,7 @@
 }
 .desk-inline-empty {
   font-size: 13px;
-  color: #59694d;
+  color: #516d78;
   padding: 13px 0;
 }
 .desk-button {
@@ -679,7 +679,7 @@
 }
 .desk-button.secondary {
   border-color: #dce3d3;
-  background: #fffef9;
+  background: #fcfefe;
   color: #506442;
   box-shadow: 0 2px 5px #354e2910;
 }
@@ -754,7 +754,7 @@
 .desk-field > small {
   font-size: 12px;
   line-height: 1.7;
-  color: #59694d;
+  color: #516d78;
 }
 .desk-form-grid {
   display: grid;
@@ -769,7 +769,7 @@
   align-items: center;
   gap: 12px;
   background: #f5e7df;
-  color: #59694d;
+  color: #516d78;
   border: 1px solid #e9cbbd;
   border-radius: 10px;
   padding: 13px 16px;
@@ -782,7 +782,7 @@
   flex-shrink: 0;
 }
 .desk-muted {
-  color: #59694d;
+  color: #516d78;
   font-size: 13px;
   line-height: 1.8;
 }
@@ -823,7 +823,7 @@
   left: 13px;
   width: 17px;
   height: 17px;
-  color: #59694d;
+  color: #516d78;
 }
 .desk-search > input {
   padding-left: 39px;
@@ -852,7 +852,7 @@
   align-items: center;
   gap: 10px;
   font-size: 11px;
-  color: #59694d;
+  color: #516d78;
 }
 .order-secondary-filters select,
 .order-secondary-filters input {
@@ -865,7 +865,7 @@
 .order-secondary-filters > span {
   margin-left: auto;
   font-size: 11px;
-  color: #59694d;
+  color: #516d78;
   white-space: nowrap;
 }
 .desk-table {
@@ -876,7 +876,7 @@
 .desk-table th {
   text-align: left;
   font-weight: 450;
-  color: #59694d;
+  color: #516d78;
   font-size: 12px;
   background: #fafbf5;
   padding: 15px 18px;
@@ -924,12 +924,12 @@
   display: block;
   margin-top: 5px;
   font-size: 10px;
-  color: #59694d;
+  color: #516d78;
 }
 .table-subline {
   display: block;
   font-size: 10px;
-  color: #59694d;
+  color: #516d78;
   margin-top: 5px;
   line-height: 1.7;
 }
@@ -937,7 +937,7 @@
   display: block;
 }
 .order-items-title > small {
-  color: #59694d;
+  color: #516d78;
 }
 .order-skeletons {
   display: grid;
@@ -966,7 +966,7 @@
   align-items: center;
   border-top: 1px solid #e5e9dc;
   font-size: 11px;
-  color: #59694d;
+  color: #516d78;
 }
 .desk-pagination > div {
   display: flex;
@@ -984,7 +984,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #59694d;
+  color: #516d78;
   white-space: nowrap;
 }
 .calendar-surface {
@@ -1032,7 +1032,7 @@
 }
 .calendar-day > header > small {
   font-size: 10px;
-  color: #59694d;
+  color: #516d78;
 }
 .calendar-day > header > strong {
   font-size: 23px;
@@ -1041,7 +1041,7 @@
 }
 .calendar-day > header > span {
   font-size: 9px;
-  color: #59694d;
+  color: #516d78;
 }
 .day-appointments {
   padding: 8px;
@@ -1073,7 +1073,7 @@
   background: #f2edde;
   border-style: dashed;
   border-color: #e3d7b9;
-  color: #59694d;
+  color: #516d78;
 }
 .day-empty {
   display: block;
@@ -1087,7 +1087,7 @@
   align-items: center;
   gap: 7px;
   font-size: 10px;
-  color: #59694d;
+  color: #516d78;
   padding-top: 13px;
 }
 .legend-dot {
@@ -1124,7 +1124,7 @@
 }
 .weekly-setting > small {
   font-size: 10px;
-  color: #59694d;
+  color: #516d78;
   text-align: right;
 }
 .weekly-time {
@@ -1142,12 +1142,12 @@
 }
 .weekly-time > input:disabled {
   background: #f5f6ef;
-  color: #59694d;
+  color: #516d78;
   border-color: #e9ece1;
 }
 .weekly-time > span {
   font-size: 11px;
-  color: #59694d;
+  color: #516d78;
 }
 .schedule-side {
   display: grid;
@@ -1183,7 +1183,7 @@
 .date-exception > small {
   display: block;
   font-size: 10px;
-  color: #59694d;
+  color: #516d78;
   margin-top: 8px;
 }
 .desk-savebar {
@@ -1192,7 +1192,7 @@
   bottom: 16px;
   z-index: 3;
   padding: 15px 19px;
-  background: #fffef9ed;
+  background: #fcfefeed;
   backdrop-filter: blur(8px);
   border: 1px solid #d7e1cb;
   border-radius: 12px;
@@ -1208,7 +1208,7 @@
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #59694d;
+  color: #516d78;
 }
 .desk-savebar > .desk-error {
   width: 100%;
@@ -1248,7 +1248,7 @@
 .desk-product-price > small {
   display: block;
   font-size: 12px;
-  color: #59694d;
+  color: #516d78;
   margin-top: 7px;
 }
 .desk-product-price > strong {
@@ -1259,7 +1259,7 @@
   text-align: right;
 }
 .desk-product-row > svg {
-  color: #59694d;
+  color: #516d78;
 }
 .product-editor-preview {
   display: flex;
@@ -1278,7 +1278,7 @@
 }
 .product-editor-preview p {
   font-size: 12px;
-  color: #59694d;
+  color: #516d78;
   margin-top: 12px;
 }
 .photo-choices {
@@ -1317,7 +1317,7 @@
 }
 .setting-switch-row p {
   font-size: 12px;
-  color: #59694d;
+  color: #516d78;
   line-height: 1.7;
   margin-top: 7px;
 }
@@ -1346,7 +1346,7 @@
 }
 .provider-setting p {
   font-size: 12px;
-  color: #59694d;
+  color: #516d78;
   line-height: 1.7;
   margin-top: 8px;
 }
@@ -1377,7 +1377,7 @@
 .currency-example small {
   display: block;
   font-size: 10px;
-  color: #59694d;
+  color: #516d78;
   margin-bottom: 8px;
 }
 .currency-example strong {
@@ -1385,14 +1385,14 @@
   font-weight: 450;
 }
 .currency-example > svg {
-  color: #59694d;
+  color: #516d78;
 }
 .settings-hint {
   background: #f3edde;
   border-radius: 9px;
   padding: 13px 15px;
   font-size: 12px;
-  color: #59694d;
+  color: #516d78;
 }
 .storefront-switch {
   padding: 26px;
@@ -1405,14 +1405,14 @@
 }
 .order-drawer-status > small {
   font-size: 11px;
-  color: #59694d;
+  color: #516d78;
 }
 .copy-order-number {
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 11px;
-  color: #59694d;
+  color: #516d78;
   margin: 15px 0 28px;
   padding: 0;
   max-width: 100%;
@@ -1436,7 +1436,7 @@
 }
 .drawer-customer p {
   font-size: 12px;
-  color: #59694d;
+  color: #516d78;
   margin-top: 5px;
   overflow-wrap: anywhere;
 }
@@ -1464,7 +1464,7 @@
 }
 .drawer-order-line p {
   font-size: 12px;
-  color: #59694d;
+  color: #516d78;
   margin-top: 8px;
   line-height: 1.8;
 }
@@ -1508,7 +1508,7 @@
   height: 21px;
   border-radius: 50%;
   background: #e7eddf;
-  color: #59694d;
+  color: #516d78;
   flex-shrink: 0;
 }
 .order-timeline strong {
@@ -1520,7 +1520,7 @@
 .order-timeline small {
   display: block;
   font-size: 10px;
-  color: #59694d;
+  color: #516d78;
   margin-top: 5px;
 }
 .drawer-loading {
@@ -1551,7 +1551,7 @@
   height: 33px;
   border-radius: 9px;
   background: #edf2e5;
-  color: #59694d;
+  color: #516d78;
 }
 .activity-row strong {
   font-size: 13px;
@@ -1559,12 +1559,12 @@
 }
 .activity-row p {
   font-size: 11px;
-  color: #59694d;
+  color: #516d78;
   margin-top: 6px;
 }
 .activity-row small {
   font-size: 10px;
-  color: #59694d;
+  color: #516d78;
   display: block;
   margin-top: 6px;
   overflow-wrap: anywhere;
@@ -1586,7 +1586,7 @@
 .audit-changes h3 {
   font-size: 11px;
   font-weight: 450;
-  color: #59694d;
+  color: #516d78;
 }
 .audit-changes pre {
   font-size: 10px;
@@ -1612,7 +1612,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   min-height: 100dvh;
-  background: #f6f6f0;
+  background: #f3f7f8;
 }
 .host-login-story {
   background: #e9ede0;
@@ -1645,7 +1645,7 @@
   font-size: 10px;
   letter-spacing: 0.12em;
   margin-top: 12px;
-  color: #59694d;
+  color: #516d78;
 }
 .host-login-form {
   display: grid;
@@ -1662,7 +1662,7 @@
 }
 .host-login-form p:not(.desk-eyebrow) {
   font-size: 13px;
-  color: #59694d;
+  color: #516d78;
   line-height: 1.9;
   margin: 18px 0 28px;
 }
@@ -2118,7 +2118,7 @@
   }
   .mobile-order > small {
     font-size: 10px;
-    color: #59694d;
+    color: #516d78;
   }
   .mobile-order-top,
   .mobile-order-bottom {
@@ -2136,7 +2136,7 @@
   }
   .mobile-order-bottom > small {
     font-size: 10px;
-    color: #59694d;
+    color: #516d78;
   }
   .mobile-order-bottom > strong {
     font-size: 13px;

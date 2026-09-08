@@ -155,13 +155,13 @@ function statusLabel(value: string): string {
     <div class="host-login-story">
       <RouterLink to="/" class="desk-brand"
         ><PhFlower :size="32" weight="light" /><span
-          >pindou puppy<small>{{
+          >{{ tr("小狗拼豆铺", "Pindo Puppy") }}<small>{{
             tr("小狗拼豆铺", "A LITTLE CREATIVE STUDIO")
           }}</small></span
         ></RouterLink
       ><img
         :src="media('studio-04')"
-        :alt="tr('小狗拼豆铺工作室', 'PinDou Puppy studio')"
+        :alt="tr('小狗拼豆铺工作室', 'Pindo Puppy studio')"
       />
       <div>
         <p>
@@ -172,7 +172,7 @@ function statusLabel(value: string): string {
             )
           }}
         </p>
-        <span>HAMILTON, ONTARIO</span>
+        <span>{{ tr("汉密尔顿 · 安大略省", "Hamilton, Ontario") }}</span>
       </div>
     </div>
     <div class="host-login-form">

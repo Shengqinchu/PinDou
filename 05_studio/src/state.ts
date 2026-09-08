@@ -25,8 +25,8 @@ watch(
     write("puppy-studio-locale", value);
     document.documentElement.lang = value === "zh" ? "zh-CN" : "en-CA";
     document.title = tr(
-      "小狗拼豆铺 · PinDou Puppy Studio",
-      "PinDou Puppy · A little creative studio in Hamilton",
+      "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
+      "Pindo Puppy · A little creative studio in Hamilton",
     );
   },
   { immediate: true },

@@ -1,14 +1,14 @@
 @charset "UTF-8";
 :root {
-  --paper: #f6f3eb;
-  --white: #fffdf7;
-  --ink: #343f31;
-  --muted: #565e4f;
-  --line: #d8d8ca;
-  --accent: #954d3d;
-  --soft: #ebe6d8;
-  --sage: #e5e9df;
-  --blue: #e0e7e8;
+  --paper: #f3f7f8;
+  --white: #fcfefe;
+  --ink: #273f48;
+  --muted: #5b6f76;
+  --line: #cedade;
+  --accent: #416f7d;
+  --soft: #e5eef1;
+  --sage: #e7f0ee;
+  --blue: #deeaf1;
   --body: "Outfit Variable", "PingFang SC", "Microsoft YaHei", sans-serif;
   --display: "DM Serif Display", "PinDou Serif SC", "Songti SC", serif;
   font-family: var(--body);
@@ -125,8 +125,8 @@ main:focus {
   outline: none;
 }
 ::selection {
-  background: #d9b8a4;
-  color: #292e23;
+  background: #bdd6df;
+  color: #273f48;
 }
 input,
 textarea {

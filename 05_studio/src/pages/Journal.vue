@@ -17,7 +17,7 @@ const viewer = ref<InstanceType<typeof PhotoViewer>>();
         {{
           tr(
             "墙上的新作品、桌上的新颜色，以及每一个认真拼豆的下午。这里的照片，都是小狗拼豆铺的真实日常。",
-            "New pieces on the wall, new colours on the table, and afternoons well spent. Real photographs from everyday life at PinDou Puppy.",
+            "New pieces on the wall, new colours on the table, and afternoons well spent. Real photographs from everyday life at Pindo Puppy.",
           )
         }}
       </p>

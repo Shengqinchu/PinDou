@@ -172,7 +172,7 @@ const readableDate = computed(() =>
     >
       <RouterLink to="/" class="desk-brand"
         ><PhFlower :size="29" weight="light" /><span
-          >pindou puppy<small>{{
+          >{{ tr("小狗拼豆铺", "Pindo Puppy") }}<small>{{
             tr("小狗拼豆铺 · 店主工作台", "YOUR STUDIO, IN GOOD HANDS")
           }}</small></span
         ></RouterLink
