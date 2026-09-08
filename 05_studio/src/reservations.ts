@@ -1,0 +1,111 @@
+import { reactive, watch } from "vue";
+export type ReservationBooking = {
+  date: string;
+  start: string;
+  end: string;
+  plan: "hourly" | "day";
+  guests: number;
+};
+export type ReservationSlot = {
+  start: string;
+  end: string;
+  available: boolean;
+  reason: string | null;
+};
+export type ReservationDay = {
+  date: string;
+  close: string;
+  slots: ReservationSlot[];
+};
+export type ReservationCalendar = {
+  today: string;
+  timezone: string;
+  minimum_minutes: number;
+  days: ReservationDay[];
+};
+export type ReservationPayload = {
+  booking: ReservationBooking;
+  name: string;
+  contact_method: "wechat" | "phone" | "email" | "other";
+  contact: string;
+  notes: string;
+  consent: boolean;
+  locale: "zh" | "en";
+  website: string;
+};
+export type Reservation = {
+  id: string;
+  status: string;
+  booking: ReservationBooking;
+  name: string;
+  version: number;
+  created_at: string;
+  updated_at: string;
+};
+export function readSession<T>(key: string): T | null {
+  try {
+    return JSON.parse(sessionStorage.getItem(key) || "null");
+  } catch {
+    return null;
+  }
+}
+export function saveSession(key: string, value: unknown) {
+  try {
+    if (value === null) sessionStorage.removeItem(key);
+    else sessionStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* Session state remains in memory. */
+  }
+}
+const initial: Omit<ReservationPayload, "locale" | "website"> = {
+  booking: { date: "", start: "", end: "", plan: "hourly", guests: 1 },
+  name: "",
+  contact_method: "wechat",
+  contact: "",
+  notes: "",
+  consent: false,
+};
+const saved = readSession<typeof initial>("puppy-reservation-draft-v1");
+export const reservationDraft = reactive({
+  ...initial,
+  ...(saved && typeof saved.name === "string" ? saved : {}),
+  booking: { ...initial.booking, ...(saved?.booking || {}) },
+});
+watch(
+  reservationDraft,
+  (value) => saveSession("puppy-reservation-draft-v1", value),
+  { deep: true },
+);
+export function minutes(value: string) {
+  const [h, m] = value.split(":").map(Number);
+  return h * 60 + m;
+}
+export function clock(value: number) {
+  return (
+    String(Math.floor(value / 60)).padStart(2, "0") +
+    ":" +
+    String(value % 60).padStart(2, "0")
+  );
+}
+export function validSelection(
+  calendar: ReservationCalendar | null,
+  booking: ReservationBooking,
+) {
+  const day = calendar?.days.find((d) => d.date === booking.date);
+  const start = minutes(booking.start),
+    end = minutes(booking.end);
+  if (
+    !day ||
+    !Number.isFinite(start) ||
+    !Number.isFinite(end) ||
+    end - start < 120 ||
+    start < 600 ||
+    end > minutes(day.close)
+  )
+    return false;
+  if (booking.plan === "day" && booking.end !== day.close) return false;
+  const slots = day.slots.filter(
+    (s) => minutes(s.start) >= start && minutes(s.start) < end,
+  );
+  return slots.length === (end - start) / 30 && slots.every((s) => s.available);
+}

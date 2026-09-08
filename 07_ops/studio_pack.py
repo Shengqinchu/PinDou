@@ -14,7 +14,7 @@ dist = root / '05_studio/dist'
 if not (dist / 'index.html').is_file():
     raise SystemExit('Build the studio frontend first.')
 files = {'site/studio/' + p.relative_to(dist).as_posix(): p for p in dist.rglob('*') if p.is_file()}
-for name in ['app.py', 'commerce.py', 'payments.py', 'requirements.txt', 'requirements.lock.txt']:
+for name in ['app.py', 'commerce.py', 'payments.py', 'reservations.py', 'requirements.txt', 'requirements.lock.txt']:
     files['service/' + name] = root / '06_studio' / name
 manifest = {'version': version, 'sha256': {name: hashlib.sha256(p.read_bytes()).hexdigest() for name, p in files.items()}}
 archive = out / (version + '.tar.gz')

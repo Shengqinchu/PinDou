@@ -43,6 +43,7 @@ class FakeGateway:
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setattr(studio, "DB_PATH", tmp_path / "shop.sqlite3")
+    monkeypatch.setattr(shop, "PUBLIC_SALES_ENABLED", True)
     fake = FakeGateway()
     monkeypatch.setattr(shop, "gateway", fake)
     studio.app.dependency_overrides[studio.admin_actor] = lambda: "test-owner"

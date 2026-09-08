@@ -12,6 +12,7 @@ import "./styles/overlays.css";
 import "./styles/motion.css";
 import "./styles/viewport.css";
 import "./styles/vision.css";
+import "./styles/reservations.css";
 import { installMotion } from "./motion";
 import { installViewport } from "./browser";
 import { reducedMotion } from "./ui";
@@ -23,6 +24,7 @@ const router = createRouter({
   routes: [
     { path: "/", component: Home },
     { path: "/visit", component: () => import("./pages/Visit.vue") },
+    { path: "/reservation/:id", component: () => import("./pages/ReservationReceipt.vue") },
     { path: "/details", component: () => import("./pages/Details.vue") },
     { path: "/shop", component: () => import("./pages/Shop.vue") },
     { path: "/cart", redirect: "/shop" },

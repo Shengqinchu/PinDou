@@ -37,6 +37,7 @@ import ProductsPanel from "./admin/ProductsPanel.vue";
 import CheckoutPanel from "./admin/CheckoutPanel.vue";
 import ActivityPanel from "./admin/ActivityPanel.vue";
 import OrderDrawer from "./admin/OrderDrawer.vue";
+import ReservationsPanel from "./admin/ReservationsPanel.vue";
 const props = defineProps<{ token: string }>();
 const emit = defineEmits<{ logout: []; expired: [] }>();
 const desk = createDesk(props.token, () => emit("expired"));
@@ -44,6 +45,8 @@ provide(deskKey, desk);
 const route = useRoute();
 const router = useRouter();
 const mobileMenu = ref(false);
+const reservationList = ref<InstanceType<typeof ReservationsPanel>>();
+const reservationCalendar = ref<InstanceType<typeof ReservationsPanel>>();
 const mobileMedia = matchMedia("(max-width: 900px)");
 const isMobile = ref(mobileMedia.matches);
 const sidebar = ref<HTMLElement>();
@@ -99,9 +102,26 @@ onBeforeUnmount(() => {
   arrival?.kill();
 });
 const navigation = computed(() => [
-  { id: "overview", zh: "今日概览", en: "Overview", icon: PhSquaresFour },
-  { id: "orders", zh: "订单管理", en: "Orders", icon: PhReceipt },
-  { id: "schedule", zh: "到店排班", en: "Schedule", icon: PhCalendarDots },
+  { id: "reservations", zh: "预约管理", en: "Reservations", icon: PhReceipt },
+  {
+    id: "reservation-calendar",
+    zh: "预约日历",
+    en: "Visit calendar",
+    icon: PhCalendarDots,
+  },
+  {
+    id: "overview",
+    zh: "交易概览",
+    en: "Commerce overview",
+    icon: PhSquaresFour,
+  },
+  { id: "orders", zh: "交易订单", en: "Payment orders", icon: PhReceipt },
+  {
+    id: "schedule",
+    zh: "原交易排班",
+    en: "Commerce schedule",
+    icon: PhCalendarDots,
+  },
   { id: "products", zh: "商品与体验", en: "Products", icon: PhPackage },
   { id: "checkout", zh: "收款设置", en: "Checkout", icon: PhWallet },
   {
@@ -115,7 +135,7 @@ const navigation = computed(() => [
 const view = computed(() =>
   navigation.value.some((n) => n.id === route.query.view)
     ? String(route.query.view)
-    : "overview",
+    : "reservations",
 );
 const selectedIndex = computed(() =>
   navigation.value.findIndex((n) => n.id === view.value),
@@ -129,7 +149,7 @@ async function navigate(id: string, intent?: DeskIntent) {
   await router.replace({
     path: "/manage",
     query: {
-      ...(id === "overview" ? {} : { view: id }),
+      ...(id === "reservations" ? {} : { view: id }),
       ...(intent
         ? { scope: intent, day: desk.overview.value?.date || hamiltonDate() }
         : {}),
@@ -146,6 +166,12 @@ watch(view, async () => {
   if (content.value) arrival = arrive(content.value, { stationary: true });
 });
 onMounted(desk.initialize);
+function refreshCurrent() {
+  if (view.value === "reservations") reservationList.value?.refresh();
+  else if (view.value === "reservation-calendar")
+    reservationCalendar.value?.refresh();
+  else desk.loadOverview();
+}
 const readableDate = computed(() =>
   new Intl.DateTimeFormat(tr("zh-CN", "en-CA"), {
     month: "long",
@@ -172,7 +198,8 @@ const readableDate = computed(() =>
     >
       <RouterLink to="/" class="desk-brand"
         ><PhFlower :size="29" weight="light" /><span
-          >{{ tr("小狗拼豆铺", "Pindo Puppy") }}<small>{{
+          >{{ tr("小狗拼豆铺", "Pindo Puppy")
+          }}<small>{{
             tr("小狗拼豆铺 · 店主工作台", "YOUR STUDIO, IN GOOD HANDS")
           }}</small></span
         ></RouterLink
@@ -214,15 +241,8 @@ const readableDate = computed(() =>
       </nav>
       <div class="sidebar-bottom">
         <div class="sidebar-shop-state">
-          <span
-            :class="[
-              'state-dot',
-              { live: desk.overview.value?.checkout_ready },
-            ]"
-          /><span>{{
-            desk.overview.value?.checkout_ready
-              ? tr("网上购买已开放", "Shop is open")
-              : tr("小店准备中", "Getting ready to open")
+          <span class="state-dot live" /><span>{{
+            tr("预约由店主确认", "Visits confirmed by the host")
           }}</span>
         </div>
         <RouterLink to="/" class="sidebar-store-link"
@@ -230,7 +250,9 @@ const readableDate = computed(() =>
           }}<PhArrowUpRight /></RouterLink
         ><button class="sidebar-signout" @click="emit('logout')">
           <PhSignOut />{{ tr("退出登录", "Sign out") }}</button
-        ><small class="desk-version">Studio desk · 0.3</small>
+        ><small class="desk-version"
+          >{{ tr("店主工作台", "Studio desk") }} · 0.4</small
+        >
       </div>
     </aside>
     <Transition name="menu-shade"
@@ -261,21 +283,32 @@ const readableDate = computed(() =>
             class="desk-icon-button"
             :disabled="desk.overviewBusy.value"
             :aria-label="tr('刷新概览', 'Refresh overview')"
-            @click="desk.loadOverview"
+            @click="refreshCurrent"
           >
             <PhArrowClockwise
               :class="{ spinning: desk.overviewBusy.value }"
             /></button
           ><button
             class="desk-language"
-            :aria-label="tr('Switch to English', '切换为中文')"
+            :aria-label="tr('切换为英文', 'Switch to Chinese')"
             @click="locale = locale === 'zh' ? 'en' : 'zh'"
           >
-            {{ locale === "zh" ? "EN" : "中文" }}</button
+            {{ locale === "zh" ? "英文" : "中文" }}</button
           ><span class="desk-avatar">{{ tr("双吉", "P") }}</span>
         </div>
       </header>
       <div ref="content" class="desk-content">
+        <ReservationsPanel
+          ref="reservationList"
+          v-show="view === 'reservations'"
+          :active="view === 'reservations'"
+        />
+        <ReservationsPanel
+          ref="reservationCalendar"
+          v-show="view === 'reservation-calendar'"
+          :active="view === 'reservation-calendar'"
+          calendar
+        />
         <p
           v-if="desk.error.value && !desk.settings.value"
           class="desk-error"

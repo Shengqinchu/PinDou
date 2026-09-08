@@ -67,6 +67,8 @@ def initialize():
         """)
     import commerce
     commerce.initialize(database)
+    import reservations
+    reservations.initialize(database)
 
 
 @asynccontextmanager
@@ -196,7 +198,7 @@ def admin_actor(authorization: Annotated[str | None, Header()] = None) -> str:
 def health():
     with database() as db:
         db.execute("SELECT 1 FROM studio_requests LIMIT 1")
-    return {"status": "ok", "service": "pindou-studio", "version": "0.3.0"}
+    return {"status": "ok", "service": "pindou-studio", "version": "0.4.0"}
 
 
 @app.post("/studio-api/requests", status_code=201)
@@ -262,3 +264,5 @@ def update_inquiry(request_id: str, payload: StatusUpdate, actor: Annotated[str,
 
 import commerce
 commerce.register(app, admin_actor)
+import reservations
+reservations.register(app, database, admin_actor)

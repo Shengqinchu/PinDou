@@ -12,6 +12,8 @@ from fastapi.responses import Response
 
 import app as studio
 import commerce
+import reservations
+reservations.COOKIE_SECURE = False
 from test_commerce import FakeGateway
 
 studio.DB_PATH = Path(tempfile.mkdtemp(prefix="pindou-commerce-qa-")) / "qa.sqlite3"

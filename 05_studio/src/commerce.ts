@@ -105,6 +105,50 @@ export type Order = {
 };
 
 const messages: Record<string, [string, string]> = {
+  shop_paused: [
+    "拼豆小店尚在开发，暂不开放购买。",
+    "The little shop is still in development and is not open for purchases.",
+  ],
+  reservation_outside_window: [
+    "目前仅接受未来两周的预约，请重新选择日期。",
+    "Please choose a date within the next two weeks.",
+  ],
+  reservation_interval_unavailable: [
+    "这个时段无法安排，请选择其他至少两小时的时段。",
+    "This time cannot be arranged. Choose another interval of at least two hours.",
+  ],
+  reservation_in_past: [
+    "这个开始时间已过去，请重新选择。",
+    "This start time has passed. Please choose another.",
+  ],
+  reservation_day_end: [
+    "全天体验需在当天可预约时段结束时结束。",
+    "A day visit ends at the end of that day's available hours.",
+  ],
+  reservation_session_missing: [
+    "请重新加载时间表后恢复提交。",
+    "Reload the timetable before recovering this submission.",
+  ],
+  reservation_request_changed: [
+    "无法核对原提交，请联系店主查询，避免重复预约。",
+    "We could not verify the original submission. Contact the host to avoid a duplicate.",
+  ],
+  reservation_not_found: [
+    "无法读取这份预约，请使用提交时的浏览器，或联系店主查询。",
+    "Open this reservation in the browser used to submit it, or contact the host.",
+  ],
+  reservation_confirmation_conflict: [
+    "此时段已有已确认预约，请先处理重叠安排。",
+    "A confirmed reservation overlaps this time. Resolve the overlap first.",
+  ],
+  reservation_not_confirmed: [
+    "请先确认预约，再标记为已完成。",
+    "Confirm the reservation before marking it complete.",
+  ],
+  invalid_reservation_time: [
+    "请选择整点或半点时间。",
+    "Choose a time on the hour or half hour.",
+  ],
   checkout_not_open: [
     "网上购买即将开放，请稍后再来。",
     "Online purchases will open soon. Please check back.",
@@ -159,6 +203,7 @@ export class CommerceError extends Error {
   constructor(
     message: string,
     public status: number,
+    public code?: string,
   ) {
     super(message);
   }
@@ -189,7 +234,8 @@ export async function commerceApi<T>(
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const words = messages[data.detail];
-    if (words) throw new CommerceError(tr(...words), response.status);
+    if (words)
+      throw new CommerceError(tr(...words), response.status, data.detail);
     if (response.status === 401 || response.status === 403)
       throw new CommerceError(
         tr(
@@ -209,8 +255,8 @@ export async function commerceApi<T>(
     if (response.status === 422)
       throw new CommerceError(
         tr(
-          "请检查必填项、时间和金额，修正后再试。",
-          "Check the required fields, times and amounts, then try again.",
+          "请检查必填项、日期和时间，修正后再试。",
+          "Check the required fields, dates and times, then try again.",
         ),
         response.status,
       );

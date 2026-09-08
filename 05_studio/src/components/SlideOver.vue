@@ -8,6 +8,7 @@ const props = defineProps<{
   title: string;
   subtitle?: string;
   busy?: boolean;
+  closeLabel?: string;
 }>();
 const emit = defineEmits<{ "update:modelValue": [value: boolean] }>();
 const dialog = ref<HTMLDialogElement>();
@@ -40,7 +41,7 @@ function dismiss() {
           <button
             class="icon-button"
             :disabled="busy"
-            :aria-label="tr('关闭详情', 'Close details')"
+            :aria-label="closeLabel || tr('关闭详情', 'Close details')"
             @click="dismiss"
           >
             <PhX :size="21" />

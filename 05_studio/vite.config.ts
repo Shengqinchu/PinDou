@@ -5,15 +5,28 @@ const build = new Date().toISOString();
 export default defineConfig({
   base: "/studio/",
   define: { __STUDIO_BUILD__: JSON.stringify(build) },
-  plugins: [vue(), {
-    name: "studio-release-identity",
-    generateBundle() {
-      this.emitFile({ type: "asset", fileName: "version.json", source: JSON.stringify({ build }) });
+  plugins: [
+    vue(),
+    {
+      name: "studio-release-identity",
+      generateBundle() {
+        this.emitFile({
+          type: "asset",
+          fileName: "version.json",
+          source: JSON.stringify({ build }),
+        });
+      },
+      transformIndexHtml() {
+        return [
+          {
+            tag: "meta",
+            attrs: { name: "studio-build", content: build },
+            injectTo: "head",
+          },
+        ];
+      },
     },
-    transformIndexHtml() {
-      return [{ tag: "meta", attrs: { name: "studio-build", content: build }, injectTo: "head" }];
-    },
-  }],
+  ],
   server: {
     port: 5184,
     strictPort: true,

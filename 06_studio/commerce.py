@@ -5,6 +5,7 @@ import asyncio
 import hashlib
 import hmac
 import json
+import os
 import re
 import time
 import uuid
@@ -270,8 +271,10 @@ def stock_held(db, product_id, exclude=""):
         WHERE s.product_id=? AND o.id<>? AND o.status IN ('creating','pending','payment_uncertain') AND o.hold_until>?""", (product_id, exclude, time.time())).fetchone()[0]
 
 
+PUBLIC_SALES_ENABLED = os.getenv("STUDIO_ONLINE_SALES", "0") == "1"
+
 def commerce_ready(settings):
-    return settings["enabled"] and settings["tax_mode"] != "unconfirmed" and gateway.configured
+    return PUBLIC_SALES_ENABLED and settings["enabled"] and settings["tax_mode"] != "unconfirmed" and gateway.configured
 
 
 def quote_cart(db, cart: Cart):
@@ -490,6 +493,7 @@ def register(app, admin_actor):
 
     @app.post("/studio-api/cart/quote")
     def quote(payload: Cart):
+        if not PUBLIC_SALES_ENABLED: fail("shop_paused", 409)
         with database() as db:
             return quote_cart(db, payload)
 
@@ -508,6 +512,7 @@ def register(app, admin_actor):
                 if existing["payload_hash"] != hashed:
                     fail("request_changed")
                 return order_view(existing)
+            if not PUBLIC_SALES_ENABLED: fail("shop_paused", 409)
             quoted = quote_cart(db, payload)
             if quoted["quote_id"] != payload.quote_id:
                 fail("price_changed")
