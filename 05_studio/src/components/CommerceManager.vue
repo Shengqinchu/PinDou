@@ -28,7 +28,7 @@ import {
 import { gsap } from "gsap";
 import { arrive } from "../motion";
 import { lockPageScroll, pageScrollY } from "../browser";
-import { createDesk, deskKey } from "../admin";
+import { createDesk, deskKey, type DeskIntent } from "../admin";
 import { hamiltonDate, locale, tr } from "../state";
 import OverviewPanel from "./admin/OverviewPanel.vue";
 import OrdersPanel from "./admin/OrdersPanel.vue";
@@ -122,14 +122,19 @@ const selectedIndex = computed(() =>
 );
 const selected = computed(() => navigation.value[selectedIndex.value]);
 const scrolls = new Map<string, number>();
-async function navigate(id: string) {
+async function navigate(id: string, intent?: DeskIntent) {
   scrolls.set(view.value, pageScrollY());
   await router.replace({
     path: "/manage",
-    query: id === "overview" ? {} : { view: id },
+    query: {
+      ...(id === "overview" ? {} : { view: id }),
+      ...(intent
+        ? { scope: intent, day: desk.overview.value?.date || hamiltonDate() }
+        : {}),
+    },
   });
   await nextTick();
-  scrollTo({ top: scrolls.get(id) || 0, behavior: "instant" });
+  scrollTo({ top: intent ? 0 : scrolls.get(id) || 0, behavior: "instant" });
 }
 watch(view, async () => {
   mobileMenu.value = false;

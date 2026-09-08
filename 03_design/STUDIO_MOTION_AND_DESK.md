@@ -18,19 +18,18 @@ The previous implementation has a functioning protected manager and payment engi
 3. Host desk: its own navigation and compact layout, meaningful daily metrics from the entire database, searchable/filterable orders, detail drawer, weekly schedule and date exceptions, product editor, checkout settings, and paginated activity.
 4. Validation: normal and reduced motion, interruption, keyboard focus/escape, touch, state preservation, failed saves, server authorization, truthful empty states, desktop and mobile layouts. Existing payment/booking contract tests remain required.
 
-## Motion contract — revised after code-level review
+## Current component and motion contract
 
-The owner rejected the first studio adaptation as fast and monotonous. T-Check itself still specifies 300ms ease-in-out. The studio's new durations below are an intentional response to that feedback, **not a claim that Turnitin uses them**.
+The independent `STUDIO_0830_REVIEW.md` documents why the prior 480ms adaptation was rejected. A longer total duration still produced a faster first 100ms, and the retained press continued after release. That is superseded by the current contract below.
 
-- Actual source inspected: `index.html#help-card` (line 831) pairs lift with border and soft shadow. `generate.html` lines 99–147 defines the outer card, nested `.product`, soft `::before` surface, pressed scale, `.product-icon` lift and matched timing. The visual relationship matters more than copying a duration.
-- `src/motion.ts` is the shared CSS/GSAP clock. Controls use 480ms `cubic-bezier(.22,.1,.22,1)`, including parent, inner number/icon, shadow, down and release. State indicators/list movement use 520ms; modal travel uses 680ms and exits use 480ms. GSAP CustomEase reads the same curve definition.
-- Removed the prior hard button ledge, sweeping fill, diagonal icon wobble and uniform route opacity animation. Interactive plan/metric cards now carry their child labels/icons; informational cards remain still.
-- Short taps retain the pressed visual for a minimum 180ms without delaying click, checkout, navigation or a save. Pointer cancellation, touch scrolling, blur and repeated input clear it; reduced motion does not add a retained transform.
-- Native dialogs own focus and Escape. A full viewport shell has separate scrim and panel layers, animated by one interruptible timeline. Desktop details enter from the right; narrow portrait uses a bottom sheet. Close/reopen uses the current rendered frame, never a new from-state or a stale close callback.
-- Photo switching crossfades in a stable stage. Images overlap; the footer and stage do not disappear while waiting for an out-in cycle. Previous/next respects direction. The public hero uses masked text lines and a slower photograph reveal; no per-character Chinese animation, no looping attention effects.
-- Host navigation keeps mounted form state; the new view arrives in place. Slot refresh retains visible time cells (disabled while stale), with measured height continuity. Cart repricing keeps the prior summary shape explicitly marked as updating; only the fresh server quote enables payment.
-- Prefer transform/opacity. Height animation is limited to the slot-result content whose size actually changes, with ResizeObserver cleanup and immediate reflow on viewport width changes. No Vue state writes per animation frame, no scroll hijacking, no invented activity.
-- Reduced motion disables spatial transitions across both parent and child, including modal/hero GSAP. Coarse pointers do not rely on hover.
+- Controls and selection use T-Check's 300ms ease-in-out (`cubic-bezier(.42,0,.58,1)`). Parent, child, shadow, down and release share that curve. `motion.ts` drives the CSS/GSAP clock; native active state follows the actual finger/key lifetime without a delayed latch.
+- Narrative/photo/modal timing is separate. Existing native modal focus, Escape, scroll restoration and interrupted close/reopen remain. Photos preload the target, keep at most two image layers, retain one caption and cancel stale transitions on repeated input.
+- The bead graphic's parent and children share one timeline. It starts when the footnote enters the viewport; the parent appears before assembly. The phone photograph precedes that auxiliary note. Reduced motion renders the complete graphic immediately.
+- Component ownership: product article/image/title/price/badge in `styles/commerce.css`; shared button states in `styles/interactions.css`; dialog geometry/surfaces in `styles/overlays.css`; switch and segment details in their Vue components; workspace type/layout in `styles/desk.css`. `layout.css` owns the single container gutter model, including safe areas. Stale `.product` and conflicting image-label anchors have been removed.
+- Chinese editorial text uses Serif SC selectively. Product titles, practical controls and the host desk use the explicit Sans SC UI stack, including a Chinese system sans fallback for catalog text outside the static subset. Verify actual rendered fonts as well as CSS values.
+- Practical pages have direct titles. On phones, a visit starts with readiness and choices; photos/details follow. An unavailable catalog stays an error, and a closed studio offers an actual contact/price-preview path instead of empty selectors.
+- The host overview prioritizes visits, recent orders and follow-up. Completed setup collapses; unfinished setup stays actionable. Metric navigation carries explicit creation/payment/visit dates and fulfillment meaning; ordinary navigation keeps drafts and filters.
+- Meaningful checks include catalog recovery without false zero prices, indicator/list semantics, card geometry, rendered Chinese fonts, actual touch hit targets, visible assembly and interrupted image transitions. Passing build/overflow checks is not visual acceptance.
 
 ## Viewports and WeChat
 

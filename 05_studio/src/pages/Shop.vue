@@ -19,11 +19,12 @@ watch(category, () =>
 );
 const lastAdded = ref("");
 const error = ref("");
+const loading = ref(false);
 const categories = computed(() => [
-  { id: "all", label: tr("全部小物", "All the little things") },
-  { id: "tools", label: tr("工具与配件", "Tools & fittings") },
-  { id: "beads", label: tr("拼豆补充装", "Bead refills") },
-  { id: "finished", label: tr("手作成品", "Finished pieces") },
+  { id: "all", label: tr("全部", "All") },
+  { id: "tools", label: tr("工具配件", "Tools") },
+  { id: "beads", label: tr("补充豆", "Beads") },
+  { id: "finished", label: tr("手作成品", "Handmade") },
 ]);
 const visible = computed(
   () =>
@@ -33,13 +34,18 @@ const visible = computed(
         (category.value === "all" || p.category === category.value),
     ) || [],
 );
-onMounted(async () => {
+async function reloadProducts() {
+  loading.value = true;
+  error.value = "";
   try {
     await loadCatalog();
   } catch (e) {
     error.value = (e as Error).message;
+  } finally {
+    loading.value = false;
   }
-});
+}
+onMounted(reloadProducts);
 function add(id: string) {
   addToBag(id);
   lastAdded.value = id;
@@ -47,11 +53,7 @@ function add(id: string) {
 </script>
 <template>
   <section class="container page-intro">
-    <h1>
-      {{ tr("把喜欢的，", "Little things") }}<br /><em>{{
-        tr("一起带回家。", "for your next idea.")
-      }}</em>
-    </h1>
+    <h1>{{ tr("拼豆小店", "The little shop.") }}</h1>
     <div>
       <p>
         {{
@@ -74,7 +76,15 @@ function add(id: string) {
       :label="tr('商品分类', 'Product categories')"
       :options="categories.map((c) => ({ value: c.id, label: c.label }))"
     />
-    <p v-if="error" class="form-error" role="alert">{{ error }}</p>
+    <p v-if="error" class="form-error" role="alert">
+      {{ error }}
+      <button class="text-link" :disabled="loading" @click="reloadProducts">
+        {{ tr("重新加载商品", "Reload products") }}
+      </button>
+    </p>
+    <p v-if="loading" class="form-help" role="status">
+      {{ tr("正在查看小店里的商品…", "Loading the little shop…") }}
+    </p>
     <AutoHeight
       ><TransitionGroup
         name="product-list"
@@ -110,6 +120,8 @@ function add(id: string) {
           <button
             class="button button-outline full-button"
             :disabled="
+              loading ||
+              !!error ||
               !p.active ||
               p.price_cents === null ||
               !p.available_stock ||
@@ -118,8 +130,7 @@ function add(id: string) {
             @click="add(p.id)"
           >
             <template v-if="lastAdded === p.id"
-              >{{ tr("已加入，再添一件", "Added · Add another")
-              }}<PhCheck /></template
+              >{{ tr("再添一件", "Add another") }}<PhCheck /></template
             ><template v-else-if="p.active && p.price_cents !== null"
               >{{
                 p.available_stock
@@ -127,7 +138,7 @@ function add(id: string) {
                   : tr("暂时售罄", "Sold out")
               }}<PhPlus /></template
             ><template v-else
-              >{{ tr("小物整理中", "Getting things ready") }}<PhPlus
+              >{{ tr("小物整理中", "Coming soon") }}<PhPlus
             /></template>
           </button>
         </article> </TransitionGroup

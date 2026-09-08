@@ -10,7 +10,7 @@
   --sage: #e5e9df;
   --blue: #e0e7e8;
   --body: "Outfit Variable", "PingFang SC", "Microsoft YaHei", sans-serif;
-  --display: "DM Serif Display", Georgia, serif;
+  --display: "DM Serif Display", "PinDou Serif SC", "Songti SC", serif;
   font-family: var(--body);
   color: var(--ink);
   background: var(--paper);
@@ -160,45 +160,7 @@ html {
 .text-link:hover svg {
   transform: translate(3px, -2px);
 }
-.button {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  gap: 24px;
-  min-height: 52px;
-  padding: 15px 25px;
-  border: 1px solid transparent;
-  font-size: 14px;
-  font-weight: 450;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    transform 0.2s;
-}
-.button:hover {
-  transform: translateY(-2px);
-}
-.button-primary {
-  background: var(--accent);
-  color: var(--white);
-}
-.button-primary:hover {
-  background: #7f4133;
-}
-.button-outline {
-  border-color: var(--ink);
-}
-.button-outline:hover {
-  background: var(--ink);
-  color: var(--paper);
-}
-.icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-}
+
 .fine-print {
   font-size: 13px;
   color: var(--muted);
@@ -777,47 +739,7 @@ details p {
 .journal-grid .photo-tile-image {
   aspect-ratio: 4/5;
 }
-.photo-dialog {
-  background: var(--paper);
-  color: var(--ink);
-  border: 0;
-  padding: 28px;
-  max-width: min(1000px, 94vw);
-  max-height: 94dvh;
-  overflow: auto;
-}
-.photo-dialog::backdrop {
-  background: rgb(24 29 22 / 0.88);
-}
-.photo-dialog figure > img {
-  max-width: 100%;
-  max-height: 72dvh;
-  width: auto;
-  height: auto;
-  margin: auto;
-  object-fit: contain;
-}
-.photo-dialog figcaption {
-  text-align: center;
-  font-size: 13px;
-  margin-top: 15px;
-}
-.photo-close {
-  position: sticky;
-  top: 0;
-  float: right;
-  margin: -16px -16px 8px 8px;
-  background: var(--paper);
-  z-index: 1;
-}
-.photo-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 30px;
-  margin-top: 8px;
-  font-size: 12px;
-}
+
 .booking-layout {
   display: grid;
   grid-template-columns: 0.83fr 1.17fr;
@@ -1113,59 +1035,7 @@ details p {
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
 }
-.product-image {
-  aspect-ratio: 4/5;
-  position: relative;
-  overflow: hidden;
-}
-.product-image > img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.45s;
-}
-.product:hover .product-image > img {
-  transform: scale(1.025);
-}
-.product-image > span {
-  position: absolute;
-  bottom: 13px;
-  left: 13px;
-  background: var(--paper);
-  padding: 7px 10px;
-  font-size: 10px;
-}
-.product-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-}
-.product h2 {
-  font-family: var(--body);
-  font-size: 17px !important;
-  line-height: 1.5;
-  letter-spacing: 0;
-}
-.add-product {
-  background: var(--soft);
-  border-radius: 50%;
-  min-width: 40px;
-  width: 40px;
-  min-height: 40px;
-}
-.product > p {
-  font-size: 12px;
-  line-height: 1.75;
-  color: var(--muted);
-  margin-top: 8px;
-}
-.product-price {
-  font-size: 11px;
-  margin-top: 13px;
-  color: var(--accent);
-}
+
 .selection-section {
   display: grid;
   grid-template-columns: 0.7fr 1.3fr;
@@ -1980,20 +1850,7 @@ details p {
   .journal-grid .photo-expand svg {
     width: 15px;
   }
-  .photo-dialog {
-    padding: 18px;
-    width: 94vw;
-  }
-  .photo-dialog figure > img {
-    max-height: 70dvh;
-  }
-  .photo-dialog figcaption {
-    font-size: 12px;
-    line-height: 1.7;
-  }
-  .photo-close {
-    margin: -8px -8px 8px 8px;
-  }
+
   .booking-layout {
     padding-top: 36px;
     gap: 30px;
@@ -2119,39 +1976,7 @@ details p {
   .product-grid {
     gap: 30px 16px;
   }
-  .product-image > span {
-    font-size: 9px;
-    left: 8px;
-    bottom: 8px;
-    padding: 6px 8px;
-  }
-  .product-heading {
-    align-items: flex-start;
-    margin-top: 10px;
-    gap: 5px;
-  }
-  .product h2 {
-    font-size: 14px !important;
-    line-height: 1.6;
-  }
-  .add-product {
-    width: 34px;
-    min-width: 34px;
-    min-height: 38px;
-    background: none;
-  }
-  .add-product > svg {
-    width: 19px;
-  }
-  .product > p {
-    font-size: 11px;
-    line-height: 1.8;
-  }
-  .product-price {
-    font-size: 10px;
-    line-height: 1.65;
-    margin-top: 10px;
-  }
+
   .selection-section {
     gap: 25px;
   }

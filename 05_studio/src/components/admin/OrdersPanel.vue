@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import {
   PhArrowUpRight,
   PhMagnifyingGlass,
@@ -9,6 +16,7 @@ import {
   PhX,
   PhArrowClockwise,
 } from "@phosphor-icons/vue";
+import { useRoute } from "vue-router";
 import { useDesk, localTime } from "../../admin";
 import { type Order, money, statusText } from "../../commerce";
 import { prettyDate, tr } from "../../state";
@@ -22,6 +30,17 @@ const search = ref("");
 const status = ref("all");
 const kind = ref("all");
 const day = ref("");
+const dayKind = ref("visit");
+const fulfillment = ref("all");
+const route = useRoute();
+let applyingIntent = false;
+const dayLabel = computed(() =>
+  dayKind.value === "paid"
+    ? tr("付款日期", "Payment date")
+    : dayKind.value === "created"
+      ? tr("下单日期", "Order date")
+      : tr("到店日期", "Visit date"),
+);
 const page = ref(1);
 let sequence = 0;
 let debounce: ReturnType<typeof setTimeout>;
@@ -34,6 +53,8 @@ async function load() {
     status: status.value,
     search: search.value,
     kind: kind.value,
+    day_kind: dayKind.value,
+    fulfillment: fulfillment.value,
   });
   if (day.value) params.set("day", day.value);
   try {
@@ -50,17 +71,59 @@ async function load() {
     if (seq === sequence) loading.value = false;
   }
 }
-watch([status, kind, day], () => {
+watch([status, kind, day, dayKind, fulfillment], () => {
+  if (applyingIntent) return;
   page.value = 1;
   load();
 });
 watch(search, () => {
+  if (applyingIntent) return;
   page.value = 1;
   clearTimeout(debounce);
   debounce = setTimeout(load, 300);
 });
 watch(orderRevision, load);
-onMounted(load);
+watch(
+  () => [route.query.scope, route.query.day],
+  async () => {
+    const scope = String(route.query.scope || "");
+    if (
+      ![
+        "today-orders",
+        "today-received",
+        "awaiting",
+        "needs-review",
+        "all-orders",
+      ].includes(scope)
+    )
+      return;
+    applyingIntent = true;
+    clearTimeout(debounce);
+    search.value = "";
+    kind.value = "all";
+    day.value = "";
+    dayKind.value = "visit";
+    fulfillment.value = "all";
+    status.value = "all";
+    page.value = 1;
+    const selectedDay = String(route.query.day || "");
+    if (scope === "today-orders" || scope === "today-received") {
+      day.value = /^\d{4}-\d{2}-\d{2}$/.test(selectedDay) ? selectedDay : "";
+      dayKind.value = scope === "today-orders" ? "created" : "paid";
+      status.value = scope === "today-orders" ? "all" : "received";
+    } else if (scope === "awaiting") {
+      status.value = "received";
+      fulfillment.value = "confirmed";
+    } else if (scope === "needs-review") status.value = "paid_needs_review";
+    await nextTick();
+    applyingIntent = false;
+    load();
+  },
+  { immediate: true },
+);
+onMounted(() => {
+  if (!applyingIntent) load();
+});
 onBeforeUnmount(() => {
   clearTimeout(debounce);
   sequence++;
@@ -77,6 +140,8 @@ function reset() {
   status.value = "all";
   kind.value = "all";
   day.value = "";
+  dayKind.value = "visit";
+  fulfillment.value = "all";
 }
 </script>
 <template>
@@ -109,7 +174,7 @@ function reset() {
           :label="tr('订单状态', 'Order status')"
           :options="[
             { value: 'all', label: tr('全部', 'All') },
-            { value: 'paid', label: tr('已付款', 'Paid') },
+            { value: 'received', label: tr('已收款', 'Paid') },
             { value: 'pending', label: tr('待付款', 'Unpaid') },
             { value: 'paid_needs_review', label: tr('需跟进', 'Follow-up') },
           ]"
@@ -137,13 +202,38 @@ function reset() {
             <option value="pickup">{{ tr("实物自提", "Pickup items") }}</option>
           </select></label
         ><label
-          >{{ tr("到店日期", "Visit date")
-          }}<input
-            v-model="day"
-            type="date"
-            :aria-label="tr('按到店日期筛选', 'Filter by visit date')" /></label
+          >{{ tr("日期类型", "Date basis")
+          }}<select
+            v-model="dayKind"
+            :aria-label="tr('日期类型', 'Date basis')"
+          >
+            <option value="visit">{{ tr("到店日期", "Visit date") }}</option>
+            <option value="created">{{ tr("下单日期", "Order date") }}</option>
+            <option value="paid">{{ tr("付款日期", "Payment date") }}</option>
+          </select></label
+        ><label
+          >{{ dayLabel
+          }}<input v-model="day" type="date" :aria-label="dayLabel" /></label
+        ><label
+          >{{ tr("交付", "Fulfillment")
+          }}<select
+            v-model="fulfillment"
+            :aria-label="tr('交付状态', 'Fulfillment status')"
+          >
+            <option value="all">{{ tr("全部", "All") }}</option>
+            <option value="confirmed">
+              {{ tr("待到店／自提", "Awaiting visit / pickup") }}
+            </option>
+            <option value="completed">{{ tr("已完成", "Completed") }}</option>
+          </select></label
         ><button
-          v-if="search || status !== 'all' || kind !== 'all' || day"
+          v-if="
+            search ||
+            status !== 'all' ||
+            kind !== 'all' ||
+            day ||
+            fulfillment !== 'all'
+          "
           class="desk-link"
           @click="reset"
         >

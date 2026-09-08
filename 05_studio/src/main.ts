@@ -8,6 +8,7 @@ import "./styles/typography.css";
 import "./styles/interactions.css";
 import "./styles/layout.css";
 import "./styles/commerce.css";
+import "./styles/overlays.css";
 import "./styles/motion.css";
 import "./styles/viewport.css";
 import { installMotion } from "./motion";

@@ -34,7 +34,7 @@ try {
         assert.equal(await page.locator(".inquiry-form").count(), 0);
       }
       if (route === "cart")
-        assert.match(await page.locator("main").innerText(), /装进购物车/);
+        assert.match(await page.locator("main").innerText(), /你的购物车/);
       if (route === "shop")
         assert.equal(await page.locator(".product-card").count(), 4);
       if (route === "manage")

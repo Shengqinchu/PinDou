@@ -3,7 +3,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { randomBytes, randomUUID } from "node:crypto";
 import assert from "node:assert/strict";
 const base = "http://127.0.0.1:5184";
-const output = "../artifacts/studio-desk";
+const output = "../artifacts/studio-0830-fixes/desk";
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({ headless: true, channel: "msedge" });
 const axe = await readFile("node_modules/axe-core/axe.min.js", "utf8");
@@ -161,7 +161,7 @@ try {
     icon: getComputedStyle(el.querySelector("svg")).transitionDuration,
     ease: getComputedStyle(el).transitionTimingFunction,
   }));
-  assert(computed.parent.includes("0.48s") && computed.icon.includes("0.48s"));
+  assert(computed.parent.includes("0.3s") && computed.icon.includes("0.3s"));
   results.push({ motion: "shared control timing", ...computed });
   await context.close();
   for (const [width, height, lang, motion] of [

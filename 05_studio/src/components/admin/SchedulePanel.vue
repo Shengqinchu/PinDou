@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import {
   PhArrowLeft,
   PhArrowRight,
@@ -24,6 +25,21 @@ const {
   openOrder,
 } = useDesk();
 const start = ref(hamiltonDate());
+const route = useRoute();
+watch(
+  () => [route.query.scope, route.query.day],
+  () => {
+    const day = String(route.query.day || "");
+    if (
+      route.query.scope === "today-visits" &&
+      /^\d{4}-\d{2}-\d{2}$/.test(day)
+    ) {
+      if (start.value === day) loadCalendar(day);
+      else start.value = day;
+    }
+  },
+  { immediate: true },
+);
 const labels = [
   ["周一", "Monday"],
   ["周二", "Tuesday"],

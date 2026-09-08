@@ -2,7 +2,7 @@ import { chromium, webkit, firefox, expect } from "@playwright/test";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 const base = "http://127.0.0.1:5184/studio/";
-const out = "../artifacts/studio-motion-v2";
+const out = "../artifacts/studio-0830-fixes/responsive";
 await mkdir(out, { recursive: true });
 const results = [],
   errors = [],
@@ -297,15 +297,15 @@ for (const [name, engine] of [
         "tap action must not be delayed",
       );
       assert(
-        await button.evaluate((e) => e.hasAttribute("data-pressed")),
-        "short tap must retain visible press",
+        !(await button.evaluate((e) => e.hasAttribute("data-pressed"))),
+        "short tap must follow the released pointer without a latch",
       );
       await page.waitForTimeout(850);
       assert(!(await button.evaluate((e) => e.hasAttribute("data-pressed"))));
       results.push({
         label: "quick-tap",
         immediateAction: true,
-        retainedPress: true,
+        nativeRelease: true,
         released: true,
       });
 

@@ -14,11 +14,13 @@ import PhotoViewer from "../components/PhotoViewer.vue";
 import BeadMark from "../components/BeadMark.vue";
 import { gallery, mapsUrl, media, socialUrl, tr, wechat } from "../state";
 import { catalog, loadCatalog } from "../commerce";
+import { notify } from "../ui";
 
 gsap.registerPlugin(ScrollTrigger);
 const page = ref<HTMLElement>();
 const viewer = ref<InstanceType<typeof PhotoViewer>>();
 const copied = ref(false);
+const copyFailed = ref(false);
 const hourlyPrice = computed(
   () => catalog.value?.products.find((p) => p.id === "hourly")?.price_cents,
 );
@@ -50,7 +52,7 @@ onMounted(() => {
           0.08,
         )
         .from(
-          ".hero-description, .hero-buttons, .hero-footnote",
+          ".hero-description, .hero-buttons",
           {
             opacity: 0,
             y: 16,
@@ -73,6 +75,36 @@ onMounted(() => {
           ".hero-photo > img",
           { scale: 1.045, duration: 1.5, clearProps: "transform" },
           0.08,
+        );
+      gsap
+        .timeline({
+          defaults: { ease: "studio-control" },
+          scrollTrigger: {
+            trigger: ".hero-footnote",
+            start: "top 94%",
+            once: true,
+          },
+        })
+        .from(".hero-footnote", {
+          opacity: 0,
+          y: 6,
+          duration: 0.25,
+          clearProps: "transform,opacity",
+        })
+        .from(
+          ".bead-mark i",
+          {
+            x: (_i, el) =>
+              parseFloat(getComputedStyle(el).getPropertyValue("--origin-x")),
+            y: (_i, el) =>
+              parseFloat(getComputedStyle(el).getPropertyValue("--origin-y")),
+            opacity: 0,
+            scale: 0.45,
+            duration: 0.55,
+            stagger: 0.02,
+            clearProps: "transform,opacity",
+          },
+          0.25,
         );
       if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
         gsap.fromTo(
@@ -102,9 +134,16 @@ async function copyContact() {
   try {
     await navigator.clipboard.writeText(wechat);
     copied.value = true;
+    copyFailed.value = false;
     copyTimer = setTimeout(() => (copied.value = false), 2500);
   } catch {
     copied.value = false;
+    copyFailed.value = true;
+    notify(
+      "未能自动复制，可以长按下方微信号手动复制。",
+      "Automatic copy was unavailable. Press and hold the WeChat ID below to copy it.",
+      "error",
+    );
   }
 }
 </script>
@@ -128,8 +167,8 @@ async function copyContact() {
         <p class="hero-description">
           {{
             tr(
-              "欢迎来到小狗拼豆铺。选一幅喜欢的图，坐进阳光里，把一颗颗小豆子，变成属于你的快乐。",
-              "Welcome to our little bead studio. Pull up a chair, pick a pattern, and turn a handful of tiny beads into something that is entirely yours.",
+              "选一幅喜欢的图，坐进阳光里，把小豆子变成属于自己的快乐。",
+              "Pull up a chair in our little bead studio. Pick a pattern, play with colour, and make something yours.",
             )
           }}
         </p>
@@ -141,15 +180,6 @@ async function copyContact() {
             >{{ tr("先逛逛小屋", "Take a look around")
             }}<PhArrowDown :size="16"
           /></RouterLink>
-        </div>
-        <div class="hero-footnote">
-          <BeadMark />
-          <span>{{
-            tr(
-              "不用很擅长，只要很喜欢。",
-              "No experience. Just a little curiosity.",
-            )
-          }}</span>
         </div>
       </div>
       <div class="hero-photo">
@@ -173,6 +203,15 @@ async function copyContact() {
             >made<br /><em>by you.</em></span
           >
         </div>
+      </div>
+      <div class="hero-footnote">
+        <BeadMark />
+        <span>{{
+          tr(
+            "不用很擅长，只要很喜欢。",
+            "No experience. Just a little curiosity.",
+          )
+        }}</span>
       </div>
     </section>
 
@@ -431,8 +470,13 @@ async function copyContact() {
               copied
                 ? tr("微信号已复制", "WeChat ID copied")
                 : `WeChat: ${wechat}`
-            }}</button
-          ><span class="sr-only" role="status">{{
+            }}
+          </button>
+          <p v-if="copyFailed" class="manual-contact" role="status">
+            {{ tr("长按复制微信号：", "Press and hold to copy: ")
+            }}<span>{{ wechat }}</span>
+          </p>
+          <span class="sr-only" role="status">{{
             copied ? tr("微信号已复制", "WeChat ID copied") : ""
           }}</span>
         </div>

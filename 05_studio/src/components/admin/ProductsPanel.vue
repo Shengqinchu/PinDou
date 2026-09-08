@@ -208,10 +208,10 @@ async function reloadSaved() {
           </div>
         </div>
         <div class="desk-form-grid">
-          <label class="desk-field"
+          <label class="desk-field product-name-field"
             >{{ tr("中文名称", "Chinese name")
             }}<input v-model="edit.zh" maxlength="90" required /></label
-          ><label class="desk-field"
+          ><label class="desk-field product-name-field"
             >{{ tr("英文名称", "English name")
             }}<input v-model="edit.en" maxlength="140" required /></label
           ><label class="desk-field"

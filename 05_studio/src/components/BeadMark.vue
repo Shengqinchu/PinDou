@@ -34,10 +34,33 @@ const beads = [
       :style="{
         '--x': x,
         '--y': y,
-        '--delay': `${index * 15}ms`,
         '--origin-x': `${(x - 2.5) * 9}px`,
         '--origin-y': `${(y - 2.5) * 9}px`,
       }"
       :class="{ center: x >= 2 && x <= 3 && y >= 2 && y <= 3 }"
   /></span>
 </template>
+
+<style scoped>
+.bead-mark {
+  display: grid;
+  flex-shrink: 0;
+  grid-template: repeat(6, 7px) / repeat(6, 7px);
+  gap: 2px;
+  width: 52px;
+  height: 52px;
+  transform: rotate(-9deg);
+}
+.bead-mark i {
+  grid-column: calc(var(--x) + 1);
+  grid-row: calc(var(--y) + 1);
+  border: 2px solid #a65d48;
+  background: #e0b79d;
+  border-radius: 50%;
+  box-shadow: 0 1px 1px #75403136;
+}
+.bead-mark i.center {
+  border-color: #c39a4e;
+  background: #eddb95;
+}
+</style>

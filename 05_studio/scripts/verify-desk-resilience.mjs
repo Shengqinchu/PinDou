@@ -56,7 +56,7 @@ try {
   await expect(p.locator(".studio-drawer[open]")).toHaveCount(0);
   result.failedSave = "draft retained; visible error; successful retry";
   await p.screenshot({
-    path: "../artifacts/studio-desk/products-mobile-en.png",
+    path: "../artifacts/studio-0830-fixes/desk/products-mobile-en.png",
     fullPage: true,
   });
   await ctx.close();
@@ -99,13 +99,13 @@ try {
   assert.notEqual(states.hover.transform, states.pressed.transform);
   assert.equal(states.hover.transform, states.released.transform);
   assert(
-    states.pressed.duration.includes("0.48s") &&
-      states.pressed.iconDuration.includes("0.48s"),
+    states.pressed.duration.includes("0.3s") &&
+      states.pressed.iconDuration.includes("0.3s"),
   );
   result.controlStates = states;
   await desktop.close();
   await writeFile(
-    "../artifacts/studio-desk/resilience.json",
+    "../artifacts/studio-0830-fixes/desk/resilience.json",
     JSON.stringify(result, null, 2),
   );
   console.log(JSON.stringify(result, null, 2));

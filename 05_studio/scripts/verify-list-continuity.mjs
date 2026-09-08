@@ -12,17 +12,15 @@ for (const [name, engine] of [
   await p.locator(".product-card").first().waitFor();
   await p.evaluate(() => document.fonts.ready);
   await p.waitForTimeout(800);
-  const original = await p
-    .locator(".product-card")
-    .evaluateAll((els) =>
-      els.map((e) => ({
-        name: e.querySelector("h2").textContent,
-        width: e.getBoundingClientRect().width,
-        left: e.offsetLeft,
-        top: e.offsetTop,
-      })),
-    );
-  await p.getByRole("button", { name: "拼豆补充装", exact: true }).click();
+  const original = await p.locator(".product-card").evaluateAll((els) =>
+    els.map((e) => ({
+      name: e.querySelector("h2").textContent,
+      width: e.getBoundingClientRect().width,
+      left: e.offsetLeft,
+      top: e.offsetTop,
+    })),
+  );
+  await p.getByRole("button", { name: "补充豆", exact: true }).click();
   await p.waitForTimeout(100);
   const leaving = await p
     .locator(".product-list-leave-active")
@@ -43,9 +41,9 @@ for (const [name, engine] of [
   }
   await p.waitForTimeout(600);
   assert.equal(await p.locator(".product-card").count(), 1);
-  await p.getByRole("button", { name: "全部小物", exact: true }).click();
+  await p.getByRole("button", { name: "全部", exact: true }).click();
   await p.waitForTimeout(80);
-  await p.getByRole("button", { name: "工具与配件", exact: true }).click();
+  await p.getByRole("button", { name: "工具配件", exact: true }).click();
   await p.waitForTimeout(700);
   assert(
     await p

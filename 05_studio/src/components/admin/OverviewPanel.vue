@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import {
   PhArrowUpRight,
   PhArrowRight,
@@ -7,16 +7,19 @@ import {
   PhUsers,
   PhReceipt,
   PhWallet,
-  PhFlower,
   PhCheck,
   PhClock,
 } from "@phosphor-icons/vue";
-import { useDesk, localTime } from "../../admin";
+import { useDesk, localTime, type DeskIntent } from "../../admin";
 import { money, statusText } from "../../commerce";
-import { media, tr } from "../../state";
+import { tr } from "../../state";
 const { overview, overviewBusy, settings, paymentConfigured, openOrder } =
   useDesk();
-const emit = defineEmits<{ navigate: [view: string] }>();
+const emit = defineEmits<{ navigate: [view: string, intent?: DeskIntent] }>();
+const setupExpanded = ref(false);
+const setupComplete = computed(() =>
+  readiness.value.every((item) => item.done),
+);
 const todayEntries = computed(() => overview.value?.days[0]?.entries || []);
 const readiness = computed(() => [
   {
@@ -40,43 +43,67 @@ const readiness = computed(() => [
     view: "checkout",
   },
 ]);
+watch(
+  setupComplete,
+  (complete) => {
+    setupExpanded.value = !complete;
+  },
+  { immediate: true },
+);
 </script>
 <template>
   <section class="desk-overview">
-    <div class="desk-welcome">
+    <header class="desk-welcome">
       <div>
         <p class="desk-eyebrow">
           {{ tr("小狗拼豆铺 · 店主工作台", "PINDOU PUPPY · STUDIO DESK") }}
         </p>
-        <h1>
-          {{ tr("把店里的小事，", "A little studio,") }}<br /><em>{{
-            tr("安排得刚刚好。", "in good hands.")
-          }}</em>
-        </h1>
+        <h1>{{ tr("店里的今天", "Today, at puppy.") }}</h1>
         <p>
           {{
             tr(
-              "看看今天谁要来，再给接下来的好时光留好位置。",
-              "See who is coming today, and make room for the lovely days ahead.",
+              "先看今天的安排，再处理新的订单。",
+              "Today’s visits, new orders and the things that need you.",
             )
           }}
         </p>
       </div>
-      <div class="desk-welcome-photo">
-        <img
-          :src="media('studio-04')"
-          width="1080"
-          height="1440"
-          :alt="tr('小狗拼豆铺的窗边座位', 'A sunlit seat at PinDou Puppy')"
-        /><span
-          ><PhFlower />{{
-            tr("慢慢做，好好经营。", "Made slowly. Looked after well.")
-          }}</span
-        >
+      <button
+        class="desk-button secondary"
+        @click="emit('navigate', 'schedule', 'today-visits')"
+      >
+        <PhCalendarDots />{{ tr("查看今日排班", "Today’s schedule") }}
+      </button>
+    </header>
+    <div v-if="overview?.metrics.needs_review" class="desk-review-callout">
+      <div>
+        <strong>{{
+          tr(
+            `${overview.metrics.needs_review} 笔订单需要跟进`,
+            `${overview.metrics.needs_review} orders need a follow-up`,
+          )
+        }}</strong>
+        <p>
+          {{
+            tr(
+              "查看付款后需要重新安排的订单。",
+              "Review payments that need a new arrangement.",
+            )
+          }}
+        </p>
       </div>
+      <button
+        class="desk-button secondary"
+        @click="emit('navigate', 'orders', 'needs-review')"
+      >
+        {{ tr("查看订单", "Review orders") }}<PhArrowRight />
+      </button>
     </div>
     <div v-if="overview" class="desk-metrics">
-      <button class="desk-metric" @click="emit('navigate', 'schedule')">
+      <button
+        class="desk-metric"
+        @click="emit('navigate', 'schedule', 'today-visits')"
+      >
         <span
           ><PhUsers />{{ tr("今日到店人数", "Guests booked today")
           }}<PhArrowUpRight /></span
@@ -84,7 +111,10 @@ const readiness = computed(() => [
         ><small>{{
           tr("已付款确认的座位", "Paid and confirmed seats")
         }}</small></button
-      ><button class="desk-metric" @click="emit('navigate', 'orders')">
+      ><button
+        class="desk-metric"
+        @click="emit('navigate', 'orders', 'today-orders')"
+      >
         <span
           ><PhReceipt />{{ tr("今日新订单", "New orders today")
           }}<PhArrowUpRight /></span
@@ -92,7 +122,10 @@ const readiness = computed(() => [
         ><small>{{
           tr("按 Hamilton 当地日期统计", "Counted by Hamilton local date")
         }}</small></button
-      ><button class="desk-metric" @click="emit('navigate', 'orders')">
+      ><button
+        class="desk-metric"
+        @click="emit('navigate', 'orders', 'today-received')"
+      >
         <span
           ><PhWallet />{{ tr("今日已收款", "Payments received today")
           }}<PhArrowUpRight /></span
@@ -102,18 +135,16 @@ const readiness = computed(() => [
         ><small>{{
           tr("人民币 · 已核实到账", "CNY · Verified payments")
         }}</small></button
-      ><button class="desk-metric" @click="emit('navigate', 'orders')">
+      ><button
+        class="desk-metric"
+        @click="emit('navigate', 'orders', 'awaiting')"
+      >
         <span
           ><PhCalendarDots />{{ tr("待到店／自提", "Awaiting visit or pickup")
           }}<PhArrowUpRight /></span
         ><strong>{{ overview.metrics.awaiting_fulfillment }}</strong
         ><small>{{
-          overview.metrics.needs_review
-            ? tr(
-                `${overview.metrics.needs_review} 笔订单需要跟进`,
-                `${overview.metrics.needs_review} orders need follow-up`,
-              )
-            : tr("所有已付款待完成订单", "All paid orders awaiting fulfillment")
+          tr("已付款，等待到店或自提", "Paid, awaiting visit or pickup")
         }}</small>
       </button>
     </div>
@@ -129,7 +160,10 @@ const readiness = computed(() => [
             </p>
             <h2>{{ tr("今天，谁来玩？", "Who is coming by?") }}</h2>
           </div>
-          <button class="desk-link" @click="emit('navigate', 'schedule')">
+          <button
+            class="desk-link"
+            @click="emit('navigate', 'schedule', 'today-visits')"
+          >
             {{ tr("查看排班", "Schedule") }}<PhArrowUpRight />
           </button>
         </header>
@@ -161,39 +195,86 @@ const readiness = computed(() => [
         <div v-else class="desk-empty agenda-empty">
           <PhCalendarDots :size="32" weight="light" />
           <h3>
-            {{
-              tr(
-                "今天的座位，等一份期待。",
-                "A little room for something lovely.",
-              )
-            }}
+            {{ tr("今天还没有到店安排", "No visits booked for today") }}
           </h3>
           <p>
             {{
               tr(
-                "确认后的到店安排会出现在这里。",
-                "Confirmed visits will appear here.",
+                "已确认的体验和付款中的座位会显示在这里。",
+                "Confirmed visits and seats held for payment appear here.",
               )
             }}
           </p>
-          <button class="desk-link" @click="emit('navigate', 'schedule')">
+          <button
+            class="desk-link"
+            @click="emit('navigate', 'schedule', 'today-visits')"
+          >
             {{ tr("去安排营业时间", "Set your studio hours") }}<PhArrowRight />
           </button>
         </div>
       </section>
-      <section class="desk-surface launch-panel">
+      <section class="desk-surface recent-orders">
         <header class="desk-section-heading">
-          <div>
-            <p class="desk-eyebrow">{{ tr("开店准备", "READY TO WELCOME") }}</p>
-            <h2>
-              {{
-                overview?.checkout_ready
-                  ? tr("小店，准备好了。", "Your studio is ready.")
-                  : tr("让小店准备好。", "A few things before opening.")
-              }}
-            </h2>
-          </div>
+          <h2>{{ tr("最近的订单", "Recent orders") }}</h2>
+          <button
+            class="desk-link"
+            @click="emit('navigate', 'orders', 'all-orders')"
+          >
+            {{ tr("全部订单", "All orders") }}<PhArrowUpRight />
+          </button>
         </header>
+        <div v-if="overview?.recent_orders.length" class="recent-order-list">
+          <button
+            v-for="order in overview.recent_orders"
+            :key="order.id"
+            class="recent-order-row"
+            @click="openOrder(order.id)"
+          >
+            <span class="customer-monogram">{{
+              order.customer?.name.slice(0, 1)
+            }}</span
+            ><span
+              ><strong>{{ order.customer?.name }}</strong
+              ><small>{{ localTime(order.created_at) }}</small></span
+            ><span :class="['desk-status', order.status]">{{
+              statusText(order.status)
+            }}</span
+            ><strong>{{ money(order.quote.cny_fen, "CNY") }}</strong
+            ><PhArrowUpRight />
+          </button>
+        </div>
+        <p v-else class="desk-inline-empty">
+          {{
+            tr(
+              "收到第一笔订单后，就会在这里看到它。",
+              "Your first order will appear here when it arrives.",
+            )
+          }}
+        </p>
+      </section>
+    </div>
+    <section class="desk-surface desk-setup-summary">
+      <button
+        class="setup-summary-trigger"
+        :aria-expanded="setupExpanded"
+        @click="setupExpanded = !setupExpanded"
+      >
+        <span class="readiness-icon" :class="{ done: setupComplete }"
+          ><PhCheck v-if="setupComplete" /><PhClock v-else /></span
+        ><span
+          ><strong>{{
+            setupComplete
+              ? tr("开店配置已完成", "Studio setup complete")
+              : tr("开店前，还需要这些准备", "A few things before opening")
+          }}</strong
+          ><small>{{
+            overview?.checkout_ready
+              ? tr("网上购买已开放", "Online purchases are open")
+              : tr("网上购买尚未开放", "Online purchases are not open yet")
+          }}</small></span
+        ><PhArrowRight :class="{ 'setup-arrow-open': setupExpanded }" />
+      </button>
+      <div v-if="setupExpanded" class="setup-checklist">
         <button
           v-for="item in readiness"
           :key="item.view + item.label"
@@ -207,52 +288,7 @@ const readiness = computed(() => [
             ><small>{{ item.detail }}</small></span
           ><PhArrowUpRight />
         </button>
-        <div class="launch-note">
-          <span
-            :class="['state-dot', { live: overview?.checkout_ready }]"
-          /><span>{{
-            overview?.checkout_ready
-              ? tr("网上购买已开放", "Online purchases are open")
-              : tr("网上购买尚未开放", "Online purchases are not open yet")
-          }}</span>
-        </div>
-      </section>
-    </div>
-    <section class="desk-surface recent-orders">
-      <header class="desk-section-heading">
-        <h2>{{ tr("最近的订单", "Recent orders") }}</h2>
-        <button class="desk-link" @click="emit('navigate', 'orders')">
-          {{ tr("全部订单", "All orders") }}<PhArrowUpRight />
-        </button>
-      </header>
-      <div v-if="overview?.recent_orders.length" class="recent-order-list">
-        <button
-          v-for="order in overview.recent_orders"
-          :key="order.id"
-          class="recent-order-row"
-          @click="openOrder(order.id)"
-        >
-          <span class="customer-monogram">{{
-            order.customer?.name.slice(0, 1)
-          }}</span
-          ><span
-            ><strong>{{ order.customer?.name }}</strong
-            ><small>{{ localTime(order.created_at) }}</small></span
-          ><span :class="['desk-status', order.status]">{{
-            statusText(order.status)
-          }}</span
-          ><strong>{{ money(order.quote.cny_fen, "CNY") }}</strong
-          ><PhArrowUpRight />
-        </button>
       </div>
-      <p v-else class="desk-inline-empty">
-        {{
-          tr(
-            "收到第一笔订单后，就会在这里看到它。",
-            "Your first order will appear here when it arrives.",
-          )
-        }}
-      </p>
     </section>
   </section>
 </template>

@@ -152,6 +152,16 @@ html .desk-topbar {
 }
 
 @media (pointer: coarse), (max-width: 900px) {
+  html .copy-contact {
+    min-height: 44px;
+  }
+  html .studio-notice > .icon-button {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+  }
+
   /* Includes search, filters and native time fields, not just text form fields. */
   html input:not([type="checkbox"]):not([type="radio"]),
   html:root select,
@@ -162,6 +172,17 @@ html .desk-topbar {
     width: 44px;
     height: 44px;
     min-width: 44px;
+  }
+  html .language-button,
+  html .bag-button,
+  html .menu-button,
+  html .desk-language {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  html .desk-link,
+  html .notice-action {
+    min-height: 44px;
   }
   .icon-button {
     min-width: 44px;
@@ -198,18 +219,20 @@ html .desk-topbar {
     padding-top: var(--safe-top);
     height: calc(65px + var(--safe-top));
   }
-  .container {
-    padding-left: max(24px, var(--safe-left));
-    padding-right: max(24px, var(--safe-right));
-  }
 }
 @media (max-width: 600px) {
   .site-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+  .header-actions {
+    gap: 0;
+  }
+  .site-header {
     padding-inline: max(18px, var(--safe-left)) max(18px, var(--safe-right));
   }
-  .container {
-    padding-inline: max(20px, var(--safe-left)) max(20px, var(--safe-right));
-  }
+
   .photo-panel {
     width: calc(100% - 20px);
     height: calc(100% - 24px);
@@ -251,19 +274,7 @@ html .desk-topbar {
   html .weekly-setting > span {
     font-size: 14px;
   }
-  html .weekly-setting > .toggle-switch {
-    justify-self: end;
-    width: 44px;
-    height: 26px;
-    padding: 3px;
-  }
-  html .weekly-setting > .toggle-switch > span {
-    width: 18px;
-    height: 18px;
-  }
-  html .weekly-setting > .toggle-switch.on > span {
-    transform: translateX(17px);
-  }
+
   html .weekly-time {
     grid-column: 1 / -1;
     display: grid;
@@ -379,5 +390,14 @@ html.keyboard-open .drawer-bottom {
   .agenda-row > svg,
   .readiness-row > svg {
     transform: none !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .wordmark > svg {
+    display: none;
+  }
+  .wordmark {
+    font-size: 23px;
   }
 }

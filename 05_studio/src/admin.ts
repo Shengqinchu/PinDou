@@ -9,6 +9,14 @@ import {
 import { hamiltonDate, tr } from "./state";
 import { notify } from "./ui";
 
+export type DeskIntent =
+  | "today-orders"
+  | "today-received"
+  | "awaiting"
+  | "needs-review"
+  | "today-visits"
+  | "all-orders";
+
 export type AuditEvent = {
   id: number;
   order_id?: string;

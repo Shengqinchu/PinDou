@@ -7,6 +7,8 @@ import {
 } from "@phosphor-icons/vue";
 import { notice, dismissNotice } from "../ui";
 import { tr } from "../state";
+import { useRoute } from "vue-router";
+const route = useRoute();
 </script>
 <template>
   <div class="notice-region" aria-live="polite" aria-atomic="true">
@@ -23,7 +25,7 @@ import { tr } from "../state";
         /></span>
         <span>{{ tr(notice.zh, notice.en) }}</span>
         <RouterLink
-          v-if="notice.action === 'cart'"
+          v-if="notice.action === 'cart' && route.path !== '/cart'"
           to="/cart"
           class="notice-action"
           @click="dismissNotice"

@@ -15,7 +15,9 @@
 }
 
 :root {
-  --body: "Outfit Variable", "PinDou Sans SC", "PingFang SC", sans-serif;
+  --body:
+    "Outfit Variable", "PinDou Sans SC", "PingFang SC", "Microsoft YaHei",
+    sans-serif;
   --chinese-display: "DM Serif Display", "PinDou Serif SC", serif;
 }
 
@@ -79,7 +81,6 @@
 }
 
 :lang(zh-CN) .form-section h2,
-:lang(zh-CN) .product h2,
 :lang(zh-CN) .manage-entry h2,
 :lang(zh-CN) .management h1,
 :lang(zh-CN) .admin-login h2 {
@@ -111,8 +112,6 @@
 }
 
 :lang(zh-CN) .request-summary > p,
-:lang(zh-CN) .product > p,
-:lang(zh-CN) .product-price,
 :lang(zh-CN) .cart-line > div > span,
 :lang(zh-CN) .footer-column,
 :lang(zh-CN) .copy-contact {
@@ -190,9 +189,7 @@
   :lang(zh-CN) .plan-option > small {
     font-size: 11px;
   }
-  :lang(zh-CN) .product h2 {
-    font-size: 15px !important;
-  }
+
   :lang(zh-CN) .shop-tabs button {
     font-size: 13px;
   }

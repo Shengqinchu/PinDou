@@ -200,10 +200,7 @@ async function pay(retry = false) {
 <template>
   <section class="container cart-intro">
     <span class="eyebrow">YOUR LITTLE COLLECTION</span>
-    <h1>
-      {{ tr("把快乐，", "A little joy,")
-      }}<em>{{ tr("装进购物车。", "all together.") }}</em>
-    </h1>
+    <h1>{{ tr("你的购物车", "Your bag.") }}</h1>
     <p>
       {{
         tr(

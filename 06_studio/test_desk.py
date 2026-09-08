@@ -97,3 +97,31 @@ def test_every_new_desk_read_requires_admin(client):
     studio.app.dependency_overrides.clear()
     for path in ['/manage/overview','/manage/activity','/manage/orders/'+oid,'/manage/orders?search=test']:
         assert client.get('/studio-api'+path).status_code == 401
+
+
+def test_metric_drilldown_uses_payment_date_not_creation_date_and_filters_delivery(client):
+    oid = place(client).json()['id']
+    assert notify(client, oid).text == 'success'
+    today = shop.now_local().date()
+    start = datetime.combine(today, datetime.min.time(), tzinfo=shop.TORONTO).timestamp()
+    with studio.database() as db:
+        original = dict(db.execute('SELECT * FROM commerce_orders WHERE id=?', (oid,)).fetchone())
+        db.execute('UPDATE commerce_orders SET created_at=?, paid_at=? WHERE id=?', (start-3600, start+120, oid))
+        for suffix, state, created, paid, fulfillment in [
+            ('OLDPAY', 'paid', start+60, start-60, 'confirmed'),
+            ('REVIEW', 'paid_needs_review', start+60, start+60, 'needs_review'),
+            ('DONE', 'paid', start+60, start+60, 'completed'),
+            ('UNPAID', 'pending', start+60, None, 'pending'),
+        ]:
+            row = {**original, 'id':'PSINTENT'+suffix, 'idempotency_key':str(uuid.uuid4()), 'trade_id':'INTENT'+suffix, 'status':state, 'created_at':created, 'paid_at':paid, 'fulfillment':fulfillment}
+            db.execute(f'INSERT INTO commerce_orders({",".join(row)}) VALUES({",".join("?" for _ in row)})', tuple(row.values()))
+    metrics = client.get('/studio-api/manage/overview').json()['metrics']
+    received = client.get('/studio-api/manage/orders', params={'status':'received','day':str(today),'day_kind':'paid'}).json()
+    assert {r['id'] for r in received['items']} == {oid, 'PSINTENTREVIEW', 'PSINTENTDONE'}
+    assert sum(r['quote']['cny_fen'] for r in received['items']) == metrics['received_cny_fen']
+    created = client.get('/studio-api/manage/orders', params={'day':str(today),'day_kind':'created'}).json()
+    assert created['total'] == metrics['orders_today'] == 4
+    awaiting = client.get('/studio-api/manage/orders', params={'status':'received','fulfillment':'confirmed'}).json()
+    assert awaiting['total'] == metrics['awaiting_fulfillment'] == 2
+    assert client.get('/studio-api/manage/orders?day_kind=paid_at%20OR%201=1').status_code == 422
+    assert client.get('/studio-api/manage/orders?fulfillment=anything').status_code == 422

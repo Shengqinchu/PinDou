@@ -641,17 +641,28 @@ def register(app, admin_actor):
         return value
 
     @app.get("/studio-api/manage/orders")
-    def list_orders(_actor: str = Depends(admin_actor), page: int = 1, status: str = "all", search: str = "", day: date | None = None, kind: str = "all"):
-        if not 1 <= page <= 10000 or len(search) > 120 or status not in {"all", *PENDING, "paid", "paid_needs_review", "expired", "failed", "refunded"} or kind not in {"all", "visit", "pickup"}:
+    def list_orders(_actor: str = Depends(admin_actor), page: int = 1, status: str = "all", search: str = "", day: date | None = None, kind: str = "all", day_kind: str = "visit", fulfillment: str = "all"):
+        if not 1 <= page <= 10000 or len(search) > 120 or status not in {"all", *PENDING, "paid", "received", "paid_needs_review", "expired", "failed", "refunded"} or kind not in {"all", "visit", "pickup"} or day_kind not in {"visit", "created", "paid"} or fulfillment not in {"all", "confirmed", "completed"}:
             fail("invalid_page", 422)
         clauses, params = [], []
-        if status != "all":
+        if status == "received":
+            clauses.append("o.status IN ('paid','paid_needs_review')")
+        elif status != "all":
             clauses.append("o.status=?"); params.append(status)
         if search.strip():
             clauses.append("(o.id LIKE ? OR json_extract(o.customer,'$.name') LIKE ? OR json_extract(o.customer,'$.contact') LIKE ?)")
             params.extend(["%" + search.strip() + "%"] * 3)
         if day:
-            clauses.append("EXISTS (SELECT 1 FROM commerce_seats s WHERE s.order_id=o.id AND s.date=?)"); params.append(str(day))
+            if day_kind == "visit":
+                clauses.append("EXISTS (SELECT 1 FROM commerce_seats s WHERE s.order_id=o.id AND s.date=?)"); params.append(str(day))
+            else:
+                start = datetime.combine(day, datetime.min.time(), tzinfo=TORONTO)
+                finish = start + timedelta(days=1)
+                column = {"created": "o.created_at", "paid": "o.paid_at"}[day_kind]
+                clauses.append(f"{column}>=? AND {column}<?")
+                params.extend([start.timestamp(), finish.timestamp()])
+        if fulfillment != "all":
+            clauses.append("o.fulfillment=?"); params.append(fulfillment)
         if kind == "visit":
             clauses.append("EXISTS (SELECT 1 FROM commerce_seats s WHERE s.order_id=o.id)")
         if kind == "pickup":
