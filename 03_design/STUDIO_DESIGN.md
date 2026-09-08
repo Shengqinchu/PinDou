@@ -15,7 +15,7 @@
 | [Taste](https://github.com/Leonxlnx/taste-skill) | 先审既有品牌/内容，避免把“高级”等同衬线字、通用色块和到处动的装饰；交互状态要成套 | typography.css / interactions.css / plan-price-reveal |
 | [Impeccable](https://github.com/pbakaus/impeccable) | 字体/配色/交互/响应式分别审；简化文字层级，克制装饰，保留业务事实；批量检查桌面与手机 | 分层字体、浅色token、分页日历、设置抽屉与验证记录 |
 | [GSAP](https://gsap.com/docs/v3/GSAP/gsap.context()/) / 本地 hyperframes:gsap skill | 作用域、matchMedia清理、连续时间线、统一状态曲线、reduced motion | 首页标题/品牌元素/照片顺序；AutoHeight；既有可逆弹层 |
-| 当前 Turnitin_generation 的 FRONTEND_INTERACTION_AND_MOTION_STANDARD.md | 300ms ease-in-out 同步父子反馈、真实按下/松开、小幅位移、细指针限定hover | 共享按钮、套餐标签、价格展开和后台控件 |
+| Turnitin_generation 的实际 #help-card / index.css 与 FRONTEND_INTERACTION_AND_MOTION_STANDARD.md | 实测帮助模块 300ms cubic-bezier(.4,0,.2,1)；模块浮起、按钮底边压缩、父子同步 | tactile.css / press.ts；实测差异及验证见 STUDIO_TACTILE_UPGRADE.md |
 | [photo-abstract-editorial](https://github.com/ZzzLc0405/photo-abstract-editorial) | 先观察实拍的明暗/间距/配色，保留照片内容 | 实拍不重绘；它的“生成英文标题双联海报”步骤不适用本网站且会冲突店主文案锁，因此没有伪称执行该海报流程 |
 
 技能使用说明：Taste、Impeccable 的上游说明保存在开发研究资料；本次实际采用以上步骤，不宣称安装过完整插件。Impeccable launcher 未包含在本地参考包，已向店主说明，按其 fallback 手动使用文档。GSAP 库实际在运行代码中使用。高德地图面向中国场景，本店加拿大地址继续使用 Google Maps 普通链接。没有为“使用技能”而给实拍套滤镜或生成另一间工作室。
@@ -40,7 +40,8 @@
 
 ## 动效实现
 
-- 按钮、标签背景、图标和按压统一300ms cubic-bezier(.42,0,.58,1)，同一状态一起启动和结束。触屏不残留hover，抬手不额外延迟。
+- 按钮、标签背景、图标和按压统一300ms cubic-bezier(.4,0,.2,1)，来自实际运行的 Turnitin 帮助模块。模块上浮4px，按钮底边3px；45ms短按也有完整回弹。详情见 `STUDIO_TACTILE_UPGRADE.md`。
+- `tactile.css` 在客户和后台组件样式之后加载；`press.ts` 每个控件最多一个可替换反馈，保持原生点击/提交即时执行，移动、禁用和降动效有清理路径。不能恢复随访问后台而改变的 CSS 注入顺序。
 - 套餐选前不显示价格；选后由AutoHeight从当前高度连续展开。改变视口时直接重排，避免横屏/键盘下错误插值。动画不伪造金额、付款或占位状态。
 - 首页内容先出现，随后小狗/星/心和照片完成一次入场。GSAP matchMedia作用域在离开页面后清理；缩减动态模式直接呈现完整静态状态。
 - 保留0830修正过的可逆照片过渡、独立scrim/panel、原生dialog焦点与滚动恢复。不退回全局飞入、无意义无限循环或滚动劫持。

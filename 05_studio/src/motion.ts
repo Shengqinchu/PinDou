@@ -1,16 +1,17 @@
 import { gsap } from "gsap";
 import { CustomEase } from "gsap/CustomEase";
 import { reducedMotion } from "./ui";
+import { installPressFeedback } from "./press";
 
 // One clock for each interaction family. CSS and GSAP share the actual curves.
-// T-Check control timing is the baseline; narrative/panel clocks remain separate.
+// Measured from the running T-Check help card (Tailwind's ease-in-out utility).
 export const motion = {
   control: 0.3,
   state: 0.3,
   panel: 0.68,
   exit: 0.48,
   editorial: 1.12,
-  controlCurve: "0.42, 0, 0.58, 1",
+  controlCurve: "0.4, 0, 0.2, 1",
   travelCurve: "0.22, 0.68, 0, 1",
 };
 gsap.registerPlugin(CustomEase);
@@ -29,8 +30,10 @@ export function installMotion() {
   }))
     root.style.setProperty(`--${key}`, value);
 
-  // Native :active follows the actual pointer/key lifetime. No delayed visual latch.
-  return () => {};
+  return installPressFeedback({
+    duration: motion.control * 1000,
+    ease: `cubic-bezier(${motion.controlCurve})`,
+  });
 }
 
 /** Animate a workspace in place, without remounting its state or form fields. */

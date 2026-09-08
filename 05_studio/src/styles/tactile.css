@@ -1,0 +1,303 @@
+/* Final interaction contract, after all customer and desk component styles.
+   The desk stylesheet is loaded once in main.ts, so visiting /manage cannot
+   change the cascade. Properties describe endpoints shared with press.ts. */
+:root {
+  --control-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --surface-ease: var(--control-ease);
+  --tactile-edge: #d2cce5;
+  --tactile-card-shadow: 0 25px 50px -12px rgb(41 42 43 / 20%);
+  --tactile-card-border: #d4cfe6;
+}
+
+:is(.button, .desk-button.primary, .desk-button.secondary) {
+  --tactile-rest-transform: translate3d(0, 0, 0) scale(1);
+  --tactile-press-transform: translate3d(0, 3px, 0) scale(0.988);
+  --tactile-rest-shadow:
+    0 3px 0 var(--tactile-edge), 0 7px 14px rgb(41 42 43 / 8%);
+  --tactile-press-shadow:
+    0 0 0 var(--tactile-edge), 0 2px 5px rgb(41 42 43 / 8%);
+  transform: var(--tactile-rest-transform);
+  box-shadow: var(--tactile-rest-shadow);
+  transition:
+    transform var(--control-duration) var(--control-ease),
+    box-shadow var(--control-duration) var(--control-ease),
+    background-color var(--control-duration) var(--control-ease),
+    border-color var(--control-duration) var(--control-ease),
+    color var(--control-duration) var(--control-ease);
+}
+:is(.button-outline, .desk-button.secondary) {
+  --tactile-edge: #e0dfe5;
+}
+:is(
+    .button,
+    .desk-button.primary,
+    .desk-button.secondary,
+    .icon-button,
+    .desk-icon-button
+  ):not(:disabled):not([aria-disabled="true"])
+  > svg:not(.spinning) {
+  /* The icon rides the same physical button through a short-tap rebound. */
+  transform: none;
+}
+
+:is(
+  .icon-button,
+  .desk-icon-button,
+  .language-button,
+  .desk-language,
+  .reservation-desk-days > button,
+  .reservation-grid td > button
+) {
+  --tactile-rest-transform: translate3d(0, 0, 0) scale(1);
+  --tactile-press-transform: translate3d(0, 1px, 0) scale(0.96);
+  --tactile-rest-shadow: 0 0 0 transparent, 0 0 0 transparent inset;
+  --tactile-press-shadow:
+    0 0 0 transparent, 0 2px 4px rgb(41 42 43 / 12%) inset;
+  transform: var(--tactile-rest-transform);
+  box-shadow: var(--tactile-rest-shadow);
+  transition:
+    transform var(--control-duration) var(--control-ease),
+    box-shadow var(--control-duration) var(--control-ease),
+    background-color var(--control-duration) var(--control-ease),
+    border-color var(--control-duration) var(--control-ease),
+    color var(--control-duration) var(--control-ease);
+}
+
+/* Cards stay on their layout grid. Only the visual surface and shadow lift. */
+:is(
+  .reservation-plans > label,
+  .photo-tile,
+  .journal-story-link,
+  .desk-metric,
+  .reservation-desk-metrics > button,
+  .reservation-desk-row,
+  .desk-surface:has(button),
+  .reservation-settings-entry
+) {
+  --tactile-rest-transform: translate3d(0, 0, 0) scale(1);
+  --tactile-press-transform: translate3d(0, -1px, 0) scale(0.996);
+  --tactile-rest-shadow: 0 0 0 transparent;
+  --tactile-press-shadow: 0 5px 12px -7px rgb(41 42 43 / 20%);
+  transform: var(--tactile-rest-transform);
+  transition:
+    transform var(--control-duration) var(--control-ease),
+    box-shadow var(--control-duration) var(--control-ease),
+    border-color var(--control-duration) var(--control-ease),
+    background-color var(--control-duration) var(--control-ease);
+}
+.journal-story-link {
+  display: block;
+}
+.photo-tile,
+.journal-story-link {
+  overflow: visible;
+}
+.journal-story-cover {
+  transition: box-shadow var(--control-duration) var(--control-ease);
+}
+.journal-story-cover img {
+  transition: transform var(--control-duration) var(--control-ease);
+}
+.reservation-plans > label > svg,
+.reservation-plans > label > strong,
+.reservation-desk-metrics > button > strong {
+  transition: transform var(--control-duration) var(--control-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :is(.button, .desk-button.primary, .desk-button.secondary):not(:disabled):not(
+      [aria-disabled="true"]
+    ):hover {
+    --tactile-rest-transform: translate3d(0, -2px, 0) scale(1);
+    --tactile-rest-shadow:
+      0 4px 0 var(--tactile-edge), 0 12px 22px rgb(41 42 43 / 12%);
+    transform: var(--tactile-rest-transform);
+    box-shadow: var(--tactile-rest-shadow);
+    filter: none;
+  }
+  :is(.button-primary, .desk-button.primary):not(:disabled):not(
+      [aria-disabled="true"]
+    ):hover {
+    background: #eeebf8;
+  }
+  :is(.button-outline, .desk-button.secondary):not(:disabled):not(
+      [aria-disabled="true"]
+    ):hover {
+    background: #faf9fc;
+  }
+  :is(
+      .icon-button,
+      .desk-icon-button,
+      .language-button,
+      .desk-language,
+      .reservation-desk-days > button,
+      .reservation-grid td > button
+    ):not(:disabled):not([aria-disabled="true"]):hover {
+    --tactile-rest-transform: translate3d(0, -1px, 0) scale(1);
+    --tactile-rest-shadow:
+      0 5px 12px -5px rgb(41 42 43 / 20%), 0 0 0 transparent inset;
+    transform: var(--tactile-rest-transform);
+    box-shadow: var(--tactile-rest-shadow);
+  }
+  :is(.icon-button, .desk-icon-button, .language-button, .desk-language):not(
+      :disabled
+    ):hover {
+    background: #f2eff8;
+  }
+  .reservation-grid td > button:not(:disabled):not(.chosen):hover {
+    background: #eeebf8;
+  }
+  .reservation-desk-days > button:not(.selected):hover {
+    background: #faf9fc;
+  }
+
+  :is(
+      .reservation-plans > label,
+      .photo-tile,
+      .journal-story-link,
+      .desk-metric,
+      .reservation-desk-metrics > button,
+      .reservation-desk-row,
+      .desk-surface:has(button),
+      .reservation-settings-entry
+    ):not(:disabled):not(:has(input:disabled)):hover {
+    --tactile-rest-transform: translate3d(0, -4px, 0) scale(1);
+    --tactile-rest-shadow: var(--tactile-card-shadow);
+    transform: var(--tactile-rest-transform);
+    border-color: var(--tactile-card-border);
+    box-shadow: var(--tactile-card-shadow);
+  }
+  .journal-story-link:not(:disabled):hover {
+    --tactile-rest-shadow: 0 0 0 transparent;
+    box-shadow: none;
+  }
+  .journal-story-link:hover .journal-story-cover {
+    box-shadow: var(--tactile-card-shadow);
+  }
+  .reservation-desk-row:not(:disabled):hover {
+    background: #faf9fc;
+  }
+  .reservation-desk-metrics > button:not(:disabled):hover {
+    background: #faf9fc;
+  }
+  .reservation-plans > label:not(:has(:disabled)):hover > :is(svg, strong),
+  .reservation-desk-metrics > button:hover > strong {
+    transform: translateY(-1px);
+  }
+}
+
+/* Active comes after hover, including the selected variants. */
+:is(
+    .button,
+    .desk-button.primary,
+    .desk-button.secondary,
+    .icon-button,
+    .desk-icon-button,
+    .language-button,
+    .desk-language,
+    .reservation-desk-days > button,
+    .reservation-grid td > button
+  ):not(:disabled):not([aria-disabled="true"]):active {
+  transform: var(--tactile-press-transform);
+  box-shadow: var(--tactile-press-shadow);
+  filter: none;
+}
+:is(
+    .button,
+    .desk-button.primary,
+    .desk-button.secondary,
+    .icon-button,
+    .desk-icon-button
+  ):not(:disabled):active
+  > svg:not(.spinning) {
+  transform: translate3d(0, 0, 0);
+}
+:is(
+    .reservation-plans > label,
+    .photo-tile,
+    .journal-story-link,
+    .desk-metric,
+    .reservation-desk-metrics > button,
+    .reservation-desk-row
+  ):not(:disabled):not(:has(input:disabled)):active {
+  transform: var(--tactile-press-transform);
+  box-shadow: var(--tactile-press-shadow);
+}
+.reservation-plans > label:not(:has(:disabled)):active > :is(svg, strong),
+.reservation-desk-metrics > button:active > strong {
+  transform: none;
+}
+
+:is(
+  .button,
+  .desk-button.primary,
+  .desk-button.secondary,
+  .icon-button,
+  .desk-icon-button,
+  .language-button,
+  .desk-language,
+  .reservation-desk-days > button,
+  .reservation-grid td > button,
+  .desk-metric,
+  .reservation-desk-metrics > button,
+  .reservation-desk-row,
+  .journal-story-link,
+  .photo-tile
+):focus-visible {
+  outline: 2px solid #8d80ad;
+  outline-offset: 4px;
+}
+.reservation-plans > label:has(input:focus-visible) {
+  outline: 2px solid #8d80ad;
+  outline-offset: 4px;
+}
+:is(
+  .button,
+  .desk-button.primary,
+  .desk-button.secondary,
+  .icon-button,
+  .desk-icon-button,
+  .language-button,
+  .desk-language,
+  .reservation-desk-days > button,
+  .reservation-grid td > button
+):is(:disabled, [aria-disabled="true"]) {
+  transform: none;
+  box-shadow: none;
+  filter: none;
+  transition: none;
+}
+.reservation-plans > label:has(input:disabled) {
+  transform: none;
+  box-shadow: none;
+  transition: none;
+}
+
+/* No sticky hover on touch; no positional effect when reduced motion is set. */
+@media (prefers-reduced-motion: reduce) {
+  :is(
+    .button,
+    .desk-button,
+    .icon-button,
+    .desk-icon-button,
+    .language-button,
+    .desk-language,
+    .reservation-desk-days > button,
+    .reservation-grid td > button,
+    .reservation-plans > label,
+    .photo-tile,
+    .journal-story-link,
+    .desk-metric,
+    .reservation-desk-metrics > button,
+    .reservation-desk-row,
+    .desk-surface:has(button),
+    .reservation-settings-entry
+  ),
+  :is(.reservation-plans > label, .reservation-desk-metrics > button)
+    > :is(svg, strong),
+  .journal-story-cover,
+  .journal-story-cover img {
+    transform: none !important;
+    transition: none !important;
+  }
+}

@@ -14,6 +14,8 @@ import "./styles/viewport.css";
 import "./styles/vision.css";
 import "./styles/reservations.css";
 import "./styles/journal.css";
+import "./styles/desk.css";
+import "./styles/tactile.css";
 import { installMotion } from "./motion";
 import { installViewport } from "./browser";
 import { reducedMotion } from "./ui";

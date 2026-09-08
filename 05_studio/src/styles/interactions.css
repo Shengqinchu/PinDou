@@ -21,7 +21,7 @@
 /* T-Check parent/control relationships with the shared, verified control clock. */
 :root {
   --control-duration: 300ms;
-  --control-ease: cubic-bezier(0.42, 0, 0.58, 1);
+  --control-ease: cubic-bezier(0.4, 0, 0.2, 1);
   --control-shadow: 0 8px 18px -8px rgb(41 42 43 / 26%);
   --control-shadow-hover: 0 14px 26px -10px rgb(41 42 43 / 35%);
 }

@@ -3,7 +3,6 @@ import BrandMotif from "../components/BrandMotif.vue";
 import copyText from "../content/pages-Manage.json";
 import { say } from "../state";
 
-import "../styles/desk.css";
 import { onMounted, reactive, ref } from "vue";
 import { PhArrowRight, PhArrowClockwise, PhFlower } from "@phosphor-icons/vue";
 import { prettyDate, products, tr, media } from "../state";

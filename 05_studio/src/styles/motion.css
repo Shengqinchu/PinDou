@@ -1,9 +1,9 @@
 /* The shared CSS/GSAP clocks are installed by motion.ts. */
 :root {
   --control-duration: 300ms;
-  --control-ease: cubic-bezier(0.42, 0, 0.58, 1);
+  --control-ease: cubic-bezier(0.4, 0, 0.2, 1);
   --surface-duration: 300ms;
-  --surface-ease: cubic-bezier(0.42, 0, 0.58, 1);
+  --surface-ease: cubic-bezier(0.4, 0, 0.2, 1);
   --layout-duration: 680ms;
   --exit-duration: 480ms;
 }
