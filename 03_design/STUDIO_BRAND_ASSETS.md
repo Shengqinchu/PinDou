@@ -19,6 +19,8 @@
 
 头像 SHA-256：`01e7abcb8f4bdcb757fc3e7d76cd14b9ed15f0903410a0dc26fb747ce73e986c`。它是原始 PNG，并未伪装成矢量文件；白底、双狗轮廓、颜色均保持原样。本次不生成另一版狗形象，不替换 PDF 提取的店铺手写字标。
 
+根目录 `.gitattributes` 禁止 Git 为这些 SVG 和许可原文转换行尾，确保 Windows、服务器或重新克隆仓库后的素材校验值保持一致。
+
 ## 使用方式
 
 - `src/components/BrandIcon.vue` 接受 `name="wechat"`、`name="xiaohongshu"` 或 `name="canada"`。资源从本站加载，无远程运行时依赖。图标用于现有可读标签旁，作为装饰隐藏于辅助技术，避免重复朗读。

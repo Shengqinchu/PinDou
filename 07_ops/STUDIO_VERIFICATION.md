@@ -1,5 +1,21 @@
 # Studio V1 开发预览验收
 
+## 2026-09-08 社交素材与头像（已发布）
+
+- 代码提交：`98b395b`；分支 `codex/studio-v1-20260907` 已推送 GitHub。
+- 发布版本：`20260908133654-studio-v2`；构建标识 `2026-09-08T13:34:02.771Z`。
+- 发布包：20,069,529 字节、158 个受清单校验的文件；SHA-256 `6e9a0301d6ec3870963f8a2ac0998e7f1ffd4d5e47793d10e2801a686cf58875`。
+- 源站 current 已切至 `/opt/pindou/studio/releases/20260908133654-studio-v2`；回滚备份 `/opt/pindou/studio/backups/20260908133654-studio-v2`。
+- 公网 HTML 与 `version.json` 已确认新构建，主资源 `index-DKocNOu4.js` / `index-Du564rQ9.css`。
+- 微信、小红书、加拿大国旗 SVG、原头像 PNG、Simple Icons 许可共 5 个归档来源文件，公网 SHA-256 与来源记录全部一致；SVG Content-Type 为 `image/svg+xml`。素材清单和复用方式见 `03_design/STUDIO_BRAND_ASSETS.md`。
+- 本地 9 组：Chromium 中英文各 320/390/768/1440px，WebKit 390px 触屏/微信 UA 模拟；正式构建、43 模块文案锁、资源解码、日记标题/正文文本一致性、无横向溢出均通过。公网另检查 390/1440px，头像及三个图标正常，14 个带加拿大国旗的日记标题正常，无 JavaScript 异常。微信模拟不代表真机验收。
+- 原生成器首页公网 200、原 JS 标识保留；源站旧 HTML SHA-256 仍为 `506f9bd2f9f0c37c52f08924f1504286816b93bff3198aea9f1790d0eceb36aa`；`pindou` 与 `pindou-studio` 均 active，Studio 公网健康检查 200。
+- 本次为静态素材和展示组件更新，服务代码、经营配置和已批准文案无变更；没有创建真实预约或支付订单。检查与截图保存在忽略目录 `artifacts/studio-social-assets/`。
+
+以下为 2026-09-07 首版的历史验收；当前业务规则以 `02_product/STUDIO_VISION2_PROGRESS.md` 为准。
+
+---
+
 验收日期：2026-09-07。
 发布版本：`20260907204623-studio-v1`。
 发布包 SHA-256：`2277b100d42ae4e6f910c51f76d3beff38f810c825915786b7ac4d77a7ba2bc4`。

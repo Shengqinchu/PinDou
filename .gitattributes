@@ -1,0 +1,3 @@
+# Preserve downloaded brand assets and their recorded SHA-256 across platforms.
+/05_studio/public/studio-brand/*.svg -text
+/05_studio/public/studio-brand/simple-icons-LICENSE.txt -text
