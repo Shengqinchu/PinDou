@@ -11,7 +11,7 @@
 - 计划提交：564d185。
 - 首页与详情提交：705edd2。
 - 预约与后台提交：bbaf292。
-- 最终适配、部署和验证提交：发布后补记。
+- 最终适配实现：0670ef2；本记录随最终文档提交推送。
 
 ## 本地证据
 
@@ -29,4 +29,14 @@
 
 ## 发布
 
-待完成最终构建、发布包校验、线上只读核对后填入。本轮继续使用 /studio/，旧生成器源代码、数据库和路由保持独立。
+- 发布：20260908024151-studio-v1，替换 20260908010538-studio-v1。
+- 归档 SHA-256：0e85e94c84db8fb685363ae7afc528cefc214572ec4faa93260e7b3803605f1d，54 个文件通过校验，包含新增 reservations.py；没有 QA 程序、凭证或数据库。
+- 原子链接切换、SQLite 备份、服务健康和 Nginx 验证/reload 通过。回退资料位于 /opt/pindou/studio/backups/20260908024151-studio-v1/。
+- 线上实际入口 index-RbLOOhV0.js、index-CL6eF75N.css；页面 studio-build 与 version.json 一致，版本探测 no-store。verify-vision-live.mjs 共 12 项线上检查通过，错误列表为空。
+- 预约日历返回 14 天、America/Toronto，周三/四禁约正确；浏览器会话 Secure、HttpOnly。陌生预约结果/未知旧订单返回 404。
+- 原站管理员权限核验：commerce/orders/overview/activity/reservations 对匿名、viewer、admin 分别返回 401、403、200。
+- 新购物报价返回 409 shop_paused；商户配置仍在，固定汇率仍为 5.0000；没有创建测试生产预约/付款或修改商户配置。
+- 两个服务均 active；旧工具 release 仍为 /opt/pindou/releases/20260615074539-wallet-mode-labels，index SHA-256 未变：506f9bd2f9f0c37c52f08924f1504286816b93bff3198aea9f1790d0eceb36aa。
+- 原始线上证据：artifacts/studio-vision/live/results.json 与 origin-after.json，以及真实网页截图。
+
+本轮继续使用 /studio/，旧生成器源代码、数据库和路由保持独立。
