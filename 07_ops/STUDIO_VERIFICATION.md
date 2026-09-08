@@ -1,5 +1,18 @@
 # Studio V1 开发预览验收
 
+## 2026-09-08 Windows Chrome 菜单位移与原生动画偏好（已发布）
+
+- 代码提交 `66c20ee`，已推送 `codex/studio-v1-20260907`；根因、实现及模式说明见 `03_design/STUDIO_RUNTIME_COMPATIBILITY.md`。
+- 发布版本 `20260908150704-studio-v2`，构建 `2026-09-08T15:00:35.299Z`；主资源 `index-0A5bm4gj.js` / `index-B94SGVmt.css`。
+- 发布包 20,071,317 字节、158 个清单文件，SHA-256 `8a903944156ace1a465551a581eb4a467d3a8f6f5759ce79cb48532a9f811cb6`；服务端整包与文件清单验证通过。
+- current 已切至 `/opt/pindou/studio/releases/20260908150704-studio-v2`；回滚备份 `/opt/pindou/studio/backups/20260908150704-studio-v2`。
+- 公网实测使用 Windows Chromium 原生媒体设置（`reducedMotion:null`）与真实15px滚动条。浏览器原生返回 reduce；完整模式覆盖后 CSS 为0.3s、套餐卡片 y=-4px，价格在约90ms采样时26.9px / 完整84.2px，确认仍处于连续展开过程。
+- 公网页面宽2105px，正文始终2090px；照片在菜单打开前/打开后/关闭后均为 x=477、y=636.703125、width=1136。横向/纵向位置差均0px，未使用隐藏滚动条的环境替代。
+- 首次完整模式链接：`https://pindoupuppy.com/studio/visit?motion=full&version=20260908150704`。之后访问普通 `/studio/visit` 已验证保留 full。模式只保存到当前浏览器，不修改 Windows/Chrome 全局设置；未选择的访客跟随系统。直接启动用户 Chrome 的便利操作被自动审批策略阻止，未执行；交付链接由店主在自己的 Chrome 中打开。
+- 本地模式/菜单位移回归、23组交互、94组布局与1个后台设置、2组微信引擎模拟通过；43模块文案锁与类型/正式构建通过。公网应用错误为空，管理登录入口正常，无生产预约或订单写入。
+- `pindou` 与 `pindou-studio` 均 active；Studio 健康检查200，原生成器主JS标识不变；原HTML SHA-256仍为 `506f9bd2f9f0c37c52f08924f1504286816b93bff3198aea9f1790d0eceb36aa`。
+- 公网证据：`artifacts/studio-runtime-fix/live-verification.json`、`live-menu-open.png`；原生环境的修正前数据：`before.json`。这些证据与之前强制开启动画的录屏分开保存。
+
 ## 2026-09-08 模块浮起与短按反馈（已发布）
 
 - 代码提交：`c4b606b`（统一模块与按压）及 `088433c`（触屏松手事件修正），均已推送 `codex/studio-v1-20260907`。代码对照、当前技能规则和验收细节见 `03_design/STUDIO_TACTILE_UPGRADE.md`。
