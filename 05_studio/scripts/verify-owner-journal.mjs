@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 const data=JSON.parse(fs.readFileSync('src/content/journal-posts.json','utf8'));
-const out='../artifacts/studio-vision2/owner-journal-qa';fs.mkdirSync(out,{recursive:true});
+const base=process.env.STUDIO_JOURNAL_BASE||'http://127.0.0.1:5184/studio/';
+const out=base.startsWith('https:')?'../artifacts/studio-vision2/owner-journal-live':'../artifacts/studio-vision2/owner-journal-qa';fs.mkdirSync(out,{recursive:true});
 const posts=data.posts.filter(p=>p.body_sha256),results=[],errors=[];
 assert.equal(posts.length,8);assert.equal(posts.reduce((sum,p)=>sum+p.images.length,0),80);
 for(const p of posts){
@@ -15,7 +16,7 @@ for(const width of [390,1440]){
  const c=await b.newContext({viewport:{width,height:900},reducedMotion:'reduce'}),p=await c.newPage();
  p.on('pageerror',e=>errors.push(e.message));
  for(const post of posts){
-  await p.goto('http://127.0.0.1:5184/studio/journal/'+post.id);await p.evaluate(()=>document.fonts.ready);
+  await p.goto(base+'journal/'+post.id);await p.evaluate(()=>document.fonts.ready);
   await expect(p.locator('.journal-entry-photos img')).toHaveCount(post.images.length);
   const body=post.body.replace(/\[话题\]#/g,'').replace(/\[([^\]]+)R\]/g,'（$1）');
   assert.equal(await p.locator('.journal-original').textContent(),body);

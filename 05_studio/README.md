@@ -24,3 +24,7 @@ node scripts/verify.mjs
 本轮验收：`../07_ops/STUDIO_VERIFICATION.md`。
 
 主站正式切根路径前，需要确认经营资料，并保持旧 `/upload`、`/result/:id`、`/editor/:id` 等链接和 API 兼容。
+
+## VISION2（2026-09-08）
+
+当前设计与业务见02_product/STUDIO_VISION2_PROGRESS.md。文案集中于src/content，构建自动执行check:copy；未经店主明确要求，不得修改文案或刷新approved.json。后台“编辑预约规则”设置每组人数、总容量和每周营业时间。新文章导入脚本仅在店主提供链接并要求迁入时执行。主工具保留。最终发布验证见07_ops/STUDIO_VISION2_VERIFICATION.md。
