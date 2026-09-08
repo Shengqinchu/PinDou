@@ -1,3 +1,5 @@
+> VISION3 已上线：品牌网站现位于主域名 `/`，常用路径 `/visit`、`/details`、`/journal`、`/shop`、`/manage`。`/studio/*` 为兼容入口；原生成器保留 `/upload`、`/tutorial` 与其原API。当前配置/验证以 `STUDIO_VISION3_VERIFICATION.md` 为准，下文旧预览/交易说明保留历史。后台新增内容发布、日记导入/英文生成、原图管理与封闭时段。源站原生成器Python路径为 `/opt/pindou/current/06_backend/.venv/bin/python`。
+
 # 小狗拼豆铺 Studio V1 运维
 
 > 2026-09-08 VISION2 更新：当前以 02_product/STUDIO_VISION2_PROGRESS.md、03_design/STUDIO_DESIGN.md 和 02_product/copy/STUDIO_COPY_RULES.md 为准。中文无衬线/白底手绘品牌；每组4人、总量不限、每日10–22点，营业时间与容量均后台可编辑；展示价格但保持人工确认。下文旧字段/视觉/固定周三四限制仅作历史参考。
