@@ -285,30 +285,6 @@
   box-shadow: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .button,
-  .button > svg,
-  .icon-button,
-  .icon-button > svg,
-  .language-button,
-  .bag-button,
-  .bag-button > svg,
-  .menu-button,
-  .menu-button > svg,
-  .plan-option,
-  .photo-tile,
-  .photo-tile-image > img,
-  .photo-expand,
-  .text-link,
-  .text-link > svg,
-  .text-link::after,
-  .copy-contact,
-  .shop-tabs button {
-    transition: none !important;
-    transform: none !important;
-  }
-}
-
 .plan-option {
   isolation: isolate;
   overflow: visible;

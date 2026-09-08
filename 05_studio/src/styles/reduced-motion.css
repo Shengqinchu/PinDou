@@ -1,0 +1,196 @@
+/* Resolved once by motion-preference.ts. CSS and JS obey the same per-site choice. */
+/* From style.css */
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  scroll-behavior: auto !important;
+  animation: none !important;
+  transition: none !important;
+}
+html[data-motion="reduced"] .hero-copy > * {
+  opacity: 1 !important;
+  transform: none !important;
+}
+html[data-motion="reduced"] .space-photo img {
+  transform: none !important;
+}
+html[data-motion="reduced"] .button:hover,
+html[data-motion="reduced"] .photo-tile:hover .photo-tile-image > img {
+  transform: none !important;
+}
+/* From styles/interactions.css */
+html[data-motion="reduced"] .button,
+html[data-motion="reduced"] .button > svg,
+html[data-motion="reduced"] .icon-button,
+html[data-motion="reduced"] .icon-button > svg,
+html[data-motion="reduced"] .language-button,
+html[data-motion="reduced"] .bag-button,
+html[data-motion="reduced"] .bag-button > svg,
+html[data-motion="reduced"] .menu-button,
+html[data-motion="reduced"] .menu-button > svg,
+html[data-motion="reduced"] .plan-option,
+html[data-motion="reduced"] .photo-tile,
+html[data-motion="reduced"] .photo-tile-image > img,
+html[data-motion="reduced"] .photo-expand,
+html[data-motion="reduced"] .text-link,
+html[data-motion="reduced"] .text-link > svg,
+html[data-motion="reduced"] .text-link::after,
+html[data-motion="reduced"] .copy-contact,
+html[data-motion="reduced"] .shop-tabs button {
+  transition: none !important;
+  transform: none !important;
+}
+/* From styles/commerce.css */
+html[data-motion="reduced"] .date-chip,
+html[data-motion="reduced"] .time-chip {
+  transform: none !important;
+  transition: none !important;
+}
+/* From styles/motion.css */
+html[data-motion="reduced"] .bead-mark i,
+html[data-motion="reduced"] .studio-drawer::backdrop {
+  animation: none !important;
+}
+html[data-motion="reduced"] .button-primary::before,
+html[data-motion="reduced"] .segmented > button,
+html[data-motion="reduced"] .segment-indicator,
+html[data-motion="reduced"] .bag-list-move,
+html[data-motion="reduced"] .product-list-move,
+html[data-motion="reduced"] .bag-list-enter-active,
+html[data-motion="reduced"] .bag-list-leave-active,
+html[data-motion="reduced"] .product-list-enter-active,
+html[data-motion="reduced"] .product-list-leave-active,
+html[data-motion="reduced"] .bag-count-enter-active,
+html[data-motion="reduced"] .bag-count-leave-active,
+html[data-motion="reduced"] .mobile-menu-enter-active,
+html[data-motion="reduced"] .mobile-menu-leave-active,
+html[data-motion="reduced"] .photo-swap-enter-active,
+html[data-motion="reduced"] .photo-swap-leave-active,
+html[data-motion="reduced"] .field-reveal-enter-active,
+html[data-motion="reduced"] .field-reveal-leave-active,
+html[data-motion="reduced"] .notice-enter-active,
+html[data-motion="reduced"] .notice-leave-active {
+  transition: none !important;
+}
+html[data-motion="reduced"] .bag-list-enter-from,
+html[data-motion="reduced"] .bag-list-leave-to,
+html[data-motion="reduced"] .product-list-enter-from,
+html[data-motion="reduced"] .product-list-leave-to,
+html[data-motion="reduced"] .mobile-menu-enter-from,
+html[data-motion="reduced"] .mobile-menu-leave-to,
+html[data-motion="reduced"] .photo-swap-enter-from,
+html[data-motion="reduced"] .photo-swap-leave-to,
+html[data-motion="reduced"] .notice-enter-from,
+html[data-motion="reduced"] .notice-leave-to {
+  transform: none !important;
+}
+html[data-motion="reduced"] .button-primary:hover > svg,
+html[data-motion="reduced"] .button-primary:active > svg {
+  transform: none !important;
+}
+/* From styles/viewport.css */
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+html[data-motion="reduced"] .button,
+html[data-motion="reduced"] .button > svg,
+html[data-motion="reduced"] .desk-button,
+html[data-motion="reduced"] .desk-button > svg,
+html[data-motion="reduced"] .desk-metric,
+html[data-motion="reduced"] .desk-metric > strong,
+html[data-motion="reduced"] .desk-metric > span > svg,
+html[data-motion="reduced"] .plan-option,
+html[data-motion="reduced"] .plan-option > strong,
+html[data-motion="reduced"] .plan-option > input,
+html[data-motion="reduced"] .desk-product-row > img,
+html[data-motion="reduced"] .desk-product-row > svg,
+html[data-motion="reduced"] .agenda-row > svg,
+html[data-motion="reduced"] .readiness-row > svg {
+  transform: none !important;
+}
+/* From styles/vision.css */
+html[data-motion="reduced"] .vision-navigation a::after {
+  transition: none;
+}
+/* From styles/reservations.css */
+html[data-motion="reduced"] .reservation-plans > label {
+  transition: none;
+}
+/* From styles/reservations.css */
+html[data-motion="reduced"] .reservation-grid td > button,
+html[data-motion="reduced"] .reservation-plans > label {
+  transition: none;
+}
+html[data-motion="reduced"] .reservation-desk-row,
+html[data-motion="reduced"] .reservation-desk-metrics > button,
+html[data-motion="reduced"] .reservation-desk-row > svg {
+  transition: none;
+  transform: none;
+}
+/* From styles/journal.css */
+html[data-motion="reduced"] .journal-story-cover img,
+html[data-motion="reduced"] .journal-read svg {
+  transition: none;
+}
+/* From styles/desk.css */
+html[data-motion="reduced"] .desk-nav-indicator,
+html[data-motion="reduced"] .desk-sidebar,
+html[data-motion="reduced"] .desk-button,
+html[data-motion="reduced"] .desk-button > svg,
+html[data-motion="reduced"] .desk-icon-button,
+html[data-motion="reduced"] .desk-icon-button > svg,
+html[data-motion="reduced"] .desk-metric,
+html[data-motion="reduced"] .desk-navigation > button,
+html[data-motion="reduced"] .desk-navigation > button > svg,
+html[data-motion="reduced"] .desk-product-row,
+html[data-motion="reduced"] .photo-choices button,
+html[data-motion="reduced"] .menu-shade-enter-active,
+html[data-motion="reduced"] .menu-shade-leave-active {
+  transition: none !important;
+}
+html[data-motion="reduced"] .desk-button:hover,
+html[data-motion="reduced"] .desk-button:active,
+html[data-motion="reduced"] .desk-button:hover > svg,
+html[data-motion="reduced"] .desk-icon-button:hover,
+html[data-motion="reduced"] .desk-icon-button:active,
+html[data-motion="reduced"] .desk-metric:hover,
+html[data-motion="reduced"] .desk-navigation > button:hover > svg,
+html[data-motion="reduced"] .photo-choices button:hover {
+  transform: none !important;
+}
+html[data-motion="reduced"] .desk-skeleton,
+html[data-motion="reduced"] .spinning {
+  animation: none !important;
+}
+/* From styles/tactile.css */
+html[data-motion="reduced"]
+  :is(
+    .button,
+    .desk-button,
+    .icon-button,
+    .desk-icon-button,
+    .language-button,
+    .desk-language,
+    .reservation-desk-days > button,
+    .reservation-grid td > button,
+    .reservation-plans > label,
+    .photo-tile,
+    .journal-story-link,
+    .desk-metric,
+    .reservation-desk-metrics > button,
+    .reservation-desk-row,
+    .desk-surface:has(button),
+    .reservation-settings-entry
+  ),
+html[data-motion="reduced"]
+  :is(.reservation-plans > label, .reservation-desk-metrics > button)
+  > :is(svg, strong),
+html[data-motion="reduced"] .journal-story-cover,
+html[data-motion="reduced"] .journal-story-cover img {
+  transform: none !important;
+  transition: none !important;
+}

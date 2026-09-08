@@ -9,63 +9,70 @@ import PhotoViewer from "../components/PhotoViewer.vue";
 import StudioCarousel from "../components/StudioCarousel.vue";
 import BrandMotif from "../components/BrandMotif.vue";
 import { gallery, media, tr } from "../state";
+import { reducedMotion, onMotionPreferenceChange } from "../motion-preference";
 const page = ref<HTMLElement>();
 const viewer = ref<InstanceType<typeof PhotoViewer>>();
-let animation: gsap.MatchMedia | undefined;
+let animation: gsap.Context | undefined;
+let stopPreference: (() => void) | undefined;
+function entrance() {
+  animation?.revert();
+  animation = undefined;
+  if (reducedMotion()) return;
+  animation = gsap.context(() => {
+    gsap
+      .timeline({ defaults: { ease: "studio-travel" } })
+      .from(
+        ".vision-title > span",
+        {
+          y: 24,
+          opacity: 0,
+          duration: 1.05,
+          stagger: 0.12,
+          clearProps: "transform,opacity",
+        },
+        0,
+      )
+      .from(
+        ".hero-puppy",
+        { rotation: -8, y: 10, opacity: 0, duration: 1.2, clearProps: "all" },
+        0.3,
+      )
+      .from(
+        ".hero-star, .hero-heart",
+        {
+          scale: 0.75,
+          rotation: 12,
+          opacity: 0,
+          duration: 1.1,
+          stagger: 0.16,
+          clearProps: "all",
+        },
+        0.55,
+      )
+      .from(
+        ".vision-hero-description",
+        { y: 12, opacity: 0, duration: 1, clearProps: "transform,opacity" },
+        0.22,
+      )
+      .from(
+        ".vision-hero-photo",
+        {
+          clipPath: "inset(3% 0 5% 0 round 16px)",
+          duration: 1.35,
+          clearProps: "clipPath",
+        },
+        0.18,
+      );
+  }, page.value);
+}
 onMounted(() => {
-  animation = gsap.matchMedia();
-  animation.add(
-    "(prefers-reduced-motion: no-preference)",
-    () => {
-      gsap
-        .timeline({ defaults: { ease: "studio-travel" } })
-        .from(
-          ".vision-title > span",
-          {
-            y: 24,
-            opacity: 0,
-            duration: 1.05,
-            stagger: 0.12,
-            clearProps: "transform,opacity",
-          },
-          0,
-        )
-        .from(
-          ".hero-puppy",
-          { rotation: -8, y: 10, opacity: 0, duration: 1.2, clearProps: "all" },
-          0.3,
-        )
-        .from(
-          ".hero-star, .hero-heart",
-          {
-            scale: 0.75,
-            rotation: 12,
-            opacity: 0,
-            duration: 1.1,
-            stagger: 0.16,
-            clearProps: "all",
-          },
-          0.55,
-        )
-        .from(
-          ".vision-hero-description",
-          { y: 12, opacity: 0, duration: 1, clearProps: "transform,opacity" },
-          0.22,
-        )
-        .from(
-          ".vision-hero-photo",
-          {
-            clipPath: "inset(3% 0 5% 0 round 16px)",
-            duration: 1.35,
-            clearProps: "clipPath",
-          },
-          0.18,
-        );
-    },
-    page.value,
-  );
+  entrance();
+  stopPreference = onMotionPreferenceChange(entrance);
 });
-onBeforeUnmount(() => animation?.revert());
+onBeforeUnmount(() => {
+  stopPreference?.();
+  animation?.revert();
+});
 </script>
 <template>
   <div ref="page" class="vision-home">

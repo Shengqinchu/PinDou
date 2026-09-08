@@ -1150,10 +1150,3 @@
     font-size: 12px;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .date-chip,
-  .time-chip {
-    transform: none !important;
-    transition: none !important;
-  }
-}

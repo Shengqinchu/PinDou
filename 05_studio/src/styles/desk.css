@@ -2429,37 +2429,6 @@
     padding: 20px 16px;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .desk-nav-indicator,
-  .desk-sidebar,
-  .desk-button,
-  .desk-button > svg,
-  .desk-icon-button,
-  .desk-icon-button > svg,
-  .desk-metric,
-  .desk-navigation > button,
-  .desk-navigation > button > svg,
-  .desk-product-row,
-  .photo-choices button,
-  .menu-shade-enter-active,
-  .menu-shade-leave-active {
-    transition: none !important;
-  }
-  .desk-button:hover,
-  .desk-button:active,
-  .desk-button:hover > svg,
-  .desk-icon-button:hover,
-  .desk-icon-button:active,
-  .desk-metric:hover,
-  .desk-navigation > button:hover > svg,
-  .photo-choices button:hover {
-    transform: none !important;
-  }
-  .desk-skeleton,
-  .spinning {
-    animation: none !important;
-  }
-}
 
 .desk-brand > .puppy-motif {
   width: 38px;

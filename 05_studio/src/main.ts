@@ -16,6 +16,8 @@ import "./styles/reservations.css";
 import "./styles/journal.css";
 import "./styles/desk.css";
 import "./styles/tactile.css";
+import "./styles/reduced-motion.css";
+import { installMotionPreference } from "./motion-preference";
 import { installMotion } from "./motion";
 import { installViewport } from "./browser";
 import { reducedMotion } from "./ui";
@@ -60,11 +62,13 @@ const router = createRouter({
   },
 });
 
+const stopPreference = installMotionPreference();
 const stopMotion = installMotion();
 const stopViewport = installViewport();
 createApp(App).use(router).mount("#app");
 if (import.meta.hot)
   import.meta.hot.dispose(() => {
     stopMotion();
+    stopPreference();
     stopViewport();
   });

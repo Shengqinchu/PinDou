@@ -968,8 +968,3 @@
     align-self: center;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .vision-navigation a::after {
-    transition: none;
-  }
-}

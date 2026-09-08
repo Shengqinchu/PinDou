@@ -26,8 +26,7 @@ export function dismissNotice() {
   clearTimeout(noticeTimer);
   notice.value = undefined;
 }
-export const reducedMotion = () =>
-  matchMedia("(prefers-reduced-motion: reduce)").matches;
+export { reducedMotion } from "./motion-preference";
 
 export function eventLabel(event: string, zh: boolean) {
   const labels: Record<string, string[]> = contentLabels as Record<

@@ -287,30 +287,3 @@
 }
 
 /* No sticky hover on touch; no positional effect when reduced motion is set. */
-@media (prefers-reduced-motion: reduce) {
-  :is(
-    .button,
-    .desk-button,
-    .icon-button,
-    .desk-icon-button,
-    .language-button,
-    .desk-language,
-    .reservation-desk-days > button,
-    .reservation-grid td > button,
-    .reservation-plans > label,
-    .photo-tile,
-    .journal-story-link,
-    .desk-metric,
-    .reservation-desk-metrics > button,
-    .reservation-desk-row,
-    .desk-surface:has(button),
-    .reservation-settings-entry
-  ),
-  :is(.reservation-plans > label, .reservation-desk-metrics > button)
-    > :is(svg, strong),
-  .journal-story-cover,
-  .journal-story-cover img {
-    transform: none !important;
-    transition: none !important;
-  }
-}

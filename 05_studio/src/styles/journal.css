@@ -185,9 +185,3 @@
     padding-inline: 20px;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .journal-story-cover img,
-  .journal-read svg {
-    transition: none;
-  }
-}

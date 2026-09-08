@@ -100,17 +100,20 @@ export function lockPageScroll() {
     const x = window.scrollX,
       y = window.scrollY;
     lockedY = y;
+    // Snapshot before position:fixed removes the root scrollbar from layout.
+    const contentWidth = document.documentElement.clientWidth;
+    const scrollbarWidth = Math.max(0, innerWidth - contentWidth);
     let lockedWidth = innerWidth;
     const resizeLockedBody = () => {
       if (innerWidth === lockedWidth) return;
       lockedWidth = innerWidth;
-      body.style.width = `${document.documentElement.clientWidth}px`;
+      body.style.width = `${Math.max(0, innerWidth - scrollbarWidth)}px`;
     };
     window.addEventListener("resize", resizeLockedBody);
     body.style.position = "fixed";
     body.style.top = `${-y}px`;
     body.style.left = `${-x}px`;
-    body.style.width = `${document.documentElement.clientWidth}px`;
+    body.style.width = `${contentWidth}px`;
     body.style.overflow = "hidden";
     document.documentElement.classList.add("modal-open");
     restore = () => {

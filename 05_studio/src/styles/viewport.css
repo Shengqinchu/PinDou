@@ -367,31 +367,6 @@ html.keyboard-open .drawer-top {
 html.keyboard-open .drawer-bottom {
   padding-block: 10px;
 }
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
-  }
-  .button,
-  .button > svg,
-  .desk-button,
-  .desk-button > svg,
-  .desk-metric,
-  .desk-metric > strong,
-  .desk-metric > span > svg,
-  .plan-option,
-  .plan-option > strong,
-  .plan-option > input,
-  .desk-product-row > img,
-  .desk-product-row > svg,
-  .agenda-row > svg,
-  .readiness-row > svg {
-    transform: none !important;
-  }
-}
 
 @media (max-width: 360px) {
   .wordmark > svg {

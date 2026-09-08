@@ -1,5 +1,6 @@
 // Complete a short tap visually without delaying its native click or form action.
 // CSS handles hover/held press. A single, replaceable WAAPI effect handles release.
+import { reducedMotion, onMotionPreferenceChange } from "./motion-preference";
 const controls = [
   ".button",
   ".desk-button",
@@ -25,7 +26,6 @@ export function installPressFeedback(clock: {
   ease: string;
 }) {
   if (!Element.prototype.animate) return () => {};
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const effects = new Map<HTMLElement, Animation>();
   const pointers = new Map<number, Press>();
   let key: { element: HTMLElement; at: number; value: string } | undefined;
@@ -77,7 +77,7 @@ export function installPressFeedback(clock: {
     ]);
   }
   function release(element: HTMLElement, at: number, completed: boolean) {
-    if (reduced.matches || !available(element)) return cancel(element);
+    if (reducedMotion() || !available(element)) return cancel(element);
     const short = completed && performance.now() - at < clock.duration * 0.6;
     if (!short && !effects.has(element)) return;
     const current = frame(element);
@@ -96,7 +96,7 @@ export function installPressFeedback(clock: {
     if (
       event.button !== 0 ||
       !event.isPrimary ||
-      reduced.matches ||
+      reducedMotion() ||
       !element ||
       !available(element)
     )
@@ -148,7 +148,7 @@ export function installPressFeedback(clock: {
     release(element, performance.now(), false);
   }
   function keyDown(event: KeyboardEvent) {
-    if (event.repeat || ![" ", "Enter"].includes(event.key) || reduced.matches)
+    if (event.repeat || ![" ", "Enter"].includes(event.key) || reducedMotion())
       return;
     const element = target(event);
     if (!element || !available(element)) return;
@@ -210,7 +210,7 @@ export function installPressFeedback(clock: {
   document.addEventListener("visibilitychange", hidden);
   window.addEventListener("blur", reset);
   window.addEventListener("pagehide", reset);
-  reduced.addEventListener("change", reset);
+  const stopPreference = onMotionPreferenceChange(reset);
   return () => {
     reset();
     observer.disconnect();
@@ -225,6 +225,6 @@ export function installPressFeedback(clock: {
     document.removeEventListener("visibilitychange", hidden);
     window.removeEventListener("blur", reset);
     window.removeEventListener("pagehide", reset);
-    reduced.removeEventListener("change", reset);
+    stopPreference();
   };
 }
