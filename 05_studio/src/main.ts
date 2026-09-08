@@ -19,6 +19,7 @@ import "./styles/desk.css";
 import "./styles/tactile.css";
 import "./styles/vision3.css";
 import "./styles/editor.css";
+import "./styles/account.css";
 import "./styles/reduced-motion.css";
 import { installContent } from "./content-store";
 import { installRoutePrefetch, routeLoaders } from "./route-loaders";

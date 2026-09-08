@@ -1,10 +1,11 @@
 {
-  "source": "owner-20260908-unify-CAD-units",
+  "source": "owner-20260908-shared-email-account-and-reservation-login",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
   },
   "hashes": {
+    "account.json": "98d0d6bc03b312b3c81d2f20907b9dfa25fd5b4a6d7fcea93358c322434bfd8c",
     "admin.json": "f867ea87d71f2508a1e9dde9ed9dadad4069582cd74159ff89549273a47c1d6e",
     "App.json": "0d821e571ff322d1a8f435ccb3ed5006f4ebdb08c7ad535d757539d0fd6f4647",
     "carousel-labels.json": "9eebcd13734eb636c39e80301a2d1c92baeea4f839c54b32057949965b0c88ab",
@@ -35,7 +36,7 @@
     "data-commerce-messages.json": "cd9fcbabe5a5f128f3d8bef5fcc4283e93a072a944cb545553a0acc026c57027",
     "data-components-admin-SchedulePanel-labels.json": "5800653cc2886f2313e67babd9486fb8190ccbe74cd2f47a8c57877517aec97a",
     "data-components-StudioCarousel-photos.json": "99d651ee66ac9c12c01450c9d60756017435dc4f342185514a276df4aec30555",
-    "data-editor-module-labels.json": "f1e19a36e008851d4bf22e019f9566183b9ae4bc401ff6e32b92798168413a57",
+    "data-editor-module-labels.json": "5c8193e22045c5ca8cf67d0958d616cb5f4f3ec82676445e15e8b3a1c8ca654c",
     "data-state-gallery.json": "9e6a73784deb8e6d371fd8f5372273176b5ef9c5663b766079787e10afa01dd1",
     "data-state-products.json": "dda7e9f229f7837b20ed143459141a21806bc7dad4fb2a5105a75a2b09403a95",
     "data-ui-labels.json": "692de89a61bbb0ddbb72fb5c1d546b5a9e293c3657fae05e55f9dca99934616e",

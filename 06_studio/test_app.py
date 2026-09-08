@@ -6,12 +6,17 @@ import pytest
 from fastapi.testclient import TestClient
 
 import app as studio
+import customer_auth
+from auth_fixture import fake_upstream,reject_legacy_admin
 
 
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setattr(studio, "DB_PATH", tmp_path / "studio.sqlite3")
+    monkeypatch.setattr(customer_auth,"upstream",fake_upstream)
+    monkeypatch.setattr(studio,"urlopen",reject_legacy_admin)
     with TestClient(studio.app) as connection:
+        connection.headers['Authorization']='Bearer qa-owner'
         yield connection
     studio.app.dependency_overrides.clear()
 

@@ -13,7 +13,9 @@ import {
   PhArrowRight,
   PhArrowClockwise,
 } from "@phosphor-icons/vue";
-import { commerceApi } from "../commerce";
+import { commerceApi,CommerceError } from "../commerce";
+import { accountCopy,ensureCustomer } from "../account";
+const needsSignIn=ref(false);
 import { prettyDate, tr, wechat, phone, phoneHref } from "../state";
 import type { Reservation } from "../reservations";
 const route = useRoute(),
@@ -25,6 +27,7 @@ let timer: ReturnType<typeof setInterval>,
 async function refresh() {
   if (busy.value) return;
   busy.value = true;
+  needsSignIn.value=false;
   try {
     const data = await commerceApi<Reservation>(
       "/reservations/" + encodeURIComponent(String(route.params.id)),
@@ -34,7 +37,7 @@ async function refresh() {
       error.value = "";
     }
   } catch (e) {
-    if (alive) error.value = (e as Error).message;
+    if (alive) {error.value = (e as Error).message;needsSignIn.value=e instanceof CommerceError&&e.status===401;}
   } finally {
     if (alive) busy.value = false;
   }
@@ -42,6 +45,7 @@ async function refresh() {
 function visible() {
   if (!document.hidden) refresh();
 }
+async function loginAndRefresh(){try{if(await ensureCustomer()&&alive)await refresh();}catch(e){error.value=(e as Error).message;}}
 onMounted(() => {
   refresh();
   timer = setInterval(() => {
@@ -132,6 +136,7 @@ onBeforeUnmount(() => {
       {{ say(copyText.loading_your_reservation_9f91f7) }}
     </p>
     <p v-if="error" class="form-error" role="alert">{{ error }}</p>
+    <button v-if="needsSignIn" class="button button-primary" @click="loginAndRefresh">{{ say(accountCopy.sign_in) }}</button>
     <button type="button" class="text-link" :disabled="busy" @click="refresh">
       <PhArrowClockwise :class="{ spinning: busy }" />{{
         say(copyText.refresh_reservation_30af18)

@@ -5,13 +5,18 @@ from fastapi.testclient import TestClient
 import app as studio
 import reservations as visits
 import commerce
+import customer_auth
+from auth_fixture import fake_upstream,reject_legacy_admin
 
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setattr(studio, "DB_PATH", tmp_path / "visits.sqlite3")
     monkeypatch.setattr(visits, "now_local", lambda: datetime(2026, 9, 7, 9, 0, tzinfo=visits.ZONE))
     monkeypatch.setattr(visits, "COOKIE_SECURE", False)
+    monkeypatch.setattr(customer_auth,"upstream",fake_upstream)
+    monkeypatch.setattr(studio,"urlopen",reject_legacy_admin)
     with TestClient(studio.app) as client:
+        client.headers['Authorization']='Bearer qa-owner'
         client.get("/studio-api/reservation-calendar")
         yield client
     studio.app.dependency_overrides.clear()
@@ -59,7 +64,7 @@ def test_submission_receipt_privacy_replay_and_no_paid_order(client):
     assert submit(client,key=key).json()["id"]==ref
     assert client.get("/studio-api/reservations/"+ref).status_code==200
     with TestClient(studio.app) as other:
-        assert other.get("/studio-api/reservations/"+ref).status_code==404
+        assert other.get("/studio-api/reservations/"+ref).status_code==401
     with studio.database() as db:
         assert db.execute("SELECT count(*) FROM studio_reservations").fetchone()[0]==1
         assert db.execute("SELECT count(*) FROM commerce_orders").fetchone()[0]==0

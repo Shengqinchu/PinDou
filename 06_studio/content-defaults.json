@@ -1,4 +1,182 @@
 {
+  "account": {
+    "sign_in": [
+      "登录",
+      "Sign in"
+    ],
+    "account": [
+      "我的账号",
+      "My account"
+    ],
+    "title": [
+      "欢迎来到小狗拼豆铺",
+      "Welcome to PinDou Puppy"
+    ],
+    "reservation_title": [
+      "登录后，继续这次预约",
+      "Sign in to finish your booking"
+    ],
+    "shared_account": [
+      "与拼豆图纸工具共用账号。邮箱首次验证后会自动注册。",
+      "Use the same account as the pattern tool. Your first email verification creates an account."
+    ],
+    "draft_saved": [
+      "选好的时段和填写的内容都已保留。",
+      "Your chosen time and form details are saved."
+    ],
+    "code_method": [
+      "邮箱验证码",
+      "Email code"
+    ],
+    "password_method": [
+      "密码登录",
+      "Password"
+    ],
+    "email": [
+      "邮箱地址",
+      "Email address"
+    ],
+    "code": [
+      "6 位验证码",
+      "6-digit code"
+    ],
+    "send_code": [
+      "发送验证码",
+      "Send code"
+    ],
+    "sending_code": [
+      "正在发送…",
+      "Sending…"
+    ],
+    "code_sent": [
+      "验证码已发送，5 分钟内有效。请查看邮箱或垃圾邮件。",
+      "Code sent. It is valid for 5 minutes. Check your inbox or spam folder."
+    ],
+    "resend_after": [
+      "{v0} 秒后重发",
+      "Resend in {v0}s"
+    ],
+    "password": [
+      "密码",
+      "Password"
+    ],
+    "show_password": [
+      "显示密码",
+      "Show password"
+    ],
+    "hide_password": [
+      "隐藏密码",
+      "Hide password"
+    ],
+    "set_password": [
+      "同时设置密码（可选）",
+      "Set a password too (optional)"
+    ],
+    "new_password": [
+      "设置密码，至少 6 位",
+      "Set a password, at least 6 characters"
+    ],
+    "confirm_password": [
+      "再次输入密码",
+      "Confirm password"
+    ],
+    "password_mismatch": [
+      "两次输入的密码不一致。",
+      "The passwords do not match."
+    ],
+    "continue": [
+      "验证并登录",
+      "Verify and sign in"
+    ],
+    "continue_reservation": [
+      "登录并继续预约",
+      "Sign in and continue booking"
+    ],
+    "working": [
+      "正在登录…",
+      "Signing in…"
+    ],
+    "forgot_password": [
+      "忘记密码？使用邮箱验证码登录",
+      "Forgot your password? Use an email code"
+    ],
+    "signed_in": [
+      "已登录",
+      "Signed in"
+    ],
+    "sign_out": [
+      "退出登录",
+      "Sign out"
+    ],
+    "my_reservations": [
+      "我的预约",
+      "My bookings"
+    ],
+    "no_reservations": [
+      "还没有账号预约记录，选一个喜欢的时间来拼豆吧。",
+      "No bookings on your account yet. Choose a time to come and create."
+    ],
+    "loading": [
+      "正在读取预约…",
+      "Loading bookings…"
+    ],
+    "retry": [
+      "重新加载",
+      "Try again"
+    ],
+    "book_a_visit": [
+      "预约到店",
+      "Book a visit"
+    ],
+    "login_notice": [
+      "浏览和选时段无需登录，提交预约时需登录账号。",
+      "Browse and choose a time freely. Sign in when you submit your booking."
+    ],
+    "checking": [
+      "正在确认登录…",
+      "Checking sign-in…"
+    ],
+    "account_login_required": [
+      "请登录后继续，已填内容会保留。",
+      "Please sign in to continue. Your details are saved."
+    ],
+    "account_email_required": [
+      "请使用已验证的邮箱账号登录。",
+      "Please sign in with a verified email account."
+    ],
+    "account_unavailable": [
+      "登录服务暂时无法连接，请稍后重试。",
+      "We cannot reach the sign-in service. Please try again shortly."
+    ],
+    "account_code_invalid": [
+      "验证码不正确或已使用，请检查或重新获取。",
+      "The code is incorrect or already used. Check it or request a new one."
+    ],
+    "account_code_expired": [
+      "验证码已过期，请重新获取。",
+      "This code has expired. Please request a new one."
+    ],
+    "account_password_invalid": [
+      "邮箱或密码不正确，也可以使用邮箱验证码登录。",
+      "The email or password is incorrect. You can also sign in with an email code."
+    ],
+    "account_already_registered": [
+      "该邮箱已有密码，请使用密码登录，或取消设置密码后用验证码登录。",
+      "This email already has a password. Sign in with it, or uncheck setting a password and use an email code."
+    ],
+    "account_rate_limited": [
+      "尝试较频繁，请稍等一会儿再试。",
+      "Too many attempts. Please wait a little before trying again."
+    ],
+    "account_email_unavailable": [
+      "验证码暂时发送失败，请稍后再试。",
+      "We could not send your email code. Please try again shortly."
+    ],
+    "account_check_details": [
+      "请检查邮箱、验证码或密码的填写。",
+      "Please check the email, code or password you entered."
+    ]
+  },
   "admin": {
     "enca_9cd218": [
       "zh-CN",
@@ -2476,6 +2654,10 @@
     ]
   },
   "data-editor-module-labels": {
+    "account": [
+      "账号与登录",
+      "Account and sign-in"
+    ],
     "App": [
       "导航与页脚",
       "Navigation and footer"

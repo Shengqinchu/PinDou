@@ -12,6 +12,7 @@ from typing import Annotated, Literal
 from zoneinfo import ZoneInfo
 from fastapi import Depends, Header, HTTPException, Request, Response
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from customer_auth import require_customer
 
 ZONE = ZoneInfo("America/Toronto")
 COOKIE = "puppy_reservation_session"
@@ -49,6 +50,9 @@ def initialize(database):
         """)
         if "settings" not in {row[1] for row in db.execute("PRAGMA table_info(reservation_policy)")}:
             db.execute("ALTER TABLE reservation_policy ADD COLUMN settings TEXT NOT NULL DEFAULT '{}'")
+        if "owner_id" not in {row[1] for row in db.execute("PRAGMA table_info(studio_reservations)")}:
+            db.execute("ALTER TABLE studio_reservations ADD COLUMN owner_id TEXT NOT NULL DEFAULT ''")
+        db.execute("CREATE INDEX IF NOT EXISTS reservation_owner ON studio_reservations(owner_id,created_at)")
 
 def clock(value):
     return f"{value // 60:02d}:{value % 60:02d}"
@@ -228,7 +232,7 @@ def register(app, database, admin_actor):
         return {"today": str(current.date()), "timezone": "America/Toronto", "minimum_minutes": 120, "max_guests_per_group": settings["max_guests_per_group"], "weekly_hours": settings["weekly_hours"], "policy_version": settings["version"], "days": days}
 
     @app.post("/studio-api/reservations", status_code=201)
-    def submit(payload: Submission, request: Request, idempotency_key: Annotated[str, Header()]):
+    def submit(payload: Submission, request: Request, idempotency_key: Annotated[str, Header()], customer=Depends(require_customer)):
         try:
             uuid.UUID(idempotency_key)
         except ValueError:
@@ -241,7 +245,8 @@ def register(app, database, admin_actor):
             db.execute("BEGIN IMMEDIATE")
             existing = db.execute("SELECT * FROM studio_reservations WHERE idempotency_key=?", (idempotency_key,)).fetchone()
             if existing:
-                if existing["visitor_hash"] != actor or existing["payload_hash"] != digest:
+                wrong_owner = existing["owner_id"] != customer["id"] if existing["owner_id"] else existing["visitor_hash"] != actor
+                if wrong_owner or existing["payload_hash"] != digest:
                     raise HTTPException(409, "reservation_request_changed")
                 return public_row(existing)
             settings = read_policy(db)
@@ -257,21 +262,30 @@ def register(app, database, admin_actor):
             db.execute("INSERT INTO submission_limits VALUES(?,?,1) ON CONFLICT(client_hash,bucket) DO UPDATE SET count=count+1", (client,bucket))
             ref = "VIS-" + uuid.uuid4().hex[:16].upper()
             timestamp = current.isoformat()
-            db.execute("INSERT INTO studio_reservations(id,created_at,updated_at,payload,visitor_hash,idempotency_key,payload_hash) VALUES(?,?,?,?,?,?,?)", (ref,timestamp,timestamp,encoded,actor,idempotency_key,digest))
+            db.execute("INSERT INTO studio_reservations(id,created_at,updated_at,payload,visitor_hash,idempotency_key,payload_hash,owner_id) VALUES(?,?,?,?,?,?,?,?)", (ref,timestamp,timestamp,encoded,actor,idempotency_key,digest,customer["id"]))
             row = db.execute("SELECT * FROM studio_reservations WHERE id=?", (ref,)).fetchone()
             return public_row(row)
 
     @app.get("/studio-api/reservations/{reference}")
-    def receipt(reference: str, request: Request):
-        try:
-            actor = visitor(request)
-        except HTTPException:
-            raise HTTPException(404, "reservation_not_found")
+    def receipt(reference: str, request: Request, authorization: Annotated[str | None, Header()]=None):
         with database() as db:
-            row = db.execute("SELECT * FROM studio_reservations WHERE id=? AND visitor_hash=?", (reference, actor)).fetchone()
+            row = db.execute("SELECT * FROM studio_reservations WHERE id=?", (reference,)).fetchone()
         if not row:
             raise HTTPException(404, "reservation_not_found")
+        if row["owner_id"]:
+            if require_customer(request,authorization)["id"]!=row["owner_id"]:
+                raise HTTPException(404,"reservation_not_found")
+        else:
+            try: actor=visitor(request)
+            except HTTPException: raise HTTPException(404,"reservation_not_found") from None
+            if row["visitor_hash"]!=actor:raise HTTPException(404,"reservation_not_found")
         return public_row(row)
+
+    @app.get("/studio-api/auth/reservations")
+    def my_reservations(customer=Depends(require_customer)):
+        with database() as db:
+            rows=db.execute("SELECT * FROM studio_reservations WHERE owner_id=? ORDER BY created_at DESC,id DESC LIMIT 50",(customer["id"],)).fetchall()
+        return {"items":[public_row(row) for row in rows]}
 
     @app.get("/studio-api/manage/reservations")
     def listing(_actor=Depends(admin_actor), status: str="all", day: date | None=None, search: str="", page: int=1):

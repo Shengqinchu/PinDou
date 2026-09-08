@@ -9,6 +9,9 @@ import { say } from "./state";
 import { computed, ref, watch } from "vue";
 import { locale, tr } from "./state";
 import { notify } from "./ui";
+import { customerToken } from "./account-storage";
+import accountDefaults from "./content/account.json";
+const accountMessages=contentModule("account",accountDefaults) as Record<string,string[]>;
 
 export type Booking = {
   date: string;
@@ -132,9 +135,10 @@ export async function commerceApi<T>(
 ): Promise<T> {
   let response: Response;
   try {
+    const token=(path.startsWith("/auth/")||path.startsWith("/reservations"))?customerToken():"";
     response = await fetch(`/studio-api${path}`, {
       ...init,
-      headers: { "Content-Type": "application/json", ...init.headers },
+      headers: { "Content-Type": "application/json", ...(token?{Authorization:"Bearer "+token}:{}), ...init.headers },
       cache: "no-store",
     });
   } catch (error) {
@@ -148,7 +152,7 @@ export async function commerceApi<T>(
   }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const words = messages[data.detail];
+    const words = messages[data.detail] || accountMessages[data.detail];
     if (words)
       throw new CommerceError(say(words), response.status, data.detail);
     if (response.status === 401 || response.status === 403)

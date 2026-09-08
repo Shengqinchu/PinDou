@@ -69,6 +69,8 @@ def initialize():
     commerce.initialize(database)
     import reservations
     reservations.initialize(database)
+    import customer_auth
+    customer_auth.initialize(database)
     import content
     content.initialize(database, DB_PATH)
 
@@ -206,7 +208,9 @@ def health():
 
 
 @app.post("/studio-api/requests", status_code=201)
-def create_inquiry(payload: Inquiry, request: Request, idempotency_key: Annotated[str, Header()]):
+def create_inquiry(payload: Inquiry, request: Request, idempotency_key: Annotated[str, Header()], authorization: Annotated[str | None, Header()]=None):
+    if payload.kind == "visit":
+        customer_auth.require_customer(request, authorization)
     try:
         uuid.UUID(idempotency_key)
     except ValueError as exc:
@@ -269,6 +273,8 @@ def update_inquiry(request_id: str, payload: StatusUpdate, actor: Annotated[str,
 import commerce
 commerce.register(app, admin_actor)
 import reservations
+import customer_auth
+customer_auth.register(app, database, ADMIN_ORIGIN)
 reservations.register(app, database, admin_actor)
 
 import content

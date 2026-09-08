@@ -1,4 +1,5 @@
 {
+  "account": ["账号与登录", "Account and sign-in"],
   "App": [
     "导航与页脚",
     "Navigation and footer"

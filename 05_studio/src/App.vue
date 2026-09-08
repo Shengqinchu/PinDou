@@ -6,13 +6,14 @@ import copyTextDefault from "./content/App.json";
 import { say } from "./state";
 
 import { asset } from "./content-store";
-import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
+import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
   PhArrowRight,
   PhArrowUpRight,
   PhFlower,
   PhList,
+  PhUserCircle,
 } from "@phosphor-icons/vue";
 import { locale, socialUrl, tr, wechat, phone, phoneHref } from "./state";
 import { gsap } from "gsap";
@@ -23,6 +24,13 @@ import ReleaseNotice from "./components/ReleaseNotice.vue";
 import BrandMark from "./components/BrandMark.vue";
 import BrandMotif from "./components/BrandMotif.vue";
 import BrandIcon from "./components/BrandIcon.vue";
+import { accountCopy,accountOpen,accountUser,openAccount,closeAccount,installAccount } from "./account";
+const AccountPanel=defineAsyncComponent(()=>import("./components/AccountPanel.vue"));
+const accountMounted=ref(false);
+watch(accountOpen,value=>{if(value)accountMounted.value=true;});
+let stopAccount:(()=>void)|undefined;
+onMounted(()=>{stopAccount=installAccount();});
+onBeforeUnmount(()=>{stopAccount?.();closeAccount();});
 const avatar = computed(() => asset("owner-avatar").src);
 const route = useRoute();
 const isDesk = computed(() => route.path.startsWith("/manage"));
@@ -77,6 +85,7 @@ watch(
       >
     </nav>
     <div class="vision-header-actions">
+      <button class="account-trigger icon-button" :aria-label="say(accountUser?accountCopy.account:accountCopy.sign_in)" :aria-expanded="accountOpen" @click="openAccount"><PhUserCircle :size="24" weight="light" /><span>{{ say(accountUser?accountCopy.account:accountCopy.sign_in) }}</span></button>
       <button
         class="language-button"
         @click="locale = locale === 'zh' ? 'en' : 'zh'"
@@ -125,6 +134,7 @@ watch(
       /></RouterLink>
     </div>
   </SlideOver>
+  <AccountPanel v-if="accountMounted" />
   <main
     ref="main"
     id="main"

@@ -13,6 +13,9 @@ from fastapi.responses import Response
 import app as studio
 import commerce
 import reservations
+import customer_auth
+from auth_fixture import fake_upstream
+customer_auth.upstream=fake_upstream
 reservations.COOKIE_SECURE = False
 from test_commerce import FakeGateway
 

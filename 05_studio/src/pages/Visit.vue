@@ -29,6 +29,8 @@ import {
 } from "../reservations";
 import ReservationCalendar from "../components/ReservationCalendar.vue";
 import AutoHeight from "../components/AutoHeight.vue";
+import { accountCopy,accountUser,ensureCustomer,closeAccount } from "../account";
+const checkingAccount=ref(false);
 const router = useRouter(),
   calendar = ref<Calendar | null>(null),
   loading = ref(false),
@@ -94,6 +96,7 @@ onMounted(() => {
   document.addEventListener("visibilitychange", refreshVisible);
 });
 onBeforeUnmount(() => {
+  closeAccount();
   alive = false;
   sequence++;
   clearInterval(timer);
@@ -114,8 +117,12 @@ function select(value: { date: string; start: string; end: string }) {
   error.value = "";
 }
 async function submit() {
-  if (sending.value) return;
+  if (sending.value||checkingAccount.value) return;
   if (!attempt.value && (!selected.value || !draft.consent)) return;
+  checkingAccount.value=true;
+  try{if(!await ensureCustomer()||!alive)return;}
+  catch(e){error.value=(e as Error).message;return;}
+  finally{checkingAccount.value=false;}
   if (!attempt.value) {
     attempt.value = {
       key: crypto.randomUUID(),
@@ -155,7 +162,7 @@ async function submit() {
       e instanceof CommerceError &&
       e.status >= 400 &&
       e.status < 500 &&
-      !["reservation_session_missing", "reservation_request_changed"].includes(
+      !["reservation_session_missing", "reservation_request_changed", "account_login_required"].includes(
         e.code || "",
       )
     ) {
@@ -393,6 +400,7 @@ async function submit() {
         >
       </section>
       <div class="reservation-submit">
+        <p v-if="!accountUser" class="reservation-account-note">{{ say(accountCopy.login_notice) }}</p>
         <p v-if="error && calendar" class="form-error" role="alert">
           {{ error }}
         </p>
@@ -402,11 +410,13 @@ async function submit() {
         <button
           class="button button-primary"
           :disabled="
-            sending || loading || (!attempt && (!selected || !draft.consent))
+            sending || checkingAccount || loading || (!attempt && (!selected || !draft.consent))
           "
         >
           {{
-            sending
+            checkingAccount
+              ? say(accountCopy.checking)
+              : sending
               ? say(copyText.sending_c40370)
               : attempt
                 ? say(copyText.recover_reservation_12c189)
