@@ -298,6 +298,19 @@ const readableDate = computed(() =>
         </div>
       </header>
       <div ref="content" class="desk-content">
+        <p
+          v-if="
+            !['reservations', 'reservation-calendar', 'legacy'].includes(view)
+          "
+          class="reservation-commerce-note"
+        >
+          {{
+            tr(
+              "商城暂缓开放，这里保留交易资料。新版到店安排请在预约管理和预约日历处理。",
+              "The shop is paused. Commerce records remain here; manage new visits in Reservations and Visit calendar.",
+            )
+          }}
+        </p>
         <ReservationsPanel
           ref="reservationList"
           v-show="view === 'reservations'"

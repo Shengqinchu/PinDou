@@ -88,6 +88,12 @@ def main():
         (backup / "studio.sqlite3").chmod(0o600)
     snippet = '''    # PinDou Studio preview (managed by studio_deploy.py)
     location = /studio { return 302 /studio/; }
+    location = /studio/version.json {
+        root /opt/pindou/studio/current/site;
+        try_files $uri =404;
+        add_header Cache-Control "no-store" always;
+        add_header X-Content-Type-Options nosniff;
+    }
     location ^~ /studio/studio-assets/ {
         root /opt/pindou/studio/current/site;
         try_files $uri =404;

@@ -1,4 +1,14 @@
 /* Manual reservation flow and its host workspace. No price or payment surfaces. */
+.reservation-commerce-note {
+  padding: 18px 22px;
+  margin-bottom: 28px;
+  background: #e3eef3;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
 .reservation-page {
   padding-block: 60px 80px;
   max-width: 1232px;
@@ -239,18 +249,22 @@
   width: 100%;
   min-height: 44px;
   background: #fcfefe;
-  color: #688b98;
+  color: var(--muted);
   font-size: 13px;
   transition:
     background-color 0.3s ease-in-out,
     color 0.3s ease-in-out;
 }
 .reservation-grid td > button.chosen {
-  background: #416f7d;
-  color: white;
+  background: #d3e6ed;
+  color: #273f48;
+  box-shadow:
+    inset 2px 0 #416f7d,
+    inset -2px 0 #416f7d;
 }
 .reservation-grid td > button.start {
-  background: #315f70;
+  background: #b9d4df;
+  color: #203e4c;
 }
 .reservation-grid td > button.unavailable {
   background: repeating-linear-gradient(

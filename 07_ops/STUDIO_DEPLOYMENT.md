@@ -1,5 +1,11 @@
 # 小狗拼豆铺 Studio V1 运维
 
+## 当前 VISION 版本
+
+当前路径与业务规则见仓库中的 02_product/STUDIO_VISION.md 和 STUDIO_VISION_VERIFICATION.md。到店页改为两周时间表与人工确认；结果为 /studio/reservation/:id，详情为 /studio/details。商城开发中，/cart 转向小店。下面交易部分保留历史与后续运维用途，当前不开放新购买。
+
+新版独立表：studio_reservations、reservation_events、reservation_policy；结果依赖 HttpOnly/Secure 同浏览器会话。STUDIO_ONLINE_SALES 默认 0，暂停新报价/付款单，旧订单与回调继续保留。STUDIO_RESERVATION_COOKIE_SECURE 生产保持默认 1，只有 loopback QA 使用 0。新预约小时规则和两周窗口见 06_studio/reservations.py。发布包需包含新增的 reservations.py。
+
 ## 独立入口
 
 - 网站预览：`https://pindoupuppy.com/studio/`

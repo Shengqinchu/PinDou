@@ -5,6 +5,8 @@ description: Design and refine the PinDou Puppy Hamilton studio website, its bil
 
 # PinDou Puppy studio design
 
+Current product contract: read 02_product/STUDIO_VISION.md and the 46-item STUDIO_VISION_PROGRESS.md first. The owner now requests a cool palette, stacked single-photo hero, six-photo studio carousel, studio details, a paused shop/cart, and manual host-confirmed reservations. Public booking uses reservations.ts, ReservationCalendar.vue and 06_studio/reservations.py, not the payment cart. Its two-week window and weekday restrictions are enforced on the server. Unspecified unit/floor text is omitted. Earlier commerce requirements below are historical where they conflict.
+
 The project root is `C:/Users/123/Desktop/PinDou`. Read `02_product/STUDIO_V1.md` for business truth and `03_design/STUDIO_DESIGN.md` for the current visual direction there. The studio frontend lives in `05_studio`; the incumbent generator is in `05_web` and must remain accessible.
 
 Use the owner's actual photographs. Observe their spatial rhythm and colour relationships before choosing layout. A photo plus abstract colour composition may support the page, but must not redraw or misrepresent the studio. Image editing or new bitmap compositions use the available imagegen tool.

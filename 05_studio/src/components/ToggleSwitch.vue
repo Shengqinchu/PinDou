@@ -34,9 +34,9 @@ defineEmits<{ "update:modelValue": [value: boolean] }>();
   display: block;
   width: 44px;
   height: 26px;
-  border: 1px solid #c8cec1;
+  border: 1px solid #bbcfd7;
   border-radius: 20px;
-  background: #d7dbd0;
+  background: #d6e2e7;
   transition:
     background-color var(--control-duration) var(--control-ease),
     border-color var(--control-duration) var(--control-ease),

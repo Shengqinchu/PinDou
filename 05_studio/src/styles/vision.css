@@ -208,13 +208,15 @@
 .vision-announcement {
   background: var(--soft);
   color: var(--muted);
-  padding: 10px 20px;
+  padding: max(10px, var(--safe-top)) max(20px, var(--safe-right)) 10px
+    max(20px, var(--safe-left));
   text-align: center;
   font-size: 12px;
   line-height: 1.6;
 }
 .vision-header {
-  padding: 24px max(24px, 4.5vw);
+  padding: 24px max(24px, 4.5vw, var(--safe-right)) 24px
+    max(24px, 4.5vw, var(--safe-left));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -649,7 +651,8 @@
   }
   .vision-header {
     gap: 16px;
-    padding-inline: 24px;
+    padding-left: max(24px, var(--safe-left));
+    padding-right: max(24px, var(--safe-right));
   }
   .vision-footer-inner {
     grid-template-columns: 1.3fr 1fr 1fr;
@@ -660,7 +663,7 @@
 }
 @media (max-width: 760px) {
   .vision-header {
-    padding: 17px 20px;
+    padding: 17px max(20px, var(--safe-right)) 17px max(20px, var(--safe-left));
   }
   .vision-brand,
   :lang(zh-CN) .vision-brand {
@@ -821,7 +824,8 @@
     font-size: 22px;
   }
   .vision-header {
-    padding-inline: 18px;
+    padding-left: max(18px, var(--safe-left));
+    padding-right: max(18px, var(--safe-right));
     gap: 8px;
   }
   .vision-carousel-bottom {

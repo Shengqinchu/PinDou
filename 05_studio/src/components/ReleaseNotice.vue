@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { tr } from "../state";
+import { useRoute } from "vue-router";
+const route = useRoute();
 const current = __STUDIO_BUILD__;
 const newer = ref(false);
 function reload() {
@@ -51,8 +53,12 @@ onBeforeUnmount(() => {
   <aside v-if="newer" class="vision-update" role="status">
     <span>{{
       tr(
-        "页面有更新，方便时重新载入即可。",
-        "An updated page is ready when you are.",
+        route.path.startsWith("/manage")
+          ? "工作台有更新，请先保存当前更改，再重新载入。"
+          : "页面有更新，方便时重新载入即可。",
+        route.path.startsWith("/manage")
+          ? "An update is ready. Save your changes before reloading."
+          : "An updated page is ready when you are.",
       )
     }}</span
     ><button class="text-link" @click="reload">

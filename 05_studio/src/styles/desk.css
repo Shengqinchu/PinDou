@@ -4,7 +4,7 @@
 }
 .studio-desk {
   --desk-line: #d1e0e4;
-  --desk-muted: #607880;
+  --desk-muted: #4f6873;
   --desk-green: #3f6e7a;
   display: grid;
   grid-template-columns: 232px minmax(0, 1fr);
