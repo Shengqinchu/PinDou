@@ -18,6 +18,9 @@ import SlideOver from "./components/SlideOver.vue";
 import ReleaseNotice from "./components/ReleaseNotice.vue";
 import BrandMark from "./components/BrandMark.vue";
 import BrandMotif from "./components/BrandMotif.vue";
+import BrandIcon from "./components/BrandIcon.vue";
+const avatar =
+  import.meta.env.BASE_URL + "studio-brand/xiaogou-shuangji-avatar.png";
 const route = useRoute();
 const isDesk = computed(() => route.path.startsWith("/manage"));
 const menu = ref(false);
@@ -135,7 +138,7 @@ watch(
           {{ say(copyText.a_beadmaking_experience_uniquely_yours_cf90ad) }}
         </p>
       </div>
-      <div class="vision-footer-links">
+      <div class="vision-footer-links vision-footer-visit">
         <span>{{ say(copyText.come_by_6b27fe) }}</span>
         <RouterLink to="/visit">{{
           say(copyText.book_a_visit_8c72a6)
@@ -144,16 +147,40 @@ watch(
           say(copyText.studio_details_7c4089)
         }}</RouterLink>
       </div>
-      <div class="vision-footer-links">
+      <div class="vision-footer-links vision-footer-contact">
         <span>{{ say(copyText.say_hello_bdf90f) }}</span>
-        <a :href="socialUrl" target="_blank" rel="noreferrer"
-          >{{ say(copyText.xiaohongshu_e1e6c0) }}<PhArrowUpRight :size="16"
-        /></a>
-        <span class="contact-id"
-          >{{ say(copyText.wechat_b2cc69) }}{{ wechat }}</span
-        ><a :href="phoneHref">{{ phone }}</a>
+        <a
+          class="contact-profile"
+          :href="socialUrl"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <img
+            class="contact-avatar"
+            :src="avatar"
+            alt=""
+            width="48"
+            height="48"
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="contact-profile-label"
+            ><BrandIcon name="xiaohongshu" /><span>{{
+              say(copyText.xiaohongshu_e1e6c0)
+            }}</span></span
+          >
+          <PhArrowUpRight class="contact-profile-arrow" :size="16" />
+        </a>
+        <span class="contact-id contact-channel">
+          <span class="contact-icon-slot"><BrandIcon name="wechat" /></span>
+          <span>{{ say(copyText.wechat_b2cc69) }}{{ wechat }}</span>
+        </span>
+        <a class="contact-channel" :href="phoneHref"
+          ><span class="contact-icon-slot"><BrandIcon name="canada" /></span
+          ><span>{{ phone }}</span></a
+        >
       </div>
-      <div class="vision-footer-links">
+      <div class="vision-footer-links vision-footer-tools">
         <span>{{ say(copyText.the_toolbox_df33f0) }}</span>
         <a href="/upload"
           >{{ say(copyText.pattern_maker_7db57b) }}<PhArrowUpRight :size="16"

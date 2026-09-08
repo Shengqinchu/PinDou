@@ -1,0 +1,28 @@
+{
+  "wechat.svg": {
+    "source": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/wechat.svg",
+    "sha256": "74b48b3d315337ce79cb644933b5f975e19996f564fcc4138ed67d45674c43ca",
+    "bytes": 1330
+  },
+  "xiaohongshu.svg": {
+    "source": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/xiaohongshu.svg",
+    "sha256": "847cacc807f5c236031a7477381daa67fd829d89f3f80c16a547ff2efe050794",
+    "bytes": 3584
+  },
+  "canada.svg": {
+    "source": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Canada.svg",
+    "sha256": "95b9eb0eaa176454215088c005a07df3df7564093b9f1d6475bb1fd61a16bb10",
+    "bytes": 699
+  },
+  "simple-icons-LICENSE.txt": {
+    "source": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/LICENSE.md",
+    "sha256": "9046848b63a5c92bff14e4accca80bd987e0623b74adf9226ce5198d312b79d5",
+    "bytes": 6569
+  },
+  "xiaogou-shuangji-avatar.png": {
+    "source": "Owner-supplied attachment, 2026-09-08",
+    "sha256": "01e7abcb8f4bdcb757fc3e7d76cd14b9ed15f0903410a0dc26fb747ce73e986c",
+    "bytes": 69232,
+    "format": "Original PNG, unchanged"
+  }
+}

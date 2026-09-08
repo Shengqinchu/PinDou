@@ -7,6 +7,7 @@ import { useRoute } from "vue-router";
 import { PhArrowLeft, PhArrowUpRight } from "@phosphor-icons/vue";
 import journal from "../content/journal-posts.json";
 import PhotoViewer from "../components/PhotoViewer.vue";
+import FlagText from "../components/FlagText.vue";
 import { tr } from "../state";
 const route = useRoute();
 const post = computed(() =>
@@ -14,7 +15,15 @@ const post = computed(() =>
 );
 const base = import.meta.env.BASE_URL;
 const viewer = ref<InstanceType<typeof PhotoViewer>>();
-const photographs = computed(() => post.value?.images.map((photo, i) => ({image: photo.src, src: base + photo.src, zh: post.value!.title + ' · ' + (i+1), en: post.value!.title + ' · ' + (i+1)})) || []);
+const photographs = computed(
+  () =>
+    post.value?.images.map((photo, i) => ({
+      image: photo.src,
+      src: base + photo.src,
+      zh: post.value!.title + " · " + (i + 1),
+      en: post.value!.title + " · " + (i + 1),
+    })) || [],
+);
 // Decode platform markup; the original source stays archived verbatim.
 const body = computed(() =>
   post.value?.body
@@ -29,11 +38,13 @@ const body = computed(() =>
     >
     <header>
       <p>{{ say(copyText.xiaogou_shuangji_from_xiaohongshu_f76c2b) }}</p>
-      <h1>{{ post.title }}</h1>
+      <h1><FlagText :text="post.title" /></h1>
     </header>
     <div class="journal-entry-layout">
       <div class="journal-entry-text">
-        <p class="journal-original" lang="zh-CN">{{ body }}</p>
+        <p class="journal-original" lang="zh-CN">
+          <FlagText :text="body || ''" />
+        </p>
         <p v-if="post.kind === 'excerpt'" class="journal-excerpt-note">
           {{ say(copyText.an_excerpt_from_the_original_post_find_e242d1) }}
         </p>
@@ -54,13 +65,13 @@ const body = computed(() =>
       <div class="journal-entry-photos">
         <figure v-for="(photo, i) in post.images" :key="photo.src">
           <button class="journal-image-button" @click="viewer?.open(i)">
-          <img
-            :src="base + photo.src"
-            :alt="post.title + ' · ' + (i + 1)"
-            :width="photo.width"
-            :height="photo.height"
-            :loading="i === 0 ? 'eager' : 'lazy'"
-          />
+            <img
+              :src="base + photo.src"
+              :alt="post.title + ' · ' + (i + 1)"
+              :width="photo.width"
+              :height="photo.height"
+              :loading="i === 0 ? 'eager' : 'lazy'"
+            />
           </button>
           <figcaption>{{ i + 1 }} / {{ post.images.length }}</figcaption>
         </figure>

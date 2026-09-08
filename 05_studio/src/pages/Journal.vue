@@ -6,6 +6,7 @@ import { PhArrowUpRight, PhArrowRight } from "@phosphor-icons/vue";
 import { socialUrl, tr } from "../state";
 import journal from "../content/journal-posts.json";
 import BrandMotif from "../components/BrandMotif.vue";
+import FlagText from "../components/FlagText.vue";
 const base = import.meta.env.BASE_URL;
 </script>
 <template>
@@ -49,13 +50,15 @@ const base = import.meta.env.BASE_URL;
               say(copyText.excerpt_040d41)
             }}</span></span
           >
-          <h2>{{ post.title }}</h2>
+          <h2><FlagText :text="post.title" /></h2>
           <p>
-            {{
-              post.body
-                .replace(/\[.*?R\]/g, "")
-                .slice(0, post.kind === "full" ? 90 : 60)
-            }}{{ post.kind === "full" ? "…" : "" }}
+            <FlagText
+              :text="
+                post.body
+                  .replace(/\[.*?R\]/g, '')
+                  .slice(0, post.kind === 'full' ? 90 : 60)
+              "
+            />{{ post.kind === "full" ? "…" : "" }}
           </p>
           <span class="journal-read"
             >{{ say(copyText.open_this_story_b4bd90) }}<PhArrowRight
