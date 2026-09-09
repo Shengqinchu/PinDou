@@ -13,7 +13,7 @@ try{
  });
  const tool=await context.newPage(),site=await context.newPage(),errors=[];
  for(const page of [tool,site]){page.setDefaultTimeout(12000);page.on('pageerror',e=>errors.push(e.message));}
- await tool.goto(base+'/upload');await site.goto(base+'/account');
+ await tool.goto(base+'/tools');await expect(tool).toHaveURL(base+'/upload');await site.goto(base+'/account');
  await expect(site.getByRole('button',{name:'微信扫码登录',exact:true})).toBeVisible();
  await site.getByRole('button',{name:'密码登录',exact:true}).click();
  await site.getByLabel('邮箱地址',{exact:true}).fill('v6@example.test');await site.getByLabel('密码',{exact:true}).fill('local-password');
@@ -46,7 +46,7 @@ try{
  await expect(tool).toHaveURL(base+'/account?intent=login&return_to=%2Fupload');
  results.push({test:'generator redirects to shared sign-in with safe return',passed:true});
  await site.goto(base+'/');await expect(site.locator('.vision-header-actions .language-button')).toHaveText('English');
- assert.deepEqual(await site.locator('.vision-navigation a').evaluateAll(list=>list.map(a=>a.getAttribute('href'))),['/','/visit','/shop','/journal','/upload']);
+ assert.deepEqual(await site.locator('.vision-navigation a').evaluateAll(list=>list.map(a=>a.getAttribute('href'))),['/','/visit','/shop','/journal','/tools']);
  await site.locator('.vision-navigation a[href="/visit"]').click();await expect(site).toHaveURL(base+'/visit');
  await site.goto(base+'/');
  await site.locator('.vision-header-actions .language-button').click();

@@ -110,6 +110,17 @@ def main():
     }
     # Keep existing www visit drafts and reservation cookies on their origin.
     location = /favicon.ico { return 302 /studio-brand/puppy-v6.ico; }
+    # A new entry avoids previously cached generator HTML. Its router keeps the
+    # existing /upload URL. Future HTML responses must be reloaded from origin.
+    location = /tools {
+        root /opt/pindou/current/05_web/dist;
+        try_files /index.html =404;
+        add_header Cache-Control "no-store" always;
+    }
+    location = /index.html {
+        root /opt/pindou/current/05_web/dist;
+        add_header Cache-Control "no-store" always;
+    }
     location ~ ^/(account|auth/wechat)$ {
         rewrite ^ /studio-api/site break;
         proxy_pass http://127.0.0.1:8011;

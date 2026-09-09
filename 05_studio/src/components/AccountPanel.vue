@@ -52,7 +52,7 @@ async function login(){
       <div class="account-identity"><PhUserCircle :size="42" weight="light" /><div><span class="fine-print">{{ say(copy.signed_in) }}</span><strong>{{ accountUser.nickname||accountUser.email }}</strong><p v-if="accountUser.nickname">{{ accountUser.email }}</p></div></div>
       <WechatSignIn v-if="!emailOnly" :key="accountUser.id" linking />
       <CustomerWallet v-if="!emailOnly&&(accountOpen||embedded)" :key="accountUser.id"/>
-      <a v-if="!emailOnly" class="button button-secondary" href="/upload">{{ say(copy.pattern_tool) }}<PhArrowRight /></a>
+      <a v-if="!emailOnly" class="button button-secondary" href="/tools">{{ say(copy.pattern_tool) }}<PhArrowRight /></a>
       <RouterLink v-if="!embedded&&!emailOnly" class="text-link" to="/account" @click="closeAccount">{{ say(copy.account_center) }}</RouterLink>
       <RouterLink class="button button-primary" to="/visit" @click="closeAccount">{{ say(copy.book_a_visit) }}<PhArrowRight /></RouterLink>
       <button type="button" class="text-link account-signout" @click="signOut">{{ say(copy.sign_out) }}</button>

@@ -8,7 +8,8 @@ def main():
     assert re.fullmatch(r'\d{14}-studio-v6',version)
     assert hashlib.sha256(Path(archive).read_bytes()).hexdigest()==digest
     root=Path('/opt/pindou');current=root/'current';old=current.resolve()
-    assert old.name=='20260615074539-wallet-mode-labels','Live source changed since capture'
+    with tarfile.open(archive) as tar:manifest=json.load(tar.extractfile('overlay-manifest.json'))
+    assert old.name==manifest['base_release'],'Live source changed since capture'
     release=root/'releases'/version;assert not release.exists()
     backup=root/'backups'/version;backup.mkdir(parents=True,mode=0o700,exist_ok=True)
     (backup/'state.json').write_text(json.dumps({'previous_current':str(old)}))
@@ -39,7 +40,8 @@ def main():
         pending=root/'current.v6-next';assert not pending.exists()
         pending.symlink_to(target);pending.replace(current)
     try:
-        switch(release);subprocess.run(['systemctl','restart','pindou'],check=True)
+        switch(release)
+        if any(name.startswith('06_backend/') for name in manifest['files']):subprocess.run(['systemctl','restart','pindou'],check=True)
         for _ in range(20):
             try:
                 with urlopen('http://127.0.0.1:8000/health',timeout=2) as response:

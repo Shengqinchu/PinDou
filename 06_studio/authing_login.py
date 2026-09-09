@@ -9,6 +9,7 @@ import base64
 import hashlib
 import hmac
 import json
+import logging
 import os
 import re
 import secrets
@@ -139,6 +140,7 @@ def signing_keys(issuer,bucket):
 
 def verify_id_token(token,nonce):
     c=config()
+    algorithm=None
     try:
         header=jwt.get_unverified_header(token)
         algorithm=header.get('alg')
@@ -163,7 +165,11 @@ def verify_id_token(token,nonce):
         if isinstance(claims['aud'],list) and len(claims['aud'])>1 and claims.get('azp')!=c.app_id: raise ValueError()
         if not isinstance(claims['nonce'],str) or not hmac.compare_digest(claims['nonce'],nonce): raise ValueError()
         return claims['sub']
-    except (jwt.PyJWTError,ValueError,TypeError,KeyError,StopIteration):
+    except (jwt.PyJWTError,ValueError,TypeError,KeyError,StopIteration) as exc:
+        # Only protocol metadata is logged: never the token, subject, nonce,
+        # email or phone. Keep public errors separate from operator diagnostics.
+        logging.getLogger('studio.auth').warning('authing_token_rejected reason=%s claim=%s algorithm=%s',
+            type(exc).__name__,getattr(exc,'claim',None),algorithm)
         raise HTTPException(400,'wechat_identity_invalid') from None
 
 
@@ -213,7 +219,7 @@ def register(app,database):
         response.set_cookie(COOKIE,cookie,max_age=FLOW_LIFETIME,httponly=True,secure=config().secure,samesite='lax',path='/studio-api/auth/wechat')
         c=config()
         url=c.issuer+'/auth?'+urlencode({'client_id':c.app_id,'redirect_uri':origin+CALLBACK,'response_type':'code','response_mode':'query',
-            'scope':'openid','state':state,'nonce':nonce,'code_challenge':challenge,'code_challenge_method':'S256','prompt':'login'})
+            'scope':'openid','state':state,'nonce':nonce,'code_challenge':challenge,'code_challenge_method':'S256'})
         return {'url':url}
 
     @app.get(CALLBACK)
@@ -229,7 +235,9 @@ def register(app,database):
             tokens=fetch_json(c.issuer+'/token',{'grant_type':'authorization_code','code':code,'client_id':c.app_id,
                   'client_secret':c.secret,'redirect_uri':row['origin']+CALLBACK,'code_verifier':row['verifier']},form=True)
             token=tokens.get('id_token')
-            if not isinstance(token,str) or len(token)>16000: raise HTTPException(400,'wechat_identity_invalid')
+            if not isinstance(token,str) or len(token)>16000:
+                logging.getLogger('studio.auth').warning('authing_exchange_missing_id_token response_fields=%s',sorted(tokens))
+                raise HTTPException(400,'wechat_identity_invalid')
             subject=verify_id_token(token,row['nonce'])
             with database() as db:
                 binding=db.execute('SELECT user_id FROM studio_auth_identities WHERE issuer=? AND app_id=? AND subject=?',(c.issuer,c.app_id,subject)).fetchone()

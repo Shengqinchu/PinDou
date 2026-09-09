@@ -46,7 +46,7 @@ const navigation = computed(() => [
   { path: "/visit", label: say(copyText.come_create_2eee81) },
   { path: "/shop", label: say(copyText.little_shop_c97261) },
   { path: "/journal", label: say(copyText.studio_journal_7b860e) },
-  { path: "/upload", label: say(copyText.pattern_maker_7db57b), document:true },
+  { path: "/tools", label: say(copyText.pattern_maker_7db57b), document:true },
 ]);
 onBeforeUnmount(() => arrival?.kill());
 watch(
@@ -200,7 +200,7 @@ watch(
       </div>
       <div class="vision-footer-links vision-footer-tools">
         <span>{{ say(copyText.the_toolbox_df33f0) }}</span>
-        <a href="/upload"
+        <a href="/tools"
           >{{ say(copyText.pattern_maker_7db57b) }}<PhArrowUpRight :size="16"
         /></a>
         <a href="/tutorial"
