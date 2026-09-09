@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import CopyContact from "../components/CopyContact.vue";
+import LiftTitle from '../components/LiftTitle.vue';
+import MoneyText from '../components/MoneyText.vue';
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-Visit", copyTextDefault);
 
@@ -178,7 +180,7 @@ async function submit() {
 <template>
   <section class="reservation-page container">
     <header class="reservation-heading">
-      <h1>{{ say(copyText.come_make_something_f834ec) }}</h1>
+      <LiftTitle :text="say(copyText.come_make_something_f834ec)"/>
       <p>
         {{ say(copyText.choose_your_time_and_group_size_once_a1fdf7) }}
       </p>
@@ -200,7 +202,7 @@ async function submit() {
               v-if="draft.booking.plan === 'hourly'"
               class="reservation-plan-price"
             >
-              <strong>CAD {{ rates.hourly }}</strong
+              <strong><MoneyText :text="'CAD '+rates.hourly"/></strong
               ><span>{{ say(copyText.hour_person_7ea78f) }}</span>
             </div></AutoHeight
           ></label
@@ -218,15 +220,15 @@ async function submit() {
             >
               <div>
                 <dt>{{ say(copyText.one_guest_684bef) }}</dt>
-                <dd>CAD {{ rates.day_one }}</dd>
+                <dd><MoneyText :text="'CAD '+rates.day_one"/></dd>
               </div>
               <div>
                 <dt>{{ say(copyText.two_guests_65a259) }}</dt>
-                <dd>CAD {{ rates.day_two }}</dd>
+                <dd><MoneyText :text="'CAD '+rates.day_two"/></dd>
               </div>
               <div>
                 <dt>{{ say(copyText.three_guests_032d3f) }}</dt>
-                <dd>CAD {{ rates.day_three }}</dd>
+                <dd><MoneyText :text="'CAD '+rates.day_three"/></dd>
               </div>
             </dl></AutoHeight
           ></label
@@ -236,7 +238,7 @@ async function submit() {
             <span class="vision-eyebrow">{{
               say(copyText.prepaid_hours_ask_in_the_studio_f180a7)
             }}</span
-            ><strong>{{ say(copyText.ca7_hour_c87a20) }}</strong>
+            ><strong><MoneyText :text="say(copyText.ca7_hour_c87a20)"/></strong>
             <p>
               {{ say(copyText.prepay_at_least_10_hours_and_at_8815bf) }}
             </p>
@@ -248,10 +250,10 @@ async function submit() {
             <span class="vision-eyebrow">{{
               say(copyText.backtoschool_until_october_1_42119e)
             }}</span
-            ><strong>CAD {{ rates.school_two_four_hours }}</strong>
+            ><strong><MoneyText :text="'CAD '+rates.school_two_four_hours"/></strong>
             <p>{{ say(copyText.four_hours_of_making_for_two_8bb2b0) }}</p>
             <strong
-              >CAD {{ rates.school_card_holder }}
+              ><MoneyText :text="'CAD '+rates.school_card_holder"/>
               <small>{{ say(copyText.piece_ef469b) }}</small></strong
             >
             <p>

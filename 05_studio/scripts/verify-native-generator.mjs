@@ -1,7 +1,7 @@
 // Isolated APIs/DB only. Never exercise purchases or paid AI on production.
 import {chromium,expect} from '@playwright/test';
 import fs from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import assert from 'node:assert/strict';
-const root=fileURLToPath(new URL('../../',import.meta.url)),out=path.join(root,'artifacts/generator-integration'),base='http://127.0.0.1:19678';
+const root=fileURLToPath(new URL('../../',import.meta.url)),out=process.env.PINDOU_QA_OUTPUT||path.join(root,'artifacts/generator-integration'),base='http://127.0.0.1:19678';
 const png=await fs.readFile(path.join(root,'01_research/tech/test_inputs/cartoon_synthetic.png'));
 const browser=await chromium.launch({headless:true,ignoreDefaultArgs:['--hide-scrollbars']}),results=[],errors=[];let currentPage;
 async function context(language='en',user='qa-owner'){

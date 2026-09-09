@@ -30,6 +30,7 @@ import "./styles/wallet.css";
 import "./styles/home-journal.css";
 import "./styles/reduced-motion.css";
 import "./styles/timetable.css";
+import "./styles/generator-motion.css";
 import { installContent } from "./content-store";
 import { installDiagnostics } from "./diagnostics";
 import { installRoutePrefetch, routeLoaders } from "./route-loaders";

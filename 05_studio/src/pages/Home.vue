@@ -13,6 +13,7 @@ import { journalPosts,journalSource,refreshJournal } from '../journal';
 import StudioImage from "../components/StudioImage.vue";
 import StudioCarousel from "../components/StudioCarousel.vue";
 import BrandMotif from "../components/BrandMotif.vue";
+import LiftTitle from '../components/LiftTitle.vue';
 import { tr } from "../state";
 import { reducedMotion, onMotionPreferenceChange } from "../motion-preference";
 const page = ref<HTMLElement>();
@@ -94,10 +95,7 @@ onBeforeUnmount(() => {
           kind="star" interactive
           class="hero-star"
         /><BrandMotif kind="heart" interactive class="hero-heart" />
-        <h1 class="vision-title">
-          <span>{{ say(copyText.a_little_time_all_yours_9e9d60) }}</span
-          ><span>{{ say(copyText.make_something_lovely_04db64) }}</span>
-        </h1>
+        <LiftTitle class="vision-title" :text="[say(copyText.a_little_time_all_yours_9e9d60),say(copyText.make_something_lovely_04db64)]"/>
       </div>
       <p class="vision-hero-description vision-mobile-copy">
         {{ say(copyText.welcome_to_pindo_puppychoose_an_afternoon_and_247303) }}

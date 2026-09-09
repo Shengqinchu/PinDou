@@ -1,0 +1,15 @@
+import { createApp } from 'vue';
+import '@fontsource/dm-serif-display/latin-400.css';
+import '@fontsource-variable/outfit';
+import '../src/style.css';
+import '../src/styles/typography.css';
+import '../src/styles/handwriting-fonts.css';
+import '../src/styles/vision.css';
+import '../src/styles/interactions.css';
+import '../src/styles/vision3.css';
+import '../src/styles/tactile.css';
+import '../src/styles/reduced-motion.css';
+import { installMotionPreference } from '../src/motion-preference';
+import { installMotion } from '../src/motion';
+import Prototype from './VisitFlow.vue';
+installMotionPreference();installMotion();createApp(Prototype).mount('#prototype');

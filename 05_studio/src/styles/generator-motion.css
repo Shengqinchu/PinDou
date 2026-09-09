@@ -1,0 +1,16 @@
+/* Same control clock and short-tap completion as the host site. Canvas transforms
+   belong to the editor; only controls and page-entry surfaces are animated here. */
+.generator-workspace[class]{--pd-ease-out:var(--control-ease);--pd-ease-soft:var(--control-ease);--pd-dur-fast:var(--control-duration);--pd-dur-base:var(--control-duration);--pd-dur-slow:var(--layout-duration);}
+.generator-workspace .generator-page{min-width:0;}
+.generator-workspace[class] :is(button,[role="button"]){--tactile-rest-transform:translate3d(0,0,0) scale(1);--tactile-press-transform:translate3d(0,1px,0) scale(.98);--tactile-rest-shadow:0 0 0 transparent;--tactile-press-shadow:0 1px 4px #243d4e12;transform:var(--tactile-rest-transform);transition-property:transform,box-shadow,background-color,border-color,color;transition-duration:var(--control-duration);transition-timing-function:var(--control-ease);}
+.generator-workspace[class] :is(.pd-btn--primary,.generate-cta,.sku-buy){--tactile-rest-shadow:0 3px 0 #cbdce9,0 6px 14px #293d4b0a;--tactile-press-shadow:0 0 0 #cbdce9,0 1px 3px #293d4b0a;--tactile-press-transform:translate3d(0,3px,0) scale(.988);box-shadow:var(--tactile-rest-shadow);}
+.generator-workspace[class] :is(.mode-card,.style-chip,.size-card){--tactile-press-transform:translate3d(0,1px,0) scale(.99);}
+.generator-workspace[class] :is(button,[role="button"]):not(:disabled):not([aria-disabled="true"]):active{transform:var(--tactile-press-transform);box-shadow:var(--tactile-press-shadow);}
+.generator-workspace[class] :is(button,[role="button"]):is(:disabled,[aria-disabled="true"]){transform:none;box-shadow:none;}
+@media(hover:hover) and (pointer:fine){
+ .generator-workspace[class] :is(button,[role="button"]):not(:disabled):not([aria-disabled="true"]):hover{--tactile-rest-transform:translate3d(0,-1px,0) scale(1);transform:var(--tactile-rest-transform);}
+ .generator-workspace[class] :is(.mode-card,.style-chip,.size-card,.drop-zone):not(:disabled):hover{--tactile-rest-shadow:0 10px 22px -14px #273e5050;box-shadow:var(--tactile-rest-shadow);border-color:#bfced9;}
+ .generator-workspace[class] :is(.pd-btn--primary,.generate-cta,.sku-buy):not(:disabled):hover{--tactile-rest-transform:translate3d(0,-2px,0) scale(1);--tactile-rest-shadow:0 4px 0 #cbdce9,0 10px 20px #293d4b12;box-shadow:var(--tactile-rest-shadow);}
+ .generator-workspace[class] :is(button,[role="button"]):not(:disabled):not([aria-disabled="true"]):active{transform:var(--tactile-press-transform);box-shadow:var(--tactile-press-shadow);}
+}
+html[data-motion="reduced"] .generator-workspace[class] :is(button,[role="button"],.generator-page){transform:none!important;animation:none!important;transition:none!important;}

@@ -21,6 +21,8 @@ const controls = [
   ".account-methods > button",
   ".wallet-history-tabs > button",
   ".wallet-pagination > button",
+  ".generator-workspace button",
+  ".generator-workspace [role=button]",
 ].join(",");
 
 type Frame = { transform: string; boxShadow: string };

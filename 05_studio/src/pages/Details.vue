@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from '../components/LiftTitle.vue';
 import { asset, contentModule } from "../content-store";
 const copyText = contentModule("pages-Details", copyTextDefault);
 
@@ -39,7 +40,7 @@ const visitPhotos = computed(() => [
       <p class="vision-eyebrow">
         {{ say(copyText.a_little_knowhow_before_you_visit_b1dd61) }}
       </p>
-      <h1>{{ say(copyText.a_little_guide_to_the_studio_1b38da) }}</h1>
+      <LiftTitle :text="say(copyText.a_little_guide_to_the_studio_1b38da)"/>
       <p>
         {{ say(copyText.getting_here_finding_parking_and_the_little_0ec5c9) }}
       </p>

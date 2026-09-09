@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from '../components/LiftTitle.vue';
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-Journal", copyTextDefault);
 
@@ -20,11 +21,7 @@ onBeforeUnmount(() => clearInterval(refresh));
 </script>
 <template>
   <section class="container page-intro journal-intro">
-    <h1>
-      {{ say(copyText.life_in_our_1d9155) }}<br /><em>{{
-        say(copyText.little_studio_902113)
-      }}</em>
-    </h1>
+    <LiftTitle :text="[say(copyText.life_in_our_1d9155),say(copyText.little_studio_902113)]" emphasis-last/>
     <div>
       <p>{{ say(copyText.new_pieces_on_the_wall_new_colours_0e0a4b) }}</p>
       <a class="text-link" :href="socialUrl" target="_blank" rel="noreferrer"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import MoneyText from '../../../05_studio/src/components/MoneyText.vue';
 import { gt } from '../i18n';
 import { vToolDialog } from '../dialog';
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
@@ -589,7 +590,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
                     {{ gt(sku.badge) }}
                   </span>
                 </div>
-                <strong class="sku-price">{{ gt(formatPrice(sku.amount_cny)) }}</strong>
+                <strong class="sku-price"><MoneyText :text="formatPrice(sku.amount_cny)"/></strong>
                 <p class="sku-main">{{ gt(skuCoreLine(sku)) }}</p>
                 <p :class="sku.category === 'membership' ? 'sku-gift' : 'sku-math'">{{ gt(skuValueLine(sku)) }}</p>
                 <button
@@ -616,7 +617,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
             <template v-else>
               <div class="payment-view__summary">
                 <strong>{{ gt(selectedSku ? displaySkuName(selectedSku) : '支付订单') }}</strong>
-                <em v-if="selectedSku">{{ gt(formatPrice(selectedSku.amount_cny)) }}</em>
+                <em v-if="selectedSku"><MoneyText :text="formatPrice(selectedSku.amount_cny)"/></em>
               </div>
 
               <div class="wechat-pay-card">
