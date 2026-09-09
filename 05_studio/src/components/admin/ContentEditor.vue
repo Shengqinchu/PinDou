@@ -1,92 +1,70 @@
 <script setup lang="ts">
-import { contentModule } from "../../content-store";
-const copyText = contentModule("components-admin-ContentEditor", copyTextDefault);
-
-import moduleNames from "../../content/data-editor-module-labels.json";
-import copyTextDefault from "../../content/components-admin-ContentEditor.json";
-import { say, locale } from "../../state";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { PhArrowClockwise, PhImage, PhEye, PhUploadSimple, PhClockCounterClockwise } from "@phosphor-icons/vue";
+import { PhEye, PhClockCounterClockwise } from "@phosphor-icons/vue";
+import { contentModule, publishedModules } from "../../content-store";
+import defaults from "../../content/components-admin-ContentEditor.json";
+import moduleNames from "../../content/data-editor-module-labels.json";
+import carousel from "../../content/data-components-StudioCarousel-photos.json";
+import { say, locale } from "../../state";
 import { useDesk } from "../../admin";
-import { publishedModules, refreshContent, type MediaAsset } from "../../content-store";
-
-const props=defineProps<{ active: boolean }>();
-const { request }=useDesk();
-type Data=Record<string,string[] | MediaAsset>;
-type Doc={ name:string; version:number; published_version:number; data:Data; published:Data };
-const items=ref<{name:string}[]>([]), name=ref('pages-Home'), doc=ref<Doc>(), search=ref('');
-const busy=ref(false), error=ref(''), success=ref(''), device=ref('desktop'), tab=ref('edit');
-const saved=ref('');
-const drafts=new Map<string,Doc>();
-const dirty=computed(()=>!!doc.value && JSON.stringify(doc.value.data)!==saved.value);
-const revisions=ref<{id:number;version:number;action:string;data:Data;created_at:number}[]>([]);
-const frame=ref<HTMLIFrameElement>();
-const canvas=ref<HTMLElement>(), canvasWidth=ref(600);
+import { useContentEditor } from "../../editor";
+import MediaUpload from "./MediaUpload.vue";
+import EditorDiagnostics from "./EditorDiagnostics.vue";
+const copyText=contentModule('components-admin-ContentEditor',defaults);
+const props=defineProps<{active:boolean}>();
+const {request}=useDesk();
+const {items,name,doc,search,busy,error,success,dirty,revisions,uploadStatus,uploadKey,globalQuery,matches,searching,load,choose,initialize,save,upload,history,restore,exportDraft}=useContentEditor(request,copyText);
+const device=ref('desktop'),tab=ref('edit'),mediaChoice=ref('hero-illustration');
+const frame=ref<HTMLIFrameElement>(),canvas=ref<HTMLElement>(),canvasWidth=ref(600),canvasHeight=ref(560);
 const frameWidth=computed(()=>device.value==='desktop'?1280:390);
 const frameScale=computed(()=>Math.max(.1,Math.min(1,(canvasWidth.value-24)/frameWidth.value)));
-let previewResize:ResizeObserver|undefined;
-let sequence=0, started=false;
-const labels:Record<string,string>={ 'pages-Home':'home','pages-Visit':'visit','pages-Details':'details','pages-Shop':'shop','pages-Journal':'journal','pages-JournalEntry':'journal','pages-ReservationReceipt':'receipt','App':'navigation','media':'media' };
+let observer:ResizeObserver|undefined,started=false;
 const words=copyText as Record<string,string[]>;
-function label(n:string){return say((moduleNames as Record<string,string[]>)[n] || copyText.shared);}
-const routes:Record<string,string>={'pages-Home':'/','pages-Visit':'/visit','pages-Details':'/details','pages-Shop':'/shop','pages-Journal':'/journal','pages-JournalEntry':'/journal','App':'/','media':'/'};
-const previewRoute=computed(()=>`${routes[name.value] || '/'}?content-preview=1&preview-locale=${locale.value}`);
-const fields=computed(()=>Object.entries(doc.value?.data || {}).filter(([key,value])=>!search.value || JSON.stringify(value).toLowerCase().includes(search.value.toLowerCase()) || key.toLowerCase().includes(search.value.toLowerCase())));
-function mediaLabel(key:string){return say(words[({'hero-illustration':'hero','shop-collage':'collage','brand-zh':'brandZh','brand-en':'brandEn','brand-puppy':'puppy'} as Record<string,string>)[key] || (key.startsWith('space-')?'space':'photo')])+(/\d+$/.test(key)?` ${key.match(/\d+$/)?.[0]}`:'');}
-function failure(e:unknown){error.value=(e as {status?:number}).status===409?say(copyText.conflict):(e as Error).message;}
-async function load(force=false){
-  const seq=++sequence;busy.value=true;error.value='';success.value='';
-  try{
-    const data=await request<Doc>('/manage/content/'+name.value);
-    if(seq!==sequence)return;
-    doc.value=!force&&drafts.has(name.value)?structuredClone(drafts.get(name.value)!):data;
-    saved.value=JSON.stringify(data.data);sendPreview();
-  }catch(e){if(seq===sequence)failure(e);}finally{if(seq===sequence)busy.value=false;}
-}
-async function choose(next:string){if(doc.value)drafts.set(doc.value.name,JSON.parse(JSON.stringify(doc.value)));name.value=next;search.value='';revisions.value=[];await load();}
-async function save(publish=false){
-  if(!doc.value||busy.value)return;busy.value=true;error.value='';success.value='';
-  try{
-    let next=await request<Doc>('/manage/content/'+name.value,{method:'PUT',body:JSON.stringify({version:doc.value.version,data:doc.value.data})});
-    if(publish)next=await request<Doc>('/manage/content/'+name.value+'/publish',{method:'POST',body:JSON.stringify({version:next.version})});
-    doc.value=next;saved.value=JSON.stringify(next.data);drafts.delete(name.value);
-    success.value=say(publish?copyText.published:copyText.saved);await refreshContent();sendPreview();
-  }catch(e){failure(e);}finally{busy.value=false;}
-}
-async function upload(key:string,event:Event){
-  const input=event.target as HTMLInputElement,file=input.files?.[0];if(!file||!doc.value)return;
-  busy.value=true;error.value='';success.value=say(copyText.uploading);
-  try{const value=await request<MediaAsset>('/manage/media',{method:'POST',headers:{'Content-Type':file.type},body:file});doc.value.data[key]={src:value.src,width:value.width,height:value.height};success.value='';}
-  catch(e){failure(e);success.value='';}finally{busy.value=false;input.value='';}
+const shortcuts=['pages-Home','pages-Visit','pages-Details','pages-Journal','App','media'];
+function label(n:string){return say((moduleNames as Record<string,string[]>)[n]||copyText.shared);}
+const routes:Record<string,string>={'pages-Home':'/','pages-Visit':'/visit','pages-Details':'/details','components-BeadingProcess':'/details','pages-Shop':'/shop','pages-Journal':'/journal','pages-JournalEntry':'/journal','App':'/','media':'/'};
+const previewRoute=computed(()=>`${routes[name.value]||'/'}?content-preview=1&preview-locale=${locale.value}`);
+const matchingFields=computed(()=>Object.entries(doc.value?.data||{}).filter(([key,value])=>!search.value||JSON.stringify(value).toLowerCase().includes(search.value.toLowerCase())||key.toLowerCase().includes(search.value.toLowerCase())).sort(([a],[b])=>{
+  if(name.value!=='media')return 0;
+  const order=(k:string)=>k.startsWith('space-')?10+carousel.findIndex(p=>p.image===k):['hero-illustration','shop-collage','brand-zh','brand-en','brand-puppy','owner-avatar'].indexOf(k);
+  return order(a)-order(b);
+}));
+const fields=computed(()=>name.value==='media'?matchingFields.value.filter(([key])=>key===mediaChoice.value):matchingFields.value);
+function mediaLabel(key:string){
+  if(key.startsWith('space-'))return say(copyText.space)+' '+String(carousel.findIndex(p=>p.image===key)+1).padStart(2,'0');
+  if(key.startsWith('process-'))return say(copyText.processPhoto)+' '+key.replace('process-','');
+  const mapped=({'hero-illustration':'hero','shop-collage':'collage','brand-zh':'brandZh','brand-en':'brandEn','brand-puppy':'puppy','owner-avatar':'avatar'} as Record<string,string>)[key];
+  return say(words[mapped||'photo'])+(mapped?'':' · '+key);
 }
 function sendPreview(){if(doc.value)frame.value?.contentWindow?.postMessage(JSON.parse(JSON.stringify({type:'studio-content-preview',modules:{...publishedModules.value,[doc.value.name]:doc.value.data}})),location.origin);}
 const ready=(event:MessageEvent)=>{if(event.origin===location.origin&&event.source===frame.value?.contentWindow&&event.data?.type==='studio-preview-ready')sendPreview();};
-async function history(){try{revisions.value=(await request<{items:typeof revisions.value}>('/manage/content/'+name.value+'/history')).items;}catch(e){failure(e);}}
-function restore(data:Data){if(doc.value){doc.value.data=JSON.parse(JSON.stringify(data));success.value=say(copyText.restoreHelp);}}
-watch(()=>props.active,async value=>{if(value&&!started){started=true;try{items.value=(await request<{items:{name:string}[]}>('/manage/content')).items.sort((a,b)=>(labels[b.name]?1:0)-(labels[a.name]?1:0));await load();}catch(e){failure(e);started=false;}}},{immediate:true});
-watch(()=>doc.value?.data,()=>{void nextTick(sendPreview);},{deep:true});
-onMounted(()=>{window.addEventListener('message',ready);previewResize=new ResizeObserver(entries=>{canvasWidth.value=entries[0].contentRect.width;});if(canvas.value)previewResize.observe(canvas.value);});
-onBeforeUnmount(()=>{previewResize?.disconnect();sequence++;window.removeEventListener('message',ready);});
+watch(()=>props.active,value=>{if(value&&!started){started=true;void initialize();}},{immediate:true});
+watch(()=>doc.value?.data,()=>void nextTick(sendPreview),{deep:true});
+onMounted(()=>{window.addEventListener('message',ready);observer=new ResizeObserver(([entry])=>{canvasWidth.value=entry.contentRect.width+24;canvasHeight.value=entry.contentRect.height;});if(canvas.value)observer.observe(canvas.value);});
+onBeforeUnmount(()=>{observer?.disconnect();window.removeEventListener('message',ready);});
 </script>
 <template>
   <section class="studio-editor">
     <header class="desk-page-heading"><div><h1>{{say(copyText.title)}}</h1><p>{{say(copyText.intro)}}</p></div></header>
+    <div class="editor-global-search"><label class="field"><span>{{say(copyText.searchAll)}}</span><input v-model="globalQuery" type="search" :placeholder="say(copyText.searchAllHelp)" /></label><p v-if="searching" role="status">{{say(copyText.loading)}}</p><div v-else-if="matches.length" class="editor-search-results"><button v-for="match in matches" :key="match.name+match.key" :disabled="busy" @click="choose(match.name,match.key)"><small>{{label(match.name)}}</small><span>{{say(match.value)}}</span></button></div><p v-else-if="globalQuery.trim().length>1" role="status">{{say(copyText.empty)}}</p></div>
+    <nav class="editor-page-shortcuts" :aria-label="say(copyText.choose)"><button v-for="page in shortcuts" :key="page" :disabled="busy" :aria-pressed="name===page" @click="choose(page)">{{label(page)}}</button></nav>
     <div class="editor-commandbar">
       <label class="field"><span>{{say(copyText.choose)}}</span><select :value="name" :disabled="busy" @change="choose(($event.target as HTMLSelectElement).value)"><option v-for="item in items" :key="item.name" :value="item.name">{{label(item.name)}}</option></select></label>
-      <div class="editor-save-actions"><span class="editor-state">{{dirty?say(copyText.unsaved):success}}</span><button class="desk-button secondary" :disabled="busy||!doc" @click="save(false)">{{say(copyText.draft)}}</button><button class="desk-button primary" :disabled="busy||!doc" @click="save(true)">{{say(copyText.publish)}}</button></div>
+      <div class="editor-save-actions"><span class="editor-state" role="status">{{busy?say(copyText.working):(success||(dirty?say(copyText.unsaved):''))}}</span><button class="desk-button secondary" :disabled="busy||!doc" @click="save(false)">{{say(copyText.draft)}}</button><button class="desk-button primary" :disabled="busy||!doc" @click="save(true)">{{say(copyText.publish)}}</button></div>
     </div>
-    <p v-if="error" role="alert" class="desk-error">{{error}} <button class="desk-link" :disabled="busy" @click="load(true)">{{say(copyText.reload)}}</button></p>
+    <p v-if="error" role="alert" class="desk-error">{{error}} <button class="desk-link" @click="exportDraft">{{say(copyText.exportDraft)}}</button> <button class="desk-link" :disabled="busy" @click="load(true)">{{say(copyText.reload)}}</button></p>
     <div class="editor-mobile-tabs"><button class="desk-button secondary" @click="tab='edit'">{{say(copyText.edit)}}</button><button class="desk-button secondary" @click="tab='preview'">{{say(copyText.preview)}}</button></div>
     <div class="editor-workspace" :data-tab="tab">
       <div class="editor-fields">
+        <div v-if="name==='media'" class="editor-media-picker"><button v-for="([key,value]) in matchingFields" :key="key" :disabled="busy" :aria-pressed="mediaChoice===key" :title="mediaLabel(key)" @click="mediaChoice=key"><img v-if="!Array.isArray(value)" :src="value.src" alt="" loading="lazy"/><span>{{mediaLabel(key)}}</span></button></div>
         <label class="field editor-search"><span>{{say(copyText.search)}}</span><input v-model="search" type="search" /></label>
         <p v-if="busy&&!doc">{{say(copyText.loading)}}</p>
         <template v-if="doc">
-          <div v-for="([key,value],i) in fields" :key="key" class="editor-field-group">
+          <fieldset v-for="([key,value],i) in fields" :key="key" class="editor-field-group" :disabled="busy">
             <template v-if="name==='rate-fields' && Array.isArray(value)"><label class="field"><span>{{say(words[key])}}</span><input type="number" min="0" max="99999" step="0.01" :value="value[0]" @input="value[0]=value[1]=($event.target as HTMLInputElement).value" /></label></template>
             <template v-else-if="Array.isArray(value)"><span class="editor-field-index">{{String(i+1).padStart(2,'0')}}</span><label class="field"><span>{{say(copyText.zh)}}</span><textarea v-model="value[0]" :rows="value[0].length>100?5:2" /></label><label class="field"><span>{{say(copyText.en)}}</span><textarea v-model="value[1]" :rows="value[1].length>180?5:2" /></label></template>
-            <template v-else><h3>{{mediaLabel(key)}}</h3><img class="editor-image-preview" :src="value.src" :alt="mediaLabel(key)" loading="lazy" /><label class="editor-upload"><PhUploadSimple/>{{say(copyText.replace)}}<input type="file" accept="image/jpeg,image/png,image/webp" :disabled="busy" @change="upload(key,$event)" /></label><p class="form-help">{{say(copyText.imageHelp)}}</p></template>
-          </div>
+            <template v-else><h3>{{mediaLabel(key)}}</h3><img class="editor-image-preview" :src="value.src" :alt="mediaLabel(key)" loading="lazy" /><MediaUpload :disabled="busy" :busy="uploadKey===key" :status="uploadStatus[key]" @select="files=>upload(key,files[0])" /></template>
+          </fieldset>
           <p v-if="!fields.length">{{say(copyText.empty)}}</p>
         </template>
         <button class="desk-button secondary" @click="history"><PhClockCounterClockwise/>{{say(copyText.history)}}</button>
@@ -94,9 +72,10 @@ onBeforeUnmount(()=>{previewResize?.disconnect();sequence++;window.removeEventLi
       </div>
       <aside class="editor-preview-pane">
         <div class="editor-preview-toolbar"><strong><PhEye/>{{say(copyText.preview)}}</strong><div><button :aria-pressed="device==='desktop'" @click="device='desktop'">{{say(copyText.desktop)}}</button><button :aria-pressed="device==='mobile'" @click="device='mobile'">{{say(copyText.mobile)}}</button></div></div>
-        <div ref="canvas" class="editor-preview-canvas" :class="device"><iframe ref="frame" :style="{width:frameWidth+'px',height:(636/frameScale)+'px',transform:`scale(${frameScale})`,transformOrigin:'top left'}" :src="previewRoute" :title="say(copyText.preview)" @load="sendPreview" /></div>
+        <div ref="canvas" class="editor-preview-canvas" :class="device"><iframe ref="frame" :style="{width:frameWidth+'px',height:(Math.max(100,canvasHeight)/frameScale)+'px',transform:`scale(${frameScale})`,transformOrigin:'top left'}" :src="previewRoute" :title="say(copyText.preview)" @load="sendPreview" /></div>
         <p class="form-help">{{say(copyText.previewHelp)}}</p>
       </aside>
     </div>
+    <EditorDiagnostics />
   </section>
 </template>

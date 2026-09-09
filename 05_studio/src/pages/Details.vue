@@ -2,6 +2,9 @@
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-Details", copyTextDefault);
 
+import BeadingProcess from "../components/BeadingProcess.vue";
+import processDefaults from "../content/components-BeadingProcess.json";
+const processCopy=contentModule('components-BeadingProcess',processDefaults);
 import { computed } from "vue";
 import { contacts } from "../state";
 import copyTextDefault from "../content/pages-Details.json";
@@ -41,6 +44,7 @@ const parking = computed(() => [say(contacts.parking_1),say(contacts.parking_2)]
       ><a href="#parking">{{ say(copyText.parking_8188de) }}</a
       ><a href="#services">{{ say(copyText.at_the_studio_0bc0c9) }}</a
       ><a href="#notes">{{ say(copyText.good_to_know_fc4515) }}</a>
+      <a href="#process">{{ say(processCopy.title) }}</a>
     </nav>
     <section id="arrival" class="vision-arrival">
       <div>
@@ -180,7 +184,7 @@ const parking = computed(() => [say(contacts.parking_1),say(contacts.parking_2)]
           }}
         </p>
       </details>
-      <details>
+      <details open>
         <summary>
           {{ say(copyText.time_and_payment_a87618) }}
         </summary>
@@ -189,5 +193,6 @@ const parking = computed(() => [say(contacts.parking_1),say(contacts.parking_2)]
         </p>
       </details>
     </section>
+    <BeadingProcess />
   </div>
 </template>

@@ -1,5 +1,8 @@
 {
-  "account": ["账号与登录", "Account and sign-in"],
+  "account": [
+    "账号与登录",
+    "Account and sign-in"
+  ],
   "App": [
     "导航与页脚",
     "Navigation and footer"
@@ -183,5 +186,21 @@
   "data-editor-module-labels": [
     "编辑目录名称",
     "Editor section names"
+  ],
+  "components-BeadingProcess": [
+    "拼豆流程图文",
+    "Beading process guide"
+  ],
+  "components-BrandMotif": [
+    "小图标互动提示",
+    "Motif interaction labels"
+  ],
+  "journal-collection": [
+    "日记合集标题与链接",
+    "Journal collection title and link"
+  ],
+  "components-CopyContact": [
+    "微信号复制提示",
+    "WeChat copy messages"
   ]
 }

@@ -9,7 +9,8 @@ import { PhArrowUpRight, PhArrowRight } from "@phosphor-icons/vue";
 import { socialUrl, tr } from "../state";
 import { onMounted, onBeforeUnmount } from "vue";
 import { journalPosts, refreshJournal, journalSource } from "../journal";
-import journalMeta from "../journal-meta.json";
+import journalMetaDefault from "../content/journal-collection.json";
+const journalMeta=contentModule('journal-collection',journalMetaDefault);
 import BrandMotif from "../components/BrandMotif.vue";
 import FlagText from "../components/FlagText.vue";
 const base = import.meta.env.BASE_URL;
@@ -71,10 +72,10 @@ onBeforeUnmount(() => clearInterval(refresh));
     </article>
     <a
       class="journal-collection"
-      :href="journalMeta.collection_url"
+      :href="say(journalMeta.url)"
       target="_blank"
       rel="noreferrer"
-      ><BrandMotif kind="heart" /><span>{{ tr(journalMeta.collection_title, journalMeta.collection_title_en) }}</span
+      ><BrandMotif kind="heart" /><span>{{ say(journalMeta.title) }}</span
       ><span class="text-link"
         >{{ say(copyText.browse_the_full_collection_on_xiaohongshu_f762be)
         }}<PhArrowUpRight /></span

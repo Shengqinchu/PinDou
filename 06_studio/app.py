@@ -73,6 +73,8 @@ def initialize():
     customer_auth.initialize(database)
     import content
     content.initialize(database, DB_PATH)
+    import observability
+    observability.initialize(database)
 
 
 @asynccontextmanager
@@ -80,13 +82,28 @@ async def lifespan(_app):
     initialize()
     import commerce
     worker = asyncio.create_task(commerce.reconciliation_loop())
+    import content
+    with database() as db:
+        db.execute("UPDATE studio_import_jobs SET status='failed',error='import_interrupted' WHERE status='running'")
+    importer=asyncio.create_task(content.import_worker(database))
     yield
     worker.cancel()
+    importer.cancel()
     with contextlib.suppress(asyncio.CancelledError):
         await worker
+    with contextlib.suppress(asyncio.CancelledError):
+        await importer
 
 
 app = FastAPI(title="PinDou Puppy Studio", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
+
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi.exception_handlers import http_exception_handler
+
+@app.exception_handler(StarletteHTTPException)
+async def tracked_http_error(request:Request,exc:StarletteHTTPException):
+    if isinstance(exc.detail,str):request.state.error_code=exc.detail
+    return await http_exception_handler(request,exc)
 
 
 @app.middleware("http")
@@ -204,7 +221,7 @@ def admin_actor(authorization: Annotated[str | None, Header()] = None) -> str:
 def health():
     with database() as db:
         db.execute("SELECT 1 FROM studio_requests LIMIT 1")
-    return {"status": "ok", "service": "pindou-studio", "version": "0.6.0"}
+    return {"status": "ok", "service": "pindou-studio", "version": "0.7.0"}
 
 
 @app.post("/studio-api/requests", status_code=201)
@@ -279,3 +296,5 @@ reservations.register(app, database, admin_actor)
 
 import content
 content.register(app, database, admin_actor)
+import observability
+observability.install(app, database, admin_actor)

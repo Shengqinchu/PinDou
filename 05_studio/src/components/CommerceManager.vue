@@ -127,6 +127,7 @@ const navigation = computed(() => [
     en: copyText.nav_b72b465f[1],
     icon: PhCalendarDots,
   },
+  /* V4: commerce navigation is retired; records and panels remain available in source.
   {
     id: "overview",
     zh: copyText.nav_2acebe6d[0],
@@ -169,6 +170,7 @@ const navigation = computed(() => [
     en: copyText.nav_096839b5[1],
     icon: PhArchive,
   },
+  */
 ]);
 const view = computed(() =>
   navigation.value.some((n) => n.id === route.query.view)
@@ -203,7 +205,7 @@ watch(view, async () => {
   arrival?.progress(1).kill();
   if (content.value) arrival = arrive(content.value, { stationary: true });
 });
-onMounted(desk.initialize);
+onMounted(desk.loadSetup);
 function refreshCurrent() {
   if (view.value === "reservations") reservationList.value?.refresh();
   else if (view.value === "reservation-calendar")
@@ -373,9 +375,9 @@ const readableDate = computed(() =>
           </button>
         </p>
         <OverviewPanel
-          v-show="view === 'overview'"
+          v-if="view === 'overview'"
           @navigate="navigate"
-        /><template v-if="desk.settings.value"
+        /><template v-if="desk.settings.value && ['orders','schedule','products','checkout','activity','legacy'].includes(view)"
           ><OrdersPanel v-show="view === 'orders'" /><SchedulePanel
             v-show="view === 'schedule'" /><ProductsPanel
             v-show="view === 'products'" /><CheckoutPanel

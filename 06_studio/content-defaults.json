@@ -599,8 +599,8 @@
       "Replace image"
     ],
     "imageHelp": [
-      "上传 JPG、PNG 或 WebP，最大 12 MB；按原比例显示。",
-      "Upload JPG, PNG or WebP up to 12 MB. Images keep their proportions."
+      "上传 JPG、PNG、WebP、AVIF 或 BMP，最大 12 MB；按原比例显示。HEIC 请先导出为 JPG。",
+      "Upload JPG, PNG, WebP, AVIF or BMP up to 12 MB. Images keep their proportions. Export HEIC as JPG first."
     ],
     "loading": [
       "正在读取内容…",
@@ -729,6 +729,62 @@
     "school_card_holder": [
       "卡套套餐／个（CAD）",
       "Card holder package / each (CAD)"
+    ],
+    "searchAll": [
+      "全站找文字",
+      "Find text across the website"
+    ],
+    "searchAllHelp": [
+      "输入页面上看到的文字，定位到对应模块",
+      "Enter text from a page to find its module"
+    ],
+    "requestId": [
+      "请求编号",
+      "Request ID"
+    ],
+    "uploaded": [
+      "图片已加入当前草稿，发布后网站才会更新。",
+      "Image added to this draft. Publish to update the website."
+    ],
+    "working": [
+      "正在处理，请稍候…",
+      "Working…"
+    ],
+    "exportDraft": [
+      "下载当前草稿副本",
+      "Download this draft"
+    ],
+    "processPhoto": [
+      "拼豆流程图片",
+      "Beading process image"
+    ],
+    "avatar": [
+      "小狗双吉头像",
+      "Xiaogou Shuangji avatar"
+    ],
+    "originalImageHelp": [
+      "上传 JPG、PNG 或 WebP，最大 12 MB，保留原图。",
+      "Upload JPG, PNG or WebP up to 12 MB. Original images are preserved."
+    ],
+    "diagnostics": [
+      "编辑诊断",
+      "Editor diagnostics"
+    ],
+    "diagnosticsHelp": [
+      "保留最近 2000 条写入或失败请求，不记录图片、文案、联系人和登录凭据。",
+      "The latest 2,000 write or failed requests are retained. Images, copy, contacts and sign-in credentials are excluded."
+    ],
+    "healthy": [
+      "服务连接与数据库正常",
+      "Service connection and database are healthy"
+    ],
+    "refresh": [
+      "刷新诊断",
+      "Refresh diagnostics"
+    ],
+    "uploadTimeout": [
+      "上传超时，草稿仍在。请检查网络后重新选择图片。",
+      "The upload timed out. Your draft is safe. Check your connection and choose the image again."
     ]
   },
   "components-admin-JournalEditor": {
@@ -875,6 +931,10 @@
     "loadDraft": [
       "读取未保存草稿",
       "Restore unsaved draft"
+    ],
+    "importPhotos": [
+      "正在保存原图",
+      "Saving original images"
     ]
   },
   "components-admin-OrderDrawer": {
@@ -2013,10 +2073,134 @@
       "{v1} closing time"
     ]
   },
+  "components-BeadingProcess": {
+    "title": [
+      "拼豆流程",
+      "From pattern to keepsake"
+    ],
+    "patternTitle": [
+      "准备图纸",
+      "Choose a pattern"
+    ],
+    "patternIntro": [
+      "先在小红书上搜索拼豆图纸，可以找自己喜欢的 ip 或者风格。图纸示例：",
+      "Search Xiaohongshu for a bead pattern featuring a character or style you like. Here is an example:"
+    ],
+    "patternDetail": [
+      "图纸右下角会显示占用格子数，可推测拼豆成品大小（40×40 格子约 10.7cm）。\n图纸下方会显示颜色及豆子数量。\n可多保存几个拼豆图，以便拼豆时使用。",
+      "The grid dimensions at the bottom right help you estimate the finished size: a 40 × 40 grid is about 10.7 cm.\nThe colours and bead counts appear beneath the pattern.\nSave a few patterns to choose from when you arrive."
+    ],
+    "toolsTitle": [
+      "了解拼豆工具",
+      "Get to know the tools"
+    ],
+    "toolsBody": [
+      "如果是第一次拼，店主会详细介绍拼豆工具如何使用，包你上手！\n当然也可以提前了解一下：",
+      "If this is your first time, the host will show you how to use each tool and help you get started!\nYou can also take a look before your visit:"
+    ],
+    "toolsLink": [
+      "提前了解拼豆工具",
+      "A closer look at the tools"
+    ],
+    "toolsUrl": [
+      "https://xhslink.com/o/5lTlu8xeZXD",
+      "https://xhslink.com/o/5lTlu8xeZXD"
+    ],
+    "makingTitle": [
+      "开始拼豆",
+      "Start placing your beads"
+    ],
+    "makingBody": [
+      "咱们是一组客人一套拼豆，所以不用先找颜色，直接上手开始拼就好啦！\n拼豆时先拼外框，可以理解为先描边；\n再拼数量较少的颜色；\n最后大面积铺色。",
+      "Each group has its own set of beads, so you can start right away without gathering colours first!\nBegin with the outline.\nThen place the colours used in smaller quantities.\nFill the larger areas last."
+    ],
+    "ironingTitle": [
+      "选择烫法",
+      "Choose your finish"
+    ],
+    "ironingBody": [
+      "告知店主喜欢的纹理烫，将拼好的豆板交给店主即可！店主烫好后会还给你，来欣赏你的萌作吧！",
+      "Tell the host which ironing texture you like and hand over your finished pegboard. The host will iron it for you—then it is time to admire your creation!"
+    ],
+    "finishingTitle": [
+      "做成手工制品",
+      "Turn it into a keepsake"
+    ],
+    "finishingBody": [
+      "无论是挂件还是冰箱贴，所有手工制品都由店主免费制作！只有较为复杂的款式需额外收费，店主届时会提前告知喔。",
+      "Whether you choose a charm or a fridge magnet, the host will put it together for free! Only more complex designs cost extra, and the host will let you know beforehand."
+    ],
+    "packaging": [
+      "最后店主会认真把成品包装起来喔！",
+      "Finally, the host will carefully package your finished creation!"
+    ],
+    "booked": [
+      "如果已提交预约，期待我们的见面！",
+      "Already sent your reservation? We look forward to meeting you!"
+    ],
+    "notBooked": [
+      "如果还未预约，准备来大展身手了吗？",
+      "Still planning your visit? Ready to try your hand at beadmaking?"
+    ],
+    "visit": [
+      "来拼豆吧",
+      "Come create"
+    ],
+    "photoLabel": [
+      "查看流程图片",
+      "View process photograph"
+    ],
+    "patternAlt": [
+      "拼豆图纸示例及颜色用量",
+      "Example bead pattern with colour counts"
+    ],
+    "toolsAlt": [
+      "一组客人使用的豆盘、豆板和工具",
+      "A group’s bead trays, pegboard and tools"
+    ],
+    "makingAlt": [
+      "在豆板上逐颗拼出图案",
+      "A pattern taking shape on the pegboard"
+    ],
+    "ironingAlt": [
+      "烫好后的小狗拼豆挂件",
+      "Finished puppy bead charms"
+    ],
+    "findingsAlt": [
+      "制作挂件和冰箱贴的配件",
+      "Findings for charms and fridge magnets"
+    ],
+    "finishesAlt": [
+      "装配完成的小狗手工作品",
+      "Assembled puppy keepsakes"
+    ],
+    "packagingAlt": [
+      "仔细包装好的拼豆作品",
+      "Carefully packaged bead creations"
+    ]
+  },
   "components-BrandMark": {
     "pindo_puppy_08aa61": [
       "小狗拼豆铺",
       "Pindo Puppy"
+    ]
+  },
+  "components-BrandMotif": {
+    "puppy": [
+      "捏捏小狗",
+      "Give the puppy a squeeze"
+    ],
+    "star": [
+      "捏捏星星",
+      "Give the star a squeeze"
+    ],
+    "heart": [
+      "捏捏爱心",
+      "Give the heart a squeeze"
+    ],
+    "bone": [
+      "捏捏狗骨头",
+      "Give the bone a squeeze"
     ]
   },
   "components-CommerceManager": {
@@ -2147,6 +2331,20 @@
     "editor_journal": [
       "日记编辑",
       "Journal editor"
+    ]
+  },
+  "components-CopyContact": {
+    "copy": [
+      "点击复制微信号",
+      "Copy WeChat ID"
+    ],
+    "copied": [
+      "微信号已复制",
+      "WeChat ID copied"
+    ],
+    "manual": [
+      "请选中号码复制，或长按复制",
+      "Select the ID to copy, or touch and hold"
     ]
   },
   "components-InquiryForm": {
@@ -2651,6 +2849,34 @@
     "content_invalid_price": [
       "请输入不超过两位小数的非负价格，中英文价格应一致。",
       "Enter a non-negative price with up to two decimal places. Both language values must match."
+    ],
+    "image_format_unsupported": [
+      "此图片格式暂不支持，请导出为 JPG、PNG 或 WebP 后重试。",
+      "This image format is unsupported. Export as JPG, PNG or WebP and retry."
+    ],
+    "image_original_format_unsupported": [
+      "日记原图请使用 JPG、PNG 或 WebP。",
+      "Use JPG, PNG or WebP for journal originals."
+    ],
+    "image_heic_unsupported": [
+      "这是 HEIC／HEIF 图片，请先在照片应用中导出为 JPG，再上传。",
+      "This is a HEIC/HEIF image. Export it as JPG in your photo app before uploading."
+    ],
+    "server_error": [
+      "服务暂时未完成操作，修改仍在，请稍后重试。",
+      "The service could not finish this action. Your edits are safe. Please retry."
+    ],
+    "import_queue_full": [
+      "还有导入正在处理，请稍后重试。",
+      "Other imports are still running. Please retry shortly."
+    ],
+    "import_job_not_found": [
+      "未找到这次导入记录，请重新粘贴分享链接。",
+      "This import record was not found. Paste the share link again."
+    ],
+    "import_interrupted": [
+      "服务更新中断了导入，原有日记未改动，请重试。",
+      "A service update interrupted the import. Existing stories are unchanged. Please retry."
     ]
   },
   "data-editor-module-labels": {
@@ -2841,6 +3067,22 @@
     "data-editor-module-labels": [
       "编辑目录名称",
       "Editor section names"
+    ],
+    "components-BeadingProcess": [
+      "拼豆流程图文",
+      "Beading process guide"
+    ],
+    "components-BrandMotif": [
+      "小图标互动提示",
+      "Motif interaction labels"
+    ],
+    "journal-collection": [
+      "日记合集标题与链接",
+      "Journal collection title and link"
+    ],
+    "components-CopyContact": [
+      "微信号复制提示",
+      "WeChat copy messages"
     ]
   },
   "data-ui-labels": {
@@ -2913,6 +3155,16 @@
     "journal-13": [
       "用手作装饰日常",
       "Make yourself at home"
+    ]
+  },
+  "journal-collection": {
+    "title": [
+      "北美拼豆日记🍄",
+      "Beadmaking in North America"
+    ],
+    "url": [
+      "https://www.xiaohongshu.com/collection/item/69dee77800ba000000000001",
+      "https://www.xiaohongshu.com/collection/item/69dee77800ba000000000001"
     ]
   },
   "pages-Cart": {
@@ -3375,12 +3627,12 @@
   },
   "pages-Journal": {
     "life_in_our_1d9155": [
-      "小屋里的，",
-      "Life in our"
+      "铺子里",
+      "Stories from"
     ],
     "little_studio_902113": [
-      "那些小快乐。",
-      "little studio."
+      "发生过的事",
+      "the studio"
     ],
     "new_pieces_on_the_wall_new_colours_0e0a4b": [
       "墙上的新作品、桌上的新颜色，以及每一个认真拼豆的下午。这里的照片，都是小狗拼豆铺的真实日常。",
@@ -3425,8 +3677,8 @@
       "An excerpt from the original post. Find the complete story and photographs in the Xiaohongshu collection."
     ],
     "this_journal_preserves_the_original_post_see_7d2ccb": [
-      "日记保留发布时的内容，当前到店安排请查看拼豆铺详细信息。",
-      "This journal preserves the original post. See the studio details for current visit arrangements."
+      "日记保留发布时的内容，当前到店安排请查看",
+      "This journal preserves the original post. For current visit arrangements, see the"
     ],
     "studio_details_7c4089": [
       "拼豆铺详细信息",
@@ -4324,6 +4576,41 @@
       "src": "/studio-brand/xiaogou-shuangji-avatar.png",
       "width": 376,
       "height": 376
+    },
+    "process-pattern": {
+      "src": "/studio-media/v4/process-pattern.webp",
+      "width": 1400,
+      "height": 1474
+    },
+    "process-tools": {
+      "src": "/studio-media/v4/process-tools.webp",
+      "width": 1200,
+      "height": 1600
+    },
+    "process-making": {
+      "src": "/studio-media/v4/process-making.webp",
+      "width": 1200,
+      "height": 1600
+    },
+    "process-ironing": {
+      "src": "/studio-media/v4/process-ironing.webp",
+      "width": 1200,
+      "height": 1600
+    },
+    "process-findings": {
+      "src": "/studio-media/v4/process-findings.webp",
+      "width": 1088,
+      "height": 1450
+    },
+    "process-finishes": {
+      "src": "/studio-media/v4/process-finishes.webp",
+      "width": 1400,
+      "height": 788
+    },
+    "process-packaging": {
+      "src": "/studio-media/v4/process-packaging.webp",
+      "width": 1200,
+      "height": 1600
     }
   }
 }

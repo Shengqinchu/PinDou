@@ -72,8 +72,8 @@
     "Replace image"
   ],
   "imageHelp": [
-    "上传 JPG、PNG 或 WebP，最大 12 MB；按原比例显示。",
-    "Upload JPG, PNG or WebP up to 12 MB. Images keep their proportions."
+    "上传 JPG、PNG、WebP、AVIF 或 BMP，最大 12 MB；按原比例显示。HEIC 请先导出为 JPG。",
+    "Upload JPG, PNG, WebP, AVIF or BMP up to 12 MB. Images keep their proportions. Export HEIC as JPG first."
   ],
   "loading": [
     "正在读取内容…",
@@ -202,5 +202,61 @@
   "school_card_holder": [
     "卡套套餐／个（CAD）",
     "Card holder package / each (CAD)"
+  ],
+  "searchAll": [
+    "全站找文字",
+    "Find text across the website"
+  ],
+  "searchAllHelp": [
+    "输入页面上看到的文字，定位到对应模块",
+    "Enter text from a page to find its module"
+  ],
+  "requestId": [
+    "请求编号",
+    "Request ID"
+  ],
+  "uploaded": [
+    "图片已加入当前草稿，发布后网站才会更新。",
+    "Image added to this draft. Publish to update the website."
+  ],
+  "working": [
+    "正在处理，请稍候…",
+    "Working…"
+  ],
+  "exportDraft": [
+    "下载当前草稿副本",
+    "Download this draft"
+  ],
+  "processPhoto": [
+    "拼豆流程图片",
+    "Beading process image"
+  ],
+  "avatar": [
+    "小狗双吉头像",
+    "Xiaogou Shuangji avatar"
+  ],
+  "originalImageHelp": [
+    "上传 JPG、PNG 或 WebP，最大 12 MB，保留原图。",
+    "Upload JPG, PNG or WebP up to 12 MB. Original images are preserved."
+  ],
+  "diagnostics": [
+    "编辑诊断",
+    "Editor diagnostics"
+  ],
+  "diagnosticsHelp": [
+    "保留最近 2000 条写入或失败请求，不记录图片、文案、联系人和登录凭据。",
+    "The latest 2,000 write or failed requests are retained. Images, copy, contacts and sign-in credentials are excluded."
+  ],
+  "healthy": [
+    "服务连接与数据库正常",
+    "Service connection and database are healthy"
+  ],
+  "refresh": [
+    "刷新诊断",
+    "Refresh diagnostics"
+  ],
+  "uploadTimeout": [
+    "上传超时，草稿仍在。请检查网络后重新选择图片。",
+    "The upload timed out. Your draft is safe. Check your connection and choose the image again."
   ]
 }

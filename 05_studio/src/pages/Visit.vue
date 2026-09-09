@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CopyContact from "../components/CopyContact.vue";
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-Visit", copyTextDefault);
 
@@ -427,7 +428,7 @@ async function submit() {
           {{ say(copyText.your_request_will_wait_for_the_hosts_cd36bf) }}
         </p>
         <span v-if="attempt" class="fine-print"
-          >{{ say(copyText.host_wechat_ac7b7e) }}{{ wechat }} ·
+          >{{ say(copyText.host_wechat_ac7b7e) }}<CopyContact :value="wechat" /> ·
           <a :href="phoneHref">{{ phone }}</a></span
         >
       </div>

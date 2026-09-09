@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CopyContact from "./CopyContact.vue";
 import { contentModule } from "../content-store";
 const copyText = contentModule("components-InquiryForm", copyTextDefault);
 
@@ -121,7 +122,7 @@ async function copyReceipt() {
     </ul>
     <p class="fine-print">
       {{ say(copyText.no_seats_or_stock_have_been_reserved_dd3eb5) }}
-      {{ wechat }}
+      <CopyContact :value="wechat" />
     </p>
     <RouterLink to="/" class="text-link"
       >{{ say(copyText.back_to_the_studio_2d6b10) }}<PhArrowRight

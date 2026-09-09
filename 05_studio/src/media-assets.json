@@ -217,5 +217,40 @@
     "src": "/studio-brand/xiaogou-shuangji-avatar.png",
     "width": 376,
     "height": 376
+  },
+  "process-pattern": {
+    "src": "/studio-media/v4/process-pattern.webp",
+    "width": 1400,
+    "height": 1474
+  },
+  "process-tools": {
+    "src": "/studio-media/v4/process-tools.webp",
+    "width": 1200,
+    "height": 1600
+  },
+  "process-making": {
+    "src": "/studio-media/v4/process-making.webp",
+    "width": 1200,
+    "height": 1600
+  },
+  "process-ironing": {
+    "src": "/studio-media/v4/process-ironing.webp",
+    "width": 1200,
+    "height": 1600
+  },
+  "process-findings": {
+    "src": "/studio-media/v4/process-findings.webp",
+    "width": 1088,
+    "height": 1450
+  },
+  "process-finishes": {
+    "src": "/studio-media/v4/process-finishes.webp",
+    "width": 1400,
+    "height": 788
+  },
+  "process-packaging": {
+    "src": "/studio-media/v4/process-packaging.webp",
+    "width": 1200,
+    "height": 1600
   }
 }

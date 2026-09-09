@@ -5,7 +5,7 @@ they are never treated as complete posts and no cookies or account tokens are us
 """
 from __future__ import annotations
 import json, re
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse, urljoin, urlunparse
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError, URLError
 from fastapi import HTTPException
@@ -64,9 +64,13 @@ def parse_note(html, expected_id=None):
     return note
 
 def retrieve(share):
-    found=re.search(r'https://[^\s<>]+',share)
+    found=re.search(r'https?://[^\s<>]+',share)
     if not found: raise HTTPException(422,'import_url_not_supported')
     source=found[0].rstrip('。，),]')
+    parsed=urlparse(source)
+    # Older official share text uses http; upgrade the known host before fetching.
+    if parsed.scheme=='http' and parsed.hostname in PAGE_HOSTS:
+        source=urlunparse(parsed._replace(scheme='https'))
     checked_url(source)
     data,final=fetch(source)
     ident=re.search(r'/(?:explore|discovery/item)/([a-f0-9]{24})',final)

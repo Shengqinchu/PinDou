@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CopyContact from "../components/CopyContact.vue";
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-Order", copyTextDefault);
 
@@ -236,7 +237,7 @@ async function tryAgain() {
           >
           <p>
             {{ say(copyText.contact_the_host_wechat_11a64c) }}
-            {{ wechat }}
+            <CopyContact :value="wechat" />
           </p>
         </div>
       </div>

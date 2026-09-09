@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CopyContact from "../components/CopyContact.vue";
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-ReservationReceipt", copyTextDefault);
 
@@ -144,7 +145,7 @@ onBeforeUnmount(() => {
     </button>
     <p class="fine-print">
       {{ say(copyText.for_changes_contact_the_host_on_wechat_2921d8)
-      }}{{ wechat }} · {{ say(copyText.phone_0614da)
+      }}<CopyContact :value="wechat" /> · {{ say(copyText.phone_0614da)
       }}<a :href="phoneHref">{{ phone }}</a>
     </p>
   </section>

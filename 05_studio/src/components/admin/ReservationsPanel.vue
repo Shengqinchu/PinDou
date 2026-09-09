@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CopyContact from "../CopyContact.vue";
 import { contentModule } from "../../content-store";
 const copyText = contentModule("components-admin-ReservationsPanel", copyTextDefault);
 
@@ -330,7 +331,7 @@ defineExpose({ refresh: load });
                     : entry.payload.contact_method === "email"
                       ? say(copyText.email_8501ec)
                       : say(copyText.other_8b6752)
-              }}：{{ entry.payload.contact }}
+              }}：<CopyContact v-if="entry.payload.contact_method==='wechat'" :value="entry.payload.contact" /><span v-else>{{ entry.payload.contact }}</span>
             </dd>
           </div>
           <div v-if="entry.payload.notes">

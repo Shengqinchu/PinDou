@@ -1,38 +1,150 @@
 {
-  "title": ["日记编辑", "Journal editor"],
-  "intro": ["粘贴小红书分享链接，导入原文与全部配图。补充英文、预览后发布。", "Paste a Xiaohongshu share link to import the full text and every image. Add English, preview, then publish."],
-  "link": ["小红书分享内容或链接", "Xiaohongshu share text or link"],
-  "import": ["导入日记", "Import story"],
-  "importing": ["正在读取原帖和图片…", "Reading the original post and images…"],
-  "new": ["手动新增", "Create manually"],
-  "draft": ["草稿", "Draft"],
-  "live": ["已发布", "Published"],
-  "changes": ["有待发布修改", "Unpublished changes"],
-  "date": ["原帖日期", "Original post date"],
-  "titleZh": ["中文标题", "Chinese title"],
-  "titleEn": ["英文标题", "English title"],
-  "bodyZh": ["中文正文", "Chinese text"],
-  "bodyEn": ["英文正文", "English text"],
-  "source": ["原帖链接", "Original post link"],
-  "photos": ["全部配图", "All images"],
-  "photoHelp": ["按原顺序保留完整图片及水印。可调整顺序、添加或移除图片。", "Keep complete images and watermarks in their original order. Reorder, add or remove images here."],
-  "add": ["添加图片", "Add images"],
-  "previous": ["前移图片", "Move image earlier"],
-  "next": ["后移图片", "Move image later"],
-  "remove": ["移除图片", "Remove image"],
-  "save": ["保存草稿", "Save draft"],
-  "publish": ["发布日记", "Publish story"],
-  "unpublish": ["转为草稿", "Unpublish"],
-  "saved": ["日记草稿已保存", "Story draft saved"],
-  "published": ["日记已发布，最新一篇会自动显示在最前面", "Published. The newest story appears first automatically."],
-  "preview": ["预览", "Preview"],
-  "edit": ["编辑", "Edit"],
-  "choose": ["选择一篇日记，或导入新的小红书帖子。", "Choose a story or import a new Xiaohongshu post."],
-  "retry": ["重新读取日记列表", "Reload story list"],
-  "translate": ["生成英文", "Generate English"],
-  "translating": ["正在翻译，原文会保留…", "Translating while keeping the original…"],
-  "translationReview": ["英文已生成，请检查后发布。", "English is ready. Please review it before publishing."],
-  "conflict": ["另一处更新了这篇日记。你的编辑保留在这里，请复制后再重新读取。", "This story changed in another window. Your edits remain here; copy them before reloading."],
-  "emptyTitle": ["新的小狗日记", "A new studio story"],
-  "loadDraft": ["读取未保存草稿", "Restore unsaved draft"]
+  "title": [
+    "日记编辑",
+    "Journal editor"
+  ],
+  "intro": [
+    "粘贴小红书分享链接，导入原文与全部配图。补充英文、预览后发布。",
+    "Paste a Xiaohongshu share link to import the full text and every image. Add English, preview, then publish."
+  ],
+  "link": [
+    "小红书分享内容或链接",
+    "Xiaohongshu share text or link"
+  ],
+  "import": [
+    "导入日记",
+    "Import story"
+  ],
+  "importing": [
+    "正在读取原帖和图片…",
+    "Reading the original post and images…"
+  ],
+  "new": [
+    "手动新增",
+    "Create manually"
+  ],
+  "draft": [
+    "草稿",
+    "Draft"
+  ],
+  "live": [
+    "已发布",
+    "Published"
+  ],
+  "changes": [
+    "有待发布修改",
+    "Unpublished changes"
+  ],
+  "date": [
+    "原帖日期",
+    "Original post date"
+  ],
+  "titleZh": [
+    "中文标题",
+    "Chinese title"
+  ],
+  "titleEn": [
+    "英文标题",
+    "English title"
+  ],
+  "bodyZh": [
+    "中文正文",
+    "Chinese text"
+  ],
+  "bodyEn": [
+    "英文正文",
+    "English text"
+  ],
+  "source": [
+    "原帖链接",
+    "Original post link"
+  ],
+  "photos": [
+    "全部配图",
+    "All images"
+  ],
+  "photoHelp": [
+    "按原顺序保留完整图片及水印。可调整顺序、添加或移除图片。",
+    "Keep complete images and watermarks in their original order. Reorder, add or remove images here."
+  ],
+  "add": [
+    "添加图片",
+    "Add images"
+  ],
+  "previous": [
+    "前移图片",
+    "Move image earlier"
+  ],
+  "next": [
+    "后移图片",
+    "Move image later"
+  ],
+  "remove": [
+    "移除图片",
+    "Remove image"
+  ],
+  "save": [
+    "保存草稿",
+    "Save draft"
+  ],
+  "publish": [
+    "发布日记",
+    "Publish story"
+  ],
+  "unpublish": [
+    "转为草稿",
+    "Unpublish"
+  ],
+  "saved": [
+    "日记草稿已保存",
+    "Story draft saved"
+  ],
+  "published": [
+    "日记已发布，最新一篇会自动显示在最前面",
+    "Published. The newest story appears first automatically."
+  ],
+  "preview": [
+    "预览",
+    "Preview"
+  ],
+  "edit": [
+    "编辑",
+    "Edit"
+  ],
+  "choose": [
+    "选择一篇日记，或导入新的小红书帖子。",
+    "Choose a story or import a new Xiaohongshu post."
+  ],
+  "retry": [
+    "重新读取日记列表",
+    "Reload story list"
+  ],
+  "translate": [
+    "生成英文",
+    "Generate English"
+  ],
+  "translating": [
+    "正在翻译，原文会保留…",
+    "Translating while keeping the original…"
+  ],
+  "translationReview": [
+    "英文已生成，请检查后发布。",
+    "English is ready. Please review it before publishing."
+  ],
+  "conflict": [
+    "另一处更新了这篇日记。你的编辑保留在这里，请复制后再重新读取。",
+    "This story changed in another window. Your edits remain here; copy them before reloading."
+  ],
+  "emptyTitle": [
+    "新的小狗日记",
+    "A new studio story"
+  ],
+  "loadDraft": [
+    "读取未保存草稿",
+    "Restore unsaved draft"
+  ],
+  "importPhotos": [
+    "正在保存原图",
+    "Saving original images"
+  ]
 }

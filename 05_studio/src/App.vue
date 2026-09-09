@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CopyContact from "./components/CopyContact.vue";
 import { contentModule } from "./content-store";
 const copyText = contentModule("App", copyTextDefault);
 
@@ -14,6 +15,7 @@ import {
   PhFlower,
   PhList,
   PhUserCircle,
+  PhGlobe,
 } from "@phosphor-icons/vue";
 import { locale, socialUrl, tr, wechat, phone, phoneHref } from "./state";
 import { gsap } from "gsap";
@@ -85,14 +87,14 @@ watch(
       >
     </nav>
     <div class="vision-header-actions">
-      <button class="account-trigger icon-button" :aria-label="say(accountUser?accountCopy.account:accountCopy.sign_in)" :aria-expanded="accountOpen" @click="openAccount"><PhUserCircle :size="24" weight="light" /><span>{{ say(accountUser?accountCopy.account:accountCopy.sign_in) }}</span></button>
       <button
         class="language-button"
         @click="locale = locale === 'zh' ? 'en' : 'zh'"
         :aria-label="say(copyText.switch_to_chinese_6c04c2)"
       >
-        {{ say(copyText.label_dd0e77) }}
+        <PhGlobe :size="23" weight="light" /><span>{{ say(copyText.label_dd0e77) }}</span>
       </button>
+      <button class="account-trigger icon-button" :aria-label="say(accountUser?accountCopy.account:accountCopy.sign_in)" :aria-expanded="accountOpen" @click="openAccount"><PhUserCircle :size="24" weight="light" /><span>{{ say(accountUser?accountCopy.account:accountCopy.sign_in) }}</span></button>
       <button
         class="icon-button"
         :aria-label="say(copyText.site_menu_40ed87)"
@@ -184,10 +186,9 @@ watch(
           >
           <PhArrowUpRight class="contact-profile-arrow" :size="16" />
         </a>
-        <span class="contact-id contact-channel">
+        <CopyContact class="contact-id contact-channel" :value="wechat" :prefix="say(copyText.wechat_b2cc69)">
           <span class="contact-icon-slot"><BrandIcon name="wechat" /></span>
-          <span>{{ say(copyText.wechat_b2cc69) }}{{ wechat }}</span>
-        </span>
+        </CopyContact>
         <a class="contact-channel" :href="phoneHref"
           ><span class="contact-icon-slot"><BrandIcon name="canada" /></span
           ><span>{{ phone }}</span></a

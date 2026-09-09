@@ -20,8 +20,12 @@ import "./styles/tactile.css";
 import "./styles/vision3.css";
 import "./styles/editor.css";
 import "./styles/account.css";
+import "./styles/process.css";
+import "./styles/copy-contact.css";
+import "./styles/responsive.css";
 import "./styles/reduced-motion.css";
 import { installContent } from "./content-store";
+import { installDiagnostics } from "./diagnostics";
 import { installRoutePrefetch, routeLoaders } from "./route-loaders";
 import { installMotionPreference } from "./motion-preference";
 import { installMotion } from "./motion";
@@ -30,6 +34,11 @@ import { reducedMotion } from "./ui";
 import App from "./App.vue";
 import Home from "./pages/Home.vue";
 
+// A fresh visit starts at the top. Vue Router still restores its saved position
+// on back/forward; obsolete shared homepage anchors no longer jump mid-page.
+if('scrollRestoration' in history)history.scrollRestoration='manual';
+if(/^\/(?:studio\/?)?$/.test(location.pathname)&&location.hash==='#space')
+  history.replaceState(history.state,'',location.pathname+location.search);
 const router = createRouter({
   history: createWebHistory("/"),
   routes: [
@@ -56,6 +65,7 @@ const router = createRouter({
     },
   ],
   scrollBehavior(to, from, saved) {
+    if(!from.matched.length)return {top:0,left:0};
     if (saved) return saved;
     if (to.path === from.path && to.query.view !== from.query.view)
       return false;
@@ -70,6 +80,7 @@ const router = createRouter({
 });
 
 const stopContent = installContent();
+const stopDiagnostics = installDiagnostics();
 const stopPrefetch = installRoutePrefetch();
 router.afterEach(to => {
   const canonical=document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
@@ -85,6 +96,7 @@ createApp(App).use(router).mount("#app");
 if (import.meta.hot)
   import.meta.hot.dispose(() => {
     stopContent();
+    stopDiagnostics();
     stopPrefetch();
     stopMotion();
     stopPreference();

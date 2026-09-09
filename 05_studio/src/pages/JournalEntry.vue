@@ -54,7 +54,7 @@ const body = computed(() =>
           {{ say(copyText.this_journal_preserves_the_original_post_see_7d2ccb)
           }}<RouterLink to="/details" class="text-link">{{
             say(copyText.studio_details_7c4089)
-          }}</RouterLink>
+          }}<PhArrowUpRight /></RouterLink>
         </p>
         <a
           class="text-link"
@@ -84,7 +84,7 @@ const body = computed(() =>
     <h1>{{ say(copyText.this_story_is_not_here_1ceff6) }}</h1>
     <RouterLink class="text-link" to="/journal">{{
       say(copyText.back_to_the_journal_b75447)
-    }}</RouterLink>
+    }}<PhArrowUpRight /></RouterLink>
   </section>
   <PhotoViewer v-if="post" ref="viewer" :photos="photographs" />
 </template>

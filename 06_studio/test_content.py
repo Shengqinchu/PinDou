@@ -41,7 +41,7 @@ def test_upload_image_and_media_publication(client):
     assert client.put('/studio-api/manage/content/media',json={'version':result.json()['version'],'data':doc['data']}).status_code==422
 
 def test_journal_complete_english_publish_and_sort(client):
-    admin();posts=client.get('/studio-api/journal').json()['posts'];assert len(posts)==7
+    admin();posts=client.get('/studio-api/journal').json()['posts'];assert len(posts)==8
     assert all(p['date']>'2026-06-24' and p['body_en'] for p in posts)
     post={**posts[0],'id':'test-new','date':'2026-09-08','title_en':'','body_en':''}
     path='/studio-api/manage/journal/test-new'

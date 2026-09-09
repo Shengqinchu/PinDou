@@ -36,7 +36,7 @@ def switch_link(link, target):
 
 def main():
     archive, version, expected_hash = sys.argv[1:4]
-    if not re.fullmatch(r"[0-9]{14}-studio-v[123]", version):
+    if not re.fullmatch(r"[0-9]{14}-studio-v[1234]", version):
         raise RuntimeError("Invalid release name")
     package = Path(archive)
     if hashlib.sha256(package.read_bytes()).hexdigest() != expected_hash:

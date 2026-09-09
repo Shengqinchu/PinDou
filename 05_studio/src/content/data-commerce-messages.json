@@ -182,5 +182,33 @@
   "content_invalid_price": [
     "请输入不超过两位小数的非负价格，中英文价格应一致。",
     "Enter a non-negative price with up to two decimal places. Both language values must match."
+  ],
+  "image_format_unsupported": [
+    "此图片格式暂不支持，请导出为 JPG、PNG 或 WebP 后重试。",
+    "This image format is unsupported. Export as JPG, PNG or WebP and retry."
+  ],
+  "image_original_format_unsupported": [
+    "日记原图请使用 JPG、PNG 或 WebP。",
+    "Use JPG, PNG or WebP for journal originals."
+  ],
+  "image_heic_unsupported": [
+    "这是 HEIC／HEIF 图片，请先在照片应用中导出为 JPG，再上传。",
+    "This is a HEIC/HEIF image. Export it as JPG in your photo app before uploading."
+  ],
+  "server_error": [
+    "服务暂时未完成操作，修改仍在，请稍后重试。",
+    "The service could not finish this action. Your edits are safe. Please retry."
+  ],
+  "import_queue_full": [
+    "还有导入正在处理，请稍后重试。",
+    "Other imports are still running. Please retry shortly."
+  ],
+  "import_job_not_found": [
+    "未找到这次导入记录，请重新粘贴分享链接。",
+    "This import record was not found. Paste the share link again."
+  ],
+  "import_interrupted": [
+    "服务更新中断了导入，原有日记未改动，请重试。",
+    "A service update interrupted the import. Existing stories are unchanged. Please retry."
   ]
 }

@@ -1,6 +1,12 @@
 {
-  "life_in_our_1d9155": ["小屋里的，", "Life in our"],
-  "little_studio_902113": ["那些小快乐。", "little studio."],
+  "life_in_our_1d9155": [
+    "铺子里",
+    "Stories from"
+  ],
+  "little_studio_902113": [
+    "发生过的事",
+    "the studio"
+  ],
   "new_pieces_on_the_wall_new_colours_0e0a4b": [
     "墙上的新作品、桌上的新颜色，以及每一个认真拼豆的下午。这里的照片，都是小狗拼豆铺的真实日常。",
     "New pieces on the wall, new colours on the table, and afternoons well spent. Real photographs from everyday life at Pindo Puppy."
@@ -17,8 +23,14 @@
     "小狗双吉 · 小红书",
     "Xiaogou Shuangji · Xiaohongshu"
   ],
-  "excerpt_040d41": ["摘录", "Excerpt"],
-  "open_this_story_b4bd90": ["翻开这篇日记", "Open this story"],
+  "excerpt_040d41": [
+    "摘录",
+    "Excerpt"
+  ],
+  "open_this_story_b4bd90": [
+    "翻开这篇日记",
+    "Open this story"
+  ],
   "browse_the_full_collection_on_xiaohongshu_f762be": [
     "去小红书翻完整合集",
     "Browse the full collection on Xiaohongshu"

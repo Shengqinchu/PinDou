@@ -86,9 +86,9 @@ onBeforeUnmount(() => {
       </p>
       <div class="vision-hero-lettering">
         <BrandMotif class="hero-puppy" /><BrandMotif
-          kind="star"
+          kind="star" interactive
           class="hero-star"
-        /><BrandMotif kind="heart" class="hero-heart" />
+        /><BrandMotif kind="heart" interactive class="hero-heart" />
         <h1 class="vision-title">
           <span>{{ say(copyText.a_little_time_all_yours_9e9d60) }}</span
           ><span>{{ say(copyText.make_something_lovely_04db64) }}</span>
@@ -183,7 +183,7 @@ onBeforeUnmount(() => {
     </section>
     <section class="vision-experience container">
       <div>
-        <BrandMotif kind="bone" class="experience-motif" />
+        <BrandMotif kind="bone" interactive class="experience-motif" />
         <h2>
           {{ say(copyText.how_about_bf459e) }}<br /><em>{{
             say(copyText.giving_it_a_try_9e9961)

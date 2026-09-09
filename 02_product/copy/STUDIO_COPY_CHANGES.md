@@ -1,3 +1,7 @@
+- V4 补充原帖：店主在本轮提供 `6a96169d000000000f03a001` 的有效分享链接，新增 2026-09-01“汉密尔顿拼豆铺开学前休息一周喔”全文及 15 张图片；中文原文逐字保留，英文忠实翻译，仅省略平台话题／表情标记。原始时间戳保留，显示日期依据原帖公开页的 `09-01 加拿大`。
+
+- V4 补充：日记合集既有标题和链接原样迁入 `journal-collection` 可编辑模块；日记导入增加原图进度、队列繁忙／中断／记录失效提示，来源为本次导入故障修复请求。
+
 # Studio 文案授权记录
 
 ## 2026-09-08 / 共用邮箱账号与预约登录
@@ -51,3 +55,14 @@
 - `components-admin-ProductsPanel.price_ca_d65afe`、`components-admin-OrderDrawer.cad_total_0fc8b6`、`pages-Order.cad_total_0fc8b6`、`pages-Cart.priced_in_cad_paid_in_cny_53d8c7`：加元标识改为 `CAD`。
 - `components-admin-CheckoutPanel.price_in_canadian_dollars_collect_in_chinese_35f2a3` / `cny_per_1_cad_e11b72`，以及 `components-admin-ContentEditor` 的六个体验售价字段：加元单位改为 `CAD`，对应英文同步。
 - 共享金额格式器的 CAD 分支使用货币代码；后台汇率示例也使用该格式器。金额数值、精度、税费、汇率与人民币付款币种均未调整。其他宣传文案、日记原文和不可变基线保持。
+# V4 — 2026-09-08
+
+授权来源：店主 v4.pdf、拼豆流程.pdf 和同条消息。未涉及的宣传文案、价格、已发布店主覆盖以及小红书原文均保留。
+
+- `pages-Journal.life_in_our_1d9155`／`little_studio_902113`：按 v4 p1–2 改为“铺子里／发生过的事”，同步英文。
+- `pages-JournalEntry.this_journal_preserves_the_original_post_see_7d2ccb`：按 p1 移除末尾重复的“拼豆铺详细信息”，保留后面的真实链接及箭头；英文对应去重。
+- 新模块 `components-BeadingProcess`：来自流程 PDF 全部五步及 7 张照片说明；末尾使用 v4 p2 指定文案与按钮。PDF 损坏的字形编码按页面可视文字转录，标点／空格作网页排版规范化；尺寸等事实原样保留。
+- 新模块 `components-BrandMotif`：按消息新增捏捏图标的无障碍名称。
+- 新模块 `components-CopyContact`：按消息新增复制成功、失败及手动复制提示。
+- `components-admin-ContentEditor`、`data-commerce-messages`、`data-editor-module-labels`：按消息新增全站查找、上传局部状态、格式错误、请求编号、草稿副本及诊断说明。后台实际支持的上传格式同步说明，不承诺未支持的 HEIC。
+- `data-components-StudioCarousel-photos`：按截图顺序调整数组，原始资产键和各张中英文说明不变。顺序为旧编号 01、05、07、04、08、02、06、09、11、10、03、12。

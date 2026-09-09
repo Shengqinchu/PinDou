@@ -125,6 +125,7 @@ export class CommerceError extends Error {
     message: string,
     public status: number,
     public code?: string,
+    public requestId?: string,
   ) {
     super(message);
   }
@@ -154,7 +155,7 @@ export async function commerceApi<T>(
   if (!response.ok) {
     const words = messages[data.detail] || accountMessages[data.detail];
     if (words)
-      throw new CommerceError(say(words), response.status, data.detail);
+      throw new CommerceError(say(words), response.status, data.detail, response.headers.get('X-Request-ID') || undefined);
     if (response.status === 401 || response.status === 403)
       throw new CommerceError(
         say(copyText.please_sign_in_with_your_administrator_account_e74731),
@@ -173,6 +174,8 @@ export async function commerceApi<T>(
     throw new CommerceError(
       say(copyText.we_could_not_complete_this_please_try_928dc4),
       response.status,
+      typeof data.detail==='string'?data.detail:undefined,
+      response.headers.get('X-Request-ID') || undefined,
     );
   }
   return data as T;

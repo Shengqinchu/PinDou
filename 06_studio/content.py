@@ -37,6 +37,10 @@ def initialize(database, db_path):
             updated_at INTEGER NOT NULL, source TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS studio_import_limits (
             actor TEXT NOT NULL, bucket INTEGER NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(actor,bucket));
+        CREATE TABLE IF NOT EXISTS studio_import_jobs (
+            id TEXT PRIMARY KEY, actor TEXT NOT NULL, share TEXT NOT NULL, status TEXT NOT NULL,
+            completed INTEGER NOT NULL DEFAULT 0, total INTEGER NOT NULL DEFAULT 0,
+            result TEXT, error TEXT, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL);
         ''')
         for name in DEFAULTS:
             db.execute('INSERT OR IGNORE INTO studio_content(name) VALUES(?)',(name,))
@@ -52,6 +56,7 @@ class Strict(BaseModel):
 class Document(Strict):
     version: int=Field(ge=1)
     data: dict
+    publish: bool=False
 
 class Version(Strict):
     version: int=Field(ge=1)
@@ -62,6 +67,59 @@ class ImportRequest(Strict):
 class Translation(Strict):
     title: str=Field(min_length=1,max_length=250)
     body: str=Field(min_length=1,max_length=25000)
+
+def import_note(share,database,actor,progress=lambda done,total:None):
+    note,source=xhs_import.retrieve(share)
+    ident=note['noteId']
+    with database() as db:
+        if db.execute('SELECT 1 FROM studio_journal WHERE id=?',(ident,)).fetchone():raise HTTPException(409,'journal_already_exists')
+    # Journal dates follow the source platform's public day label. Reservation
+    # times are a separate Toronto-time domain; applying them here moved 09-01
+    # source posts to 08-31. Keep the original millisecond timestamp too.
+    day=datetime.fromtimestamp(note['time']/1000,ZoneInfo('Asia/Shanghai')).date().isoformat()
+    if day<=CUTOFF:raise HTTPException(422,'journal_before_cutoff')
+    from concurrent.futures import ThreadPoolExecutor,as_completed
+    def download(photo):return store_image(xhs_import.fetch(xhs_import.photo_url(photo),True)[0],True)
+    photos=[None]*len(note['imageList']);progress(0,len(photos))
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        tasks={pool.submit(download,photo):i for i,photo in enumerate(note['imageList'])}
+        for count,task in enumerate(as_completed(tasks),1):
+            photos[tasks[task]]=task.result();progress(count,len(photos))
+    post=JournalPost(id=ident,title=note['title'],body=note['desc'],date=day,source=source,images=photos,published_at=note['time'],body_sha256=hashlib.sha256(note['desc'].encode()).hexdigest()).model_dump()
+    with database() as db:
+        db.execute('BEGIN IMMEDIATE')
+        if db.execute('SELECT 1 FROM studio_journal WHERE id=?',(ident,)).fetchone():raise HTTPException(409,'journal_already_exists')
+        db.execute('INSERT INTO studio_journal(id,draft,updated_at,source) VALUES(?,?,?,?)',(ident,json.dumps(post,ensure_ascii=False),int(time.time()),source))
+        history(db,'journal:'+ident,1,actor,'import',post)
+    return {'id':ident,'data':post,'version':1,'published':False}
+
+def process_import_job(database):
+    with database() as db:
+        db.execute('BEGIN IMMEDIATE')
+        job=db.execute("SELECT * FROM studio_import_jobs WHERE status='queued' ORDER BY created_at LIMIT 1").fetchone()
+        if not job:return False
+        db.execute("UPDATE studio_import_jobs SET status='running',updated_at=? WHERE id=?",(int(time.time()),job['id']))
+    def progress(done,total):
+        with database() as db:db.execute('UPDATE studio_import_jobs SET completed=?,total=?,updated_at=? WHERE id=?',(done,total,int(time.time()),job['id']))
+    try:
+        result=import_note(job['share'],database,job['actor'],progress)
+        with database() as db:db.execute("UPDATE studio_import_jobs SET status='done',result=?,updated_at=? WHERE id=?",(json.dumps(result,ensure_ascii=False),int(time.time()),job['id']))
+    except Exception as exc:
+        code=exc.detail if isinstance(exc,HTTPException) else 'import_source_unavailable'
+        with database() as db:db.execute("UPDATE studio_import_jobs SET status='failed',error=?,updated_at=? WHERE id=?",(code,int(time.time()),job['id']))
+        import logging
+        logging.getLogger('uvicorn.error').warning('studio_import_failed job=%s code=%s',job['id'],code)
+    return True
+
+async def import_worker(database):
+    import asyncio
+    while True:
+        try:worked=await asyncio.to_thread(process_import_job,database)
+        except Exception:
+            import logging
+            logging.getLogger('uvicorn.error').warning('studio_import_worker_failed')
+            worked=False
+        await asyncio.sleep(.2 if worked else 2)
 
 class JournalPhoto(Strict):
     src: str=Field(max_length=350)
@@ -103,7 +161,7 @@ def validate_document(name,data):
                 raise HTTPException(422,'content_invalid_media')
         elif name=='rate-fields':
             if not isinstance(value,list) or len(value)!=2 or value[0]!=value[1] or not isinstance(value[0],str) or not re.fullmatch(r'\d{1,5}(?:\.\d{1,2})?',value[0]):raise HTTPException(422,'content_invalid_price')
-        elif name=='contact-fields' and key in ('phone_href','social_url','original_post'):
+        elif (name=='contact-fields' and key in ('phone_href','social_url','original_post')) or (name=='components-BeadingProcess' and key=='toolsUrl') or (name=='journal-collection' and key=='url'):
             if not isinstance(value,list) or len(value)!=2 or not all(isinstance(t,str) and len(t)<=2000 for t in value):raise HTTPException(422,'content_invalid_text')
             for link in value:
                 if key=='phone_href':
@@ -133,10 +191,13 @@ def store_image(data,original=False):
     try:
         im=Image.open(io.BytesIO(data)); im.verify()
         im=Image.open(io.BytesIO(data))
-        if im.format not in ('JPEG','PNG','WEBP'): raise ValueError()
+        if im.format not in ('JPEG','PNG','WEBP','AVIF','BMP'):
+            raise HTTPException(422,'image_format_unsupported')
         width,height=im.size
         if width>20000 or height>20000 or width*height>60_000_000: raise ValueError()
         if original:
+            if im.format not in ('JPEG','PNG','WEBP'):
+                raise HTTPException(422,'image_original_format_unsupported')
             extension={'JPEG':'jpg','PNG':'png','WEBP':'webp'}[im.format]
         else:
             im=ImageOps.exif_transpose(im)
@@ -144,7 +205,11 @@ def store_image(data,original=False):
             im.thumbnail((2400,2400),Image.Resampling.LANCZOS)
             width,height=im.size
             output=io.BytesIO();im.save(output,format='WEBP',quality=88,method=4);data=output.getvalue();extension='webp'
-    except (UnidentifiedImageError,ValueError,OSError,Image.DecompressionBombError):
+    except UnidentifiedImageError:
+        if b'ftyphei' in data[:32] or b'ftypmif1' in data[:32]:
+            raise HTTPException(422,'image_heic_unsupported')
+        raise HTTPException(422,'image_invalid')
+    except (ValueError,OSError,Image.DecompressionBombError):
         raise HTTPException(422,'image_invalid')
     digest=hashlib.sha256(data).hexdigest();name=f'{digest}.{extension}'
     path=MEDIA_DIR/name
@@ -221,6 +286,21 @@ def register(app,database,admin_actor):
     def get_document(name:str,_actor=Depends(admin_actor)):
         with database() as db:return document_row(db,name)
 
+    @app.get('/studio-api/manage/content-search')
+    def search_content(q:str='',_actor=Depends(admin_actor)):
+        query=q.strip().casefold()[:120]
+        if len(query)<2:return {'items':[]}
+        found=[]
+        with database() as db:
+            for name in DEFAULTS:
+                if name=='media':continue
+                doc=document_row(db,name)
+                for key,value in doc['data'].items():
+                    if isinstance(value,list) and any(query in str(v).casefold() for v in value):
+                        found.append({'name':name,'key':key,'value':value})
+                        if len(found)>=60:return {'items':found}
+        return {'items':found}
+
     @app.put('/studio-api/manage/content/{name}')
     def save_document(name:str,payload:Document,actor=Depends(admin_actor)):
         data=validate_document(name,payload.data)
@@ -230,6 +310,11 @@ def register(app,database,admin_actor):
             compact={k:v for k,v in data.items() if v!=DEFAULTS[name][k]}
             db.execute('UPDATE studio_content SET draft=?,version=version+1,updated_at=? WHERE name=?',(json.dumps(compact,ensure_ascii=False),int(time.time()),name))
             history(db,name,payload.version+1,actor,'draft',data)
+            if payload.publish:
+                # One transaction: a failed publish cannot strand the client on an
+                # old version after its draft was already committed.
+                db.execute('UPDATE studio_content SET published=draft,published_version=version WHERE name=?',(name,))
+                history(db,name,payload.version+1,actor,'publish',data)
             return document_row(db,name)
 
     @app.post('/studio-api/manage/content/{name}/publish')
@@ -254,7 +339,9 @@ def register(app,database,admin_actor):
         async for chunk in request.stream():
             buffer.extend(chunk)
             if len(buffer)>12*1024*1024:raise HTTPException(413,'image_too_large')
-        return store_image(bytes(buffer),original)
+        from starlette.concurrency import run_in_threadpool
+        # Image decoding and WebP compression must not block the event loop.
+        return await run_in_threadpool(store_image,bytes(buffer),original)
 
     @app.get('/studio-api/media/{name}')
     def image(name:str):
@@ -311,26 +398,31 @@ def register(app,database,admin_actor):
         return {'version':payload.version+1}
 
     @app.post('/studio-api/manage/journal-import')
-    def import_note(payload:ImportRequest,actor=Depends(admin_actor)):
+    def import_shared_note(payload:ImportRequest,actor=Depends(admin_actor)):
         bucket=int(time.time())//3600
         with database() as db:
             db.execute('BEGIN IMMEDIATE')
             row=db.execute('SELECT count FROM studio_import_limits WHERE actor=? AND bucket=?',(actor,bucket)).fetchone()
             if row and row[0]>=20:raise HTTPException(429,'import_rate_limit')
             db.execute('INSERT INTO studio_import_limits VALUES(?,?,1) ON CONFLICT(actor,bucket) DO UPDATE SET count=count+1',(actor,bucket))
-        note,source=xhs_import.retrieve(payload.share)
-        ident=note['noteId']
-        with database() as db:
-            if db.execute('SELECT 1 FROM studio_journal WHERE id=?',(ident,)).fetchone():raise HTTPException(409,'journal_already_exists')
-        day=datetime.fromtimestamp(note['time']/1000,ZoneInfo('America/Toronto')).date().isoformat()
-        if day<=CUTOFF:raise HTTPException(422,'journal_before_cutoff')
-        from concurrent.futures import ThreadPoolExecutor
-        def download(photo):return store_image(xhs_import.fetch(xhs_import.photo_url(photo),True)[0],True)
-        with ThreadPoolExecutor(max_workers=4) as pool:photos=list(pool.map(download,note['imageList']))
-        post=JournalPost(id=ident,title=note['title'],body=note['desc'],date=day,source=source,images=photos,published_at=note['time'],body_sha256=hashlib.sha256(note['desc'].encode()).hexdigest()).model_dump()
+        return import_note(payload.share,database,actor)
+
+    @app.post('/studio-api/manage/journal-import-jobs',status_code=202)
+    def start_import(payload:ImportRequest,actor=Depends(admin_actor)):
+        now=int(time.time())
         with database() as db:
             db.execute('BEGIN IMMEDIATE')
-            if db.execute('SELECT 1 FROM studio_journal WHERE id=?',(ident,)).fetchone():raise HTTPException(409,'journal_already_exists')
-            db.execute('INSERT INTO studio_journal(id,draft,updated_at,source) VALUES(?,?,?,?)',(ident,json.dumps(post,ensure_ascii=False),int(time.time()),source))
-            history(db,'journal:'+ident,1,actor,'import',post)
-        return {'id':ident,'data':post,'version':1,'published':False}
+            count=db.execute('SELECT count(*) FROM studio_import_jobs WHERE actor=? AND created_at>?',(actor,now-3600)).fetchone()[0]
+            if count>=20:raise HTTPException(429,'import_rate_limit')
+            if db.execute("SELECT count(*) FROM studio_import_jobs WHERE status IN ('queued','running')").fetchone()[0]>=5:
+                raise HTTPException(429,'import_queue_full')
+            ident=uuid.uuid4().hex
+            db.execute('INSERT INTO studio_import_jobs(id,actor,share,status,created_at,updated_at) VALUES(?,?,?,?,?,?)',(ident,actor,payload.share,'queued',now,now))
+            db.execute("DELETE FROM studio_import_jobs WHERE created_at<? AND status IN ('done','failed')",(now-30*86400,))
+        return {'id':ident,'status':'queued','completed':0,'total':0}
+
+    @app.get('/studio-api/manage/journal-import-jobs/{ident}')
+    def import_status(ident:str,actor=Depends(admin_actor)):
+        with database() as db:job=db.execute('SELECT * FROM studio_import_jobs WHERE id=? AND actor=?',(ident,actor)).fetchone()
+        if not job:raise HTTPException(404,'import_job_not_found')
+        return {'id':job['id'],'status':job['status'],'completed':job['completed'],'total':job['total'],'error':job['error'],'result':json.loads(job['result']) if job['result'] else None}

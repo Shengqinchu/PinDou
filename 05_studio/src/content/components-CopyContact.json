@@ -1,0 +1,5 @@
+{
+  "copy": ["点击复制微信号", "Copy WeChat ID"],
+  "copied": ["微信号已复制", "WeChat ID copied"],
+  "manual": ["请选中号码复制，或长按复制", "Select the ID to copy, or touch and hold"]
+}

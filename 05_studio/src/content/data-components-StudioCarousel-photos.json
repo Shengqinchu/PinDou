@@ -5,29 +5,9 @@
     "en": "Step into the studio"
   },
   {
-    "image": "space-02",
-    "zh": "小狗作品墙",
-    "en": "The puppy art wall"
-  },
-  {
-    "image": "space-03",
-    "zh": "拼豆作品展示",
-    "en": "Beadwork on display"
-  },
-  {
-    "image": "space-04",
-    "zh": "靠墙的工作桌",
-    "en": "A worktable by the wall"
-  },
-  {
     "image": "space-05",
     "zh": "阳光下的拼豆座位",
     "en": "Sunlit beadwork seats"
-  },
-  {
-    "image": "space-06",
-    "zh": "甜点与小狗作品",
-    "en": "Treats and puppies in beads"
   },
   {
     "image": "space-07",
@@ -35,9 +15,24 @@
     "en": "Colours and tools"
   },
   {
+    "image": "space-04",
+    "zh": "靠墙的工作桌",
+    "en": "A worktable by the wall"
+  },
+  {
     "image": "space-08",
     "zh": "准备好开始拼豆",
     "en": "Ready to start creating"
+  },
+  {
+    "image": "space-02",
+    "zh": "小狗作品墙",
+    "en": "The puppy art wall"
+  },
+  {
+    "image": "space-06",
+    "zh": "甜点与小狗作品",
+    "en": "Treats and puppies in beads"
   },
   {
     "image": "space-09",
@@ -45,14 +40,19 @@
     "en": "The display by the window"
   },
   {
+    "image": "space-11",
+    "zh": "配件与装饰",
+    "en": "Findings and decorations"
+  },
+  {
     "image": "space-10",
     "zh": "收纳角落",
     "en": "The storage corner"
   },
   {
-    "image": "space-11",
-    "zh": "配件与装饰",
-    "en": "Findings and decorations"
+    "image": "space-03",
+    "zh": "拼豆作品展示",
+    "en": "Beadwork on display"
   },
   {
     "image": "space-12",

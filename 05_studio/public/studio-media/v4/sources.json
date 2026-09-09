@@ -1,0 +1,61 @@
+{
+  "pdf_sha256": "f1723a81c06a21fd1f2fd3ee721a0a726fcbbe51f1ebf3da29fc0e373bbd6b1d",
+  "images": [
+    {
+      "name": "pattern",
+      "pdf_xref": 12,
+      "source_sha256": "0a1f7008b11953051bd35d25ac7ad71f01c934a2df224c5eda6fe165f05fbe0b",
+      "web_sha256": "459a401bc23e750103701d2e0f3bcf3ba22e505838f2d0cf20e7c701a484c831",
+      "width": 1400,
+      "height": 1474
+    },
+    {
+      "name": "tools",
+      "pdf_xref": 17,
+      "source_sha256": "419619c47613b92d1aa3a98602116561e660b1f1dd56c9d173c9dd9d4a863a78",
+      "web_sha256": "a98fde3f587b8bf18e90da4985f46068bf9e73fa14280a19ab5872a178a0ca2c",
+      "width": 1200,
+      "height": 1600
+    },
+    {
+      "name": "making",
+      "pdf_xref": 24,
+      "source_sha256": "12810bfbd1bb928c67d4a63ff2a168e61853b1acc730f509069748a13e7f0bb0",
+      "web_sha256": "708130ff754837f82736e530a4c1ee7b955d14454b2674149850903824e73a86",
+      "width": 1200,
+      "height": 1600
+    },
+    {
+      "name": "ironing",
+      "pdf_xref": 28,
+      "source_sha256": "d8be95cb91dec87cee702bf8c5445eb9fd3bc335be6eebdf92d767f22bbbf25c",
+      "web_sha256": "94f5dc379b510a6eed35c089b656d30439400d10d1ee0714e5ba03f9144128d3",
+      "width": 1200,
+      "height": 1600
+    },
+    {
+      "name": "findings",
+      "pdf_xref": 29,
+      "source_sha256": "ba07eccbac9a31e9bcdedc51f0cd7884916a6fcd36e86524b90f1213c706d12f",
+      "web_sha256": "cfa7ddc068570f1e07fad57399ac04f111a9abcf6f0009a3385fbf47be1a0739",
+      "width": 1088,
+      "height": 1450
+    },
+    {
+      "name": "finishes",
+      "pdf_xref": 33,
+      "source_sha256": "a272feee796f2c9ad02c53696503bfdc3a049a83bc9e08e2a12396575de3a20e",
+      "web_sha256": "749f03bb3afea1acdbd93450d7905189d587159aa702732dfc4f2c9d96986b04",
+      "width": 1400,
+      "height": 788
+    },
+    {
+      "name": "packaging",
+      "pdf_xref": 34,
+      "source_sha256": "f62c15c83841b60cc132f3af24afb8b133c50942eab983de7914f408572087d9",
+      "web_sha256": "2ce9c4dab77bb62a59b3d5b3c4713ba189b9be39bff2f4d61dc0379214b55cc8",
+      "width": 1200,
+      "height": 1600
+    }
+  ]
+}
