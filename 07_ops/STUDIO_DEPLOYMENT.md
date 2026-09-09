@@ -1,5 +1,8 @@
 # 当前发布：Studio V4
 
+> 当前版本：**20260909041406-studio-v5**（build `2026-09-09T04:12:18.912Z`）。顾客时长钱包、积分明细、实际到店记录、预约删除恢复及 V5 首页布局已发布。备份和完整验证见 [STUDIO_V5_VERIFICATION.md](STUDIO_V5_VERIFICATION.md)。以下较早版本记录保留供追溯。
+
+
 `20260909023204-studio-v4`（build `2026-09-09T02:29:23.933Z`）。轮播受控滑动、菜单动效选择、全天时间模板和后台预览连接修正已上线。当前发布／回滚／公网验收见 [STUDIO_EDITOR_MOTION_FIX_VERIFICATION.md](STUDIO_EDITOR_MOTION_FIX_VERIFICATION.md)。297个发布文件校验通过，原生成器及店主最新经营数据保留。下文较早发布与架构说明作为历史记录。
 
 > 最新发布：`20260908224009-studio-v3`，复用图纸工具邮箱账号、提交预约需登录；验证记录见 `STUDIO_ACCOUNT_VERIFICATION.md`。CAD 单位统一保留，历史记录见 `STUDIO_CAD_UNITS_VERIFICATION.md`。

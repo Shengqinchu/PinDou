@@ -24,7 +24,17 @@ Source and checklist: `02_product/STUDIO_VISION5_PROGRESS.md` (owner account PDF
 
 ## Release
 
-Pending final packaging and live verification. The publication will back up the current shared database and preserve owner overrides, current reservations, journal posts and business policy. Shared generator code is not included.
+Published **20260909041406-studio-v5**, build **2026-09-09T04:12:18.912Z**, implementation commit **daa3760** (pushed to GitHub).
+
+- Archive SHA256: `4fdd74d7d7098dd7586543204a7fae756a938d53f2cd41a879767d62de7c9be2`; **298** files verified both against local source and on the production origin. No test server, fixture, credential file or generator code is packaged.
+- Database/Nginx/service backup: `/opt/pindou/studio/backups/20260909041406-studio-v5`. All pre-existing `studio_content`, `studio_journal`, `reservation_policy` and `studio_reservations` fields compared equal to the deployment backup.52 content modules,11 diary posts; new wallet ledger initially0 entries (no fabricated credits).
+- Public build JSON equals the local build; homepage shows the actual live latest3 dates **2026-09-09,2026-09-01,2026-08-29**, not the older default collection. Their3 covers and all7 process images load.
+- Public homepage, visit, details and manage routes respond successfully. Wallet and members endpoints reject anonymous reads with401.390/768/1440/2560 public widths have no horizontal overflow; anonymous email login opens; no browser JavaScript errors.
+- Codex in-app browser also opened the production homepage and confirmed the three live article links. No financial test transaction was submitted to production.
+- Both `pindou` and `pindou-studio` services active. Original generator HTML SHA256 remains `506f9bd2f9f0c37c52f08924f1504286816b93bff3198aea9f1790d0eceb36aa`.
+- Final added controls: homepage card hover sampled at−2.95px mid-transition and−5px settled; points-tab tap uses the shared press animation; opening a guest wallet from a booking pre-fills its reference.
+- Operational health endpoint retains its existing0.7.0 API compatibility label; the release/build above identifies this V5 deployment.
+- Rollback switches the Studio release symlink/service only; retain the shared database and new ledgers. Do not replace the live DB with an old backup after customers have accumulated new entries.
 
 ## Host workflow
 
