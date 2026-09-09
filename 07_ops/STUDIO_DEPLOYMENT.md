@@ -1,3 +1,7 @@
+# 当前发布：Studio V4
+
+`20260909003439-studio-v4`（build `2026-09-09T00:29:19.126Z`）。完整发布／回滚／验收记录见 [STUDIO_VISION4_VERIFICATION.md](STUDIO_VISION4_VERIFICATION.md)。原生成器继续保留，店主已发布覆盖未重置。
+
 > 最新发布：`20260908224009-studio-v3`，复用图纸工具邮箱账号、提交预约需登录；验证记录见 `STUDIO_ACCOUNT_VERIFICATION.md`。CAD 单位统一保留，历史记录见 `STUDIO_CAD_UNITS_VERIFICATION.md`。
 
 > VISION3 已上线：品牌网站现位于主域名 `/`，常用路径 `/visit`、`/details`、`/journal`、`/shop`、`/manage`。`/studio/*` 为兼容入口；原生成器保留 `/upload`、`/tutorial` 与其原API。当前配置/验证以 `STUDIO_VISION3_VERIFICATION.md` 为准，下文旧预览/交易说明保留历史。后台新增内容发布、日记导入/英文生成、原图管理与封闭时段。源站原生成器Python路径为 `/opt/pindou/current/06_backend/.venv/bin/python`。
