@@ -1,5 +1,5 @@
 {
-  "source": "2026-09-09-native-generator-166-timetable",
+  "source": "2026-09-09-owner-registration-166-menu-notes",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -66,7 +66,7 @@
     "reservation-timetable.json": "2489a12c109a6a7890834006a26d0c4beb7a247a965a6e6cb82e095d5c184800",
     "state.json": "c4eeb599810219fc6102c20f5c7c3a265a0d592a3cefd9351d88734552a2650f",
     "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3",
-    "wallet.json": "4d30b5593d29d2741ea0dc59e5877ad16d2f1fa907d6dbfaf59a6adfdad6f23e",
+    "wallet.json": "b51553b78c0f164bcb99288b7c19d939e95ab8dde41c41a3c0d64d73259b3002",
     "wechat.json": "37d27979e3bb40246494c1980b9e71bb5bdef6f8e66621ed918a20d51291dc9f"
   }
 }

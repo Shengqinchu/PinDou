@@ -13,10 +13,18 @@ for label,path in [('studio','/opt/pindou/studio/shared/studio.sqlite3'),('gener
  names=[x[0] for x in db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")]
  tables={}
  for name in names:
-  if any(word in name for word in ('account','user','artwork','wallet','credit','membership','reservation','identit','binding','claim','policy','journal')) and not any(word in name for word in ('log','limit','job')):
+  if any(word in name for word in ('account','user','artwork','wallet','credit','member','reservation','identit','binding','claim','policy','journal')) and not any(word in name for word in ('log','limit','job')):
    rows=db.execute('SELECT * FROM "'+name.replace('"','""')+'" ORDER BY rowid').fetchall()
    tables[name]={'rows':len(rows),'sha256':hashlib.sha256(json.dumps(rows,ensure_ascii=False,default=str,separators=(',',':')).encode()).hexdigest()}
  if label=='studio':
+  def fingerprint(rows):return hashlib.sha256(json.dumps(rows,ensure_ascii=False,default=str,separators=(',',':')).encode()).hexdigest()
+  protected={}
+  for row in db.execute('SELECT owner_id,name,email,minutes,staff_note,created_at FROM studio_members ORDER BY owner_id'):
+   protected[hashlib.sha256(row[0].encode()).hexdigest()]=fingerprint(row)
+  columns=[row[1] for row in db.execute('PRAGMA table_info(studio_wallet_ledger)') if row[1] not in ('redemption_use','no_promotion')]
+  old_entries=db.execute('SELECT '+','.join('"'+c+'"' for c in columns)+" FROM studio_wallet_ledger WHERE kind!='registration_reward' ORDER BY rowid").fetchall()
+  rewards=db.execute("SELECT count(*),coalesce(sum(points_delta),0) FROM studio_wallet_ledger WHERE kind='registration_reward'").fetchone()
+  result['studio_preservation']={'existing_member_time_notes_identity':protected,'non_registration_ledger':{'rows':len(old_entries),'sha256':fingerprint(old_entries)},'registration_rewards':{'rows':rewards[0],'points':rewards[1]}}
   row=db.execute("SELECT published,draft,version,published_version FROM studio_content WHERE name='wallet'").fetchone()
   result['wallet_copy']={key:{k:v for k,v in json.loads(row[index]).items() if k in ('earn_rule','attendance_help')} for index,key in enumerate(('published','draft'))}
   result['wallet_copy']['version']=row[2];result['wallet_copy']['published_version']=row[3]

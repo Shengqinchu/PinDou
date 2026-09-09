@@ -1936,9 +1936,9 @@
 | point_count | {v0} 积分 | {v0} points |
 | redeemable | 可抵扣 CAD {v0} | Redeemable: CAD {v0} |
 | rules | 100 积分抵扣 CAD 1，每次按整数 CAD 使用，剩余积分保留。 | 100 points = CAD 1. Redeem in whole CAD amounts; unused points stay in your account. |
-| earn_rule | 每次通过网站预约并实际到店，店主完成到店记录后赠送 166 积分。额外赠送会单独记录。 | Earn 166 points for each website booking you attend, once the host completes the visit record. Extra gifts are recorded separately. |
+| earn_rule | 注册账号即可获得166积分；每次通过网站预约并到店游玩可获得166 积分。 | Receive 166 points when you register an account, and 166 points each time you book through the website and attend a beading session. |
 | time_rule | 储值、赠送与实际扣时由店主核实后记录。预约不会自动扣除钱包时长。 | The host records verified top-ups, gifts and time used. Making a booking does not deduct wallet time. |
-| redeem_rule | 积分在到店结算时由店主确认抵扣。 | The host confirms point redemption when you settle your visit. |
+| redeem_rule | 积分在到店结算时由店主确认抵扣，也可在拼豆小店购物使用。 | The host confirms redemption when you settle your visit. Points can also be used for purchases in the Little shop. |
 | empty | 还没有明细，店主记账后会显示在这里。 | No entries yet. Records will appear after the host saves them. |
 | loading | 正在读取账户… | Loading your wallet… |
 | refresh | 刷新记录 | Refresh records |
@@ -1956,7 +1956,7 @@
 | public_note | 给顾客的备注 | Note for the guest |
 | members | 顾客账户 | Guest accounts |
 | members_intro | 记录储值时长、到店消费与积分，每一笔都有明细。 | Record prepaid time, visits and points with an entry for every change. |
-| search | 搜索姓名、邮箱或账号编号 | Search name, email or account ID |
+| search | 搜索姓名、邮箱、账号或备注 | Search name, email, account ID or host note |
 | no_members | 还没有找到顾客账户。 | No guest accounts found. |
 | register_first | 请让顾客先用邮箱登录网站一次。老用户已有的时长可在账户中录入，不会按联系邮箱自动认领。 | Ask the guest to sign in to the website with email first. You can then record their existing time balance on that account. |
 | transaction | 登记一笔 | Record an entry |
@@ -2012,6 +2012,14 @@
 | wallet_actual_details_required | 请同时填写实际游玩分钟和人数。 | Enter both the actual minutes and number of guests. |
 | wallet_completed_record_locked | 这次到店已赠分。可更正实际时长；误记到店请先在顾客账户撤销赠分，再改状态。 | Points were awarded for this visit. You can correct its duration. To undo attendance, reverse the reward in the guest account before changing the status. |
 | reservation_cancel_before_delete | 请先取消已确认的预约，再删除。 | Cancel this confirmed booking before deleting it. |
+| promotion_rule | 积分和优惠活动不可同时使用。 | Points cannot be combined with promotional offers. |
+| registration_reward | 注册赠分 | Registration reward |
+| redemption_use | 抵扣用途 | Redemption use |
+| redeem_visit | 到店游玩 | Studio visit |
+| redeem_shop | 小店购物 | Little shop purchase |
+| no_promotion | 确认本单未使用其他优惠活动 | I confirm this bill does not use another promotional offer |
+| wallet_promotion_confirmation_required | 积分和优惠活动不可同时使用，请确认本单未使用其他优惠。 | Points cannot be combined with promotional offers. Confirm that this bill has no other offer. |
+| wallet_redemption_use_required | 请选择到店游玩或小店购物。 | Choose a studio visit or Little shop purchase. |
 
 ## wechat.json
 

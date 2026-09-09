@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed,onBeforeUnmount,ref,watch } from 'vue';
 import { PhPencilSimple,PhUserCircle } from '@phosphor-icons/vue';
-import { accountCopy,accountUser } from '../account';
+import { RouterLink } from 'vue-router';
+import { accountCopy,accountUser,closeAccount } from '../account';
 import { customerToken } from '../account-storage';
 import { profileCopy as copy,normalizeNickname,imageError,saveProfilePart } from '../profile';
 import { say } from '../state';
@@ -9,7 +10,7 @@ import { notify } from '../ui';
 import SlideOver from './SlideOver.vue';
 import InfoTip from './InfoTip.vue';
 import WechatSignIn from './WechatSignIn.vue';
-defineProps<{emailOnly?:boolean}>();
+defineProps<{emailOnly?:boolean;linkToCenter?:boolean}>();
 const editing=ref(false),busy=ref(false),nickname=ref(''),error=ref(''),file=ref<File>(),preview=ref(''),failed=ref(false);
 const input=ref<HTMLInputElement>(),owner=ref(''),token=ref(''),original=ref('');
 const name=computed(()=>normalizeNickname(nickname.value));
@@ -50,9 +51,8 @@ onBeforeUnmount(releasePreview);
 </script>
 <template>
   <div v-if="accountUser" class="account-identity">
-    <img v-if="accountUser.avatar&&!failed" class="account-portrait" :src="accountUser.avatar" alt="" referrerpolicy="no-referrer" @error="failed=true"/>
-    <PhUserCircle v-else class="account-portrait" :size="56" weight="light"/>
-    <div class="account-identity-text"><strong>{{accountUser.nickname||accountUser.email}}</strong><WechatSignIn v-if="!emailOnly" :key="accountUser.id" linking compact/><p v-else>{{accountUser.email}}</p></div>
+    <component :is="linkToCenter?RouterLink:'span'" class="account-avatar-link" v-bind="linkToCenter?{to:'/account','aria-label':say(accountCopy.account_center)}:{}" @click="linkToCenter&&closeAccount()"><img v-if="accountUser.avatar&&!failed" class="account-portrait" :src="accountUser.avatar" alt="" referrerpolicy="no-referrer" @error="failed=true"/><PhUserCircle v-else class="account-portrait" :size="56" weight="light"/></component>
+    <div class="account-identity-text"><component :is="linkToCenter?RouterLink:'span'" class="account-name-link" v-bind="linkToCenter?{to:'/account'}:{}" @click="linkToCenter&&closeAccount()"><strong>{{accountUser.nickname||accountUser.email}}</strong></component><WechatSignIn v-if="!emailOnly" :key="accountUser.id" linking compact/><p v-else>{{accountUser.email}}</p></div>
     <button v-if="!emailOnly" type="button" class="account-edit" @click="openEditor"><PhPencilSimple :size="18"/><span>{{say(copy.edit)}}</span></button>
   </div>
   <SlideOver v-if="!emailOnly" :model-value="editing" :title="say(copy.edit)" :busy="busy" @update:model-value="closeEditor">

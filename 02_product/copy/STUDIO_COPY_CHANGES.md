@@ -135,3 +135,11 @@
 - Generator parameter help now reflects the verified production service: 20–200 cells per side, aspect ratio 0.5–2; fixes existing misleading 1-cell wording. Tutorial imagery is recaptured in both languages from the native UI using an offline Standard pattern.
 
 - Upload errors now explain unsupported HEIC conversion and the 12 MB request boundary before submission; removed the unimplemented automatic-compression promise. Tool prices explicitly retain CNY denomination.
+
+## 2026-09-09 店主积分与账户截图补充
+
+- 积分提示按本条消息原文：注册赠166，到店游玩赠166，可用于小店购物，积分与优惠活动不可同时使用。可抵扣CAD金额继续按实际余额计算。
+- 已明确答复：已有账号也补发一次，新账号注册时自动发放。发放通过唯一账号流水去重。
+- 删除抽屉底部“账号中心”链接；头像和昵称直接进入账号中心。菜单05详细信息、06生成器，移除店主管理和动效设置区域。
+- 后台顾客列表直接显示私密备注，并支持备注搜索；只在管理员接口返回，不向顾客公开。
+- 小店尚未上线交易，购物抵扣通过店主核实后的钱包登记执行；这次不启用在线购买。

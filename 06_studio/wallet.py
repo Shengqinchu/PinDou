@@ -20,6 +20,7 @@ from customer_auth import require_customer
 _database = None
 POINTS_PER_CAD = 100
 VISIT_REWARD = 166
+REGISTRATION_REWARD = 166
 ZONE = ZoneInfo("America/Toronto")
 
 
@@ -52,6 +53,11 @@ def initialize(database):
         CREATE TRIGGER IF NOT EXISTS studio_ledger_immutable_delete BEFORE DELETE ON studio_wallet_ledger
         BEGIN SELECT RAISE(ABORT, 'wallet ledger is append-only'); END;
         """)
+        columns={row[1] for row in db.execute('PRAGMA table_info(studio_wallet_ledger)')}
+        if 'redemption_use' not in columns:
+            db.execute("ALTER TABLE studio_wallet_ledger ADD COLUMN redemption_use TEXT NOT NULL DEFAULT ''")
+        if 'no_promotion' not in columns:
+            db.execute('ALTER TABLE studio_wallet_ledger ADD COLUMN no_promotion INTEGER')
         # Existing stable user IDs only. Contact details are not identity proofs.
         db.execute("""INSERT OR IGNORE INTO studio_members(owner_id,name,created_at,updated_at)
           SELECT owner_id, coalesce(json_extract(payload,'$.name'),owner_id),min(created_at),max(updated_at)
@@ -70,6 +76,7 @@ def remember_customer(customer):
                        (customer['id'], name, customer['email'], now(), now()))
         elif existing['email'] != customer['email'] or existing['name'] != name:
             db.execute("UPDATE studio_members SET name=?,email=? WHERE owner_id=?", (name, customer['email'], customer['id']))
+        reward_registration(db,customer['id'])
 
 
 def member(db, owner_id):
@@ -82,7 +89,7 @@ def member(db, owner_id):
 def public_member(row):
     return {k: row[k] for k in ('owner_id', 'name', 'email', 'minutes', 'points', 'version', 'updated_at')} | {
         'redeemable_cad': row['points'] // POINTS_PER_CAD, 'points_per_cad': POINTS_PER_CAD,
-        'visit_reward': VISIT_REWARD,
+        'visit_reward': VISIT_REWARD, 'registration_reward': REGISTRATION_REWARD,
     }
 
 
@@ -95,7 +102,7 @@ def detail(db, owner_id, page=1, category='all', admin=False):
     entries = []
     for row in rows:
         entry = {k: row[k] for k in ('id','created_at','effective_date','kind','minutes_delta','points_delta',
-                 'minutes_balance','points_balance','note','reservation_id','bill_cents','reverses_id','reversed_by')}
+                 'minutes_balance','points_balance','note','reservation_id','bill_cents','reverses_id','reversed_by','redemption_use','no_promotion')}
         if admin: entry['actor'] = row['actor']
         entries.append(entry)
     return {'account': (account | public_member(account)) if admin else public_member(account),
@@ -107,7 +114,7 @@ def fingerprint(value):
 
 
 def append(db, owner_id, *, kind, minutes, points, note, actor, key, digest,
-           effective_date=None, reservation_id='', bill_cents=None, reverses_id=None):
+           effective_date=None, reservation_id='', bill_cents=None, reverses_id=None,redemption_use='',no_promotion=None):
     account = member(db, owner_id)
     remaining_minutes, remaining_points = account['minutes']+minutes, account['points']+points
     if min(remaining_minutes, remaining_points) < 0:
@@ -117,12 +124,21 @@ def append(db, owner_id, *, kind, minutes, points, note, actor, key, digest,
     stamp = now()
     cursor = db.execute("""INSERT INTO studio_wallet_ledger(owner_id,created_at,effective_date,actor,kind,
         minutes_delta,points_delta,minutes_balance,points_balance,note,reservation_id,bill_cents,
-        idempotency_key,request_hash,reverses_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        idempotency_key,request_hash,reverses_id,redemption_use,no_promotion) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
         (owner_id,stamp,str(effective_date or stamp[:10]),actor,kind,minutes,points,remaining_minutes,
-         remaining_points,note,reservation_id,bill_cents,key,digest,reverses_id))
+         remaining_points,note,reservation_id,bill_cents,key,digest,reverses_id,redemption_use,no_promotion))
     db.execute('UPDATE studio_members SET minutes=?,points=?,version=version+1,updated_at=? WHERE owner_id=?',
                (remaining_minutes,remaining_points,stamp,owner_id))
     return cursor.lastrowid
+
+
+def reward_registration(db,owner_id):
+    """One system entry per verified shared account, including an authorized backfill."""
+    key='registration-reward:'+owner_id
+    if db.execute('SELECT 1 FROM studio_wallet_ledger WHERE idempotency_key=?',(key,)).fetchone():return False
+    append(db,owner_id,kind='registration_reward',minutes=0,points=REGISTRATION_REWARD,note='',
+           actor='system:registration',key=key,digest=fingerprint({'owner_id':owner_id,'registration_points':REGISTRATION_REWARD}))
+    return True
 
 
 def reward_visit(db, row, actor):
@@ -156,6 +172,8 @@ class Transaction(Strict):
     effective_date: date
     reservation_id: str = Field(default='', max_length=64)
     bill_cents: int | None = Field(default=None, ge=100, le=100000000, strict=True)
+    redemption_use: Literal['visit','shop'] | None = None
+    no_promotion: bool | None = Field(default=None,strict=True)
 
     @model_validator(mode='after')
     def amounts(self):
@@ -168,7 +186,8 @@ class Transaction(Strict):
         if self.kind=='redeem':
             if m or p>=0 or p%POINTS_PER_CAD or self.bill_cents is None or -p>self.bill_cents:
                 raise ValueError('Redeem whole CAD within the verified bill amount')
-        elif self.bill_cents is not None: raise ValueError('Bill amount is for redemption only')
+        elif self.bill_cents is not None or self.redemption_use is not None or self.no_promotion is not None:
+            raise ValueError('Redemption details are for redemption only')
         return self
 
 
@@ -208,12 +227,12 @@ def register(app, database, admin_actor):
     @app.get('/studio-api/manage/members')
     def members(search:str='',page:int=1,_actor=Depends(admin_actor)):
         if len(search)>160 or not 1<=page<=100000: raise HTTPException(422,'invalid_filter')
-        where=' WHERE instr(lower(name),lower(?))>0 OR instr(lower(email),lower(?))>0 OR instr(owner_id,?)>0'
-        params=(search,search,search)
+        where=' WHERE instr(lower(name),lower(?))>0 OR instr(lower(email),lower(?))>0 OR instr(owner_id,?)>0 OR instr(lower(staff_note),lower(?))>0'
+        params=(search,search,search,search)
         with database() as db:
             total=db.execute('SELECT count(*) FROM studio_members'+where,params).fetchone()[0]
             rows=db.execute('SELECT * FROM studio_members'+where+' ORDER BY updated_at DESC,owner_id LIMIT 30 OFFSET ?',(*params,(page-1)*30)).fetchall()
-            return {'items':[public_member(dict(r)) for r in rows],'total':total,'page':page}
+            return {'items':[public_member(dict(r))|{'staff_note':r['staff_note']} for r in rows],'total':total,'page':page}
 
     @app.get('/studio-api/manage/members/{owner_id}')
     def get_member(owner_id:str,page:int=1,category:Literal['all','time','points']='all',_actor=Depends(admin_actor)):
@@ -238,13 +257,20 @@ def register(app, database, admin_actor):
     @app.post('/studio-api/manage/members/{owner_id}/transactions')
     def transaction(owner_id:str,payload:Transaction,idempotency_key:Annotated[str,Header()],actor=Depends(admin_actor)):
         validate_key(idempotency_key)
-        digest=fingerprint(payload.model_dump() | {'owner_id':owner_id})
+        data=payload.model_dump()
+        # Keep successful pre-policy retries compatible with their original hash.
+        for field in ('redemption_use','no_promotion'):
+            if data[field] is None:data.pop(field)
+        digest=fingerprint(data | {'owner_id':owner_id})
         with database() as db:
             db.execute('BEGIN IMMEDIATE')
             if repeated(db,idempotency_key,owner_id,digest): return detail(db,owner_id,admin=True)
+            if payload.kind=='redeem':
+                if payload.redemption_use is None:raise HTTPException(422,'wallet_redemption_use_required')
+                if payload.no_promotion is not True:raise HTTPException(422,'wallet_promotion_confirmation_required')
             account=member(db,owner_id)
             if account['version']!=payload.version: raise HTTPException(409,'version_conflict')
-            if payload.kind=='opening' and db.execute('SELECT 1 FROM studio_wallet_ledger WHERE owner_id=? LIMIT 1',(owner_id,)).fetchone():
+            if payload.kind=='opening' and db.execute("SELECT 1 FROM studio_wallet_ledger WHERE owner_id=? AND kind!='registration_reward' LIMIT 1",(owner_id,)).fetchone():
                 raise HTTPException(409,'wallet_opening_exists')
             if payload.reservation_id:
                 row=db.execute('SELECT owner_id,status,deleted_at FROM studio_reservations WHERE id=?',(payload.reservation_id,)).fetchone()
@@ -254,7 +280,8 @@ def register(app, database, admin_actor):
                     raise HTTPException(409,'wallet_reservation_incomplete')
             append(db,owner_id,kind=payload.kind,minutes=payload.minutes_delta,points=payload.points_delta,
                    note=payload.note,actor=actor,key=idempotency_key,digest=digest,
-                   effective_date=payload.effective_date,reservation_id=payload.reservation_id,bill_cents=payload.bill_cents)
+                   effective_date=payload.effective_date,reservation_id=payload.reservation_id,bill_cents=payload.bill_cents,
+                   redemption_use=payload.redemption_use or '',no_promotion=payload.no_promotion)
             return detail(db,owner_id,admin=True)
 
     @app.post('/studio-api/manage/members/{owner_id}/entries/{entry_id}/reverse')

@@ -69,3 +69,6 @@
   .vision-header .puppy-brandmark { width: 100%; }
   .vision-header-actions { flex-shrink: 0; }
 }
+
+.account-avatar-link{display:inline-flex;flex-shrink:0;border-radius:50%;}.account-name-link{display:inline-block;max-width:100%;}.account-identity a:focus-visible{outline:2px solid var(--ink);outline-offset:4px;}
+@media(hover:hover) and (pointer:fine){a.account-name-link:hover{text-decoration:underline;text-underline-offset:4px;}}

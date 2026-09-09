@@ -1,4 +1,6 @@
-# 当前发布：Studio V4
+# 当前发布：Studio V7
+
+> 2026-09-09 当前发布：**20260909203119-studio-v7**（build `2026-09-09T20:26:18.455Z`）。共享账号注册赠送 166 积分、5 个老账号一次性补发完成；账户抽屉入口与菜单简化，店主列表直接显示私密备注，游玩／购物抵扣需确认没有其他优惠。351 个发布文件核验通过。详见 [STUDIO_REGISTRATION_MENU_VERIFICATION.md](STUDIO_REGISTRATION_MENU_VERIFICATION.md)。主站已内嵌中英双语生成器；下文较早版本描述保留为历史记录。
 
 > 当前版本：**20260909041406-studio-v5**（build `2026-09-09T04:12:18.912Z`）。顾客时长钱包、积分明细、实际到店记录、预约删除恢复及 V5 首页布局已发布。备份和完整验证见 [STUDIO_V5_VERIFICATION.md](STUDIO_V5_VERIFICATION.md)。以下较早版本记录保留供追溯。
 

@@ -25,7 +25,6 @@ import SlideOver from "./components/SlideOver.vue";
 import ReleaseNotice from "./components/ReleaseNotice.vue";
 import BrandMark from "./components/BrandMark.vue";
 import FooterBrand from "./components/FooterBrand.vue";
-import MotionSettings from "./components/MotionSettings.vue";
 import BrandMotif from "./components/BrandMotif.vue";
 import BrandIcon from "./components/BrandIcon.vue";
 import { accountCopy,accountOpen,accountUser,openAccount,closeAccount,installAccount } from "./account";
@@ -50,6 +49,7 @@ const navigation = computed(() => [
   { path: "/journal", label: say(copyText.studio_journal_7b860e) },
   { path: "/tools", label: say(copyText.pattern_maker_7db57b), document:false },
 ]);
+const menuNavigation=computed(()=>[...navigation.value.slice(0,4),{path:'/details',label:say(copyText.studio_details_7c4089),document:false},navigation.value[4]]);
 onBeforeUnmount(() => arrival?.kill());
 watch(
   () => route.fullPath,
@@ -120,7 +120,7 @@ watch(
     <nav class="vision-menu" :aria-label="say(copyText.site_navigation_d091f4)">
       <component
         :is="item.document?'a':RouterLink"
-        v-for="(item, index) in navigation"
+        v-for="(item, index) in menuNavigation"
         :key="item.path"
         v-bind="item.document?{href:item.path}:{to:item.path}"
         @click="menu = false"
@@ -131,16 +131,7 @@ watch(
         ><span>{{ item.label }}</span
         ><PhArrowRight :size="20" />
       </component>
-      <RouterLink to="/details" @click="menu = false"
-        >{{ say(copyText.studio_details_7c4089) }}<PhArrowUpRight :size="20"
-      /></RouterLink>
     </nav>
-    <div class="vision-menu-extra">
-      <RouterLink to="/manage" @click="menu = false"
-        >{{ say(copyText.studio_desk_4f230e) }}<PhArrowRight
-      /></RouterLink>
-    </div>
-    <MotionSettings />
   </SlideOver>
   <AccountPanel v-if="accountMounted" />
   <main

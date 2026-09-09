@@ -50,9 +50,8 @@ async function login(){
   <component :is="props.embedded?'section':SlideOver" :model-value="props.embedded||accountOpen" @update:model-value="(value:boolean)=>{if(!value)closeAccount()}" :busy="working"
     :title="say(accountUser?copy.account:accountForReservation?copy.reservation_title:copy.title)">
     <section v-if="accountUser" class="account-content">
-      <AccountIdentity :key="accountUser.id" :email-only="emailOnly"/>
+      <AccountIdentity :key="accountUser.id" :email-only="emailOnly" :link-to-center="!embedded&&!emailOnly"/>
       <CustomerWallet v-if="!emailOnly&&(accountOpen||embedded)" :key="accountUser.id"/>
-      <RouterLink v-if="!embedded&&!emailOnly" class="text-link" to="/account" @click="closeAccount">{{ say(copy.account_center) }}</RouterLink>
       <button type="button" class="text-link account-signout" @click="signOut">{{ say(copy.sign_out) }}</button>
     </section>
     <div v-else class="account-content">
