@@ -22,6 +22,8 @@
 
 ## 发布
 
-候选发布 `20260909152214-studio-v6`。Studio包311文件，SHA256 `8a5317571029df7e27e9b956aa0da8a267f41da1c5c62eacfd90c196412024ba`。头像接口单文件包SHA256 `952c634d25782f2ed48965c67ec0372ca3f4b1276762451a6c8cfbf6bbd4dda3`，基于实时下载的原API，仅替换头像文件名规则；生成器前端和其他未提交修改不参与本次发布。上线结果在完成后补充。
+已发布 `20260909152214-studio-v6`，代码提交 `fb8fabf` 已推送。Studio build `2026-09-09T15:15:01.622Z`，JS `index-KtdtEowG.js`；包311文件，SHA256 `8a5317571029df7e27e9b956aa0da8a267f41da1c5c62eacfd90c196412024ba`。头像接口单文件包SHA256 `952c634d25782f2ed48965c67ec0372ca3f4b1276762451a6c8cfbf6bbd4dda3`，基于实时下载的原API，仅替换头像文件名规则；生成器前端和其他未提交修改不参与本次发布。
+
+线上311个Studio文件与1个头像接口文件哈希通过。两服务active，NTP同步；发布前后对比确认顾客余额／明细、原账号资料与生成器余额、管理员已发布文案、排班、微信绑定均保留。生成器HTML SHA256仍为 `2f581f2b0db0df44ac39291edcc16c41ff9bfb63869e32f7b56a7c3d5564e131`。右侧已登录的真实账号刷新后显示新版精简页面及原微信绑定、原余额；没有用真实账号写测试昵称或头像。证据：`artifacts/account-refinement/live-verification.json`。
 
 本地证据：`artifacts/account-refinement/verification.json`、`webkit.json`、`desktop.png`、`mobile.png`。运行所用QA数据库与身份源为本地独立替身。
