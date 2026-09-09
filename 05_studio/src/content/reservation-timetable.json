@@ -1,0 +1,18 @@
+{
+  "title": ["时段预约表", "Booking timetable"],
+  "previous": ["前一组日期", "Previous dates"],
+  "next": ["后一组日期", "Next dates"],
+  "today": ["今天", "Today"],
+  "pending": ["待确认", "Pending"],
+  "confirmed": ["已确认", "Confirmed"],
+  "completed": ["已到店", "Attended"],
+  "closed": ["未开放", "Closed"],
+  "empty": ["空闲", "No bookings"],
+  "guests": ["{v0} 人", "{v0} guests"],
+  "slot": ["{v0} {v1}，已确认 {v2} 人，待确认 {v3} 人，已到店 {v4} 人", "{v0} {v1}: {v2} confirmed, {v3} pending, {v4} attended"],
+  "help": ["点击时段查看对应预约。数字为该半小时内的人数；待确认预约不占用已确认名额。", "Select a slot to see its bookings. Counts show guests during that half hour; pending bookings do not use confirmed capacity."],
+  "help_label": ["时段表说明", "About the timetable"],
+  "selected": ["正在查看 {v0} {v1} 的预约", "Showing bookings for {v0} at {v1}"],
+  "clear": ["清除时段筛选", "Clear time filter"],
+  "loading": ["正在读取时段…", "Loading timetable…"]
+}

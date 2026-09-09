@@ -1,0 +1,1979 @@
+<script setup lang="ts">
+import { gt } from '../i18n';
+import { vToolDialog } from '../dialog';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
+
+import { saveArtworkPattern } from '../api';
+import PatternEditorCanvas from '../components/PatternEditor.vue';
+import type { ColorRef, PatternSheet, SaveArtworkPatternResponse } from '../api/types';
+import mardPaletteJson from '../assets/colormap/mard-5mm.json';
+import paletteManifestJson from '../assets/colormap/manifest.json';
+import { useGenerationStore } from '../stores/generation';
+import { useSWRCacheStore } from '../stores/swrCache';
+import { downloadImage } from '../utils/download';
+import {
+  applyBatchPatch,
+  applyCellPatch,
+  cloneColor,
+  cloneColorOrNull,
+  clonePattern,
+  paletteRowsForPattern,
+  recalculatePattern,
+  type CellPatch,
+  type EditPatch
+} from '../utils/patternEditing';
+
+type SaveStatus = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
+type EditorTool = 'none' | 'paint' | 'erase';
+type DownloadStatusKind = 'busy' | 'success' | 'error';
+type CatalogColor = ColorRef & { category: string };
+type ColorModalMode = 'choose' | 'replace';
+
+interface PendingReplace {
+  source: ColorRef;
+  target: ColorRef;
+  count: number;
+}
+
+const AUTOSAVE_DELAY_MS = 1600;
+const MAX_PATCH_STACK = 240;
+const COLOR_CATEGORY_ALL = '全部';
+
+const route = useRoute();
+const router = useRouter();
+const generation = useGenerationStore();
+const swrCache = useSWRCacheStore();
+const editorRef = ref<InstanceType<typeof PatternEditorCanvas> | null>(null);
+const loading = ref(false);
+const error = ref('');
+const editablePattern = ref<PatternSheet | null>(null);
+const availablePalette = ref<ColorRef[]>([]);
+const selectedColor = ref<ColorRef | null>(null);
+const activeTool = ref<EditorTool>('none');
+const showGridLines = ref(true);
+const isColorModalOpen = ref(false);
+const colorModalMode = ref<ColorModalMode>('choose');
+const colorSearch = ref('');
+const activeCategory = ref(COLOR_CATEGORY_ALL);
+const recentColors = ref<ColorRef[]>([]);
+const cursorInfo = ref<{ row: number; col: number; cell: ColorRef | null }>({ row: 0, col: 0, cell: null });
+const undoStack = ref<EditPatch[]>([]);
+const redoStack = ref<EditPatch[]>([]);
+const isDirty = ref(false);
+const saveStatus = ref<SaveStatus>('idle');
+const saveError = ref('');
+const isDownloading = ref(false);
+const downloadStatus = ref<{ visible: boolean; message: string; kind: DownloadStatusKind; canRetry: boolean }>({
+  visible: false,
+  message: '',
+  kind: 'busy',
+  canRetry: false
+});
+const patternKey = ref(0);
+const paintRevision = ref(0);
+const lastPatch = ref<CellPatch | null>(null);
+const dirtyVersion = ref(0);
+const savedVersion = ref(0);
+const renderedVersion = ref(0);
+const replaceSourceColor = ref<ColorRef | null>(null);
+const pendingReplace = ref<PendingReplace | null>(null);
+const replaceMessage = ref('');
+
+let autosaveTimer: number | undefined;
+let savePromise: Promise<SaveArtworkPatternResponse | null> | null = null;
+let downloadStatusTimer: number | undefined;
+
+const artworkId = computed(() => String(route.params.id || ''));
+const pattern = computed(() => editablePattern.value);
+const rows = computed(() => pattern.value?.grid.length || 0);
+const cols = computed(() => Math.max(...(pattern.value?.grid.map((row) => row.length) || [0]), 0));
+const beadTotal = computed(() => pattern.value?.bead_total || 0);
+const colorTotal = computed(() => pattern.value?.palette_used.length || 0);
+const paletteRows = computed(() => paletteRowsForPattern(pattern.value));
+const fullPalette = computed(() => normalizeCatalog(mardPaletteJson as CatalogColor[]));
+const paletteManifest = paletteManifestJson as {
+  default_palette: string;
+  palettes: Array<{ id: string; display_name: string; count: number; categories: string[] }>;
+};
+const currentPaletteMeta = computed(() => paletteManifest.palettes.find((item) => item.id === paletteManifest.default_palette));
+const colorCategories = computed(() => [
+  COLOR_CATEGORY_ALL,
+  ...Array.from(new Set(fullPalette.value.map((color) => color.category))).sort((left, right) => (
+    left.localeCompare(right, 'zh-Hans-CN')
+  ))
+]);
+const filteredFullPalette = computed(() => {
+  const keyword = colorSearch.value.trim().toLowerCase();
+  return fullPalette.value.filter((color) => {
+    const categoryMatched = activeCategory.value === COLOR_CATEGORY_ALL || color.category === activeCategory.value;
+    if (!categoryMatched) {
+      return false;
+    }
+    if (!keyword) {
+      return true;
+    }
+    return color.code.toLowerCase().includes(keyword)
+      || color.name_cn.toLowerCase().includes(keyword)
+      || color.hex.toLowerCase().includes(keyword);
+  });
+});
+const canUndo = computed(() => undoStack.value.length > 0);
+const canRedo = computed(() => redoStack.value.length > 0);
+const paintEnabled = computed(() => activeTool.value !== 'none');
+const canDownload = computed(() => Boolean(pattern.value && artworkId.value && !isDownloading.value));
+const downloadButtonLabel = computed(() => {
+  if (isDownloading.value) {
+    return '处理中';
+  }
+  return shouldPreferNativeShare() ? '存相册' : '下载';
+});
+const downloadFileName = computed(() => `${gt('拼豆图纸')}_${artworkId.value || 'pindou'}.png`);
+const selectedColorUseCount = computed(() => (
+  selectedColor.value ? (pattern.value?.color_counts[selectedColor.value.code] || 0) : 0
+));
+const canReplaceSelectedColor = computed(() => Boolean(selectedColor.value && selectedColorUseCount.value > 0));
+const saveStatusText = computed(() => {
+  if (saveStatus.value === 'saving') {
+    return '保存中';
+  }
+  if (saveStatus.value === 'saved') {
+    return '已保存';
+  }
+  if (saveStatus.value === 'error') {
+    return '保存失败';
+  }
+  if (isDirty.value) {
+    return '有未保存修改';
+  }
+  return '已同步';
+});
+
+onMounted(() => {
+  void loadArtwork();
+  window.addEventListener('beforeunload', handleBeforeUnload);
+  window.addEventListener('keydown', handleKeydown);
+});
+
+onBeforeUnmount(() => {
+  clearAutosaveTimer();
+  clearDownloadStatusTimer();
+  window.removeEventListener('beforeunload', handleBeforeUnload);
+  window.removeEventListener('keydown', handleKeydown);
+});
+
+onBeforeRouteLeave(async () => {
+  if (savePromise) await savePromise;
+  if (isDirty.value) {
+    return window.confirm(gt('图纸还有未保存的修改，确定要离开吗？'));
+  }
+  return true;
+});
+
+async function loadArtwork(): Promise<void> {
+  const id = artworkId.value;
+  if (!id || isDirty.value) {
+    return;
+  }
+  const snapshot = swrCache.getArtworkSnapshot(id);
+  if (snapshot) {
+    applyLoadedPattern(snapshot.data.pattern_data);
+    generation.applyArtwork(snapshot.data);
+    void swrCache.revalidateArtwork(id).then((artwork) => {
+      if (!isDirty.value) {
+        generation.applyArtwork(artwork);
+        applyLoadedPattern(artwork.pattern_data);
+      }
+    }).catch(() => undefined);
+    return;
+  }
+
+  loading.value = true;
+  error.value = '';
+  try {
+    const artwork = await generation.loadArtwork(id);
+    applyLoadedPattern(artwork.pattern_data);
+  } catch (loadError) {
+    error.value = loadError instanceof Error ? loadError.message : '编辑器加载失败，请回到作品集重新打开。';
+  } finally {
+    loading.value = false;
+  }
+}
+
+function applyLoadedPattern(nextPattern: PatternSheet): void {
+  const normalized = recalculatePattern(clonePattern(nextPattern));
+  editablePattern.value = normalized;
+  availablePalette.value = uniquePalette(normalized.palette_used);
+  selectedColor.value = availablePalette.value[0]
+    ? cloneColor(availablePalette.value[0])
+    : (fullPalette.value[0] ? cloneColor(fullPalette.value[0]) : null);
+  activeTool.value = 'none';
+  undoStack.value = [];
+  redoStack.value = [];
+  isDirty.value = false;
+  saveStatus.value = 'idle';
+  saveError.value = '';
+  dirtyVersion.value = 0;
+  savedVersion.value = 0;
+  renderedVersion.value = 0;
+  lastPatch.value = null;
+  paintRevision.value = 0;
+  patternKey.value += 1;
+}
+
+function handleApplyCell(payload: { row: number; col: number; color: ColorRef | null }): void {
+  applyCell(payload.row, payload.col, payload.color);
+}
+
+function applyCell(row: number, col: number, color: ColorRef | null): void {
+  const sheet = editablePattern.value;
+  const current = sheet?.grid[row]?.[col];
+  if (!sheet || !sheet.grid[row] || col < 0 || col >= sheet.grid[row].length) {
+    return;
+  }
+  if ((current?.code || null) === (color?.code || null)) {
+    return;
+  }
+  const patch: CellPatch = {
+    row,
+    col,
+    before: cloneColorOrNull(current || null),
+    after: cloneColorOrNull(color)
+  };
+  editablePattern.value = applyCellPatch(sheet, patch, true);
+  if (color) {
+    availablePalette.value = uniquePalette([...availablePalette.value, cloneColor(color)]);
+    selectedColor.value = cloneColor(color);
+    rememberRecentColor(color);
+  }
+  syncAvailablePalette();
+  undoStack.value.push({ kind: 'cell', patch });
+  if (undoStack.value.length > MAX_PATCH_STACK) {
+    undoStack.value.shift();
+  }
+  redoStack.value = [];
+  markSingleCellEdited(patch);
+}
+
+function undoEdit(): void {
+  const edit = undoStack.value.pop();
+  const sheet = editablePattern.value;
+  if (!edit || !sheet) {
+    return;
+  }
+  editablePattern.value = applyEditPatch(sheet, edit, false);
+  syncAvailablePalette();
+  redoStack.value.push(edit);
+  markAppliedEdit(edit, false);
+}
+
+function redoEdit(): void {
+  const edit = redoStack.value.pop();
+  const sheet = editablePattern.value;
+  if (!edit || !sheet) {
+    return;
+  }
+  editablePattern.value = applyEditPatch(sheet, edit, true);
+  syncAvailablePalette();
+  undoStack.value.push(edit);
+  markAppliedEdit(edit, true);
+}
+
+function applyEditPatch(sheet: PatternSheet, edit: EditPatch, useAfter: boolean): PatternSheet {
+  if (edit.kind === 'cell') {
+    return applyCellPatch(sheet, edit.patch, useAfter);
+  }
+  return applyBatchPatch(sheet, edit.patches, useAfter);
+}
+
+function markAppliedEdit(edit: EditPatch, useAfter: boolean): void {
+  if (edit.kind === 'cell') {
+    const patch = edit.patch;
+    markSingleCellEdited({
+      ...patch,
+      before: useAfter ? patch.before : patch.after,
+      after: useAfter ? patch.after : patch.before
+    });
+    return;
+  }
+  markBatchEdited();
+}
+
+function markSingleCellEdited(patch: CellPatch): void {
+  lastPatch.value = patch;
+  paintRevision.value += 1;
+  markDirty();
+}
+
+function markBatchEdited(): void {
+  lastPatch.value = null;
+  patternKey.value += 1;
+  markDirty();
+}
+
+function markDirty(): void {
+  dirtyVersion.value += 1;
+  isDirty.value = true;
+  saveStatus.value = 'dirty';
+  saveError.value = '';
+  scheduleAutosave();
+}
+
+function syncAvailablePalette(): void {
+  if (!editablePattern.value) {
+    availablePalette.value = [];
+    return;
+  }
+  availablePalette.value = uniquePalette(editablePattern.value.palette_used);
+}
+
+function chooseColor(color: ColorRef): void {
+  selectedColor.value = cloneColor(color);
+  activeTool.value = 'paint';
+  rememberRecentColor(color);
+}
+
+function chooseTool(tool: Exclude<EditorTool, 'none'>): void {
+  activeTool.value = activeTool.value === tool ? 'none' : tool;
+}
+
+function openColorModal(mode: ColorModalMode = 'choose'): void {
+  colorModalMode.value = mode;
+  if (mode === 'choose') {
+    replaceSourceColor.value = null;
+    pendingReplace.value = null;
+    replaceMessage.value = '';
+  }
+  isColorModalOpen.value = true;
+}
+
+function closeColorModal(): void {
+  isColorModalOpen.value = false;
+  colorModalMode.value = 'choose';
+  replaceSourceColor.value = null;
+  pendingReplace.value = null;
+  replaceMessage.value = '';
+}
+
+function chooseFullColor(color: ColorRef): void {
+  if (colorModalMode.value === 'replace') {
+    prepareReplaceTarget(color);
+    return;
+  }
+  chooseColor(color);
+  closeColorModal();
+}
+
+function openReplaceModal(): void {
+  const source = selectedColor.value;
+  if (!source || !selectedColorUseCount.value) {
+    replaceMessage.value = '请先选中图纸中正在使用的颜色。';
+    return;
+  }
+  replaceSourceColor.value = cloneColor(source);
+  pendingReplace.value = null;
+  replaceMessage.value = '';
+  openColorModal('replace');
+}
+
+function prepareReplaceTarget(target: ColorRef): void {
+  const source = replaceSourceColor.value;
+  if (!source) {
+    replaceMessage.value = '请先选择要替换的源色。';
+    return;
+  }
+  if (source.code === target.code) {
+    replaceMessage.value = '目标色和源色相同，不需要替换。';
+    return;
+  }
+  const count = pattern.value?.color_counts[source.code] || 0;
+  if (!count) {
+    replaceMessage.value = `图纸里已经没有 ${source.code} 了。`;
+    return;
+  }
+  pendingReplace.value = {
+    source: cloneColor(source),
+    target: cloneColor(target),
+    count
+  };
+}
+
+function cancelReplaceConfirm(): void {
+  pendingReplace.value = null;
+  replaceMessage.value = '';
+}
+
+function confirmReplaceColor(): void {
+  const pending = pendingReplace.value;
+  if (!pending) {
+    return;
+  }
+  replaceColor(pending.source, pending.target);
+}
+
+function replaceColor(source: ColorRef, target: ColorRef): void {
+  const sheet = editablePattern.value;
+  if (!sheet) {
+    return;
+  }
+  const patches: CellPatch[] = [];
+  sheet.grid.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      if (cell?.code === source.code) {
+        patches.push({
+          row: rowIndex,
+          col: colIndex,
+          before: cloneColorOrNull(cell),
+          after: cloneColor(target)
+        });
+      }
+    });
+  });
+  if (!patches.length) {
+    replaceMessage.value = `图纸里已经没有 ${source.code} 了。`;
+    return;
+  }
+
+  editablePattern.value = applyBatchPatch(sheet, patches, true);
+  syncAvailablePalette();
+  selectedColor.value = cloneColor(target);
+  rememberRecentColor(target);
+  undoStack.value.push({ kind: 'batch', patches });
+  if (undoStack.value.length > MAX_PATCH_STACK) {
+    undoStack.value.shift();
+  }
+  redoStack.value = [];
+  markBatchEdited();
+  closeColorModal();
+}
+
+function rememberRecentColor(color: ColorRef): void {
+  const next = [cloneColor(color), ...recentColors.value.filter((item) => item.code !== color.code)];
+  recentColors.value = next.slice(0, 10);
+}
+
+function updateCursor(payload: { row: number; col: number; cell: ColorRef | null }): void {
+  cursorInfo.value = payload;
+}
+
+function scheduleAutosave(): void {
+  clearAutosaveTimer();
+  autosaveTimer = window.setTimeout(() => {
+    void saveNow(false);
+  }, AUTOSAVE_DELAY_MS);
+}
+
+async function saveNow(manual: boolean): Promise<SaveArtworkPatternResponse | null> {
+  if (savePromise) {
+    return savePromise;
+  }
+  const id = artworkId.value;
+  const sheet = editablePattern.value;
+  if (!id || !sheet) {
+    return null;
+  }
+  if (!isDirty.value && !manual) {
+    return null;
+  }
+  clearAutosaveTimer();
+  const versionAtStart = dirtyVersion.value;
+  saveStatus.value = 'saving';
+  saveError.value = '';
+  const currentSave = (async () => {
+    try {
+      const saved = await saveArtworkPattern(id, recalculatePattern(clonePattern(sheet)), {
+        renderPreview: manual
+      });
+      swrCache.setArtwork(saved.artwork);
+      swrCache.invalidateGallery();
+      generation.applyArtwork(saved.artwork);
+      syncPatternDownloadAssets(saved.pattern);
+      if (manual) {
+        renderedVersion.value = Math.max(renderedVersion.value, versionAtStart);
+      }
+      if (dirtyVersion.value === versionAtStart) {
+        savedVersion.value = versionAtStart;
+        isDirty.value = false;
+        saveStatus.value = 'saved';
+        saveError.value = '';
+      } else {
+        saveStatus.value = 'dirty';
+        scheduleAutosave();
+      }
+      return saved;
+    } catch (saveFailure) {
+      saveStatus.value = 'error';
+      saveError.value = saveFailure instanceof Error ? saveFailure.message : '保存失败，请稍后再试。';
+      return null;
+    }
+  })();
+  savePromise = currentSave;
+  try {
+    return await currentSave;
+  } finally {
+    if (savePromise === currentSave) {
+      savePromise = null;
+    }
+  }
+}
+
+async function downloadCurrentPattern(): Promise<void> {
+  if (!canDownload.value) {
+    return;
+  }
+  isDownloading.value = true;
+  saveError.value = '';
+  clearDownloadStatusTimer();
+  setDownloadStatus('准备下载…', 'busy');
+  try {
+    let savedForDownload: SaveArtworkPatternResponse | null = null;
+    if (savePromise) {
+      setDownloadStatus('保存中…', 'busy');
+      const saveStartedAt = performance.now();
+      const saved = await savePromise;
+      console.info(`[PinDou] 下载保存段 ${Math.round(performance.now() - saveStartedAt)}ms`);
+      if (!saved) {
+        setDownloadStatus('保存失败', 'error', true);
+        return;
+      }
+      savedForDownload = saved;
+      setDownloadStatus('已保存', 'success');
+      await stageDelay(180);
+    }
+
+    if (isDirty.value || renderedVersion.value !== dirtyVersion.value || !currentRenderedPatternImageUrl(savedForDownload)) {
+      setDownloadStatus('保存中…', 'busy');
+      const saveStartedAt = performance.now();
+      const saved = await saveNow(true);
+      console.info(`[PinDou] 下载保存段 ${Math.round(performance.now() - saveStartedAt)}ms`);
+      if (!saved) {
+        setDownloadStatus('保存失败', 'error', true);
+        return;
+      }
+      savedForDownload = saved;
+      setDownloadStatus('已保存', 'success');
+      await stageDelay(180);
+    }
+
+    const url = currentRenderedPatternImageUrl(savedForDownload);
+    if (!url) {
+      saveError.value = '高清图纸还没准备好，请先保存后再试。';
+      setDownloadStatus('下载失败', 'error', true);
+      return;
+    }
+
+    const preferNativeShare = shouldPreferNativeShare();
+    setDownloadStatus(preferNativeShare ? '准备保存到相册…' : '下载中…', 'busy');
+    const fetchStartedAt = performance.now();
+    const result = await downloadImage(url, downloadFileName.value, {
+      preferNativeShare,
+      shareTitle: gt('PinDou 拼豆图纸'),
+      shareText: gt('保存到相册或分享这张拼豆图纸。')
+    });
+    console.info(`[PinDou] 下载 fetch 段 ${Math.round(performance.now() - fetchStartedAt)}ms`);
+    if (result === 'shared') {
+      setDownloadStatus('已打开保存面板 ✓', 'success');
+      hideDownloadStatusLater();
+      return;
+    }
+    if (result === 'cancelled') {
+      setDownloadStatus('已取消', 'success');
+      hideDownloadStatusLater();
+      return;
+    }
+    if (result === 'opened') {
+      saveError.value = '浏览器不支持直接保存相册，已打开高清图纸，可长按保存。';
+      setDownloadStatus('已打开高清图纸', 'success');
+      hideDownloadStatusLater();
+      return;
+    }
+    if (preferNativeShare) {
+      saveError.value = '已下载到文件，若未进入相册，请在下载列表里打开后长按保存。';
+    }
+    setDownloadStatus('完成 ✓', 'success');
+    hideDownloadStatusLater();
+  } catch (_downloadFailure) {
+    setDownloadStatus('下载失败', 'error', true);
+  } finally {
+    isDownloading.value = false;
+  }
+}
+
+function setDownloadStatus(message: string, kind: DownloadStatusKind, canRetry = false): void {
+  clearDownloadStatusTimer();
+  downloadStatus.value = {
+    visible: true,
+    message,
+    kind,
+    canRetry
+  };
+}
+
+function hideDownloadStatusLater(): void {
+  clearDownloadStatusTimer();
+  downloadStatusTimer = window.setTimeout(() => {
+    downloadStatus.value.visible = false;
+    downloadStatusTimer = undefined;
+  }, 1400);
+}
+
+function clearDownloadStatusTimer(): void {
+  if (downloadStatusTimer) {
+    window.clearTimeout(downloadStatusTimer);
+    downloadStatusTimer = undefined;
+  }
+}
+
+function stageDelay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+function currentRenderedPatternImageUrl(saved?: SaveArtworkPatternResponse | null): string {
+  return highQualityPatternImageUrl(saved?.pattern || null)
+    || highQualityPatternImageUrl(saved?.artwork?.pattern_data || null)
+    || highQualityPatternImageUrl(editablePattern.value)
+    || highQualityPatternImageUrl(generation.currentPattern);
+}
+
+function highQualityPatternImageUrl(sheet: PatternSheet | null | undefined): string {
+  if (!sheet) {
+    return '';
+  }
+  const metadata = sheet.metadata || {};
+  return metadataString(metadata, 'labeled_image_url') || stringValue(sheet.image_url);
+}
+
+function syncPatternDownloadAssets(savedPattern: PatternSheet): void {
+  const sheet = editablePattern.value;
+  if (!sheet) {
+    return;
+  }
+  editablePattern.value = {
+    ...sheet,
+    image_url: savedPattern.image_url || sheet.image_url,
+    metadata: {
+      ...(sheet.metadata || {}),
+      ...(savedPattern.metadata || {})
+    }
+  };
+}
+
+function metadataString(metadata: Record<string, unknown>, key: string): string {
+  return stringValue(metadata[key]);
+}
+
+function stringValue(value: unknown): string {
+  return typeof value === 'string' && value.trim() ? value.trim() : '';
+}
+
+function shouldPreferNativeShare(): boolean {
+  const nav = navigator as Navigator & { share?: unknown };
+  if (typeof nav.share !== 'function') {
+    return false;
+  }
+  return window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
+}
+
+async function goBackToResult(): Promise<void> {
+  if (isDirty.value) {
+    await saveNow(true);
+  }
+  await router.push({ name: 'tools-result', params: { id: artworkId.value } });
+}
+
+function handleBeforeUnload(event: BeforeUnloadEvent): void {
+  if (!isDirty.value) {
+    return;
+  }
+  event.preventDefault();
+  event.returnValue = '';
+}
+
+function handleKeydown(event: KeyboardEvent): void {
+  if (isColorModalOpen.value || document.querySelector('dialog[open]') || (event.target instanceof Element && event.target.closest('input,textarea,select,[contenteditable="true"]'))) return;
+  const key = event.key.toLowerCase();
+  if ((event.ctrlKey || event.metaKey) && key === 'z') {
+    event.preventDefault();
+    if (event.shiftKey) {
+      redoEdit();
+    } else {
+      undoEdit();
+    }
+    return;
+  }
+  if ((event.ctrlKey || event.metaKey) && key === 'y') {
+    event.preventDefault();
+    redoEdit();
+    return;
+  }
+  if ((event.ctrlKey || event.metaKey) && key === 's') {
+    event.preventDefault();
+    void saveNow(true);
+  }
+}
+
+function clearAutosaveTimer(): void {
+  if (autosaveTimer) {
+    window.clearTimeout(autosaveTimer);
+    autosaveTimer = undefined;
+  }
+}
+
+function uniquePalette(colors: ColorRef[]): ColorRef[] {
+  const seen = new Set<string>();
+  const result: ColorRef[] = [];
+  for (const color of colors) {
+    if (!seen.has(color.code)) {
+      seen.add(color.code);
+      result.push(cloneColor(color));
+    }
+  }
+  return result;
+}
+
+function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
+  return colors.map((color) => ({
+    ...cloneColor(color),
+    category: color.category || '其他'
+  }));
+}
+</script>
+
+<template>
+  <section class="editor-page">
+    <template v-if="loading">
+      <div class="editor-state">
+        <p class="eyebrow">{{ gt("正在打开") }}</p>
+        <h1>{{ gt("读取图纸中") }}</h1>
+      </div>
+    </template>
+
+    <template v-else-if="error">
+      <div class="editor-state">
+        <p class="eyebrow">{{ gt("编辑器加载失败") }}</p>
+        <h1>{{ gt("暂时打不开这个图纸") }}</h1>
+        <p>{{ gt(error) }}</p>
+        <RouterLink class="pd-btn pd-btn--primary" to="/tools/works">{{ gt("回作品集") }}</RouterLink>
+      </div>
+    </template>
+
+    <template v-else-if="pattern">
+      <header class="editor-topbar">
+        <button class="editor-back" type="button" @click="goBackToResult">{{ gt("返回") }}</button>
+        <div class="editor-title">
+          <strong>{{ gt("图纸编辑器") }}</strong>
+          <span>{{ gt(`${cols} × ${rows} · ${beadTotal} 颗豆 · ${colorTotal} 色`) }}</span>
+        </div>
+        <div class="editor-topbar__actions">
+          <button class="editor-icon-button" type="button" :aria-label='gt("撤销")' :title='gt("撤销")' :disabled="!canUndo" @click="undoEdit">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M9 7 4 12l5 5" />
+              <path d="M5 12h9.5a5.5 5.5 0 1 1 0 11H11" />
+            </svg>
+          </button>
+          <button class="editor-icon-button" type="button" :aria-label='gt("重做")' :title='gt("重做")' :disabled="!canRedo" @click="redoEdit">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="m15 7 5 5-5 5" />
+              <path d="M19 12H9.5a5.5 5.5 0 1 0 0 11H13" />
+            </svg>
+          </button>
+          <button class="editor-download" type="button" :disabled="!canDownload" @click="downloadCurrentPattern">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 4v10" />
+              <path d="m7.5 10.5 4.5 4.5 4.5-4.5" />
+              <path d="M5 19h14" />
+            </svg>
+            <span>{{ gt(downloadButtonLabel) }}</span>
+          </button>
+          <button type="button" class="editor-save" :disabled="saveStatus === 'saving'" @click="saveNow(true)">
+            {{ gt(saveStatus === 'saving' ? '保存中' : '保存') }}
+          </button>
+        </div>
+      </header>
+
+      <div
+        v-if="downloadStatus.visible"
+        class="editor-download-status"
+        :class="`editor-download-status--${downloadStatus.kind}`"
+        role="status"
+        aria-live="polite"
+      >
+        <span class="editor-download-status__dot" aria-hidden="true"></span>
+        <strong>{{ gt(downloadStatus.message) }}</strong>
+        <button v-if="downloadStatus.canRetry" type="button" @click="downloadCurrentPattern">{{ gt("重试") }}</button>
+      </div>
+
+      <div class="editor-canvas-shell">
+        <PatternEditorCanvas
+          ref="editorRef"
+          :pattern="pattern"
+          :palette="availablePalette"
+          :selected-color="selectedColor"
+          :active-tool="activeTool"
+          :paint-enabled="paintEnabled"
+          :show-grid-lines="showGridLines"
+          :pattern-key="patternKey"
+          :paint-revision="paintRevision"
+          :last-patch="lastPatch"
+          @apply-cell="handleApplyCell"
+          @cursor-change="updateCursor"
+        />
+      </div>
+
+      <footer class="editor-tray">
+        <section class="editor-tray__status">
+          <div>
+            <strong>{{ gt(`第 ${cursorInfo.row + 1} 行，第 ${cursorInfo.col + 1} 列`) }}</strong>
+            <span>{{ gt(cursorInfo.cell?.code || '空格') }} · {{ gt(saveStatusText) }}</span>
+          </div>
+          <p v-if="saveError">{{ gt(saveError) }}</p>
+        </section>
+
+        <section class="editor-tools" :aria-label='gt("编辑工具")'>
+          <div class="editor-tool-segment" role="group" :aria-label='gt("画笔和橡皮擦")'>
+            <button
+              type="button"
+              class="editor-tool-square"
+              :class="{ 'editor-tool-square--active': activeTool === 'paint' }"
+              :aria-label='gt("画笔")'
+              :aria-pressed="activeTool === 'paint'"
+              @click="chooseTool('paint')"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M14 4 20 10 9 21H3v-6L14 4Z" />
+                <path d="m12 6 6 6" />
+              </svg>
+              <span>{{ gt("画") }}</span>
+            </button>
+            <button
+              type="button"
+              class="editor-tool-square"
+              :class="{ 'editor-tool-square--active': activeTool === 'erase' }"
+              :aria-label='gt("橡皮擦")'
+              :aria-pressed="activeTool === 'erase'"
+              @click="chooseTool('erase')"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="m4 16 8.5-8.5a3 3 0 0 1 4.2 0l1.8 1.8a3 3 0 0 1 0 4.2L11 21H7l-3-3v-2Z" />
+                <path d="M10 10 15 15" />
+                <path d="M11 21h9" />
+              </svg>
+              <span>{{ gt("擦") }}</span>
+            </button>
+          </div>
+          <button
+            type="button"
+            class="editor-tool-grid"
+            :class="{ 'editor-tool-grid--active': showGridLines }"
+            :aria-pressed="showGridLines"
+            @click="showGridLines = !showGridLines"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 4h16v16H4z" />
+              <path d="M9.33 4v16" />
+              <path d="M14.67 4v16" />
+              <path d="M4 9.33h16" />
+              <path d="M4 14.67h16" />
+            </svg>
+            <span>{{ gt(showGridLines ? '移除框线' : '添加框线') }}</span>
+          </button>
+        </section>
+
+        <section class="editor-palette" :aria-label='gt("已用色")'>
+          <button
+            v-for="row in paletteRows"
+            :key="row.color.code"
+            type="button"
+            class="editor-color"
+            :class="{ 'editor-color--active': activeTool === 'paint' && selectedColor?.code === row.color.code }"
+            :title="gt(`${row.color.code} · ${row.color.name_cn}`)"
+            @click="chooseColor(row.color)"
+          >
+            <span :style="{ backgroundColor: row.color.hex }"></span>
+            <strong>{{ gt(row.color.code) }}</strong>
+          </button>
+          <button
+            type="button"
+            class="editor-color editor-color--all"
+            @click="openColorModal()"
+          >
+            <span class="editor-color__rainbow"></span>
+            <strong>{{ gt("全部颜色") }}</strong>
+          </button>
+        </section>
+
+        <section class="editor-current" :aria-label='gt("当前工具")'>
+          <div class="editor-current__main">
+            <div class="editor-current__swatch" :class="{ 'editor-current__swatch--erase': activeTool === 'erase' }">
+              <span v-if="activeTool !== 'erase'" :style="{ backgroundColor: selectedColor?.hex || '#fff' }"></span>
+            </div>
+            <div>
+              <strong>{{ gt(activeTool === 'erase' ? '橡皮擦' : selectedColor?.code || '未选色') }}</strong>
+              <span v-if="activeTool === 'erase' || !selectedColor">
+                {{ gt(activeTool === 'erase' ? '点格变空白' : '从全部颜色选择') }}
+              </span>
+            </div>
+          </div>
+          <button
+            v-if="activeTool === 'paint'"
+            type="button"
+            class="editor-replace-trigger"
+            :disabled="!canReplaceSelectedColor"
+            @click="openReplaceModal"
+          >{{ gt("全局替换为…") }}</button>
+        </section>
+      </footer>
+
+      <Teleport to="body"><div class="generator-workspace generator-portal">
+        <div v-if="isColorModalOpen" class="editor-modal" @click.self="closeColorModal">
+          <dialog class="editor-color-dialog" v-tool-dialog="closeColorModal" role="dialog" aria-modal="true" :aria-label='gt("全部颜色")'>
+            <header class="editor-color-dialog__header">
+              <div>
+                <strong>{{ gt(colorModalMode === 'replace' ? '选择替换目标色' : '全部颜色') }}</strong>
+                <span v-if="colorModalMode === 'replace' && replaceSourceColor">{{ gt(`将 ${replaceSourceColor.code} 替换成新的色号`) }}</span>
+                <span v-else>{{ gt(currentPaletteMeta?.display_name || 'MARD') }} · {{ gt(`${currentPaletteMeta?.count || fullPalette.length} 色`) }}</span>
+              </div>
+              <button type="button" :aria-label='gt("关闭全部颜色")' @click="closeColorModal">×</button>
+            </header>
+
+            <label class="editor-color-search">
+              <span>{{ gt("搜索色号") }}</span>
+              <input v-model="colorSearch" type="search" :placeholder='gt("输入 A1 / 黑 / #FF")' />
+            </label>
+
+            <section v-if="pendingReplace" class="editor-replace-confirm" aria-live="polite">
+              <div>
+                <span :style="{ backgroundColor: pendingReplace.source.hex }"></span>
+                <strong>{{ gt(pendingReplace.source.code) }}</strong>
+              </div>
+              <em>→</em>
+              <div>
+                <span :style="{ backgroundColor: pendingReplace.target.hex }"></span>
+                <strong>{{ gt(pendingReplace.target.code) }}</strong>
+              </div>
+              <p>{{ gt(`将替换 ${pendingReplace.count} 格，撤销时会一次全部恢复。`) }}</p>
+              <button type="button" @click="cancelReplaceConfirm">{{ gt("再选一个") }}</button>
+              <button type="button" class="editor-replace-confirm__primary" @click="confirmReplaceColor">{{ gt("确认替换") }}</button>
+            </section>
+            <p v-else-if="replaceMessage" class="editor-replace-message">{{ gt(replaceMessage) }}</p>
+
+            <section v-if="recentColors.length" class="editor-color-section" :aria-label='gt("最近使用")'>
+              <h2>{{ gt("最近使用") }}</h2>
+              <div class="editor-color-grid editor-color-grid--recent">
+                <button
+                  v-for="color in recentColors"
+                  :key="`recent-${color.code}`"
+                  type="button"
+                  class="editor-color-card"
+                  @click="chooseFullColor(color)"
+                >
+                  <span :style="{ backgroundColor: color.hex }"></span>
+                  <strong>{{ gt(color.code) }}</strong>
+                </button>
+              </div>
+            </section>
+
+            <nav class="editor-color-tabs" :aria-label='gt("色系")'>
+              <button
+                v-for="category in colorCategories"
+                :key="category"
+                type="button"
+                :class="{ 'editor-color-tab--active': activeCategory === category }"
+                @click="activeCategory = category"
+              >
+                {{ gt(category) }}
+              </button>
+            </nav>
+
+            <div class="editor-color-grid" :aria-label='gt("MARD 色卡")'>
+              <button
+                v-for="color in filteredFullPalette"
+                :key="color.code"
+                type="button"
+                class="editor-color-card"
+                :class="{ 'editor-color-card--active': activeTool === 'paint' && selectedColor?.code === color.code }"
+                @click="chooseFullColor(color)"
+              >
+                <span :style="{ backgroundColor: color.hex }"></span>
+                <strong>{{ gt(color.code) }}</strong>
+              </button>
+            </div>
+            <p v-if="!filteredFullPalette.length" class="editor-color-empty">{{ gt("没有找到这个颜色") }}</p>
+          </dialog>
+        </div>
+      </div></Teleport>
+    </template>
+  </section>
+</template>
+
+<style scoped>
+.editor-page {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  height: calc(100dvh - 72px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(235, 243, 249, 0.24), transparent 28%),
+    radial-gradient(circle at 92% 10%, rgba(184, 230, 201, 0.24), transparent 30%),
+    var(--pd-bg);
+  overscroll-behavior: none;
+}
+
+.editor-state {
+  width: min(100% - 32px, 620px);
+  align-self: center;
+  justify-self: center;
+  border: 1px solid rgba(242, 247, 250, 0.86);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--pd-shadow-float);
+  padding: 34px;
+  text-align: center;
+}
+
+.editor-state h1 {
+  margin: 0;
+  color: var(--pd-fg-1);
+  font-family: var(--pd-font-body);
+  font-size: clamp(30px, 5vw, 42px);
+}
+
+@keyframes download-dot-pulse {
+  from {
+    opacity: 0.58;
+    transform: scale(0.86);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes download-status-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.editor-topbar {
+  min-width: 0;
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(242, 247, 250, 0.82);
+  background: rgba(235, 243, 249, 0.92);
+  padding: 10px clamp(12px, 3vw, 22px);
+  backdrop-filter: blur(16px);
+}
+
+.editor-back,
+.editor-topbar__actions button,
+.editor-tools button,
+.editor-replace-trigger,
+.editor-color,
+.editor-color-card,
+.editor-color-dialog button {
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    background 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    color 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.editor-back,
+.editor-topbar__actions button,
+.editor-tools button {
+  min-height: 40px;
+  border: 1px solid rgba(134, 162, 184, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--pd-fg-1);
+  padding: 0 14px;
+}
+
+.editor-back:hover,
+.editor-topbar__actions button:hover:not(:disabled),
+.editor-tools button:hover {
+  border-color: rgba(134, 162, 184, 0.5);
+  box-shadow: 0 10px 22px rgba(134, 162, 184, 0.13);
+  transform: translateY(-1px);
+}
+
+.editor-title {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.editor-title strong {
+  overflow: hidden;
+  color: var(--pd-fg-1);
+  font-family: var(--pd-font-body);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-title span,
+.editor-tray__status span,
+.editor-tray__status p {
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.editor-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-topbar__actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.editor-topbar__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  transform: none;
+}
+
+.editor-icon-button {
+  width: 40px;
+  padding: 0 !important;
+}
+
+.editor-topbar__actions svg,
+.editor-tools svg {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.editor-download {
+  min-width: 78px;
+}
+
+.editor-save {
+  border-color: transparent !important;
+  background: var(--pd-gradient-warm) !important;
+  color: var(--pd-fg-1) !important;
+  box-shadow: var(--pd-shadow-cta);
+}
+
+.editor-download-status {
+  position: fixed;
+  top: max(86px, calc(env(safe-area-inset-top) + 78px));
+  left: 50%;
+  z-index: 2000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: fit-content;
+  max-width: min(360px, calc(100vw - 28px));
+  border: 1px solid rgba(134, 162, 184, 0.28);
+  border-radius: 22px;
+  background: rgba(242, 247, 250, 0.97);
+  box-shadow:
+    0 18px 48px rgba(45, 45, 45, 0.18),
+    0 8px 20px rgba(134, 162, 184, 0.12);
+  color: var(--pd-fg-1);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 16px;
+  transform: translateX(-50%);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  pointer-events: auto;
+  animation: download-status-pop 180ms ease-out;
+}
+
+.editor-download-status strong {
+  white-space: nowrap;
+}
+
+.editor-download-status__dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--pd-orange);
+  box-shadow: 0 0 0 5px rgba(134, 162, 184, 0.14);
+}
+
+.editor-download-status--busy .editor-download-status__dot {
+  animation: download-dot-pulse 840ms ease-in-out infinite alternate;
+}
+
+.editor-download-status--success .editor-download-status__dot {
+  background: #5bbf89;
+  box-shadow: 0 0 0 5px rgba(91, 191, 137, 0.14);
+}
+
+.editor-download-status--error .editor-download-status__dot {
+  background: #ff5b6e;
+  box-shadow: 0 0 0 5px rgba(255, 91, 110, 0.14);
+}
+
+.editor-download-status button {
+  min-height: 30px;
+  border: 1px solid rgba(134, 162, 184, 0.32);
+  border-radius: 999px;
+  background: rgba(235, 243, 249, 0.9);
+  color: var(--pd-orange);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 10px;
+}
+
+.editor-canvas-shell {
+  min-height: 0;
+  padding: 10px;
+}
+
+.editor-tray {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(150px, 0.8fr) auto minmax(0, 1.4fr) minmax(132px, auto);
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid rgba(242, 247, 250, 0.86);
+  background: rgba(235, 243, 249, 0.94);
+  padding: 10px clamp(10px, 3vw, 20px);
+  box-shadow: 0 -12px 28px rgba(45, 45, 45, 0.06);
+}
+
+.editor-tray__status {
+  min-width: 0;
+}
+
+.editor-tray__status strong,
+.editor-tray__status span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-tray__status strong {
+  color: var(--pd-fg-1);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.editor-tray__status p {
+  margin: 2px 0 0;
+  color: #c42535;
+}
+
+.editor-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.editor-tool-segment {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editor-tools button {
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+.editor-tool-square {
+  min-width: 88px;
+  border-radius: 14px !important;
+}
+
+.editor-tool-grid {
+  flex: 1 1 auto;
+  min-width: 116px;
+}
+
+.editor-tool-square--active,
+.editor-tool-grid--active {
+  border-color: transparent !important;
+  background: var(--pd-gradient-warm) !important;
+  box-shadow: var(--pd-shadow-cta);
+  color: var(--pd-fg-1) !important;
+}
+
+.editor-palette {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 3px 2px;
+  scrollbar-width: thin;
+}
+
+.editor-color {
+  flex: 0 0 auto;
+  min-width: 62px;
+  min-height: 52px;
+  display: grid;
+  place-items: center;
+  gap: 3px;
+  border: 1px solid var(--pd-stroke);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--pd-fg-1);
+  padding: 6px 8px;
+}
+
+.editor-color:hover,
+.editor-color--active,
+.editor-color--all {
+  border-color: rgba(134, 162, 184, 0.56);
+  background: #fff;
+  box-shadow: 0 10px 22px rgba(134, 162, 184, 0.13);
+  transform: translateY(-1px);
+}
+
+.editor-color span,
+.editor-current__swatch span,
+.editor-color-card span {
+  display: block;
+  border: 1px solid rgba(45, 45, 45, 0.1);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.65);
+}
+
+.editor-color span {
+  width: 24px;
+  height: 24px;
+}
+
+.editor-color__rainbow {
+  background:
+    conic-gradient(from 0deg, #ff6b6b, #f7f9fb, #79d98b, #69b7ff, #b58cff, #ff7ab6, #ff6b6b);
+}
+
+.editor-color strong {
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.editor-current {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 260px;
+  border: 1px solid rgba(134, 162, 184, 0.18);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.86);
+  padding: 7px 10px;
+}
+
+.editor-current__main {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-current__swatch {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.editor-current__swatch span {
+  width: 28px;
+  height: 28px;
+}
+
+.editor-current__swatch--erase::before {
+  width: 20px;
+  height: 20px;
+  display: block;
+  border: 2px solid rgba(45, 45, 45, 0.66);
+  border-radius: 6px;
+  background:
+    linear-gradient(135deg, transparent 44%, #90a8bd 45%, #90a8bd 55%, transparent 56%),
+    #f7f9fb;
+  content: "";
+}
+
+.editor-current strong,
+.editor-current span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-current strong {
+  color: var(--pd-fg-1);
+  font-size: 12px;
+  line-height: 1.15;
+}
+
+.editor-current span {
+  color: var(--pd-fg-2);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.editor-replace-trigger {
+  justify-self: end;
+  max-width: 100%;
+  min-height: 38px;
+  border: 1px solid rgba(134, 162, 184, 0.24);
+  border-radius: 999px;
+  background: rgba(235, 243, 249, 0.84);
+  color: var(--pd-orange);
+  font-size: 12px;
+  padding: 0 11px;
+  white-space: nowrap;
+}
+
+.editor-replace-trigger:hover:not(:disabled) {
+  border-color: rgba(134, 162, 184, 0.52);
+  box-shadow: 0 10px 22px rgba(134, 162, 184, 0.14);
+  transform: translateY(-1px);
+}
+
+.editor-replace-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
+}
+
+.editor-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background: rgba(45, 45, 45, 0.24);
+  padding: clamp(12px, 4vw, 28px);
+  backdrop-filter: blur(10px);
+}
+
+.editor-color-dialog {
+  width: min(920px, 100%);
+  max-height: min(760px, calc(100dvh - 28px));
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  gap: 12px;
+  border: 1px solid rgba(134, 162, 184, 0.22);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(235, 243, 249, 0.22), transparent 30%),
+    rgba(242, 247, 250, 0.98);
+  box-shadow: var(--pd-shadow-float);
+  padding: clamp(14px, 3vw, 22px);
+}
+
+.editor-color-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.editor-color-dialog__header div {
+  display: grid;
+  gap: 2px;
+}
+
+.editor-color-dialog__header strong {
+  color: var(--pd-fg-1);
+  font-family: var(--pd-font-body);
+  font-size: clamp(24px, 5vw, 34px);
+  line-height: 1;
+}
+
+.editor-color-dialog__header span,
+.editor-color-section h2,
+.editor-color-empty {
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.editor-color-dialog__header button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(134, 162, 184, 0.24);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--pd-fg-1);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.editor-color-search {
+  display: grid;
+  gap: 6px;
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.editor-color-search input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--pd-stroke);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--pd-fg-1);
+  font: inherit;
+  font-weight: 600;
+  outline: none;
+  padding: 0 14px;
+}
+
+.editor-color-search input:focus {
+  border-color: rgba(134, 162, 184, 0.58);
+  box-shadow: 0 0 0 4px rgba(134, 162, 184, 0.12);
+}
+
+.editor-replace-confirm {
+  display: grid;
+  grid-template-columns: auto auto auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(134, 162, 184, 0.26);
+  border-radius: 18px;
+  background: rgba(235, 243, 249, 0.76);
+  padding: 10px;
+}
+
+.editor-replace-confirm div {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 6px;
+  color: var(--pd-fg-1);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.editor-replace-confirm div span {
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(45, 45, 45, 0.1);
+  border-radius: 999px;
+}
+
+.editor-replace-confirm em {
+  color: var(--pd-orange);
+  font-style: normal;
+  font-weight: 600;
+}
+
+.editor-replace-confirm p,
+.editor-replace-message {
+  margin: 0;
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.editor-replace-confirm button {
+  min-height: 34px;
+  border: 1px solid rgba(134, 162, 184, 0.24);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--pd-orange);
+  padding: 0 12px;
+}
+
+.editor-replace-confirm__primary {
+  border-color: transparent !important;
+  background: var(--pd-gradient-warm) !important;
+  color: var(--pd-fg-1) !important;
+  box-shadow: 0 10px 22px rgba(134, 162, 184, 0.14);
+}
+
+.editor-replace-message {
+  border: 1px solid rgba(134, 162, 184, 0.2);
+  border-radius: 14px;
+  background: rgba(235, 243, 249, 0.68);
+  padding: 9px 11px;
+}
+
+.editor-color-section {
+  display: grid;
+  gap: 8px;
+}
+
+.editor-color-section h2 {
+  margin: 0;
+}
+
+.editor-color-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.editor-color-tabs button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  border: 1px solid var(--pd-stroke);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--pd-fg-2);
+  padding: 0 13px;
+}
+
+.editor-color-tab--active {
+  border-color: transparent !important;
+  background: var(--pd-gradient-warm) !important;
+  color: var(--pd-fg-1) !important;
+  box-shadow: 0 10px 22px rgba(134, 162, 184, 0.16);
+}
+
+.editor-color-grid {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 8px;
+  overflow-y: auto;
+  padding: 2px 2px 4px;
+}
+
+.editor-color-grid--recent {
+  grid-template-columns: repeat(auto-fill, minmax(64px, 82px));
+  max-height: 90px;
+  overflow-y: hidden;
+}
+
+.editor-color-card {
+  min-width: 0;
+  min-height: 68px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  border: 1px solid var(--pd-stroke);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--pd-fg-1);
+  padding: 8px;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
+}
+
+.editor-color-card:hover,
+.editor-color-card--active {
+  border-color: rgba(134, 162, 184, 0.56);
+  box-shadow: 0 10px 22px rgba(134, 162, 184, 0.14);
+  transform: translateY(-1px);
+}
+
+.editor-color-card span {
+  width: 30px;
+  height: 30px;
+}
+
+.editor-color-card strong {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--pd-fg-1);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-color-empty {
+  margin: 0;
+  text-align: center;
+}
+
+@media (min-width: 1024px) {
+  .editor-page {
+    grid-template-columns: minmax(0, 1fr) clamp(300px, 26vw, 360px);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+      "top top"
+      "canvas panel";
+  }
+
+  .editor-state {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+  }
+
+  .editor-topbar {
+    grid-area: top;
+  }
+
+  .editor-canvas-shell {
+    grid-area: canvas;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: clamp(14px, 2vw, 24px);
+  }
+
+  .editor-tray {
+    grid-area: panel;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    border-top: 0;
+    border-left: 1px solid rgba(242, 247, 250, 0.86);
+    background: rgba(235, 243, 249, 0.94);
+    padding: 16px clamp(14px, 1.6vw, 20px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    box-shadow: -12px 0 28px rgba(45, 45, 45, 0.05);
+  }
+
+  .editor-tray__status,
+  .editor-tools,
+  .editor-palette,
+  .editor-current {
+    width: 100%;
+  }
+
+  .editor-tray__status {
+    border: 1px solid rgba(134, 162, 184, 0.14);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.72);
+    padding: 12px;
+  }
+
+  .editor-tools {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .editor-tool-segment {
+    flex: 1 1 178px;
+  }
+
+  .editor-tool-square {
+    flex: 1 1 0;
+    min-width: 82px;
+  }
+
+  .editor-tool-grid {
+    flex: 1 1 116px;
+    min-width: 116px;
+  }
+
+  .editor-palette {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    align-items: stretch;
+    gap: 8px;
+    overflow: visible;
+    overscroll-behavior: auto;
+    padding: 0;
+  }
+
+  .editor-color {
+    width: 100%;
+    min-width: 0;
+    min-height: 56px;
+  }
+
+  .editor-color strong {
+    font-size: 10.5px;
+  }
+
+  .editor-current {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 860px) {
+  .editor-topbar {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .editor-topbar__actions {
+    grid-column: 1 / -1;
+    justify-content: stretch;
+  }
+
+  .editor-topbar__actions .editor-icon-button {
+    flex: 0 0 42px;
+  }
+
+  .editor-topbar__actions .editor-download,
+  .editor-topbar__actions .editor-save {
+    flex: 1 1 0;
+  }
+
+  .editor-tray {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editor-tray__status,
+  .editor-tools,
+  .editor-palette,
+  .editor-current {
+    grid-column: 1 / -1;
+  }
+
+  .editor-tools {
+    justify-content: stretch;
+  }
+}
+
+@media (max-width: 560px) {
+  .editor-page {
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+
+  .editor-topbar {
+    min-height: 54px;
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .editor-back,
+  .editor-topbar__actions button {
+    min-height: 38px;
+    padding: 0 11px;
+  }
+
+  .editor-icon-button {
+    width: 38px;
+    padding: 0 !important;
+  }
+
+  .editor-title strong {
+    font-size: 18px;
+  }
+
+  .editor-title span {
+    font-size: 11px;
+  }
+
+  .editor-canvas-shell {
+    padding: 6px;
+  }
+
+  .editor-tray {
+    gap: 8px;
+    padding: 8px 8px max(8px, env(safe-area-inset-bottom));
+  }
+
+  .editor-tools {
+    gap: 8px;
+  }
+
+  .editor-tool-segment {
+    gap: 5px;
+  }
+
+  .editor-tools button {
+    min-height: 52px;
+    padding-inline: 9px;
+  }
+
+  .editor-tool-square {
+    min-width: 82px;
+  }
+
+  .editor-color {
+    min-width: 58px;
+    min-height: 48px;
+    border-radius: 14px;
+    padding: 5px 7px;
+  }
+
+  .editor-current {
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-width: 0;
+    border-radius: 16px;
+  }
+
+  .editor-replace-trigger {
+    min-height: 38px;
+    padding: 0 9px;
+  }
+
+  .editor-color-dialog {
+    max-height: calc(100dvh - 18px);
+    border-radius: 22px;
+  }
+
+  .editor-replace-confirm {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .editor-replace-confirm p,
+  .editor-replace-confirm button {
+    grid-column: 1 / -1;
+  }
+
+  .editor-color-grid {
+    grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+    gap: 8px;
+  }
+
+  .editor-color-card {
+    min-height: 76px;
+  }
+}
+</style>

@@ -19,7 +19,7 @@ from customer_auth import require_customer
 
 _database = None
 POINTS_PER_CAD = 100
-VISIT_REWARD = 100
+VISIT_REWARD = 166
 ZONE = ZoneInfo("America/Toronto")
 
 

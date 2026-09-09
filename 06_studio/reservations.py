@@ -307,12 +307,17 @@ def register(app, database, admin_actor):
         return {"items":[public_row(row) for row in rows],'total':total,'page':page}
 
     @app.get("/studio-api/manage/reservations")
-    def listing(_actor=Depends(admin_actor), status: str="all", day: date | None=None, search: str="", page: int=1, deleted:bool=False):
+    def listing(_actor=Depends(admin_actor), status: str="all", day: date | None=None, search: str="", page: int=1, deleted:bool=False, at:str=""):
         if status not in STATES | {"all"} or not 1 <= page <= 10000 or len(search) > 120:
             raise HTTPException(422, "invalid_filter")
         clauses, params = ['deleted_at IS NOT NULL' if deleted else 'deleted_at IS NULL'], []
         if status != "all": clauses.append("status=?"); params.append(status)
         if day: clauses.append("json_extract(payload,'$.booking.date')=?"); params.append(str(day))
+        if at:
+            if not day or deleted or not re.fullmatch(r'\d{2}:\d{2}',at): raise HTTPException(422,'invalid_filter')
+            end=clock(minute(at)+30)
+            clauses.extend(["status IN ('pending','confirmed','completed')","json_extract(payload,'$.booking.start')<?","json_extract(payload,'$.booking.end')>?"])
+            params.extend([end,at])
         if search: clauses.append("(instr(lower(json_extract(payload,'$.name')),lower(?))>0 OR instr(id,?)>0)"); params.extend([search,search])
         where = " WHERE " + " AND ".join(clauses) if clauses else ""
         with database() as db:
@@ -321,6 +326,30 @@ def register(app, database, admin_actor):
             counts = dict(db.execute("SELECT status,count(*) FROM studio_reservations WHERE deleted_at IS NULL GROUP BY status").fetchall())
             policy = read_policy(db)
         return {"items":[public_row(r) | {"payload":json.loads(r["payload"]),"staff_note":r["staff_note"],'owner_id':r['owner_id'],'deleted_at':r['deleted_at']} for r in rows], "total":count,"counts":counts,"policy":policy}
+
+    @app.get('/studio-api/manage/reservation-timetable')
+    def timetable(_actor=Depends(admin_actor),start:date|None=None):
+        first=start or now_local().date();last=first+timedelta(days=14)
+        with database() as db:
+            policy=read_policy(db)
+            # Aggregate every overlapping booking, independently of the list's 30-row pagination.
+            rows=db.execute("SELECT status,json_extract(payload,'$.booking') FROM studio_reservations WHERE deleted_at IS NULL AND status IN ('pending','confirmed','completed') AND json_extract(payload,'$.booking.date')>=? AND json_extract(payload,'$.booking.date')<?",(str(first),str(last))).fetchall()
+            blocks=[dict(r) for r in db.execute('SELECT date,start,end FROM reservation_blocks WHERE date>=? AND date<?',(str(first),str(last)))]
+        days=[]
+        booked=[(r[0],json.loads(r[1])) for r in rows]
+        for index in range(14):
+            day=first+timedelta(days=index);opening=hours(day,policy);slots=[]
+            present=[(s,b) for s,b in booked if b['date']==str(day)]
+            for at in range(0,1440,30):
+                begin,end=clock(at),clock(at+30)
+                slot={'start':begin,'end':end,'closed':not opening['enabled'] or begin<opening['open'] or end>opening['close'],
+                      'blocked':any(b['date']==str(day) and b['start']<end and b['end']>begin for b in blocks)}
+                for state in ('pending','confirmed','completed'):
+                    overlaps=[b for s,b in present if s==state and b['start']<end and b['end']>begin]
+                    slot[state]=sum(b['guests'] for b in overlaps);slot[state+'_groups']=len(overlaps)
+                slots.append(slot)
+            days.append({'date':str(day),'open':opening['open'],'close':opening['close'],'closed':not opening['enabled'],'slots':slots})
+        return {'days':days,'timezone':str(ZONE),'policy_version':policy['version']}
 
     @app.patch("/studio-api/manage/reservations/{reference}")
     def update(reference: str, payload: ReservationUpdate, actor=Depends(admin_actor)):

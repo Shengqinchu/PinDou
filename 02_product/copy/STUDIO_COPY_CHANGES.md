@@ -121,3 +121,17 @@
 - 余额旁 `i` 保留现有时长与积分规则原文，桌面悬停／键盘及手机点击均可读；CAD 可抵扣金额放入积分提示。新增 `profile` 模块记录资料编辑、上传约束、保存错误、简短空状态与无障碍标签。
 - 复用图纸工具的昵称和头像接口。当前小登录资料未提供真实微信昵称／头像，绑定提示如实说明，不把自动生成的 `wechat_*` 名称冒充微信昵称。
 - 用户指定积分规则不变：100 积分抵 CAD 1，整数 CAD 抵扣、零头保留；真实到店记录赠100积分一次。
+
+## 2026-09-09 / 生成器主站整合、166到店赠分与管理时段表
+
+授权来源：店主要求生成器封装到主网站、适配UI颜色设计，并确认“完整中英双语”；随后“另外再加上这两个问题的修复，开工吧”，截图指定到店赠分改166及预约管理加入日期时段表。
+
+- 新增 `generator` 与 `generator-shell`：从已核验的线上生成器提取中文原文、提供完整英文对应，包含控件、错误、进度、教程、额度和无障碍说明。原始机器参数、真实色卡与费率不翻译或换算。
+- `wallet.earn_rule`、`attendance_help`由100改166；兑换仍为100积分/CAD1，历史账目不补差、不重发。
+- 新增 `reservation-timetable`：管理员半小时时段汇总、状态图例、日期翻页、点击筛选与辅助名称。
+
+- 2026-09-09 owner screenshot follow-up: wallet balances and history display decimal hours (30 min = 0.5 h, 90 min = 1.5 h), retaining minute precision in storage and host entry forms.
+
+- Generator parameter help now reflects the verified production service: 20–200 cells per side, aspect ratio 0.5–2; fixes existing misleading 1-cell wording. Tutorial imagery is recaptured in both languages from the native UI using an offline Standard pattern.
+
+- Upload errors now explain unsupported HEIC conversion and the 12 MB request boundary before submission; removed the unimplemented automatic-compression promise. Tool prices explicitly retain CNY denomination.

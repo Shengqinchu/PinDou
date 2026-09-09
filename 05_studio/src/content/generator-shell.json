@@ -1,0 +1,16 @@
+{
+ "title":["拼豆图纸生成器","Pattern maker"],
+ "create":["制作图纸","Make a pattern"],
+ "works":["我的作品","My works"],
+ "tutorial":["使用教程","How to use"],
+ "credits":["AI 积分","AI credits"],
+ "passes":["普通生成","Standard"],
+ "wallet":["工具额度与兑换","Tool allowance and codes"],
+ "ready":["图纸已生成","Your pattern is ready"],
+ "view_result":["查看图纸","View pattern"],
+ "loading":["正在打开工具…","Opening the pattern maker…"],
+ "credit_help":["工具额度用于生成图纸，与店铺到店积分、储值时长分别记录。","Tool allowance is used for pattern generation. It is separate from studio loyalty points and prepaid visit time."],
+ "unlimited":["不限","Unlimited"],
+ "not_open":["未开通","No pass"],
+ "units":["{v0} 次","{v0} uses"]
+}

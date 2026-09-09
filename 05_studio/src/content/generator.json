@@ -1,0 +1,1714 @@
+{
+  "e7df88a711": [
+    "请求失败 ({v0})",
+    "Request failed ({v0})"
+  ],
+  "81ac5eab68": [
+    "登录账号已变化，请重新打开此页面。",
+    "Your account changed. Please reopen this page."
+  ],
+  "82ca4a6ba6": [
+    "空",
+    "Empty"
+  ],
+  "ef23ea67b0": [
+    "浏览",
+    "Pan"
+  ],
+  "ef89f04b76": [
+    "橡皮擦",
+    "Eraser"
+  ],
+  "45263a44bb": [
+    "未选",
+    "None selected"
+  ],
+  "b823339c01": [
+    "拼豆图纸画布",
+    "Bead pattern canvas"
+  ],
+  "2a2b777ae4": [
+    "行",
+    "row"
+  ],
+  "ad3ee64830": [
+    "列",
+    "column"
+  ],
+  "a85b0e899c": [
+    "选中",
+    "Selected"
+  ],
+  "cd89854068": [
+    "体验包",
+    "Starter pack"
+  ],
+  "da96ae386f": [
+    "标准包",
+    "Standard pack"
+  ],
+  "9dea6f5407": [
+    "超值包",
+    "Value pack"
+  ],
+  "d02a49b981": [
+    "周卡",
+    "Weekly pass"
+  ],
+  "bea2209399": [
+    "月卡",
+    "Monthly pass"
+  ],
+  "67bb7d1f11": [
+    "季卡",
+    "Quarterly pass"
+  ],
+  "e8041a8c93": [
+    "未登录",
+    "Signed out"
+  ],
+  "6901b4cf1a": [
+    "普通不限",
+    "Unlimited standard"
+  ],
+  "5050acf588": [
+    "会员至 {v0}",
+    "Pass until {v0}"
+  ],
+  "836ae3d91a": [
+    "普通剩余 {v0} 次",
+    "{v0} standard uses left"
+  ],
+  "09c4fc252c": [
+    "不限",
+    "Unlimited"
+  ],
+  "04816ddc36": [
+    "同步中",
+    "Syncing"
+  ],
+  "972cc4b623": [
+    " 张",
+    " patterns"
+  ],
+  "1ff09bb134": [
+    "AI 积分",
+    "AI credits"
+  ],
+  "1958bfa01d": [
+    "时间卡会员",
+    "Standard pass"
+  ],
+  "eab90bb178": [
+    "当前 {v0} 积分，正在同步本次所需积分。",
+    "Balance: {v0} credits. Checking the cost of this generation."
+  ],
+  "a62b070054": [
+    "当前 {v0} 积分，本次需要 {v1}，还差 {v2} 积分。",
+    "Balance: {v0} credits. This needs {v1}; you need {v2} more."
+  ],
+  "e8fdb1124f": [
+    "普通额度用完啦，开通时间卡后普通图纸不限次。",
+    "Your standard allowance is used up. A pass unlocks unlimited standard patterns."
+  ],
+  "201b78553f": [
+    "AI 生成按积分扣费，普通模式可用时间卡解锁不限次。",
+    "AI uses credits. A pass unlocks unlimited standard generation."
+  ],
+  "947dc7fdd2": [
+    "权益已到账",
+    "Your allowance is ready"
+  ],
+  "0d42c38abb": [
+    "+{v0} 积分已到账",
+    "{v0} credits added"
+  ],
+  "63c402a9fc": [
+    "，赠 {v0} 积分已到账",
+    ", including {v0} bonus credits"
+  ],
+  "e1d1bf1d80": [
+    "已开通 {v0}{v1}",
+    "{v0} activated{v1}"
+  ],
+  "c5329f7002": [
+    "套餐暂时加载失败，请稍后重试。",
+    "Plans could not be loaded. Please try again shortly."
+  ],
+  "c41b116906": [
+    "最受欢迎",
+    "Most popular"
+  ],
+  "ee7b253d02": [
+    "请先登录/注册后购买，避免换设备后余额丢失。",
+    "Sign in before purchasing so your balance stays with your account across devices."
+  ],
+  "f74105bf81": [
+    "正在生成支付二维码…",
+    "Preparing payment QR code…"
+  ],
+  "d51809e74b": [
+    "下单失败，请稍后再试。",
+    "The order could not be created. Please try again."
+  ],
+  "3bba277cac": [
+    "请输入兑换码。",
+    "Enter a redemption code."
+  ],
+  "229505ce90": [
+    "时间卡兑换成功，会员权益已刷新。",
+    "Pass redeemed. Your allowance has been refreshed."
+  ],
+  "2569089a03": [
+    "时间卡已兑换到本设备。",
+    "The pass was redeemed on this device."
+  ],
+  "6ab767a9a1": [
+    "积分兑换成功，余额已刷新。",
+    "Credits redeemed. Your balance has been refreshed."
+  ],
+  "480967589c": [
+    "积分已兑换到本设备。",
+    "Credits were added to this device."
+  ],
+  "00eb3ef032": [
+    "兑换失败，请检查兑换码。",
+    "Redemption failed. Please check the code."
+  ],
+  "767c7ee4f3": [
+    "订单创建成功但缺少支付信息，请重新打开支付页。",
+    "The order was created, but payment details are missing. Please reopen the payment page."
+  ],
+  "896e35ceeb": [
+    "二维码已过期。若已付款，请保留支付截图，联系客服补单。",
+    "This QR code expired. If you already paid, keep your receipt and contact support."
+  ],
+  "fb9fc8d320": [
+    "支付成功，资料刷新失败，请手动刷新页面。",
+    "Payment succeeded, but your profile could not be refreshed. Please refresh the page."
+  ],
+  "9a8b0eef4c": [
+    "这个订单已失效，请重新选择套餐。",
+    "This order expired. Please choose a plan again."
+  ],
+  "716351ed28": [
+    "订单状态暂时查不到，稍后会继续刷新。",
+    "We cannot check the order yet. It will refresh shortly."
+  ],
+  "ba71026dbb": [
+    "权益已处理，资料刷新失败时请手动刷新页面。",
+    "Your allowance was processed. Refresh the page if your profile has not updated."
+  ],
+  "a8588e6f25": [
+    "积分包",
+    "Credit pack"
+  ],
+  "7e396634c6": [
+    "包",
+    "pack"
+  ],
+  "b2f2eb5732": [
+    "普通图纸",
+    "Standard patterns"
+  ],
+  "4ce51255cc": [
+    "{v0} 积分",
+    "{v0} credits"
+  ],
+  "024bb29e8a": [
+    "{v0} 天普通无限",
+    "{v0} days of unlimited standard patterns"
+  ],
+  "fed2867ccc": [
+    "≈ {v0} 张 AI",
+    "≈ {v0} AI patterns"
+  ],
+  "5b688c8c6d": [
+    "赠 {v0} 积分",
+    "{v0} bonus credits"
+  ],
+  "53035780c6": [
+    "关闭定价弹窗",
+    "Close plans"
+  ],
+  "0a2dde4c65": [
+    "充值中心",
+    "Credits and passes"
+  ],
+  "e09555c652": [
+    "支付成功后自动到账。",
+    "Your allowance is added after successful payment."
+  ],
+  "42ae141886": [
+    "查看计费说明",
+    "How billing works"
+  ],
+  "eabbe3a148": [
+    "AI 按",
+    "AI costs"
+  ],
+  "706479a7e8": [
+    "积分/张计费，成功才扣；时间卡只解锁普通模式不限次，赠送积分可用于 AI。",
+    "credits per pattern, charged on success. Passes unlock unlimited standard patterns; bonus credits can be used for AI."
+  ],
+  "04ad726f66": [
+    "生成成功才扣，失败不扣。",
+    "Charged on success. Failed generations are not charged."
+  ],
+  "25e74dceac": [
+    "当前",
+    "Balance"
+  ],
+  "d0c3e8f8d5": [
+    "积分 · 可生成 AI",
+    "credits · AI patterns available"
+  ],
+  "2afd2ad54c": [
+    "CDK 可直接兑换到本设备；充值请先登录/注册，避免换设备后余额丢失。",
+    "Redeem a CDK on this device. Sign in before purchasing to keep your balance across devices."
+  ],
+  "a0fb6806f0": [
+    "充值类型",
+    "Purchase type"
+  ],
+  "deded9295c": [
+    "正在加载套餐…",
+    "Loading plans…"
+  ],
+  "31a7e8aea6": [
+    "支付成功",
+    "Payment successful"
+  ],
+  "a6028ffab8": [
+    "钱包正在刷新，稍后自动关闭",
+    "Refreshing your wallet. This will close shortly."
+  ],
+  "c8715f381c": [
+    "微信扫码支付",
+    "Pay with WeChat"
+  ],
+  "5b84acc4f1": [
+    "支付二维码",
+    "Payment QR code"
+  ],
+  "2d0366384f": [
+    "二维码",
+    "QR code"
+  ],
+  "580d36db9f": [
+    "内有效",
+    "remaining"
+  ],
+  "8cec2a3233": [
+    "二维码已过期。",
+    "This QR code expired."
+  ],
+  "11d0241540": [
+    "返回",
+    "Back"
+  ],
+  "2e19057052": [
+    "重新生成",
+    "Generate again"
+  ],
+  "55fa8292fb": [
+    "有兑换码？",
+    "Have a code?"
+  ],
+  "5f734c32b7": [
+    "输入 CDK 兑换码",
+    "Enter CDK redemption code"
+  ],
+  "25940ac897": [
+    "AI 积分还差一点",
+    "More AI credits needed"
+  ],
+  "91b6dd66bc": [
+    "普通生成权益不足",
+    "Standard allowance needed"
+  ],
+  "bbeebfa249": [
+    "AI 模式需要可用积分。你可以兑换 CDK、注册领取免费额度，或充值后继续生成。",
+    "AI requires available credits. Redeem a CDK, sign up for a welcome allowance, or buy credits to continue."
+  ],
+  "5119b50f1a": [
+    "普通模式需要时间卡或普通额度。你可以兑换 CDK、注册领取免费额度，或开通时间卡。",
+    "Standard generation requires a pass or available uses. Redeem a CDK, sign up for a welcome allowance, or activate a pass."
+  ],
+  "3d02b40bad": [
+    "充值积分",
+    "Get AI credits"
+  ],
+  "1cadea35a6": [
+    "开通时间卡",
+    "Get a pass"
+  ],
+  "b9b46e1144": [
+    "关闭额度引导",
+    "Close allowance options"
+  ],
+  "2805a589bb": [
+    "继续生成",
+    "Continue generating"
+  ],
+  "f3c6c93001": [
+    "选择继续方式",
+    "Choose how to continue"
+  ],
+  "131d4a2741": [
+    "兑换 CDK 直接用",
+    "Redeem a CDK"
+  ],
+  "86b739ed1b": [
+    "游客也可兑换到本设备",
+    "Guests can redeem on this device"
+  ],
+  "62b46f24ae": [
+    "推荐",
+    "Recommended"
+  ],
+  "0cab21ca13": [
+    "注册领免费额度",
+    "Sign up for a welcome allowance"
+  ],
+  "cb104b5c8d": [
+    "3 次普通 + 188 积分",
+    "3 standard uses + 188 credits"
+  ],
+  "71b5cdecbe": [
+    "登录后购买，权益绑账号",
+    "Sign in to keep purchases on your account"
+  ],
+  "0b943c7afc": [
+    "生成成功才会扣额度，失败不会扣。",
+    "Your allowance is charged only when generation succeeds."
+  ],
+  "740e700712": [
+    "PinDou 用户",
+    "PinDou user"
+  ],
+  "39633dce90": [
+    "AI 模式",
+    "AI mode"
+  ],
+  "1838450b3b": [
+    "Q版后转图纸",
+    "Stylize, then make a pattern"
+  ],
+  "e8a4554eb3": [
+    "普通模式",
+    "Standard mode"
+  ],
+  "fd544135fa": [
+    "秒出原图量化",
+    "Convert your image directly"
+  ],
+  "261757e6a1": [
+    "萌宠特化",
+    "Pets"
+  ],
+  "f2e0bbd562": [
+    "宠物轮廓更清楚",
+    "Clearer pet outlines"
+  ],
+  "336c08eb47": [
+    "人像特化",
+    "Portraits"
+  ],
+  "8499e19d68": [
+    "适合真人和实物照",
+    "For people and objects"
+  ],
+  "0b2580c9bf": [
+    "卡通特化",
+    "Cartoons"
+  ],
+  "683350cf18": [
+    "适合卡通原图",
+    "For existing cartoon images"
+  ],
+  "ff17173709": [
+    "请先选择一张照片。",
+    "Choose a photo first."
+  ],
+  "131e4229a9": [
+    "生成完成但没有拿到结果，请到作品集刷新查看。",
+    "Generation finished, but the result is not available yet. Refresh your works to check."
+  ],
+  "2948ff9e53": [
+    "AI 生成暂时失败，请稍后重试或切换普通模式。",
+    "AI generation failed. Try again shortly or use standard mode."
+  ],
+  "b6c2ca4985": [
+    "AI 生成仍在处理中，请稍后到作品集查看，或重新提交一次。",
+    "AI is still processing. Check your works shortly before submitting another task."
+  ],
+  "cfcbc98815": [
+    "AI 生成时间较长，请稍后重试；也可以切换普通模式先生成。",
+    "AI is taking longer than expected. Try again later, or try standard mode."
+  ],
+  "2a14b6d51e": [
+    "图纸生成失败，请重新试一次。",
+    "Pattern generation failed. Please try again."
+  ],
+  "e192025a0c": [
+    "PinDou 拼豆图纸",
+    "PinDou bead pattern"
+  ],
+  "778fc8f994": [
+    "全部",
+    "All"
+  ],
+  "fcb979ef0b": [
+    "处理中",
+    "Processing"
+  ],
+  "2eaa0e3743": [
+    "存相册",
+    "Save image"
+  ],
+  "2b9d013177": [
+    "下载",
+    "Download"
+  ],
+  "39bfeaacb5": [
+    "拼豆图纸_{v0}.png",
+    "Bead_pattern_{v0}.png"
+  ],
+  "a032e8fdda": [
+    "保存中",
+    "Saving"
+  ],
+  "cdfab96f75": [
+    "已保存",
+    "Saved"
+  ],
+  "40525a7328": [
+    "保存失败",
+    "Save failed"
+  ],
+  "b2680641e3": [
+    "有未保存修改",
+    "Unsaved changes"
+  ],
+  "76ce8e3d5e": [
+    "已同步",
+    "Synced"
+  ],
+  "6f37e32b6f": [
+    "图纸还有未保存的修改，确定要离开吗？",
+    "This pattern has unsaved changes. Leave anyway?"
+  ],
+  "029aed78bc": [
+    "编辑器加载失败，请回到作品集重新打开。",
+    "The editor could not load. Reopen the pattern from your works."
+  ],
+  "2cba99cf85": [
+    "请先选中图纸中正在使用的颜色。",
+    "Select a colour currently used in this pattern first."
+  ],
+  "bd199d3971": [
+    "请先选择要替换的源色。",
+    "Choose the colour you want to replace first."
+  ],
+  "241c8d6ed4": [
+    "目标色和源色相同，不需要替换。",
+    "The replacement is the same colour. No change is needed."
+  ],
+  "fe50997ee0": [
+    "图纸里已经没有 {v0} 了。",
+    "This pattern no longer uses {v0}."
+  ],
+  "8efa973514": [
+    "保存失败，请稍后再试。",
+    "Saving failed. Please try again."
+  ],
+  "87355246b9": [
+    "准备下载…",
+    "Preparing download…"
+  ],
+  "6644f06197": [
+    "保存中…",
+    "Saving…"
+  ],
+  "b790d3a614": [
+    "高清图纸还没准备好，请先保存后再试。",
+    "The full-size pattern is not ready. Save it first, then try again."
+  ],
+  "e0dab22b1a": [
+    "下载失败",
+    "Download failed"
+  ],
+  "d1875fed56": [
+    "准备保存到相册…",
+    "Preparing to save image…"
+  ],
+  "65188d08a2": [
+    "下载中…",
+    "Downloading…"
+  ],
+  "03406a4fd5": [
+    "保存到相册或分享这张拼豆图纸。",
+    "Save or share this bead pattern."
+  ],
+  "aba61b8a01": [
+    "已打开保存面板 ✓",
+    "Save panel opened ✓"
+  ],
+  "a5ffdc95ee": [
+    "已取消",
+    "Cancelled"
+  ],
+  "8e22313079": [
+    "浏览器不支持直接保存相册，已打开高清图纸，可长按保存。",
+    "Direct photo saving is unavailable. The full-size image is open; touch and hold it to save."
+  ],
+  "b38f9c39b3": [
+    "已打开高清图纸",
+    "Full-size pattern opened"
+  ],
+  "fee77e685f": [
+    "已下载到文件，若未进入相册，请在下载列表里打开后长按保存。",
+    "Downloaded to files. Open it from your downloads and touch and hold to save it to Photos."
+  ],
+  "33f80f7a65": [
+    "完成 ✓",
+    "Done ✓"
+  ],
+  "1a26edf94a": [
+    "其他",
+    "Other"
+  ],
+  "76a3e2cb94": [
+    "正在打开",
+    "Opening"
+  ],
+  "ee2ee7dda0": [
+    "读取图纸中",
+    "Loading pattern"
+  ],
+  "b791910c1e": [
+    "编辑器加载失败",
+    "Editor could not load"
+  ],
+  "c5a4b5c7bf": [
+    "暂时打不开这个图纸",
+    "This pattern is not available right now"
+  ],
+  "fd16777715": [
+    "回作品集",
+    "Back to my works"
+  ],
+  "338e106616": [
+    "图纸编辑器",
+    "Pattern editor"
+  ],
+  "d40929f964": [
+    "豆 ·",
+    "beads ·"
+  ],
+  "1391f4a4c6": [
+    "色",
+    "colours"
+  ],
+  "9fcefd8dc8": [
+    "撤销",
+    "Undo"
+  ],
+  "1238f0d363": [
+    "重做",
+    "Redo"
+  ],
+  "e2d53a6d3a": [
+    "重试",
+    "Retry"
+  ],
+  "81590250fc": [
+    "编辑工具",
+    "Editing tools"
+  ],
+  "5ed8d65874": [
+    "画笔和橡皮擦",
+    "Brush and eraser"
+  ],
+  "203114dfc0": [
+    "画笔",
+    "Brush"
+  ],
+  "9e7879e620": [
+    "画",
+    "Paint"
+  ],
+  "7dbe873740": [
+    "擦",
+    "Erase"
+  ],
+  "53beedc904": [
+    "已用色",
+    "Colours in use"
+  ],
+  "08c86780b8": [
+    "全部颜色",
+    "All colours"
+  ],
+  "3239502ee7": [
+    "当前工具",
+    "Current tool"
+  ],
+  "1255edcdf8": [
+    "全局替换为…",
+    "Replace everywhere…"
+  ],
+  "4170cd5063": [
+    "将",
+    "Replace"
+  ],
+  "2aec759759": [
+    "替换成新的色号",
+    "with a different colour code"
+  ],
+  "8374111b2c": [
+    "关闭全部颜色",
+    "Close all colours"
+  ],
+  "7835fb4531": [
+    "搜索色号",
+    "Search colours"
+  ],
+  "e9e8296469": [
+    "输入 A1 / 黑 / #FF",
+    "Enter A1 / black / #FF"
+  ],
+  "ee57701108": [
+    "将替换",
+    "This replaces"
+  ],
+  "7e617c668f": [
+    "格，撤销时会一次全部恢复。",
+    "cells. Undo restores them all in one step."
+  ],
+  "25c5e551b2": [
+    "再选一个",
+    "Choose another"
+  ],
+  "1751c5fa51": [
+    "确认替换",
+    "Confirm replacement"
+  ],
+  "71265fc4cb": [
+    "最近使用",
+    "Recently used"
+  ],
+  "fb3c391e35": [
+    "色系",
+    "Colour family"
+  ],
+  "560d604f97": [
+    "MARD 色卡",
+    "MARD palette"
+  ],
+  "54c58bd5b5": [
+    "没有找到这个颜色",
+    "No matching colours"
+  ],
+  "356468a887": [
+    "AI 风格化中",
+    "AI stylizing"
+  ],
+  "0f9b3fec5e": [
+    "先把照片整理成 Q 版卡通",
+    "Turning your photo into a cartoon"
+  ],
+  "c4c52df074": [
+    "提炼拼豆轮廓",
+    "Refining the outline"
+  ],
+  "976b827f49": [
+    "保留主体、边线和大色块",
+    "Keeping the subject, edges and main colours"
+  ],
+  "9ed62eb171": [
+    "匹配豆色",
+    "Matching bead colours"
+  ],
+  "380678cb5a": [
+    "把画面压进 MARD 色号体系",
+    "Matching the image to MARD colour codes"
+  ],
+  "de065fd682": [
+    "导出图纸",
+    "Exporting the pattern"
+  ],
+  "f551e68924": [
+    "生成网格、清单和作品记录",
+    "Preparing the grid, colour list and saved work"
+  ],
+  "134d36cb25": [
+    "整理照片",
+    "Preparing the photo"
+  ],
+  "2b64c49315": [
+    "校正方向和尺寸",
+    "Checking orientation and size"
+  ],
+  "891b71bbc4": [
+    "直接使用色卡量化",
+    "Matching the original image to the palette"
+  ],
+  "152a7a84cd": [
+    "生成图纸",
+    "Creating the pattern"
+  ],
+  "c6030f082b": [
+    "保存预览和清单",
+    "Saving the preview and colour list"
+  ],
+  "34b4d9f7c3": [
+    "生成遇到问题",
+    "Generation needs attention"
+  ],
+  "dd39999c56": [
+    "Q 版豆图正在制作",
+    "Your AI bead pattern is taking shape"
+  ],
+  "2ed1b057f4": [
+    "图纸正在快速生成",
+    "Your pattern is being created"
+  ],
+  "681bb2f0fd": [
+    "{v0} · {v1}{v2} · {v3}格",
+    "{v0} · {v1}{v2} · {v3} cells"
+  ],
+  "01475c7946": [
+    "这次生成没有找到原图，请回到上传页重新选择。",
+    "The source image is missing. Return to upload and choose it again."
+  ],
+  "1d937f69fe": [
+    "正在提交 AI 生成任务。",
+    "Submitting your AI generation task."
+  ],
+  "a893edab9d": [
+    "回到上传",
+    "Back to upload"
+  ],
+  "d7ebc1e7ca": [
+    "注册或登录后继续生成",
+    "Sign in to continue generating"
+  ],
+  "361427d35f": [
+    "关闭登录弹窗",
+    "Close sign-in"
+  ],
+  "f8486781ee": [
+    "拼豆图纸_{v0}",
+    "Bead_pattern_{v0}"
+  ],
+  "fda25ea027": [
+    "拼豆图纸",
+    "Bead-pattern"
+  ],
+  "8f9c40ec2a": [
+    "结果加载失败，请回到作品集重新打开。",
+    "The result could not load. Reopen it from your works."
+  ],
+  "b2c68c6b7e": [
+    "重新生成需要原图，请回到上传页重新选择照片。",
+    "Generating again needs the source image. Return to upload and select it again."
+  ],
+  "e5a331f0d3": [
+    "图片已在新窗口打开，手机端可长按保存。",
+    "The image is open in a new window. Touch and hold to save it on your phone."
+  ],
+  "62e5156191": [
+    "正在读取",
+    "Loading"
+  ],
+  "fe835bb94c": [
+    "正在打开图纸",
+    "Opening your pattern"
+  ],
+  "b3dbced060": [
+    "稍等一下，作品数据马上回来。",
+    "Your saved work will be ready shortly."
+  ],
+  "d9f607a200": [
+    "读取失败",
+    "Could not load"
+  ],
+  "8969a83ae5": [
+    "暂时打不开这个结果",
+    "This result is not available right now"
+  ],
+  "53e50ea462": [
+    "重新上传",
+    "Upload another image"
+  ],
+  "0bf73c1bd6": [
+    "拼豆图纸结果",
+    "Bead pattern result"
+  ],
+  "cee99d1123": [
+    "拼豆图纸预览",
+    "Bead pattern preview"
+  ],
+  "998f7c8db0": [
+    "图纸预览生成中",
+    "Preparing pattern preview"
+  ],
+  "4fd872de1c": [
+    "编辑图纸",
+    "Edit pattern"
+  ],
+  "20b6e2fcec": [
+    "返回主页",
+    "Back to start"
+  ],
+  "5fe05e75d8": [
+    "点击编辑图纸即可",
+    "Open the pattern editor to"
+  ],
+  "a0737ce1f6": [
+    "修改配色",
+    "adjust colours"
+  ],
+  "10ab718386": [
+    "哦~",
+    "."
+  ],
+  "32c9370377": [
+    "重新生成 ›",
+    "Generate again ›"
+  ],
+  "11a14ffea8": [
+    "色号清单",
+    "Colour list"
+  ],
+  "a48a73cc1b": [
+    "图纸摘要",
+    "Pattern summary"
+  ],
+  "94a6711f24": [
+    "尺寸",
+    "Size"
+  ],
+  "921713a4e1": [
+    "格宽",
+    "cells wide"
+  ],
+  "b231b4f5a4": [
+    "豆数",
+    "Beads"
+  ],
+  "d71705bfe2": [
+    "颗",
+    "beads"
+  ],
+  "72699cbbf7": [
+    "色号",
+    "Colour codes"
+  ],
+  "f09a897c5c": [
+    "种",
+    "colours"
+  ],
+  "dbc96489b1": [
+    "没有结果",
+    "No result yet"
+  ],
+  "a562a796b3": [
+    "先上传一张照片",
+    "Upload a photo first"
+  ],
+  "e997a2879e": [
+    "生成完成后，会在这里看到图纸预览和色号清单。",
+    "Your pattern preview and colour list will appear here after generation."
+  ],
+  "45ab4097f1": [
+    "去上传",
+    "Upload a photo"
+  ],
+  "42d6ce10e3": [
+    "调整参数后再试一次",
+    "Adjust the settings and try again"
+  ],
+  "6c14bd7f6f": [
+    "关闭",
+    "Close"
+  ],
+  "9d48527d26": [
+    "生成方式",
+    "Generation mode"
+  ],
+  "a4ce420c69": [
+    "风格",
+    "Style"
+  ],
+  "9229f568fa": [
+    "目标格数",
+    "Grid size"
+  ],
+  "9778d1fc66": [
+    "重新生成尺寸",
+    "Size for the new pattern"
+  ],
+  "452463f580": [
+    "格",
+    "cells"
+  ],
+  "4d0b4688c7": [
+    "取消",
+    "Cancel"
+  ],
+  "8b330eeea4": [
+    "确认重新生成",
+    "Confirm new generation"
+  ],
+  "6566a95018": [
+    "上传照片",
+    "Upload a photo"
+  ],
+  "7f18931ff3": [
+    "选一张主体清楚、光线干净的照片。白底卡通和正脸照片最容易出清爽图纸。",
+    "Choose a well-lit photo with a clear subject. Cartoons on a white background and front-facing portraits often work well."
+  ],
+  "c5b10498cb": [
+    "PinDou 上传页截图",
+    "PinDou upload screen"
+  ],
+  "6ada99c2f4": [
+    "选模式和尺寸",
+    "Choose mode and size"
+  ],
+  "28f7bcf29e": [
+    "卡通原图用普通模式秒出；真人、宠物、实物照片建议 AI 模式，先转 Q 版再量化。",
+    "Use standard mode for an existing cartoon. For people, pets or objects, AI can stylize the photo before conversion."
+  ],
+  "2be4c95a22": [
+    "PinDou 模式和目标格数选择截图",
+    "PinDou mode and grid size settings"
+  ],
+  "4363468b43": [
+    "等待生成",
+    "Wait for generation"
+  ],
+  "1e3614a55b": [
+    "生成中会显示阶段进度。AI 模式稍慢一点，普通模式通常更快。",
+    "Follow the stages as your pattern is made. AI takes a little longer; standard mode is usually quicker."
+  ],
+  "2b98d411a3": [
+    "PinDou 生成中页面截图",
+    "PinDou generation progress screen"
+  ],
+  "881ade0b64": [
+    "检查图纸",
+    "Check the pattern"
+  ],
+  "0f0c71271c": [
+    "看图纸、豆数、色号清单和占比。觉得某块颜色不对，就进入编辑器微调。",
+    "Review the grid, bead count and colour list. Open the editor to adjust colours where needed."
+  ],
+  "7231b0e6e7": [
+    "PinDou 结果页截图",
+    "PinDou result screen"
+  ],
+  "20da7ffe6d": [
+    "编辑和下载",
+    "Edit and download"
+  ],
+  "7fcce50449": [
+    "点格改色、全局替换色号，保存后下载 PNG。手机端可分享或长按保存。",
+    "Paint individual cells or replace a colour throughout the pattern, then save and download a PNG. On a phone, share it or touch and hold to save."
+  ],
+  "ff6d0fec13": [
+    "PinDou 图纸编辑器截图",
+    "PinDou pattern editor screen"
+  ],
+  "0f1d2bf234": [
+    "秒出",
+    "Quick"
+  ],
+  "c8400530cc": [
+    "适合本来就是卡通、线稿、图标的图片",
+    "For existing cartoons, line art and icons"
+  ],
+  "0bbd9424e6": [
+    "直接量化原图，保留原始构图",
+    "Converts the source image while keeping its composition"
+  ],
+  "ad304396f5": [
+    "有时间卡时普通生成不限次",
+    "A pass includes unlimited standard generation"
+  ],
+  "3e853b213a": [
+    "想快速试尺寸、看豆数，先用它。",
+    "Use this to try sizes and check bead counts quickly."
+  ],
+  "d45aa287ef": [
+    "推荐真人/宠物",
+    "Recommended for people and pets"
+  ],
+  "b910673797": [
+    "先把照片变成 Q 版卡通，再转拼豆图纸",
+    "Stylizes your photo before creating the bead pattern"
+  ],
+  "005499348f": [
+    "更容易少色、干净、轮廓清楚",
+    "Helps simplify colours and clarify outlines"
+  ],
+  "9a1e3cc46c": [
+    "统一 128 积分/张，成功才扣",
+    "128 credits per pattern, charged on success"
+  ],
+  "0444adb18f": [
+    "真实照片、实物、杂色背景，优先用它。",
+    "A good starting point for photos, objects and busy backgrounds."
+  ],
+  "2f8c2b38a6": [
+    "AI 模式统一 128 积分/张。生成成功才扣，失败不扣。",
+    "AI costs 128 credits per pattern. Successful generations are charged; failed ones are not."
+  ],
+  "7c9ac84743": [
+    "PinDou 充值中心截图",
+    "PinDou credits and passes screen"
+  ],
+  "faeef25e4c": [
+    "时间卡解锁普通模式不限次，并随卡赠送积分；AI 仍按积分扣。",
+    "Passes include unlimited standard generation and bonus credits. AI still uses credits."
+  ],
+  "7d1ae34af0": [
+    "PinDou 时间卡会员截图",
+    "PinDou pass options"
+  ],
+  "300b507fd3": [
+    "CDK 兑换",
+    "CDK redemption"
+  ],
+  "30e7fed91e": [
+    "有兑换码时可以直接兑换。游客也能把 CDK 兑到当前设备钱包。",
+    "Redeem a code directly. Guests can add a CDK to their current device wallet too."
+  ],
+  "de5e95d9ab": [
+    "PinDou CDK 兑换截图",
+    "PinDou CDK redemption screen"
+  ],
+  "4358ab83e8": [
+    "额度不足",
+    "Insufficient allowance"
+  ],
+  "f737c9cbfd": [
+    "额度不够时会给你三条路：兑换 CDK、注册领礼、充值。",
+    "When your allowance runs out, redeem a CDK, sign up for a welcome allowance, or purchase more."
+  ],
+  "092d0f0ee4": [
+    "PinDou 额度不足三选一引导截图",
+    "PinDou allowance options"
+  ],
+  "0de9c5503e": [
+    "新手教程",
+    "Getting started"
+  ],
+  "69082b2815": [
+    "从照片到拼豆图纸，一页看懂",
+    "From a photo to a bead pattern"
+  ],
+  "eb82fbd80a": [
+    "照着这条流程走：上传照片、选择模式、生成图纸、编辑配色、下载保存。第一次用也不会乱。",
+    "Upload, choose a mode, generate, edit colours and download. Follow the steps for your first pattern."
+  ],
+  "bb98dda057": [
+    "现在去上传",
+    "Upload a photo"
+  ],
+  "ac7bdd7534": [
+    "先看避坑",
+    "Read the tips"
+  ],
+  "01f16d30a0": [
+    "PinDou 结果页预览",
+    "PinDou result preview"
+  ],
+  "fd233dfd58": [
+    "教程小节",
+    "Tutorial sections"
+  ],
+  "2eaed05412": [
+    "普通 vs AI",
+    "Standard vs AI"
+  ],
+  "a14c799d9d": [
+    "积分会员",
+    "Credits and passes"
+  ],
+  "4b6cea87bf": [
+    "怎么生成图纸",
+    "How to make a pattern"
+  ],
+  "26efcd088b": [
+    "上传、选择、生成、编辑、下载，五步就能拿到可照着摆的图纸。",
+    "Upload, choose, generate, edit and download: five steps to a pattern you can bead from."
+  ],
+  "e32b9acfeb": [
+    "普通 vs AI 怎么选",
+    "Choosing standard or AI"
+  ],
+  "d30bff5e4b": [
+    "不需要纠结参数。看原图类型，选对模式就行。",
+    "Start with your source image and choose the mode that suits it."
+  ],
+  "5c5bcb0931": [
+    "PinDou 模式和尺寸选择",
+    "PinDou mode and size settings"
+  ],
+  "807918f91b": [
+    "PinDou 生成进度",
+    "PinDou generation progress"
+  ],
+  "d7cefc27ac": [
+    "积分 / 会员 / CDK 怎么用",
+    "Using credits, passes and CDKs"
+  ],
+  "3dbec82003": [
+    "一句话：AI 用积分，普通看时间卡或普通额度，CDK 可直接兑换到账户或设备。",
+    "AI uses credits. Standard mode uses a pass or available uses. CDKs can be redeemed to an account or device."
+  ],
+  "dceac6b0b5": [
+    "避坑 / FAQ",
+    "Tips and FAQ"
+  ],
+  "1bc74a21ab": [
+    "先把容易翻车的点记住，后面就省很多豆。",
+    "A few things to check before you start beading."
+  ],
+  "9fd7728e93": [
+    "尺寸怎么选？",
+    "Which size should I choose?"
+  ],
+  "dc94129abf": [
+    "第一次建议 52 格起步。26 格豆少但细节糊；78/104 更精细，豆数和时间也更高。",
+    "Start with 52 cells. 26 uses fewer beads but loses detail; 78 and 104 give more detail and take more beads and time."
+  ],
+  "498b322b96": [
+    "为什么不像本人？",
+    "Why does it look different from the person?"
+  ],
+  "6385a20503": [
+    "拼豆是低分辨率图纸，发型、眼睛、嘴巴和标志性衣服最重要。真人照片建议用 AI 模式。",
+    "Bead patterns have limited resolution. Hair, eyes, mouth and distinctive clothing matter most. Try AI for portraits."
+  ],
+  "998853dc15": [
+    "颜色不满意怎么办？",
+    "What if I want different colours?"
+  ],
+  "121ea8d88a": [
+    "进编辑器点格改色，或者用“全局替换”把某个色号一次性换掉。",
+    "Paint individual cells in the editor, or use Replace everywhere to change a colour code throughout the pattern."
+  ],
+  "44a5fb1a71": [
+    "下载后怎么保存？",
+    "How do I save the download?"
+  ],
+  "557afec843": [
+    "电脑会下载 PNG；手机端优先用分享面板保存，浏览器不支持时可打开高清图后长按保存。",
+    "On a computer, download the PNG. On a phone, use the share panel; if unavailable, open the full-size image and touch and hold to save."
+  ],
+  "95844461a8": [
+    "现在做一张自己的拼豆图纸",
+    "Make your own bead pattern"
+  ],
+  "2d08f109af": [
+    "先上传一张你喜欢的照片，PinDou 会帮你整理成可编辑、可下载、可保存的图纸。",
+    "Choose a photo you like and turn it into a pattern you can edit, download and keep."
+  ],
+  "dc83fe2ffb": [
+    "AI 模式：先把照片变成 Q 版再转图纸，更精细，真人、实物照片强烈推荐（有 AI 参与，稍慢一点）。普通模式：直接量化原图，秒出，适合本来就是卡通的图。",
+    "AI mode stylizes your photo before conversion, helping with portraits and objects. It takes a little longer. Standard mode converts the original directly and works well for existing cartoons."
+  ],
+  "a3cfbc080f": [
+    "格子越多，细节越清楚、越还原；格子越少越好拼，但细节会糊。建议从 52 格起步。格数越高，生成时间也越久哦。",
+    "Larger grids preserve more detail. Smaller grids are easier to bead but lose detail. Start with 52 cells; larger grids also take longer to generate."
+  ],
+  "430058dec5": [
+    "{v0} 积分/张",
+    "{v0} credits/pattern"
+  ],
+  "80cee99245": [
+    "积分同步中",
+    "Syncing credits"
+  ],
+  "5757c4a64e": [
+    "消耗 1 次 · 会员期内无限",
+    "Uses 1 · unlimited with a pass"
+  ],
+  "d58e544df1": [
+    "消耗 {v0} 积分",
+    "Uses {v0} credits"
+  ],
+  "753bb2dc14": [
+    "会员免次",
+    "Included in your pass"
+  ],
+  "c6ce215edf": [
+    "消耗 1 次",
+    "Uses 1 standard allowance"
+  ],
+  "cad0ebf315": [
+    "本次消耗 {v0} 积分，生成成功才扣",
+    "This uses {v0} credits, charged on success"
+  ],
+  "3d73441ec8": [
+    "AI 积分同步中，生成成功才扣",
+    "Syncing AI credits; charged on success"
+  ],
+  "a7fdc46723": [
+    "会员期内普通模式免次",
+    "Standard generation is included in your pass"
+  ],
+  "3e13dfab60": [
+    "普通模式消耗 1 次",
+    "Uses 1 standard allowance"
+  ],
+  "bb046fcd8b": [
+    "请输入至少 1 × 1 的格数",
+    "Enter a grid of at least 1 × 1"
+  ],
+  "ee636e1bb6": [
+    "选择照片后开始生成",
+    "Choose a photo to generate"
+  ],
+  "b15be1822f": [
+    "开始生成 · {v0}",
+    "Generate · {v0}"
+  ],
+  "5e5d12dc53": [
+    "请上传 jpg、png、webp 或 HEIC 照片。",
+    "Upload a JPG, PNG, WebP or HEIC photo."
+  ],
+  "8b9671c76f": [
+    "照片较大，会在生成前自动整理。",
+    "This is a large photo. It will be prepared before generation."
+  ],
+  "b11c7ba695": [
+    "照片已就位，可以开始生成。",
+    "Photo ready. You can start generating."
+  ],
+  "1238474f6a": [
+    "自定义格数至少为 1 × 1，且宽高都不能超过 200。",
+    "Custom grids must be at least 1 × 1 and no more than 200 cells on either side."
+  ],
+  "943f58d54b": [
+    "已选择照片预览",
+    "Selected photo preview"
+  ],
+  "a34d247245": [
+    "HEIC 照片已选择",
+    "HEIC photo selected"
+  ],
+  "70a7422342": [
+    "可以继续生成。",
+    "You can continue generating."
+  ],
+  "c8c718f79e": [
+    "拖拽照片到这里",
+    "Drop your photo here"
+  ],
+  "d3ff5197cd": [
+    "或点击选择图片",
+    "or click to choose an image"
+  ],
+  "c5fbc1ca2e": [
+    "从相册选择",
+    "Choose photo"
+  ],
+  "dbbb0ce053": [
+    "拍一张",
+    "Take a photo"
+  ],
+  "23381f3ad8": [
+    "重新选择",
+    "Choose another"
+  ],
+  "71113fd4c8": [
+    "生成选项",
+    "Generation settings"
+  ],
+  "41006327a6": [
+    "生成方式说明",
+    "About generation modes"
+  ],
+  "a00272c585": [
+    "AI 默认推荐",
+    "AI recommended"
+  ],
+  "265e6e3a81": [
+    "仅 AI 模式可用",
+    "Available in AI mode"
+  ],
+  "8a8dc6e731": [
+    "目标格数说明",
+    "About grid sizes"
+  ],
+  "7c21af2fa3": [
+    "按拼豆板规格",
+    "Beadboard sizes"
+  ],
+  "c493338e8c": [
+    "自定义",
+    "Custom"
+  ],
+  "dfcd205790": [
+    "自定义宽度",
+    "Custom width"
+  ],
+  "e55e61e74c": [
+    "自定义高度",
+    "Custom height"
+  ],
+  "98c475bdde": [
+    "按拼豆板规格更好拼",
+    "Board sizes are easier to bead"
+  ],
+  "0f5acafb50": [
+    "关闭确认弹窗",
+    "Close generation confirmation"
+  ],
+  "f7d5b8d499": [
+    "确认这次生成设置",
+    "Confirm generation settings"
+  ],
+  "678e194aae": [
+    "格数",
+    "Grid size"
+  ],
+  "ee53d5e039": [
+    "本次消耗",
+    "This generation uses"
+  ],
+  "bce024df63": [
+    "确认生成",
+    "Confirm generation"
+  ],
+  "e56dc80cde": [
+    "正在整理作品",
+    "Loading your works"
+  ],
+  "ffe5baab17": [
+    "共 {v0} 个作品",
+    "{v0} works"
+  ],
+  "e9dce97e56": [
+    "作品集暂时加载失败，请稍后再试。",
+    "Your works could not load. Please try again shortly."
+  ],
+  "643c1c9871": [
+    "拼豆作品 {v0}",
+    "Bead pattern {v0}"
+  ],
+  "9e636642d6": [
+    "刚刚",
+    "Just now"
+  ],
+  "6478dde454": [
+    "时间未知",
+    "Date unavailable"
+  ],
+  "5398a45cb1": [
+    "我的拼豆作品",
+    "My bead patterns"
+  ],
+  "d7d59ef74c": [
+    "去生成",
+    "Make a pattern"
+  ],
+  "0bdba0b354": [
+    "作品加载中",
+    "Loading works"
+  ],
+  "581b3a3802": [
+    "作品集没加载出来",
+    "Could not load your works"
+  ],
+  "5982c44c18": [
+    "重新加载",
+    "Reload"
+  ],
+  "d0818889a2": [
+    "豆",
+    "beads"
+  ],
+  "43259e2cea": [
+    "还没有保存的作品",
+    "No saved works yet"
+  ],
+  "fa0e89d6fe": [
+    "生成一张照片，作品会自动出现在这里，之后可以随时回来查看和继续编辑。",
+    "Generate a pattern and it will appear here. Return anytime to view or keep editing it."
+  ],
+  "80a6ca2dcc": [
+    "我的作品",
+    "My works"
+  ],
+  "748084ff65": [
+    "拼",
+    "Make"
+  ],
+  "551e2d5be9": [
+    "作品分页",
+    "Works pagination"
+  ],
+  "b41561d807": [
+    "上一页",
+    "Previous"
+  ],
+  "dae828fe4f": [
+    "第",
+    "Page"
+  ],
+  "73422182ab": [
+    "页",
+    "page"
+  ],
+  "67a246a344": [
+    "下一页",
+    "Next"
+  ],
+  "e03cc0f221": [
+    "回到顶部",
+    "Back to top"
+  ],
+  "ff755e63d6": [
+    "登录并继续",
+    "Sign in and continue"
+  ],
+  "f85094e477": [
+    "擦除中",
+    "Erasing"
+  ],
+  "d71c597e7a": [
+    "上色中",
+    "Painting"
+  ],
+  "49bf78eaed": [
+    "生成二维码…",
+    "Preparing QR code…"
+  ],
+  "70b208202c": [
+    "选择",
+    "Choose"
+  ],
+  "5aeb889edf": [
+    "支付订单",
+    "Pay order"
+  ],
+  "3a98deb05d": [
+    "生成中…",
+    "Generating…"
+  ],
+  "29c1b896e5": [
+    "暂无二维码",
+    "QR code unavailable"
+  ],
+  "5d5815647c": [
+    "收起",
+    "Collapse"
+  ],
+  "697c3ff976": [
+    "展开兑换",
+    "Redeem a code"
+  ],
+  "48b3679697": [
+    "兑换中…",
+    "Redeeming…"
+  ],
+  "b19c364187": [
+    "立即兑换",
+    "Redeem now"
+  ],
+  "fadf24dbc5": [
+    "保存",
+    "Save"
+  ],
+  "816bea701d": [
+    "空格",
+    "Empty cell"
+  ],
+  "bc80a61cb5": [
+    "移除框线",
+    "Hide grid"
+  ],
+  "63967fdb91": [
+    "添加框线",
+    "Show grid"
+  ],
+  "3123d8bb3b": [
+    "未选色",
+    "No colour selected"
+  ],
+  "f5cfb5ee1b": [
+    "点格变空白",
+    "Tap a cell to clear it"
+  ],
+  "3f96440558": [
+    "从全部颜色选择",
+    "Choose from all colours"
+  ],
+  "3f7c38dd0e": [
+    "选择替换目标色",
+    "Choose a replacement colour"
+  ],
+  "327d59b5bd": [
+    "下载中",
+    "Downloading"
+  ],
+  "ad91569ca1": [
+    "下载图纸",
+    "Download pattern"
+  ],
+  "bc2e521709": [
+    "Q版风格化",
+    "Cartoon styling"
+  ],
+  "e04626edff": [
+    "普通模式不使用风格",
+    "Standard mode uses the original image"
+  ],
+  "ca83e87e59": [
+    "橙色系",
+    "Orange"
+  ],
+  "3a1ec7735c": [
+    "灰色系",
+    "Grey"
+  ],
+  "ed1d5454f4": [
+    "白色系",
+    "White"
+  ],
+  "d57ce18129": [
+    "粉色系",
+    "Pink"
+  ],
+  "d59f2d8897": [
+    "紫色系",
+    "Purple"
+  ],
+  "944525475e": [
+    "红色系",
+    "Red"
+  ],
+  "600a285035": [
+    "绿色系",
+    "Green"
+  ],
+  "99756538bc": [
+    "蓝色系",
+    "Blue"
+  ],
+  "bbc51eafef": [
+    "青色系",
+    "Cyan"
+  ],
+  "58d1339647": [
+    "黄色系",
+    "Yellow"
+  ],
+  "e310c9cf13": [
+    "黑色系",
+    "Black"
+  ],
+  "e0da0994d2": [
+    "{v0} × {v1} · {v2} 颗豆 · {v3} 色",
+    "{v0} × {v1} · {v2} beads · {v3} colours"
+  ],
+  "279f4aebc9": [
+    "第 {v0} 行，第 {v1} 列",
+    "Row {v0}, column {v1}"
+  ],
+  "1a78a9f1e3": [
+    "选中 {v0}",
+    "Selected {v0}"
+  ],
+  "38e834072f": [
+    "提交结果尚未确认，请先到我的作品查看。确认没有生成后，可回到制作图纸重新提交。",
+    "We could not confirm the submission. Check My patterns first. If no pattern was created, return to Make a pattern to try again."
+  ],
+  "5137594b19": [
+    "AI 生成仍在处理中，请稍后到我的作品查看，或继续查询此任务。",
+    "AI generation is still running. Check My patterns later, or continue checking this task."
+  ],
+  "2392beabaf": [
+    "图纸已生成",
+    "Your pattern is ready"
+  ],
+  "c5229ed6df": [
+    "将 {v0} 替换成新的色号",
+    "Replace {v0} with another colour"
+  ],
+  "a526dceb6b": [
+    "{v0} 色",
+    "{v0} colours"
+  ],
+  "6141f14166": [
+    "将替换 {v0} 格，撤销时会一次全部恢复。",
+    "This replaces {v0} cells. Undo restores them together."
+  ],
+  "5dfad5abca": [
+    "{v0} 格",
+    "{v0} cells"
+  ],
+  "5b197d238e": [
+    "AI 积分不足",
+    "Not enough AI credits"
+  ],
+  "99cf553562": [
+    "AI 按 {v0} 积分/张计费，成功才扣；时间卡只解锁普通模式不限次，赠送积分可用于 AI。",
+    "AI costs {v0} credits per successful pattern. A tool pass unlocks unlimited Standard generation; its bonus credits can be used for AI."
+  ],
+  "c3a737b344": [
+    "当前 {v0} 积分 · 可生成 AI {v1} 张",
+    "{v0} credits · {v1} AI patterns available"
+  ],
+  "d70b675a07": [
+    "点击编辑图纸，即可修改配色。",
+    "Open the editor to change colours."
+  ],
+  "d6241eb215": [
+    "{v0} · {v1} 颗豆 · {v2} 色",
+    "{v0} · {v1} beads · {v2} colours"
+  ],
+  "f6d857e3f4": [
+    "第 {v0} / {v1} 页",
+    "Page {v0} / {v1}"
+  ],
+  "e23501c3bb": [
+    "请输入至少 20 × 20 的格数",
+    "Enter a grid of at least 20 × 20"
+  ],
+  "751c31affe": [
+    "自定义格数每边需为 20–200，宽高比在 1:2 到 2:1 之间。",
+    "Use 20–200 cells per side, with an aspect ratio between 1:2 and 2:1."
+  ],
+  "3d83f5f6af": [
+    "请检查格数与长宽比例",
+    "Check the grid size and aspect ratio"
+  ],
+  "1532f499eb": [
+    "{v0} 颗",
+    "{v0} beads"
+  ],
+  "bdb2330b1e": [
+    "请先将 HEIC 照片转换为 JPG 或 PNG。",
+    "Convert HEIC photos to JPG or PNG first."
+  ],
+  "667ce6b603": [
+    "请上传 JPG、PNG 或 WebP 照片。",
+    "Choose a JPG, PNG or WebP photo."
+  ],
+  "d3b80c3345": [
+    "照片过大，请选择小于 12 MB 的图片。",
+    "This photo is too large. Choose an image smaller than 12 MB."
+  ],
+  "8e16acc43b": [
+    "照片较大，上传可能需要一些时间。",
+    "This is a large photo, so uploading may take a little longer."
+  ]
+}

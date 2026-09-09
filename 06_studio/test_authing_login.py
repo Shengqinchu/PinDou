@@ -8,6 +8,14 @@ import app as studio
 import authing_login as login
 from test_reservations import client
 
+@pytest.mark.parametrize('target',['/tools','/tools/loading','/tools/works','/tools/result/a_b-123','/tools/editor/a_b-123?view=grid','/tools/tutorial#generate'])
+def test_native_generator_return_paths(target):
+    assert login.safe_return(target)==target
+
+@pytest.mark.parametrize('target',['/tools//evil.test','/tools/../api/user','/tools/editor/%2f%2fevil.test','/tools/%5cevil.test','//evil.test/tools'])
+def test_native_generator_returns_reject_external_or_unknown_paths(target):
+    with pytest.raises(HTTPException):login.safe_return(target)
+
 
 @pytest.fixture
 def configured(client,monkeypatch):

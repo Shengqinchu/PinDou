@@ -10,7 +10,7 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 out = root / 'artifacts/studio-release'
 out.mkdir(parents=True, exist_ok=True)
-version = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') + '-studio-v6'
+version = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') + '-studio-v7'
 dist = root / '05_studio/dist'
 if not (dist / 'index.html').is_file():
     raise SystemExit('Build the studio frontend first.')

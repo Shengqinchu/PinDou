@@ -90,7 +90,7 @@ def safe_return(value):
         any(ord(x)<32 for x in decoded) or path.scheme or path.netloc or
         path.path.startswith(('/studio-api','/api','/auth/'))):
         raise HTTPException(422,'wechat_return_invalid')
-    if not re.fullmatch(r'/(?:visit|upload|tutorial|loading|works|details|shop|journal(?:/[A-Za-z0-9_-]+)?|account|(?:reservation|editor|result)/[A-Za-z0-9_-]+)?',path.path):
+    if not re.fullmatch(r'/(?:tools(?:/(?:upload|tutorial|loading|works|(?:editor|result)/[A-Za-z0-9_-]+))?|visit|upload|tutorial|loading|works|details|shop|journal(?:/[A-Za-z0-9_-]+)?|account|(?:reservation|editor|result)/[A-Za-z0-9_-]+)?',path.path):
         raise HTTPException(422,'wechat_return_invalid')
     return value
 

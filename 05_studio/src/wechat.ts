@@ -10,11 +10,12 @@ export function accountReturn(value:unknown,fallback='/account'):string{
   try{
     const parsed=new URL(value,location.origin);
     if(!value.startsWith('/')||value.startsWith('//')||parsed.origin!==location.origin||/[\\\x00-\x1f]/.test(decodeURIComponent(value)))return fallback;
-    if(!/^\/(?:visit|upload|tutorial|loading|works|details|shop|journal(?:\/[\w-]+)?|account|(?:reservation|editor|result)\/[\w-]+)?$/.test(parsed.pathname))return fallback;
+    if(!/^\/(?:tools(?:\/(?:upload|tutorial|loading|works|(?:editor|result)\/[\w-]+))?|visit|upload|tutorial|loading|works|details|shop|journal(?:\/[\w-]+)?|account|(?:reservation|editor|result)\/[\w-]+)?$/.test(parsed.pathname))return fallback;
     return parsed.pathname+parsed.search+parsed.hash;
   }catch{return fallback;}
 }
 export async function startWechat(linking=false){
+  if(location.pathname.startsWith('/tools'))await (await import('../../05_generator/src/draft')).flushGeneratorDraft();
   const params=new URLSearchParams(location.search);
   const returnTo=accountReturn(params.get('return_to')||location.pathname+location.search+location.hash);
   const result=await commerceApi<{url:string}>('/auth/wechat/start',{method:'POST',body:JSON.stringify({mode:linking?'link':'login',return_to:returnTo})});

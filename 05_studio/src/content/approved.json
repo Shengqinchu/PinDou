@@ -1,5 +1,5 @@
 {
-  "source": "2026-09-09-account-refinement",
+  "source": "2026-09-09-native-generator-166-timetable",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -46,6 +46,8 @@
     "data-ui-labels.json": "692de89a61bbb0ddbb72fb5c1d546b5a9e293c3657fae05e55f9dca99934616e",
     "experience-rates.json": "9a5515b8f56c8564d9b2a7fe99b1ace1c69dff5ab51ea67790b85027fb25a66a",
     "gallery-labels.json": "def6dfca6ed941ced5e8f4098880a93f7dc5c20e7a71d20764327523d9860d20",
+    "generator-shell.json": "663e0e410fbc06933f7c76818f925b7a5d00ac9fb495bdf21c58270ec3262bc5",
+    "generator.json": "360b8535df299201d85641d77300da9514bd0ee36b622819974eaa74f6936b71",
     "journal-collection.json": "b58215725c1eba05052d83ac53eda17ae46f4923ea4be4d1d1d8cc1b5a5e2bd8",
     "journal-posts.json": "0d729d67cc00df5499308c9093d76f9afb9f64d49314dffa7e414df57cca610b",
     "pages-Cart.json": "877954464d055594da1e658d84de59655929265f6d9795dd9b793e4a2a0a02cd",
@@ -61,9 +63,10 @@
     "pages-Visit.json": "ddff8ab91c460ed8788a3c22b7927f582ba9b018cf3f5a84d93a1f7d1695aee0",
     "profile.json": "a911d0b65fd0f10b5e045238b2240c46eaaf86ec4850c2e979fc9f1f4da9fb4a",
     "rate-fields.json": "3470adfe9da8bf9b2f47d05a5e4c128c8325325f58b6075bfd2ecf9728938b79",
+    "reservation-timetable.json": "2489a12c109a6a7890834006a26d0c4beb7a247a965a6e6cb82e095d5c184800",
     "state.json": "c4eeb599810219fc6102c20f5c7c3a265a0d592a3cefd9351d88734552a2650f",
     "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3",
-    "wallet.json": "bfefe5c757fca0095b7aec2992729ab394d3a42c128fefa0558390a9d8c6659f",
+    "wallet.json": "4d30b5593d29d2741ea0dc59e5877ad16d2f1fa907d6dbfaf59a6adfdad6f23e",
     "wechat.json": "37d27979e3bb40246494c1980b9e71bb5bdef6f8e66621ed918a20d51291dc9f"
   }
 }

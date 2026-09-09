@@ -38,6 +38,8 @@ onBeforeUnmount(()=>{stopAccount?.();closeAccount();});
 const avatar = computed(() => asset("owner-avatar").src);
 const route = useRoute();
 const isDesk = computed(() => route.path.startsWith("/manage"));
+const isTool=computed(()=>route.path.startsWith('/tools'));
+const isToolEditor=computed(()=>!!route.meta.toolEditor);
 const menu = ref(false);
 const main = ref<HTMLElement>();
 let arrival: gsap.core.Tween | undefined;
@@ -46,7 +48,7 @@ const navigation = computed(() => [
   { path: "/visit", label: say(copyText.come_create_2eee81) },
   { path: "/shop", label: say(copyText.little_shop_c97261) },
   { path: "/journal", label: say(copyText.studio_journal_7b860e) },
-  { path: "/tools", label: say(copyText.pattern_maker_7db57b), document:true },
+  { path: "/tools", label: say(copyText.pattern_maker_7db57b), document:false },
 ]);
 onBeforeUnmount(() => arrival?.kill());
 watch(
@@ -55,7 +57,7 @@ watch(
     menu.value = false;
     await nextTick();
     main.value?.focus({ preventScroll: true });
-    if (!isDesk.value && route.path !== "/" && main.value?.firstElementChild) {
+    if (!isDesk.value && !isTool.value && route.path !== "/" && main.value?.firstElementChild) {
       arrival?.progress(1).kill();
       arrival = arrive(main.value.firstElementChild, { stationary: true });
     }
@@ -66,10 +68,10 @@ watch(
   <a class="skip-link" href="#main">{{
     say(copyText.skip_to_content_1760ff)
   }}</a>
-  <div v-if="!isDesk" class="vision-announcement">
+  <div v-if="!isDesk&&!isToolEditor" class="vision-announcement">
     {{ say(copyText.a_little_creative_space_in_hamilton_book_5cf34e) }}
   </div>
-  <header v-if="!isDesk" class="vision-header">
+  <header v-if="!isDesk" class="vision-header" :class="{'tool-editor-header':isToolEditor}">
     <RouterLink
       to="/"
       class="vision-brand"
@@ -86,7 +88,7 @@ watch(
         v-for="item in navigation"
         :key="item.path"
         v-bind="item.document?{href:item.path}:{to:item.path}"
-        :class="{ selected: route.path === item.path }"
+        :class="{ selected: route.path === item.path || item.path==='/tools'&&isTool }"
         >{{ item.label }}</component
       >
     </nav>
@@ -149,7 +151,7 @@ watch(
   >
     <RouterView />
   </main>
-  <footer v-if="!isDesk" class="vision-footer">
+  <footer v-if="!isDesk&&!isToolEditor" class="vision-footer">
     <div class="vision-footer-inner container">
       <div class="vision-footer-brand">
         <FooterBrand />
@@ -200,13 +202,13 @@ watch(
       </div>
       <div class="vision-footer-links vision-footer-tools">
         <span>{{ say(copyText.the_toolbox_df33f0) }}</span>
-        <a href="/tools"
+        <RouterLink to="/tools"
           >{{ say(copyText.pattern_maker_7db57b) }}<PhArrowUpRight :size="16"
-        /></a>
-        <a href="/tutorial"
+        /></RouterLink>
+        <RouterLink to="/tools/tutorial"
           >{{ say(copyText.pattern_maker_guide_c1f795)
           }}<PhArrowUpRight :size="16"
-        /></a>
+        /></RouterLink>
       </div>
     </div>
   </footer>

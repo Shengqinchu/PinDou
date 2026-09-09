@@ -36,7 +36,7 @@ def switch_link(link, target):
 
 def main():
     archive, version, expected_hash = sys.argv[1:4]
-    if not re.fullmatch(r"[0-9]{14}-studio-v[123456]", version):
+    if not re.fullmatch(r"[0-9]{14}-studio-v[1234567]", version):
         raise RuntimeError("Invalid release name")
     package = Path(archive)
     if hashlib.sha256(package.read_bytes()).hexdigest() != expected_hash:
@@ -49,7 +49,7 @@ def main():
         manifest=json.load(tar.extractfile('manifest.json'))
         if manifest.get('reuse'):
             base_version=manifest.get('base_version','')
-            if not re.fullmatch(r'[0-9]{14}-studio-v[123456]',base_version):raise RuntimeError('Invalid base release')
+            if not re.fullmatch(r'[0-9]{14}-studio-v[1234567]',base_version):raise RuntimeError('Invalid base release')
             base=ROOT/'releases'/base_version
             for name in manifest['reuse']:
                 source=(base/name).resolve();target=(release/name).resolve()
@@ -110,17 +110,31 @@ def main():
     }
     # Keep existing www visit drafts and reservation cookies on their origin.
     location = /favicon.ico { return 302 /studio-brand/puppy-v6.ico; }
-    # A new entry avoids previously cached generator HTML. Its router keeps the
-    # existing /upload URL. Future HTML responses must be reloaded from origin.
+    # The generator is a lazy native Studio route. API and stored pattern assets
+    # continue to use the existing generator service.
     location = /tools {
-        root /opt/pindou/current/05_web/dist;
-        try_files /index.html =404;
+        rewrite ^ /studio-api/site break;
+        proxy_pass http://127.0.0.1:8011;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
         add_header Cache-Control "no-store" always;
     }
-    location = /index.html {
-        root /opt/pindou/current/05_web/dist;
+    location ^~ /tools/ {
+        rewrite ^ /studio-api/site break;
+        proxy_pass http://127.0.0.1:8011;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header Cache-Control "no-store" always;
+        add_header X-Robots-Tag "noindex, nofollow" always;
+    }
+    location ~ ^/(upload|loading|result|editor|works|tutorial|me)(/.*)?$ {
+        rewrite ^ /studio-api/site break;
+        proxy_pass http://127.0.0.1:8011;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
         add_header Cache-Control "no-store" always;
     }
+    location = /index.html { return 302 /; }
     location ~ ^/(account|auth/wechat)$ {
         rewrite ^ /studio-api/site break;
         proxy_pass http://127.0.0.1:8011;

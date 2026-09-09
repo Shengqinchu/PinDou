@@ -1,4 +1,6 @@
 import { createApp } from "vue";
+import { createPinia } from 'pinia';
+import { generatorRoutes } from '../../05_generator/src/routes';
 import { createRouter, createWebHistory } from "vue-router";
 import "@fontsource/dm-serif-display/latin-400.css";
 import "@fontsource/dm-serif-display/latin-400-italic.css";
@@ -27,6 +29,7 @@ import "./styles/arrival-photos.css";
 import "./styles/wallet.css";
 import "./styles/home-journal.css";
 import "./styles/reduced-motion.css";
+import "./styles/timetable.css";
 import { installContent } from "./content-store";
 import { installDiagnostics } from "./diagnostics";
 import { installRoutePrefetch, routeLoaders } from "./route-loaders";
@@ -52,6 +55,8 @@ const router = createRouter({
     { path: "/visit", component: routeLoaders.visit },
     { path: "/account", component: () => import('./pages/Account.vue') },
     { path: "/auth/wechat", component: () => import('./pages/WechatReturn.vue') },
+    { path:'/tools',component:()=>import('../../05_generator/src/Workspace.vue'),children:generatorRoutes },
+    ...['upload','loading','result/:id','editor/:id','works','tutorial','me'].map(path=>({path:'/'+path,redirect:(to:any)=>({path:'/tools'+(path==='upload'?'':path==='me'?'/works':to.path),query:to.query,hash:to.hash})})),
     {
       path: "/reservation/:id",
       component: () => import("./pages/ReservationReceipt.vue"),
@@ -94,12 +99,12 @@ router.afterEach(to => {
   if(canonical)canonical.href="https://pindoupuppy.com"+to.path;
   let robots=document.querySelector<HTMLMetaElement>('meta[name="robots"]');
   if(!robots){robots=document.createElement("meta");robots.name="robots";document.head.appendChild(robots);}
-  robots.content=/^\/(manage|reservation|order|account|auth)(\/|$)/.test(to.path)?"noindex, nofollow":"index, follow";
+  robots.content=/^\/(manage|reservation|order|account|auth)(\/|$)|^\/tools\/(works|loading|result|editor)(\/|$)/.test(to.path)?"noindex, nofollow":"index, follow";
 });
 const stopPreference = installMotionPreference();
 const stopMotion = installMotion();
 const stopViewport = installViewport();
-createApp(App).use(router).mount("#app");
+createApp(App).use(createPinia()).use(router).mount("#app");
 if (import.meta.hot)
   import.meta.hot.dispose(() => {
     stopContent();

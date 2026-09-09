@@ -121,12 +121,12 @@ def test_attendance_reward_once_updates_client_and_never_deducts_time(client,mon
     ref=submit(client).json()['id']
     assert complete(client,ref).status_code==200
     state=client.get('/studio-api/auth/wallet').json()
-    assert state['account']['points']==100 and state['account']['minutes']==600
+    assert state['account']['points']==166 and state['account']['minutes']==600
     receipt=client.get('/studio-api/reservations/'+ref).json()
     assert receipt['booked_minutes']==120 and receipt['actual_minutes']==165 and receipt['actual_guests']==2
     assert receipt['public_note']=='165 minutes per guest' and 'staff_note' not in receipt
     assert client.patch('/studio-api/manage/reservations/'+ref,json={'version':3,'status':'completed','actual_minutes':180,'actual_guests':2}).status_code==200
-    assert get(client)['account']['points']==100
+    assert get(client)['account']['points']==166
     # Ledger remains distinct from actual attendance; deliberate host debit only.
     assert post(client,kind='usage',minutes_delta=-360,reservation_id=ref).status_code==200
     assert get(client)['account']['minutes']==240
@@ -143,6 +143,18 @@ def test_future_rewards_fail_atomically_and_no_defaults_backfill(client,monkeypa
     studio.initialize();studio.initialize()
     assert get(client)['total']==0
 
+def test_reward_change_keeps_existing_100_point_entry_and_uses_166_for_new_visits(client,monkeypatch):
+    monkeypatch.setattr(wallet,'now',lambda:'2026-09-08T18:00:00-04:00');prepare(client)
+    monkeypatch.setattr(wallet,'VISIT_REWARD',100)
+    first=submit(client).json()['id'];assert complete(client,first).status_code==200
+    monkeypatch.setattr(wallet,'VISIT_REWARD',166)
+    assert client.patch('/studio-api/manage/reservations/'+first,json={'version':3,'status':'completed','actual_minutes':170,'actual_guests':2}).status_code==200
+    assert get(client)['account']['points']==100
+    second=submit(client).json()['id'];assert complete(client,second).status_code==200
+    assert get(client)['account']['points']==266
+    assert post(client,kind='redeem',minutes_delta=0,points_delta=-200,bill_cents=888).status_code==200
+    assert get(client)['account']['points']==66
+
 
 def test_delete_restore_and_preserve_ledgers(client,monkeypatch):
     monkeypatch.setattr(wallet,'now',lambda:'2026-09-08T18:00:00-04:00')
@@ -156,10 +168,10 @@ def test_delete_restore_and_preserve_ledgers(client,monkeypatch):
     assert client.get('/studio-api/auth/reservations').json()['items']==[]
     assert client.get('/studio-api/reservations/'+ref).status_code==404
     assert client.get('/studio-api/manage/reservations?deleted=true').json()['total']==1
-    assert get(client)['account']['points']==100
+    assert get(client)['account']['points']==166
     assert client.post(path+'/restore',json={'version':4,'reason':'restore record'}).status_code==200
     assert client.get('/studio-api/auth/reservations').json()['items'][0]['actual_minutes']==120
-    assert get(client)['account']['points']==100
+    assert get(client)['account']['points']==166
 
 
 def test_reservation_link_must_match_owner_and_completed_visit(client):

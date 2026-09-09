@@ -4,6 +4,8 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "strict": true,
+    "baseUrl": ".",
+    "paths": {"vue":["./node_modules/vue"],"vue-router":["./node_modules/vue-router"],"pinia":["./node_modules/pinia"]},
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

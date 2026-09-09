@@ -21,10 +21,15 @@ import type { Reservation, ReservationPayload } from "../../reservations";
 import SlideOver from "../SlideOver.vue";
 import ReservationAvailability from "./ReservationAvailability.vue";
 import ReservationSettings from "./ReservationSettings.vue";
+import ReservationTimetable from './ReservationTimetable.vue';
+import timetableWords from '../../content/reservation-timetable.json';
+import { formatCopy } from '../../state';
+const timetableCopy=contentModule('reservation-timetable',timetableWords);
 import { walletCopy,duration } from '../../wallet';
 import { useRouter } from 'vue-router';
 type Entry = Reservation & { payload: ReservationPayload; staff_note: string;owner_id:string;deleted_at:string|null };
 const props = defineProps<{ active: boolean; calendar?: boolean }>();
+const at=ref(''),timetableRevision=ref(0);
 const { request } = useDesk();
 const router=useRouter();
 const deleted=ref(false),deleting=ref(false),deleteReason=ref(''),publicNote=ref('');
@@ -69,6 +74,7 @@ async function load() {
       deleted:String(deleted.value),
     });
     if (day.value) query.set("day", day.value);
+    if(day.value&&at.value&&!deleted.value)query.set('at',at.value);
     const data = await request<{
       items: Entry[];
       total: number;
@@ -83,6 +89,7 @@ async function load() {
       exclusive_groups: !!data.policy.exclusive_groups,
       version: data.policy.version,
     };
+    timetableRevision.value++;
   } catch (e) {
     if (seq === sequence) error.value = (e as Error).message;
   } finally {
@@ -160,7 +167,8 @@ watch(
   },
   { immediate: true },
 );
-watch([status, day,deleted], () => {
+watch([status, day,deleted,at], () => {
+  if(deleted.value||!day.value)at.value='';
   page.value = 1;
   if (props.active) load();
 });
@@ -232,6 +240,8 @@ defineExpose({ refresh: load });
       </button>
     </div>
     <ReservationSettings :active="active" @saved="load" />
+    <ReservationTimetable v-if="!deleted" :active="active" :refresh-key="timetableRevision" :selected-date="day" :selected-time="at" @select="value=>{day=value.date;at=value.at;status='all';search='';}"/>
+    <div v-if="at&&day&&!deleted" class="timetable-filter"><span>{{formatCopy(timetableCopy.selected,{v0:prettyDate(day),v1:at})}}</span><button class="desk-link" @click="at=''">{{say(timetableCopy.clear)}}</button></div>
     <div class="reservation-deleted-toggle" role="group" :aria-label="say(walletCopy.deleted)"><button class="desk-link" :aria-pressed="!deleted" @click="deleted=false">{{say(walletCopy.active)}}</button><button class="desk-link" :aria-pressed="deleted" @click="deleted=true">{{say(walletCopy.deleted)}}</button></div>
     <div class="reservation-desk-filters">
       <label class="desk-field"
@@ -254,6 +264,7 @@ defineExpose({ refresh: load });
           status = 'all';
           day = '';
           search = '';
+          at = '';
         "
       >
         {{ say(copyText.clear_filters_0a6c6f) }}
