@@ -34,7 +34,8 @@ database and synthetic generator APIs. Run `verify-generator-stage1.mjs`,
 `05_studio/scripts`. Real payment, live AI billing and native phone OS sheets
 are outside those simulations.
 
-Tutorial capture uses `capture-generator-tutorial.mjs` with the offline Standard
+Run `05_studio/scripts/prepare-generator-tutorial.py` to create the local example.
+Tutorial capture then uses `capture-generator-tutorial.mjs` with the offline Standard
 pattern fixture under `artifacts/generator-integration`; it never consumes paid AI.
 The initial text migration script is retained as provenance, not a recurring
 build step. Change archived copy directly for future edits.

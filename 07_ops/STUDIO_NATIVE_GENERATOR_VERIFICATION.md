@@ -11,7 +11,7 @@ timetable, and wallet balances/history displayed in decimal hours.
 - Package SHA256: `38076f83e74b3b23cf105df7fd4b32ffd468c93f5e0a7eac57257b7ac80ddccc`.
 - 351 verified files; incremental archive 2,680,469 bytes.
 - Existing generator service remains `20260909152214-studio-v6`.
-- Deployment status: package uploaded and verified; live checks recorded below after switching.
+- Deployment status: live; Nginx validation/reload succeeded and both services are active.
 
 ## Behavior
 
@@ -78,3 +78,19 @@ Rollback: use the recorded previous Studio symlink and Nginx/unit backup under
 `/opt/pindou/studio/backups/20260909195017-studio-v7`; keep the current shared
 database and media so subsequent legitimate entries are not lost. The old
 generator service/assets remain available at their unchanged release.
+
+## Production acceptance
+
+- Deployed Studio `20260909195017-studio-v7`, main bundle `index-DI0bQCGH.js`;
+  all 351 deployed file hashes match the package manifest.
+- Seven public native/legacy/account/manage paths return the new Studio entry
+  with `Cache-Control: no-store`. Private API authority remains server-enforced.
+- Pre/post release fingerprints match for all audited account, artwork,
+  reservation, policy, journal, credit, membership, identity and wallet tables.
+  Original generator release and HTML hash are unchanged. NTP remains synchronized.
+- Codex in-app browser opened the native tool with the existing signed-in user,
+  displayed the correct unlimited generator allowance, and opened the shared
+  account drawer showing its existing WeChat binding and `0 小时` balance.
+- Code commit: `4d5fa01`, pushed to `codex/studio-v1-20260907`.
+
+- The live account tooltip confirms 166 points per attended booking and the unchanged 100 points = CAD 1 redemption rate.
