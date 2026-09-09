@@ -6536,6 +6536,18 @@
       "当天闭店时间",
       "Closes at"
     ],
+    "regular_end": [
+      "普通预约截止",
+      "Regular bookings end"
+    ],
+    "end_marker": [
+      "结束",
+      "End"
+    ],
+    "overtime_notice": [
+      "小店最晚经营到24:00，超过22:00需额外5cad/小时加班费。",
+      "The studio can stay open until 24:00. An additional CAD 5 per hour applies after 22:00."
+    ],
     "fixed_duration": [
       "套餐时长",
       "Included in this offer"

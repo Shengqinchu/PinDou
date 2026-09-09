@@ -3,6 +3,7 @@ import { contentModule } from "../content-store";
 const copyText = contentModule("components-ReservationCalendar", copyTextDefault);
 
 import copyTextDefault from "../content/components-ReservationCalendar.json";
+import ReservationHoursNote from './ReservationHoursNote.vue';
 import { say } from "../state";
 
 import {
@@ -43,6 +44,7 @@ const columns = computed(() => days.value.length);
 const rows = computed(
   () => props.calendar.days[0]?.slots.map((s) => s.start) || [],
 );
+const endBoundary=computed(()=>props.calendar.days[0]?.slots.at(-1)?.end||'');
 let resize: ResizeObserver | undefined;
 onMounted(() => {
   resize = new ResizeObserver(([entry]) => {
@@ -266,9 +268,11 @@ watch(
               </button>
             </td>
           </tr>
+          <tr v-if="endBoundary" class="reservation-end-boundary"><th scope="row">{{endBoundary}}</th><td v-for="day in days" :key="day.date">{{!day.closed&&day.close===endBoundary?say(copyText.end_c4265b):'—'}}</td></tr>
         </tbody>
       </table>
     </div>
+    <ReservationHoursNote/>
     <p v-if="message" class="form-error" role="alert">{{ message }}</p>
     <p class="reservation-hours">
       {{ say(copyText.all_times_are_local_to_hamilton_the_8a3607) }}

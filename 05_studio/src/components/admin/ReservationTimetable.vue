@@ -6,6 +6,9 @@ import { contentModule } from '../../content-store';
 import words from '../../content/reservation-timetable.json';
 import { say,formatCopy,hamiltonDate,plusDays,prettyDate } from '../../state';
 import InfoTip from '../InfoTip.vue';
+import ReservationHoursNote from '../ReservationHoursNote.vue';
+import endWords from '../../content/visit-flow.json';
+const endCopy=contentModule('visit-flow',endWords);
 const copy=contentModule('reservation-timetable',words),{request}=useDesk();
 const props=defineProps<{active:boolean;refreshKey:number;selectedDate:string;selectedTime:string}>();
 const emit=defineEmits<{select:[{date:string;at:string} ]}>();
@@ -15,6 +18,7 @@ const first=ref(hamiltonDate()),days=ref<Day[]>([]),size=ref(7),offset=ref(0),bu
 let seq=0,resize:ResizeObserver|undefined;
 const visible=computed(()=>days.value.slice(offset.value,offset.value+size.value));
 const rows=computed(()=>Array.from({length:48},(_,i)=>i).filter(i=>days.value.some(d=>!d.slots[i].closed||d.slots[i].pending+d.slots[i].confirmed+d.slots[i].completed>0)));
+const endBoundary=computed(()=>{const last=rows.value.at(-1);return last===undefined?'':days.value[0]?.slots[last]?.end||'';});
 async function load(){const n=++seq;busy.value=true;error.value='';try{const data=await request<{days:Day[]}>(`/manage/reservation-timetable?start=${first.value}`);if(n===seq)days.value=data.days;}catch(e){if(n===seq)error.value=(e as Error).message;}finally{if(n===seq)busy.value=false;}}
 function move(delta:number){const next=offset.value+delta*size.value;if(next>=0&&next<14)offset.value=next;else{first.value=plusDays(first.value,delta*7);offset.value=0;}}
 function today(){offset.value=0;if(first.value===hamiltonDate())void load();else first.value=hamiltonDate();}
@@ -32,7 +36,9 @@ onBeforeUnmount(()=>{seq++;resize?.disconnect();});
       <div class="timetable-grid" :style="{'--days':visible.length}">
         <span class="timetable-date corner"/><strong v-for="day in visible" :key="day.date" class="timetable-date">{{prettyDate(day.date)}}</strong>
         <template v-for="index in rows" :key="index"><span class="timetable-time">{{days[0].slots[index].start}}</span><button v-for="day in visible" :key="day.date" type="button" class="timetable-slot" :class="{confirmed:day.slots[index].confirmed,pending:day.slots[index].pending,completed:day.slots[index].completed,closed:day.slots[index].closed||day.slots[index].blocked,selected:selectedDate===day.date&&selectedTime===day.slots[index].start}" :aria-label="label(day,day.slots[index])" :aria-pressed="selectedDate===day.date&&selectedTime===day.slots[index].start" @click="emit('select',{date:day.date,at:day.slots[index].start})"><span v-if="day.slots[index].confirmed" class="confirmed">{{formatCopy(copy.guests,{v0:day.slots[index].confirmed})}}</span><span v-if="day.slots[index].pending" class="pending">{{say(copy.pending)}} {{day.slots[index].pending}}</span><span v-if="day.slots[index].completed" class="completed">{{say(copy.completed)}} {{day.slots[index].completed}}</span><span v-if="!day.slots[index].pending&&!day.slots[index].confirmed&&!day.slots[index].completed" aria-hidden="true">{{day.slots[index].closed||day.slots[index].blocked?'—':'·'}}</span></button></template>
+        <template v-if="endBoundary"><span class="timetable-time timetable-end-boundary">{{endBoundary}}</span><span v-for="day in visible" :key="'end-'+day.date" class="timetable-end-cell">{{!day.closed&&day.close===endBoundary?say(endCopy.end_marker):'—'}}</span></template>
       </div>
     </div>
+    <ReservationHoursNote/>
   </section>
 </template>

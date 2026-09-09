@@ -468,6 +468,7 @@
   outline-offset: -4px;
   outline: 2px solid #102f3b;
 }
+.reservation-end-boundary td{height:30px;text-align:center;font-size:11px;color:var(--muted);background:#f5f8fa}
 .reservation-selection {
   padding: 22px 25px;
   background: #f1f5ef;

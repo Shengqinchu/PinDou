@@ -1,5 +1,5 @@
 {
-  "source": "2026-09-09-owner-approved-visit-flow-launch",
+  "source": "2026-09-09-owner-reservation-end22-overtime",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -66,7 +66,7 @@
     "reservation-timetable.json": "2489a12c109a6a7890834006a26d0c4beb7a247a965a6e6cb82e095d5c184800",
     "state.json": "c4eeb599810219fc6102c20f5c7c3a265a0d592a3cefd9351d88734552a2650f",
     "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3",
-    "visit-flow.json": "7c03a637af8519b0d8dd782cf2e54375adb28a24b6d8b1764c260d025d979350",
+    "visit-flow.json": "3b22d352ad317d0778aeedd2e60add31d804b95d5eca5f9d645dfeaf39b0fac2",
     "wallet.json": "b51553b78c0f164bcb99288b7c19d939e95ab8dde41c41a3c0d64d73259b3002",
     "wechat.json": "37d27979e3bb40246494c1980b9e71bb5bdef6f8e66621ed918a20d51291dc9f"
   }
