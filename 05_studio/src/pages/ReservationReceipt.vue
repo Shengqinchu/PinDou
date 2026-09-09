@@ -4,9 +4,10 @@ import { contentModule } from "../content-store";
 const copyText = contentModule("pages-ReservationReceipt", copyTextDefault);
 
 import copyTextDefault from "../content/pages-ReservationReceipt.json";
-import { say } from "../state";
+import { say,formatCopy } from "../state";
+import { walletCopy,duration } from '../wallet';
 
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref,watch } from "vue";
 import { useRoute } from "vue-router";
 import {
   PhCheck,
@@ -15,7 +16,7 @@ import {
   PhArrowClockwise,
 } from "@phosphor-icons/vue";
 import { commerceApi,CommerceError } from "../commerce";
-import { accountCopy,ensureCustomer } from "../account";
+import { accountCopy,ensureCustomer,accountUser } from "../account";
 const needsSignIn=ref(false);
 import { prettyDate, tr, wechat, phone, phoneHref } from "../state";
 import type { Reservation } from "../reservations";
@@ -25,32 +26,35 @@ const route = useRoute(),
   error = ref("");
 let timer: ReturnType<typeof setInterval>,
   alive = true;
+let sequence=0;
 async function refresh() {
   if (busy.value) return;
   busy.value = true;
+  const seq=++sequence;
   needsSignIn.value=false;
   try {
     const data = await commerceApi<Reservation>(
       "/reservations/" + encodeURIComponent(String(route.params.id)),
     );
-    if (alive) {
+    if (alive&&seq===sequence) {
       result.value = data;
       error.value = "";
     }
   } catch (e) {
-    if (alive) {error.value = (e as Error).message;needsSignIn.value=e instanceof CommerceError&&e.status===401;}
+    if (alive&&seq===sequence) {error.value = (e as Error).message;needsSignIn.value=e instanceof CommerceError&&e.status===401;if(e instanceof CommerceError&&[401,403,404].includes(e.status))result.value=undefined;}
   } finally {
-    if (alive) busy.value = false;
+    if (alive&&seq===sequence) busy.value = false;
   }
 }
 function visible() {
   if (!document.hidden) refresh();
 }
 async function loginAndRefresh(){try{if(await ensureCustomer()&&alive)await refresh();}catch(e){error.value=(e as Error).message;}}
+watch(()=>[route.params.id,accountUser.value?.id],()=>{sequence++;result.value=undefined;busy.value=false;void refresh();});
 onMounted(() => {
   refresh();
   timer = setInterval(() => {
-    if (result.value?.status === "pending") visible();
+    visible();
   }, 15000);
   window.addEventListener("pageshow", visible);
   document.addEventListener("visibilitychange", visible);
@@ -124,6 +128,9 @@ onBeforeUnmount(() => {
             }}
           </dd>
         </div>
+        <div><dt>{{say(walletCopy.booked)}}</dt><dd>{{duration(result.booked_minutes)}}</dd></div>
+        <div><dt>{{say(walletCopy.actual)}}</dt><dd>{{result.actual_minutes==null?say(walletCopy.unrecorded):formatCopy(walletCopy.per_guest,{v0:duration(result.actual_minutes),v1:result.actual_guests||result.booking.guests})}}</dd></div>
+        <div v-if="result.public_note"><dt>{{say(walletCopy.public_note)}}</dt><dd>{{result.public_note}}</dd></div>
       </dl>
       <p class="reservation-details-link">
         {{ say(copyText.come_along_and_read_our_ad449d)

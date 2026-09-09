@@ -1,0 +1,35 @@
+.customer-wallet { min-width:0; }
+.wallet-sync { display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:12px; margin:10px 0; }
+.wallet-balances { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-block:12px; }
+.wallet-balance { display:flex; flex-direction:column; align-items:flex-start; gap:10px; padding:clamp(16px,2vw,24px); border:1px solid #e4e8eb; border-radius:18px; background:#f0f6fa; min-width:0; }
+.wallet-balance.points { background:#f4f2f8; }.wallet-balance>span { font-size:13px; color:var(--muted); }
+.wallet-balance strong { font-family:var(--body); font-size:clamp(22px,2vw,30px); line-height:1.25; font-weight:500; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.wallet-balance small { font-size:12px; }
+.wallet-rule,.member-intro { color:var(--muted); font-size:13px; line-height:1.85; margin-block:14px 22px; }
+.wallet-rules { font-size:13px; border-block:1px solid var(--line); padding:10px 0; margin-bottom:20px; }.wallet-rules summary { cursor:pointer; padding-block:8px; }.wallet-rules p{line-height:1.8;margin:8px 0;}
+.wallet-history-tabs { display:flex; gap:12px; border-bottom:1px solid var(--line); margin-top:24px; flex-wrap:wrap; }
+.wallet-history-tabs button { min-height:44px; font-size:14px; border-bottom:2px solid transparent; color:var(--muted); padding:10px 4px; }
+.wallet-history-tabs button[aria-pressed="true"] { border-color:var(--ink); color:var(--ink); }
+.wallet-ledger { list-style:none; padding:0; margin:0; }.wallet-ledger>li { padding:20px 0; border-bottom:1px solid var(--line); overflow-wrap:anywhere; }
+.wallet-entry-heading { display:flex; gap:12px; justify-content:space-between; align-items:baseline; }.wallet-entry-heading strong {font-size:14px; font-weight:500;}.wallet-entry-heading time { color:var(--muted); font-size:12px; flex-shrink:0; }
+.wallet-entry-deltas { display:flex; gap:16px; flex-wrap:wrap; font-variant-numeric:tabular-nums; margin:9px 0; }.wallet-entry-deltas strong {font-size:20px;font-weight:500;}
+.wallet-ledger p{font-size:13px;line-height:1.75;margin:8px 0;white-space:pre-line;}.wallet-ledger small{display:block;font-size:12px;color:var(--muted);line-height:1.8;}.wallet-entry-balance{margin-top:6px;}.wallet-reverse{min-height:36px;margin-top:6px;}
+.wallet-empty { padding:28px 0; color:var(--muted); font-size:14px; }
+.wallet-pagination { display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; padding-block:16px; }.wallet-pagination button { min-height:44px; padding:8px; }.wallet-pagination button:disabled { opacity:.4; cursor:default; }
+.wallet-bookings a { align-items:flex-start; }.wallet-bookings p { font-size:13px; white-space:pre-line; margin:10px 0 0; }.wallet-bookings svg{margin-top:8px;}
+.member-intro { max-width:70ch; }.member-search { max-width:640px; margin-bottom:24px; }
+.member-list { background:var(--paper); border:1px solid var(--line); border-radius:18px; overflow:hidden; }
+.member-list:empty{display:none;}.member-row { display:grid; grid-template-columns:28px minmax(0,1fr) minmax(120px,.5fr) 20px; width:100%; gap:20px; align-items:center; padding:22px 24px; text-align:left; border-bottom:1px solid var(--line); min-height:90px; }
+.member-row:last-child{border:0;}.member-row strong{font-weight:500;font-size:16px;}.member-row small{display:block;color:var(--muted);margin-top:6px;font-size:13px;overflow-wrap:anywhere;}.member-row>span{min-width:0;font-size:15px;}
+.wallet-new{margin-block:4px 24px;}.wallet-form { padding:20px; border:1px solid var(--line); border-radius:16px; background:#f9fbfc; display:grid; gap:18px; margin:20px 0; }.wallet-form h3{font-size:20px;margin:0;}.wallet-input-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}.wallet-form .desk-field{margin:0;}.wallet-form-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;}.wallet-form .wallet-rule{margin:0;}
+.wallet-saved{display:flex;gap:8px;align-items:center;padding:14px;background:#eff6ee;border-radius:12px;font-size:14px;}
+.wallet-uncertain { background:#fff5e7; border:1px solid #ead6b5; padding:18px; border-radius:14px; margin:20px 0; font-size:14px; line-height:1.8; }
+.member-private-note { border-block:1px solid var(--line); padding:10px 0; margin:16px 0; }.member-private-note summary{min-height:44px;padding:12px 0;cursor:pointer;font-size:14px;}.member-private-note form{padding:12px 0;display:grid;gap:12px;}.member-private-note button{justify-self:start;}
+.reservation-attendance { padding-block:20px; border-block:1px solid var(--line); margin:20px 0; }.reservation-attendance .wallet-input-grid{margin-block:16px;}
+.reservation-delete { padding-block:22px; margin-top:24px; border-top:1px solid var(--line); }.reservation-delete .desk-button {color:#8c3f34;}.reservation-delete form{display:grid;gap:14px;margin-top:14px;}
+.reservation-deleted-toggle{display:flex;gap:16px;margin-block:12px 20px;}
+.member-row,.home-journal-card,.account-methods>button,.wallet-history-tabs>button,.wallet-pagination>button {--tactile-rest-transform:translate3d(0,0,0) scale(1);--tactile-press-transform:translate3d(0,1px,0) scale(.985);--tactile-rest-shadow:0 0 0 transparent;--tactile-press-shadow:0 1px 4px #283b4410;transform:var(--tactile-rest-transform);transition:transform var(--control-duration) var(--control-ease),background-color var(--control-duration) var(--control-ease),box-shadow var(--control-duration) var(--control-ease);}
+:is(.member-row,.home-journal-card,.account-methods>button,.wallet-history-tabs>button,.wallet-pagination>button):not(:disabled):active{transform:var(--tactile-press-transform);box-shadow:var(--tactile-press-shadow);}
+html[data-motion="reduced"] :is(.member-row,.home-journal-card,.account-methods>button,.wallet-history-tabs>button,.wallet-pagination>button){transform:none!important;}
+@media(hover:hover) and (pointer:fine){.member-row:hover{background:#f1f6f9;}}
+@media(max-width:600px){.member-row{grid-template-columns:minmax(0,1fr) auto 18px;padding:18px 16px;gap:12px;}.member-row>svg:first-child{display:none;}.member-row strong{font-size:15px;}.wallet-form{padding:16px;}.wallet-entry-heading{flex-wrap:wrap;gap:4px 12px;}.wallet-input-grid{grid-template-columns:1fr;}.wallet-balance{padding:14px;}.wallet-balances{gap:8px;}.wallet-form-actions .desk-button{flex:1;}}

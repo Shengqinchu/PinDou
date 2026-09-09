@@ -1,5 +1,5 @@
 {
-  "source": "owner-20260909-carousel-hours-live-preview-fixes",
+  "source": "owner-account-pdf-v5-and-confirmed-100-points-per-visit",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -61,6 +61,7 @@
     "pages-Visit.json": "ddff8ab91c460ed8788a3c22b7927f582ba9b018cf3f5a84d93a1f7d1695aee0",
     "rate-fields.json": "3470adfe9da8bf9b2f47d05a5e4c128c8325325f58b6075bfd2ecf9728938b79",
     "state.json": "c4eeb599810219fc6102c20f5c7c3a265a0d592a3cefd9351d88734552a2650f",
-    "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3"
+    "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3",
+    "wallet.json": "bfefe5c757fca0095b7aec2992729ab394d3a42c128fefa0558390a9d8c6659f"
   }
 }

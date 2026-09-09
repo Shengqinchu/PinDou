@@ -2,15 +2,14 @@
 import { computed,onBeforeUnmount,ref,watch } from "vue";
 import { PhArrowRight,PhEye,PhEyeSlash,PhUserCircle } from "@phosphor-icons/vue";
 import SlideOver from "./SlideOver.vue";
+import CustomerWallet from './CustomerWallet.vue';
 import { accountCopy as copy,accountUser,accountOpen,accountForReservation,closeAccount,completeSignIn,signOut,type SignInResult } from "../account";
-import { commerceApi,statusText } from "../commerce";
-import { say,formatCopy,prettyDate } from "../state";
-import type { Reservation } from "../reservations";
+import { commerceApi } from "../commerce";
+import { say,formatCopy } from "../state";
 const method=ref<"code"|"password">("code");
 const email=ref("");const code=ref("");const password=ref("");const confirmation=ref("");
 const setPassword=ref(false);const reveal=ref(false);const busy=ref(false);const sending=ref(false);
 const error=ref("");const sent=ref(false);const now=ref(Date.now());const nextSend=ref<Record<string,number>>({});
-const bookings=ref<Reservation[]>([]);const loading=ref(false);const listError=ref("");
 const normalizedEmail=computed(()=>email.value.trim().toLowerCase());
 const cooldown=computed(()=>Math.max(0,Math.ceil(((nextSend.value[normalizedEmail.value]||0)-now.value)/1000)));
 const validEmail=computed(()=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail.value));
@@ -42,28 +41,13 @@ async function login(){
   }catch(e){error.value=(e as Error).message;}
   finally{busy.value=false;}
 }
-let listVersion=0;
-async function loadBookings(){
-  const version=++listVersion;
-  bookings.value=[];listError.value="";
-  if(!accountUser.value){loading.value=false;return;}
-  loading.value=true;
-  try{const result=await commerceApi<{items:Reservation[]}>("/auth/reservations");if(version===listVersion)bookings.value=result.items;}
-  catch(e){if(version===listVersion)listError.value=(e as Error).message;}
-  finally{if(version===listVersion)loading.value=false;}
-}
-watch([accountOpen,()=>accountUser.value?.id],()=>{if(accountOpen.value)void loadBookings();else ++listVersion;},{immediate:true});
 </script>
 <template>
   <SlideOver :model-value="accountOpen" @update:model-value="value=>{if(!value)closeAccount()}" :busy="working"
     :title="say(accountUser?copy.account:accountForReservation?copy.reservation_title:copy.title)">
     <section v-if="accountUser" class="account-content">
       <div class="account-identity"><PhUserCircle :size="42" weight="light" /><div><span class="fine-print">{{ say(copy.signed_in) }}</span><strong>{{ accountUser.nickname||accountUser.email }}</strong><p v-if="accountUser.nickname">{{ accountUser.email }}</p></div></div>
-      <h3>{{ say(copy.my_reservations) }}</h3>
-      <p v-if="loading" role="status">{{ say(copy.loading) }}</p>
-      <div v-else-if="listError"><p class="form-error" role="alert">{{ listError }}</p><button class="text-link" @click="loadBookings">{{ say(copy.retry) }}</button></div>
-      <p v-else-if="!bookings.length" class="account-note">{{ say(copy.no_reservations) }}</p>
-      <ul v-else class="account-bookings"><li v-for="booking in bookings" :key="booking.id"><RouterLink :to="'/reservation/'+booking.id" @click="closeAccount"><span><strong>{{ prettyDate(booking.booking.date) }}</strong><small>{{ booking.booking.start }}–{{ booking.booking.end }}</small></span><span>{{ statusText(booking.status) }}</span><PhArrowRight :size="18" /></RouterLink></li></ul>
+      <CustomerWallet v-if="accountOpen" :key="accountUser.id"/>
       <RouterLink class="button button-primary" to="/visit" @click="closeAccount">{{ say(copy.book_a_visit) }}<PhArrowRight /></RouterLink>
       <button type="button" class="text-link account-signout" @click="signOut">{{ say(copy.sign_out) }}</button>
     </section>

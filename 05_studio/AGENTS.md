@@ -2,7 +2,8 @@
 
 用户明确要求：文案要落档、规范化、模块化；只有用户要求修改时才修改。
 
-- 当前业务与逐项要求：`../02_product/STUDIO_VISION3_PROGRESS.md`。后续用户澄清优先于 PDF，第三版优先于第二版和第一版。
+- 当前业务与逐项要求：`../02_product/STUDIO_VISION5_PROGRESS.md`；V4、V3 保留未被新版替代的要求。后续用户澄清优先于 PDF。
+- V5 账户按整数分钟及整数积分记账；100 积分抵 CAD 1，完成真实到店记录赠100积分一次。后台原子追加明细、版本和幂等保护，顾客按稳定登录 ID 隔离；不要按联系邮箱猜测资产归属或把 PDF 示例当生产余额。
 - 页面、错误、通知、辅助名称、中英文内容使用 `src/content/`。文案键稳定；不因排版、动效或重构更换文案、翻译、标点或插入新宣传语。
 - `../02_product/copy/STUDIO_COPY_BE46A3D.json` 是变更前不可修改的基线。`STUDIO_COPY_CATALOG.md` 是当前内容目录；`STUDIO_COPY_RULES.md` 规定修改流程。
 - 修改文案必须关联用户原话/PDF 页码/已确认要求，并写到 `STUDIO_COPY_CHANGES.md`。不得为通过检查无理由执行 `content-catalog.mjs --approve`。只有本次获得用户文案修改授权时才能更新批准哈希。

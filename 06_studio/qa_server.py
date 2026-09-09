@@ -58,5 +58,19 @@ def paid(order_id: str):
     return {'ok': True}
 
 
+@studio.app.post('/studio-api/qa/attended-visit')
+def attended_visit():
+    """Past confirmed arrival for wallet UI QA. This module is never packaged."""
+    import uuid
+    stamp=reservations.now_local().isoformat()
+    reference='VIS-QA-'+uuid.uuid4().hex[:12].upper()
+    payload={'name':'Local QA','contact_method':'wechat','contact':'local-qa',
+             'booking':{'date':stamp[:10],'start':'10:00','end':'12:00','plan':'hourly','guests':2}}
+    with studio.database() as db:
+        db.execute("INSERT INTO studio_reservations(id,created_at,updated_at,status,payload,visitor_hash,idempotency_key,payload_hash,owner_id) VALUES(?,?,?,?,?,?,?,?,?)",
+                   (reference,stamp,stamp,'confirmed',json.dumps(payload),'qa',str(uuid.uuid4()),'qa','qa-owner'))
+    return {'id':reference}
+
+
 if __name__ == '__main__':
     uvicorn.run(studio.app, host='127.0.0.1', port=8011, access_log=False)

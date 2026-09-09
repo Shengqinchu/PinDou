@@ -4443,6 +4443,368 @@
       "We could not complete that request. Please try again or contact us on WeChat."
     ]
   },
+  "wallet": {
+    "account": [
+      "我的账户",
+      "My wallet"
+    ],
+    "time": [
+      "我的时长",
+      "My time"
+    ],
+    "points": [
+      "我的积分",
+      "My points"
+    ],
+    "remaining_time": [
+      "剩余时长",
+      "Time remaining"
+    ],
+    "remaining_points": [
+      "剩余积分",
+      "Points balance"
+    ],
+    "time_history": [
+      "时长明细",
+      "Time history"
+    ],
+    "point_history": [
+      "积分明细",
+      "Points history"
+    ],
+    "all_history": [
+      "全部明细",
+      "All entries"
+    ],
+    "hours_minutes": [
+      "{v0} 小时 {v1} 分钟",
+      "{v0}h {v1}m"
+    ],
+    "whole_hours": [
+      "{v0} 小时",
+      "{v0}h"
+    ],
+    "short_minutes": [
+      "{v0} 分钟",
+      "{v0}m"
+    ],
+    "point_count": [
+      "{v0} 积分",
+      "{v0} points"
+    ],
+    "redeemable": [
+      "可抵扣 CAD {v0}",
+      "Redeemable: CAD {v0}"
+    ],
+    "rules": [
+      "100 积分抵扣 CAD 1，每次按整数 CAD 使用，剩余积分保留。",
+      "100 points = CAD 1. Redeem in whole CAD amounts; unused points stay in your account."
+    ],
+    "earn_rule": [
+      "每次通过网站预约并实际到店，店主完成到店记录后赠送 100 积分。额外赠送会单独记录。",
+      "Earn 100 points for each website booking you attend, once the host completes the visit record. Extra gifts are recorded separately."
+    ],
+    "time_rule": [
+      "储值、赠送与实际扣时由店主核实后记录。预约不会自动扣除钱包时长。",
+      "The host records verified top-ups, gifts and time used. Making a booking does not deduct wallet time."
+    ],
+    "redeem_rule": [
+      "积分在到店结算时由店主确认抵扣。",
+      "The host confirms point redemption when you settle your visit."
+    ],
+    "empty": [
+      "还没有明细，店主记账后会显示在这里。",
+      "No entries yet. Records will appear after the host saves them."
+    ],
+    "loading": [
+      "正在读取账户…",
+      "Loading your wallet…"
+    ],
+    "refresh": [
+      "刷新记录",
+      "Refresh records"
+    ],
+    "sync": [
+      "与店主记录同步",
+      "Synced with the host’s records"
+    ],
+    "previous": [
+      "上一页",
+      "Previous"
+    ],
+    "next": [
+      "下一页",
+      "Next"
+    ],
+    "page": [
+      "第 {v0} 页 · 共 {v1} 条",
+      "Page {v0} · {v1} entries"
+    ],
+    "booked": [
+      "预约时长",
+      "Booked time"
+    ],
+    "actual": [
+      "实际游玩时长",
+      "Actual time"
+    ],
+    "unrecorded": [
+      "待店主记录",
+      "Not recorded yet"
+    ],
+    "per_guest": [
+      "{v0}／人 · {v1} 人",
+      "{v0} per guest · {v1} guests"
+    ],
+    "actual_minutes": [
+      "实际游玩时长（分钟／人）",
+      "Actual time (minutes per guest)"
+    ],
+    "actual_guests": [
+      "实际游玩人数",
+      "Guests who attended"
+    ],
+    "attendance_help": [
+      "填写实际游玩时间，完成到店记录后赠送 100 积分；不会自动扣钱包时长。",
+      "Record the actual time. Completing attendance awards 100 points; wallet time is not deducted automatically."
+    ],
+    "public_note": [
+      "给顾客的备注",
+      "Note for the guest"
+    ],
+    "members": [
+      "顾客账户",
+      "Guest accounts"
+    ],
+    "members_intro": [
+      "记录储值时长、到店消费与积分，每一笔都有明细。",
+      "Record prepaid time, visits and points with an entry for every change."
+    ],
+    "search": [
+      "搜索姓名、邮箱或账号编号",
+      "Search name, email or account ID"
+    ],
+    "no_members": [
+      "还没有找到顾客账户。",
+      "No guest accounts found."
+    ],
+    "register_first": [
+      "请让顾客先用邮箱登录网站一次。老用户已有的时长可在账户中录入，不会按联系邮箱自动认领。",
+      "Ask the guest to sign in to the website with email first. You can then record their existing time balance on that account."
+    ],
+    "transaction": [
+      "登记一笔",
+      "Record an entry"
+    ],
+    "kind": [
+      "记账类型",
+      "Entry type"
+    ],
+    "opening": [
+      "老用户结余",
+      "Opening balance"
+    ],
+    "topup": [
+      "时长充值",
+      "Time top-up"
+    ],
+    "gift": [
+      "赠送",
+      "Gift"
+    ],
+    "usage": [
+      "消费扣时",
+      "Time used"
+    ],
+    "redeem": [
+      "积分抵扣",
+      "Point redemption"
+    ],
+    "adjustment": [
+      "余额更正",
+      "Balance adjustment"
+    ],
+    "visit_reward": [
+      "到店赠分",
+      "Visit reward"
+    ],
+    "reversal": [
+      "撤销记账",
+      "Reversal"
+    ],
+    "reversed": [
+      "已撤销，原记录保留",
+      "Reversed; original entry retained"
+    ],
+    "reverse": [
+      "撤销这笔",
+      "Reverse entry"
+    ],
+    "reverse_help": [
+      "将以一笔相反的变动撤销原记账，保留两笔明细。",
+      "An opposite entry reverses this change. Both entries remain in the history."
+    ],
+    "time_amount": [
+      "时长（分钟）",
+      "Time (minutes)"
+    ],
+    "points_amount": [
+      "积分数量",
+      "Number of points"
+    ],
+    "redeem_cad": [
+      "抵扣金额（整数 CAD）",
+      "Amount to redeem (whole CAD)"
+    ],
+    "bill": [
+      "本次可抵扣消费金额（CAD）",
+      "Eligible bill amount (CAD)"
+    ],
+    "debit_help": [
+      "填写正数，保存时会从余额中扣除。多人共用时，请填写合计消费分钟。",
+      "Enter a positive number to deduct. For shared time, enter the total minutes used by all guests."
+    ],
+    "adjust_help": [
+      "更正填写变化量：正数增加，负数扣除。",
+      "Enter the change: positive adds, negative deducts."
+    ],
+    "date": [
+      "发生日期",
+      "Entry date"
+    ],
+    "reason": [
+      "记账说明（顾客可见）",
+      "Entry note (visible to guest)"
+    ],
+    "reservation": [
+      "关联预约编号（可选）",
+      "Booking reference (optional)"
+    ],
+    "save": [
+      "保存并同步给顾客",
+      "Save and sync with guest"
+    ],
+    "saving": [
+      "正在保存…",
+      "Saving…"
+    ],
+    "saved": [
+      "已保存并同步。",
+      "Saved and synced."
+    ],
+    "private_note": [
+      "店主私密备注",
+      "Private host note"
+    ],
+    "save_note": [
+      "保存备注",
+      "Save note"
+    ],
+    "balance_after": [
+      "本笔后余额",
+      "Balance after entry"
+    ],
+    "cancel": [
+      "取消",
+      "Cancel"
+    ],
+    "close": [
+      "关闭",
+      "Close"
+    ],
+    "uncertain": [
+      "还未确认这笔是否保存成功。请重试同一笔，不要重复新建；系统会核对记录，避免重复扣款或入账。",
+      "This entry has not been confirmed. Retry the same entry instead of creating another; the system checks it to prevent duplicates."
+    ],
+    "retry": [
+      "重试这笔记账",
+      "Retry this entry"
+    ],
+    "delete": [
+      "删除预约",
+      "Delete booking"
+    ],
+    "deleted": [
+      "已删除的预约",
+      "Deleted bookings"
+    ],
+    "active": [
+      "当前预约",
+      "Current bookings"
+    ],
+    "delete_help": [
+      "删除后将从顾客和当前列表中隐藏，可在已删除列表恢复。时长和积分明细保留；已确认的预约请先取消。",
+      "Hide this booking from the guest and current list. Restore it from Deleted bookings. Time and points entries stay; cancel confirmed bookings first."
+    ],
+    "deletion_reason": [
+      "删除／恢复原因",
+      "Reason for deletion or restore"
+    ],
+    "confirm_delete": [
+      "确认删除预约",
+      "Confirm deletion"
+    ],
+    "restore": [
+      "恢复预约",
+      "Restore booking"
+    ],
+    "open_wallet": [
+      "查看顾客账户",
+      "Open guest account"
+    ],
+    "wallet_insufficient_balance": [
+      "余额不足，未保存任何变动。请核对时长和积分。",
+      "Insufficient balance. No changes were saved. Check the time and points."
+    ],
+    "wallet_member_missing": [
+      "顾客账户还未建立，请让顾客先登录一次。",
+      "This guest account is not available yet. Ask the guest to sign in first."
+    ],
+    "wallet_amount_too_large": [
+      "金额或时长超出可记录范围，请核对。",
+      "The amount exceeds the recording limit. Please check it."
+    ],
+    "wallet_request_changed": [
+      "重试内容发生变化，请先刷新核对原明细。",
+      "The retry details changed. Refresh and check the original entry first."
+    ],
+    "wallet_opening_exists": [
+      "该账户已有明细；补充旧记录请使用充值、赠送或更正。",
+      "This account already has entries. Use a top-up, gift or adjustment for further records."
+    ],
+    "wallet_reservation_mismatch": [
+      "预约不存在、已删除或不属于该顾客，请核对编号。",
+      "The booking is missing, deleted or belongs to another guest. Check the reference."
+    ],
+    "wallet_reservation_incomplete": [
+      "请先完成该预约的到店记录，再关联消费扣时或积分抵扣。",
+      "Complete this booking’s attendance record before linking a debit or redemption."
+    ],
+    "wallet_entry_missing": [
+      "没有找到这笔明细，请刷新。",
+      "This entry was not found. Refresh the records."
+    ],
+    "wallet_already_reversed": [
+      "这笔已撤销，不能再次撤销。",
+      "This entry has already been reversed."
+    ],
+    "wallet_visit_not_arrived": [
+      "预约日期尚未到来，不能提前完成并赠分。",
+      "This visit is in the future. It cannot be completed or rewarded yet."
+    ],
+    "wallet_actual_details_required": [
+      "请同时填写实际游玩分钟和人数。",
+      "Enter both the actual minutes and number of guests."
+    ],
+    "wallet_completed_record_locked": [
+      "这次到店已赠分。可更正实际时长；误记到店请先在顾客账户撤销赠分，再改状态。",
+      "Points were awarded for this visit. You can correct its duration. To undo attendance, reverse the reward in the guest account before changing the status."
+    ],
+    "reservation_cancel_before_delete": [
+      "请先取消已确认的预约，再删除。",
+      "Cancel this confirmed booking before deleting it."
+    ]
+  },
   "media": {
     "hero-illustration": {
       "src": "/studio-media/v3/hero-illustration-1269.webp",

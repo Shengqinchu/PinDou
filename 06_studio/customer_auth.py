@@ -93,7 +93,10 @@ def public_user(data: dict) -> dict:
 def require_customer(request: Request, authorization: Annotated[str | None, Header()] = None) -> dict:
     if not authorization or not authorization.startswith("Bearer ") or len(authorization)>5000:
         raise HTTPException(401,"account_login_required")
-    return public_user(upstream("profile",request,token=authorization[7:]))
+    customer=public_user(upstream("profile",request,token=authorization[7:]))
+    import wallet
+    wallet.remember_customer(customer)
+    return customer
 
 
 class EmailInput(BaseModel):
@@ -129,7 +132,10 @@ def signed_in(path, payload, request):
         raise HTTPException(503,"account_unavailable")
     profile=result.get("user")
     if not isinstance(profile,dict):raise HTTPException(503,"account_unavailable")
-    return {"token":token,"user":public_user(profile),"shared_user":profile}
+    customer=public_user(profile)
+    import wallet
+    wallet.remember_customer(customer)
+    return {"token":token,"user":customer,"shared_user":profile}
 
 
 def register(app, database, origin):

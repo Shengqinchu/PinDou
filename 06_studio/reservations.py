@@ -53,6 +53,12 @@ def initialize(database):
         if "owner_id" not in {row[1] for row in db.execute("PRAGMA table_info(studio_reservations)")}:
             db.execute("ALTER TABLE studio_reservations ADD COLUMN owner_id TEXT NOT NULL DEFAULT ''")
         db.execute("CREATE INDEX IF NOT EXISTS reservation_owner ON studio_reservations(owner_id,created_at)")
+        columns={row[1] for row in db.execute('PRAGMA table_info(studio_reservations)')}
+        for name,definition in {
+            'actual_minutes':'INTEGER', 'actual_guests':'INTEGER',
+            'public_note':"TEXT NOT NULL DEFAULT ''", 'deleted_at':'TEXT',
+        }.items():
+            if name not in columns: db.execute(f'ALTER TABLE studio_reservations ADD COLUMN {name} {definition}')
 
 def clock(value):
     return f"{value // 60:02d}:{value % 60:02d}"
@@ -158,12 +164,23 @@ def has_capacity(db, booking, policy, exclude=""):
 
 def public_row(row):
     data = json.loads(row["payload"])
-    return {key: row[key] for key in ("id", "status", "created_at", "updated_at", "version")} | {"booking": data["booking"], "name": data["name"]}
+    booking=data['booking']
+    return {key: row[key] for key in ("id", "status", "created_at", "updated_at", "version", "actual_minutes", "actual_guests", "public_note")} | {
+        "booking": booking, "name": data["name"],
+        "booked_minutes": minute(booking['end'])-minute(booking['start']),
+    }
 
 class ReservationUpdate(Strict):
     status: Literal["pending", "confirmed", "completed", "cancelled"]
     staff_note: str = Field(default="", max_length=1500)
     version: int = Field(ge=1)
+    actual_minutes: int | None = Field(default=None, ge=1, le=1440, strict=True)
+    actual_guests: int | None = Field(default=None, ge=1, le=99, strict=True)
+    public_note: str = Field(default='',max_length=600)
+
+class ReservationDeletion(Strict):
+    version: int = Field(ge=1,strict=True)
+    reason: str = Field(min_length=1,max_length=600)
 
 class DayHours(Strict):
     weekday: int = Field(ge=0, le=6, strict=True)
@@ -270,7 +287,7 @@ def register(app, database, admin_actor):
     def receipt(reference: str, request: Request, authorization: Annotated[str | None, Header()]=None):
         with database() as db:
             row = db.execute("SELECT * FROM studio_reservations WHERE id=?", (reference,)).fetchone()
-        if not row:
+        if not row or row['deleted_at']:
             raise HTTPException(404, "reservation_not_found")
         if row["owner_id"]:
             if require_customer(request,authorization)["id"]!=row["owner_id"]:
@@ -282,16 +299,18 @@ def register(app, database, admin_actor):
         return public_row(row)
 
     @app.get("/studio-api/auth/reservations")
-    def my_reservations(customer=Depends(require_customer)):
+    def my_reservations(page:int=1,customer=Depends(require_customer)):
+        if not 1<=page<=100000: raise HTTPException(422,'invalid_filter')
         with database() as db:
-            rows=db.execute("SELECT * FROM studio_reservations WHERE owner_id=? ORDER BY created_at DESC,id DESC LIMIT 50",(customer["id"],)).fetchall()
-        return {"items":[public_row(row) for row in rows]}
+            rows=db.execute("SELECT * FROM studio_reservations WHERE owner_id=? AND deleted_at IS NULL ORDER BY created_at DESC,id DESC LIMIT 30 OFFSET ?",(customer["id"],(page-1)*30)).fetchall()
+            total=db.execute('SELECT count(*) FROM studio_reservations WHERE owner_id=? AND deleted_at IS NULL',(customer['id'],)).fetchone()[0]
+        return {"items":[public_row(row) for row in rows],'total':total,'page':page}
 
     @app.get("/studio-api/manage/reservations")
-    def listing(_actor=Depends(admin_actor), status: str="all", day: date | None=None, search: str="", page: int=1):
+    def listing(_actor=Depends(admin_actor), status: str="all", day: date | None=None, search: str="", page: int=1, deleted:bool=False):
         if status not in STATES | {"all"} or not 1 <= page <= 10000 or len(search) > 120:
             raise HTTPException(422, "invalid_filter")
-        clauses, params = [], []
+        clauses, params = ['deleted_at IS NOT NULL' if deleted else 'deleted_at IS NULL'], []
         if status != "all": clauses.append("status=?"); params.append(status)
         if day: clauses.append("json_extract(payload,'$.booking.date')=?"); params.append(str(day))
         if search: clauses.append("(instr(lower(json_extract(payload,'$.name')),lower(?))>0 OR instr(id,?)>0)"); params.extend([search,search])
@@ -299,9 +318,9 @@ def register(app, database, admin_actor):
         with database() as db:
             count = db.execute("SELECT count(*) FROM studio_reservations"+where, params).fetchone()[0]
             rows = db.execute("SELECT * FROM studio_reservations"+where+" ORDER BY created_at DESC,id DESC LIMIT 30 OFFSET ?", (*params,(page-1)*30)).fetchall()
-            counts = dict(db.execute("SELECT status,count(*) FROM studio_reservations GROUP BY status").fetchall())
+            counts = dict(db.execute("SELECT status,count(*) FROM studio_reservations WHERE deleted_at IS NULL GROUP BY status").fetchall())
             policy = read_policy(db)
-        return {"items":[public_row(r) | {"payload":json.loads(r["payload"]),"staff_note":r["staff_note"]} for r in rows], "total":count,"counts":counts,"policy":policy}
+        return {"items":[public_row(r) | {"payload":json.loads(r["payload"]),"staff_note":r["staff_note"],'owner_id':r['owner_id'],'deleted_at':r['deleted_at']} for r in rows], "total":count,"counts":counts,"policy":policy}
 
     @app.patch("/studio-api/manage/reservations/{reference}")
     def update(reference: str, payload: ReservationUpdate, actor=Depends(admin_actor)):
@@ -309,7 +328,7 @@ def register(app, database, admin_actor):
         with database() as db:
             db.execute("BEGIN IMMEDIATE")
             row = db.execute("SELECT * FROM studio_reservations WHERE id=?", (reference,)).fetchone()
-            if not row: raise HTTPException(404,"reservation_not_found")
+            if not row or row['deleted_at']: raise HTTPException(404,"reservation_not_found")
             if row["version"] != payload.version: raise HTTPException(409,"version_conflict")
             if payload.status == "confirmed" and row["status"] != "confirmed":
                 booking = Visit(**json.loads(row["payload"])["booking"])
@@ -319,9 +338,48 @@ def register(app, database, admin_actor):
                     raise HTTPException(409,"reservation_confirmation_conflict")
             if payload.status == "completed" and row["status"] not in ("confirmed","completed"):
                 raise HTTPException(409,"reservation_not_confirmed")
-            db.execute("UPDATE studio_reservations SET status=?,staff_note=?,version=version+1,updated_at=? WHERE id=?", (payload.status,payload.staff_note,current.isoformat(),reference))
+            actual=payload.actual_minutes if 'actual_minutes' in payload.model_fields_set else row['actual_minutes']
+            guests=payload.actual_guests if 'actual_guests' in payload.model_fields_set else row['actual_guests']
+            public_note=payload.public_note if 'public_note' in payload.model_fields_set else row['public_note']
+            if (actual is None)!=(guests is None): raise HTTPException(422,'wallet_actual_details_required')
+            # Once attendance has earned points, status cannot quietly erase the visit.
+            earned=db.execute('SELECT 1 FROM studio_wallet_ledger l WHERE idempotency_key=? AND NOT EXISTS(SELECT 1 FROM studio_wallet_ledger r WHERE r.reverses_id=l.id)',('visit-reward:'+reference,)).fetchone()
+            if earned and (payload.status!='completed' or actual is None):
+                raise HTTPException(409,'wallet_completed_record_locked')
+            db.execute("UPDATE studio_reservations SET status=?,staff_note=?,actual_minutes=?,actual_guests=?,public_note=?,version=version+1,updated_at=? WHERE id=?", (payload.status,payload.staff_note,actual,guests,public_note,current.isoformat(),reference))
+            if payload.status=='completed':
+                from wallet import reward_visit
+                reward_visit(db,db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone(),actor)
             db.execute("INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)", (reference,actor,current.isoformat(),payload.status,payload.staff_note))
+            if (actual,guests,public_note)!=(row['actual_minutes'],row['actual_guests'],row['public_note']):
+                db.execute('INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)',
+                    (reference,actor,current.isoformat(),'attendance',json.dumps({'minutes':actual,'guests':guests,'public_note':public_note},ensure_ascii=False)))
         return {"id":reference,"status":payload.status,"version":payload.version+1}
+
+    @app.delete('/studio-api/manage/reservations/{reference}')
+    def remove_reservation(reference:str,payload:ReservationDeletion,actor=Depends(admin_actor)):
+        with database() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row=db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone()
+            if row is None: raise HTTPException(404,'reservation_not_found')
+            if row['deleted_at']: return {'deleted':True}
+            if row['version']!=payload.version: raise HTTPException(409,'version_conflict')
+            if row['status']=='confirmed': raise HTTPException(409,'reservation_cancel_before_delete')
+            db.execute('UPDATE studio_reservations SET deleted_at=?,updated_at=?,version=version+1 WHERE id=?',(now_local().isoformat(),now_local().isoformat(),reference))
+            db.execute('INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)',(reference,actor,now_local().isoformat(),'deleted',payload.reason))
+        return {'deleted':True}
+
+    @app.post('/studio-api/manage/reservations/{reference}/restore')
+    def restore_reservation(reference:str,payload:ReservationDeletion,actor=Depends(admin_actor)):
+        with database() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row=db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone()
+            if row is None: raise HTTPException(404,'reservation_not_found')
+            if not row['deleted_at']: return {'restored':True}
+            if row['version']!=payload.version: raise HTTPException(409,'version_conflict')
+            db.execute('UPDATE studio_reservations SET deleted_at=NULL,updated_at=?,version=version+1 WHERE id=?',(now_local().isoformat(),reference))
+            db.execute('INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)',(reference,actor,now_local().isoformat(),'restored',payload.reason))
+        return {'restored':True}
 
     @app.get("/studio-api/manage/reservation-policy")
     def get_policy(_actor=Depends(admin_actor)):
@@ -363,8 +421,8 @@ def register(app, database, admin_actor):
         if after<0:raise HTTPException(422,'invalid_filter')
         with database() as db:
             latest=db.execute('SELECT coalesce(max(rowid),0) FROM studio_reservations').fetchone()[0]
-            new=db.execute('SELECT count(*) FROM studio_reservations WHERE rowid>?',(after,)).fetchone()[0]
-            pending=db.execute("SELECT count(*) FROM studio_reservations WHERE status='pending'").fetchone()[0]
+            new=db.execute('SELECT count(*) FROM studio_reservations WHERE rowid>? AND deleted_at IS NULL',(after,)).fetchone()[0]
+            pending=db.execute("SELECT count(*) FROM studio_reservations WHERE status='pending' AND deleted_at IS NULL").fetchone()[0]
         return {'cursor':latest,'new_count':new,'pending':pending}
 
     @app.put("/studio-api/manage/reservation-policy")

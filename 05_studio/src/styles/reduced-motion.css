@@ -15,6 +15,7 @@ html[data-motion="reduced"] .space-photo img {
   transform: none !important;
 }
 html[data-motion="reduced"] .button:hover,
+html[data-motion="reduced"] .home-journal-card:hover,
 html[data-motion="reduced"] .photo-tile:hover .photo-tile-image > img {
   transform: none !important;
 }

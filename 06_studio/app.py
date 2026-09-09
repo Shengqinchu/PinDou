@@ -71,6 +71,8 @@ def initialize():
     reservations.initialize(database)
     import customer_auth
     customer_auth.initialize(database)
+    import wallet
+    wallet.initialize(database)
     import content
     content.initialize(database, DB_PATH)
     import observability
@@ -293,6 +295,8 @@ import reservations
 import customer_auth
 customer_auth.register(app, database, ADMIN_ORIGIN)
 reservations.register(app, database, admin_actor)
+import wallet
+wallet.register(app, database, admin_actor)
 
 import content
 content.register(app, database, admin_actor)

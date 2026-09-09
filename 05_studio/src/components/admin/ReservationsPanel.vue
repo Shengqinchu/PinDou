@@ -21,9 +21,14 @@ import type { Reservation, ReservationPayload } from "../../reservations";
 import SlideOver from "../SlideOver.vue";
 import ReservationAvailability from "./ReservationAvailability.vue";
 import ReservationSettings from "./ReservationSettings.vue";
-type Entry = Reservation & { payload: ReservationPayload; staff_note: string };
+import { walletCopy,duration } from '../../wallet';
+import { useRouter } from 'vue-router';
+type Entry = Reservation & { payload: ReservationPayload; staff_note: string;owner_id:string;deleted_at:string|null };
 const props = defineProps<{ active: boolean; calendar?: boolean }>();
 const { request } = useDesk();
+const router=useRouter();
+const deleted=ref(false),deleting=ref(false),deleteReason=ref(''),publicNote=ref('');
+const actualMinutes=ref<number|''>(''),actualGuests=ref<number|''>('');
 const items = ref<Entry[]>([]),
   counts = ref<Record<string, number>>({}),
   total = ref(0),
@@ -61,6 +66,7 @@ async function load() {
       status: status.value,
       page: String(page.value),
       search: search.value,
+      deleted:String(deleted.value),
     });
     if (day.value) query.set("day", day.value);
     const data = await request<{
@@ -87,11 +93,16 @@ function inspect(item: Entry) {
   entry.value = item;
   nextStatus.value = item.status;
   note.value = item.staff_note;
+  actualMinutes.value=item.actual_minutes??'';actualGuests.value=item.actual_guests??'';
+  publicNote.value=item.public_note||'';deleting.value=false;deleteReason.value='';
   saveError.value = "";
   open.value = true;
 }
 async function save() {
   if (!entry.value || saving.value) return;
+  if((actualMinutes.value==='')!==(actualGuests.value==='') || (actualMinutes.value!==''&&(!Number.isInteger(actualMinutes.value)||actualMinutes.value<1||actualMinutes.value>1440||!Number.isInteger(actualGuests.value)||Number(actualGuests.value)<1||Number(actualGuests.value)>99))){
+    saveError.value=say(walletCopy.wallet_actual_details_required);return;
+  }
   saving.value = true;
   saveError.value = "";
   try {
@@ -101,6 +112,9 @@ async function save() {
         status: nextStatus.value,
         staff_note: note.value,
         version: entry.value.version,
+        actual_minutes:actualMinutes.value===''?null:actualMinutes.value,
+        actual_guests:actualGuests.value===''?null:actualGuests.value,
+        public_note:publicNote.value,
       }),
     });
     open.value = false;
@@ -111,6 +125,15 @@ async function save() {
     saving.value = false;
   }
 }
+async function removeOrRestore(){
+  if(!entry.value||saving.value||!deleteReason.value.trim())return;
+  saving.value=true;saveError.value='';
+  try{await request('/manage/reservations/'+entry.value.id+(entry.value.deleted_at?'/restore':''),{
+    method:entry.value.deleted_at?'POST':'DELETE',body:JSON.stringify({version:entry.value.version,reason:deleteReason.value.trim()})});
+    open.value=false;await load();
+  }catch(e){saveError.value=(e as Error).message;}finally{saving.value=false;}
+}
+function openWallet(){if(!entry.value?.owner_id)return;open.value=false;void router.push({path:'/manage',query:{view:'members',member:entry.value.owner_id,booking:entry.value.id}});}
 async function changePolicy(value: boolean) {
   if (policyBusy.value) return;
   policyBusy.value = true;
@@ -137,7 +160,7 @@ watch(
   },
   { immediate: true },
 );
-watch([status, day], () => {
+watch([status, day,deleted], () => {
   page.value = 1;
   if (props.active) load();
 });
@@ -209,6 +232,7 @@ defineExpose({ refresh: load });
       </button>
     </div>
     <ReservationSettings :active="active" @saved="load" />
+    <div class="reservation-deleted-toggle" role="group" :aria-label="say(walletCopy.deleted)"><button class="desk-link" :aria-pressed="!deleted" @click="deleted=false">{{say(walletCopy.active)}}</button><button class="desk-link" :aria-pressed="deleted" @click="deleted=true">{{say(walletCopy.deleted)}}</button></div>
     <div class="reservation-desk-filters">
       <label class="desk-field"
         >{{ say(copyText.status_4434e2)
@@ -339,6 +363,13 @@ defineExpose({ refresh: load });
             <dd>{{ entry.payload.notes }}</dd>
           </div>
         </dl>
+        <button v-if="entry.owner_id" class="desk-button secondary" @click="openWallet">{{say(walletCopy.open_wallet)}}<PhArrowRight/></button>
+        <div v-if="!entry.deleted_at" class="reservation-attendance">
+          <p class="fine-print">{{say(walletCopy.booked)}} · {{duration(entry.booked_minutes)}}</p>
+          <div class="wallet-input-grid"><label class="desk-field">{{say(walletCopy.actual_minutes)}}<input v-model.number="actualMinutes" type="number" min="1" max="1440" step="1" :disabled="saving"/></label><label class="desk-field">{{say(walletCopy.actual_guests)}}<input v-model.number="actualGuests" type="number" min="1" max="99" step="1" :disabled="saving"/></label></div>
+          <p class="wallet-rule">{{say(walletCopy.attendance_help)}}</p>
+          <label class="desk-field">{{say(walletCopy.public_note)}}<textarea v-model="publicNote" rows="3" maxlength="600" :disabled="saving"/></label>
+        </div>
         <p class="fine-print">
           {{
             say(copyText.saving_updates_the_guests_result_page_please_6140a1)
@@ -348,7 +379,7 @@ defineExpose({ refresh: load });
           >{{ say(copyText.update_reservation_status_0ddee8)
           }}<select
             v-model="nextStatus"
-            :disabled="saving"
+            :disabled="saving||!!entry.deleted_at"
             :aria-label="say(copyText.update_reservation_status_0ddee8)"
           >
             <option v-for="(label, key) in labels" :key="key" :value="key">
@@ -361,9 +392,13 @@ defineExpose({ refresh: load });
             v-model="note"
             rows="4"
             maxlength="1500"
-            :disabled="saving"
+            :disabled="saving||!!entry.deleted_at"
           />
         </label>
+        <div class="reservation-delete">
+          <button class="desk-button secondary" :disabled="saving" @click="deleting=!deleting">{{say(entry.deleted_at?walletCopy.restore:walletCopy.delete)}}</button>
+          <form v-if="deleting" @submit.prevent="removeOrRestore"><p class="wallet-rule">{{say(walletCopy.delete_help)}}</p><label class="desk-field">{{say(walletCopy.deletion_reason)}}<textarea v-model="deleteReason" rows="2" minlength="1" maxlength="600" required :disabled="saving"/></label><button class="desk-button secondary" :disabled="saving||!deleteReason.trim()">{{say(entry.deleted_at?walletCopy.restore:walletCopy.confirm_delete)}}</button></form>
+        </div>
         <p v-if="saveError" class="desk-error" role="alert">
           {{ saveError }}
         </p></template
@@ -374,7 +409,7 @@ defineExpose({ refresh: load });
           @click="open = false"
         >
           {{ say(copyText.close_accb35) }}</button
-        ><button class="desk-button primary" :disabled="saving" @click="save">
+        ><button v-if="!entry?.deleted_at" class="desk-button primary" :disabled="saving" @click="save">
           {{
             saving
               ? say(copyText.saving_9a40ec)

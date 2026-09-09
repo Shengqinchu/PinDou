@@ -16,6 +16,11 @@ const controls = [
   ".desk-metric",
   ".reservation-desk-metrics > button",
   ".reservation-desk-row",
+  ".member-row",
+  ".home-journal-card",
+  ".account-methods > button",
+  ".wallet-history-tabs > button",
+  ".wallet-pagination > button",
 ].join(",");
 
 type Frame = { transform: string; boxShadow: string };

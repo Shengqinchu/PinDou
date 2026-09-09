@@ -5,17 +5,20 @@ const copyText = contentModule("pages-Home", copyTextDefault);
 import copyTextDefault from "../content/pages-Home.json";
 import { say } from "../state";
 
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { computed,onBeforeUnmount, onMounted, ref } from "vue";
 import { PhArrowUpRight, PhArrowRight, PhFlower } from "@phosphor-icons/vue";
 import { gsap } from "gsap";
-import PhotoViewer from "../components/PhotoViewer.vue";
+import FlagText from '../components/FlagText.vue';
+import { journalPosts,journalSource,refreshJournal } from '../journal';
 import StudioImage from "../components/StudioImage.vue";
 import StudioCarousel from "../components/StudioCarousel.vue";
 import BrandMotif from "../components/BrandMotif.vue";
-import { gallery, media, tr } from "../state";
+import { tr } from "../state";
 import { reducedMotion, onMotionPreferenceChange } from "../motion-preference";
 const page = ref<HTMLElement>();
-const viewer = ref<InstanceType<typeof PhotoViewer>>();
+const latestPosts=computed(()=>journalPosts.value.slice(0,3));
+let journalTimer:ReturnType<typeof setInterval>;
+function syncJournal(){if(document.visibilityState==='visible')void refreshJournal();}
 let animation: gsap.Context | undefined;
 let stopPreference: (() => void) | undefined;
 function entrance() {
@@ -71,9 +74,11 @@ function entrance() {
 }
 onMounted(() => {
   entrance();
+  void refreshJournal();journalTimer=setInterval(syncJournal,60000);window.addEventListener('focus',syncJournal);
   stopPreference = onMotionPreferenceChange(entrance);
 });
 onBeforeUnmount(() => {
+  clearInterval(journalTimer);window.removeEventListener('focus',syncJournal);
   stopPreference?.();
   animation?.revert();
 });
@@ -160,24 +165,11 @@ onBeforeUnmount(() => {
             }}<PhArrowUpRight
           /></RouterLink>
         </div>
-        <div class="vision-journal-grid">
-          <button
-            v-for="(item, index) in [gallery[1], gallery[2], gallery[4]]"
-            :key="item.image"
-            class="photo-tile"
-            @click="viewer?.open([1, 2, 4][index])"
-          >
-            <div class="photo-tile-image">
-              <img
-                :src="media(item.image)"
-                :alt="tr(item.zh, item.en)"
-                width="1080"
-                height="1440"
-                loading="lazy"
-              /><span class="photo-expand"><PhArrowUpRight /></span>
-            </div>
-            <span>{{ tr(item.zh, item.en) }}</span>
-          </button>
+        <div class="home-journal-grid">
+          <RouterLink v-for="post in latestPosts" :key="post.id" :to="'/journal/'+post.id" class="home-journal-card">
+            <div class="home-journal-photo"><img v-if="post.images[0]" :src="journalSource(post.images[0].src)" :alt="tr(post.title,post.title_en)" :width="post.images[0].width" :height="post.images[0].height" loading="lazy" decoding="async"/></div>
+            <div class="home-journal-caption"><time :datetime="post.date">{{post.date}}</time><h3><FlagText :text="tr(post.title,post.title_en)"/></h3><PhArrowUpRight :size="20"/></div>
+          </RouterLink>
         </div>
       </div>
     </section>
@@ -231,6 +223,5 @@ onBeforeUnmount(() => {
         /></RouterLink>
       </div>
     </section>
-    <PhotoViewer ref="viewer" :photos="gallery" />
   </div>
 </template>

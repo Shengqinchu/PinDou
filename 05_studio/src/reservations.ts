@@ -52,6 +52,10 @@ export type Reservation = {
   version: number;
   created_at: string;
   updated_at: string;
+  booked_minutes: number;
+  actual_minutes: number | null;
+  actual_guests: number | null;
+  public_note: string;
 };
 export function readSession<T>(key: string): T | null {
   if (isContentPreview()) return null;
