@@ -357,6 +357,8 @@ onUnmounted(revokePreview);
           ref="galleryInput"
           class="sr-only"
           type="file"
+          :aria-label="gt('从相册选择')"
+          tabindex="-1"
           accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
           @change="handleInput"
         />
@@ -364,6 +366,8 @@ onUnmounted(revokePreview);
           ref="cameraInput"
           class="sr-only"
           type="file"
+          :aria-label="gt('拍一张')"
+          tabindex="-1"
           accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
           capture="environment"
           @change="handleInput"
@@ -1529,8 +1533,8 @@ onUnmounted(revokePreview);
     grid-template-columns: 1fr;
     grid-template-rows: auto;
     grid-template-areas:
-      "controls"
       "upload"
+      "controls"
       "action";
   }
 

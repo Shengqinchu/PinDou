@@ -5,6 +5,7 @@ try{
  const ctx=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true,locale:'en-CA',reducedMotion:'reduce',acceptDownloads:true});
  await ctx.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','en');localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('pd_web_user',JSON.stringify({user_id:'qa-owner',nickname:'Example'}));});
  page=await ctx.newPage();page.on('pageerror',e=>errors.push(e.message));await page.request.post(base+'/qa/controls',{data:{clear:true}});await page.goto(base+'/tools');await expect(page.locator('.control-panel')).toBeVisible();
+ const order=await page.evaluate(()=>({upload:document.querySelector('.upload-stage').getBoundingClientRect().top,controls:document.querySelector('.control-panel').getBoundingClientRect().top}));assert(order.upload<order.controls);checks.push('mobile photo selection precedes settings');
  const camera=page.locator('input[type=file][capture]');await expect(camera).toHaveAttribute('capture','environment');
  // Exercise the browser drop path, keeping the original filename intact in English.
  await page.locator('.drop-zone').evaluate((element,bytes)=>{const file=new File([new Uint8Array(bytes)],'我的照片.png',{type:'image/png'}),data=new DataTransfer();data.items.add(file);element.dispatchEvent(new DragEvent('drop',{bubbles:true,dataTransfer:data}));},[...png]);await expect(page.locator('.file-strip')).toContainText('我的照片.png');

@@ -6,10 +6,10 @@ timetable, and wallet balances/history displayed in decimal hours.
 
 ## Release package
 
-- Studio release: `20260909195017-studio-v7`.
-- UI build: `2026-09-09T19:48:49.615Z`.
-- Package SHA256: `38076f83e74b3b23cf105df7fd4b32ffd468c93f5e0a7eac57257b7ac80ddccc`.
-- 351 verified files; incremental archive 2,680,469 bytes.
+- Studio release: `20260909200320-studio-v7`.
+- UI build: `2026-09-09T20:02:41.622Z`.
+- Package SHA256: `200b59dec53d4e6f49d38950884ae7e9144abea3701c2e23a313ac7bba7bb9fd`.
+- 351 verified files; incremental archive 2,680,815 bytes.
 - Existing generator service remains `20260909152214-studio-v6`.
 - Deployment status: live; Nginx validation/reload succeeded and both services are active.
 
@@ -45,7 +45,7 @@ timetable, and wallet balances/history displayed in decimal hours.
   30-row pagination, date/time filtering, current policy, and OAuth return paths.
 - Native workflow/layout: **58 checks passed**, including 50 page/language/width
   cases (five tool pages × two languages × 320/390/768/1440/2560).
-- Interaction groups: **6 passed**: drop and file limits, exact custom-size request,
+- Interaction groups: **7 passed**: drop and file limits, exact custom-size request,
   DPR2 mobile pinch, PNG file-share payload/cancellation, short portrait/landscape,
   and bilingual quota dialog. Browser page errors: zero.
 - Stage-one checks separately confirm a same-document header transition,
@@ -75,13 +75,13 @@ backs up the Studio database, Nginx configuration and service unit before
 switching. No generator DB or service upgrade is included.
 
 Rollback: use the recorded previous Studio symlink and Nginx/unit backup under
-`/opt/pindou/studio/backups/20260909195017-studio-v7`; keep the current shared
+`/opt/pindou/studio/backups/20260909200320-studio-v7`; keep the current shared
 database and media so subsequent legitimate entries are not lost. The old
 generator service/assets remain available at their unchanged release.
 
 ## Production acceptance
 
-- Deployed Studio `20260909195017-studio-v7`, main bundle `index-DI0bQCGH.js`;
+- Deployed Studio `20260909200320-studio-v7`, main bundle `index-UVc_kjey.js`;
   all 351 deployed file hashes match the package manifest.
 - Seven public native/legacy/account/manage paths return the new Studio entry
   with `Cache-Control: no-store`. Private API authority remains server-enforced.
@@ -91,6 +91,12 @@ generator service/assets remain available at their unchanged release.
 - Codex in-app browser opened the native tool with the existing signed-in user,
   displayed the correct unlimited generator allowance, and opened the shared
   account drawer showing its existing WeChat binding and `0 小时` balance.
-- Code commit: `4d5fa01`, pushed to `codex/studio-v1-20260907`.
+- First implementation commit: `4d5fa01`, pushed to `codex/studio-v1-20260907`.
 
 - The live account tooltip confirms 166 points per attended booking and the unchanged 100 points = CAD 1 redemption rate.
+
+- Final narrow-screen acceptance: photo selection precedes settings; both file
+  controls have bilingual accessible names. Verified in the in-app browser.
+- The earlier first-native backup `20260909195017-studio-v7` retains the original
+  v6 symlink/config for a full return to the standalone-tool setup. The final
+  backup retains the preceding native version for the small layout follow-up.
