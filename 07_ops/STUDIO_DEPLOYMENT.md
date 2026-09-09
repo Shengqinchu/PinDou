@@ -1,5 +1,7 @@
 # 当前发布：Studio V7
 
+> 当前发布 **20260909221008-studio-v7**（build `2026-09-09T22:01:04.286Z`）：标题620ms浮起并保持、预约称呼与联系选项细化、取消用途勾选。354个文件核验，167项后端测试、6组专项与5组动效回归通过。三步日期／时间切换和双人4小时套餐仍在本地原型。详见 [STUDIO_VISIT_REFINEMENT_VERIFICATION.md](STUDIO_VISIT_REFINEMENT_VERIFICATION.md)。
+
 > 当前发布 **20260909211553-studio-v7**（build `2026-09-09T21:05:10.485Z`）：生成器同步动效、大标题独立字形上浮、价格币种右下角标。353 个文件核验通过。三步预约仅为本地方案，正式预约流程未替换。详见 [STUDIO_MOTION_VISIT_PROPOSAL_VERIFICATION.md](STUDIO_MOTION_VISIT_PROPOSAL_VERIFICATION.md)。
 
 > 2026-09-09 当前发布：**20260909203119-studio-v7**（build `2026-09-09T20:26:18.455Z`）。共享账号注册赠送 166 积分、5 个老账号一次性补发完成；账户抽屉入口与菜单简化，店主列表直接显示私密备注，游玩／购物抵扣需确认没有其他优惠。351 个发布文件核验通过。详见 [STUDIO_REGISTRATION_MENU_VERIFICATION.md](STUDIO_REGISTRATION_MENU_VERIFICATION.md)。主站已内嵌中英双语生成器；下文较早版本描述保留为历史记录。

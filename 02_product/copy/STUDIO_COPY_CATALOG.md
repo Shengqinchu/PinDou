@@ -1814,7 +1814,7 @@
 | choose_a_time_in_the_timetable_d988a8 | 请在时间表中选择 | Choose a time in the timetable |
 | who_is_coming_along_aa3fd9 | 和谁一起来？ | Who is coming along? |
 | number_of_guests_including_you_fadbc4 | 同行人数（包括你自己） | Number of guests, including you |
-| guest_name_e468f6 | 客人名称 | Guest name |
+| guest_name_e468f6 | 怎么称呼您~ | What should we call you? |
 | if_you_have_added_the_host_on_e3e883 | 如已添加店主微信，可以填写微信名称，方便联系。 | If you have added the host on WeChat, your WeChat name is helpful. |
 | contact_method_73d70a | 联系方式 | Contact method |
 | wechat_2941d2 | 微信 | WeChat |

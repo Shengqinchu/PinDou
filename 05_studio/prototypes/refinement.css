@@ -1,0 +1,45 @@
+.flow-guests{margin-top:18px}
+.flow-offer-section{margin-top:22px}
+.flow-duo-offer{display:flex;align-items:center;justify-content:space-between;gap:20px;width:100%;padding:22px 24px;text-align:left;border:1px solid #ebded4;border-radius:15px;background:#faf4ef;transition:transform .3s var(--control-ease),background .3s var(--control-ease),border-color .3s var(--control-ease),box-shadow .3s var(--control-ease)}
+.flow-duo-offer:disabled{opacity:.5;cursor:default}
+.flow-duo-offer[aria-pressed=true]{border-color:#bca491;background:#f7eee7}
+.flow-offer-copy{display:flex;flex-direction:column;gap:8px;min-width:0}
+.flow-offer-copy>small{font-size:10px;color:#746354}
+.flow-offer-copy>strong{font-size:17px;font-weight:500;line-height:1.6}
+.flow-offer-facts{display:flex;gap:16px;font-size:12px;color:var(--muted)}
+.flow-offer-facts>span{display:flex;align-items:center;gap:6px}
+.flow-offer-facts svg{width:16px;height:16px}
+.flow-offer-price{display:flex;align-items:center;gap:22px;font-size:31px;font-weight:500;flex-shrink:0}
+.flow-offer-price>svg{width:22px;height:22px}
+.flow-prepaid-details{margin:14px 0 0;padding:0;border:0}
+.flow-prepaid-details>summary{font-size:13px;min-height:44px;padding:12px 0;color:var(--muted)}
+.flow-prepaid-content{padding:0 20px;border:1px solid #e3e9e1;border-radius:13px;background:#f6f8f4}
+.flow-prepaid-row{display:grid;grid-template-columns:1fr auto;gap:14px 24px;padding:18px 0;align-items:start}
+.flow-prepaid-row h3{font-family:var(--body);font-size:14px;font-weight:500;margin:0 0 8px}
+.flow-prepaid-row p{font-size:13px;line-height:1.85;margin:0;color:var(--muted);max-width:58ch}
+.flow-prepaid-row>strong{font-size:13px;font-weight:500;white-space:nowrap}
+.flow-prepaid-row>strong .price-amount{font-size:23px}
+.flow-cardholder-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 0;border-top:1px solid #dfe6dd}
+.flow-cardholder-row p{font-size:13px;line-height:1.8;margin:0;color:var(--muted)}
+.flow-cardholder-row>strong{font-size:23px;font-weight:500;white-space:nowrap}
+.flow-cardholder-row>strong>small{font-size:11px;margin-left:4px}
+.flow-picker-pane>.flow-dates{margin-top:4px}
+.flow-picked-date{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:56px;padding:10px 14px;border:1px solid #e1e8ec;border-radius:11px;background:#f6f9fb}
+.flow-picked-date>strong{font-size:15px;font-weight:500;line-height:1.7}
+.flow-change-date{display:flex;align-items:center;gap:5px;min-height:40px;white-space:nowrap;font-size:12px;color:#4f6c80}
+.flow-change-date svg{width:16px;height:16px}
+.flow-fixed-duration{display:flex;align-items:center;flex-wrap:wrap;gap:10px;font-size:14px;margin:22px 0 8px}
+.flow-fixed-duration svg{width:20px;height:20px}
+.flow-fixed-duration small{font-size:12px;color:var(--muted)}
+.flow-contact{grid-template-columns:1fr;gap:20px}
+.flow-contact .contact-method-picker{min-width:0}
+.flow-notes{padding:0;border:0;margin-top:18px}
+.flow-notes>summary{min-height:44px}
+.flow-actions{margin-top:16px}
+@media(hover:hover) and (pointer:fine){.flow-duo-offer:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 6px 16px #836e4c0d}.flow-duo-offer:not(:disabled):active{transform:translateY(1px)}}
+@media(max-width:600px){
+ .flow-duo-offer{padding:18px 16px;gap:10px}.flow-offer-copy>small{font-size:9px}.flow-offer-copy>strong{font-size:15px}.flow-offer-price{font-size:26px;gap:9px}.flow-offer-price>svg{width:18px;height:18px}.flow-offer-facts{font-size:11px}
+ .flow-prepaid-content{padding:0 16px}.flow-prepaid-row{grid-template-columns:1fr;gap:10px;position:relative}.flow-prepaid-row h3{padding-right:125px;min-height:30px;line-height:30px}.flow-prepaid-row>strong{position:absolute;right:0;top:18px}.flow-prepaid-row>strong .price-amount{font-size:22px}.flow-prepaid-row p{font-size:12px;line-height:1.9}.flow-cardholder-row>strong{font-size:22px}
+ .flow-picked-date>strong{font-size:13px}
+}
+html[data-motion="reduced"] .flow-duo-offer{transition:none;transform:none!important}

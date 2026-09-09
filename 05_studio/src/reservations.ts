@@ -40,7 +40,7 @@ export type ReservationPayload = {
   contact_method: "wechat" | "phone" | "email" | "other";
   contact: string;
   notes: string;
-  consent: boolean;
+  consent?: boolean; // Compatibility for already-saved requests from older clients.
   locale: "zh" | "en";
   website: string;
 };
@@ -80,7 +80,6 @@ const initial: Omit<ReservationPayload, "locale" | "website"> = {
   contact_method: "wechat",
   contact: "",
   notes: "",
-  consent: false,
 };
 const saved = readSession<typeof initial>("puppy-reservation-draft-v1");
 export const reservationDraft = reactive({

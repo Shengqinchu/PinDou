@@ -1,7 +1,8 @@
 import {chromium,expect} from '@playwright/test';
 import fs from 'node:fs/promises';import assert from 'node:assert/strict';import {fileURLToPath} from 'node:url';
 import AxeBuilder from '@axe-core/playwright';
-const out=new URL('../../artifacts/visit-flow/',import.meta.url),base='http://127.0.0.1:19678',prototype='http://127.0.0.1:19679/prototype.html';
+const out=new URL(process.env.PINDOU_QA_OUTPUT||'../../artifacts/visit-flow/',import.meta.url),base='http://127.0.0.1:19678',prototype='http://127.0.0.1:19679/prototype.html';
+await fs.mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true,ignoreDefaultArgs:['--hide-scrollbars']}),checks=[],errors=[];let page;
 const capture=async(name)=>{if(page.url()===prototype)await expect.poll(()=>page.locator('.flow-stage').evaluate(e=>getComputedStyle(e).opacity)).toBe('1');return page.screenshot({path:fileURLToPath(new URL(name,out)),fullPage:true});};
 try{
@@ -43,7 +44,7 @@ try{
  await page.locator('.flow-dates button:not(:disabled)').nth(1).click();await expect(page.locator('.flow-times button').first()).toBeVisible();await page.locator('.flow-times button').first().click();
  const selectedText=await page.locator('.flow-chosen').innerText();await capture('prototype-step2.png');
  await page.locator('.flow-actions .button').click();await expect(page.locator('.flow-contact')).toBeVisible();
- await page.locator('.flow-contact input').first().fill('Local guest');await page.locator('.flow-contact input').last().fill('local-wechat');await page.locator('.flow-consent input').check();await capture('prototype-step3.png');
+ await page.locator('.flow-contact input').first().fill('Local guest');await page.locator('.flow-contact input').last().fill('local-wechat');await capture('prototype-step3.png');
  await page.locator('.flow-back').click();await expect(page.locator('.flow-chosen')).toHaveText(selectedText);await page.locator('.flow-actions .button').click();await expect(page.locator('.flow-contact input').first()).toHaveValue('Local guest');
  await page.locator('.flow-actions .button').click();await expect(page.locator('.flow-chosen')).toContainText('预览已走通');assert.equal(bookingPosts,0);
  await page.locator('.prototype-bar button').click();await expect(page.locator('h1')).toHaveText('Come make something');await expect(page.locator('.flow-contact input').first()).toHaveValue('Local guest');
@@ -51,7 +52,7 @@ try{
  await page.locator('.prototype-bar button').click();
  for(const width of [320,390,768,1440]){
   await page.setViewportSize({width,height:844});await page.locator('.flow-progress button').first().click();await expect(page.locator('.flow-plans')).toBeVisible();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
-  if(width===390)await capture('prototype-mobile-step1.png');await page.locator('.flow-progress button').nth(1).click();await expect(page.locator('.flow-dates')).toBeVisible();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));if(width===390)await capture('prototype-mobile-step2.png');
+  if(width===390)await capture('prototype-mobile-step1.png');await page.locator('.flow-progress button').nth(1).click();await expect(page.locator('.flow-times')).toBeVisible();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));if(width===390)await capture('prototype-mobile-step2.png');
  }
  await expect.poll(()=>page.locator('.flow-stage').evaluate(e=>getComputedStyle(e).opacity)).toBe('1');
  const axe=await new AxeBuilder({page}).include('.flow-shell').analyze();await fs.writeFile(new URL('prototype-accessibility.json',out),JSON.stringify(axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})),null,2));assert.deepEqual(axe.violations.map(v=>({id:v.id,nodes:v.nodes.length})),[]);

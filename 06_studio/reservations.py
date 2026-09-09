@@ -114,7 +114,9 @@ class Submission(Strict):
     contact_method: Literal["wechat", "phone", "email", "other"]
     contact: str = Field(min_length=3, max_length=180)
     notes: str = Field(default="", max_length=1500)
-    consent: Literal[True]
+    # New booking forms submit directly. Keep the optional legacy flag so an
+    # already-saved request can be retried unchanged; never synthesize consent.
+    consent: Literal[True] | None = None
     locale: Literal["zh", "en"] = "zh"
     website: str = Field(default="", max_length=0)
 

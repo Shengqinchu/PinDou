@@ -2,6 +2,7 @@
 import CopyContact from "../components/CopyContact.vue";
 import LiftTitle from '../components/LiftTitle.vue';
 import MoneyText from '../components/MoneyText.vue';
+import ContactMethodPicker from '../components/ContactMethodPicker.vue';
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-Visit", copyTextDefault);
 
@@ -120,7 +121,7 @@ function select(value: { date: string; start: string; end: string }) {
 }
 async function submit() {
   if (sending.value||checkingAccount.value) return;
-  if (!attempt.value && (!selected.value || !draft.consent)) return;
+  if (!attempt.value && !selected.value) return;
   checkingAccount.value=true;
   try{if(!await ensureCustomer()||!alive)return;}
   catch(e){error.value=(e as Error).message;return;}
@@ -134,7 +135,6 @@ async function submit() {
         contact_method: draft.contact_method,
         contact: draft.contact,
         notes: draft.notes,
-        consent: draft.consent,
         locale: locale.value,
         website: "",
       },
@@ -154,7 +154,6 @@ async function submit() {
     saveSession("puppy-last-reservation", receipt.id);
     draft.booking.start = "";
     draft.booking.end = "";
-    draft.consent = false;
     await router.push("/reservation/" + receipt.id);
   } catch (e) {
     error.value = (e as Error).message;
@@ -242,9 +241,6 @@ async function submit() {
             <p>
               {{ say(copyText.prepay_at_least_10_hours_and_at_8815bf) }}
             </p>
-            <small>{{
-              say(copyText.for_information_only_this_is_not_a_09a580)
-            }}</small>
           </aside>
           <aside class="reservation-credit reservation-school">
             <span class="vision-eyebrow">{{
@@ -261,9 +257,6 @@ async function submit() {
                 say(copyText.bead_cardholder_package_no_makingtime_limit_92105b)
               }}
             </p>
-            <small>{{
-              say(copyText.for_information_only_this_is_not_a_09a580)
-            }}</small>
           </aside>
         </div>
       </fieldset>
@@ -346,17 +339,7 @@ async function submit() {
             /><small>{{
               say(copyText.if_you_have_added_the_host_on_e3e883)
             }}</small></label
-          ><label class="field"
-            >{{ say(copyText.contact_method_73d70a)
-            }}<select v-model="draft.contact_method" :disabled="locked">
-              <option value="wechat">{{ say(copyText.wechat_2941d2) }}</option>
-              <option value="phone">{{ say(copyText.phone_ac7a62) }}</option>
-              <option value="email">{{ say(copyText.email_b6d15f) }}</option>
-              <option value="other">
-                {{ say(copyText.another_way_f489b4) }}
-              </option>
-            </select></label
-          ><label class="field"
+          ><ContactMethodPicker v-model="draft.contact_method" :disabled="locked"/><label class="field"
             >{{
               draft.contact_method === "wechat"
                 ? say(copyText.wechat_id_7a6e86)
@@ -388,16 +371,6 @@ async function submit() {
             />
           </label>
         </div>
-        <label class="reservation-consent"
-          ><input
-            v-model="draft.consent"
-            type="checkbox"
-            required
-            :disabled="locked"
-          /><span>{{
-            say(copyText.i_agree_to_use_these_details_to_5469c9)
-          }}</span></label
-        >
       </section>
       <div class="reservation-submit">
         <p v-if="!accountUser" class="reservation-account-note">{{ say(accountCopy.login_notice) }}</p>
@@ -410,7 +383,7 @@ async function submit() {
         <button
           class="button button-primary"
           :disabled="
-            sending || checkingAccount || loading || (!attempt && (!selected || !draft.consent))
+            sending || checkingAccount || loading || (!attempt && !selected)
           "
         >
           {{
