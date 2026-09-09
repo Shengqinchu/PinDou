@@ -666,6 +666,38 @@
       "英文品牌标识",
       "English brand mark"
     ],
+    "previewSynced": [
+      "预览已同步",
+      "Preview is up to date"
+    ],
+    "previewConnecting": [
+      "正在同步预览…",
+      "Updating preview…"
+    ],
+    "previewDisconnected": [
+      "预览连接未完成，修改仍保留在编辑区。",
+      "Preview is not connected. Your edits remain in the editor."
+    ],
+    "reconnectPreview": [
+      "重新连接预览",
+      "Reconnect preview"
+    ],
+    "previewNewVersion": [
+      "网站已更新，保存草稿后重新载入工作台即可使用新版编辑器。",
+      "The site has been updated. Save your draft and reload the desk to use the current editor."
+    ],
+    "previewConditional": [
+      "预览同步当前页面可见的内容；错误和成功提示只在对应状态下显示。",
+      "The preview updates content visible on this page. Error and success messages appear only in their corresponding states."
+    ],
+    "schedulePlaceholder": [
+      "保留 {v0}，它会显示后台排班的结束时间。实际营业时间请在预约日历中修改。",
+      "Keep {v0}; it displays the closing time from the schedule. Edit opening hours in the reservation calendar."
+    ],
+    "editSchedule": [
+      "修改营业时间",
+      "Edit opening hours"
+    ],
     "brandEnContact": [
       "英文页脚品牌与联系方式",
       "English footer brand and contacts"
@@ -2481,6 +2513,32 @@
       "Contact details are only used by the host to handle this request. No online payment is required. Please wait for confirmation before visiting."
     ]
   },
+  "components-MotionSettings": {
+    "title": [
+      "页面动效",
+      "Page motion"
+    ],
+    "system": [
+      "跟随系统",
+      "System"
+    ],
+    "full": [
+      "完整动效",
+      "Full"
+    ],
+    "reduced": [
+      "减少动效",
+      "Reduced"
+    ],
+    "systemReduced": [
+      "当前系统要求减少动效。可在本站单独选择完整动效。",
+      "Your system requests reduced motion. You can choose full motion for this site."
+    ],
+    "systemFull": [
+      "当前系统允许完整动效；选择会保存在这个浏览器。",
+      "Your system allows full motion. Your choice is saved in this browser."
+    ]
+  },
   "components-PhotoViewer": {
     "this_photo_could_not_load_please_try_b36e40": [
       "这张照片暂时没能加载，请重试。",
@@ -2900,6 +2958,10 @@
     ]
   },
   "data-editor-module-labels": {
+    "components-MotionSettings": [
+      "页面动效设置",
+      "Page motion settings"
+    ],
     "account": [
       "账号与登录",
       "Account and sign-in"
@@ -4169,8 +4231,12 @@
       "A day of making"
     ],
     "make_from_your_chosen_arrival_until_37196a": [
-      "从所选时间开始，可拼到当天",
-      "Make from your chosen arrival until"
+      "从所选时间开始，可拼到当天 {v0}。",
+      "Make from your chosen arrival until {v0}."
+    ],
+    "selected_day_hours": [
+      "{v0} 营业至 {v1}，以店主最新排班为准。",
+      "{v0} closes at {v1}, according to the host’s latest schedule."
     ],
     "label_1efc6a": [
       "。",

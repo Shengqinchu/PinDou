@@ -8,7 +8,7 @@
 |---|---|---|
 | Descope | 已完成邮箱登录，并看到与店主截图一致的 `public-amber-morse`、`Free Plan`；店主完成手机号 OTP 流程向导，未加顾客 MFA | 配置服务端调用所需权限、号码测试与共享身份桥接后才能启用网站手机登录 |
 | Firebase | 自动浏览器输入邮箱后被 Google 提示 `This browser or app may not be secure`；没有进入控制台、没有创建项目或开通计费 | 店主用自己的 Chrome 完成 Google 登录；已有 Google 账号与否仍待确认 |
-| Authing | 已核对当前邮箱注册页和官方“微信 PC 小程序扫码”接入步骤；未代店主注册 | 按下方步骤创建免费应用并核验默认“小登录”的实际可用权限 |
+| Authing | 店主已创建 `PinDou Puppy` 用户池，截图显示启用统一认证域名；无需换号或重建 | 在基础设置修改认证前缀，费用管理核实实际版本，再核验默认“小登录”的可用权限 |
 
 Descope Project ID：`P3J4R1ubICbwLu2OJLsE4UXCVqmP`，由店主从控制台复制提供。本地已写入被 Git 忽略的 `.env` 的 `STUDIO_DESCOPE_PROJECT_ID`。Project ID 是公开标识；没有生成或索取 Management Key、Access Key、密码，没有将邮箱验证链接／会话令牌保存进仓库。
 
@@ -21,8 +21,12 @@ Descope Project ID：`P3J4R1ubICbwLu2OJLsE4UXCVqmP`，由店主从控制台复�
 1. 打开 [Authing 控制台](https://console.authing.cn/)，点击 **立即注册**。
 2. 当前注册页为邮箱验证码注册：输入邮箱、本人完成图形验证码、发送并填写邮件验证码，阅读并勾选服务协议后注册。
 3. 进入控制台后使用免费方案。若出现用户池创建，名称使用 `PinDou Puppy`，只创建一套即可。
+
+   店主实际创建页补充：选择 **To C**，取消默认勾选的 **开启体验期**。30天全功能体验到期不升级会停用，不可当作长期免费档；创建后再核对费用管理中的实际版本。[体验规则](https://docs.authing.cn/v2/guides/basics/trial/admin.html)、[用户池版本](https://docs.authing.com/v2/concepts/user-pool.html)
 4. 进入 **应用 → 自建应用 → 创建自建应用**。应用名称填 `PinDou Puppy`，认证地址可用 `pindoupuppy`；如已被占用可用 `pindoupuppy-hamilton`。
 5. 本项目计划由 Python 后端处理认证结果，使用 **标准 Web 应用**。界面若已创建默认应用，可复用该应用，不需要同时新增多个应用。暂时不要把密钥复制到前端。
+
+   如果注册时勾选“所有应用使用同一域名”，认证地址应在 **设置→基础设置→基础信息** 修改。只把中间随机前缀改为 `pindoupuppy`（占用则 `pindoupuppy-hamilton`）。应用地址自动成为 `https://前缀.authing.cn/APP_ID`，属于正常配置，不需要重新注册。先保留平台生成的体验回调，网站正式回调实现后再替换。[统一认证域名说明](https://docs.authing.cn/v2/guides/faqs/union-domain.html)
 
 依据：[应用类型与创建](https://docs.authing.cn/v2/guides/app/)、[标准 Web 应用配置示例](https://docs.authing.cn/v2/quickstarts/webApp/javaSpringBoot.html)。此处只借用其控制台步骤，网站仍保留 Vue + Python。
 

@@ -1,4 +1,4 @@
-type MotionMode = "system" | "full" | "reduced";
+export type MotionMode = "system" | "full" | "reduced";
 const key = "puppy-studio-motion";
 const system = matchMedia("(prefers-reduced-motion: reduce)");
 const listeners = new Set<() => void>();
@@ -13,6 +13,24 @@ function stored(): MotionMode {
   }
 }
 let mode = stored();
+const settingsListeners = new Set<() => void>();
+export const getMotionMode = () => mode;
+export const systemReducesMotion = () => system.matches;
+export function onMotionSettingsChange(listener: () => void) {
+  settingsListeners.add(listener); return () => { settingsListeners.delete(listener); };
+}
+export function setMotionMode(value: MotionMode) {
+  if (!valid(value)) return;
+  mode = value;
+  // An in-page choice supersedes an older diagnostic link on the next reload.
+  const url = new URL(location.href);
+  if (url.searchParams.has('motion')) {
+    url.searchParams.delete('motion');
+    history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+  }
+  try { if (value === 'system') localStorage.removeItem(key); else localStorage.setItem(key,value); } catch {}
+  window.dispatchEvent(new Event('studio-motion-change'));
+}
 // A deliberate per-site choice. Ordinary visits continue to honor the OS.
 const requested = new URLSearchParams(location.search).get("motion");
 if (valid(requested)) {
@@ -43,6 +61,7 @@ export function installMotionPreference() {
     root.dataset.motionSource = mode;
     root.dataset.systemMotion = system.matches ? "reduced" : "full";
     root.dataset.studioBuild = __STUDIO_BUILD__;
+    for (const listener of settingsListeners) listener();
     if (previous !== reduced) {
       previous = reduced;
       for (const listener of listeners) listener();
@@ -55,9 +74,11 @@ export function installMotionPreference() {
   }
   sync();
   system.addEventListener("change", sync);
+  window.addEventListener('studio-motion-change',sync);
   window.addEventListener("storage", storage);
   return () => {
     system.removeEventListener("change", sync);
+    window.removeEventListener('studio-motion-change',sync);
     window.removeEventListener("storage", storage);
   };
 }

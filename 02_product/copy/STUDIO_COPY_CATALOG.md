@@ -208,6 +208,14 @@
 | collage | 首页小店预告 | Home shop preview |
 | brandZh | 中文品牌标识 | Chinese brand mark |
 | brandEn | 英文品牌标识 | English brand mark |
+| previewSynced | 预览已同步 | Preview is up to date |
+| previewConnecting | 正在同步预览… | Updating preview… |
+| previewDisconnected | 预览连接未完成，修改仍保留在编辑区。 | Preview is not connected. Your edits remain in the editor. |
+| reconnectPreview | 重新连接预览 | Reconnect preview |
+| previewNewVersion | 网站已更新，保存草稿后重新载入工作台即可使用新版编辑器。 | The site has been updated. Save your draft and reload the desk to use the current editor. |
+| previewConditional | 预览同步当前页面可见的内容；错误和成功提示只在对应状态下显示。 | The preview updates content visible on this page. Error and success messages appear only in their corresponding states. |
+| schedulePlaceholder | 保留 {v0}，它会显示后台排班的结束时间。实际营业时间请在预约日历中修改。 | Keep {v0}; it displays the closing time from the schedule. Edit opening hours in the reservation calendar. |
+| editSchedule | 修改营业时间 | Edit opening hours |
 | brandEnContact | 英文页脚品牌与联系方式 | English footer brand and contacts |
 | arrivalEntrance | 建筑入口指引 | Building entrance guide |
 | parkingEntrance | 访客停车入口 | Visitor parking entrance |
@@ -732,6 +740,17 @@
 | send_pickup_inquiry_9e7c67 | 提交自提询单 | Send pickup inquiry |
 | contact_details_are_only_used_by_the_145329 | 联系信息仅供店主处理本次请求。提交后无需在线付款；收到确认后再到店。 | Contact details are only used by the host to handle this request. No online payment is required. Please wait for confirmation before visiting. |
 
+## components-MotionSettings.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| title | 页面动效 | Page motion |
+| system | 跟随系统 | System |
+| full | 完整动效 | Full |
+| reduced | 减少动效 | Reduced |
+| systemReduced | 当前系统要求减少动效。可在本站单独选择完整动效。 | Your system requests reduced motion. You can choose full motion for this site. |
+| systemFull | 当前系统允许完整动效；选择会保存在这个浏览器。 | Your system allows full motion. Your choice is saved in this browser. |
+
 ## components-PhotoViewer.json
 
 | 键 | 中文 | English |
@@ -902,6 +921,7 @@
 
 | 键 | 中文 | English |
 |---|---|---|
+| components-MotionSettings | 页面动效设置 | Page motion settings |
 | account | 账号与登录 | Account and sign-in |
 | App | 导航与页脚 | Navigation and footer |
 | pages-Home | 首页 | Home |
@@ -1318,7 +1338,8 @@
 | at_least_two_hours_9f144b | 至少两小时 | At least two hours |
 | hour_person_7ea78f | ／小时／人 | / hour / person |
 | a_day_of_making_01d6e2 | 全天体验 | A day of making |
-| make_from_your_chosen_arrival_until_37196a | 从所选时间开始，可拼到当天 | Make from your chosen arrival until |
+| make_from_your_chosen_arrival_until_37196a | 从所选时间开始，可拼到当天 {v0}。 | Make from your chosen arrival until {v0}. |
+| selected_day_hours | {v0} 营业至 {v1}，以店主最新排班为准。 | {v0} closes at {v1}, according to the host’s latest schedule. |
 | label_1efc6a | 。 | . |
 | one_guest_684bef | 单人 | One guest |
 | two_guests_65a259 | 双人 | Two guests |

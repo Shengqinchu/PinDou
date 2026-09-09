@@ -34,6 +34,8 @@ import { installViewport } from "./browser";
 import { reducedMotion } from "./ui";
 import App from "./App.vue";
 import Home from "./pages/Home.vue";
+import { preparePreviewRoute } from './preview-context';
+preparePreviewRoute();
 
 // A fresh visit starts at the top. Vue Router still restores its saved position
 // on back/forward; obsolete shared homepage anchors no longer jump mid-page.

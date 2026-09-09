@@ -60,6 +60,7 @@ export function installContent() {
   const receive = (event: MessageEvent) => {
     if (!preview || event.origin !== location.origin || event.source !== parent || event.data?.type !== "studio-content-preview") return;
     previewModules.value = event.data.modules;
+    requestAnimationFrame(() => parent.postMessage({type:'studio-preview-applied',revision:event.data.revision,module:event.data.module,build:__STUDIO_BUILD__},location.origin));
   };
   const blockActions = (event: Event) => {
     if (preview && ((event.target as Element).closest("a,button") || event.type === "submit")) {
@@ -70,7 +71,7 @@ export function installContent() {
     window.addEventListener("message", receive);
     document.addEventListener("click", blockActions, true);
     document.addEventListener("submit", blockActions, true);
-    parent.postMessage({ type: "studio-preview-ready" }, location.origin);
+    parent.postMessage({ type: "studio-preview-ready", build:__STUDIO_BUILD__ }, location.origin);
   }
   return () => {
     clearInterval(timer);document.removeEventListener("visibilitychange", refresh);

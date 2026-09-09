@@ -25,6 +25,7 @@ import SlideOver from "./components/SlideOver.vue";
 import ReleaseNotice from "./components/ReleaseNotice.vue";
 import BrandMark from "./components/BrandMark.vue";
 import FooterBrand from "./components/FooterBrand.vue";
+import MotionSettings from "./components/MotionSettings.vue";
 import BrandMotif from "./components/BrandMotif.vue";
 import BrandIcon from "./components/BrandIcon.vue";
 import { accountCopy,accountOpen,accountUser,openAccount,closeAccount,installAccount } from "./account";
@@ -136,6 +137,7 @@ watch(
         >{{ say(copyText.studio_desk_4f230e) }}<PhArrowRight
       /></RouterLink>
     </div>
+    <MotionSettings />
   </SlideOver>
   <AccountPanel v-if="accountMounted" />
   <main

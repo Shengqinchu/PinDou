@@ -1,5 +1,5 @@
 {
-  "source": "owner-20260908-english-logos-and-arrival-photos",
+  "source": "owner-20260909-carousel-hours-live-preview-fixes",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -12,7 +12,7 @@
     "commerce.json": "aaefe10888f4213e2c5595cd8ba90e118649f143839b732a60b27707ae6c8c3a",
     "components-admin-ActivityPanel.json": "1999c2fc63b0dfe8546aa8f15b91aca9097194d50333f5d03c1a832feb0b238c",
     "components-admin-CheckoutPanel.json": "5392671070678ce8e824a6b7bc3ae7b01e4470d7051c96709706f238ba798734",
-    "components-admin-ContentEditor.json": "1a895387532989b5e62913c98e88ed3c8c147bb4a18a8fbbebeab61e1afdd87c",
+    "components-admin-ContentEditor.json": "ba5944db03ce811d85660953d328eb0e288507d4fed3006c944ede76a4f75f84",
     "components-admin-JournalEditor.json": "34a29fcfc9e8d9b2022dbeb4798f57c8b62b1050683eeaafccba5902e3140e04",
     "components-admin-OrderDrawer.json": "82df1e43752c1d0e14213cf8559b48d1d33026eead7cf0fbee723547372d61fc",
     "components-admin-OrdersPanel.json": "4aadfc07669826fb646c384ed09eb37d311785364f3f020c8cfe46da7c538b3d",
@@ -28,6 +28,7 @@
     "components-CommerceManager.json": "fc7c0cb22f646cdc95a1a61831abe7d521ca9eb3e7d6fbc89da74bf2edbbb377",
     "components-CopyContact.json": "8fc49aff1aba71b5f78e5641fc19206692adedc0836e2838069b7cd44eb1081b",
     "components-InquiryForm.json": "5ca4e64147c241fdcdefbe5f52f230be82ad83f3856b228200d4642eb5faf884",
+    "components-MotionSettings.json": "21047eb1d7179abe0209efcbdbd947d48962af9ac6f779e14a45e6d443d4f12f",
     "components-PhotoViewer.json": "4345fb992a989bfb81ad81181fe27fbe67edc3ffc6219f777e9275fd8a16784d",
     "components-ReleaseNotice.json": "6a6254580cd2de4b0a6005e84c788d50b0883f68a22daf1bf1b2564d825cf88d",
     "components-ReservationCalendar.json": "76ef975fae3a0b674c98cd699409b79b55433f5885ddc62d71c6ebcf463379bf",
@@ -39,7 +40,7 @@
     "data-commerce-messages.json": "52a31ead95f0467f80dad74e4087b68a5639bb05c9aa2a2216ea0768429d963b",
     "data-components-admin-SchedulePanel-labels.json": "5800653cc2886f2313e67babd9486fb8190ccbe74cd2f47a8c57877517aec97a",
     "data-components-StudioCarousel-photos.json": "0de9f21ee4aecc483c2db6827a58032faf32245d8e8713d6c4ed79a564740737",
-    "data-editor-module-labels.json": "684820084f928db309d32c54d55e7a3e43f6361b6bbd27ab8310e16d78272dcd",
+    "data-editor-module-labels.json": "7427bd7ab511d55f368b952dd862d72d012402ff952bd4751cfd2ca64d79a4d5",
     "data-state-gallery.json": "9e6a73784deb8e6d371fd8f5372273176b5ef9c5663b766079787e10afa01dd1",
     "data-state-products.json": "dda7e9f229f7837b20ed143459141a21806bc7dad4fb2a5105a75a2b09403a95",
     "data-ui-labels.json": "692de89a61bbb0ddbb72fb5c1d546b5a9e293c3657fae05e55f9dca99934616e",
@@ -57,7 +58,7 @@
     "pages-Order.json": "d3086b46d00cca732ecbca9fd1d2a3ab60ea25dd1abd32a7a66966bba17b7508",
     "pages-ReservationReceipt.json": "304a37966c1151dffea6f4e06b2276d0ea3e2ef637a47138d4c226cd95e26029",
     "pages-Shop.json": "e5ec408e16a4b59c824bf7664b684a5b17796a7da24cc7133e598426a5891e2c",
-    "pages-Visit.json": "7625e526b3f349cce0e7977bf4c44b261f9340c0b54274f4c1078847270cc9b4",
+    "pages-Visit.json": "ddff8ab91c460ed8788a3c22b7927f582ba9b018cf3f5a84d93a1f7d1695aee0",
     "rate-fields.json": "3470adfe9da8bf9b2f47d05a5e4c128c8325325f58b6075bfd2ecf9728938b79",
     "state.json": "c4eeb599810219fc6102c20f5c7c3a265a0d592a3cefd9351d88734552a2650f",
     "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3"

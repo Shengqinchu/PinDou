@@ -1,4 +1,5 @@
 import { reactive, watch } from "vue";
+import { isContentPreview } from './preview-context';
 export type ReservationBooking = {
   date: string;
   start: string;
@@ -53,6 +54,7 @@ export type Reservation = {
   updated_at: string;
 };
 export function readSession<T>(key: string): T | null {
+  if (isContentPreview()) return null;
   try {
     return JSON.parse(sessionStorage.getItem(key) || "null");
   } catch {
@@ -60,6 +62,7 @@ export function readSession<T>(key: string): T | null {
   }
 }
 export function saveSession(key: string, value: unknown) {
+  if (isContentPreview()) return;
   try {
     if (value === null) sessionStorage.removeItem(key);
     else sessionStorage.setItem(key, JSON.stringify(value));

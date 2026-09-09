@@ -23,8 +23,13 @@ const words=copyText as Record<string,string[]>;
 const shortcuts=['pages-Home','pages-Visit','pages-Details','pages-Journal','App','media'];
 function label(n:string){return say((moduleNames as Record<string,string[]>)[n]||copyText.shared);}
 const routes:Record<string,string>={'pages-Home':'/','pages-Visit':'/visit','pages-Details':'/details','components-BeadingProcess':'/details','pages-Shop':'/shop','pages-Journal':'/journal','pages-JournalEntry':'/journal','App':'/','media':'/'};
-const previewRoute=computed(()=>`${routes[name.value]||'/'}?content-preview=1&preview-locale=${locale.value}`);
-const matchingFields=computed(()=>Object.entries(doc.value?.data||{}).filter(([key,value])=>!search.value||JSON.stringify(value).toLowerCase().includes(search.value.toLowerCase())||key.toLowerCase().includes(search.value.toLowerCase())).sort(([a],[b])=>{
+const previewReload=ref(0),previewStatus=ref<'connecting'|'synced'|'error'>('connecting'),previewStale=ref(false);
+let previewRevision=0,previewTimeout:ReturnType<typeof setTimeout>;
+const previewRoute=computed(()=>{
+  const path=routes[name.value]||'/',query=`content-preview=1&preview-locale=${locale.value}&preview-refresh=${previewReload.value}`;
+  return import.meta.env.DEV?`${path}?${query}`:`/studio-api/site?preview-path=${encodeURIComponent(path)}&${query}`;
+});
+const matchingFields=computed(()=>Object.entries(doc.value?.data||{}).filter(([key])=>!(name.value==='pages-Visit'&&key==='label_1efc6a')).filter(([key,value])=>!search.value||JSON.stringify(value).toLowerCase().includes(search.value.toLowerCase())||key.toLowerCase().includes(search.value.toLowerCase())).sort(([a],[b])=>{
   if(name.value!=='media')return 0;
   const order=(k:string)=>k.startsWith('space-')?10+carousel.findIndex(p=>p.image===k):['hero-illustration','shop-collage','brand-zh','brand-en','brand-en-contact','brand-puppy','owner-avatar','arrival-entrance','parking-entrance','parking-location'].indexOf(k);
   return order(a)-order(b);
@@ -36,12 +41,23 @@ function mediaLabel(key:string){
   const mapped=({'hero-illustration':'hero','shop-collage':'collage','brand-zh':'brandZh','brand-en':'brandEn','brand-en-contact':'brandEnContact','brand-puppy':'puppy','owner-avatar':'avatar','arrival-entrance':'arrivalEntrance','parking-entrance':'parkingEntrance','parking-location':'parkingLocation'} as Record<string,string>)[key];
   return say(words[mapped||'photo'])+(mapped?'':' · '+key);
 }
-function sendPreview(){if(doc.value)frame.value?.contentWindow?.postMessage(JSON.parse(JSON.stringify({type:'studio-content-preview',modules:{...publishedModules.value,[doc.value.name]:doc.value.data}})),location.origin);}
-const ready=(event:MessageEvent)=>{if(event.origin===location.origin&&event.source===frame.value?.contentWindow&&event.data?.type==='studio-preview-ready')sendPreview();};
+function sendPreview(){
+  if(!doc.value||!frame.value?.contentWindow)return;
+  previewStatus.value='connecting';clearTimeout(previewTimeout);
+  try { frame.value.contentWindow.postMessage(JSON.parse(JSON.stringify({type:'studio-content-preview',revision:++previewRevision,module:doc.value.name,modules:{...publishedModules.value,[doc.value.name]:doc.value.data}})),location.origin); }
+  catch {previewStatus.value='error';return;}
+  previewTimeout=setTimeout(()=>previewStatus.value='error',4000);
+}
+const ready=(event:MessageEvent)=>{
+  if(event.origin!==location.origin||event.source!==frame.value?.contentWindow)return;
+  if(event.data?.type==='studio-preview-ready'){previewStale.value=!!event.data.build&&event.data.build!==__STUDIO_BUILD__;sendPreview();}
+  if(event.data?.type==='studio-preview-applied'&&event.data.revision===previewRevision&&event.data.module===doc.value?.name){clearTimeout(previewTimeout);previewStatus.value='synced';}
+};
+function reconnectPreview(){previewStatus.value='connecting';previewReload.value++;}
 watch(()=>props.active,value=>{if(value&&!started){started=true;void initialize();}},{immediate:true});
 watch(()=>doc.value?.data,()=>void nextTick(sendPreview),{deep:true});
 onMounted(()=>{window.addEventListener('message',ready);observer=new ResizeObserver(([entry])=>{canvasWidth.value=entry.contentRect.width+24;canvasHeight.value=entry.contentRect.height;});if(canvas.value)observer.observe(canvas.value);});
-onBeforeUnmount(()=>{observer?.disconnect();window.removeEventListener('message',ready);});
+onBeforeUnmount(()=>{observer?.disconnect();clearTimeout(previewTimeout);window.removeEventListener('message',ready);});
 </script>
 <template>
   <section class="studio-editor">
@@ -60,9 +76,9 @@ onBeforeUnmount(()=>{observer?.disconnect();window.removeEventListener('message'
         <label class="field editor-search"><span>{{say(copyText.search)}}</span><input v-model="search" type="search" /></label>
         <p v-if="busy&&!doc">{{say(copyText.loading)}}</p>
         <template v-if="doc">
-          <fieldset v-for="([key,value],i) in fields" :key="key" class="editor-field-group" :disabled="busy">
+          <fieldset v-for="([key,value],i) in fields" :key="key" :data-content-key="key" class="editor-field-group" :disabled="busy">
             <template v-if="name==='rate-fields' && Array.isArray(value)"><label class="field"><span>{{say(words[key])}}</span><input type="number" min="0" max="99999" step="0.01" :value="value[0]" @input="value[0]=value[1]=($event.target as HTMLInputElement).value" /></label></template>
-            <template v-else-if="Array.isArray(value)"><span class="editor-field-index">{{String(i+1).padStart(2,'0')}}</span><label class="field"><span>{{say(copyText.zh)}}</span><textarea v-model="value[0]" :rows="value[0].length>100?5:2" /></label><label class="field"><span>{{say(copyText.en)}}</span><textarea v-model="value[1]" :rows="value[1].length>180?5:2" /></label></template>
+            <template v-else-if="Array.isArray(value)"><span class="editor-field-index">{{String(i+1).padStart(2,'0')}}</span><label class="field"><span>{{say(copyText.zh)}}</span><textarea v-model="value[0]" :rows="value[0].length>100?5:2" /></label><label class="field"><span>{{say(copyText.en)}}</span><textarea v-model="value[1]" :rows="value[1].length>180?5:2" /></label><p v-if="name==='pages-Visit'&&key==='make_from_your_chosen_arrival_until_37196a'" class="editor-field-help">{{say(copyText.schedulePlaceholder)}} <RouterLink to="/manage?view=reservation-calendar">{{say(copyText.editSchedule)}}</RouterLink></p></template>
             <template v-else><h3>{{mediaLabel(key)}}</h3><img class="editor-image-preview" :src="value.src" :alt="mediaLabel(key)" loading="lazy" /><MediaUpload :disabled="busy" :busy="uploadKey===key" :status="uploadStatus[key]" @select="files=>upload(key,files[0])" /></template>
           </fieldset>
           <p v-if="!fields.length">{{say(copyText.empty)}}</p>
@@ -73,7 +89,9 @@ onBeforeUnmount(()=>{observer?.disconnect();window.removeEventListener('message'
       <aside class="editor-preview-pane">
         <div class="editor-preview-toolbar"><strong><PhEye/>{{say(copyText.preview)}}</strong><div><button :aria-pressed="device==='desktop'" @click="device='desktop'">{{say(copyText.desktop)}}</button><button :aria-pressed="device==='mobile'" @click="device='mobile'">{{say(copyText.mobile)}}</button></div></div>
         <div ref="canvas" class="editor-preview-canvas" :class="device"><iframe ref="frame" :style="{width:frameWidth+'px',height:(Math.max(100,canvasHeight)/frameScale)+'px',transform:`scale(${frameScale})`,transformOrigin:'top left'}" :src="previewRoute" :title="say(copyText.preview)" @load="sendPreview" /></div>
-        <p class="form-help">{{say(copyText.previewHelp)}}</p>
+        <div class="editor-preview-state" :data-state="previewStatus" role="status"><span>{{say(previewStatus==='synced'?copyText.previewSynced:previewStatus==='error'?copyText.previewDisconnected:copyText.previewConnecting)}}</span><button v-if="previewStatus==='error'" class="desk-link" @click="reconnectPreview">{{say(copyText.reconnectPreview)}}</button></div>
+        <p v-if="previewStale" class="editor-field-help">{{say(copyText.previewNewVersion)}}</p>
+        <p class="form-help">{{say(copyText.previewHelp)}}</p><p class="editor-field-help">{{say(copyText.previewConditional)}}</p>
       </aside>
     </div>
     <EditorDiagnostics />

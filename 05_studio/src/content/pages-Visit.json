@@ -14,9 +14,10 @@
   "hour_person_7ea78f": ["／小时／人", "/ hour / person"],
   "a_day_of_making_01d6e2": ["全天体验", "A day of making"],
   "make_from_your_chosen_arrival_until_37196a": [
-    "从所选时间开始，可拼到当天",
-    "Make from your chosen arrival until"
+    "从所选时间开始，可拼到当天 {v0}。",
+    "Make from your chosen arrival until {v0}."
   ],
+  "selected_day_hours": ["{v0} 营业至 {v1}，以店主最新排班为准。", "{v0} closes at {v1}, according to the host’s latest schedule."],
   "label_1efc6a": ["。", "."],
   "one_guest_684bef": ["单人", "One guest"],
   "two_guests_65a259": ["双人", "Two guests"],

@@ -1,0 +1,8 @@
+{
+ "title":["页面动效","Page motion"],
+ "system":["跟随系统","System"],
+ "full":["完整动效","Full"],
+ "reduced":["减少动效","Reduced"],
+ "systemReduced":["当前系统要求减少动效。可在本站单独选择完整动效。","Your system requests reduced motion. You can choose full motion for this site."],
+ "systemFull":["当前系统允许完整动效；选择会保存在这个浏览器。","Your system allows full motion. Your choice is saved in this browser."]
+}

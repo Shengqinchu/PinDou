@@ -14,6 +14,8 @@ import app as studio
 import commerce
 import reservations
 import customer_auth
+import content
+content.SITE_PATH = Path(__file__).resolve().parents[1] / '05_studio/dist/index.html'
 from auth_fixture import fake_upstream
 customer_auth.upstream=fake_upstream
 reservations.COOKIE_SECURE = False

@@ -101,3 +101,7 @@
 .editor-preview-canvas.mobile iframe { max-width:none; }
 
 @media(max-width:420px){.journal-editor-photos{grid-template-columns:1fr;}}
+.editor-preview-state {display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;line-height:1.6;margin-top:10px;color:var(--muted);}
+.editor-preview-state[data-state=error] {color:#9a3c2a;}
+.editor-field-help {font-size:12px;line-height:1.8;color:var(--muted);margin-top:10px;}
+.editor-field-help a {text-decoration:underline;text-underline-offset:3px;}

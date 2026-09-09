@@ -7,7 +7,7 @@ import rateDefaults from "../content/experience-rates.json";
 import { contentValues } from "../content-store";
 const rates = contentValues("rate-fields",rateDefaults);
 import copyTextDefault from "../content/pages-Visit.json";
-import { say } from "../state";
+import { say, formatCopy } from "../state";
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
@@ -44,11 +44,10 @@ const attempt = ref(
 );
 const locked = computed(() => sending.value || !!attempt.value);
 const selected = computed(() => validSelection(calendar.value, draft.booking));
-const dayClosing = computed(
-  () =>
-    calendar.value?.days.find((d) => d.date === draft.booking.date)?.close ||
-    "22:00",
-);
+const selectedDay = computed(() => draft.booking.plan === 'day' && selected.value
+  ? calendar.value?.days.find(d => d.date === draft.booking.date) : undefined);
+const dayClosing = computed(() => selectedDay.value?.close ||
+  calendar.value?.weekly_hours.filter(d=>d.enabled).map(d=>d.close).sort().at(-1) || '22:00');
 watch(
   () => draft.booking.guests,
   () => {
@@ -211,9 +210,7 @@ async function submit() {
             weight="light"
           /><strong>{{ say(copyText.a_day_of_making_01d6e2) }}</strong
           ><span
-            >{{ say(copyText.make_from_your_chosen_arrival_until_37196a) }}
-            {{ dayClosing === "22:00" ? "10pm" : dayClosing
-            }}{{ say(copyText.label_1efc6a) }}</span
+            >{{ formatCopy(copyText.make_from_your_chosen_arrival_until_37196a,{v0:dayClosing}) }}<small v-if="selectedDay" class="selected-day-context">{{ formatCopy(copyText.selected_day_hours,{v0:selectedDay.date,v1:selectedDay.close}) }}</small></span
           ><AutoHeight class="plan-price-reveal"
             ><dl
               v-if="draft.booking.plan === 'day'"

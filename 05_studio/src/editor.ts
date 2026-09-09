@@ -16,6 +16,16 @@ export function useContentEditor(request:EditorRequest,words:Words) {
   const busy=ref(false),error=ref(''),success=ref(''),saved=ref('');
   const uploadKey=ref(''),uploadStatus=ref<Record<string,{error:boolean;text:string}>>({});
   const drafts=new Map<string,EditorDocument>();
+  const draftStorage='puppy-studio-editor-drafts-v1';
+  // Static website copy only. Keep unfinished edits across a release reload;
+  // never silently replace a newer server version with a recovered document.
+  try {
+    const stored=JSON.parse(sessionStorage.getItem(draftStorage)||'[]');
+    if(Array.isArray(stored))for(const [key,value] of stored){
+      if(typeof key==='string'&&value?.name===key&&Number.isInteger(value.version)&&value.data&&value.published)drafts.set(key,value);
+    }
+  } catch {}
+  function persistDrafts(){try{sessionStorage.setItem(draftStorage,JSON.stringify([...drafts]));}catch{}}
   const dirty=computed(()=>!!doc.value&&JSON.stringify(doc.value.data)!==saved.value);
   const revisions=ref<{id:number;version:number;action:string;data:EditorData;created_at:number}[]>([]);
   const globalQuery=ref(''),matches=ref<{name:string;key:string;value:string[]}[]>([]),searching=ref(false);
@@ -32,11 +42,15 @@ export function useContentEditor(request:EditorRequest,words:Words) {
       if(seq!==sequence)return;
       doc.value=!force&&drafts.has(selected)?clone(drafts.get(selected)!):data;
       saved.value=JSON.stringify(data.data);
+      if(!force&&drafts.has(selected)&&doc.value.version!==data.version) error.value=say(words.conflict);
     } catch(e) {if(seq===sequence)failure(e);} finally {if(seq===sequence)busy.value=false;}
   }
   async function choose(next:string,key='') {
     if(busy.value)return;
-    if(doc.value)drafts.set(doc.value.name,clone(doc.value));
+    if(doc.value){
+      if(dirty.value)drafts.set(doc.value.name,clone(doc.value));else drafts.delete(doc.value.name);
+      persistDrafts();
+    }
     name.value=next;search.value=key;revisions.value=[];await load();
   }
   async function initialize() {
@@ -49,6 +63,7 @@ export function useContentEditor(request:EditorRequest,words:Words) {
     try {
       const next=await request<EditorDocument>('/manage/content/'+current.name,{method:'PUT',body:JSON.stringify({version:current.version,data:current.data,publish})});
       doc.value=next;saved.value=JSON.stringify(next.data);drafts.delete(current.name);
+      persistDrafts();
       success.value=say(publish?words.published:words.saved);uploadStatus.value={};
       if(publish)await refreshContent();
     } catch(e){failure(e);} finally{busy.value=false;}
@@ -77,6 +92,11 @@ export function useContentEditor(request:EditorRequest,words:Words) {
     searching.value=true;
     searchTimer=setTimeout(async()=>{try{const result=await request<{items:typeof matches.value}>('/manage/content-search?q='+encodeURIComponent(value));if(seq===searchSequence)matches.value=result.items;}catch(e){if(seq===searchSequence)failure(e);}finally{if(seq===searchSequence)searching.value=false;}},280);
   });
+  watch(()=>doc.value?.data,()=>{
+    if(!doc.value||busy.value)return;
+    if(dirty.value)drafts.set(doc.value.name,clone(doc.value));else drafts.delete(doc.value.name);
+    persistDrafts();
+  },{deep:true,flush:'post'});
   onBeforeUnmount(()=>{sequence++;searchSequence++;clearTimeout(searchTimer);});
   return {items,name,doc,search,busy,error,success,dirty,revisions,uploadKey,uploadStatus,globalQuery,matches,searching,failure,load,choose,initialize,save,upload,history,restore,exportDraft};
 }
