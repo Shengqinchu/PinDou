@@ -1,5 +1,5 @@
 {
-  "source": "owner-20260908-vision4-process-editor-and-interactions",
+  "source": "owner-20260908-english-logos-and-arrival-photos",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -12,7 +12,7 @@
     "commerce.json": "aaefe10888f4213e2c5595cd8ba90e118649f143839b732a60b27707ae6c8c3a",
     "components-admin-ActivityPanel.json": "1999c2fc63b0dfe8546aa8f15b91aca9097194d50333f5d03c1a832feb0b238c",
     "components-admin-CheckoutPanel.json": "5392671070678ce8e824a6b7bc3ae7b01e4470d7051c96709706f238ba798734",
-    "components-admin-ContentEditor.json": "8e7537c6542d8d612926558399abff9ddc2c268065d4dc23673b2aee56d90cba",
+    "components-admin-ContentEditor.json": "1a895387532989b5e62913c98e88ed3c8c147bb4a18a8fbbebeab61e1afdd87c",
     "components-admin-JournalEditor.json": "34a29fcfc9e8d9b2022dbeb4798f57c8b62b1050683eeaafccba5902e3140e04",
     "components-admin-OrderDrawer.json": "82df1e43752c1d0e14213cf8559b48d1d33026eead7cf0fbee723547372d61fc",
     "components-admin-OrdersPanel.json": "4aadfc07669826fb646c384ed09eb37d311785364f3f020c8cfe46da7c538b3d",
@@ -23,7 +23,7 @@
     "components-admin-ReservationsPanel.json": "cb449035647ad001fc54b625574668a1ad503a26309445c7dc910b4a206e23fd",
     "components-admin-SchedulePanel.json": "2d4b563ebe1a456a2c3e489d8f054c67cf453315b385101f614600469fab3cd4",
     "components-BeadingProcess.json": "20a8c3d3102fb2e424ea982d5f065f6923b02816051be3f5c74ff4a4e977f354",
-    "components-BrandMark.json": "0391a503c41b764b5faf07526e3ac2df73ca1e2147f44f6a927520ac6c250416",
+    "components-BrandMark.json": "2799756d538185e183881b5ee6c7bbb1a284e612e84a15ce40b5754f3aecbf18",
     "components-BrandMotif.json": "67eb0a93ddfc2df38d569b226a13c3045c19c3a24dd5bd16f4d20af818ced7ad",
     "components-CommerceManager.json": "fc7c0cb22f646cdc95a1a61831abe7d521ca9eb3e7d6fbc89da74bf2edbbb377",
     "components-CopyContact.json": "8fc49aff1aba71b5f78e5641fc19206692adedc0836e2838069b7cd44eb1081b",
@@ -48,7 +48,7 @@
     "journal-collection.json": "b58215725c1eba05052d83ac53eda17ae46f4923ea4be4d1d1d8cc1b5a5e2bd8",
     "journal-posts.json": "0d729d67cc00df5499308c9093d76f9afb9f64d49314dffa7e414df57cca610b",
     "pages-Cart.json": "877954464d055594da1e658d84de59655929265f6d9795dd9b793e4a2a0a02cd",
-    "pages-Details.json": "01ea17717bf2ee90ac866918f8379a16a2cce802ea36d30a2f62c84e91b0a399",
+    "pages-Details.json": "59b75afd09d0698eff84771d5ee13c5fe8ab147068e20215c725fcc9786f3995",
     "pages-Home.json": "cf6a0ee53776b222af5070af6f70d11512f2a6d6a4cc4f9bb6cddd3e9157294f",
     "pages-Journal.json": "89abbdef1d4add06bd9a99301494abaa0e1af23594fdbae268a00b44595122b6",
     "pages-JournalEntry.json": "ce8ca253f087a72d42253bef267cb3a27bc6605854e78fcb50701efe7a9d6ce5",

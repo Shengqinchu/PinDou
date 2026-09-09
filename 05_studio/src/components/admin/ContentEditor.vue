@@ -26,14 +26,14 @@ const routes:Record<string,string>={'pages-Home':'/','pages-Visit':'/visit','pag
 const previewRoute=computed(()=>`${routes[name.value]||'/'}?content-preview=1&preview-locale=${locale.value}`);
 const matchingFields=computed(()=>Object.entries(doc.value?.data||{}).filter(([key,value])=>!search.value||JSON.stringify(value).toLowerCase().includes(search.value.toLowerCase())||key.toLowerCase().includes(search.value.toLowerCase())).sort(([a],[b])=>{
   if(name.value!=='media')return 0;
-  const order=(k:string)=>k.startsWith('space-')?10+carousel.findIndex(p=>p.image===k):['hero-illustration','shop-collage','brand-zh','brand-en','brand-puppy','owner-avatar'].indexOf(k);
+  const order=(k:string)=>k.startsWith('space-')?10+carousel.findIndex(p=>p.image===k):['hero-illustration','shop-collage','brand-zh','brand-en','brand-en-contact','brand-puppy','owner-avatar','arrival-entrance','parking-entrance','parking-location'].indexOf(k);
   return order(a)-order(b);
 }));
 const fields=computed(()=>name.value==='media'?matchingFields.value.filter(([key])=>key===mediaChoice.value):matchingFields.value);
 function mediaLabel(key:string){
   if(key.startsWith('space-'))return say(copyText.space)+' '+String(carousel.findIndex(p=>p.image===key)+1).padStart(2,'0');
   if(key.startsWith('process-'))return say(copyText.processPhoto)+' '+key.replace('process-','');
-  const mapped=({'hero-illustration':'hero','shop-collage':'collage','brand-zh':'brandZh','brand-en':'brandEn','brand-puppy':'puppy','owner-avatar':'avatar'} as Record<string,string>)[key];
+  const mapped=({'hero-illustration':'hero','shop-collage':'collage','brand-zh':'brandZh','brand-en':'brandEn','brand-en-contact':'brandEnContact','brand-puppy':'puppy','owner-avatar':'avatar','arrival-entrance':'arrivalEntrance','parking-entrance':'parkingEntrance','parking-location':'parkingLocation'} as Record<string,string>)[key];
   return say(words[mapped||'photo'])+(mapped?'':' · '+key);
 }
 function sendPreview(){if(doc.value)frame.value?.contentWindow?.postMessage(JSON.parse(JSON.stringify({type:'studio-content-preview',modules:{...publishedModules.value,[doc.value.name]:doc.value.data}})),location.origin);}

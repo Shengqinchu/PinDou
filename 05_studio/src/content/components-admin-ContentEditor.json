@@ -139,6 +139,13 @@
     "英文品牌标识",
     "English brand mark"
   ],
+  "brandEnContact": [
+    "英文页脚品牌与联系方式",
+    "English footer brand and contacts"
+  ],
+  "arrivalEntrance": ["建筑入口指引", "Building entrance guide"],
+  "parkingEntrance": ["访客停车入口", "Visitor parking entrance"],
+  "parkingLocation": ["访客停车位置", "Visitor parking location"],
   "puppy": [
     "独立小狗标识",
     "Puppy symbol"

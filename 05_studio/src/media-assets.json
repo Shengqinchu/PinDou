@@ -204,9 +204,9 @@
     "height": 458
   },
   "brand-en": {
-    "src": "/studio-brand/full-en-v3.jpg",
-    "width": 509,
-    "height": 509
+    "src": "/studio-brand/english-mark-20260908.jpg",
+    "width": 1280,
+    "height": 1280
   },
   "brand-puppy": {
     "src": "/studio-brand/puppy-v3.jpg",
@@ -252,5 +252,25 @@
     "src": "/studio-media/v4/process-packaging.webp",
     "width": 1200,
     "height": 1600
+  },
+  "brand-en-contact": {
+    "src": "/studio-brand/english-contact-20260908.jpg",
+    "width": 1280,
+    "height": 1280
+  },
+  "arrival-entrance": {
+    "src": "/studio-media/arrival/building-entrance-20260908.jpg",
+    "width": 1280,
+    "height": 1707
+  },
+  "parking-entrance": {
+    "src": "/studio-media/arrival/parking-entrance-20260908.jpg",
+    "width": 1280,
+    "height": 1707
+  },
+  "parking-location": {
+    "src": "/studio-media/arrival/visitor-parking-20260908.jpg",
+    "width": 1280,
+    "height": 1707
   }
 }

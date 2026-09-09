@@ -66,3 +66,20 @@
 - 新模块 `components-CopyContact`：按消息新增复制成功、失败及手动复制提示。
 - `components-admin-ContentEditor`、`data-commerce-messages`、`data-editor-module-labels`：按消息新增全站查找、上传局部状态、格式错误、请求编号、草稿副本及诊断说明。后台实际支持的上传格式同步说明，不承诺未支持的 HEIC。
 - `data-components-StudioCarousel-photos`：按截图顺序调整数组，原始资产键和各张中英文说明不变。顺序为旧编号 01、05、07、04、08、02、06、09、11、10、03、12。
+
+## 2026-09-08 / 店主提供两张英文 Logo
+
+来源：店主“把英文logo改成以上两图”，附纯品牌图与带 rednote／WeChat 联系方式图。文件来源和 SHA-256 见 `03_design/STUDIO_ENGLISH_BRAND.md`。
+
+- `components-BrandMark.pindo_puppy_08aa61` 英文辅助名称按新原图改为 `Hamilton PindouPuppy`；中文保持。新增 `artwork_wechat` 保存图片内原样写出的 `xiaogoushuangji`，用于该行点击复制，遵循此前“所有涉及微信号都能点击复制”的要求。
+- `components-admin-ContentEditor.brandEnContact` 仅新增“英文页脚品牌与联系方式／English footer brand and contacts”，让两张图片可分别替换。
+- 原始 JPG 按字节保存；CSS 仅隐藏外围空白，不改写、重绘或重新压缩。中文 Logo、标题、正文、价格与其他辅助文案保持。
+
+## 2026-09-08 / 到访与停车三张实拍图
+
+来源：店主“把这三张图导入进去”，附详情页位置截图与三张带指引的原始照片。
+
+- 地址右侧换成门牌 8 的建筑入口；两个停车占位分别换车道入口、内部访客车位。照片保留原始字节与箭头；不把第一张页面截图当作待发布照片。
+- `pages-Details.lightfilled_worktables_by_the_studio_window_148082` 稳定键保留，图片辅助描述改为新入口图的实际内容及对应英文。
+- `components-admin-ContentEditor` 新增三张照片的媒体编辑标签。停车原有标题／图注、地址、到访与停车说明保持；仅停止渲染已经过时的“指引照片即将补充”，原文键仍留档。
+- 放大查看复用已有 `PhotoViewer` 与已有“查看原图”辅助文案，不引入新的营销文案。

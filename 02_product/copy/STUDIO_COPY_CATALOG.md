@@ -208,6 +208,10 @@
 | collage | 首页小店预告 | Home shop preview |
 | brandZh | 中文品牌标识 | Chinese brand mark |
 | brandEn | 英文品牌标识 | English brand mark |
+| brandEnContact | 英文页脚品牌与联系方式 | English footer brand and contacts |
+| arrivalEntrance | 建筑入口指引 | Building entrance guide |
+| parkingEntrance | 访客停车入口 | Visitor parking entrance |
+| parkingLocation | 访客停车位置 | Visitor parking location |
 | puppy | 独立小狗标识 | Puppy symbol |
 | space | 空间轮播图 | Studio carousel photo |
 | photo | 页面图片 | Page image |
@@ -636,7 +640,8 @@
 
 | 键 | 中文 | English |
 |---|---|---|
-| pindo_puppy_08aa61 | 小狗拼豆铺 | Pindo Puppy |
+| pindo_puppy_08aa61 | 小狗拼豆铺 | Hamilton PindouPuppy |
+| artwork_wechat | xiaogoushuangji | xiaogoushuangji |
 
 ## components-BrandMotif.json
 
@@ -1082,7 +1087,7 @@
 | in_downtown_hamilton_accessible_by_local_buses_657f96 | 位于汉密尔顿市中心，公交与城际公共交通可达。 | In downtown Hamilton, accessible by local buses and GO Transit. |
 | visits_are_by_appointment_you_are_welcome_008328 | 预约到访，可比约定时间稍早一点到。 | Visits are by appointment. You are welcome to arrive a little before your confirmed time. |
 | the_host_will_meet_you_downstairs_when_aeec4f | 抵达时店主会去楼下迎接 | The host will meet you downstairs when you arrive |
-| lightfilled_worktables_by_the_studio_window_148082 | 窗边明亮的拼豆工作台 | Light-filled worktables by the studio window |
+| lightfilled_worktables_by_the_studio_window_148082 | 8 Hughson St N 建筑入口，白色虚线标明进门方向 | Building entrance at 8 Hughson St N, with a white dotted arrow showing the way in |
 | a_place_to_park_fcb8e3 | 停车指引 | A place to park |
 | free_visitor_parking_is_available_downstairs_usually_7daf39 | 楼下有免费的访客停车位，一般工作日有空位，实际以到访时情况为准。 | Free visitor parking is available downstairs, usually with space on weekdays. Availability can vary when you arrive. |
 | visitor_parking_entrance_30c573 | 访客停车入口 | Visitor parking entrance |

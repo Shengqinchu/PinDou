@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { contentModule } from "../content-store";
+import { asset, contentModule } from "../content-store";
 const copyText = contentModule("pages-Details", copyTextDefault);
 
 import BeadingProcess from "../components/BeadingProcess.vue";
 import processDefaults from "../content/components-BeadingProcess.json";
 const processCopy=contentModule('components-BeadingProcess',processDefaults);
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import StudioImage from "../components/StudioImage.vue";
+import PhotoViewer from "../components/PhotoViewer.vue";
 import { contacts } from "../state";
 import copyTextDefault from "../content/pages-Details.json";
 import { say } from "../state";
@@ -24,6 +26,12 @@ const map = (address: string) =>
   encodeURIComponent(address);
 const address = computed(() => say(contacts.address));
 const parking = computed(() => [say(contacts.parking_1),say(contacts.parking_2)]);
+const visitViewer = ref<InstanceType<typeof PhotoViewer>>();
+const visitPhotos = computed(() => [
+  { image: 'arrival-entrance', words: copyText.lightfilled_worktables_by_the_studio_window_148082 },
+  { image: 'parking-entrance', words: copyText.visitor_parking_entrance_30c573 },
+  { image: 'parking-location', words: copyText.visitor_parking_location_c046e2 },
+].map(photo => ({ image: photo.image, src: asset(photo.image).src, zh: photo.words[0], en: photo.words[1] })));
 </script>
 <template>
   <div class="vision-details container">
@@ -73,12 +81,9 @@ const parking = computed(() => [say(contacts.parking_1),say(contacts.parking_2)]
           }}
         </p>
       </div>
-      <img
-        :src="media('studio-04')"
-        :alt="say(copyText.lightfilled_worktables_by_the_studio_window_148082)"
-        width="1080"
-        height="1440"
-      />
+      <button class="visit-photo arrival-photo" :aria-label="say(processCopy.photoLabel)+' · '+say(copyText.lightfilled_worktables_by_the_studio_window_148082)" @click="visitViewer?.open(0)">
+        <StudioImage name="arrival-entrance" :alt="say(copyText.lightfilled_worktables_by_the_studio_window_148082)" sizes="(max-width:760px) 90vw, 300px" loading="eager" />
+      </button>
     </section>
     <section id="parking" class="vision-detail-section">
       <h2>{{ say(copyText.a_place_to_park_fcb8e3) }}</h2>
@@ -89,19 +94,15 @@ const parking = computed(() => [say(contacts.parking_1),say(contacts.parking_2)]
           )
         }}
       </p>
-      <div class="vision-parking-photos">
+      <div class="vision-parking-photos photos-ready">
         <figure
-          v-for="(label, index) in [
-            say(copyText.visitor_parking_entrance_30c573),
-            say(copyText.visitor_parking_location_c046e2),
-          ]"
-          :key="index"
+          v-for="(photo, index) in visitPhotos.slice(1)"
+          :key="photo.image"
         >
-          <PhCar :size="35" weight="light" />
-          <figcaption>
-            {{ label
-            }}<small>{{ say(copyText.photograph_to_follow_3aecbb) }}</small>
-          </figcaption>
+          <button class="visit-photo parking-photo" :aria-label="say(processCopy.photoLabel)+' · '+say([photo.zh,photo.en])" @click="visitViewer?.open(index+1)">
+            <StudioImage :name="photo.image" :alt="say([photo.zh,photo.en])" sizes="(max-width:600px) 90vw, 400px" />
+          </button>
+          <figcaption>{{ say([photo.zh,photo.en]) }}</figcaption>
         </figure>
       </div>
       <h3>{{ say(copyText.nearby_parking_options_1a311a) }}</h3>
@@ -117,6 +118,7 @@ const parking = computed(() => [say(contacts.parking_1),say(contacts.parking_2)]
         /></a>
       </div>
     </section>
+    <PhotoViewer ref="visitViewer" :photos="visitPhotos" />
     <section id="services" class="vision-detail-section">
       <h2>{{ say(copyText.made_comfortable_made_yours_0c8904) }}</h2>
       <div class="vision-service-grid">

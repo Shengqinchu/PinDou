@@ -1,0 +1,17 @@
+/* Original arrival instructions stay uncropped, including the owner's arrows. */
+.visit-photo { display: block; width: 100%; min-width: 0; padding: 0; border-radius: 10px; cursor: zoom-in; }
+.visit-photo img { width: auto; height: auto; max-width: 100%; margin-inline: auto; object-fit: contain; border-radius: 10px; }
+.arrival-photo { justify-self: center; }
+.arrival-photo img { max-height: 360px; }
+.vision-parking-photos.photos-ready { align-items: start; }
+.vision-parking-photos.photos-ready > figure {
+  min-width: 0; min-height: 0; padding: 0; gap: 14px;
+  background: transparent; border: 0; border-radius: 0;
+}
+.parking-photo img { max-height: clamp(300px, 52svh, 540px); }
+.visit-photo:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
+@media (max-width: 600px) {
+  .vision-parking-photos.photos-ready { grid-template-columns: 1fr; gap: 28px; }
+  .arrival-photo img { max-height: min(420px, 64svh); }
+  .parking-photo img { max-height: min(540px, 68svh); }
+}

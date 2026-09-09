@@ -24,6 +24,7 @@ import StudioToast from "./components/StudioToast.vue";
 import SlideOver from "./components/SlideOver.vue";
 import ReleaseNotice from "./components/ReleaseNotice.vue";
 import BrandMark from "./components/BrandMark.vue";
+import FooterBrand from "./components/FooterBrand.vue";
 import BrandMotif from "./components/BrandMotif.vue";
 import BrandIcon from "./components/BrandIcon.vue";
 import { accountCopy,accountOpen,accountUser,openAccount,closeAccount,installAccount } from "./account";
@@ -148,7 +149,7 @@ watch(
   <footer v-if="!isDesk" class="vision-footer">
     <div class="vision-footer-inner container">
       <div class="vision-footer-brand">
-        <RouterLink to="/"><BrandMark /></RouterLink>
+        <FooterBrand />
         <p>
           {{ say(copyText.a_beadmaking_experience_uniquely_yours_cf90ad) }}
         </p>

@@ -666,6 +666,22 @@
       "英文品牌标识",
       "English brand mark"
     ],
+    "brandEnContact": [
+      "英文页脚品牌与联系方式",
+      "English footer brand and contacts"
+    ],
+    "arrivalEntrance": [
+      "建筑入口指引",
+      "Building entrance guide"
+    ],
+    "parkingEntrance": [
+      "访客停车入口",
+      "Visitor parking entrance"
+    ],
+    "parkingLocation": [
+      "访客停车位置",
+      "Visitor parking location"
+    ],
     "puppy": [
       "独立小狗标识",
       "Puppy symbol"
@@ -2182,7 +2198,11 @@
   "components-BrandMark": {
     "pindo_puppy_08aa61": [
       "小狗拼豆铺",
-      "Pindo Puppy"
+      "Hamilton PindouPuppy"
+    ],
+    "artwork_wechat": [
+      "xiaogoushuangji",
+      "xiaogoushuangji"
     ]
   },
   "components-BrandMotif": {
@@ -3403,8 +3423,8 @@
       "The host will meet you downstairs when you arrive"
     ],
     "lightfilled_worktables_by_the_studio_window_148082": [
-      "窗边明亮的拼豆工作台",
-      "Light-filled worktables by the studio window"
+      "8 Hughson St N 建筑入口，白色虚线标明进门方向",
+      "Building entrance at 8 Hughson St N, with a white dotted arrow showing the way in"
     ],
     "a_place_to_park_fcb8e3": [
       "停车指引",
@@ -4563,9 +4583,9 @@
       "height": 458
     },
     "brand-en": {
-      "src": "/studio-brand/full-en-v3.jpg",
-      "width": 509,
-      "height": 509
+      "src": "/studio-brand/english-mark-20260908.jpg",
+      "width": 1280,
+      "height": 1280
     },
     "brand-puppy": {
       "src": "/studio-brand/puppy-v3.jpg",
@@ -4611,6 +4631,26 @@
       "src": "/studio-media/v4/process-packaging.webp",
       "width": 1200,
       "height": 1600
+    },
+    "brand-en-contact": {
+      "src": "/studio-brand/english-contact-20260908.jpg",
+      "width": 1280,
+      "height": 1280
+    },
+    "arrival-entrance": {
+      "src": "/studio-media/arrival/building-entrance-20260908.jpg",
+      "width": 1280,
+      "height": 1707
+    },
+    "parking-entrance": {
+      "src": "/studio-media/arrival/parking-entrance-20260908.jpg",
+      "width": 1280,
+      "height": 1707
+    },
+    "parking-location": {
+      "src": "/studio-media/arrival/visitor-parking-20260908.jpg",
+      "width": 1280,
+      "height": 1707
     }
   }
 }

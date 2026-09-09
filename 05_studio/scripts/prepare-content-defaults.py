@@ -9,9 +9,12 @@ for path in (web/'public/studio-media').glob('*'):
     if path.suffix.lower() not in ('.jpg','.png','.webp'):continue
     with Image.open(path) as im:width,height=im.size
     assets.setdefault(path.stem,{'src':'/studio-media/'+path.name,'width':width,'height':height})
-for key,filename in [('brand-zh','full-zh-v3.jpg'),('brand-en','full-en-v3.jpg'),('brand-puppy','puppy-v3.jpg'),('owner-avatar','xiaogou-shuangji-avatar.png')]:
+for key,filename in [('brand-zh','full-zh-v3.jpg'),('brand-en','english-mark-20260908.jpg'),('brand-en-contact','english-contact-20260908.jpg'),('brand-puppy','puppy-v3.jpg'),('owner-avatar','xiaogou-shuangji-avatar.png')]:
     with Image.open(web/'public/studio-brand'/filename) as im:width,height=im.size
     assets[key]={'src':'/studio-brand/'+filename,'width':width,'height':height}
+for key,filename in [('arrival-entrance','building-entrance-20260908.jpg'),('parking-entrance','parking-entrance-20260908.jpg'),('parking-location','visitor-parking-20260908.jpg')]:
+    with Image.open(web/'public/studio-media/arrival'/filename) as im:width,height=im.size
+    assets[key]={'src':'/studio-media/arrival/'+filename,'width':width,'height':height}
 (src/'media-assets.json').write_text(json.dumps(assets,indent=2)+'\n',encoding='utf8')
 documents={}
 for path in (src/'content').glob('*.json'):
