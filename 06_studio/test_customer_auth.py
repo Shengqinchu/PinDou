@@ -96,3 +96,10 @@ def test_fixed_upstream_allowlist_no_redirect_and_failure_closed(monkeypatch):
     monkeypatch.setattr(auth,'build_opener',lambda *_:Opener())
     with pytest.raises(HTTPException) as error:auth.upstream('profile',request(),token='safe-fixture-token')
     assert error.value.status_code==503
+
+def test_account_profile_exposes_shared_avatar_but_no_provider_or_private_fields(client,monkeypatch):
+    monkeypatch.setattr(auth,'upstream',lambda *a,**kw:{'user_id':'qa-owner','email':'qa@example.test',
+        'nickname':'Shared name','avatar':'/static/thumbnails/avatar_test.png','phone':'private',
+        'password_hash':'private','wechat_openid':'private','paid_credits':188})
+    assert client.get('/studio-api/auth/me').json()['user']=={
+        'id':'qa-owner','email':'qa@example.test','nickname':'Shared name','avatar':'/static/thumbnails/avatar_test.png'}

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed,onBeforeUnmount,ref,watch } from "vue";
-import { PhArrowRight,PhEye,PhEyeSlash,PhUserCircle } from "@phosphor-icons/vue";
+import { PhArrowRight,PhEye,PhEyeSlash } from "@phosphor-icons/vue";
 import SlideOver from "./SlideOver.vue";
 import CustomerWallet from './CustomerWallet.vue';
 import { accountCopy as copy,accountUser,accountOpen,accountForReservation,closeAccount,completeSignIn,signOut,type SignInResult } from "../account";
 import { commerceApi } from "../commerce";
 import { say,formatCopy } from "../state";
 import WechatSignIn from './WechatSignIn.vue';
+import AccountIdentity from './AccountIdentity.vue';
 const props=defineProps<{embedded?:boolean;emailOnly?:boolean}>();
 const emit=defineEmits<{signedIn:[]}>();
 const method=ref<"code"|"password">("code");
@@ -49,12 +50,9 @@ async function login(){
   <component :is="props.embedded?'section':SlideOver" :model-value="props.embedded||accountOpen" @update:model-value="(value:boolean)=>{if(!value)closeAccount()}" :busy="working"
     :title="say(accountUser?copy.account:accountForReservation?copy.reservation_title:copy.title)">
     <section v-if="accountUser" class="account-content">
-      <div class="account-identity"><PhUserCircle :size="42" weight="light" /><div><span class="fine-print">{{ say(copy.signed_in) }}</span><strong>{{ accountUser.nickname||accountUser.email }}</strong><p v-if="accountUser.nickname">{{ accountUser.email }}</p></div></div>
-      <WechatSignIn v-if="!emailOnly" :key="accountUser.id" linking />
+      <AccountIdentity :key="accountUser.id" :email-only="emailOnly"/>
       <CustomerWallet v-if="!emailOnly&&(accountOpen||embedded)" :key="accountUser.id"/>
-      <a v-if="!emailOnly" class="button button-secondary" href="/tools">{{ say(copy.pattern_tool) }}<PhArrowRight /></a>
       <RouterLink v-if="!embedded&&!emailOnly" class="text-link" to="/account" @click="closeAccount">{{ say(copy.account_center) }}</RouterLink>
-      <RouterLink class="button button-primary" to="/visit" @click="closeAccount">{{ say(copy.book_a_visit) }}<PhArrowRight /></RouterLink>
       <button type="button" class="text-link account-signout" @click="signOut">{{ say(copy.sign_out) }}</button>
     </section>
     <div v-else class="account-content">

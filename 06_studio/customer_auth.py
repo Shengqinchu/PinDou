@@ -87,7 +87,9 @@ def public_user(data: dict) -> dict:
     # can enter Studio until a real WeChat OAuth provider is configured.
     if not isinstance(ident,str) or not 1 <= len(ident) <= 128 or not isinstance(email,str) or not EMAIL.fullmatch(email):
         raise HTTPException(401,"account_email_required")
-    return {"id":ident,"email":email,"nickname":str(data.get("nickname") or "")[:80]}
+    avatar=data.get("avatar")
+    return {"id":ident,"email":email,"nickname":str(data.get("nickname") or "")[:80],
+            "avatar":avatar if isinstance(avatar,str) and len(avatar)<=2048 else ""}
 
 
 def require_customer(request: Request, authorization: Annotated[str | None, Header()] = None) -> dict:

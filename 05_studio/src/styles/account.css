@@ -15,7 +15,7 @@
 .account-password { position: relative; display: block; }
 .account-password input { padding-right: 54px !important; }
 .account-password button { position: absolute; inset: 3px 4px 3px auto; }
-.account-identity { display: flex; gap: 14px; align-items: center; padding-bottom: 24px; border-bottom: 1px solid var(--line); min-width: 0; }
+.account-identity { display: flex; gap: 14px; align-items: center; padding-bottom: 8px; min-width: 0; }
 .account-identity > svg { flex-shrink: 0; }
 .account-identity strong { display: block; font-size: 18px; margin-top: 4px; }
 .account-identity p { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
@@ -35,6 +35,32 @@
 .wechat-return { display: grid; align-content: start; gap: 20px; }
 .wechat-return h1 { margin-bottom: 10px; }
 .wechat-return .button { justify-self: start; }
+.account-portrait { width:56px; height:56px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+.account-identity-text { flex:1; min-width:0; }
+.account-identity-text strong { margin:0; font-weight:500; font-size:20px; }
+.account-edit { display:flex; align-items:center; justify-content:center; gap:6px; min-height:44px; padding:8px 0 8px 10px; font-size:13px; flex-shrink:0; }
+.account-edit svg { flex-shrink:0; }
+.wechat-compact { margin-top:3px; font-size:12px; color:var(--muted); }
+.wechat-bound,.wechat-bound>span,.wechat-link { display:flex; align-items:center; gap:6px; }
+.wechat-bound { flex-wrap:wrap; gap:0; }
+.wechat-bound>span { min-height:32px; }
+.wechat-link { justify-self:start; min-height:32px; width:auto!important; padding:0; font-size:12px; }
+.info-tip { display:inline-flex; flex-shrink:0; vertical-align:middle; }
+.info-tip-trigger { display:flex; align-items:center; justify-content:center; min-width:36px; min-height:36px; border-radius:50%; color:#616975; }
+.info-tip-trigger:focus-visible { outline:2px solid var(--ink); outline-offset:1px; }
+.info-tip-panel { position:fixed; z-index:2000; width:min(310px,calc(100vw - 24px)); padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:var(--paper,#fff); box-shadow:0 8px 28px #182b4024; color:var(--ink); font:13px/1.8 var(--body); overflow:auto; overflow-wrap:anywhere; text-align:left; }
+.info-tip-panel p { margin:0 0 8px; }.info-tip-panel p:last-child { margin:0; }
+.profile-form { padding-block:8px; }
+.profile-avatar-editor { display:flex; align-items:center; gap:20px; margin-bottom:8px; }
+.profile-preview { width:80px; height:80px; border-radius:50%; object-fit:cover; }
+.profile-upload-actions { display:flex; align-items:center; }
+.profile-field-label { display:flex; align-items:center; gap:4px; }
+.profile-email { display:grid; grid-template-columns:1fr auto; align-items:center; font-size:13px; color:var(--muted); }
+.profile-email>span { grid-column:1; }.profile-email>p { grid-column:1; margin:6px 0; overflow-wrap:anywhere; color:var(--ink); }
+.profile-email>.info-tip { grid-column:2; grid-row:1/3; }
+.profile-actions { display:flex; gap:12px; margin-top:12px; }.profile-actions>.button { flex:1; }
+@media(hover:hover) and (pointer:fine){.account-edit:hover,.info-tip-trigger:hover{color:var(--ink);}.info-tip-trigger:hover{background:#e9edf080;}}
+@media(max-width:380px){.account-edit{font-size:12px;gap:4px;}.account-identity{gap:10px;}.account-portrait{width:44px;height:44px;}.account-identity-text strong{font-size:18px;}}
 @media (max-width: 600px) {
   .account-trigger span { display: none; }
   .vision-header { gap: 8px; }

@@ -8,6 +8,7 @@ import { say,formatCopy,prettyDate } from '../state';
 import type { Reservation } from '../reservations';
 import WalletBalances from './WalletBalances.vue';
 import WalletLedger from './WalletLedger.vue';
+import { profileCopy } from '../profile';
 const tab=ref<'wallet'|'bookings'>('wallet'), category=ref<WalletCategory>('time'), page=ref(1), bookingPage=ref(1);
 const data=ref<WalletDetail>(), bookings=ref<Reservation[]>([]), bookingTotal=ref(0), busy=ref(false), error=ref('');
 let sequence=0,timer:ReturnType<typeof setInterval>|undefined;
@@ -29,15 +30,12 @@ onBeforeUnmount(()=>{sequence++;clearInterval(timer);window.removeEventListener(
 </script>
 <template>
   <div class="customer-wallet">
-    <div class="account-methods" role="group" :aria-label="say(accountCopy.account)"><button :aria-pressed="tab==='wallet'" @click="tab='wallet'">{{say(copy.account)}}</button><button :aria-pressed="tab==='bookings'" @click="tab='bookings'">{{say(accountCopy.my_reservations)}}</button></div>
-    <div class="wallet-sync"><span>{{say(copy.sync)}}</span><button class="icon-button" :aria-label="say(copy.refresh)" :disabled="busy" @click="refresh"><PhArrowClockwise :size="19" :class="{spinning:busy}"/></button></div>
+    <div class="wallet-toolbar"><div class="wallet-overview-tabs" role="group" :aria-label="say(accountCopy.account)"><button :aria-pressed="tab==='wallet'" @click="tab='wallet'">{{say(copy.account)}}</button><button :aria-pressed="tab==='bookings'" @click="tab='bookings'">{{say(accountCopy.my_reservations)}}</button></div><button class="icon-button" :aria-label="say(copy.refresh)" :disabled="busy" @click="refresh"><PhArrowClockwise :size="19" :class="{spinning:busy}"/></button></div>
     <p v-if="error" class="form-error" role="alert">{{error}}</p><p v-if="busy&&!data" role="status">{{say(copy.loading)}}</p>
     <template v-if="data&&tab==='wallet'">
-      <WalletBalances :account="data.account"/>
-      <p class="wallet-rule">{{say(copy.rules)}} {{say(copy.redeem_rule)}}</p>
-      <details class="wallet-rules"><summary>{{say(copy.time)}} / {{say(copy.points)}}</summary><p>{{say(copy.time_rule)}}</p><p>{{say(copy.earn_rule)}}</p></details>
+      <WalletBalances :account="data.account" customer/>
       <div class="wallet-history-tabs" role="group" :aria-label="say(copy.all_history)"><button :aria-pressed="category==='time'" @click="category='time'">{{say(copy.time_history)}}</button><button :aria-pressed="category==='points'" @click="category='points'">{{say(copy.point_history)}}</button></div>
-      <WalletLedger :entries="data.entries"/>
+      <WalletLedger v-if="data.entries.length" :entries="data.entries"/><p v-else class="wallet-empty">{{say(category==='time'?profileCopy.time_empty:profileCopy.points_empty)}}</p>
       <div v-if="data.total>30" class="wallet-pagination"><button :disabled="page===1||busy" @click="page--">{{say(copy.previous)}}</button><span>{{formatCopy(copy.page,{v0:page,v1:data.total})}}</span><button :disabled="page*30>=data.total||busy" @click="page++">{{say(copy.next)}}</button></div>
     </template>
     <template v-if="tab==='bookings'">

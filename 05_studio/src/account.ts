@@ -4,7 +4,7 @@ import defaults from "./content/account.json";
 import { commerceApi, CommerceError } from "./commerce";
 import { customerToken,storeCustomer,clearCustomer } from "./account-storage";
 export const accountCopy=contentModule("account",defaults);
-export type Customer={id:string;email:string;nickname:string};
+export type Customer={id:string;email:string;nickname:string;avatar?:string};
 export type SignInResult={token:string;user:Customer;shared_user:Record<string,unknown>};
 export const accountUser=ref<Customer|null>(null);
 export const accountOpen=ref(false);
@@ -44,6 +44,12 @@ export function completeSignIn(result:SignInResult){
   if(resolve){accountOpen.value=false;accountForReservation.value=false;resolve(true);}
 }
 export function signOut(){++sequence;clearCustomer();accountUser.value=null;closeAccount();}
+export function applyAccountProfile(profile:Record<string,unknown>,token:string):boolean{
+  if(token!==customerToken()||profile.user_id!==accountUser.value?.id)return false;
+  ++sequence;storeCustomer(token,profile);
+  accountUser.value={id:String(profile.user_id),email:String(profile.email),nickname:String(profile.nickname||''),avatar:typeof profile.avatar==='string'?profile.avatar:''};
+  return true;
+}
 export function installAccount(){
   const refresh=()=>{if(!document.hidden)void refreshAccount().catch(()=>{});};
   const storage=(event:StorageEvent)=>{if(event.key===null||event.key==="pd_web_token"||event.key==="pd_web_user")refresh();};

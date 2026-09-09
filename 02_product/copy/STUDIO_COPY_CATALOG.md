@@ -1382,6 +1382,36 @@
 | your_request_will_wait_for_the_hosts_cd36bf | 提交后等待店主确认，无需在此付款。 | Your request will wait for the host's confirmation. No payment is needed here. |
 | host_wechat_ac7b7e | 店主微信： | Host WeChat:  |
 
+## profile.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| edit | 编辑资料 | Edit profile |
+| nickname | 昵称 | Display name |
+| avatar | 头像 | Avatar |
+| upload | 更换头像 | Change avatar |
+| image_help | JPG、PNG 或 WebP，最大 2 MB。图片会居中裁成正方形。 | JPG, PNG or WebP, up to 2 MB. The image is cropped to a square from the centre. |
+| nickname_help | 1–20 个字符，可随时修改。 | 1–20 characters. You can change this anytime. |
+| shared_help | 昵称和头像与拼豆图纸生成器共用。邮箱仍用于登录。 | Your display name and avatar are shared with the pattern maker. You still sign in with your email. |
+| save | 保存 | Save |
+| saving | 正在保存… | Saving… |
+| saved | 资料已保存 | Profile saved |
+| cancel | 取消 | Cancel |
+| name_invalid | 请输入 1–20 个字符的昵称。 | Enter a display name of 1–20 characters. |
+| name_rejected | 这个昵称无法使用，请换一个。 | This display name cannot be used. Please choose another. |
+| image_invalid | 请选择 JPG、PNG 或 WebP 图片。 | Choose a JPG, PNG or WebP image. |
+| image_large | 图片不能超过 2 MB。 | The image must be no larger than 2 MB. |
+| save_error | 资料未确认保存，请重试。 | We could not confirm the changes. Please try again. |
+| avatar_error | 头像未确认保存，请重试或换一张图片。 | We could not confirm the avatar change. Please retry or choose another image. |
+| partial_save | 昵称已保存；头像未确认保存，请重试。 | Your display name was saved. The avatar change was not confirmed; please retry. |
+| time_help | 时长说明 | About your time |
+| points_help | 积分说明 | About your points |
+| time_empty | 暂无时长记录 | No time entries yet |
+| points_empty | 暂无积分记录 | No points entries yet |
+| wechat_help | 微信绑定说明 | About your WeChat link |
+| wechat_profile_help | 已绑定的微信可用于登录。当前登录方式未提供真实微信昵称和头像；网站昵称和头像可在“编辑资料”中设置。 | Your linked WeChat can be used to sign in. This sign-in method has not provided your real WeChat name or avatar. Set your website profile in Edit profile. |
+| mobile_link_help | 请在电脑上登录此账号，再用手机微信扫码完成绑定。 | Sign in to this account on a computer, then scan the code with WeChat on your phone to link it. |
+
 ## rate-fields.json
 
 | 键 | 中文 | English |

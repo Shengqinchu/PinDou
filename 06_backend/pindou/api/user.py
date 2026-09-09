@@ -195,7 +195,8 @@ async def upload_avatar(
     except ValueError as exc:
         raise ApiException(415, ErrorCode.INVALID_UPLOAD, str(exc)) from exc
 
-    digest = hashlib.sha256(current_user.user_id.encode("utf-8")).hexdigest()[:18]
+    # A new image needs a new URL so both shared-account clients drop the old cached avatar.
+    digest = hashlib.sha256(current_user.user_id.encode("utf-8") + b"\0" + avatar_bytes).hexdigest()[:24]
     key = f"thumbnails/avatar_{digest}.png"
     backend = get_storage_backend()
     backend.upload(key, avatar_bytes, content_type="image/png")
