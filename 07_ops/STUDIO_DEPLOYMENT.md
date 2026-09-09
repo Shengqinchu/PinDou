@@ -1,6 +1,6 @@
 # 当前发布：Studio V4
 
-`20260909003439-studio-v4`（build `2026-09-09T00:29:19.126Z`）。完整发布／回滚／验收记录见 [STUDIO_VISION4_VERIFICATION.md](STUDIO_VISION4_VERIFICATION.md)。原生成器继续保留，店主已发布覆盖未重置。
+`20260909023204-studio-v4`（build `2026-09-09T02:29:23.933Z`）。轮播受控滑动、菜单动效选择、全天时间模板和后台预览连接修正已上线。当前发布／回滚／公网验收见 [STUDIO_EDITOR_MOTION_FIX_VERIFICATION.md](STUDIO_EDITOR_MOTION_FIX_VERIFICATION.md)。297个发布文件校验通过，原生成器及店主最新经营数据保留。下文较早发布与架构说明作为历史记录。
 
 > 最新发布：`20260908224009-studio-v3`，复用图纸工具邮箱账号、提交预约需登录；验证记录见 `STUDIO_ACCOUNT_VERIFICATION.md`。CAD 单位统一保留，历史记录见 `STUDIO_CAD_UNITS_VERIFICATION.md`。
 
