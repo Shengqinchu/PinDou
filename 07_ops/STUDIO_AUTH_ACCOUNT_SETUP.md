@@ -8,7 +8,7 @@
 |---|---|---|
 | Descope | 已完成邮箱登录，并看到与店主截图一致的 `public-amber-morse`、`Free Plan`；店主完成手机号 OTP 流程向导，未加顾客 MFA | 配置服务端调用所需权限、号码测试与共享身份桥接后才能启用网站手机登录 |
 | Firebase | 自动浏览器输入邮箱后被 Google 提示 `This browser or app may not be secure`；没有进入控制台、没有创建项目或开通计费 | 店主用自己的 Chrome 完成 Google 登录；已有 Google 账号与否仍待确认 |
-| Authing | 已改为 `pindoupuppy.authing.cn`，店主提供App ID及Secret，本地配置已保存；公开服务发现端点一致 | 实际登录页仍只有验证码；创建并关联“PC小程序扫码”身份源，再验证免费权限和真实扫码 |
+| Authing | 已直接在Codex内置浏览器创建并关联pindou-wechat，托管体验页已生成微信码；费用管理确认B2C免费版、8,000 MAU、有效期无限期 | 店主真实扫码验收；随后完成网站回调和共享身份桥接。手机保持同机邮箱流程，不能套用PC二维码 |
 
 Descope Project ID：`P3J4R1ubICbwLu2OJLsE4UXCVqmP`，由店主从控制台复制提供。本地已写入被 Git 忽略的 `.env` 的 `STUDIO_DESCOPE_PROJECT_ID`。Project ID 是公开标识；没有生成或索取 Management Key、Access Key、密码，没有将邮箱验证链接／会话令牌保存进仓库。
 
@@ -59,6 +59,8 @@ Authing App ID：`6aa0be1ff986e3e847b44a28`；应用地址 `https://pindoupuppy.
 先验证平台自己的体验页即可。平台体验成功后，记录 **App ID、认证域名、身份源标识**；它们用于后续网站配置。App Secret 留在控制台／受限环境文件。正式接入还需完成服务端验证、回调、现有账号绑定和预约草稿恢复。
 
 默认“小登录”主要针对电脑展示二维码、手机扫码。微信内打开网站及手机同屏识别还要实测，不能以一次桌面扫码代替全部移动端验收。
+
+店主随后明确要求手机用户同机完成登录。当前手机继续使用已上线邮箱入口，短信接通后加入；“PC小程序扫码”不作为手机必经步骤。微信内网页直接授权需要另一套服务号配置，“微信移动端”则用于原生App。环境矩阵及官方依据见 `../02_product/STUDIO_MOBILE_AUTH.md`。
 
 ## Descope：当前向导之后
 
