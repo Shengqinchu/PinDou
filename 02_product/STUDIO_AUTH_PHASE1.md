@@ -1,6 +1,6 @@
 # 第一阶段登录方案与接入准备 · 2026-09-08
 
-> 后续进展：店主已完成 Descope Free 项目 `public-amber-morse` 的手机号 OTP 向导，本任务也已用指定邮箱登录确认同一项目。Project ID 已写入本地受忽略配置。Firebase 自动登录被 Google 安全检查拦截，尚未创建项目。Authing 已配置为 `pindoupuppy.authing.cn`，店主提供的应用参数已保存，公开端点核验通过；实际登录页尚无微信入口。当前待办见 `../07_ops/STUDIO_AUTH_ACCOUNT_SETUP.md` 和 `../07_ops/STUDIO_AUTHING_CONNECTION.md`。下文“账号未创建”描述前一轮决策时的状态。
+> 后续进展：店主已完成 Descope Free 项目 `public-amber-morse` 的手机号 OTP 向导，本任务也已用指定邮箱登录确认同一项目。Project ID 已写入本地受忽略配置。Firebase 自动登录被 Google 安全检查拦截，尚未创建项目。Authing 已配置为 `pindoupuppy.authing.cn`，应用参数已保存，微信身份源已创建和关联，托管体验页已生成二维码；控制台确认B2C免费版、8,000 MAU、有效期无限期。真实扫码、网站回调和共享账号桥接未完成。当前待办见 `../07_ops/STUDIO_AUTH_ACCOUNT_SETUP.md` 和 `../07_ops/STUDIO_AUTHING_CONNECTION.md`，手机同机登录边界见 `STUDIO_MOBILE_AUTH.md`。下文“账号未创建”描述前一轮决策时的状态。
 
 来源：店主要求“Firebase 每天优先，用完转 Descope，使用免费额度”，并希望先采用第三方微信登录服务或开源项目；随后确认 Firebase／Descope 账号均未创建，也没有自己的小程序／已认证公众号。
 
