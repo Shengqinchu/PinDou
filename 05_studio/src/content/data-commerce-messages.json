@@ -210,5 +210,17 @@
   "import_interrupted": [
     "服务更新中断了导入，原有日记未改动，请重试。",
     "A service update interrupted the import. Existing stories are unchanged. Please retry."
+  ],
+  "reservation_offer_invalid": [
+    "此套餐需选择两人、连续四小时，请重新选择。",
+    "This offer requires two guests and four consecutive hours. Please select again."
+  ],
+  "reservation_offer_expired": [
+    "此套餐不适用于所选日期，请选择其他体验。",
+    "This offer is unavailable for the selected date. Choose another experience."
+  ],
+  "reservation_offer_changed": [
+    "套餐信息已更新，请核对后重新提交。",
+    "The offer has changed. Review it before submitting again."
   ]
 }

@@ -21,6 +21,7 @@ export type ReservationDay = {
   slots: ReservationSlot[];
 };
 export type ReservationCalendar = {
+  offers?: ReservationOffer[];
   today: string;
   timezone: string;
   minimum_minutes: number;
@@ -35,6 +36,8 @@ export type ReservationCalendar = {
   days: ReservationDay[];
 };
 export type ReservationPayload = {
+  offer?: 'duo4h';
+  offer_revision?: string;
   booking: ReservationBooking;
   name: string;
   contact_method: "wechat" | "phone" | "email" | "other";
@@ -45,6 +48,7 @@ export type ReservationPayload = {
   website: string;
 };
 export type Reservation = {
+  offer?: ReservationOffer | null;
   id: string;
   status: string;
   booking: ReservationBooking;
@@ -57,6 +61,7 @@ export type Reservation = {
   actual_guests: number | null;
   public_note: string;
 };
+export type ReservationOffer = { id:'duo4h';guests:number;minutes:number;until:string;amount:string;currency:string;label:string[];revision:string };
 export function readSession<T>(key: string): T | null {
   if (isContentPreview()) return null;
   try {

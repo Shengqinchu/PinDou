@@ -46,7 +46,7 @@ export function installViewport() {
       focused &&
       (visibleHeight !== priorVisibleHeight || active !== priorFocus)
     ) {
-      const scroller = active?.closest<HTMLElement>(".drawer-body");
+      const scroller = active?.closest<HTMLElement>(".drawer-body,.visit-scroll");
       if (scroller && active) {
         const field = active.getBoundingClientRect();
         const body = scroller.getBoundingClientRect();

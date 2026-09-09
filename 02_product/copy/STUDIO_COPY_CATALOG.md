@@ -901,6 +901,9 @@
 | import_queue_full | 还有导入正在处理，请稍后重试。 | Other imports are still running. Please retry shortly. |
 | import_job_not_found | 未找到这次导入记录，请重新粘贴分享链接。 | This import record was not found. Paste the share link again. |
 | import_interrupted | 服务更新中断了导入，原有日记未改动，请重试。 | A service update interrupted the import. Existing stories are unchanged. Please retry. |
+| reservation_offer_invalid | 此套餐需选择两人、连续四小时，请重新选择。 | This offer requires two guests and four consecutive hours. Please select again. |
+| reservation_offer_expired | 此套餐不适用于所选日期，请选择其他体验。 | This offer is unavailable for the selected date. Choose another experience. |
+| reservation_offer_changed | 套餐信息已更新，请核对后重新提交。 | The offer has changed. Review it before submitting again. |
 
 ## data-components-admin-SchedulePanel-labels.json
 
@@ -923,6 +926,7 @@
 
 | 键 | 中文 | English |
 |---|---|---|
+| visit-flow | 三步预约流程 | Guided visit booking |
 | components-MotionSettings | 页面动效设置 | Page motion settings |
 | account | 账号与登录 | Account and sign-in |
 | App | 导航与页脚 | Navigation and footer |
@@ -1917,6 +1921,57 @@
 | phone_href | tel:+14373624360 | |
 | social_url | https://www.xiaohongshu.com/user/profile/65f8375c000000000b00c921 | |
 | original_post | https://xhslink.cn/o/8HFIo1pstmk | |
+
+## visit-flow.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| step_experience | 体验与人数 | Experience & guests |
+| step_time | 日期与时间 | Date & time |
+| step_contact | 联系与确认 | Contact & review |
+| progress | 预约进度 | Booking progress |
+| experience | 先选一种体验 | Choose your experience |
+| time | 挑一个合适的时间 | Find a time that suits you |
+| contact | 留下联系方式，核对一下 | Your contact details & a final check |
+| day_until_close | 从你选的时间，拼到当天闭店。 | Make from your chosen arrival until closing. |
+| group_prices | 查看多人价格 | Prices for groups |
+| two | 两人 | Two guests |
+| three | 三人 | Three guests |
+| more_guests | 更多人数由店主确认 | The host confirms prices for larger groups |
+| guests | 人数 | Guests |
+| guest_count | {v0} 人 | {v0} guests |
+| single_guest | 1 人 | 1 guest |
+| hour_count | {v0} 小时 | {v0} hours |
+| prepaid | 储值与其他体验 | Prepaid hours & other experiences |
+| prepaid_hours | 储值时长 | Prepaid hours |
+| back | 上一步 | Back |
+| back_experience | 返回体验选择 | Back to experiences |
+| edit | 修改 | Edit |
+| next_time | 下一步：选时间 | Next: date & time |
+| next_contact | 下一步：确认信息 | Next: contact & review |
+| next_two_weeks | 未来两周 | The next two weeks |
+| choose_date | 选择日期 | Choose a date |
+| choose_time | 选择当天时间 | Choose a time for this day |
+| change_date | 换日期 | Change date |
+| how_long | 想拼多久？ | How long would you like? |
+| hours | 小时 | Hours |
+| other_duration | 其他时长 | Other duration |
+| arrive | 几点到店？ | When will you arrive? |
+| closes | 当天闭店时间 | Closes at |
+| fixed_duration | 套餐时长 | Included in this offer |
+| closed | 休息 | Closed |
+| no_time | 这一天没有符合条件的时段，可以换一天或缩短时长。 | No times fit this selection. Choose another day or a shorter visit. |
+| no_duo_time | 这一天没有完整四小时的空位，可以换一天看看。 | No four-hour time slots are available on this day. Try another date. |
+| choose_first | 先选择一种体验和人数。 | Choose an experience and guest count first. |
+| choose_available | 先选择可预约的日期和时间。 | Choose an available date and time first. |
+| offer_changed | 套餐信息已更新，请重新选择。其他资料已保留。 | This offer has changed. Please select it again. Your other details are saved. |
+| offer_unavailable | 此套餐暂不可预约，可以选择其他体验。 | This offer is unavailable. Choose another experience. |
+| checking | 正在查看时段… | Checking available times… |
+| calendar_error | 时段暂时没有加载出来，请重试。 | Times could not be loaded. Try again. |
+| retry | 重试 | Retry |
+| review | 核对预约 | Review your visit |
+| continue | 继续 | Continue |
+| close | 关闭 | Close |
 
 ## wallet.json
 

@@ -20,9 +20,9 @@ const frameWidth=computed(()=>device.value==='desktop'?1280:390);
 const frameScale=computed(()=>Math.max(.1,Math.min(1,(canvasWidth.value-24)/frameWidth.value)));
 let observer:ResizeObserver|undefined,started=false;
 const words=copyText as Record<string,string[]>;
-const shortcuts=['pages-Home','pages-Visit','pages-Details','pages-Journal','App','media'];
+const shortcuts=['pages-Home','pages-Visit','visit-flow','pages-Details','pages-Journal','App','media'];
 function label(n:string){return say((moduleNames as Record<string,string[]>)[n]||copyText.shared);}
-const routes:Record<string,string>={'pages-Home':'/','pages-Visit':'/visit','pages-Details':'/details','components-BeadingProcess':'/details','pages-Shop':'/shop','pages-Journal':'/journal','pages-JournalEntry':'/journal','App':'/','media':'/'};
+const routes:Record<string,string>={'pages-Home':'/','pages-Visit':'/visit','visit-flow':'/visit','pages-Details':'/details','components-BeadingProcess':'/details','pages-Shop':'/shop','pages-Journal':'/journal','pages-JournalEntry':'/journal','App':'/','media':'/'};
 const previewReload=ref(0),previewStatus=ref<'connecting'|'synced'|'error'>('connecting'),previewStale=ref(false);
 let previewRevision=0,previewTimeout:ReturnType<typeof setTimeout>;
 const previewRoute=computed(()=>{

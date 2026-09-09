@@ -39,6 +39,7 @@ const route = useRoute();
 const isDesk = computed(() => route.path.startsWith("/manage"));
 const isTool=computed(()=>route.path.startsWith('/tools'));
 const isToolEditor=computed(()=>!!route.meta.toolEditor);
+const isVisit=computed(()=>route.path==='/visit');
 const menu = ref(false);
 const main = ref<HTMLElement>();
 let arrival: gsap.core.Tween | undefined;
@@ -57,7 +58,7 @@ watch(
     menu.value = false;
     await nextTick();
     main.value?.focus({ preventScroll: true });
-    if (!isDesk.value && !isTool.value && route.path !== "/" && main.value?.firstElementChild) {
+    if (!isDesk.value && !isTool.value && !isVisit.value && route.path !== "/" && main.value?.firstElementChild) {
       arrival?.progress(1).kill();
       arrival = arrive(main.value.firstElementChild, { stationary: true });
     }
@@ -68,10 +69,10 @@ watch(
   <a class="skip-link" href="#main">{{
     say(copyText.skip_to_content_1760ff)
   }}</a>
-  <div v-if="!isDesk&&!isToolEditor" class="vision-announcement">
+  <div v-if="!isDesk&&!isToolEditor&&!isVisit" class="vision-announcement">
     {{ say(copyText.a_little_creative_space_in_hamilton_book_5cf34e) }}
   </div>
-  <header v-if="!isDesk" class="vision-header" :class="{'tool-editor-header':isToolEditor}">
+  <header v-if="!isDesk" class="vision-header" :class="{'tool-editor-header':isToolEditor,'visit-header':isVisit}">
     <RouterLink
       to="/"
       class="vision-brand"
@@ -138,11 +139,11 @@ watch(
     ref="main"
     id="main"
     tabindex="-1"
-    :class="{ 'studio-admin-main': isDesk }"
+    :class="{ 'studio-admin-main': isDesk, 'studio-visit-main':isVisit }"
   >
     <RouterView />
   </main>
-  <footer v-if="!isDesk&&!isToolEditor" class="vision-footer">
+  <footer v-if="!isDesk&&!isToolEditor&&!isVisit" class="vision-footer">
     <div class="vision-footer-inner container">
       <div class="vision-footer-brand">
         <FooterBrand />

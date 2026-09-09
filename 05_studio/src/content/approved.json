@@ -1,5 +1,5 @@
 {
-  "source": "2026-09-09-owner-visit-refinement-2",
+  "source": "2026-09-09-owner-approved-visit-flow-launch",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -37,10 +37,10 @@
     "components-StudioToast.json": "3901e64e5116ccf047f593172fa5945a6df55fff548cd84df0e293f72efa7f52",
     "contact-fields.json": "cc1879ad8ac262c92f74045c165b46ee15360923d53992667349bc0e1ac7a7fc",
     "data-commerce-labels.json": "5155567d136dedbf4dc78ab99e7b35a7748a5b1284b6c8577cd87d1a6c80c1e5",
-    "data-commerce-messages.json": "52a31ead95f0467f80dad74e4087b68a5639bb05c9aa2a2216ea0768429d963b",
+    "data-commerce-messages.json": "97a38ba88c035bc17927294027583ff483fa8d52102ca1f5077f2c32a77c62dd",
     "data-components-admin-SchedulePanel-labels.json": "5800653cc2886f2313e67babd9486fb8190ccbe74cd2f47a8c57877517aec97a",
     "data-components-StudioCarousel-photos.json": "0de9f21ee4aecc483c2db6827a58032faf32245d8e8713d6c4ed79a564740737",
-    "data-editor-module-labels.json": "7427bd7ab511d55f368b952dd862d72d012402ff952bd4751cfd2ca64d79a4d5",
+    "data-editor-module-labels.json": "c1bac39ddd9d9ffc58639b3167ed9c9e0039afb7937e7ae162290a3b6ed88538",
     "data-state-gallery.json": "9e6a73784deb8e6d371fd8f5372273176b5ef9c5663b766079787e10afa01dd1",
     "data-state-products.json": "dda7e9f229f7837b20ed143459141a21806bc7dad4fb2a5105a75a2b09403a95",
     "data-ui-labels.json": "692de89a61bbb0ddbb72fb5c1d546b5a9e293c3657fae05e55f9dca99934616e",
@@ -66,6 +66,7 @@
     "reservation-timetable.json": "2489a12c109a6a7890834006a26d0c4beb7a247a965a6e6cb82e095d5c184800",
     "state.json": "c4eeb599810219fc6102c20f5c7c3a265a0d592a3cefd9351d88734552a2650f",
     "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3",
+    "visit-flow.json": "7c03a637af8519b0d8dd782cf2e54375adb28a24b6d8b1764c260d025d979350",
     "wallet.json": "b51553b78c0f164bcb99288b7c19d939e95ab8dde41c41a3c0d64d73259b3002",
     "wechat.json": "37d27979e3bb40246494c1980b9e71bb5bdef6f8e66621ed918a20d51291dc9f"
   }

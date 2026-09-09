@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CopyContact from "../components/CopyContact.vue";
+import OfferLabel from '../visit/OfferLabel.vue';
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-ReservationReceipt", copyTextDefault);
 
@@ -121,11 +122,11 @@ onBeforeUnmount(() => {
         <div>
           <dt>{{ say(copyText.experience_cc25a0) }}</dt>
           <dd>
-            {{
+            <OfferLabel v-if="result.offer" :offer="result.offer"/><template v-else>{{
               result.booking.plan === "day"
                 ? say(copyText.day_visit_aad886)
                 : say(copyText.hourly_visit_681491)
-            }}
+            }}</template>
           </dd>
         </div>
         <div><dt>{{say(walletCopy.booked)}}</dt><dd>{{duration(result.booked_minutes)}}</dd></div>

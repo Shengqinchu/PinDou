@@ -79,6 +79,7 @@ const router = createRouter({
   ],
   scrollBehavior(to, from, saved) {
     if(!from.matched.length)return {top:0,left:0};
+    if(to.path==='/visit'&&from.path==='/visit')return false;
     if (saved) return saved;
     if (to.path === from.path && to.query.view !== from.query.view)
       return false;

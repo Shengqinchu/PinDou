@@ -119,6 +119,8 @@ class Submission(Strict):
     consent: Literal[True] | None = None
     locale: Literal["zh", "en"] = "zh"
     website: str = Field(default="", max_length=0)
+    offer: Literal['duo4h'] | None = None
+    offer_revision: str | None = Field(default=None, pattern=r'^[a-f0-9]{64}$')
 
     @model_validator(mode="after")
     def contact_valid(self):
@@ -164,12 +166,42 @@ def has_capacity(db, booking, policy, exclude=""):
     confirmed = [json.loads(r[0])["booking"] for r in db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed' AND id!=? AND json_extract(payload,'$.booking.date')=?", (exclude, str(booking.date)))]
     return capacity_available(confirmed, booking.date, minute(booking.start), minute(booking.end), booking.guests, policy)
 
+def available_offer(db, current):
+    from pathlib import Path
+    import content
+    config = json.loads(Path(__file__).with_name('reservation-offers.json').read_text())['duo4h']
+    if str(current.date()) > config['until']:
+        return None
+    rates = content.document_row(db, 'rate-fields')['published']
+    words = content.document_row(db, 'pages-Visit')['published']
+    value = {'id': 'duo4h', 'guests': 2, 'minutes': 240, 'until': config['until'],
+             'amount': rates[config['price_key']][0], 'currency': 'CAD', 'label': words[config['name_key']]}
+    value['revision'] = hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+    return value
+
+
+def validate_offer(db, payload, current):
+    if not payload.offer:
+        if payload.offer_revision:
+            raise HTTPException(422, 'reservation_offer_invalid')
+        return None
+    value = available_offer(db, current)
+    if not value or str(payload.booking.date) > value['until']:
+        raise HTTPException(422, 'reservation_offer_expired')
+    if payload.booking.plan != 'hourly' or payload.booking.guests != value['guests'] or minute(payload.booking.end)-minute(payload.booking.start) != value['minutes']:
+        raise HTTPException(422, 'reservation_offer_invalid')
+    if payload.offer_revision != value['revision']:
+        raise HTTPException(409, 'reservation_offer_changed')
+    return value
+
+
 def public_row(row):
     data = json.loads(row["payload"])
     booking=data['booking']
     return {key: row[key] for key in ("id", "status", "created_at", "updated_at", "version", "actual_minutes", "actual_guests", "public_note")} | {
         "booking": booking, "name": data["name"],
         "booked_minutes": minute(booking['end'])-minute(booking['start']),
+        "offer": data.get('offer_snapshot'),
     }
 
 class ReservationUpdate(Strict):
@@ -231,6 +263,7 @@ def register(app, database, admin_actor):
             raise HTTPException(422, "reservation_group_limit")
         with database() as db:
             settings = read_policy(db)
+            offer = available_offer(db, current)
             confirmed = [json.loads(r[0])["booking"] for r in db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed' AND json_extract(payload,'$.booking.date')>=?", (str(current.date()),))]
             blocks = [dict(r) for r in db.execute('SELECT date,start,end FROM reservation_blocks WHERE date>=?', (str(current.date()),))]
         enabled = [h for h in settings["weekly_hours"] if h["enabled"]]
@@ -248,7 +281,7 @@ def register(app, database, admin_actor):
                 reason = "closed" if closed else "past" if past else "capacity" if busy or guests > settings["max_guests_per_group"] else None
                 slots.append({"start": clock(start), "end": clock(start + 30), "available": reason is None, "reason": reason})
             days.append({"date": str(day), "open": opening["open"], "close": opening["close"], "closed": not opening["enabled"], "slots": slots})
-        return {"today": str(current.date()), "timezone": "America/Toronto", "minimum_minutes": 120, "max_guests_per_group": settings["max_guests_per_group"], "weekly_hours": settings["weekly_hours"], "policy_version": settings["version"], "days": days}
+        return {"today": str(current.date()), "timezone": "America/Toronto", "minimum_minutes": 120, "max_guests_per_group": settings["max_guests_per_group"], "weekly_hours": settings["weekly_hours"], "policy_version": settings["version"], "days": days, "offers": [offer] if offer and settings['max_guests_per_group'] >= 2 else []}
 
     @app.post("/studio-api/reservations", status_code=201)
     def submit(payload: Submission, request: Request, idempotency_key: Annotated[str, Header()], customer=Depends(require_customer)):
@@ -257,7 +290,8 @@ def register(app, database, admin_actor):
         except ValueError:
             raise HTTPException(422, "invalid_request_id")
         actor = visitor(request)
-        encoded = payload.model_dump_json()
+        # Keep the pre-offer canonical representation for existing request keys.
+        encoded = payload.model_dump_json(exclude={'offer', 'offer_revision'} if not payload.offer and not payload.offer_revision else set())
         digest = hashlib.sha256(encoded.encode()).hexdigest()
         current = now_local()
         with database() as db:
@@ -270,6 +304,7 @@ def register(app, database, admin_actor):
                 return public_row(existing)
             settings = read_policy(db)
             validate_interval(payload.booking, current, settings)
+            offer = validate_offer(db, payload, current)
             if not has_capacity(db, payload.booking, settings):
                 raise HTTPException(409, "reservation_interval_unavailable")
             bucket = int(time.time()) // 3600
@@ -281,7 +316,8 @@ def register(app, database, admin_actor):
             db.execute("INSERT INTO submission_limits VALUES(?,?,1) ON CONFLICT(client_hash,bucket) DO UPDATE SET count=count+1", (client,bucket))
             ref = "VIS-" + uuid.uuid4().hex[:16].upper()
             timestamp = current.isoformat()
-            db.execute("INSERT INTO studio_reservations(id,created_at,updated_at,payload,visitor_hash,idempotency_key,payload_hash,owner_id) VALUES(?,?,?,?,?,?,?,?)", (ref,timestamp,timestamp,encoded,actor,idempotency_key,digest,customer["id"]))
+            stored = json.dumps(json.loads(encoded) | {'offer_snapshot': offer}, ensure_ascii=False, separators=(',', ':')) if offer else encoded
+            db.execute("INSERT INTO studio_reservations(id,created_at,updated_at,payload,visitor_hash,idempotency_key,payload_hash,owner_id) VALUES(?,?,?,?,?,?,?,?)", (ref,timestamp,timestamp,stored,actor,idempotency_key,digest,customer["id"]))
             row = db.execute("SELECT * FROM studio_reservations WHERE id=?", (ref,)).fetchone()
             return public_row(row)
 

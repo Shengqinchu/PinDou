@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CopyContact from "../CopyContact.vue";
+import OfferLabel from '../../visit/OfferLabel.vue';
 import { contentModule } from "../../content-store";
 const copyText = contentModule("components-admin-ReservationsPanel", copyTextDefault);
 
@@ -298,6 +299,7 @@ defineExpose({ refresh: load });
             >{{ item.booking.start }}–{{ item.booking.end }} ·
             {{ item.booking.guests }} {{ say(copyText.guests_24bfb5) }}</small
           >
+          <small v-if="item.offer"><OfferLabel :offer="item.offer"/></small>
         </div>
         <span :class="['reservation-status', item.status]">{{
           labels[item.status]
@@ -353,6 +355,7 @@ defineExpose({ refresh: load });
                   : say(copyText.hourly_visit_681491)
               }}
               · {{ entry.booking.guests }} {{ say(copyText.guests_24bfb5) }}
+              <p v-if="entry.offer"><OfferLabel :offer="entry.offer"/></p>
             </dd>
           </div>
           <div>

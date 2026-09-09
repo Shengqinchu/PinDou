@@ -29,3 +29,5 @@ journal=json.loads((src/'content/journal-posts.json').read_text(encoding='utf8')
 journal['posts']=[p for p in journal['posts'] if p.get('kind')=='full' and p.get('date','')>'2026-06-24']
 (root/'06_studio/journal-defaults.json').write_text(json.dumps(journal,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
 print(json.dumps({'modules':len(documents),'media':len(assets),'posts':len(journal['posts'])}))
+rates=json.loads((src/'content/experience-rates.json').read_text(encoding='utf8'))
+(root/'06_studio/reservation-offers.json').write_text(json.dumps({'duo4h':{'until':rates['school_offer_until'],'price_key':'school_two_four_hours','name_key':'four_hours_of_making_for_two_8bb2b0'}},indent=2)+'\n',encoding='utf8')

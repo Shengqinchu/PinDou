@@ -1,5 +1,7 @@
 # 当前发布：Studio V7
 
+> 当前发布 **20260909225909-studio-v7**（build `2026-09-09T22:58:04.439Z`）：三步预约正式接入，一屏布局、同区日期／时段切换、双人4小时套餐、草稿及幂等恢复。356个文件核验；177项后端测试、84个双语布局状态、Chromium/WebKit及真实6人配置适配通过。详见 [STUDIO_VISIT_FLOW_LAUNCH_VERIFICATION.md](STUDIO_VISIT_FLOW_LAUNCH_VERIFICATION.md)。下方原型未上线描述均为历史记录。
+
 > 当前发布 **20260909221008-studio-v7**（build `2026-09-09T22:01:04.286Z`）：标题620ms浮起并保持、预约称呼与联系选项细化、取消用途勾选。354个文件核验，167项后端测试、6组专项与5组动效回归通过。三步日期／时间切换和双人4小时套餐仍在本地原型。详见 [STUDIO_VISIT_REFINEMENT_VERIFICATION.md](STUDIO_VISIT_REFINEMENT_VERIFICATION.md)。
 
 > 当前发布 **20260909211553-studio-v7**（build `2026-09-09T21:05:10.485Z`）：生成器同步动效、大标题独立字形上浮、价格币种右下角标。353 个文件核验通过。三步预约仅为本地方案，正式预约流程未替换。详见 [STUDIO_MOTION_VISIT_PROPOSAL_VERIFICATION.md](STUDIO_MOTION_VISIT_PROPOSAL_VERIFICATION.md)。
