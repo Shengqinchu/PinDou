@@ -50,6 +50,8 @@ const router = createRouter({
     { path: "/studio/:pathMatch(.*)*", redirect: to => ({path: to.path.replace(/^\/studio/, "") || "/", query: to.query, hash: to.hash}) },
     { path: "/", component: Home },
     { path: "/visit", component: routeLoaders.visit },
+    { path: "/account", component: () => import('./pages/Account.vue') },
+    { path: "/auth/wechat", component: () => import('./pages/WechatReturn.vue') },
     {
       path: "/reservation/:id",
       component: () => import("./pages/ReservationReceipt.vue"),
@@ -92,7 +94,7 @@ router.afterEach(to => {
   if(canonical)canonical.href="https://pindoupuppy.com"+to.path;
   let robots=document.querySelector<HTMLMetaElement>('meta[name="robots"]');
   if(!robots){robots=document.createElement("meta");robots.name="robots";document.head.appendChild(robots);}
-  robots.content=/^\/(manage|reservation|order)(\/|$)/.test(to.path)?"noindex, nofollow":"index, follow";
+  robots.content=/^\/(manage|reservation|order|account|auth)(\/|$)/.test(to.path)?"noindex, nofollow":"index, follow";
 });
 const stopPreference = installMotionPreference();
 const stopMotion = installMotion();

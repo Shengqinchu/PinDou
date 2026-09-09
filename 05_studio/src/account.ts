@@ -46,8 +46,9 @@ export function completeSignIn(result:SignInResult){
 export function signOut(){++sequence;clearCustomer();accountUser.value=null;closeAccount();}
 export function installAccount(){
   const refresh=()=>{if(!document.hidden)void refreshAccount().catch(()=>{});};
-  const storage=(event:StorageEvent)=>{if(event.key===null||event.key==="pd_web_token")refresh();};
+  const storage=(event:StorageEvent)=>{if(event.key===null||event.key==="pd_web_token"||event.key==="pd_web_user")refresh();};
   refresh();window.addEventListener("storage",storage);window.addEventListener("pageshow",refresh);
+  window.addEventListener("focus",refresh);
   document.addEventListener("visibilitychange",refresh);
-  return ()=>{window.removeEventListener("storage",storage);window.removeEventListener("pageshow",refresh);document.removeEventListener("visibilitychange",refresh);};
+  return ()=>{window.removeEventListener("storage",storage);window.removeEventListener("pageshow",refresh);window.removeEventListener("focus",refresh);document.removeEventListener("visibilitychange",refresh);};
 }

@@ -12,12 +12,12 @@ const isEditorPage = computed(() => route.name === 'editor');
 <template>
   <div class="app-shell">
     <header v-if="!isEditorPage" class="app-header">
-      <RouterLink class="brand" to="/" aria-label="PinDou 首页">
+      <a class="brand" href="/" aria-label="PinDou 首页">
         <img class="brand__logo" src="/brand/logo.png" alt="" aria-hidden="true" />
         <span class="brand__text">PinDou 拼豆</span>
-      </RouterLink>
+      </a>
       <nav class="app-nav" aria-label="主导航">
-        <RouterLink class="nav-link nav-link--home" to="/">首页</RouterLink>
+        <a class="nav-link nav-link--home" href="/">首页</a>
         <AccountMenu />
       </nav>
     </header>

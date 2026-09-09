@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from pindou.api import admin, artwork, cdk, generate, pattern, payment, upload, user, wallet
+from pindou.api import admin, artwork, cdk, generate, pattern, payment, upload, user, wallet, studio_session
 
 api_router = APIRouter()
 
@@ -13,6 +13,7 @@ for router in (
     pattern.router,
     artwork.router,
     user.router,
+    studio_session.router,
     payment.router,
     payment.webhook_router,
     cdk.router,

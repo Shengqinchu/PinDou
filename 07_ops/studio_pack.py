@@ -3,24 +3,30 @@ import hashlib
 import io
 import json
 import tarfile
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 out = root / 'artifacts/studio-release'
 out.mkdir(parents=True, exist_ok=True)
-version = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') + '-studio-v5'
+version = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') + '-studio-v6'
 dist = root / '05_studio/dist'
 if not (dist / 'index.html').is_file():
     raise SystemExit('Build the studio frontend first.')
 files = {'site/studio/' + p.relative_to(dist).as_posix(): p for p in dist.rglob('*') if p.is_file()}
-for name in ['app.py', 'commerce.py', 'payments.py', 'reservations.py', 'customer_auth.py', 'wallet.py', 'observability.py', 'content.py', 'xhs_import.py', 'content-defaults.json', 'journal-defaults.json', 'requirements.txt', 'requirements.lock.txt']:
+for name in ['app.py', 'commerce.py', 'payments.py', 'reservations.py', 'customer_auth.py', 'authing_login.py', 'wallet.py', 'observability.py', 'content.py', 'xhs_import.py', 'content-defaults.json', 'journal-defaults.json', 'requirements.txt', 'requirements.lock.txt']:
     files['service/' + name] = root / '06_studio' / name
 manifest = {'version': version, 'sha256': {name: hashlib.sha256(p.read_bytes()).hexdigest() for name, p in files.items()}}
+reused=set()
+if len(sys.argv)>1:
+    base=json.loads(Path(sys.argv[1]).read_text())
+    reused={name for name,value in manifest['sha256'].items() if base['sha256'].get(name)==value}
+    manifest.update(base_version=base['version'],reuse=sorted(reused))
 archive = out / (version + '.tar.gz')
 with tarfile.open(archive, 'x:gz') as tar:
     for name, p in files.items():
-        tar.add(p, arcname=name)
+        if name not in reused:tar.add(p, arcname=name)
     data = json.dumps(manifest, indent=2).encode()
     info = tarfile.TarInfo('manifest.json')
     info.size = len(data)

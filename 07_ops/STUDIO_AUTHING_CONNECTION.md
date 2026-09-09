@@ -14,7 +14,7 @@
 | 域名模式 | 用户池内应用共用统一域名 |
 | 认证地址 | `https://pindoupuppy.authing.cn/6aa0be1ff986e3e847b44a28` |
 | Issuer | `https://pindoupuppy.authing.cn/6aa0be1ff986e3e847b44a28/oidc` |
-| 当前登录回调 | `https://console.authing.cn/console/get-started/6aa0be1ff986e3e847b44a28` |
+| 当前登录回调 | `https://pindoupuppy.com/studio-api/auth/wechat/callback`、对应 www 地址；另保留原控制台体验地址 |
 
 本地配置键：`STUDIO_AUTHING_APP_ID`、`STUDIO_AUTHING_ISSUER`、`STUDIO_AUTHING_APP_SECRET`。服务端正式接入时读取配置，不把Secret编入Vue资源。
 
@@ -55,7 +55,9 @@
 
 实际DOM确认二维码图片加载完成，原始尺寸430×430。局部“刷新”曾停在加载状态，重新从认证地址发起会话后恢复；Authing托管页日志出现过`Error: redirect`，尚未确定其内部原因。后续真实扫码及回调验收须覆盖二维码过期与重试，不能只凭图片加载成功开放网站入口。
 
-应用仍保留平台体验回调；身份源的可选Callback URL留空。网站的正式回调、state/nonce/PKCE、服务端令牌验证、共享账号绑定及预约草稿返回尚待实现和验收，不能把首页填成未实现的回调地址。手机同屏微信授权和用户真实扫码结果尚未确认。
+2026-09-09 V6：网站正式回调、state/nonce/PKCE、签名验证、共享邮箱账户绑定与原路径返回已实现并发布。Authing 应用回调清单已保存主域名／www 的正式回调，保留原体验地址；身份源可选Callback仍留空。控制台确认 authorization_code、code、HS256、client_secret_post，与服务实现一致。
+
+首次真实扫码，店主 iPhone 截图提示“无权限登录此应用”。随即核实应用“访问授权”默认行为确为“所有人 → 拒绝”。已按面向顾客公开登录的要求将此应用规则改为“允许”，二次读取确认已生效。这是Authing顾客认证应用访问权限，不改变网站管理员授权。重新生成会话后继续本人扫码验收；不能把本次错误写成网站已完成真实登录。
 
 证据：忽略目录 `artifacts/authing-setup/openid-configuration.json`、`connection-check.json`、`hosted-login.png`。Git与截图未包含Secret或会话令牌。
 

@@ -144,7 +144,8 @@ def register(app, database, origin):
 
     @app.get("/studio-api/auth/options")
     def options():
-        return {"email":True,"password":True,"wechat":False,"phone":False}
+        import authing_login
+        return {"email":True,"password":True,"wechat":authing_login.available(),"phone":False}
 
     @app.get("/studio-api/auth/me")
     def me(request: Request, authorization: Annotated[str | None,Header()]=None):

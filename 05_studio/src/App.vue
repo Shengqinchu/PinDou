@@ -8,7 +8,7 @@ import { say } from "./state";
 
 import { asset } from "./content-store";
 import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { RouterLink,useRoute } from "vue-router";
 import {
   PhArrowRight,
   PhArrowUpRight,
@@ -46,6 +46,7 @@ const navigation = computed(() => [
   { path: "/visit", label: say(copyText.come_create_2eee81) },
   { path: "/shop", label: say(copyText.little_shop_c97261) },
   { path: "/journal", label: say(copyText.studio_journal_7b860e) },
+  { path: "/upload", label: say(copyText.pattern_maker_7db57b), document:true },
 ]);
 onBeforeUnmount(() => arrival?.kill());
 watch(
@@ -80,12 +81,13 @@ watch(
       class="vision-navigation"
       :aria-label="say(copyText.main_navigation_b48c67)"
     >
-      <RouterLink
+      <component
+        :is="item.document?'a':RouterLink"
         v-for="item in navigation"
         :key="item.path"
-        :to="item.path"
+        v-bind="item.document?{href:item.path}:{to:item.path}"
         :class="{ selected: route.path === item.path }"
-        >{{ item.label }}</RouterLink
+        >{{ item.label }}</component
       >
     </nav>
     <div class="vision-header-actions">
@@ -93,6 +95,7 @@ watch(
         class="language-button"
         @click="locale = locale === 'zh' ? 'en' : 'zh'"
         :aria-label="say(copyText.switch_to_chinese_6c04c2)"
+        :lang="locale==='zh'?'en':'zh-CN'"
       >
         <PhGlobe :size="23" weight="light" /><span>{{ say(copyText.label_dd0e77) }}</span>
       </button>
@@ -113,10 +116,11 @@ watch(
     :close-label="say(copyText.close_menu_d36a12)"
   >
     <nav class="vision-menu" :aria-label="say(copyText.site_navigation_d091f4)">
-      <RouterLink
+      <component
+        :is="item.document?'a':RouterLink"
         v-for="(item, index) in navigation"
         :key="item.path"
-        :to="item.path"
+        v-bind="item.document?{href:item.path}:{to:item.path}"
         @click="menu = false"
       >
         <span class="vision-menu-number">{{
@@ -124,15 +128,12 @@ watch(
         }}</span
         ><span>{{ item.label }}</span
         ><PhArrowRight :size="20" />
-      </RouterLink>
+      </component>
       <RouterLink to="/details" @click="menu = false"
         >{{ say(copyText.studio_details_7c4089) }}<PhArrowUpRight :size="20"
       /></RouterLink>
     </nav>
     <div class="vision-menu-extra">
-      <a href="/upload"
-        >{{ say(copyText.pattern_maker_7db57b) }}<PhArrowUpRight
-      /></a>
       <RouterLink to="/manage" @click="menu = false"
         >{{ say(copyText.studio_desk_4f230e) }}<PhArrowRight
       /></RouterLink>

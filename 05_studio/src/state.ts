@@ -23,9 +23,9 @@ function write(key: string, value: string) {
     /* Browsing still works without storage. */
   }
 }
-export const locale = ref<Locale>(
-  (new URLSearchParams(location.search).get("preview-locale") || read("puppy-studio-locale")) === "en" ? "en" : "zh",
-);
+const chosenLocale=new URLSearchParams(location.search).get("preview-locale")||read("puppy-studio-locale");
+export const locale = ref<Locale>(chosenLocale==='en'||chosenLocale==='zh'?chosenLocale:
+  /^zh\b/i.test(navigator.languages?.[0]||navigator.language)?'zh':'en');
 export const tr = (zh: string, en: string) => (locale.value === "zh" ? zh : en);
 export function say(pair: readonly string[]) {
   return tr(pair[0], pair[1]);

@@ -23,6 +23,12 @@ export const useAuthStore = defineStore('auth', {
     displayName: (state) => state.user?.nickname || state.user?.email || 'PinDou 用户'
   },
   actions: {
+    syncFromStorage() {
+      const token=getToken();
+      if(token!==this.token)useSWRCacheStore().clearAll();
+      this.token=token;
+      this.applyUser(token?getStoredUser():null,false);
+    },
     setSession(token: string, user: User) {
       if (token !== this.token) {
         useSWRCacheStore().clearAll();
@@ -66,8 +72,9 @@ export const useAuthStore = defineStore('auth', {
       return payload.user;
     },
     async refreshProfile(): Promise<User> {
+      const token=this.token;
       const user = await getProfile();
-      this.applyUser(user);
+      if(token===this.token&&token===getToken())this.applyUser(user);
       return user;
     },
     async updateProfile(payload: { nickname?: string; avatar_url?: string }): Promise<User> {

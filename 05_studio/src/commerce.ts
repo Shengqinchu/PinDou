@@ -14,6 +14,8 @@ import accountDefaults from "./content/account.json";
 const accountMessages=contentModule("account",accountDefaults) as Record<string,string[]>;
 import walletDefaults from './content/wallet.json';
 const walletMessages=contentModule('wallet',walletDefaults) as Record<string,string[]>;
+import wechatDefaults from './content/wechat.json';
+const wechatMessages=contentModule('wechat',wechatDefaults) as Record<string,string[]>;
 
 export type Booking = {
   date: string;
@@ -155,7 +157,7 @@ export async function commerceApi<T>(
   }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const words = messages[data.detail] || accountMessages[data.detail] || walletMessages[data.detail];
+    const words = messages[data.detail] || accountMessages[data.detail] || walletMessages[data.detail] || wechatMessages[data.detail];
     if (words)
       throw new CommerceError(say(words), response.status, data.detail, response.headers.get('X-Request-ID') || undefined);
     if (response.status === 401 || response.status === 403)

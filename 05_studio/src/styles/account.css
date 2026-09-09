@@ -27,6 +27,14 @@
 .account-bookings svg { flex-shrink: 0; }
 .account-signout { justify-self: start; min-height: 44px; }
 .reservation-account-note { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.container.account-page { max-width: 680px; padding-block: clamp(24px,4vh,48px); min-height: 65vh; }
+.account-page h1 { font-size: clamp(30px,4vw,46px); margin: 0 0 32px; }
+.wechat-signin { display: grid; gap: 10px; }
+.wechat-signin .button { width: 100%; }
+.wechat-signin .account-note svg { vertical-align: middle; margin-right: 8px; }
+.wechat-return { display: grid; align-content: start; gap: 20px; }
+.wechat-return h1 { margin-bottom: 10px; }
+.wechat-return .button { justify-self: start; }
 @media (max-width: 600px) {
   .account-trigger span { display: none; }
   .vision-header { gap: 8px; }

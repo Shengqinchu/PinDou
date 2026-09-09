@@ -6,6 +6,9 @@ import CustomerWallet from './CustomerWallet.vue';
 import { accountCopy as copy,accountUser,accountOpen,accountForReservation,closeAccount,completeSignIn,signOut,type SignInResult } from "../account";
 import { commerceApi } from "../commerce";
 import { say,formatCopy } from "../state";
+import WechatSignIn from './WechatSignIn.vue';
+const props=defineProps<{embedded?:boolean;emailOnly?:boolean}>();
+const emit=defineEmits<{signedIn:[]}>();
 const method=ref<"code"|"password">("code");
 const email=ref("");const code=ref("");const password=ref("");const confirmation=ref("");
 const setPassword=ref(false);const reveal=ref(false);const busy=ref(false);const sending=ref(false);
@@ -37,23 +40,27 @@ async function login(){
     const path=method.value==="password"?"password-login":setPassword.value?"register":"code-login";
     const body={email:normalizedEmail.value,...(method.value==="code"?{code:code.value.trim()}:{}),...(method.value==="password"||setPassword.value?{password:password.value}:{})};
     const result=await commerceApi<SignInResult>("/auth/"+path,{method:"POST",body:JSON.stringify(body)});
-    password.value="";confirmation.value="";code.value="";completeSignIn(result);
+    password.value="";confirmation.value="";code.value="";completeSignIn(result);emit('signedIn');
   }catch(e){error.value=(e as Error).message;}
   finally{busy.value=false;}
 }
 </script>
 <template>
-  <SlideOver :model-value="accountOpen" @update:model-value="value=>{if(!value)closeAccount()}" :busy="working"
+  <component :is="props.embedded?'section':SlideOver" :model-value="props.embedded||accountOpen" @update:model-value="(value:boolean)=>{if(!value)closeAccount()}" :busy="working"
     :title="say(accountUser?copy.account:accountForReservation?copy.reservation_title:copy.title)">
     <section v-if="accountUser" class="account-content">
       <div class="account-identity"><PhUserCircle :size="42" weight="light" /><div><span class="fine-print">{{ say(copy.signed_in) }}</span><strong>{{ accountUser.nickname||accountUser.email }}</strong><p v-if="accountUser.nickname">{{ accountUser.email }}</p></div></div>
-      <CustomerWallet v-if="accountOpen" :key="accountUser.id"/>
+      <WechatSignIn v-if="!emailOnly" :key="accountUser.id" linking />
+      <CustomerWallet v-if="!emailOnly&&(accountOpen||embedded)" :key="accountUser.id"/>
+      <a v-if="!emailOnly" class="button button-secondary" href="/upload">{{ say(copy.pattern_tool) }}<PhArrowRight /></a>
+      <RouterLink v-if="!embedded&&!emailOnly" class="text-link" to="/account" @click="closeAccount">{{ say(copy.account_center) }}</RouterLink>
       <RouterLink class="button button-primary" to="/visit" @click="closeAccount">{{ say(copy.book_a_visit) }}<PhArrowRight /></RouterLink>
       <button type="button" class="text-link account-signout" @click="signOut">{{ say(copy.sign_out) }}</button>
     </section>
     <div v-else class="account-content">
       <p class="account-note">{{ say(copy.shared_account) }}</p>
       <p v-if="accountForReservation" class="account-draft-note">{{ say(copy.draft_saved) }}</p>
+      <WechatSignIn v-if="!emailOnly&&(accountOpen||embedded)" />
       <div class="account-methods" role="group" :aria-label="say(copy.sign_in)">
         <button type="button" class="language-button" :aria-pressed="method==='code'" :disabled="working" @click="method='code'">{{ say(copy.code_method) }}</button>
         <button type="button" class="language-button" :aria-pressed="method==='password'" :disabled="working" @click="method='password'">{{ say(copy.password_method) }}</button>
@@ -77,5 +84,5 @@ async function login(){
         <button class="button button-primary" :disabled="working||!validEmail">{{ busy?say(copy.working):accountForReservation?say(copy.continue_reservation):say(method==='password'?copy.sign_in:copy.continue) }}<PhArrowRight /></button>
       </form>
     </div>
-  </SlideOver>
+  </component>
 </template>

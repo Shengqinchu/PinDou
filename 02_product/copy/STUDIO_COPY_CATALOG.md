@@ -8,6 +8,8 @@
 |---|---|---|
 | sign_in | 登录 | Sign in |
 | account | 我的账号 | My account |
+| account_center | 账号中心 | Account centre |
+| pattern_tool | 拼豆图纸生成器 | Pattern maker |
 | title | 欢迎来到小狗拼豆铺 | Welcome to PinDou Puppy |
 | reservation_title | 登录后，继续这次预约 | Sign in to finish your booking |
 | shared_account | 与拼豆图纸工具共用账号。邮箱首次验证后会自动注册。 | Use the same account as the pattern tool. Your first email verification creates an account. |
@@ -75,8 +77,8 @@
 | a_little_creative_space_in_hamilton_book_5cf34e | 汉密尔顿的小小手作空间，欢迎来到小狗拼豆铺！ | A little creative space in Hamilton. Welcome to Pindo Puppy! |
 | pindo_puppy_home_69051e | 小狗拼豆铺首页 | Pindo Puppy home |
 | main_navigation_b48c67 | 主要导航 | Main navigation |
-| switch_to_chinese_6c04c2 | 切换为英文 | Switch to Chinese |
-| label_dd0e77 | 英文 | 中文 |
+| switch_to_chinese_6c04c2 | Switch to English | 切换为中文 |
+| label_dd0e77 | English | 中文 |
 | site_menu_40ed87 | 网站菜单 | Site menu |
 | a_little_time_to_explore_7313f5 | 慢慢逛，慢慢拼。 | A little time to explore. |
 | close_menu_d36a12 | 关闭菜单 | Close menu |
@@ -1507,3 +1509,30 @@
 | wallet_actual_details_required | 请同时填写实际游玩分钟和人数。 | Enter both the actual minutes and number of guests. |
 | wallet_completed_record_locked | 这次到店已赠分。可更正实际时长；误记到店请先在顾客账户撤销赠分，再改状态。 | Points were awarded for this visit. You can correct its duration. To undo attendance, reverse the reward in the guest account before changing the status. |
 | reservation_cancel_before_delete | 请先取消已确认的预约，再删除。 | Cancel this confirmed booking before deleting it. |
+
+## wechat.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| title | 微信登录 | WeChat sign-in |
+| sign_in | 微信扫码登录 | Sign in with WeChat |
+| link | 绑定微信 | Link WeChat |
+| linked | 微信已绑定 | WeChat is linked |
+| redirecting | 正在前往微信登录… | Opening WeChat sign-in… |
+| desktop_help | 用手机微信扫描电脑上的二维码。 | Scan the code on your computer using WeChat on your phone. |
+| phone_email | 手机上请使用下方邮箱登录。微信扫码登录目前支持电脑端。 | Use email to sign in on this phone. WeChat QR sign-in is currently available on a computer. |
+| first_link | 首次使用微信，请验证你在小狗拼豆铺使用的邮箱；已有账号请使用原邮箱。 | For your first WeChat sign-in, verify the email you use with PinDou Puppy. Use your existing email if you already have an account. |
+| confirm_link | 将微信绑定到这个账号 | Link WeChat to this account |
+| link_preserves_account | 绑定后，仍使用这个账号的图纸、时长钱包和积分。 | Your patterns, time wallet and loyalty points stay with this account. |
+| continue | 继续访问 | Continue |
+| checking | 正在确认微信登录… | Checking your WeChat sign-in… |
+| retry | 返回登录 | Return to sign-in |
+| wechat_not_configured | 微信登录暂未开放，请使用邮箱登录。 | WeChat sign-in is not available yet. Please use email. |
+| wechat_flow_expired | 这次微信登录已过期或来自另一个浏览器，请重新登录。 | This WeChat sign-in expired or belongs to another browser. Please start again. |
+| wechat_flow_used | 这次登录已处理，可以继续访问；如尚未登录，请返回登录页重试。 | This sign-in has already been processed. Continue, or return to sign-in if needed. |
+| wechat_provider_unavailable | 微信登录服务暂时无法连接，请重试或使用邮箱登录。 | We cannot reach WeChat sign-in right now. Try again or use email. |
+| wechat_cancelled | 微信登录未完成，请重试或使用邮箱登录。 | WeChat sign-in was not completed. Try again or use email. |
+| wechat_identity_invalid | 微信登录验证未通过，请重新登录。 | We could not verify this WeChat sign-in. Please start again. |
+| wechat_binding_conflict | 该微信或邮箱已有其他绑定，请使用原账号登录。 | This WeChat or email already has a different link. Please sign in with your original account. |
+| wechat_origin_invalid | 请从当前网站重新发起登录。 | Please start sign-in again from this website. |
+| wechat_return_invalid | 返回地址无效，请从网站页面重新登录。 | The return address is invalid. Please sign in from a page on this website. |

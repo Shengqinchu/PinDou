@@ -36,7 +36,7 @@ def switch_link(link, target):
 
 def main():
     archive, version, expected_hash = sys.argv[1:4]
-    if not re.fullmatch(r"[0-9]{14}-studio-v[12345]", version):
+    if not re.fullmatch(r"[0-9]{14}-studio-v[123456]", version):
         raise RuntimeError("Invalid release name")
     package = Path(archive)
     if hashlib.sha256(package.read_bytes()).hexdigest() != expected_hash:
@@ -46,11 +46,23 @@ def main():
         raise RuntimeError("Release exists; refusing overwrite")
     release.mkdir(parents=True)
     with tarfile.open(package) as tar:
+        manifest=json.load(tar.extractfile('manifest.json'))
+        if manifest.get('reuse'):
+            base_version=manifest.get('base_version','')
+            if not re.fullmatch(r'[0-9]{14}-studio-v[123456]',base_version):raise RuntimeError('Invalid base release')
+            base=ROOT/'releases'/base_version
+            for name in manifest['reuse']:
+                source=(base/name).resolve();target=(release/name).resolve()
+                if not source.is_relative_to(base.resolve()) or not target.is_relative_to(release.resolve()):raise RuntimeError('Invalid reused path')
+                if hashlib.sha256(source.read_bytes()).hexdigest()!=manifest['sha256'][name]:raise RuntimeError('Base asset changed')
+                target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,target)
         for member in tar.getmembers():
             target = (release / member.name).resolve()
             if not target.is_relative_to(release) or member.issym() or member.islnk() or not (member.isfile() or member.isdir()):
                 raise RuntimeError("Unsafe archive entry")
         tar.extractall(release)
+        for member in tar.getmembers():
+            (release/member.name).chmod(0o755 if member.isdir() else 0o644)
     manifest = json.loads((release / "manifest.json").read_text())
     for name, expected in manifest["sha256"].items():
         if hashlib.sha256((release / name).read_bytes()).hexdigest() != expected:
@@ -97,6 +109,25 @@ def main():
         add_header Cache-Control "no-store" always;
     }
     # Keep existing www visit drafts and reservation cookies on their origin.
+    location = /favicon.ico { return 302 /studio-brand/puppy-v6.ico; }
+    location ~ ^/(account|auth/wechat)$ {
+        rewrite ^ /studio-api/site break;
+        proxy_pass http://127.0.0.1:8011;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header Cache-Control "no-store" always;
+        add_header Referrer-Policy "no-referrer" always;
+    }
+    # Assertions are exchanged over loopback, never through the public proxy.
+    location = /api/v1/studio-session/exchange { return 404; }
+    location = /studio-api/auth/wechat/callback {
+        access_log off;
+        proxy_pass http://127.0.0.1:8011;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header Cache-Control "no-store" always;
+        add_header Referrer-Policy "no-referrer" always;
+    }
     location = /visit {
         rewrite ^ /studio-api/site break;
         proxy_pass http://127.0.0.1:8011;

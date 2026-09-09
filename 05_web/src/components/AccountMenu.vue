@@ -131,6 +131,8 @@ watch(
   }
 );
 
+function openAccountCentre(): void { window.location.assign('/account'); }
+
 function toggleMenu(): void {
   if (!auth.isLoggedIn) {
     void router.push('/login');
@@ -430,6 +432,7 @@ function formatMonthDay(value: string): string {
         </div>
 
         <div class="account-menu-list">
+          <button type="button" role="menuitem" @click="openAccountCentre">账号中心 · 时长与积分</button>
           <button type="button" role="menuitem" @click="openEditor">编辑资料</button>
           <button type="button" role="menuitem" @click="goWorks">我的作品</button>
           <button class="account-menu-list__danger" type="button" role="menuitem" @click="logout">退出登录</button>

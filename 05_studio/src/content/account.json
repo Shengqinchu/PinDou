@@ -1,6 +1,8 @@
 {
   "sign_in": ["登录", "Sign in"],
   "account": ["我的账号", "My account"],
+  "account_center": ["账号中心", "Account centre"],
+  "pattern_tool": ["拼豆图纸生成器", "Pattern maker"],
   "title": ["欢迎来到小狗拼豆铺", "Welcome to PinDou Puppy"],
   "reservation_title": ["登录后，继续这次预约", "Sign in to finish your booking"],
   "shared_account": ["与拼豆图纸工具共用账号。邮箱首次验证后会自动注册。", "Use the same account as the pattern tool. Your first email verification creates an account."],
