@@ -22,4 +22,14 @@
 
 ## 发布结果
 
-待完成发布后记录普通域名构建标识、五张原图哈希、服务状态与媒体覆盖一致性。
+- 代码 `edc3844` 已推送到 `codex/studio-v1-20260907`。
+- 发布：`20260909012942-studio-v4`；build `2026-09-09T01:27:03.374Z`；JS `index-BZ1HstiU.js`；CSS `index-CnAdAK3r.css`。
+- 发布包 SHA-256：`0d9d2e5faff52d971c9f6d2f7d0765658f853af32b4250c90128b064959a99dc`，14 个上传分片和全部297个发布文件校验通过。
+- 当前目录 `/opt/pindou/studio/releases/20260909012942-studio-v4`；备份 `/opt/pindou/studio/backups/20260909012942-studio-v4`。
+- 普通域名 `https://pindoupuppy.com/` 返回上述 build，无需 version 查询参数；www 正确重定向到根主页。五张图片公网均200，逐字节 SHA-256 与附件一致。
+- 公网重新执行 Logo 26 组、指引图24组检查，两引擎中英文均通过；图片查看器打开关闭、鼠标／键盘复制和手动复制回退通过，无页面运行异常。
+- 源站 `pindou`／`pindou-studio` 均 active，Studio health 0.7.0；Nginx 配置校验通过。旧生成器首页哈希不变。
+- 线上媒体草稿与发布内容／版本均与部署前一致，店主 shop-collage 覆盖保留。媒体编辑接口合并后有52项，包含新增英文页脚和三张指引图。
+- `/studio-api/auth/options` 仍为 email/password true、wechat/phone false。短信准备模块未进入生产发布；没有重置账号或改动生成器身份库。
+
+证据：`artifacts/english-brand-auth/deploy-result.json`、`origin-after.json`、`public-assets.json`、`live-layout.json`、`live-arrival.json`。本轮代码和验证记录均更新 GitHub。
