@@ -8,9 +8,11 @@
 |---|---|---|
 | Descope | 已完成邮箱登录，并看到与店主截图一致的 `public-amber-morse`、`Free Plan`；店主完成手机号 OTP 流程向导，未加顾客 MFA | 配置服务端调用所需权限、号码测试与共享身份桥接后才能启用网站手机登录 |
 | Firebase | 自动浏览器输入邮箱后被 Google 提示 `This browser or app may not be secure`；没有进入控制台、没有创建项目或开通计费 | 店主用自己的 Chrome 完成 Google 登录；已有 Google 账号与否仍待确认 |
-| Authing | 店主已创建 `PinDou Puppy` 用户池，截图显示启用统一认证域名；无需换号或重建 | 在基础设置修改认证前缀，费用管理核实实际版本，再核验默认“小登录”的可用权限 |
+| Authing | 已改为 `pindoupuppy.authing.cn`，店主提供App ID及Secret，本地配置已保存；公开服务发现端点一致 | 实际登录页仍只有验证码；创建并关联“PC小程序扫码”身份源，再验证免费权限和真实扫码 |
 
 Descope Project ID：`P3J4R1ubICbwLu2OJLsE4UXCVqmP`，由店主从控制台复制提供。本地已写入被 Git 忽略的 `.env` 的 `STUDIO_DESCOPE_PROJECT_ID`。Project ID 是公开标识；没有生成或索取 Management Key、Access Key、密码，没有将邮箱验证链接／会话令牌保存进仓库。
+
+Authing App ID：`6aa0be1ff986e3e847b44a28`；应用地址 `https://pindoupuppy.authing.cn/6aa0be1ff986e3e847b44a28`。店主主动提供的Secret已按授权写入本地明文环境配置。公开端点、实际登录页与尚未完成项见[应用连接记录](STUDIO_AUTHING_CONNECTION.md)。
 
 本轮没有真实短信发送、付费升级、信用卡绑定或网站登录入口变更。官网仍只开放已有邮箱登录。店主的项目注册和代码准备完成不等于手机号登录已经接通。
 
