@@ -1,5 +1,7 @@
 # 第一阶段登录方案与接入准备 · 2026-09-08
 
+> 后续进展：店主已完成 Descope Free 项目 `public-amber-morse` 的手机号 OTP 向导，本任务也已用指定邮箱登录确认同一项目。Project ID 已写入本地受忽略配置。Firebase 自动登录被 Google 安全检查拦截，尚未创建项目。Authing 逐步操作与当前待接入项见 `../07_ops/STUDIO_AUTH_ACCOUNT_SETUP.md`。下文“账号未创建”描述前一轮决策时的状态。
+
 来源：店主要求“Firebase 每天优先，用完转 Descope，使用免费额度”，并希望先采用第三方微信登录服务或开源项目；随后确认 Firebase／Descope 账号均未创建，也没有自己的小程序／已认证公众号。
 
 当前结论：保留共享邮箱登录；短信按 Firebase → Descope → 邮箱的顺序准备。微信优先核验 Authing 托管的“小登录”，wxAuth 作为免费备选。第三方托管小程序能省去自建小程序的步骤；普通 OAuth 开源库仍需要微信应用凭据。
