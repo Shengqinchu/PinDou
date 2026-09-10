@@ -1,5 +1,9 @@
 export type MotionMode = "system" | "full" | "reduced";
 const key = "puppy-studio-motion";
+// Owner requirement (2026-09-09): the first visit includes the brand's motion,
+// including private browsing and browsers that cannot persist site settings.
+// Only an explicit visitor choice opts into reduced or system motion.
+const defaultMode: MotionMode = "full";
 const system = matchMedia("(prefers-reduced-motion: reduce)");
 const listeners = new Set<() => void>();
 const valid = (value: string | null): value is MotionMode =>
@@ -7,9 +11,9 @@ const valid = (value: string | null): value is MotionMode =>
 function stored(): MotionMode {
   try {
     const value = localStorage.getItem(key);
-    return valid(value) ? value : "system";
+    return valid(value) ? value : defaultMode;
   } catch {
-    return "system";
+    return defaultMode;
   }
 }
 let mode = stored();
@@ -28,16 +32,15 @@ export function setMotionMode(value: MotionMode) {
     url.searchParams.delete('motion');
     history.replaceState(history.state, '', url.pathname + url.search + url.hash);
   }
-  try { if (value === 'system') localStorage.removeItem(key); else localStorage.setItem(key,value); } catch {}
+  try { localStorage.setItem(key,value); } catch {}
   window.dispatchEvent(new Event('studio-motion-change'));
 }
-// A deliberate per-site choice. Ordinary visits continue to honor the OS.
+// A deliberate per-site choice overrides the full-motion first-visit default.
 const requested = new URLSearchParams(location.search).get("motion");
 if (valid(requested)) {
   mode = requested;
   try {
-    if (mode === "system") localStorage.removeItem(key);
-    else localStorage.setItem(key, mode);
+    localStorage.setItem(key, mode);
   } catch {
     // This page still honors the explicit choice without persistent storage.
   }
