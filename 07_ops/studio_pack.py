@@ -20,6 +20,7 @@ for name in ['app.py', 'commerce.py', 'payments.py', 'reservations.py', 'reserva
 files['service/owner-notification-copy.json'] = root / '05_studio/src/content/owner-notifications.json'
 files['service/telegram_notifications.py'] = root / '06_studio/telegram_notifications.py'
 files['service/telegram-notification-copy.json'] = root / '05_studio/src/content/telegram-notifications.json'
+files['service/miniapp_login.py'] = root / '06_studio/miniapp_login.py'
 manifest = {'version': version, 'sha256': {name: hashlib.sha256(p.read_bytes()).hexdigest() for name, p in files.items()}}
 reused=set()
 if len(sys.argv)>1:

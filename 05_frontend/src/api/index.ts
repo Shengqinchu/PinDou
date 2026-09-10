@@ -1,5 +1,6 @@
 // PinDou API 封装 (符合 PRD §5 接口契约)
 import { request, BASE_URL, USE_WX_CLOUD } from '../utils/request';
+import { loginWithMiniappCode } from '../utils/miniapp-client';
 
 // 是否开启 Mock 模式 (联调前默认开启)
 const USE_MOCK = false;
@@ -400,7 +401,7 @@ export const api = {
         }
       });
     }
-    return request({ url: '/user/login', method: 'POST', data: { code } });
+    return loginWithMiniappCode(code);
   },
 
   sendEmailCode(email: string): Promise<{ success: boolean; message: string; cooldown_seconds: number; expires_in_seconds: number }> {

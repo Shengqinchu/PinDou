@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed,onMounted,onBeforeUnmount,ref,watch,useId } from 'vue';
+import { useRoute } from 'vue-router';
 import { PhArrowRight,PhArrowLeft,PhEye,PhEyeSlash,PhLink } from '@phosphor-icons/vue';
 import { accountCopy as copy,accountOpen,closeAccount,accountUser,accountForReservation,completeSignIn,signOut,type SignInResult } from '../account';
 import { say,formatCopy } from '../state';
@@ -17,6 +18,8 @@ const method=ref<Method>('password');
 const tabId=useId();
 const available=ref(true),email=ref(''),password=ref(''),confirmation=ref(''),code=ref(''),reveal=ref(false);
 const busy=ref(false),sending=ref(false),error=ref(''),notice=ref(''),pendingWechat=ref(''),now=ref(Date.now());
+const pendingWechatBase=ref('/auth/wechat');
+const route=useRoute();
 const sentUntil=new Map<string,number>();let timer:ReturnType<typeof setInterval>,alive=true;
 const normalizedEmail=computed(()=>email.value.trim().toLowerCase());
 const emailValid=computed(()=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail.value));
@@ -31,7 +34,7 @@ function tabKey(event:KeyboardEvent,index:number){
  const next=event.key==='ArrowRight'?(index+1)%tabs.value.length:event.key==='ArrowLeft'?(index+tabs.value.length-1)%tabs.value.length:event.key==='Home'?0:event.key==='End'?tabs.value.length-1:-1;
  if(next<0||busy.value)return;event.preventDefault();choose(tabs.value[next].value);(event.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLButtonElement>('[role=tab]')[next]?.focus();
 }
-function existing(state:string){pendingWechat.value=state;change('password');}
+function existing(state:string,base='/auth/wechat'){pendingWechat.value=state;pendingWechatBase.value=base==='/auth/wechat/miniapp'?base:'/auth/wechat';change('password');}
 watch(accountOpen,value=>{if(!props.embedded){if(value)method.value='password';else{pendingWechat.value='';error.value='';notice.value='';code.value='';password.value='';confirmation.value='';reveal.value=false;}}});
 async function sendCode(){
  if(sending.value||cooldown.value||!emailValid.value)return;
@@ -49,11 +52,11 @@ async function submit(){
    if(alive){method.value='password';password.value='';confirmation.value='';code.value='';reveal.value=false;notice.value=say(copy.recovery_done);}return;
   }
   const result=await commerceApi<SignInResult>(method.value==='register'?'/auth/password-register':'/auth/password-login',{method:'POST',body:JSON.stringify({email:normalizedEmail.value,password:password.value})});
-  if(pendingWechat.value)await commerceApi('/auth/wechat/bind',{method:'POST',headers:{Authorization:'Bearer '+result.token},body:JSON.stringify({state:pendingWechat.value})});
+  if(pendingWechat.value)await commerceApi(pendingWechatBase.value+'/bind',{method:'POST',headers:{Authorization:'Bearer '+result.token},body:JSON.stringify({state:pendingWechat.value})});
   if(alive){pendingWechat.value='';completeSignIn(result);emit('signedIn');}
  }catch(e){if(alive)error.value=(e as Error).message;}finally{busy.value=false;}
 }
-onMounted(()=>{timer=setInterval(()=>now.value=Date.now(),1000);void commerceApi<{wechat:boolean}>('/auth/options').then(result=>{if(alive){available.value=result.wechat;if(!result.wechat&&method.value==='wechat')method.value='password';}}).catch(()=>{available.value=false;if(method.value==='wechat')method.value='password';});});
+onMounted(()=>{timer=setInterval(()=>now.value=Date.now(),1000);void commerceApi<{wechat:boolean;miniapp_available?:boolean}>('/auth/options').then(result=>{if(alive){available.value=result.wechat||!!(result.miniapp_available&&route.query.wechat_provider==='miniapp');if(!available.value&&method.value==='wechat')method.value='password';}}).catch(()=>{available.value=false;if(method.value==='wechat')method.value='password';});});
 onBeforeUnmount(()=>{alive=false;clearInterval(timer);});
 </script>
 <template>

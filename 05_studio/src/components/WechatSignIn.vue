@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted,ref } from 'vue';
+import { useRoute } from 'vue-router';
 import { PhWechatLogo } from '@phosphor-icons/vue';
 import { commerceApi } from '../commerce';
 import { wechatCopy as copy } from '../wechat';
@@ -10,7 +11,8 @@ import SlideOver from './SlideOver.vue';
 import WechatQr from './WechatQr.vue';
 defineProps<{linking?:boolean;compact?:boolean}>();
 const available=ref(false),linked=ref(false),open=ref(false);
-async function refresh(){try{const options=await commerceApi<{wechat:boolean}>('/auth/options');available.value=options.wechat;if(options.wechat)linked.value=(await commerceApi<{linked:boolean}>('/auth/wechat/binding')).linked;}catch{available.value=false;}}
+const route=useRoute();
+async function refresh(){try{const options=await commerceApi<{wechat:boolean;wechat_provider?:string;miniapp_available?:boolean}>('/auth/options');const native=options.miniapp_available&&(options.wechat_provider==='miniapp'||route.query.wechat_provider==='miniapp');available.value=options.wechat||!!native;if(available.value)linked.value=(await commerceApi<{linked:boolean}>(native?'/auth/wechat/miniapp/binding':'/auth/wechat/binding')).linked;}catch{available.value=false;}}
 function done(){open.value=false;void refresh();}
 onMounted(refresh);
 </script>

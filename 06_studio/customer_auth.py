@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import time
 from typing import Annotated
@@ -152,7 +153,10 @@ def register(app, database, origin):
     @app.get("/studio-api/auth/options")
     def options():
         import authing_login
-        return {"email":False,"password":True,"recovery":True,"wechat":authing_login.available(),"phone":False}
+        import miniapp_login
+        provider='miniapp' if os.getenv('STUDIO_WECHAT_PROVIDER','authing')=='miniapp' and miniapp_login.available() else 'authing'
+        return {"email":False,"password":True,"recovery":True,"wechat":miniapp_login.available() if provider=='miniapp' else authing_login.available(),"phone":False,
+                "wechat_provider":provider,"miniapp_available":miniapp_login.available()}
 
     @app.get("/studio-api/auth/me")
     def me(request: Request, authorization: Annotated[str | None,Header()]=None):

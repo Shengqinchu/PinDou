@@ -16,7 +16,7 @@ def test_public_pages_and_calendar_need_no_login_but_submission_does(client):
     client.headers.pop('Authorization')
     assert client.get('/studio-api/reservation-calendar').status_code==200
     assert client.get('/studio-api/journal').status_code==200
-    assert client.get('/studio-api/auth/options').json()=={'email':False,'password':True,'recovery':True,'wechat':False,'phone':False}
+    assert client.get('/studio-api/auth/options').json()=={'email':False,'password':True,'recovery':True,'wechat':False,'phone':False,'wechat_provider':'authing','miniapp_available':False}
     assert submit(client).status_code==401
     assert client.get('/studio-api/auth/me').status_code==401
     assert client.get('/studio-api/auth/reservations').status_code==401

@@ -18,9 +18,9 @@
 
       <section v-if="!isLoggedIn" class="card me__guest">
         <h3 class="me__guest-title">登录后保存你的拼豆作品</h3>
-        <p class="me__guest-text">用邮箱验证码即可注册，之后可以查看作品集、兑换 CDK、同步订单和额度。</p>
+        <p class="me__guest-text">{{nativeCopy.native_intro[0]}}</p>
         <button type="button" class="btn btn--primary btn--block btn--md" @click="goLogin">
-          用邮箱登录
+          登录 / 注册
         </button>
       </section>
 
@@ -124,6 +124,7 @@ import { onShow } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import { useUserStore } from '../../store/user';
 import { BASE_URL, IS_H5_CLIENT } from '../../utils/request';
+import nativeCopy from '../../../../05_studio/src/content/miniapp.json';
 
 const userStore = useUserStore();
 const showCsQr = ref(false);
@@ -196,7 +197,7 @@ const loadProfile = async () => {
 
 const goLogin = () => {
   uni.navigateTo({
-    url: `/pages/auth/email-login?redirect=${encodeURIComponent('/pages/user/me')}`
+    url: IS_H5_CLIENT ? `/pages/auth/email-login?redirect=${encodeURIComponent('/pages/user/me')}` : '/pages/auth/studio-login'
   });
 };
 

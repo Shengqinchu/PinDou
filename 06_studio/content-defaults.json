@@ -5151,6 +5151,180 @@
       "https://www.xiaohongshu.com/collection/item/69dee77800ba000000000001"
     ]
   },
+  "miniapp": {
+    "brand": [
+      "小狗拼豆铺",
+      "PinDou Puppy"
+    ],
+    "check_code": [
+      "校验码 {v0}",
+      "Verification number {v0}"
+    ],
+    "confirm_title": [
+      "登录小狗拼豆铺",
+      "Sign in to PinDou Puppy"
+    ],
+    "link_title": [
+      "绑定你的微信",
+      "Connect your WeChat"
+    ],
+    "site": [
+      "正在访问 pindoupuppy.com",
+      "Visiting pindoupuppy.com"
+    ],
+    "confirm_help": [
+      "请确认电脑上的校验码与这里一致，再继续。",
+      "Check that the number on your computer matches before continuing."
+    ],
+    "link_account": [
+      "将绑定到此网站账号",
+      "Website account to connect"
+    ],
+    "confirm": [
+      "确认登录",
+      "Confirm sign-in"
+    ],
+    "link": [
+      "确认绑定",
+      "Confirm connection"
+    ],
+    "cancel": [
+      "取消",
+      "Cancel"
+    ],
+    "working": [
+      "正在确认…",
+      "Confirming…"
+    ],
+    "loading": [
+      "正在读取登录请求…",
+      "Loading sign-in request…"
+    ],
+    "done_title": [
+      "已确认，回到网站继续吧",
+      "Confirmed. Continue on the website"
+    ],
+    "done_body": [
+      "网站会继续完成登录。首次使用时，可在网站选择绑定已有账号或创建新账号。",
+      "The website will complete sign-in. On your first visit, choose an existing account or create a new one there."
+    ],
+    "cancelled": [
+      "已取消本次登录",
+      "This sign-in was cancelled"
+    ],
+    "home": [
+      "回到小程序首页",
+      "Mini program home"
+    ],
+    "retry": [
+      "重新尝试",
+      "Try again"
+    ],
+    "native_title": [
+      "欢迎来到小狗拼豆铺",
+      "Welcome to PinDou Puppy"
+    ],
+    "native_intro": [
+      "已有网站账号，登录后可继续使用原有图纸、积分和时长。",
+      "Use your website account to keep your patterns, points and studio time together."
+    ],
+    "email": [
+      "邮箱地址",
+      "Email address"
+    ],
+    "password": [
+      "密码",
+      "Password"
+    ],
+    "password_login": [
+      "登录并绑定当前微信",
+      "Sign in and connect this WeChat"
+    ],
+    "wechat_login": [
+      "使用已绑定的微信登录",
+      "Continue with your connected WeChat"
+    ],
+    "wechat_create": [
+      "新用户，使用微信创建账号",
+      "New here? Create an account with WeChat"
+    ],
+    "website_account": [
+      "已有微信网站账号但未设置密码？请先在网站登录，再用自有小程序二维码绑定当前微信。",
+      "Already use WeChat on the website without a password? Sign in there first, then connect this WeChat using the mini program QR code."
+    ],
+    "forgot": [
+      "找回账号 / 忘记密码",
+      "Recover account / Forgot password"
+    ],
+    "recovery_help": [
+      "请在 pindoupuppy.com 的登录入口选择“找回账号 / 忘记密码”。",
+      "Select Recover account / Forgot password on pindoupuppy.com."
+    ],
+    "visit_website": [
+      "复制网站地址",
+      "Copy website address"
+    ],
+    "copied": [
+      "网站地址已复制",
+      "Website address copied"
+    ],
+    "miniapp_not_configured": [
+      "自有小程序登录正在准备中，请先使用网站现有登录方式。",
+      "Mini program sign-in is being prepared. Use the current website sign-in options."
+    ],
+    "miniapp_provider_unavailable": [
+      "暂时无法连接微信，请稍后再试。",
+      "Temporarily unable to connect to WeChat. Please retry."
+    ],
+    "miniapp_code_expired": [
+      "微信登录凭证已失效，请重新尝试。",
+      "WeChat sign-in expired. Please try again."
+    ],
+    "miniapp_session_expired": [
+      "本次微信验证已过期，请重新尝试。",
+      "This WeChat verification expired. Please try again."
+    ],
+    "miniapp_account_required": [
+      "请先登录已有账号或创建新账号。",
+      "Sign in to an existing account or create a new one."
+    ],
+    "miniapp_other_scanner": [
+      "这张二维码已由其他微信扫码，请在网站刷新后重试。",
+      "Another WeChat account scanned this code. Refresh it on the website."
+    ],
+    "miniapp_confirmation_mismatch": [
+      "校验码不一致，请在网站刷新二维码后重试。",
+      "The verification numbers do not match. Refresh the QR code on the website."
+    ],
+    "wechat_flow_expired": [
+      "二维码已失效，请在网站刷新后重新扫码。",
+      "The QR code expired. Refresh it on the website and scan again."
+    ],
+    "wechat_flow_used": [
+      "这次登录请求已处理，请在网站重新开始。",
+      "This sign-in request was already handled. Start again on the website."
+    ],
+    "wechat_binding_conflict": [
+      "微信或网站账号已有其他绑定，请使用原账号继续。",
+      "This WeChat or website account is already connected elsewhere. Continue with the original account."
+    ],
+    "account_password_invalid": [
+      "邮箱或密码不正确，请检查后重试。",
+      "Email or password is incorrect. Please try again."
+    ],
+    "account_rate_limited": [
+      "尝试次数较多，请稍后再试。",
+      "Too many attempts. Please try again later."
+    ],
+    "account_check_details": [
+      "请检查填写的信息。",
+      "Check the information entered."
+    ],
+    "generic_error": [
+      "暂时未能完成，请稍后重试。",
+      "Could not complete this action. Please try again."
+    ]
+  },
   "owner-notifications": {
     "title": [
       "微信预约提醒",

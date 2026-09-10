@@ -77,6 +77,8 @@ def initialize():
     booking_profile.initialize(database)
     import authing_login
     authing_login.initialize(database)
+    import miniapp_login
+    miniapp_login.initialize(database)
     import content
     content.initialize(database, DB_PATH)
     import observability
@@ -316,6 +318,8 @@ import booking_profile
 booking_profile.register(app, database, admin_actor)
 import authing_login
 authing_login.register(app,database)
+import miniapp_login
+miniapp_login.register(app,database)
 
 import content
 content.register(app, database, admin_actor)

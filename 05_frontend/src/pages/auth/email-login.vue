@@ -88,6 +88,10 @@ const sendButtonText = computed(() => {
 });
 
 onLoad((options: any) => {
+  // #ifdef MP-WEIXIN
+  uni.redirectTo({url:'/pages/auth/studio-login'});
+  return;
+  // #endif
   if (options.redirect) {
     redirect.value = decodeURIComponent(options.redirect);
   }

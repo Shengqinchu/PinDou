@@ -78,6 +78,24 @@
       }
     },
     {
+      "path": "pages/auth/studio-confirm",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "path": "pages/auth/studio-login",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
       "path": "pages/consent/consent",
       "style": {
         "navigationBarTitleText": "用户授权与隐私协议",

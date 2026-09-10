@@ -6,15 +6,20 @@ import { commerceApi } from '../commerce';
 import { completeSignIn,type SignInResult } from '../account';
 import { accountReturn,wechatCopy as copy } from '../wechat';
 import { say } from '../state';
+import { formatCopy } from '../state';
+import miniappDefaults from '../content/miniapp.json';
+import { contentModule } from '../content-store';
+const miniappCopy=contentModule('miniapp',miniappDefaults);
 import { wechatQrImage } from '../wechat-qr-image';
 const props=withDefaults(defineProps<{linking?:boolean}>(),{linking:false});
-const emit=defineEmits<{done:[];existing:[state:string]}>();
+const emit=defineEmits<{done:[];existing:[state:string,base:string]}>();
 const route=useRoute(),state=ref(''),source=ref(''),status=ref('loading'),error=ref(''),busy=ref(false);
+const base=ref('/auth/wechat'),displayCode=ref('');
 let alive=true,version=0,timer:ReturnType<typeof setTimeout>|undefined,expires=0;
 const statusText=computed(()=>say(status.value==='qr_scanned'?copy.scanned:status.value==='loading'?copy.loading_qr:status.value==='qr_exchanging'?copy.checking:copy.sign_in));
 function schedule(){clearTimeout(timer);if(alive)timer=setTimeout(()=>void poll(),1800);}
 async function finish(){
- const result=await commerceApi<SignInResult>('/auth/wechat/finish',{method:'POST',body:JSON.stringify({state:state.value})});
+ const result=await commerceApi<SignInResult>(base.value+'/finish',{method:'POST',body:JSON.stringify({state:state.value})});
  if(alive){completeSignIn(result);emit('done');}
 }
 async function poll(){
@@ -23,7 +28,7 @@ async function poll(){
  if(document.hidden){schedule();return;}
  const current=version;
  try{
-  const result=await commerceApi<{status:string;error?:string}>('/auth/wechat/qr/poll',{method:'POST',body:JSON.stringify({state:state.value})});
+  const result=await commerceApi<{status:string;error?:string}>(base.value+'/qr/poll',{method:'POST',body:JSON.stringify({state:state.value})});
   if(!alive||current!==version)return;
   status.value=result.status;error.value='';
   if(result.status==='ready'){await finish();return;}
@@ -33,20 +38,23 @@ async function poll(){
  }catch(e){if(alive&&current===version){error.value=(e as Error).message;schedule();}}
 }
 async function start(){
- const current=++version;clearTimeout(timer);status.value='loading';error.value='';source.value='';state.value='';
+ const current=++version;clearTimeout(timer);status.value='loading';error.value='';source.value='';state.value='';displayCode.value='';
  try{
+  const options=await commerceApi<{wechat_provider?:string;miniapp_available?:boolean}>('/auth/options');
+  if(!alive||current!==version)return;
+  base.value=options.miniapp_available&&(options.wechat_provider==='miniapp'||route.query.wechat_provider==='miniapp')?'/auth/wechat/miniapp':'/auth/wechat';
   const returnTo=accountReturn(route.query.return_to,route.path==='/account'?'/account':route.fullPath);
-  const result=await commerceApi<{state:string;image:string;logo?:string;expires_in:number}>('/auth/wechat/qr/start',{method:'POST',body:JSON.stringify({mode:props.linking?'link':'login',return_to:returnTo})});
+  const result=await commerceApi<{state:string;image:string;logo?:string;expires_in:number;display_code?:string}>(base.value+'/qr/start',{method:'POST',body:JSON.stringify({mode:props.linking?'link':'login',return_to:returnTo})});
   if(!alive||current!==version)return;
   expires=Date.now()+result.expires_in*1000;
-  const image=await wechatQrImage(result.image,result.logo);
+  const image=base.value.endsWith('/miniapp')?result.image:await wechatQrImage(result.image,result.logo);
   if(!alive||current!==version)return;
-  state.value=result.state;source.value=image;status.value='qr_pending';schedule();
+  state.value=result.state;source.value=image;displayCode.value=result.display_code||'';status.value='qr_pending';schedule();
  }catch(e){if(alive&&current===version){status.value='failed';error.value=(e as Error).message;}}
 }
 async function create(){
  if(busy.value)return;busy.value=true;error.value='';
- try{await commerceApi('/auth/wechat/create-account',{method:'POST',body:JSON.stringify({state:state.value})});if(alive)await finish();}
+ try{await commerceApi(base.value+'/create-account',{method:'POST',body:JSON.stringify({state:state.value})});if(alive)await finish();}
  catch(e){if(alive)error.value=(e as Error).message;}finally{busy.value=false;}
 }
 function resume(){if(!document.hidden){clearTimeout(timer);void poll();}}
@@ -58,7 +66,7 @@ onBeforeUnmount(()=>{alive=false;++version;clearTimeout(timer);document.removeEv
   <template v-if="status==='needs_email'">
    <PhCheck class="wechat-verified-icon" :size="36"/>
    <p class="wechat-qr-title">{{say(copy.authorized)}}</p>
-   <div class="wechat-account-choices"><button type="button" class="auth-method-choice" :disabled="busy" @click="emit('existing',state)"><PhLink/>{{say(copy.existing_account)}}</button><button type="button" class="auth-method-choice" :disabled="busy" @click="create"><PhUserCircle/>{{say(busy?copy.checking:copy.new_account)}}</button></div>
+   <div class="wechat-account-choices"><button type="button" class="auth-method-choice" :disabled="busy" @click="emit('existing',state,base)"><PhLink/>{{say(copy.existing_account)}}</button><button type="button" class="auth-method-choice" :disabled="busy" @click="create"><PhUserCircle/>{{say(busy?copy.checking:copy.new_account)}}</button></div>
   </template>
   <template v-else>
    <div class="wechat-qr-window" :class="{'is-loading':status==='loading'}" :aria-busy="status==='loading'">
@@ -67,6 +75,7 @@ onBeforeUnmount(()=>{alive=false;++version;clearTimeout(timer);document.removeEv
     <div v-else class="wechat-qr-placeholder"><PhCheck v-if="status==='qr_scanned'" :size="44"/><PhWechatLogo v-else :size="44" weight="light"/></div>
    </div>
    <p class="wechat-qr-title" role="status">{{status==='failed'?say(copy.refresh_qr):statusText}}</p>
+   <p v-if="displayCode&&status!=='failed'" class="form-help">{{formatCopy(miniappCopy.check_code,{v0:displayCode})}}</p>
   </template>
   <p v-if="error" role="alert" class="form-error">{{error}}</p>
  </section>

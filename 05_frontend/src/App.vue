@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
 import { useUserStore } from "./store/user";
-import { IS_H5_CLIENT } from "./utils/request";
+import { IS_H5_CLIENT, USE_WX_CLOUD } from "./utils/request";
 
 declare const wx: any;
 declare const process: { env?: { VITE_WX_CLOUD_ENV?: string } };
@@ -20,12 +20,8 @@ onLaunch(() => {
     // #ifdef H5
     console.log("H5 默认保持未登录态，用户需要身份动作时再走邮箱验证码登录。");
     // #endif
-    // #ifndef H5
-    // 首次启动：自动微信登录拿 JWT，保证 consent / upload 等鉴权接口可用
-    void userStore.login().catch((e) => {
-      console.warn("自动登录失败（可继续浏览，鉴权动作时会再触发）:", e);
-    });
-    // #endif
+    // Native visitors can browse first. Sign-in is requested by an identity
+    // action; opening an approval QR must not silently register a new account.
   }
 });
 
@@ -51,6 +47,7 @@ async function refreshProfileInBackground(userStore: ReturnType<typeof useUserSt
 }
 
 function initWxCloud() {
+  if (!USE_WX_CLOUD) return;
   if (typeof wx === "undefined" || !wx.cloud) {
     return;
   }

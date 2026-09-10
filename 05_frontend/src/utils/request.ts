@@ -1,4 +1,5 @@
 // PinDou 统一请求库封装 (微信云托管 callContainer + 传统 HTTP fallback)
+import { loginWithMiniappCode } from './miniapp-client';
 
 declare const process: {
   env?: {
@@ -20,7 +21,7 @@ const runtimeEnv = {
   ...viteEnv,
   ...(typeof process !== 'undefined' && process.env ? process.env : {})
 };
-const isDev = runtimeEnv.NODE_ENV !== 'production';
+const isDev = runtimeEnv.DEV === true || runtimeEnv.NODE_ENV === 'development';
 export const IS_H5_CLIENT = detectH5Client();
 const SAME_ORIGIN_API = '/api/v1';
 const PUBLIC_API = 'https://pindoupuppy.com/api/v1';
@@ -30,11 +31,11 @@ const storageWxCloudFlag = uni.getStorageSync('pd_use_wx_cloud');
 const storageApiBase = uni.getStorageSync('pd_api_base_url');
 const configuredApiBase =
   runtimeEnv.VITE_API_BASE_URL ||
-  (IS_H5_CLIENT && !isDev ? '' : storageApiBase) ||
+  (isDev ? storageApiBase : '') ||
   (IS_H5_CLIENT ? (isDev ? DEV_API : SAME_ORIGIN_API) : (isDev ? DEV_API : PROD_API));
 
 export const BASE_URL = normalizeBaseUrl(configuredApiBase);
-export const USE_WX_CLOUD = IS_H5_CLIENT ? false : storageWxCloudFlag
+export const USE_WX_CLOUD = IS_H5_CLIENT || !isDev ? false : storageWxCloudFlag
   ? storageWxCloudFlag !== 'false'
   : runtimeEnv.VITE_USE_WX_CLOUD !== 'false';
 export const WX_CLOUD_ENV = runtimeEnv.VITE_WX_CLOUD_ENV || 'prod-01';
@@ -251,14 +252,7 @@ async function performWxLogin(): Promise<void> {
     throw new RequestError('请先使用邮箱登录。', 401, { error: 'AUTH_REQUIRED' });
   }
   const code = await getPlatformLoginCode();
-  const data = await sendRequest<LoginResponse>({
-    url: '/user/login',
-    method: 'POST',
-    data: { code },
-    hideErrorToast: true,
-    _retried: true,
-    _skipAuthRefresh: true
-  });
+  const data = await loginWithMiniappCode(code);
 
   uni.setStorageSync('pd_token', data.token);
   uni.setStorageSync('pd_user', JSON.stringify(data.user));
