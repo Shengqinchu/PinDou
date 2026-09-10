@@ -6,6 +6,7 @@ import { commerceApi } from '../commerce';
 import { completeSignIn,type SignInResult } from '../account';
 import { accountReturn,wechatCopy as copy } from '../wechat';
 import { say } from '../state';
+import { wechatQrImage } from '../wechat-qr-image';
 const props=withDefaults(defineProps<{linking?:boolean}>(),{linking:false});
 const emit=defineEmits<{done:[];existing:[state:string]}>();
 const route=useRoute(),state=ref(''),source=ref(''),status=ref('loading'),error=ref(''),busy=ref(false);
@@ -35,9 +36,12 @@ async function start(){
  const current=++version;clearTimeout(timer);status.value='loading';error.value='';source.value='';state.value='';
  try{
   const returnTo=accountReturn(route.query.return_to,route.path==='/account'?'/account':route.fullPath);
-  const result=await commerceApi<{state:string;image:string;expires_in:number}>('/auth/wechat/qr/start',{method:'POST',body:JSON.stringify({mode:props.linking?'link':'login',return_to:returnTo})});
+  const result=await commerceApi<{state:string;image:string;logo?:string;expires_in:number}>('/auth/wechat/qr/start',{method:'POST',body:JSON.stringify({mode:props.linking?'link':'login',return_to:returnTo})});
   if(!alive||current!==version)return;
-  state.value=result.state;source.value=result.image;status.value='qr_pending';expires=Date.now()+result.expires_in*1000;schedule();
+  expires=Date.now()+result.expires_in*1000;
+  const image=await wechatQrImage(result.image,result.logo);
+  if(!alive||current!==version)return;
+  state.value=result.state;source.value=image;status.value='qr_pending';schedule();
  }catch(e){if(alive&&current===version){status.value='failed';error.value=(e as Error).message;}}
 }
 async function create(){

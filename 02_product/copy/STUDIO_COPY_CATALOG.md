@@ -7,6 +7,8 @@
 | 键 | 中文 | English |
 |---|---|---|
 | sign_in | 登录 | Sign in |
+| register | 注册 | Register |
+| registering | 正在注册… | Creating account… |
 | account | 我的账号 | My account |
 | account_center | 账号中心 | Account centre |
 | pattern_tool | 拼豆图纸生成器 | Pattern maker |
@@ -51,7 +53,7 @@
 | account_rate_limited | 尝试较频繁，请稍等一会儿再试。 | Too many attempts. Please wait a little before trying again. |
 | account_email_unavailable | 验证码暂时发送失败，请稍后再试。 | We could not send your email code. Please try again shortly. |
 | account_check_details | 请检查邮箱、验证码或密码的填写。 | Please check the email, code or password you entered. |
-| wechat_method | 微信 | WeChat |
+| wechat_method | 微信登录 | WeChat |
 | recovery_title | 找回账号 | Recover your account |
 | back_password | 返回密码登录 | Back to password sign-in |
 | reset_password | 重设密码 | Reset password |

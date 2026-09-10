@@ -64,7 +64,7 @@ def exchange(payload:Assertion,request:Request,db:DbSession,
 
 class AccountAssertion(BaseModel):
     model_config=ConfigDict(extra='forbid')
-    action:Literal['wechat_create','recovery_send','recovery_reset']
+    action:Literal['wechat_create','password_register','recovery_send','recovery_reset']
     issued_at:int=Field(strict=True)
     nonce:str=Field(pattern=r'^[a-f0-9]{32}$')
     audience:Literal['pindou-studio-account']
@@ -95,6 +95,10 @@ async def account(payload:AccountAssertion,request:Request,db:DbSession,
     from pindou.services import studio_accounts
     if payload.action=='wechat_create' and payload.subject_key:
         user=studio_accounts.wechat_account(db,payload.subject_key)
+        return {'token':create_access_token(subject=user.user_id,role='user',is_admin=False),'user':user_payload(db,user)}
+    if payload.action=='password_register' and payload.email and payload.password and payload.ip:
+        user=studio_accounts.password_account(db,payload.email,payload.password,payload.ip)
+        if isinstance(user,dict):return user
         return {'token':create_access_token(subject=user.user_id,role='user',is_admin=False),'user':user_payload(db,user)}
     if payload.action=='recovery_send' and payload.email and payload.ip:
         return await studio_accounts.send_recovery(db,payload.email,payload.ip)

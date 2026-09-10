@@ -5,7 +5,8 @@ by the generator's legacy email-login endpoints or used to create an account.
 """
 import asyncio,hashlib,hmac,os,secrets,time
 import requests
-from sqlalchemy import select,text
+from sqlalchemy import select,text,func,or_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from pindou.config import get_settings
 from pindou.db.models import User
@@ -16,6 +17,36 @@ from pindou.services.rate_limit_service import consume_rate_limits,RateLimitRule
 def wechat_account(db:Session,key:str):
     from pindou.services.user_service import UserService
     return UserService(db).register_or_login(openid='wechat_authing_'+key)
+
+
+def password_account(db:Session,email:str,password:str,ip:str):
+    from pindou.services.email_verification import validate_email_or_raise
+    from pindou.services.user_service import email_openid
+    from pindou.services.credit_service import grant_registration_gift
+    email=validate_email_or_raise(email)
+    try:
+        consume_rate_limits(db,[RateLimitRule('studio_register:ip:minute',ip,limit=3,window_seconds=60),
+            RateLimitRule('studio_register:ip:day',ip,limit=30,window_seconds=86400),
+            RateLimitRule('studio_register:global:hour','all',limit=100,window_seconds=3600)])
+    except RateLimitExceeded:return {'error':'account_rate_limited'}
+    # These addresses carry generator entitlements and require an existing,
+    # verified account. Unverified public registration must not claim them.
+    if email in get_settings().unlimited_credit_email_set:
+        return {'error':'account_already_registered'}
+    openid=email_openid(email)
+    digest=hash_password(password)
+    db.execute(text('BEGIN IMMEDIATE'))
+    # Never reuse the legacy "register or complete password" operation: it
+    # may overwrite the password of an existing account after email proof.
+    existing=db.scalar(select(User).where(or_(func.lower(User.email)==email,User.openid==openid)))
+    if existing is not None:
+        db.rollback();return {'error':'account_already_registered'}
+    try:
+        user=User(openid=openid,email=email,password_hash=digest,nickname=email.split('@',1)[0][:32],avatar='')
+        db.add(user);db.flush();grant_registration_gift(db,user);db.commit();db.refresh(user)
+        return user
+    except IntegrityError:
+        db.rollback();return {'error':'account_already_registered'}
 
 
 def code_hash(email,code):

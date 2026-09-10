@@ -126,6 +126,10 @@ class PasswordInput(EmailInput):
     password: str = Field(min_length=1,max_length=128)
 
 
+class PasswordRegistration(EmailInput):
+    password: str = Field(min_length=6,max_length=128)
+
+
 def signed_in(path, payload, request):
     limit(request,"login-ip",30,600)
     limit(request,"login-email",10,600,payload.email)
@@ -165,6 +169,16 @@ def register(app, database, origin):
     @app.post("/studio-api/auth/password-login")
     def password_login(payload: PasswordInput,request: Request):
         return signed_in("email-login",payload,request)
+
+    @app.post('/studio-api/auth/password-register')
+    def password_register(payload:PasswordRegistration,request:Request):
+        import authing_login,wallet
+        authing_login.same_origin(request)
+        limit(request,'register-ip-minute',3,60);limit(request,'register-ip-day',30,86400)
+        limit(request,'register-email-hour',5,3600,payload.email)
+        result=authing_login.account_action('password_register',**payload.model_dump(),ip=request.client.host if request.client else 'unknown')
+        wallet.remember_customer(result['user'])
+        return result
 
     @app.post("/studio-api/auth/register")
     def create(payload: RegisterInput,request: Request):

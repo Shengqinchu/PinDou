@@ -52,6 +52,9 @@ def main():
     for source in old.rglob('*'):
         if not source.is_file() or any(x in source.parts for x in ('.venv','node_modules','.git','__pycache__')):continue
         name=source.relative_to(old).as_posix();target=release/name
+        # The new manifest is validated above; it necessarily differs on a
+        # second scoped account release and is not generator application code.
+        if name=='studio-account-overlay.json':continue
         if source.read_bytes()!=target.read_bytes():differences.append(name)
     assert set(differences)<=ALLOWED,differences
     def switch(target):
@@ -67,7 +70,7 @@ def main():
         else:raise RuntimeError('Generator health failed')
     except Exception:
         switch(old);subprocess.run(['systemctl','restart','pindou'],check=True);raise
-    print(json.dumps({'release':str(release),'previous':str(old),'backup':str(backup),'changed_existing_files':differences,'new_file':'06_backend/pindou/services/studio_accounts.py'}))
+    print(json.dumps({'release':str(release),'previous':str(old),'backup':str(backup),'changed_existing_files':differences,'new_files':[name for name in sorted(ALLOWED) if not (old/name).exists()]}))
 
 
 if __name__=='__main__':main()

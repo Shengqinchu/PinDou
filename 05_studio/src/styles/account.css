@@ -72,21 +72,21 @@
 
 .account-avatar-link{display:inline-flex;flex-shrink:0;border-radius:50%;}.account-name-link{display:inline-block;max-width:100%;}.account-identity a:focus-visible{outline:2px solid var(--ink);outline-offset:4px;}
 .account-auth{width:100%;max-width:440px;margin-inline:auto;padding:clamp(12px,3vh,32px) 6px 24px;gap:24px}
-.auth-methods{display:flex;justify-content:center;gap:12px}
-.auth-method-choice{display:flex;align-items:center;justify-content:center;gap:9px;border:1px solid #dce5e9;border-radius:14px;background:white;min-height:64px;padding:12px 20px;font-size:15px}
-.auth-methods>.auth-method-choice{min-width:130px}.auth-method-choice>svg{width:24px;height:24px;flex-shrink:0}.auth-method-choice[aria-pressed=true]{background:#edf5fa;border-color:#9cb5c7}
+.auth-methods{display:flex;align-items:stretch;gap:4px;padding:5px;border-radius:16px;background:#edf2f5}
+.auth-method-choice{display:flex;flex:1;align-items:center;justify-content:center;min-width:0;border:1px solid transparent;border-radius:11px;min-height:48px;padding:10px 4px;font-size:15px;line-height:1.4;white-space:nowrap;transition:background var(--control-duration) var(--control-ease),box-shadow var(--control-duration) var(--control-ease)}
+.auth-method-choice[aria-selected=true]{background:white;border-color:#e4eaf0;box-shadow:0 2px 6px #27384412}.auth-method-choice:focus-visible{outline:2px solid #66849a;outline-offset:-2px}.auth-method-panel{display:grid;gap:20px;min-width:0}
 .wechat-qr{display:flex;flex-direction:column;align-items:center;gap:18px;padding:12px 0 20px;min-height:326px;text-align:center}
 .wechat-qr-window{width:min(248px,100%);aspect-ratio:1;display:grid;place-items:center;background:white;border:1px solid #e0e8ed;border-radius:20px;padding:7px;flex-shrink:0}
 .wechat-qr-window>img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain;border-radius:12px}
 .wechat-qr-placeholder{display:grid;place-items:center;width:100%;height:100%;color:#4b7467}
 .wechat-qr-window.is-loading .wechat-qr-placeholder{animation:qr-breathe 1.8s ease-in-out infinite}
 .wechat-qr-title{margin:0;font-size:15px;line-height:1.6}.wechat-verified-icon{color:#4b7467;margin-top:35px}
-.wechat-account-choices{display:flex;flex-direction:column;gap:12px;width:min(100%,290px)}.wechat-qr .form-error{font-size:13px;line-height:1.8;margin:0;max-width:360px}
+.wechat-account-choices{display:flex;flex-direction:column;gap:12px;width:min(100%,290px)}.wechat-account-choices>.auth-method-choice{flex:auto;gap:9px;min-height:56px;padding:12px 16px;border-color:#dce5e9;background:white;white-space:normal}.wechat-account-choices>.auth-method-choice>svg{width:24px;height:24px;flex-shrink:0}.wechat-qr .form-error{font-size:13px;line-height:1.8;margin:0;max-width:360px}
 .auth-recovery-heading{display:flex;align-items:center;gap:10px}.auth-recovery-heading .lift-title{font-size:20px;margin:0}.auth-recovery-heading .icon-button{flex-shrink:0}
 .account-link-notice{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.8;color:var(--muted);margin:0}.account-link-notice>svg{flex-shrink:0;width:20px;height:20px;margin-top:2px}
 .account-code-field{display:flex;gap:10px;align-items:center;min-width:0}.account-code-field>input{flex:1;min-width:0!important;width:0!important;letter-spacing:.1em}.account-code-field>button{min-height:44px;font-size:13px;flex-shrink:0;padding:8px;text-decoration:underline;text-underline-offset:4px}.account-recovery-link{min-height:44px;justify-self:center;font-size:13px;color:var(--muted);padding:8px;text-underline-offset:4px}
 .account-recovery-link:hover{text-decoration:underline}.account-auth .account-form{gap:18px}.account-auth .form-error{margin:0;font-size:13px;line-height:1.8}
 @keyframes qr-breathe{50%{opacity:.35}}
-@media(max-width:380px){.auth-method-choice{padding:10px 14px;font-size:14px}.auth-methods>.auth-method-choice{min-width:110px}.account-auth{padding-inline:2px;gap:20px}.account-code-field{gap:4px}.account-code-field>button{font-size:12px;padding-inline:4px}}
-@media(max-height:700px){.account-auth{padding-top:8px;gap:18px}.wechat-qr{padding-top:0;min-height:300px}.auth-method-choice{min-height:54px}}
+@media(max-width:380px){.auth-method-choice{font-size:14px}.account-auth{padding-inline:2px;gap:20px}.account-code-field{gap:4px}.account-code-field>button{font-size:12px;padding-inline:4px}}
+@media(max-height:700px){.account-auth{padding-top:8px;gap:18px}.wechat-qr{padding-top:0;min-height:300px}}
 @media(hover:hover) and (pointer:fine){a.account-name-link:hover{text-decoration:underline;text-underline-offset:4px;}}

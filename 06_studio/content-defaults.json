@@ -4,6 +4,14 @@
       "登录",
       "Sign in"
     ],
+    "register": [
+      "注册",
+      "Register"
+    ],
+    "registering": [
+      "正在注册…",
+      "Creating account…"
+    ],
     "account": [
       "我的账号",
       "My account"
@@ -181,7 +189,7 @@
       "Please check the email, code or password you entered."
     ],
     "wechat_method": [
-      "微信",
+      "微信登录",
       "WeChat"
     ],
     "recovery_title": [

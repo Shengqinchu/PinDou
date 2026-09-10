@@ -62,6 +62,7 @@ def register(app,database):
         limit(request,'wechat-qr-start',12,600)
         data=provider('gene',{'scene':'WXAPP_AUTH','autoMergeQrCode':False})
         qr=data.get('random');url=image_url(data.get('url'))
+        logo=image_url(data['customLogo']) if data.get('customLogo') else ''
         if not isinstance(qr,str) or not re.fullmatch(r'[A-Za-z0-9_-]{6,160}',qr):raise HTTPException(503,'wechat_provider_unavailable')
         cookie=request.cookies.get(auth.COOKIE,'')
         if not re.fullmatch(r'[A-Za-z0-9_-]{43}',cookie):cookie=secrets.token_urlsafe(32)
@@ -72,7 +73,7 @@ def register(app,database):
                 (auth.digest(state),auth.digest(cookie),origin,target,now,now+auth.FLOW_LIFETIME,'qr_pending',user,qr))
         response.set_cookie(auth.COOKIE,cookie,max_age=auth.FLOW_LIFETIME,httponly=True,secure=auth.config().secure,samesite='lax',path='/studio-api/auth/wechat')
         response.headers['Cache-Control']='no-store'
-        return {'state':state,'image':url,'expires_in':120}
+        return {'state':state,'image':url,'logo':logo,'expires_in':120}
 
     @app.post('/studio-api/auth/wechat/qr/poll')
     def poll(payload:auth.FlowAction,request:Request):

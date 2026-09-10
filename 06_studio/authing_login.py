@@ -195,9 +195,9 @@ def account_action(action,**values):
     signature=hmac.new(c.bridge_key.encode(),json.dumps(payload,sort_keys=True,separators=(',',':')).encode(),hashlib.sha256).hexdigest()
     result=fetch_json(c.backend+'/api/v1/studio-session/account',payload,{'X-Studio-Signature':signature})
     if result.get('error'):raise HTTPException(400,result['error'])
-    if action=='wechat_create':
+    if action in ('wechat_create','password_register'):
         profile=result.get('user');token=result.get('token')
-        if not isinstance(profile,dict) or not isinstance(token,str):raise HTTPException(503,'wechat_provider_unavailable')
+        if not isinstance(profile,dict) or not isinstance(token,str) or not 1<=len(token)<=5000:raise HTTPException(503,'account_unavailable')
         return {'token':token,'user':public_user(profile),'shared_user':profile}
     return result
 

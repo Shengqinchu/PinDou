@@ -97,3 +97,30 @@ def test_account_profile_exposes_shared_avatar_but_no_provider_or_private_fields
         'password_hash':'private','wechat_openid':'private','paid_credits':188})
     assert client.get('/studio-api/auth/me').json()['user']=={
         'id':'qa-owner','email':'qa@example.test','nickname':'Shared name','avatar':'/static/thumbnails/avatar_test.png'}
+
+
+def test_password_signup_uses_bridge_and_rewards_once(client,monkeypatch):
+    import authing_login as login
+    from test_authing_login import configured
+    settings=login.Config('app-test','https://fixture.authing.cn/app-test/oidc','s'*40,'b'*64,
+        'http://127.0.0.1:8000',('http://testserver',),True,False)
+    monkeypatch.setattr(login,'config',lambda:settings)
+    calls=[]
+    def action(name,**values):
+        calls.append((name,values))
+        return {'token':'qa-email-registration','user':{'id':'qa-email-registration','email':values['email'],'nickname':'New member'},'shared_user':{'user_id':'qa-email-registration','email':values['email']}}
+    monkeypatch.setattr(login,'account_action',action)
+    payload={'email':'  New@Example.Test ','password':'local-password'}
+    response=client.post('/studio-api/auth/password-register',json=payload,headers={'Origin':'http://testserver'})
+    assert response.status_code==200,response.text
+    assert calls[0][0]=='password_register' and calls[0][1]['email']=='new@example.test'
+    assert 'code' not in calls[0][1] and response.json()['token']=='qa-email-registration'
+    # A retried shared result cannot duplicate the Studio registration reward.
+    assert client.post('/studio-api/auth/password-register',json=payload,headers={'Origin':'http://testserver'}).status_code==200
+    with studio.database() as db:
+        assert db.execute("SELECT points FROM studio_members WHERE owner_id='qa-email-registration'").fetchone()[0]==166
+        assert db.execute("SELECT count(*) FROM studio_wallet_ledger WHERE owner_id='qa-email-registration'").fetchone()[0]==1
+    assert client.post('/studio-api/auth/password-register',json=payload,headers={'Origin':'https://attacker.invalid'}).status_code==403
+    assert len(calls)==2
+    for changes in [{'password':'short'},{'role':'admin'},{'email':'not an email'}]:
+        assert client.post('/studio-api/auth/password-register',json=payload|changes,headers={'Origin':'http://testserver'}).status_code==422

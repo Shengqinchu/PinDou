@@ -1,11 +1,11 @@
 {
-  "source": "2026-09-09-ui-auth-refinement",
+  "source": "owner-auth-tabs-2026-09-09",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
   },
   "hashes": {
-    "account.json": "c2f4dca0e53d52d10ea26fff7f5baff2d905f35a508e203c03302ffd6a0cc40a",
+    "account.json": "92a5425502327c5acf7f7bbe703255acf28634d532f0594b625444863f5ff6d3",
     "admin.json": "f867ea87d71f2508a1e9dde9ed9dadad4069582cd74159ff89549273a47c1d6e",
     "App.json": "11615c68d94a5488985886162ee225322755d3668aeb0685651bf41c137ac2a0",
     "carousel-labels.json": "9eebcd13734eb636c39e80301a2d1c92baeea4f839c54b32057949965b0c88ab",

@@ -18,7 +18,7 @@ def provider(configured,monkeypatch):
         state['calls'].append((path,body))
         if path=='gene':
             assert body=={'scene':'WXAPP_AUTH','autoMergeQrCode':False}
-            return {'random':'generatedQR123','url':'https://files.authing.co/qr.png'}
+            return {'random':'generatedQR123','url':'https://files.authing.co/qr.png','customLogo':'https://files.authing.co/puppy.png'}
         if path.startswith('check?'):return {'random':'generatedQR123','status':state['status'],'ticket':'server-only-ticket'}
         if path=='userinfo':
             assert body=={'ticket':'server-only-ticket'}
@@ -31,7 +31,8 @@ def provider(configured,monkeypatch):
 def start(client,**values):
     result=client.post('/studio-api/auth/wechat/qr/start',headers=ORIGIN,json={'return_to':'/visit?step=3',**values})
     assert result.status_code==200,result.text
-    assert set(result.json())=={'state','image','expires_in'}
+    assert set(result.json())=={'state','image','logo','expires_in'}
+    assert result.json()['logo']=='https://files.authing.co/puppy.png'
     assert 'HttpOnly' in result.headers['set-cookie']
     return result.json()['state']
 
