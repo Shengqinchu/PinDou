@@ -104,6 +104,25 @@
 | the_toolbox_df33f0 | 小小工具箱 | The toolbox |
 | pattern_maker_guide_c1f795 | 图纸工具教程 | Pattern maker guide |
 
+## booking-profile.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| title | 预约资料 | Booking details |
+| name | 预约称呼 | Booking name |
+| contact | 预约联系方式 | Booking contact |
+| empty | 尚未填写预约资料 | No booking details saved yet |
+| loading | 正在读取预约资料… | Loading booking details… |
+| load_error | 预约资料暂时无法读取，请重试。 | Your booking details could not be loaded. Please retry. |
+| incomplete | 请填写称呼和有效的联系方式。 | Enter a name and valid contact details. |
+| changed | 预约资料已在其他窗口更新，请核对后重试。 | Your booking details changed in another window. Review them and retry. |
+| partial | 部分资料已保存，未完成的修改已保留。 | Some details were saved. Your remaining changes have been kept. |
+| retry | 重试 | Retry |
+| use_latest | 使用最新资料 | Use latest details |
+| edit | 修改 | Edit |
+| save | 保存 | Save |
+| cancel | 取消修改 | Cancel changes |
+
 ## carousel-labels.json
 
 | 键 | 中文 | English |
@@ -1978,7 +1997,6 @@
 | no_time | 这一天没有符合条件的时段，可以换一天或缩短时长。 | No times fit this selection. Choose another day or a shorter visit. |
 | no_duo_time | 这一天没有完整四小时的空位，可以换一天看看。 | No four-hour time slots are available on this day. Try another date. |
 | choose_first | 先选择一种体验。 | Choose an experience first. |
-| returning_help | 如果您已登录且来玩耍过可忽略 | If you are signed in and have visited before, you can leave these blank. |
 | confirmation_note | 提交预约后待店主确认，届时预约就安排好啦 | After submitting, wait for the host to confirm. Then your visit is all arranged! |
 | choose_available | 先选择可预约的日期和时间。 | Choose an available date and time first. |
 | offer_changed | 套餐信息已更新，请重新选择。其他资料已保留。 | This offer has changed. Please select it again. Your other details are saved. |

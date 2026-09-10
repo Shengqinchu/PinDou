@@ -10,6 +10,8 @@ import { readSession,saveSession } from '../../reservations';
 import SlideOver from '../SlideOver.vue';
 import WalletBalances from '../WalletBalances.vue';
 import WalletLedger from '../WalletLedger.vue';
+import BookingContactFields from '../BookingContactFields.vue';
+import { bookingProfileCopy as bookingCopy,contactDetails,emptyContact,contactMethodLabel,validContact,type BookingProfile } from '../../booking-profile';
 const props=defineProps<{active:boolean}>();
 const {request}=useDesk();const route=useRoute();
 type Pending={owner:string;key:string;path:string;body:Record<string,unknown>};
@@ -21,6 +23,15 @@ const redemptionUse=ref<'visit'|'shop'>('visit'),noPromotion=ref(false);
 const kind=ref('topup'),timeAmount=ref<number|''>(600),pointsAmount=ref<number|''>(0),redeemCad=ref<number|''>(1),bill=ref('');
 const note=ref(''),effective=ref(hamiltonDate()),reservation=ref(''),privateNote=ref(''),noteVersion=ref(1),reverseEntry=ref<WalletEntry>();
 const frozen=computed(()=>saving.value||!!pending.value);
+const editingBooking=ref(false),bookingDraft=ref(emptyContact()),bookingVersion=ref(0);
+function editBooking(){if(!data.value)return;bookingDraft.value=contactDetails(data.value.booking_profile);bookingVersion.value=data.value.booking_profile.version;editingBooking.value=true;}
+async function saveBooking(){
+ if(frozen.value||!data.value)return;
+ if(!validContact(bookingDraft.value,true)){saveError.value=say(bookingCopy.incomplete);return;}
+ const owner=selected.value;saving.value=true;saveError.value='';saved.value=false;
+ try{const profile=await request<BookingProfile>(`/manage/members/${encodeURIComponent(owner)}/booking-profile`,{method:'PUT',body:JSON.stringify({...bookingDraft.value,version:bookingVersion.value})});if(owner===selected.value&&data.value){data.value.booking_profile=profile;editingBooking.value=false;saved.value=true;}await load();}
+ catch(e){saveError.value=(e as Error).message;}finally{saving.value=false;}
+}
 let listSequence=0,detailSequence=0,debounce:ReturnType<typeof setTimeout>;
 const kinds=['opening','topup','gift','usage','redeem','adjustment'];
 const label=(value:string)=>say((copy as Record<string,string[]>)[value]);
@@ -32,13 +43,14 @@ async function load(){
 async function loadDetail(resetNote=false){
   if(!selected.value)return;
   const owner=selected.value,seq=++detailSequence;loading.value=true;
-  try{const result=await request<WalletDetail>(`/manage/members/${encodeURIComponent(owner)}?page=${ledgerPage.value}&category=${category.value}`);if(seq!==detailSequence)return;data.value=result;if(resetNote){privateNote.value=result.account.staff_note||'';noteVersion.value=result.account.version;}}
+  try{const result=await request<WalletDetail>(`/manage/members/${encodeURIComponent(owner)}?page=${ledgerPage.value}&category=${category.value}`);if(seq!==detailSequence)return;data.value=result;if(resetNote){privateNote.value=result.account.staff_note||'';noteVersion.value=result.account.version;if(editingBooking.value){bookingDraft.value=contactDetails(result.booking_profile);bookingVersion.value=result.booking_profile.version;}}}
   catch(e){if(seq===detailSequence)saveError.value=(e as Error).message;}finally{if(seq===detailSequence)loading.value=false;}
 }
 async function inspect(owner:string){
   if(saving.value)return;
   if(pending.value)owner=pending.value.owner;
   selected.value=owner;data.value=undefined;ledgerPage.value=1;category.value='all';saved.value=false;saveError.value='';
+  editingBooking.value=false;
   showForm.value=false;reverseEntry.value=undefined;note.value='';reservation.value=typeof route.query.booking==='string'?route.query.booking:'';effective.value=hamiltonDate();
   open.value=true;await loadDetail(true);
 }
@@ -97,13 +109,14 @@ defineExpose({refresh:load});
     <label class="desk-field member-search">{{say(copy.search)}}<input v-model.trim="search" type="search" maxlength="160"/></label>
     <p v-if="error" class="desk-error" role="alert">{{error}}</p>
     <p v-if="busy&&!members.length" role="status">{{say(copy.loading)}}</p><p v-else-if="!members.length" class="wallet-empty">{{say(copy.no_members)}}</p>
-    <div class="member-list"><button v-for="member in members" :key="member.owner_id" class="member-row" @click="inspect(member.owner_id)"><PhWallet :size="24" weight="light"/><span><strong>{{member.name}}</strong><small>{{member.email||member.owner_id}}</small></span><span class="member-list-note">{{member.staff_note}}</span><span class="member-list-balance">{{duration(member.minutes)}}<small>{{formatCopy(copy.point_count,{v0:member.points})}}</small></span><PhArrowRight :size="18"/></button></div>
+    <div class="member-list"><button v-for="member in members" :key="member.owner_id" class="member-row" @click="inspect(member.owner_id)"><PhWallet :size="24" weight="light"/><span><strong>{{member.booking_profile?.name||member.name}}</strong><small>{{member.email||member.owner_id}}</small><small v-if="member.booking_profile?.contact">{{contactMethodLabel(member.booking_profile.contact_method)}} · {{member.booking_profile.contact}}</small></span><span class="member-list-note">{{member.staff_note}}</span><span class="member-list-balance">{{duration(member.minutes)}}<small>{{formatCopy(copy.point_count,{v0:member.points})}}</small></span><PhArrowRight :size="18"/></button></div>
     <div v-if="total>30" class="wallet-pagination"><button :disabled="page===1||busy" @click="page--;load()">{{say(copy.previous)}}</button><span>{{formatCopy(copy.page,{v0:page,v1:total})}}</span><button :disabled="page*30>=total||busy" @click="page++;load()">{{say(copy.next)}}</button></div>
     <SlideOver v-model="open" :title="data?.account.name||say(copy.members)" :subtitle="data?.account.email||selected" :busy="saving">
       <p v-if="loading&&!data" role="status">{{say(copy.loading)}}</p>
       <p v-if="saveError" class="desk-error" role="alert">{{saveError}} <button class="desk-link" :disabled="frozen" @click="loadDetail(true)">{{say(copy.refresh)}}</button></p>
       <p v-if="saved" class="wallet-saved" role="status"><PhCheck/>{{say(copy.saved)}}</p>
       <template v-if="data">
+        <section class="booking-profile-section"><h3>{{say(bookingCopy.title)}}</h3><div v-if="!editingBooking" class="booking-profile-summary"><div v-if="data.booking_profile.complete"><strong>{{data.booking_profile.name}}</strong><p>{{contactMethodLabel(data.booking_profile.contact_method)}} · {{data.booking_profile.contact}}</p></div><p v-else>{{say(bookingCopy.empty)}}</p><button type="button" class="text-link" :disabled="frozen" @click="editBooking">{{say(bookingCopy.edit)}}</button></div><form v-else @submit.prevent="saveBooking"><BookingContactFields v-model="bookingDraft" class="profile-contact" :required="false" :disabled="frozen"/><div class="booking-profile-actions"><button type="button" class="desk-button secondary" :disabled="frozen" @click="editingBooking=false">{{say(bookingCopy.cancel)}}</button><button class="desk-button primary" :disabled="frozen">{{say(bookingCopy.save)}}</button></div></form></section>
         <WalletBalances :account="data.account"/><p class="wallet-rule">{{say(copy.rules)}}</p>
         <p v-if="saving" role="status">{{say(copy.saving)}}</p>
         <div v-if="pending&&!saving" class="wallet-uncertain" role="alert"><p>{{say(copy.uncertain)}}</p><p>{{pending.body.note}}</p><button class="desk-button primary" :disabled="saving" @click="sendPending">{{say(copy.retry)}}</button></div>

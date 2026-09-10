@@ -16,6 +16,7 @@ from fastapi import Depends, Header, HTTPException
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from customer_auth import require_customer
+import booking_profile
 
 _database = None
 POINTS_PER_CAD = 100
@@ -106,7 +107,7 @@ def detail(db, owner_id, page=1, category='all', admin=False):
         if admin: entry['actor'] = row['actor']
         entries.append(entry)
     return {'account': (account | public_member(account)) if admin else public_member(account),
-            'entries': entries, 'total': total, 'page': page}
+            'entries': entries, 'total': total, 'page': page, 'booking_profile':booking_profile.read(db,owner_id)}
 
 
 def fingerprint(value):
@@ -227,12 +228,12 @@ def register(app, database, admin_actor):
     @app.get('/studio-api/manage/members')
     def members(search:str='',page:int=1,_actor=Depends(admin_actor)):
         if len(search)>160 or not 1<=page<=100000: raise HTTPException(422,'invalid_filter')
-        where=' WHERE instr(lower(name),lower(?))>0 OR instr(lower(email),lower(?))>0 OR instr(owner_id,?)>0 OR instr(lower(staff_note),lower(?))>0'
-        params=(search,search,search,search)
+        where=' WHERE instr(lower(name),lower(?))>0 OR instr(lower(email),lower(?))>0 OR instr(owner_id,?)>0 OR instr(lower(staff_note),lower(?))>0 OR owner_id IN (SELECT owner_id FROM studio_booking_profiles WHERE instr(lower(name),lower(?))>0 OR instr(lower(contact),lower(?))>0)'
+        params=(search,search,search,search,search,search)
         with database() as db:
             total=db.execute('SELECT count(*) FROM studio_members'+where,params).fetchone()[0]
             rows=db.execute('SELECT * FROM studio_members'+where+' ORDER BY updated_at DESC,owner_id LIMIT 30 OFFSET ?',(*params,(page-1)*30)).fetchall()
-            return {'items':[public_member(dict(r))|{'staff_note':r['staff_note']} for r in rows],'total':total,'page':page}
+            return {'items':[public_member(dict(r))|{'staff_note':r['staff_note'],'booking_profile':booking_profile.read(db,r['owner_id'])} for r in rows],'total':total,'page':page}
 
     @app.get('/studio-api/manage/members/{owner_id}')
     def get_member(owner_id:str,page:int=1,category:Literal['all','time','points']='all',_actor=Depends(admin_actor)):

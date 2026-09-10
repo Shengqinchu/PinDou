@@ -14,11 +14,11 @@ def completed(owner='qa-owner',day='2026-09-05'):
 def empty():return body()|{'name':'','contact':''}
 
 
-def test_new_accounts_and_unconfirmed_bookings_still_need_contact(client):
-    assert client.get('/studio-api/auth/reservation-context').json()=={'can_omit_details':False}
+def test_new_accounts_need_contact_and_submission_saves_profile(client):
+    assert client.get('/studio-api/auth/reservation-context').json()['can_omit_details'] is False
     assert submit(client,empty()).json()['detail']=='reservation_contact_required'
     assert submit(client).status_code==201
-    assert client.get('/studio-api/auth/reservation-context').json()=={'can_omit_details':False}
+    assert client.get('/studio-api/auth/reservation-context').json()['can_omit_details'] is True
     assert submit(client,empty()|{'returning_customer':True}).status_code==422
     client.headers.pop('Authorization')
     assert client.get('/studio-api/auth/reservation-context').status_code==401
@@ -27,7 +27,7 @@ def test_new_accounts_and_unconfirmed_bookings_still_need_contact(client):
 
 def test_returning_guests_can_omit_both_fields_using_own_history(client):
     completed();completed('qa-other')
-    assert client.get('/studio-api/auth/reservation-context').json()=={'can_omit_details':True}
+    assert client.get('/studio-api/auth/reservation-context').json()['can_omit_details'] is True
     response=submit(client,empty());assert response.status_code==201,response.text
     assert response.json()['name']=='Known guest'
     with studio.database() as db:
@@ -41,7 +41,7 @@ def test_returning_guests_can_omit_both_fields_using_own_history(client):
 
 def test_another_account_or_future_completed_record_is_not_attendance(client):
     completed('qa-other');completed(day='2026-09-12')
-    assert client.get('/studio-api/auth/reservation-context').json()=={'can_omit_details':False}
+    assert client.get('/studio-api/auth/reservation-context').json()['can_omit_details'] is False
     assert submit(client,empty()).status_code==422
 
 
@@ -63,22 +63,22 @@ def usage(owner,kind='usage',minutes=-60,reverses=None):
 
 def test_manual_time_usage_qualifies_but_credit_gifts_and_reversals_do_not(client):
     usage('qa-owner','gift',60)
-    assert client.get('/studio-api/auth/reservation-context').json()=={'can_omit_details':False}
+    assert client.get('/studio-api/auth/reservation-context').json()['can_omit_details'] is False
     used=usage('qa-owner')
-    assert client.get('/studio-api/auth/reservation-context').json()=={'can_omit_details':True}
+    assert client.get('/studio-api/auth/reservation-context').json()['can_omit_details'] is True
     response=submit(client,empty());assert response.status_code==201,response.text
     with studio.database() as db:
         data=json.loads(db.execute('SELECT payload FROM studio_reservations WHERE id=?',(response.json()['id'],)).fetchone()[0])
         assert data['contact_method']=='email' and data['contact']=='qa-owner@example.test'
     usage('qa-owner','reversal',60,used)
-    assert client.get('/studio-api/auth/reservation-context').json()=={'can_omit_details':False}
+    assert client.get('/studio-api/auth/reservation-context').json()['can_omit_details'] is False
 
 
 def test_email_less_wechat_regular_can_omit_contact_without_fabricating_it(client,monkeypatch):
     ident='wechat_authing_'+'a'*64
     monkeypatch.setattr(customer_auth,'upstream',lambda *a,**kw:{'user_id':ident,'email':None,'nickname':'Known WeChat guest'})
     usage(ident)
-    assert client.get('/studio-api/auth/reservation-context').json()=={'can_omit_details':True}
+    assert client.get('/studio-api/auth/reservation-context').json()['can_omit_details'] is True
     result=submit(client,empty());assert result.status_code==201,result.text
     assert result.json()['name']=='Known WeChat guest'
     with studio.database() as db:

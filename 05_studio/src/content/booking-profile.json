@@ -1,0 +1,16 @@
+{
+  "title": ["预约资料", "Booking details"],
+  "name": ["预约称呼", "Booking name"],
+  "contact": ["预约联系方式", "Booking contact"],
+  "empty": ["尚未填写预约资料", "No booking details saved yet"],
+  "loading": ["正在读取预约资料…", "Loading booking details…"],
+  "load_error": ["预约资料暂时无法读取，请重试。", "Your booking details could not be loaded. Please retry."],
+  "incomplete": ["请填写称呼和有效的联系方式。", "Enter a name and valid contact details."],
+  "changed": ["预约资料已在其他窗口更新，请核对后重试。", "Your booking details changed in another window. Review them and retry."],
+  "partial": ["部分资料已保存，未完成的修改已保留。", "Some details were saved. Your remaining changes have been kept."],
+  "retry": ["重试", "Retry"],
+  "use_latest": ["使用最新资料", "Use latest details"],
+  "edit": ["修改", "Edit"],
+  "save": ["保存", "Save"],
+  "cancel": ["取消修改", "Cancel changes"]
+}

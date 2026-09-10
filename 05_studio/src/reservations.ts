@@ -36,6 +36,7 @@ export type ReservationCalendar = {
   days: ReservationDay[];
 };
 export type ReservationPayload = {
+  contact_profile_version?: number;
   offer?: 'duo4h';
   offer_revision?: string;
   booking: ReservationBooking;

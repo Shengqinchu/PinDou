@@ -121,6 +121,7 @@ class Submission(Strict):
     website: str = Field(default="", max_length=0)
     offer: Literal['duo4h'] | None = None
     offer_revision: str | None = Field(default=None, pattern=r'^[a-f0-9]{64}$')
+    contact_profile_version: int | None = Field(default=None, ge=0, strict=True)
 
     @model_validator(mode="after")
     def contact_valid(self):
@@ -245,6 +246,11 @@ def returning_customer(db, owner_id, current):
 
 def reservation_contact(db, payload, customer, current):
     if payload.name and payload.contact:return {}
+    import booking_profile
+    profile=booking_profile.read(db,customer['id'])
+    if profile['complete']:
+        return {**({'name':profile['name']} if not payload.name else {}),
+                **({'contact':profile['contact'],'contact_method':profile['contact_method']} if not payload.contact else {})}
     if not returning_customer(db,customer['id'],current):
         raise HTTPException(422,'reservation_contact_required')
     # Resolve only this account's history. The request hash remains the original
@@ -292,7 +298,9 @@ def register(app, database, admin_actor):
     @app.get('/studio-api/auth/reservation-context')
     def contact_context(customer=Depends(require_customer)):
         with database() as db:
-            return {'can_omit_details':returning_customer(db,customer['id'],now_local())}
+            import booking_profile
+            profile=booking_profile.read(db,customer['id'])
+            return {'can_omit_details':profile['complete'] or returning_customer(db,customer['id'],now_local()),'profile':profile}
 
     @app.get("/studio-api/reservation-calendar")
     def calendar(request: Request, response: Response, guests: int = 1):
@@ -330,7 +338,9 @@ def register(app, database, admin_actor):
             raise HTTPException(422, "invalid_request_id")
         actor = visitor(request)
         # Keep the pre-offer canonical representation for existing request keys.
-        encoded = payload.model_dump_json(exclude={'offer', 'offer_revision'} if not payload.offer and not payload.offer_revision else set())
+        excluded={'offer', 'offer_revision'} if not payload.offer and not payload.offer_revision else set()
+        if payload.contact_profile_version is None:excluded.add('contact_profile_version')
+        encoded = payload.model_dump_json(exclude=excluded)
         digest = hashlib.sha256(encoded.encode()).hexdigest()
         current = now_local()
         with database() as db:
@@ -358,6 +368,8 @@ def register(app, database, admin_actor):
             timestamp = current.isoformat()
             stored = json.dumps(json.loads(encoded) | contact | ({'offer_snapshot': offer} if offer else {}), ensure_ascii=False, separators=(',', ':')) if offer or contact else encoded
             db.execute("INSERT INTO studio_reservations(id,created_at,updated_at,payload,visitor_hash,idempotency_key,payload_hash,owner_id) VALUES(?,?,?,?,?,?,?,?)", (ref,timestamp,timestamp,stored,actor,idempotency_key,digest,customer["id"]))
+            import booking_profile
+            booking_profile.capture(db,customer['id'],json.loads(stored),payload.contact_profile_version,ref)
             row = db.execute("SELECT * FROM studio_reservations WHERE id=?", (ref,)).fetchone()
             return public_row(row)
 
