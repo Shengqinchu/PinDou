@@ -1,4 +1,8 @@
 <template>
+  <!-- #ifdef MP-WEIXIN -->
+  <view />
+  <!-- #endif -->
+  <!-- #ifndef MP-WEIXIN -->
   <MiniProgramLayout variant="home" title="我的" :scroll="true">
     <section class="me">
       <section class="me__profile">
@@ -116,6 +120,7 @@
       </div>
     </section>
   </MiniProgramLayout>
+  <!-- #endif -->
 </template>
 
 <script setup lang="ts">
@@ -237,7 +242,13 @@ const showAbout = () => {
 };
 
 onShow(() => {
+  // #ifdef MP-WEIXIN
+  uni.redirectTo({url:'/pages/auth/studio-account'});
+  return;
+  // #endif
+  // #ifndef MP-WEIXIN
   loadProfile();
+  // #endif
 });
 </script>
 

@@ -67,6 +67,8 @@ function initWxCloud() {
 /* 导入小程序版 Design Tokens 与全局公共组件 */
 @import "./static/styles/colors_and_type.css";
 @import "./static/styles/components.css";
+/* Shared across the native auth shell, its slot content and child components. */
+@import "./static/styles/studio-auth.css";
 
 /* 适配小程序 page 容器 */
 page {

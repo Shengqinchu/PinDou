@@ -7,14 +7,17 @@ export type SharedSession={token:string;user:{id:string;nickname:string;email:st
 export class MiniappError extends Error {
   constructor(public code:string,public status=0){super((copy as Record<string,string[]>)[code]?.[0]||copy.generic_error[0]);}
 }
-export function studioCall<T>(path:string,data:unknown={},ticket='',token=''):Promise<T>{
+export function studioCall<T>(path:string,data:unknown={},ticket='',token='',method:'POST'|'GET'='POST'):Promise<T>{
   return new Promise((resolve,reject)=>uni.request({
-    url:origin+path,method:'POST',data,
+    url:origin+path,method,data,
     header:{'Content-Type':'application/json',...(ticket?{'X-Pindou-Miniapp':ticket}:{}),...(token?{Authorization:'Bearer '+token}:{})},
     timeout:20000,
     success:(response)=>{const body=response.data as any;if(response.statusCode>=200&&response.statusCode<300)resolve(body);else reject(new MiniappError(typeof body?.detail==='string'?body.detail:'generic_error',response.statusCode));},
     fail:()=>reject(new MiniappError('miniapp_provider_unavailable')),
   }));
+}
+export function studioRead<T>(path:string,token:string):Promise<T>{
+  return studioCall<T>(path,{},'',token,'GET');
 }
 export function wxCode():Promise<string>{
   return new Promise((resolve,reject)=>uni.login({provider:'weixin',success:result=>result.code?resolve(result.code):reject(new MiniappError('miniapp_code_expired')),fail:()=>reject(new MiniappError('miniapp_code_expired'))}));

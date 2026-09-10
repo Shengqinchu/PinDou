@@ -1,39 +1,111 @@
 <script setup lang="ts">
-import { computed,ref } from 'vue';
-import { onLoad,onUnload } from '@dcloudio/uni-app';
+import { computed, ref } from 'vue';
+import { onLoad, onUnload } from '@dcloudio/uni-app';
 import copy from '../../../../05_studio/src/content/miniapp.json';
-import { miniSession,studioCall,miniappPrefix,MiniappError,type SharedSession } from '../../utils/miniapp-client';
+import accountCopy from '../../../../05_studio/src/content/account.json';
+import StudioShell from '../../components/StudioShell.vue';
+import StudioGlyph from '../../components/StudioGlyph.vue';
+import { useStudioNative } from '../../utils/studio-native';
+import { miniSession, studioCall, miniappPrefix, MiniappError, type SharedSession } from '../../utils/miniapp-client';
 import { useUserStore } from '../../store/user';
-const user=useUserStore();
-const language=ref(uni.getStorageSync('pd_studio_language')||(/^en/i.test(uni.getSystemInfoSync().language||'')?'en':'zh'));
-const t=(key:keyof typeof copy)=>copy[key][language.value==='en'?1:0];
-const email=ref(''),password=ref(''),ticket=ref(''),linked=ref(false),loading=ref(false),busy=ref(false),error=ref('');let alive=true;
-const valid=computed(()=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())&&password.value.length>0);
-function fail(e:unknown){if(e instanceof MiniappError&&e.code==='miniapp_session_expired')ticket.value='';error.value=e instanceof MiniappError?t((e.code in copy?e.code:'generic_error') as keyof typeof copy):t('generic_error');}
-async function prepare(){loading.value=true;error.value='';try{const result=await miniSession();if(alive){ticket.value=result.ticket;linked.value=result.linked;}}catch(e){if(alive)fail(e);}finally{if(alive)loading.value=false;}}
-function complete(result:SharedSession){if(!alive)return;user.token=result.token;user.userInfo=result.shared_user;uni.setStorageSync('pd_token',result.token);uni.setStorageSync('pd_user',JSON.stringify(result.shared_user));password.value='';if(getCurrentPages().length>1)uni.navigateBack({delta:1});else uni.switchTab({url:'/pages/user/me'});}
-async function signIn(){if(busy.value||!valid.value||!ticket.value)return;busy.value=true;error.value='';try{const result=await studioCall<SharedSession>('/auth/password-login',{email:email.value.trim().toLowerCase(),password:password.value});await studioCall(miniappPrefix+'/native/bind',{},ticket.value,result.token);complete(result);}catch(e){if(alive)fail(e);}finally{if(alive)busy.value=false;}}
-async function wechat(){if(busy.value||!ticket.value)return;busy.value=true;error.value='';try{complete(await studioCall<SharedSession>(miniappPrefix+(linked.value?'/native/sign-in':'/native/create'),{},ticket.value));}catch(e){if(alive)fail(e);}finally{if(alive)busy.value=false;}}
-function changeLanguage(){language.value=language.value==='zh'?'en':'zh';uni.setStorageSync('pd_studio_language',language.value);}
-function recover(){uni.showModal({title:t('forgot'),content:t('recovery_help'),showCancel:false});}
-function website(){uni.setClipboardData({data:'https://pindoupuppy.com/account?wechat_provider=miniapp'});}
-onLoad(()=>{void prepare();});onUnload(()=>{alive=false;ticket.value='';password.value='';});
+const user = useUserStore();
+const { language, keyboardOpen, shellStyle, say, t, changeLanguage, website } = useStudioNative();
+type Method = 'register' | 'password' | 'wechat';
+const method = ref<Method>('password');
+const email = ref(''), password = ref(''), confirmation = ref(''), ticket = ref('');
+const linked = ref(false), loading = ref(false), busy = ref(false), reveal = ref(false), focus = ref(''), errorCode = ref('');
+let alive = true, proofExpires = 0;
+const tabs = computed(() => [
+  { value: 'register' as Method, label: say(accountCopy.register) },
+  { value: 'password' as Method, label: say(accountCopy.sign_in) },
+  { value: 'wechat' as Method, label: say(accountCopy.wechat_method) },
+]);
+const valid = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()) &&
+  password.value.length >= (method.value === 'register' ? 6 : 1) &&
+  (method.value !== 'register' || password.value === confirmation.value));
+const error = computed(() => say(({ ...accountCopy, ...copy } as Record<string,string[]>)[errorCode.value] || copy.generic_error));
+function fail(e: unknown) { errorCode.value = e instanceof MiniappError ? e.code : 'generic_error'; if (errorCode.value === 'miniapp_session_expired') proofExpires = 0; }
+async function prepare() {
+  if (loading.value) return false;
+  if (ticket.value && Date.now() < proofExpires) return true;
+  loading.value = true; errorCode.value = '';
+  try {
+    const proof = await miniSession();
+    if (!alive) return false;
+    ticket.value = proof.ticket; linked.value = proof.linked;
+    proofExpires = Date.now() + proof.expires_in * 1000 - 5000;
+    return true;
+  } catch (e) { if (alive) fail(e); return false; }
+  finally { if (alive) loading.value = false; }
+}
+function choose(value: Method) {
+  if (busy.value) return;
+  uni.hideKeyboard(); method.value = value; errorCode.value = ''; reveal.value = false;
+  if (value === 'wechat') void prepare();
+}
+function complete(result: SharedSession) {
+  if (!alive) return;
+  user.token = result.token; user.userInfo = result.shared_user;
+  uni.setStorageSync('pd_token', result.token); uni.setStorageSync('pd_user', JSON.stringify(result.shared_user));
+  password.value = ''; confirmation.value = '';
+  const previous = getCurrentPages().slice(-2)[0]?.route || '';
+  if (getCurrentPages().length > 1 && !/pages\/(auth|index|user)\//.test(previous)) uni.navigateBack({ delta: 1 });
+  else uni.redirectTo({ url: '/pages/auth/studio-account' });
+}
+async function signIn() {
+  if (busy.value || !valid.value) return;
+  busy.value = true; errorCode.value = ''; uni.hideKeyboard();
+  try {
+    if (!await prepare() || !alive) return;
+    // A connected WeChat cannot be assigned to a second account. Reject before
+    // registering, so a UI retry does not leave an unintended spare account.
+    if (method.value === 'register' && linked.value) throw new MiniappError('wechat_binding_conflict');
+    const result = await studioCall<SharedSession>(method.value === 'register' ? '/auth/password-register' : '/auth/password-login',
+      { email: email.value.trim().toLowerCase(), password: password.value });
+    if (!alive) return;
+    await studioCall(miniappPrefix + '/native/bind', {}, ticket.value, result.token);
+    complete(result);
+  } catch (e) { if (alive) fail(e); }
+  finally { if (alive) busy.value = false; }
+}
+async function wechat() {
+  if (busy.value || loading.value || !ticket.value || errorCode.value) return;
+  busy.value = true; errorCode.value = '';
+  try {
+    if (!await prepare() || !alive) return;
+    complete(await studioCall<SharedSession>(miniappPrefix + (linked.value ? '/native/sign-in' : '/native/create'), {}, ticket.value));
+  } catch (e) { if (alive) fail(e); }
+  finally { if (alive) busy.value = false; }
+}
+function recover() { uni.showModal({ title: t('forgot'), content: t('recovery_help'), showCancel: false }); }
+onLoad(() => { if (user.token) uni.redirectTo({ url: '/pages/auth/studio-account' }); });
+onUnload(() => { alive = false; ticket.value = ''; password.value = ''; confirmation.value = ''; });
 </script>
 <template>
- <view class="studio-native">
-  <view class="studio-native-top"><image class="studio-native-logo" :src="language==='en'?'/static/studio/logo-en.jpg':'/static/studio/logo-zh.jpg'" mode="aspectFit"/><button class="studio-native-language" @tap="changeLanguage">{{language==='zh'?'English':'中文'}}</button></view>
-  <view class="studio-native-main studio-native-login">
-   <text class="studio-native-title">{{t('native_title')}}</text><text class="studio-native-body">{{t('native_intro')}}</text>
-   <view class="studio-native-field"><text>{{t('email')}}</text><input v-model="email" type="text" :maxlength="254" :disabled="busy" :placeholder="t('email')"/></view>
-   <view class="studio-native-field"><text>{{t('password')}}</text><input v-model="password" :password="true" :maxlength="128" :disabled="busy" :placeholder="t('password')"/></view>
-   <text v-if="error" class="studio-native-error">{{error}}</text>
-   <button v-if="!ticket&&error" class="studio-native-secondary" :disabled="loading" @tap="prepare">{{t('retry')}}</button>
-   <button class="studio-native-primary" :disabled="busy||loading||!valid||!ticket" @tap="signIn">{{t(busy?'working':'password_login')}}</button>
-   <button class="studio-native-link" :disabled="busy" @tap="recover">{{t('forgot')}}</button>
-   <view class="studio-native-divider"/>
-   <button class="studio-native-secondary" :disabled="busy||loading||!ticket" @tap="wechat">{{t(linked?'wechat_login':'wechat_create')}}</button>
-   <text class="studio-native-body studio-native-small">{{t('website_account')}}</text><button class="studio-native-link" @tap="website">{{t('visit_website')}}</button>
-  </view>
- </view>
+  <StudioShell :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" @language="changeLanguage">
+    <view class="studio-native-main">
+      <view class="studio-native-heading"><text class="studio-native-title">{{t('native_title')}}</text><text class="studio-native-body">{{t('native_intro')}}</text></view>
+      <view class="studio-native-tabs" role="tablist" :aria-label="say(accountCopy.sign_in)">
+        <button v-for="tab in tabs" :key="tab.value" :id="'method-'+tab.value" class="studio-native-tab" :class="{'studio-native-tab--active':method===tab.value}" role="tab" :aria-selected="method===tab.value" :disabled="busy" hover-class="studio-native-pressed" @tap="choose(tab.value)">{{tab.label}}</button>
+      </view>
+      <view v-if="method!=='wechat'" class="studio-native-form" role="tabpanel" :aria-labelledby="'method-'+method">
+        <label class="studio-native-field" for="studio-email"><text>{{t('email')}}</text><view class="studio-native-input" :class="{'studio-native-input--focused':focus==='email'}"><input id="studio-email" v-model="email" type="text" :maxlength="254" :disabled="busy" confirm-type="next" :cursor-spacing="24" :adjust-position="true" :aria-label="t('email')" @focus="focus='email'" @blur="focus=''" @confirm="focus='password'" /></view></label>
+        <label class="studio-native-field" for="studio-password"><text>{{method==='register'?say(accountCopy.new_password):t('password')}}</text><view class="studio-native-input" :class="{'studio-native-input--focused':focus==='password'}"><input id="studio-password" v-model="password" :password="!reveal" :maxlength="128" :disabled="busy" :focus="focus==='password'" :confirm-type="method==='register'?'next':'done'" :cursor-spacing="80" :adjust-position="true" :aria-label="t('password')" @focus="focus='password'" @blur="focus=''" @confirm="method==='register'?focus='confirmation':signIn()" /><button class="studio-native-eye" hover-class="studio-native-pressed" :disabled="busy" :aria-label="say(reveal?accountCopy.hide_password:accountCopy.show_password)" @tap="reveal=!reveal"><StudioGlyph :name="reveal?'hidden':'eye'" :size="20" /></button></view></label>
+        <label v-if="method==='register'" class="studio-native-field" for="studio-confirm-password"><text>{{say(accountCopy.confirm_password)}}</text><view class="studio-native-input" :class="{'studio-native-input--focused':focus==='confirmation'}"><input id="studio-confirm-password" v-model="confirmation" :password="!reveal" :maxlength="128" :disabled="busy" :focus="focus==='confirmation'" confirm-type="done" :cursor-spacing="80" :adjust-position="true" :aria-label="say(accountCopy.confirm_password)" @focus="focus='confirmation'" @blur="focus=''" @confirm="signIn" /></view></label>
+        <text v-if="method==='register'&&confirmation&&confirmation!==password" class="studio-native-error" role="alert">{{say(accountCopy.password_mismatch)}}</text>
+        <text v-if="errorCode" class="studio-native-error" role="alert">{{error}}</text>
+        <button class="studio-native-primary" :disabled="busy||!valid" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="signIn"><view v-if="busy" class="studio-native-progress"/><text class="studio-native-primary-label">{{busy?say(method==='register'?accountCopy.registering:accountCopy.working):method==='register'?say(accountCopy.register):t('password_login')}}</text><view v-if="!busy" class="studio-native-button-arrow"><StudioGlyph name="arrow" :size="18"/></view></button>
+        <button v-if="method==='password'" class="studio-native-link" :disabled="busy" hover-class="studio-native-pressed" @tap="recover">{{t('forgot')}}</button>
+      </view>
+      <view v-else class="studio-native-wechat" role="tabpanel" aria-labelledby="method-wechat">
+        <view class="studio-native-wechat-icon"><StudioGlyph name="wechat" :size="36"/></view>
+        <view v-if="loading" class="studio-native-status"><view class="studio-native-progress"/><text class="studio-native-body">{{t('loading')}}</text></view>
+        <text v-if="errorCode" class="studio-native-error" role="alert">{{error}}</text>
+        <button v-if="errorCode" class="studio-native-secondary" :disabled="loading||busy" hover-class="studio-native-pressed" @tap="proofExpires=0;prepare()">{{t('retry')}}</button>
+        <button v-else-if="!loading" class="studio-native-primary" :disabled="busy||!ticket" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="wechat"><view v-if="busy" class="studio-native-progress"/><text>{{t(busy?'working':linked?'wechat_login':'wechat_create')}}</text></button>
+        <text class="studio-native-body studio-native-small">{{t('website_account')}}</text>
+      </view>
+    </view>
+    <view class="studio-native-footer"><text class="studio-native-site">pindoupuppy.com</text><button class="studio-native-link" hover-class="studio-native-pressed" @tap="website"><StudioGlyph name="copy" :size="16"/>{{t('visit_website')}}</button></view>
+  </StudioShell>
 </template>
-<style src="../../static/styles/studio-auth.css"></style>

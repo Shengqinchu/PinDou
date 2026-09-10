@@ -1,0 +1,17 @@
+[
+  {
+    "family": "Studio Hand",
+    "bytes": 12000,
+    "sha256": "5caf70d91578ae4540dcf0c97349015c2a9c7c03381b86d541a699b792be99ea"
+  },
+  {
+    "family": "Studio Serif",
+    "bytes": 24744,
+    "sha256": "fdf61e20fd2c0108e0ea28da4daca0035205b4b7fc031a3974b865b704de160a"
+  },
+  {
+    "family": "Studio Outfit",
+    "bytes": 32292,
+    "sha256": "6c18d579fd87c3776be068b762cbc83fde3acb543d49eabd3ade842eb987e887"
+  }
+]
