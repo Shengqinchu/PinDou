@@ -1,7 +1,7 @@
 // Isolated APIs/DB only. Never exercise purchases or paid AI on production.
 import {chromium,expect} from '@playwright/test';
 import fs from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import assert from 'node:assert/strict';
-const root=fileURLToPath(new URL('../../',import.meta.url)),out=process.env.PINDOU_QA_OUTPUT||path.join(root,'artifacts/generator-integration'),base='http://127.0.0.1:19678';
+const root=fileURLToPath(new URL('../../',import.meta.url)),out=process.env.PINDOU_QA_OUTPUT||path.join(root,'artifacts/generator-integration'),base=process.env.PINDOU_QA_ORIGIN||'http://127.0.0.1:19678';
 const png=await fs.readFile(path.join(root,'01_research/tech/test_inputs/cartoon_synthetic.png'));
 const browser=await chromium.launch({headless:true,ignoreDefaultArgs:['--hide-scrollbars']}),results=[],errors=[];let currentPage;
 async function context(language='en',user='qa-owner'){
@@ -66,7 +66,7 @@ try{
  }results.push({test:'wallet decimal hours 0, 0.5, 1.5',passed:true});await accounts.ctx.close();
 
  const admin=await context('zh');currentPage=admin.page;const seed=await (await admin.page.request.post(base+'/qa/timetable-seed')).json();await admin.page.addInitScript(()=>sessionStorage.setItem('puppy-studio-admin','qa-admin'));await admin.page.goto(base+'/manage');await admin.page.getByRole('button',{name:'预约管理',exact:true}).click();await expect(admin.page.locator('.timetable-grid')).toBeVisible();
- const slot=admin.page.locator('.timetable-slot').filter({hasText:'待确认 2'}).first();await expect(slot).toContainText('1');await expect(slot).toContainText('3');await slot.click();await expect(admin.page.locator('input[type=date]').first()).toHaveValue(seed.date);await admin.page.screenshot({path:path.join(out,'admin-timetable.png'),fullPage:true});
+ const slot=admin.page.locator('.timetable-slot.confirmed.pending.completed').filter({hasText:'待确认 2'}).first();await expect(slot).toContainText('1');await expect(slot).toContainText('3');await slot.click();await expect(admin.page.locator('input[type=date]').first()).toHaveValue(seed.date);await admin.page.screenshot({path:path.join(out,'admin-timetable.png'),fullPage:true});
  for(const width of [390,768,1440]){await admin.page.setViewportSize({width,height:950});const metrics=await admin.page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));assert(metrics.scroll<=metrics.width+1);}
  results.push({test:'admin occupancy states, click filters date and responsive timetable',passed:true});await admin.ctx.close();
  assert.deepEqual(errors,[]);

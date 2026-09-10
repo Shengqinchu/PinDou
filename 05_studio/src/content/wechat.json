@@ -1,24 +1,114 @@
 {
-  "title": ["微信登录", "WeChat sign-in"],
-  "sign_in": ["微信扫码登录", "Sign in with WeChat"],
-  "link": ["绑定微信", "Link WeChat"],
-  "linked": ["微信已绑定", "WeChat is linked"],
-  "redirecting": ["正在前往微信登录…", "Opening WeChat sign-in…"],
-  "desktop_help": ["用手机微信扫描电脑上的二维码。", "Scan the code on your computer using WeChat on your phone."],
-  "phone_email": ["手机上请使用下方邮箱登录。微信扫码登录目前支持电脑端。", "Use email to sign in on this phone. WeChat QR sign-in is currently available on a computer."],
-  "first_link": ["首次使用微信，请验证你在小狗拼豆铺使用的邮箱；已有账号请使用原邮箱。", "For your first WeChat sign-in, verify the email you use with PinDou Puppy. Use your existing email if you already have an account."],
-  "confirm_link": ["将微信绑定到这个账号", "Link WeChat to this account"],
-  "link_preserves_account": ["绑定后，仍使用这个账号的图纸、时长钱包和积分。", "Your patterns, time wallet and loyalty points stay with this account."],
-  "continue": ["继续访问", "Continue"],
-  "checking": ["正在确认微信登录…", "Checking your WeChat sign-in…"],
-  "retry": ["返回登录", "Return to sign-in"],
-  "wechat_not_configured": ["微信登录暂未开放，请使用邮箱登录。", "WeChat sign-in is not available yet. Please use email."],
-  "wechat_flow_expired": ["这次微信登录已过期或来自另一个浏览器，请重新登录。", "This WeChat sign-in expired or belongs to another browser. Please start again."],
-  "wechat_flow_used": ["这次登录已处理，可以继续访问；如尚未登录，请返回登录页重试。", "This sign-in has already been processed. Continue, or return to sign-in if needed."],
-  "wechat_provider_unavailable": ["微信登录服务暂时无法连接，请重试或使用邮箱登录。", "We cannot reach WeChat sign-in right now. Try again or use email."],
-  "wechat_cancelled": ["微信登录未完成，请重试或使用邮箱登录。", "WeChat sign-in was not completed. Try again or use email."],
-  "wechat_identity_invalid": ["微信登录验证未通过，请重新登录。", "We could not verify this WeChat sign-in. Please start again."],
-  "wechat_binding_conflict": ["该微信或邮箱已有其他绑定，请使用原账号登录。", "This WeChat or email already has a different link. Please sign in with your original account."],
-  "wechat_origin_invalid": ["请从当前网站重新发起登录。", "Please start sign-in again from this website."],
-  "wechat_return_invalid": ["返回地址无效，请从网站页面重新登录。", "The return address is invalid. Please sign in from a page on this website."]
+  "title": [
+    "微信登录",
+    "WeChat sign-in"
+  ],
+  "sign_in": [
+    "微信扫码登录",
+    "Sign in with WeChat"
+  ],
+  "link": [
+    "绑定微信",
+    "Link WeChat"
+  ],
+  "linked": [
+    "微信已绑定",
+    "WeChat is linked"
+  ],
+  "redirecting": [
+    "正在前往微信登录…",
+    "Opening WeChat sign-in…"
+  ],
+  "phone_email": [
+    "手机上请使用下方邮箱登录。微信扫码登录目前支持电脑端。",
+    "Use email to sign in on this phone. WeChat QR sign-in is currently available on a computer."
+  ],
+  "first_link": [
+    "登录已有账号以绑定微信，或创建新账号。",
+    "Sign in to link an existing account, or create a new account."
+  ],
+  "confirm_link": [
+    "将微信绑定到这个账号",
+    "Link WeChat to this account"
+  ],
+  "link_preserves_account": [
+    "绑定后，仍使用这个账号的图纸、时长钱包和积分。",
+    "Your patterns, time wallet and loyalty points stay with this account."
+  ],
+  "continue": [
+    "继续访问",
+    "Continue"
+  ],
+  "checking": [
+    "正在确认微信登录…",
+    "Checking your WeChat sign-in…"
+  ],
+  "retry": [
+    "返回登录",
+    "Return to sign-in"
+  ],
+  "wechat_not_configured": [
+    "微信登录暂未开放，请使用密码登录。",
+    "WeChat sign-in is not available yet. Please use your password."
+  ],
+  "wechat_flow_expired": [
+    "这次微信登录已过期或来自另一个浏览器，请重新登录。",
+    "This WeChat sign-in expired or belongs to another browser. Please start again."
+  ],
+  "wechat_flow_used": [
+    "这次登录已处理，可以继续访问；如尚未登录，请返回登录页重试。",
+    "This sign-in has already been processed. Continue, or return to sign-in if needed."
+  ],
+  "wechat_provider_unavailable": [
+    "微信登录服务暂时无法连接，请重试或使用密码登录。",
+    "We cannot reach WeChat sign-in right now. Try again or use your password."
+  ],
+  "wechat_cancelled": [
+    "微信登录未完成，请重试或使用密码登录。",
+    "WeChat sign-in was not completed. Try again or use your password."
+  ],
+  "wechat_identity_invalid": [
+    "微信登录验证未通过，请重新登录。",
+    "We could not verify this WeChat sign-in. Please start again."
+  ],
+  "wechat_binding_conflict": [
+    "该微信或邮箱已有其他绑定，请使用原账号登录。",
+    "This WeChat or email already has a different link. Please sign in with your original account."
+  ],
+  "wechat_origin_invalid": [
+    "请从当前网站重新发起登录。",
+    "Please start sign-in again from this website."
+  ],
+  "wechat_return_invalid": [
+    "返回地址无效，请从网站页面重新登录。",
+    "The return address is invalid. Please sign in from a page on this website."
+  ],
+  "loading_qr": [
+    "正在准备二维码…",
+    "Preparing your QR code…"
+  ],
+  "scanned": [
+    "请在微信中确认",
+    "Confirm in WeChat"
+  ],
+  "authorized": [
+    "微信授权成功",
+    "WeChat verified"
+  ],
+  "existing_account": [
+    "绑定已有账号",
+    "Link an existing account"
+  ],
+  "new_account": [
+    "创建新账号",
+    "Create a new account"
+  ],
+  "qr_alt": [
+    "微信登录二维码",
+    "WeChat sign-in QR code"
+  ],
+  "refresh_qr": [
+    "刷新二维码",
+    "Refresh QR code"
+  ]
 }

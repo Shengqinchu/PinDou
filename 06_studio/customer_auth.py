@@ -82,10 +82,11 @@ def upstream(path: str, request: Request, body=None, token: str = "") -> dict:
 
 def public_user(data: dict) -> dict:
     ident = data.get("user_id")
-    email = data.get("email")
-    # The legacy WeChat endpoint is a development stub. Only proven email accounts
-    # can enter Studio until a real WeChat OAuth provider is configured.
-    if not isinstance(ident,str) or not 1 <= len(ident) <= 128 or not isinstance(email,str) or not EMAIL.fullmatch(email):
+    email = data.get("email") or ''
+    # Profiles come from the authenticated generator API. Only its signed
+    # Authing bridge can create this namespace; legacy wx_ stubs remain denied.
+    if (not isinstance(ident,str) or not 1 <= len(ident) <= 128 or not isinstance(email,str)
+        or not (EMAIL.fullmatch(email) or (not email and re.fullmatch(r'wechat_authing_[a-f0-9]{64}',ident)))):
         raise HTTPException(401,"account_email_required")
     avatar=data.get("avatar")
     return {"id":ident,"email":email,"nickname":str(data.get("nickname") or "")[:80],
@@ -147,7 +148,7 @@ def register(app, database, origin):
     @app.get("/studio-api/auth/options")
     def options():
         import authing_login
-        return {"email":True,"password":True,"wechat":authing_login.available(),"phone":False}
+        return {"email":False,"password":True,"recovery":True,"wechat":authing_login.available(),"phone":False}
 
     @app.get("/studio-api/auth/me")
     def me(request: Request, authorization: Annotated[str | None,Header()]=None):
@@ -155,15 +156,11 @@ def register(app, database, origin):
 
     @app.post("/studio-api/auth/send-code")
     def send_code(payload: EmailInput,request: Request):
-        limit(request,"email-ip-minute",3,60)
-        limit(request,"email-ip-hour",10,3600)
-        limit(request,"email-address-hour",6,3600,payload.email)
-        result=upstream("email/send-code",request,payload.model_dump())
-        return {"ok":True,"cooldown_seconds":max(60,min(300,int(result.get("cooldown_seconds",60))))}
+        raise HTTPException(410,"account_code_login_disabled")
 
     @app.post("/studio-api/auth/code-login")
     def code_login(payload: CodeInput,request: Request):
-        return signed_in("email/verify",payload,request)
+        raise HTTPException(410,"account_code_login_disabled")
 
     @app.post("/studio-api/auth/password-login")
     def password_login(payload: PasswordInput,request: Request):
@@ -171,4 +168,18 @@ def register(app, database, origin):
 
     @app.post("/studio-api/auth/register")
     def create(payload: RegisterInput,request: Request):
-        return signed_in("register",payload,request)
+        raise HTTPException(410,"account_code_login_disabled")
+
+    @app.post('/studio-api/auth/recovery/send-code')
+    def recovery_code(payload:EmailInput,request:Request):
+        import authing_login
+        authing_login.same_origin(request)
+        limit(request,'recovery-ip-minute',3,60);limit(request,'recovery-email-hour',5,3600,payload.email)
+        return authing_login.account_action('recovery_send',email=payload.email,ip=request.client.host if request.client else 'unknown')
+
+    @app.post('/studio-api/auth/recovery/reset-password')
+    def recovery_reset(payload:RegisterInput,request:Request):
+        import authing_login
+        authing_login.same_origin(request)
+        limit(request,'recovery-reset-ip',20,600);limit(request,'recovery-reset-email',10,600,payload.email)
+        return authing_login.account_action('recovery_reset',**payload.model_dump())

@@ -12,7 +12,6 @@
 | pattern_tool | 拼豆图纸生成器 | Pattern maker |
 | title | 欢迎来到小狗拼豆铺 | Welcome to PinDou Puppy |
 | reservation_title | 登录后，继续这次预约 | Sign in to finish your booking |
-| shared_account | 与拼豆图纸工具共用账号。邮箱首次验证后会自动注册。 | Use the same account as the pattern tool. Your first email verification creates an account. |
 | draft_saved | 选好的时段和填写的内容都已保留。 | Your chosen time and form details are saved. |
 | code_method | 邮箱验证码 | Email code |
 | password_method | 密码登录 | Password |
@@ -32,7 +31,7 @@
 | continue | 验证并登录 | Verify and sign in |
 | continue_reservation | 登录并继续预约 | Sign in and continue booking |
 | working | 正在登录… | Signing in… |
-| forgot_password | 忘记密码？使用邮箱验证码登录 | Forgot your password? Use an email code |
+| forgot_password | 找回账号 / 忘记密码 | Recover account / Forgot password |
 | signed_in | 已登录 | Signed in |
 | sign_out | 退出登录 | Sign out |
 | my_reservations | 我的预约 | My bookings |
@@ -43,15 +42,23 @@
 | login_notice | 浏览和选时段无需登录，提交预约时需登录账号。 | Browse and choose a time freely. Sign in when you submit your booking. |
 | checking | 正在确认登录… | Checking sign-in… |
 | account_login_required | 请登录后继续，已填内容会保留。 | Please sign in to continue. Your details are saved. |
-| account_email_required | 请使用已验证的邮箱账号登录。 | Please sign in with a verified email account. |
+| account_email_required | 请使用微信或密码登录。 | Please sign in with WeChat or your password. |
 | account_unavailable | 登录服务暂时无法连接，请稍后重试。 | We cannot reach the sign-in service. Please try again shortly. |
 | account_code_invalid | 验证码不正确或已使用，请检查或重新获取。 | The code is incorrect or already used. Check it or request a new one. |
 | account_code_expired | 验证码已过期，请重新获取。 | This code has expired. Please request a new one. |
-| account_password_invalid | 邮箱或密码不正确，也可以使用邮箱验证码登录。 | The email or password is incorrect. You can also sign in with an email code. |
-| account_already_registered | 该邮箱已有密码，请使用密码登录，或取消设置密码后用验证码登录。 | This email already has a password. Sign in with it, or uncheck setting a password and use an email code. |
+| account_password_invalid | 邮箱或密码不正确，请重试或找回账号。 | The email or password is incorrect. Try again or recover your account. |
+| account_already_registered | 该邮箱已注册，请使用密码登录或找回账号。 | This email is registered. Use your password or recover your account. |
 | account_rate_limited | 尝试较频繁，请稍等一会儿再试。 | Too many attempts. Please wait a little before trying again. |
 | account_email_unavailable | 验证码暂时发送失败，请稍后再试。 | We could not send your email code. Please try again shortly. |
 | account_check_details | 请检查邮箱、验证码或密码的填写。 | Please check the email, code or password you entered. |
+| wechat_method | 微信 | WeChat |
+| recovery_title | 找回账号 | Recover your account |
+| back_password | 返回密码登录 | Back to password sign-in |
+| reset_password | 重设密码 | Reset password |
+| recovery_sent | 若该邮箱已注册，将收到找回账号验证码，5 分钟内有效。 | If this email is registered, a recovery code will arrive. It is valid for 5 minutes. |
+| recovery_done | 密码已重设，请使用新密码登录。 | Your password has been reset. Sign in with your new password. |
+| account_code_login_disabled | 邮箱验证码仅用于找回账号，请使用微信或密码登录。 | Email codes are for account recovery only. Sign in with WeChat or your password. |
+| default_name | 拼豆用户 | PinDou member |
 
 ## admin.json
 
@@ -2088,20 +2095,26 @@
 | link | 绑定微信 | Link WeChat |
 | linked | 微信已绑定 | WeChat is linked |
 | redirecting | 正在前往微信登录… | Opening WeChat sign-in… |
-| desktop_help | 用手机微信扫描电脑上的二维码。 | Scan the code on your computer using WeChat on your phone. |
 | phone_email | 手机上请使用下方邮箱登录。微信扫码登录目前支持电脑端。 | Use email to sign in on this phone. WeChat QR sign-in is currently available on a computer. |
-| first_link | 首次使用微信，请验证你在小狗拼豆铺使用的邮箱；已有账号请使用原邮箱。 | For your first WeChat sign-in, verify the email you use with PinDou Puppy. Use your existing email if you already have an account. |
+| first_link | 登录已有账号以绑定微信，或创建新账号。 | Sign in to link an existing account, or create a new account. |
 | confirm_link | 将微信绑定到这个账号 | Link WeChat to this account |
 | link_preserves_account | 绑定后，仍使用这个账号的图纸、时长钱包和积分。 | Your patterns, time wallet and loyalty points stay with this account. |
 | continue | 继续访问 | Continue |
 | checking | 正在确认微信登录… | Checking your WeChat sign-in… |
 | retry | 返回登录 | Return to sign-in |
-| wechat_not_configured | 微信登录暂未开放，请使用邮箱登录。 | WeChat sign-in is not available yet. Please use email. |
+| wechat_not_configured | 微信登录暂未开放，请使用密码登录。 | WeChat sign-in is not available yet. Please use your password. |
 | wechat_flow_expired | 这次微信登录已过期或来自另一个浏览器，请重新登录。 | This WeChat sign-in expired or belongs to another browser. Please start again. |
 | wechat_flow_used | 这次登录已处理，可以继续访问；如尚未登录，请返回登录页重试。 | This sign-in has already been processed. Continue, or return to sign-in if needed. |
-| wechat_provider_unavailable | 微信登录服务暂时无法连接，请重试或使用邮箱登录。 | We cannot reach WeChat sign-in right now. Try again or use email. |
-| wechat_cancelled | 微信登录未完成，请重试或使用邮箱登录。 | WeChat sign-in was not completed. Try again or use email. |
+| wechat_provider_unavailable | 微信登录服务暂时无法连接，请重试或使用密码登录。 | We cannot reach WeChat sign-in right now. Try again or use your password. |
+| wechat_cancelled | 微信登录未完成，请重试或使用密码登录。 | WeChat sign-in was not completed. Try again or use your password. |
 | wechat_identity_invalid | 微信登录验证未通过，请重新登录。 | We could not verify this WeChat sign-in. Please start again. |
 | wechat_binding_conflict | 该微信或邮箱已有其他绑定，请使用原账号登录。 | This WeChat or email already has a different link. Please sign in with your original account. |
 | wechat_origin_invalid | 请从当前网站重新发起登录。 | Please start sign-in again from this website. |
 | wechat_return_invalid | 返回地址无效，请从网站页面重新登录。 | The return address is invalid. Please sign in from a page on this website. |
+| loading_qr | 正在准备二维码… | Preparing your QR code… |
+| scanned | 请在微信中确认 | Confirm in WeChat |
+| authorized | 微信授权成功 | WeChat verified |
+| existing_account | 绑定已有账号 | Link an existing account |
+| new_account | 创建新账号 | Create a new account |
+| qr_alt | 微信登录二维码 | WeChat sign-in QR code |
+| refresh_qr | 刷新二维码 | Refresh QR code |

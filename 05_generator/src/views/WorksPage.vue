@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from "../../../05_studio/src/components/LiftTitle.vue";
 import { gt,generatorLocale } from '../i18n';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
@@ -188,7 +189,7 @@ function formatDate(value?: string): string {
   <section class="works-page">
     <header class="works-hero">
       <div class="works-hero__copy">
-        <h1>{{ gt("我的拼豆作品") }}</h1>
+        <LiftTitle as="h1" :text="gt('我的拼豆作品')"/>
         <p>{{ gt(totalLabel) }}</p>
       </div>
       <RouterLink class="works-hero__cta" to="/tools">{{ gt("去生成") }}</RouterLink>
@@ -204,14 +205,14 @@ function formatDate(value?: string): string {
 
     <section v-else-if="errorMessage" class="works-empty" role="alert">
       <span class="works-empty__mark" aria-hidden="true">!</span>
-      <h2>{{ gt("作品集没加载出来") }}</h2>
+      <LiftTitle as="h2" :text="gt('作品集没加载出来')"/>
       <p>{{ gt(errorMessage) }}</p>
       <button class="works-empty__button" type="button" @click="loadWorks(page)">{{ gt("重新加载") }}</button>
     </section>
 
     <section v-else-if="!works.length" class="works-empty">
       <span class="works-empty__mark" aria-hidden="true">{{ gt("豆") }}</span>
-      <h2>{{ gt("还没有保存的作品") }}</h2>
+      <LiftTitle as="h2" :text="gt('还没有保存的作品')"/>
       <p>{{ gt("生成一张照片，作品会自动出现在这里，之后可以随时回来查看和继续编辑。") }}</p>
       <RouterLink class="works-empty__button" to="/tools">{{ gt("去生成") }}</RouterLink>
     </section>

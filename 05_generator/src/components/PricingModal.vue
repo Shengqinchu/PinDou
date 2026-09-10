@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from "../../../05_studio/src/components/LiftTitle.vue";
 import MoneyText from '../../../05_studio/src/components/MoneyText.vue';
 import { gt } from '../i18n';
 import { vToolDialog } from '../dialog';
@@ -542,7 +543,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
           <button class="pricing-close" type="button" :aria-label='gt("关闭定价弹窗")' @click="close">×</button>
 
           <header class="pricing-header">
-            <h2 id="pricing-title">{{ gt("充值中心") }}</h2>
+            <LiftTitle id="pricing-title" as="h2" :text="gt('充值中心')"/>
             <div class="pricing-summary">
               <span>{{ gt("支付成功后自动到账。") }}</span>
               <details class="pricing-info">

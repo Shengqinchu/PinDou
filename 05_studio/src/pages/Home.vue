@@ -91,7 +91,7 @@ onBeforeUnmount(() => {
         {{ say(copyText.hamilton_ontario_canada_fbf034) }}
       </p>
       <div class="vision-hero-lettering">
-        <BrandMotif class="hero-puppy" /><BrandMotif
+        <BrandMotif class="hero-puppy" interactive /><BrandMotif
           kind="star" interactive
           class="hero-star"
         /><BrandMotif kind="heart" interactive class="hero-heart" />
@@ -117,10 +117,10 @@ onBeforeUnmount(() => {
     </section>
     <div class="vision-welcome">
       <span>{{ say(copyText.time_for_yourself_9e1db5) }}</span
-      ><BrandMotif kind="star" /><span>{{
+      ><BrandMotif kind="star" interactive /><span>{{
         say(copyText.friends_together_71ba0c)
       }}</span
-      ><BrandMotif kind="star" /><span>{{
+      ><BrandMotif kind="star" interactive /><span>{{
         say(copyText.made_by_hand_f4654d)
       }}</span>
     </div>
@@ -130,11 +130,7 @@ onBeforeUnmount(() => {
         <p class="vision-eyebrow">
           {{ say(copyText.welcome_to_pindo_puppy_2b7fcf) }}
         </p>
-        <h2>
-          {{ say(copyText.a_little_workshop_32499a) }}<br /><em>{{
-            say(copyText.endless_lovely_possibilities_b5a1fa)
-          }}</em>
-        </h2>
+        <LiftTitle as="h2" :text="[say(copyText.a_little_workshop_32499a),say(copyText.endless_lovely_possibilities_b5a1fa)]" emphasis-last/>
         <p>
           {{ say(copyText.we_turned_a_room_in_our_home_3b9cec) }}
         </p>
@@ -155,9 +151,7 @@ onBeforeUnmount(() => {
     <section class="vision-journal">
       <div class="container">
         <div class="vision-section-heading">
-          <h2>
-            {{ say(copyText.happiness_takes_many_shapes_c5b449) }}
-          </h2>
+          <LiftTitle as="h2" :text="say(copyText.happiness_takes_many_shapes_c5b449)"/>
           <RouterLink class="text-link" to="/journal"
             >{{ say(copyText.browse_the_studio_journal_39842d)
             }}<PhArrowUpRight
@@ -174,11 +168,7 @@ onBeforeUnmount(() => {
     <section class="vision-experience container">
       <div>
         <BrandMotif kind="bone" interactive class="experience-motif" />
-        <h2>
-          {{ say(copyText.how_about_bf459e) }}<br /><em>{{
-            say(copyText.giving_it_a_try_9e9961)
-          }}</em>
-        </h2>
+        <LiftTitle as="h2" :text="[say(copyText.how_about_bf459e),say(copyText.giving_it_a_try_9e9961)]" emphasis-last/>
         <RouterLink class="button button-primary" to="/visit"
           >{{ say(copyText.book_a_beadmaking_visit_ec7a0a) }}<PhArrowUpRight
         /></RouterLink>
@@ -208,11 +198,7 @@ onBeforeUnmount(() => {
     <section class="vision-shop-teaser container">
       <StudioImage name="shop-collage" :alt="say(copyText.charms_and_craft_fittings_in_the_studio_183b2f)" />
       <div>
-        <h2>
-          {{ say(copyText.or_take_a_little_38633e) }}<br /><em>{{
-            say(copyText.happiness_home_4ed870)
-          }}</em>
-        </h2>
+        <LiftTitle as="h2" :text="[say(copyText.or_take_a_little_38633e),say(copyText.happiness_home_4ed870)]" emphasis-last/>
         <p>
           {{ say(copyText.our_little_shop_is_still_taking_shape_bf9bb8) }}
         </p>

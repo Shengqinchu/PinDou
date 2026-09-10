@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from "../../../05_studio/src/components/LiftTitle.vue";
 import { gt } from '../i18n';
 import { vToolDialog } from '../dialog';
 import { computed } from 'vue';
@@ -39,7 +40,7 @@ const rechargeLabel = computed(() => isAi.value ? '充值积分' : '开通时间
         <dialog class="quota-guide" v-tool-dialog="()=>emit('close')" role="dialog" aria-modal="true" aria-labelledby="quota-guide-title">
           <button class="quota-guide__close" type="button" :aria-label='gt("关闭额度引导")' @click="emit('close')">×</button>
           <p class="quota-guide__eyebrow">{{ gt("继续生成") }}</p>
-          <h2 id="quota-guide-title">{{ gt(title) }}</h2>
+          <LiftTitle id="quota-guide-title" as="h2" :text="gt(title)"/>
           <p class="quota-guide__lead">{{ gt(lead) }}</p>
 
           <div class="quota-guide__choices" :aria-label='gt("选择继续方式")'>

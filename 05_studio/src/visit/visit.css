@@ -1,6 +1,6 @@
 .studio-visit-main{min-height:0!important;flex:0 0 auto!important}
 .vision-header.visit-header{min-height:70px;padding-block:12px}
-.visit-flow-page{max-width:950px;width:100%;height:calc(var(--visible-height) - var(--visit-header-height,80px));min-height:0;padding:18px 30px 12px;margin:0 auto;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}
+.visit-flow-page{max-width:clamp(950px,72vw,1480px);width:100%;height:min(1100px,calc(var(--visible-height) - var(--visit-header-height,80px)));min-height:0;padding:18px 30px 12px;margin:0 auto;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}
 .visit-flow-heading{display:flex;align-items:baseline;justify-content:space-between;gap:24px;flex-shrink:0}
 .visit-flow-heading h1{font-size:34px;line-height:1.25;margin:0;white-space:nowrap}
 .visit-flow-heading p{font-size:12px;line-height:1.7;color:var(--muted);margin:0;max-width:420px}
@@ -10,7 +10,7 @@
 .visit-progress button.current{color:var(--ink)}.visit-progress button.current>span{background:#e6f0f7;border-color:#9bb2c2}.visit-progress button.done>span{background:#edf5ed;border-color:#d4e1d4}
 .visit-progress>div{height:2px;background:#e8edf0;margin-top:4px}.visit-progress i{display:block;height:100%;background:#7a96a8;transform-origin:left;transition:transform .3s var(--control-ease)}
 .visit-flow-form{display:flex;flex-direction:column;flex:1;min-height:0;gap:8px}
-.visit-scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scroll-padding-block:10px;padding:2px 5px 8px;margin-inline:-5px;scrollbar-width:thin}
+.visit-scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scroll-padding-block:14px;padding:10px 12px 12px;margin-inline:-12px;scrollbar-width:thin}
 .visit-fields{border:0;min-width:0;padding:0;margin:0}.visit-stage{min-width:0;outline:none;overflow-wrap:anywhere}
 .visit-flow-page .sr-only{position:absolute;width:1px;height:1px;clip:rect(0,0,0,0);overflow:hidden;white-space:nowrap}
 .visit-stage-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 12px}.visit-stage-title h2{font-size:22px;margin:0;line-height:1.45}.visit-stage-title small{font-size:11px;color:var(--muted)}
@@ -36,8 +36,28 @@
 .visit-feedback:empty{display:none}
 .visit-actions{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 0 max(5px,var(--safe-bottom));border-top:1px solid #dfe6eb;background:white}.visit-back{display:flex;align-items:center;gap:8px;min-height:44px;font-size:13px}.visit-actions>small{font-size:11px;line-height:1.6;max-width:45%;color:var(--muted)}.visit-actions>.button{min-height:46px;font-size:13px;padding:11px 22px;white-space:nowrap}.visit-actions svg{width:18px;height:18px}
 .visit-step-enter-active,.visit-step-leave-active{transition:opacity .22s var(--control-ease),transform .22s var(--control-ease)}.visit-step-enter-from{opacity:0;transform:translateX(calc(12px * var(--visit-direction)))}.visit-step-leave-to{opacity:0;transform:translateX(calc(-10px * var(--visit-direction)))}
-.visit-flow-page button:focus-visible,.visit-flow-page input:focus-visible,.visit-flow-page summary:focus-visible{outline:2px solid #66849a;outline-offset:2px}.visit-flow-page button:disabled{cursor:not-allowed}.visit-flow-page button:disabled:not(.visit-dates button){opacity:.5}
+.visit-flow-page button:focus-visible,.visit-flow-page summary:focus-visible{outline:2px solid #66849a;outline-offset:2px}.visit-flow-page :is(input,textarea):focus-visible{outline:2px solid #66849a;outline-offset:-2px;box-shadow:0 0 0 3px #e8f1f7}.visit-flow-page button:disabled{cursor:not-allowed}.visit-flow-page button:disabled:not(.visit-dates button){opacity:.5}
 @media(hover:hover) and (pointer:fine){.visit-plans>label:hover{border-color:#90aaba}.visit-duo-offer:not(:disabled):hover{background:#f6ece4}.visit-dates button:not(:disabled):hover,.visit-times button:not(:disabled):hover{border-color:#86a3b5}}
+/* Grow the working surface with spacious viewports, while keeping the action
+   within reach on very tall screens. Smaller windows retain the compact flow. */
+@media(min-width:1400px) and (min-height:850px){
+ .visit-flow-page{padding-top:clamp(24px,3vh,44px);padding-bottom:20px;gap:clamp(14px,1.8vh,22px)}
+ .visit-flow-heading h1{font-size:clamp(38px,2.5vw,52px)}.visit-flow-heading p{font-size:14px;max-width:480px}
+ .visit-progress button{font-size:16px;min-height:54px;gap:12px}.visit-progress button>span{width:32px;height:32px;font-size:13px}
+ .visit-stage-title{margin-bottom:18px}.visit-stage-title h2{font-size:clamp(26px,1.7vw,32px)}.visit-stage-title small{font-size:13px}
+ .visit-plans{gap:20px}.visit-plans>label{padding:clamp(22px,2vw,32px);gap:9px;border-radius:18px}.visit-plans>label>svg{width:26px;height:26px;margin-bottom:6px}.visit-plans>label>input{right:24px;top:28px}
+ .visit-plans strong{font-size:20px}.visit-plans label>span{font-size:15px}.visit-plans label>div{font-size:36px;margin-top:8px}.visit-plans small{font-size:13px}
+ .visit-guests{margin:18px 0}.visit-guests>div{gap:12px}.visit-guests button{min-height:56px;font-size:16px;border-radius:13px;gap:9px}.visit-guests svg{width:21px;height:21px}
+ .visit-duo-offer{padding:22px 28px;border-radius:18px}.visit-duo-offer strong{font-size:21px}.visit-duo-offer small{font-size:12px}.visit-offer-facts{font-size:14px}.visit-offer-price{font-size:36px}
+ .visit-details-toggle{font-size:14px;margin-top:10px;min-height:50px}.visit-prepaid article{padding:28px 0}.visit-prepaid h3{font-size:19px}.visit-prepaid p{font-size:16px}
+ .visit-dates button{min-height:112px;gap:8px}.visit-dates strong{font-size:30px}.visit-dates small,.visit-dates span{font-size:14px}.visit-dates>div{gap:12px}
+ .visit-inline-summary{font-size:16px;min-height:44px}.visit-picked-date{padding:10px 18px}.visit-picked-date h2{font-size:19px}.visit-picked-date button{font-size:14px}
+ .visit-duration,.visit-times{margin-top:22px}.visit-duration legend,.visit-times legend{font-size:16px;margin-bottom:12px}.visit-times legend>small{font-size:13px}.visit-duration button,.visit-times button{min-height:54px;font-size:16px}.visit-duration label>span{font-size:12px}.visit-duration input{min-height:54px}.visit-times>div{gap:10px}.visit-chosen{font-size:16px;margin-top:14px}
+ .visit-review{gap:28px;padding-bottom:22px;margin-bottom:22px}.visit-review small{font-size:14px}.visit-review strong{font-size:17px}.visit-review button{font-size:14px}
+ .visit-contact{gap:22px 28px}.visit-contact>label{font-size:16px;gap:11px}.visit-contact input:not([type=radio]){min-height:56px;padding:14px}.visit-contact .contact-method-picker legend{font-size:16px;margin-bottom:11px}.visit-contact .contact-method-picker>div>label{min-height:48px;font-size:15px}
+ .visit-notes{margin-top:18px;font-size:15px}.visit-notes>summary{min-height:44px}.visit-notes textarea{min-height:104px;padding:14px}
+ .visit-actions{padding-top:18px;gap:24px}.visit-actions>.button{font-size:16px;min-height:56px;padding:14px 30px}.visit-actions>small{font-size:13px}.visit-back{font-size:16px}.visit-feedback{font-size:14px}
+}
 @media(max-width:700px){
  .vision-header.visit-header{min-height:62px;padding-block:8px}.visit-flow-page{padding:13px 18px 6px;gap:9px}.visit-flow-heading{display:block}.visit-flow-heading h1{font-size:29px}.visit-flow-heading p{font-size:11px;line-height:1.6;margin-top:5px;max-width:none}.visit-progress ol{gap:8px}.visit-progress button{font-size:11px;gap:6px;min-height:40px}.visit-progress button>span{width:23px;height:23px;font-size:10px}.visit-stage-title{margin-bottom:10px}.visit-stage-title h2{font-size:20px}.visit-stage-title small{font-size:10px}
  .visit-plans{gap:10px}.visit-plans>label{padding:12px 14px;gap:4px}.visit-plans>label>svg{width:19px;height:19px}.visit-plans>label>input{top:14px;right:14px}.visit-plans strong{font-size:14px}.visit-plans label>span{font-size:11px;min-height:35px}.visit-plans label>div{font-size:24px;gap:7px;margin-top:0}.visit-plans small{font-size:10px}.visit-guests{margin:10px 0}.visit-guests button{font-size:12px;gap:5px}.visit-duo-offer{padding:12px 14px;gap:10px}.visit-duo-offer strong{font-size:14px}.visit-duo-offer small{font-size:9px}.visit-offer-price{font-size:25px;gap:8px}.visit-offer-price>svg{width:18px;height:18px}.visit-offer-facts{font-size:11px;gap:10px}.visit-details-toggle{font-size:11px;min-height:38px}

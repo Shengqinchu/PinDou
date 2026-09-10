@@ -1,6 +1,5 @@
 import { contentModule } from './content-store';
 import defaults from './content/wechat.json';
-import { commerceApi } from './commerce';
 export const wechatCopy=contentModule('wechat',defaults);
 
 // Restrict navigation to site pages, including generator paths. Never accept an
@@ -13,11 +12,4 @@ export function accountReturn(value:unknown,fallback='/account'):string{
     if(!/^\/(?:tools(?:\/(?:upload|tutorial|loading|works|(?:editor|result)\/[\w-]+))?|visit|upload|tutorial|loading|works|details|shop|journal(?:\/[\w-]+)?|account|(?:reservation|editor|result)\/[\w-]+)?$/.test(parsed.pathname))return fallback;
     return parsed.pathname+parsed.search+parsed.hash;
   }catch{return fallback;}
-}
-export async function startWechat(linking=false){
-  if(location.pathname.startsWith('/tools'))await (await import('../../05_generator/src/draft')).flushGeneratorDraft();
-  const params=new URLSearchParams(location.search);
-  const returnTo=accountReturn(params.get('return_to')||location.pathname+location.search+location.hash);
-  const result=await commerceApi<{url:string}>('/auth/wechat/start',{method:'POST',body:JSON.stringify({mode:linking?'link':'login',return_to:returnTo})});
-  location.assign(result.url);
 }

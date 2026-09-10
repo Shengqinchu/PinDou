@@ -77,6 +77,8 @@ def initialize(database):
         ''')
         if 'link_user' not in {r[1] for r in db.execute('PRAGMA table_info(studio_oauth_flows)')}:
             db.execute("ALTER TABLE studio_oauth_flows ADD COLUMN link_user TEXT NOT NULL DEFAULT ''")
+    import wechat_qr
+    wechat_qr.initialize(database)
 
 
 def digest(value):
@@ -186,6 +188,20 @@ def shared_session(user_id):
     return {'token':token,'user':customer,'shared_user':profile}
 
 
+def account_action(action,**values):
+    c=config()
+    payload={'action':action,'issued_at':int(time.time()),'nonce':uuid.uuid4().hex,
+        'audience':'pindou-studio-account',**values}
+    signature=hmac.new(c.bridge_key.encode(),json.dumps(payload,sort_keys=True,separators=(',',':')).encode(),hashlib.sha256).hexdigest()
+    result=fetch_json(c.backend+'/api/v1/studio-session/account',payload,{'X-Studio-Signature':signature})
+    if result.get('error'):raise HTTPException(400,result['error'])
+    if action=='wechat_create':
+        profile=result.get('user');token=result.get('token')
+        if not isinstance(profile,dict) or not isinstance(token,str):raise HTTPException(503,'wechat_provider_unavailable')
+        return {'token':token,'user':public_user(profile),'shared_user':profile}
+    return result
+
+
 class Start(BaseModel):
     model_config=ConfigDict(extra='forbid')
     return_to:str=Field(default='/',max_length=600)
@@ -200,6 +216,8 @@ class FlowAction(BaseModel):
 def register(app,database):
     global _database
     _database=database
+    import wechat_qr
+    wechat_qr.register(app,database)
 
     @app.post('/studio-api/auth/wechat/start')
     def start(payload:Start,request:Request,response:Response):

@@ -58,7 +58,7 @@ const visitPhotos = computed(() => [
     <section id="arrival" class="vision-arrival">
       <div>
         <PhMapPin :size="30" weight="light" />
-        <h2>{{ say(copyText.studio_address_171634) }}</h2>
+        <LiftTitle as="h2" :text="say(copyText.studio_address_171634)"/>
         <a
           class="vision-address"
           :href="map(address)"
@@ -87,7 +87,7 @@ const visitPhotos = computed(() => [
       </button>
     </section>
     <section id="parking" class="vision-detail-section">
-      <h2>{{ say(copyText.a_place_to_park_fcb8e3) }}</h2>
+      <LiftTitle as="h2" :text="say(copyText.a_place_to_park_fcb8e3)"/>
       <p>
         {{
           say(
@@ -121,7 +121,7 @@ const visitPhotos = computed(() => [
     </section>
     <PhotoViewer ref="visitViewer" :photos="visitPhotos" />
     <section id="services" class="vision-detail-section">
-      <h2>{{ say(copyText.made_comfortable_made_yours_0c8904) }}</h2>
+      <LiftTitle as="h2" :text="say(copyText.made_comfortable_made_yours_0c8904)"/>
       <div class="vision-service-grid">
         <article>
           <span>01</span>
@@ -166,7 +166,7 @@ const visitPhotos = computed(() => [
       </div>
     </section>
     <section id="notes" class="vision-detail-section vision-notes">
-      <h2>{{ say(copyText.a_few_little_notes_7bbea4) }}</h2>
+      <LiftTitle as="h2" :text="say(copyText.a_few_little_notes_7bbea4)"/>
       <details open>
         <summary>
           {{ say(copyText.beads_and_handmade_finishes_cdb69f) }}

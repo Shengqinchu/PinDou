@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from './LiftTitle.vue';
 import { computed, ref } from 'vue';
 import { PhArrowUpRight } from '@phosphor-icons/vue';
 import defaults from '../content/components-BeadingProcess.json';
@@ -21,7 +22,7 @@ const steps=computed(()=>[
 </script>
 <template>
   <section id="process" class="beading-process vision-detail-section">
-    <header class="process-heading"><h2>{{say(copy.title)}}</h2><BrandMotif kind="bone" interactive /></header>
+    <header class="process-heading"><LiftTitle as="h2" :text="say(copy.title)"/><BrandMotif kind="bone" interactive /></header>
     <ol class="process-steps"><li v-for="(step,i) in steps" :key="i" class="process-step">
       <div class="process-copy"><span class="process-number">{{String(i+1).padStart(2,'0')}}</span><h3>{{say(step.title)}}</h3><p>{{say(step.body)}}</p><p v-if="step.extra">{{say(step.extra)}}</p><a v-if="i===1" class="text-link" :href="say(copy.toolsUrl)" target="_blank" rel="noreferrer">{{say(copy.toolsLink)}}<PhArrowUpRight/></a><p v-if="i===4">{{say(copy.packaging)}}</p></div>
       <div class="process-photos" :class="{'process-finishes':i===4}"><button v-for="key in step.photos" :key="key" class="process-photo" :aria-label="say(copy.photoLabel)+' · '+say((copy as Record<string,string[]>)[key+'Alt'])" @click="viewer?.open(photoKeys.indexOf(key as typeof photoKeys[number]))"><StudioImage :name="'process-'+key" :alt="say((copy as Record<string,string[]>)[key+'Alt'])" sizes="(max-width:760px) 90vw, 400px" /></button></div>

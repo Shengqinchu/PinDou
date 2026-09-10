@@ -47,7 +47,7 @@ export function signOut(){++sequence;clearCustomer();accountUser.value=null;clos
 export function applyAccountProfile(profile:Record<string,unknown>,token:string):boolean{
   if(token!==customerToken()||profile.user_id!==accountUser.value?.id)return false;
   ++sequence;storeCustomer(token,profile);
-  accountUser.value={id:String(profile.user_id),email:String(profile.email),nickname:String(profile.nickname||''),avatar:typeof profile.avatar==='string'?profile.avatar:''};
+  accountUser.value={id:String(profile.user_id),email:String(profile.email||''),nickname:String(profile.nickname||''),avatar:typeof profile.avatar==='string'?profile.avatar:''};
   return true;
 }
 export function installAccount(){

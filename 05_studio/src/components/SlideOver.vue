@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from './LiftTitle.vue';
 import { contentModule } from "../content-store";
 const copyText = contentModule("components-SlideOver", copyTextDefault);
 
@@ -42,7 +43,7 @@ function dismiss() {
         <div class="drawer-top">
           <div>
             <p v-if="subtitle" class="drawer-kicker">{{ subtitle }}</p>
-            <h2 :id="heading">{{ title }}</h2>
+            <LiftTitle :id="heading" as="h2" :text="title"/>
           </div>
           <button
             class="icon-button"

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed,onBeforeUnmount,onMounted,watch } from 'vue';
+import BrandIcon from './BrandIcon.vue';
 import { reducedMotion,onMotionPreferenceChange } from '../motion-preference';
-const props=withDefaults(defineProps<{text:string|string[];as?:'h1'|'h2';emphasisLast?:boolean}>(),{as:'h1'});
+const props=withDefaults(defineProps<{text:string|string[];as?:'h1'|'h2'|'h3';emphasisLast?:boolean}>(),{as:'h1'});
 const lines=computed(()=>Array.isArray(props.text)?props.text:props.text.split('\n'));
 // Keep Latin words together; CJK and emoji remain complete graphemes.
 const segmenter=typeof Intl.Segmenter==='function'?new Intl.Segmenter(undefined,{granularity:'grapheme'}):undefined;
@@ -41,7 +42,7 @@ onMounted(()=>{stop=onMotionPreferenceChange(reset);document.addEventListener('v
 watch(()=>props.text,reset);onBeforeUnmount(()=>{reset();stop?.();document.removeEventListener('visibilitychange',hidden);window.removeEventListener('blur',reset);hover.removeEventListener('change',reset);});
 </script>
 <template>
- <component :is="as" class="lift-title" :aria-label="lines.join(' ')" @pointerover="lift" @pointerout="lower"><span v-for="(line,i) in words" :key="lines[i]" class="lift-line" :class="{'lift-emphasis':emphasisLast&&i===words.length-1}" aria-hidden="true"><template v-for="(word,j) in line" :key="j"><span v-if="/^\s/u.test(word)" class="lift-space">{{word}}</span><span v-else class="lift-word"><span v-for="(letter,k) in graphemes(word)" :key="k" class="lift-hit"><span class="lift-glyph">{{letter}}</span></span></span></template></span></component>
+ <component :is="as" class="lift-title" :aria-label="lines.join(' ')" @pointerover="lift" @pointerout="lower"><span v-for="(line,i) in words" :key="lines[i]" class="lift-line" :class="{'lift-emphasis':emphasisLast&&i===words.length-1}" aria-hidden="true"><template v-for="(word,j) in line" :key="j"><span v-if="/^\s/u.test(word)" class="lift-space">{{word}}</span><span v-else class="lift-word"><span v-for="(letter,k) in graphemes(word)" :key="k" class="lift-hit"><span class="lift-glyph"><BrandIcon v-if="letter==='🇨🇦'" name="canada"/><template v-else>{{letter}}</template></span></span></span></template></span></component>
 </template>
 <style>
 .lift-title{font-kerning:none;}.lift-title>.lift-line{display:block;}.lift-word{display:inline;white-space:nowrap;}.lift-space{white-space:pre-wrap;}.lift-hit,.lift-glyph{display:inline-block;}.lift-hit{vertical-align:baseline;}.lift-glyph{pointer-events:none;transform:translateY(0);}.lift-emphasis{font-style:italic;}

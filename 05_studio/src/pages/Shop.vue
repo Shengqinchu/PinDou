@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from '../components/LiftTitle.vue';
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-Shop", copyTextDefault);
 
@@ -12,13 +13,9 @@ import { media, tr } from "../state";
 <template>
   <section class="vision-coming container">
     <div class="vision-coming-copy">
-      <BrandMotif />
+      <BrandMotif interactive />
       <p class="vision-eyebrow">{{ say(copyText.the_little_shop_915927) }}</p>
-      <h1>
-        {{ say(copyText.little_things_01bed6) }}<br /><em>{{
-          say(copyText.worth_waiting_for_23de2b)
-        }}</em>
-      </h1>
+      <LiftTitle as="h1" :text="[say(copyText.little_things_01bed6),say(copyText.worth_waiting_for_23de2b)]" emphasis-last/>
       <p>
         {{ say(copyText.still_in_the_making_coming_soon_2c6744) }}
       </p>

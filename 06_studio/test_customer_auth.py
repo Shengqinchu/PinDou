@@ -16,7 +16,7 @@ def test_public_pages_and_calendar_need_no_login_but_submission_does(client):
     client.headers.pop('Authorization')
     assert client.get('/studio-api/reservation-calendar').status_code==200
     assert client.get('/studio-api/journal').status_code==200
-    assert client.get('/studio-api/auth/options').json()=={'email':True,'password':True,'wechat':False,'phone':False}
+    assert client.get('/studio-api/auth/options').json()=={'email':False,'password':True,'recovery':True,'wechat':False,'phone':False}
     assert submit(client).status_code==401
     assert client.get('/studio-api/auth/me').status_code==401
     assert client.get('/studio-api/auth/reservations').status_code==401
@@ -49,19 +49,15 @@ def test_legacy_anonymous_receipt_stays_browser_private(client):
         other.get('/studio-api/reservation-calendar')
         assert other.get('/studio-api/reservations/'+ref).status_code==404
 
-def test_email_code_register_password_and_shared_identity(client):
-    client.headers.pop('Authorization');email='new@example.test'
-    assert client.post('/studio-api/auth/send-code',json={'email':email}).json()['cooldown_seconds']==60
-    bad=client.post('/studio-api/auth/code-login',json={'email':email,'code':'000000'})
-    assert bad.status_code==400 and bad.json()['detail']=='account_code_invalid'
-    first=client.post('/studio-api/auth/code-login',json={'email':email,'code':'123456'}).json()
-    second=client.post('/studio-api/auth/register',json={'email':email,'code':'123456','password':'local-password'}).json()
+def test_password_shared_identity_and_email_codes_are_not_login(client,monkeypatch):
+    client.headers.pop('Authorization');email='existing@example.test'
+    for path,body in [('send-code',{'email':email}),('code-login',{'email':email,'code':'123456'}),('register',{'email':email,'code':'123456','password':'local-password'})]:
+        response=client.post('/studio-api/auth/'+path,json=body)
+        assert response.status_code==410 and response.json()['detail']=='account_code_login_disabled'
     password=client.post('/studio-api/auth/password-login',json={'email':email,'password':'local-password'}).json()
-    assert first['user']['id']==second['user']['id']==password['user']['id']
-    assert first['user']['id']==first['shared_user']['user_id']
-    assert 'device_token' not in first
+    assert password['user']['id']==password['shared_user']['user_id'] and 'device_token' not in password
     assert client.post('/studio-api/auth/password-login',json={'email':email,'password':'incorrect'}).status_code==401
-    assert client.post('/studio-api/auth/register',json={'email':email,'code':'123456','password':'local-password','cdk':'not-accepted'}).status_code==422
+
 
 def test_expired_or_fake_email_less_identity_cannot_reserve(client,monkeypatch):
     client.headers['Authorization']='Bearer expired'
@@ -71,8 +67,6 @@ def test_expired_or_fake_email_less_identity_cannot_reserve(client,monkeypatch):
     assert submit(client).status_code==401
 
 def test_rate_limits_apply_to_login_and_sending(client):
-    for i in range(3):assert client.post('/studio-api/auth/send-code',json={'email':f'email{i}@example.test'}).status_code==200
-    assert client.post('/studio-api/auth/send-code',json={'email':'next@example.test'}).status_code==429
     for _ in range(10):client.post('/studio-api/auth/password-login',json={'email':'test@example.test','password':'incorrect'})
     assert client.post('/studio-api/auth/password-login',json={'email':'test@example.test','password':'local-password'}).status_code==429
 

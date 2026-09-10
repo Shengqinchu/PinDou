@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from "../../../05_studio/src/components/LiftTitle.vue";
 import { gt } from '../i18n';
 import { vToolDialog } from '../dialog';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
@@ -746,14 +747,14 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
     <template v-if="loading">
       <div class="editor-state">
         <p class="eyebrow">{{ gt("正在打开") }}</p>
-        <h1>{{ gt("读取图纸中") }}</h1>
+        <LiftTitle as="h1" :text="gt('读取图纸中')"/>
       </div>
     </template>
 
     <template v-else-if="error">
       <div class="editor-state">
         <p class="eyebrow">{{ gt("编辑器加载失败") }}</p>
-        <h1>{{ gt("暂时打不开这个图纸") }}</h1>
+        <LiftTitle as="h1" :text="gt('暂时打不开这个图纸')"/>
         <p>{{ gt(error) }}</p>
         <RouterLink class="pd-btn pd-btn--primary" to="/tools/works">{{ gt("回作品集") }}</RouterLink>
       </div>
@@ -960,7 +961,7 @@ function normalizeCatalog(colors: CatalogColor[]): CatalogColor[] {
             <p v-else-if="replaceMessage" class="editor-replace-message">{{ gt(replaceMessage) }}</p>
 
             <section v-if="recentColors.length" class="editor-color-section" :aria-label='gt("最近使用")'>
-              <h2>{{ gt("最近使用") }}</h2>
+              <LiftTitle as="h2" :text="gt('最近使用')"/>
               <div class="editor-color-grid editor-color-grid--recent">
                 <button
                   v-for="color in recentColors"

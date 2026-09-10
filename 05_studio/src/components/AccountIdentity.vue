@@ -52,7 +52,7 @@ onBeforeUnmount(releasePreview);
 <template>
   <div v-if="accountUser" class="account-identity">
     <component :is="linkToCenter?RouterLink:'span'" class="account-avatar-link" v-bind="linkToCenter?{to:'/account','aria-label':say(accountCopy.account_center)}:{}" @click="linkToCenter&&closeAccount()"><img v-if="accountUser.avatar&&!failed" class="account-portrait" :src="accountUser.avatar" alt="" referrerpolicy="no-referrer" @error="failed=true"/><PhUserCircle v-else class="account-portrait" :size="56" weight="light"/></component>
-    <div class="account-identity-text"><component :is="linkToCenter?RouterLink:'span'" class="account-name-link" v-bind="linkToCenter?{to:'/account'}:{}" @click="linkToCenter&&closeAccount()"><strong>{{accountUser.nickname||accountUser.email}}</strong></component><WechatSignIn v-if="!emailOnly" :key="accountUser.id" linking compact/><p v-else>{{accountUser.email}}</p></div>
+    <div class="account-identity-text"><component :is="linkToCenter?RouterLink:'span'" class="account-name-link" v-bind="linkToCenter?{to:'/account'}:{}" @click="linkToCenter&&closeAccount()"><strong>{{accountUser.nickname||accountUser.email||say(accountCopy.default_name)}}</strong></component><WechatSignIn v-if="!emailOnly" :key="accountUser.id" linking compact/><p v-else>{{accountUser.email}}</p></div>
     <button v-if="!emailOnly" type="button" class="account-edit" @click="openEditor"><PhPencilSimple :size="18"/><span>{{say(copy.edit)}}</span></button>
   </div>
   <SlideOver v-if="!emailOnly" :model-value="editing" :title="say(copy.edit)" :busy="busy" @update:model-value="closeEditor">
@@ -64,7 +64,7 @@ onBeforeUnmount(releasePreview);
         <input ref="input" type="file" accept="image/jpeg,image/png,image/webp" hidden :disabled="busy" :aria-label="say(copy.upload)" @change="choose"/>
       </div>
       <label class="field"><span class="profile-field-label">{{say(copy.nickname)}}<InfoTip :label="say(copy.nickname_help)"><p>{{say(copy.nickname_help)}}</p></InfoTip></span><input v-model="nickname" autocomplete="nickname" required :disabled="busy" :aria-invalid="nickname.length>0&&!valid||undefined"/></label>
-      <div class="profile-email"><span>{{say(accountCopy.email)}}</span><p>{{accountUser?.email}}</p><InfoTip :label="say(copy.shared_help)"><p>{{say(copy.shared_help)}}</p></InfoTip></div>
+      <div v-if="accountUser?.email" class="profile-email"><span>{{say(accountCopy.email)}}</span><p>{{accountUser?.email}}</p><InfoTip :label="say(copy.shared_help)"><p>{{say(copy.shared_help)}}</p></InfoTip></div>
       <p v-if="error" class="form-error" role="alert">{{error}}</p>
       <div class="profile-actions"><button type="button" class="button button-secondary" :disabled="busy" @click="closeEditor">{{say(copy.cancel)}}</button><button class="button button-primary" :disabled="busy||!changed||!valid">{{say(busy?copy.saving:copy.save)}}</button></div>
     </form>

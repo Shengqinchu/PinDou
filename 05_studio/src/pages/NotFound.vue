@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from '../components/LiftTitle.vue';
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-NotFound", copyTextDefault);
 
@@ -10,11 +11,7 @@ import { tr } from "../state";
 <template>
   <section class="container page-intro">
     <div>
-      <h1>
-        {{ say(copyText.this_little_bead_6335af) }}<br /><em>{{
-          say(copyText.rolled_away_9759a2)
-        }}</em>
-      </h1>
+      <LiftTitle as="h1" :text="[say(copyText.this_little_bead_6335af),say(copyText.rolled_away_9759a2)]" emphasis-last/>
       <p>
         {{ say(copyText.we_could_not_find_that_page_let_05f3f9) }}
       </p>

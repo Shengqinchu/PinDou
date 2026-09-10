@@ -91,4 +91,4 @@ def seed():
    ident='VIS-TABLE-'+uuid.uuid4().hex[:8]
    db.execute('INSERT INTO studio_reservations(id,created_at,updated_at,status,payload,visitor_hash,idempotency_key,payload_hash,owner_id) VALUES(?,?,?,?,?,?,?,?,?)',(ident,stamp,stamp,status,json.dumps(payload),'qa',str(uuid.uuid4()),'qa','qa-owner'))
  return {'date':date}
-uvicorn.run(app,host='127.0.0.1',port=19678,access_log=False)
+if __name__=='__main__':uvicorn.run(app,host='127.0.0.1',port=19678,access_log=False)

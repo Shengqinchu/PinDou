@@ -23,6 +23,13 @@ const controls = [
   ".wallet-pagination > button",
   ".generator-workspace button",
   ".generator-workspace [role=button]",
+  ".visit-guests button",
+  ".visit-plans > label",
+  ".visit-duo-offer",
+  ".visit-dates button",
+  ".visit-duration button",
+  ".visit-times button",
+  ".auth-method-choice",
 ].join(",");
 
 type Frame = { transform: string; boxShadow: string };

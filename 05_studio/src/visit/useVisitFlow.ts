@@ -59,7 +59,7 @@ export function useVisitFlow(){
   error.value='';
  }
  function chooseGuests(value:number){if(locked.value)return;if(draft.offer&&value!==2){delete draft.offer;delete draft.offer_revision;duration.value=120;clearTime();}draft.booking.guests=value;error.value='';}
- function chooseOffer(value:ReservationOffer){if(locked.value||loading.value)return;draft.offer=value.id;draft.offer_revision=value.revision;draft.booking.plan='hourly';draft.booking.guests=value.guests;duration.value=value.minutes;clearTime();draft.booking.date='';error.value='';void navigate(1);}
+ function chooseOffer(value:ReservationOffer){if(locked.value||loadError.value||!calendar.value?.offers?.some(o=>o.id===value.id&&o.revision===value.revision))return;draft.offer=value.id;draft.offer_revision=value.revision;draft.booking.plan='hourly';draft.booking.guests=value.guests;duration.value=value.minutes;clearTime();draft.booking.date='';error.value='';void navigate(1);}
  function chooseDate(value:string){if(locked.value)return;if(value!==draft.booking.date)clearTime();draft.booking.date=value;pickerView.value='time';error.value='';persist();}
  function chooseTime(value:string){if(locked.value)return;draft.booking.start=value;draft.booking.end=draft.booking.plan==='day'?day.value!.close:clock(minutes(value)+(offer.value?.minutes||duration.value));error.value='';}
  function back(){if(step.value===1&&pickerView.value==='time'){pickerView.value='date';return;}void navigate(step.value-1);}
@@ -89,7 +89,7 @@ export function useVisitFlow(){
    }
   }finally{if(alive)sending.value=false;}
  }
- function visible(){if(!document.hidden&&!locked.value)void load();}
+ function visible(){if(!document.hidden&&!locked.value&&!loading.value)void load();}
  watch(()=>draft.booking.guests,()=>{if(!locked.value)void load();});
  watch(duration,()=>{if(!locked.value&&draft.booking.start){draft.booking.end=clock(minutes(draft.booking.start)+duration.value);if(!validSelection(calendar.value,draft.booking)){draft.booking.start='';draft.booking.end='';}}persist();});
  watch(pickerView,persist);

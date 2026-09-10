@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from "../../../05_studio/src/components/LiftTitle.vue";
 import { gt } from '../i18n';
 import { vToolDialog } from '../dialog';
 import InfoTip from '../../../05_studio/src/components/InfoTip.vue';
@@ -550,7 +551,7 @@ onUnmounted(revokePreview);
     <div v-if="isConfirmOpen" class="confirm-backdrop" role="presentation" @click.self="closeConfirm">
       <dialog class="confirm-dialog" v-tool-dialog="closeConfirm" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
         <button class="confirm-close" type="button" :aria-label='gt("关闭确认弹窗")' @click="closeConfirm">×</button>
-        <h2 id="confirm-title">{{ gt("确认这次生成设置") }}</h2>
+        <LiftTitle id="confirm-title" as="h2" :text="gt('确认这次生成设置')"/>
         <dl class="confirm-summary">
           <div>
             <dt>{{ gt("生成方式") }}</dt>

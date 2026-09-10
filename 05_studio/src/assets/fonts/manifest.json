@@ -1,21 +1,21 @@
 {
-  "characters": 1352,
+  "characters": 1353,
   "fonts": [
     {
       "family": "PinDou Serif SC",
       "upstream": "NotoSerifSC",
       "source_sha256": "050080d9255a86808f2945bffac582b31ef32bc36411ce29563b4961670c66f9",
       "file": "pindou-serif-sc.woff2",
-      "bytes": 465568,
-      "sha256": "2de60454a20ddf1eee7c5e7ba713bf05c45937d991c8429d51c8a020230c26a1"
+      "bytes": 465724,
+      "sha256": "09dd37f4164063e15a29567b9b6948e309bff3c90d4ac33740ff4a10a2b036b2"
     },
     {
       "family": "PinDou Sans SC",
       "upstream": "NotoSansSC",
       "source_sha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
       "file": "pindou-sans-sc.woff2",
-      "bytes": 351088,
-      "sha256": "71ee16924315bb570d4b1cc595b1e2bb32b2c25f8ab4236b78a4cba96fbe081c"
+      "bytes": 351180,
+      "sha256": "2885aeb6bb72aa33b459ecd9c5cfc503701280c1a554e7c0f8c3b63d10b86ad5"
     }
   ]
 }

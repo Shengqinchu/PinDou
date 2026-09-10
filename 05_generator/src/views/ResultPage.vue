@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from "../../../05_studio/src/components/LiftTitle.vue";
 import { gt } from '../i18n';
 import { vToolDialog } from '../dialog';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -150,7 +151,7 @@ async function downloadPattern(): Promise<void> {
     <template v-if="loading">
       <div class="result-state">
         <p class="eyebrow">{{ gt("正在读取") }}</p>
-        <h1>{{ gt("正在打开图纸") }}</h1>
+        <LiftTitle as="h1" :text="gt('正在打开图纸')"/>
         <p>{{ gt("稍等一下，作品数据马上回来。") }}</p>
       </div>
     </template>
@@ -158,7 +159,7 @@ async function downloadPattern(): Promise<void> {
     <template v-else-if="error">
       <div class="result-state">
         <p class="eyebrow">{{ gt("读取失败") }}</p>
-        <h1>{{ gt("暂时打不开这个结果") }}</h1>
+        <LiftTitle as="h1" :text="gt('暂时打不开这个结果')"/>
         <p>{{ gt(error) }}</p>
         <RouterLink class="pd-btn pd-btn--primary" to="/tools">{{ gt("重新上传") }}</RouterLink>
       </div>
@@ -243,7 +244,7 @@ async function downloadPattern(): Promise<void> {
     <template v-else>
       <div class="result-state">
         <p class="eyebrow">{{ gt("没有结果") }}</p>
-        <h1>{{ gt("先上传一张照片") }}</h1>
+        <LiftTitle as="h1" :text="gt('先上传一张照片')"/>
         <p>{{ gt("生成完成后，会在这里看到图纸预览和色号清单。") }}</p>
         <RouterLink class="pd-btn pd-btn--primary" to="/tools">{{ gt("去上传") }}</RouterLink>
       </div>
@@ -254,7 +255,7 @@ async function downloadPattern(): Promise<void> {
         <header class="regen-modal__header">
           <div>
             <p class="eyebrow">{{ gt("重新生成") }}</p>
-            <h2 id="regen-title">{{ gt("调整参数后再试一次") }}</h2>
+            <LiftTitle id="regen-title" as="h2" :text="gt('调整参数后再试一次')"/>
           </div>
           <button class="regen-modal__close" type="button" :aria-label='gt("关闭")' @click="closeRegenerateModal">×</button>
         </header>

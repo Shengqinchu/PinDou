@@ -30,7 +30,7 @@ export async function saveProfilePart(token:string,id:string,part:{nickname:stri
     throw new Error(say(words));
   }
   const profile=avatar?data?.user:data;
-  if(!profile||profile.user_id!==id||typeof profile.email!=='string')throw new Error(say(profileCopy.save_error));
+  if(!profile||profile.user_id!==id||(profile.email!=null&&typeof profile.email!=='string'))throw new Error(say(profileCopy.save_error));
   if(!applyAccountProfile(profile,token))throw new Error(say(accountCopy.account_login_required));
   return profile;
 }

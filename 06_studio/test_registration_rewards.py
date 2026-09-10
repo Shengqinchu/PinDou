@@ -17,11 +17,11 @@ def test_verified_signin_grants_once_across_concurrent_refresh_and_restart(clien
     assert result['entries'][0]['kind']=='registration_reward'
     admin();assert post(client,kind='opening',minutes_delta=90).status_code==200
 
-def test_new_registration_awards_the_same_shared_account(client):
-    result=client.post('/studio-api/auth/register',json={'email':'new-member@example.test','code':'123456','password':'local-password'}).json()
+def test_first_password_signin_awards_the_same_shared_account(client):
+    result=client.post('/studio-api/auth/password-login',json={'email':'new-member@example.test','password':'local-password'}).json()
     client.headers['Authorization']='Bearer '+result['token']
     assert client.get('/studio-api/auth/wallet').json()['account']['points']==166
-    again=client.post('/studio-api/auth/code-login',json={'email':'new-member@example.test','code':'123456'}).json()
+    again=client.post('/studio-api/auth/password-login',json={'email':'new-member@example.test','password':'local-password'}).json()
     assert again['user']['id']==result['user']['id']
     assert client.get('/studio-api/auth/wallet').json()['total']==1
 

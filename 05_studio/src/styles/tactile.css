@@ -9,6 +9,27 @@
   --tactile-card-border: #d0e0ec;
 }
 
+/* Wizard choices have the same 300 ms press/release clock as other controls. */
+:is(.visit-guests button,.visit-plans>label,.visit-duo-offer,.visit-dates button,.visit-duration button,.visit-times button,.auth-method-choice){
+ --tactile-rest-transform:translate3d(0,0,0) scale(1);
+ --tactile-press-transform:translate3d(0,1px,0) scale(.975);
+ --tactile-rest-shadow:0 1px 2px rgb(70 90 108 / 3%);
+ --tactile-press-shadow:0 2px 4px rgb(70 90 108 / 12%) inset;
+ transform:var(--tactile-rest-transform);box-shadow:var(--tactile-rest-shadow);
+ transition:transform var(--control-duration) var(--control-ease),box-shadow var(--control-duration) var(--control-ease),background-color var(--control-duration) var(--control-ease),border-color var(--control-duration) var(--control-ease);
+}
+@media(hover:hover) and (pointer:fine){
+ :is(.visit-guests button,.visit-plans>label,.visit-duo-offer,.visit-dates button,.visit-duration button,.visit-times button,.auth-method-choice):not(:disabled):not(:has(input:disabled)):hover{
+  --tactile-rest-transform:translate3d(0,-2px,0) scale(1);
+  --tactile-rest-shadow:0 6px 14px -6px rgb(70 90 108 / 22%);
+  border-color:#91acbe;
+ }
+ .visit-guests button:not(:disabled):hover{background:#f1f7fb}
+ .visit-guests button[aria-pressed=true]:hover{background:#e3eff7}
+}
+:is(.visit-guests button,.visit-plans>label,.visit-duo-offer,.visit-dates button,.visit-duration button,.visit-times button,.auth-method-choice):not(:disabled):not(:has(input:disabled)):active{transform:var(--tactile-press-transform);box-shadow:var(--tactile-press-shadow)}
+html[data-motion=reduced] :is(.visit-guests button,.visit-plans>label,.visit-duo-offer,.visit-dates button,.visit-duration button,.visit-times button,.auth-method-choice){transform:none!important}
+
 :is(.button, .desk-button.primary, .desk-button.secondary) {
   --tactile-rest-transform: translate3d(0, 0, 0) scale(1);
   --tactile-press-transform: translate3d(0, 3px, 0) scale(0.988);

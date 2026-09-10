@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from "../../../05_studio/src/components/LiftTitle.vue";
 import { gt } from '../i18n';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -251,7 +252,7 @@ function closeAuthModal(): void {
   <section class="loading-page">
     <div class="loading-panel">
       <div class="loading-copy">
-        <h1>{{ gt(progressHeadline) }}</h1>
+        <LiftTitle as="h1" :text="gt(progressHeadline)"/>
         <p class="loading-sub">{{ progressSub }}</p>
         <p v-if="liveMessage" class="loading-live">{{ gt(liveMessage) }}</p>
       </div>

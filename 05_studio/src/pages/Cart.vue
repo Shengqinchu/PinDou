@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from '../components/LiftTitle.vue';
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-Cart", copyTextDefault);
 
@@ -206,7 +207,7 @@ async function pay(retry = false) {
 <template>
   <section class="container cart-intro">
     <span class="eyebrow">YOUR LITTLE COLLECTION</span>
-    <h1>{{ say(copyText.your_bag_fe50f1) }}</h1>
+    <LiftTitle as="h1" :text="say(copyText.your_bag_fe50f1)"/>
     <p>
       {{ say(copyText.an_afternoon_a_few_little_things_everything_f3f96f) }}
     </p>
@@ -234,7 +235,7 @@ async function pay(retry = false) {
     </div>
     <div>
       <PhShoppingBagOpen :size="38" weight="light" />
-      <h2>{{ say(copyText.room_for_something_lovely_ded35b) }}</h2>
+      <LiftTitle as="h2" :text="say(copyText.room_for_something_lovely_ded35b)"/>
       <p>
         {{ say(copyText.start_with_a_studio_visit_or_a_becf32) }}
       </p>
@@ -256,7 +257,7 @@ async function pay(retry = false) {
   <div v-else class="container cart-layout section-bottom">
     <div class="cart-details">
       <div class="cart-list-title">
-        <h2>{{ say(copyText.your_bag_5af126) }}</h2>
+        <LiftTitle as="h2" :text="say(copyText.your_bag_5af126)"/>
         <span>{{ bagCount }} {{ say(copyText.little_things_5d8e28) }}</span>
       </div>
       <TransitionGroup name="bag-list" tag="div" class="bag-line-list"
@@ -396,7 +397,7 @@ async function pay(retry = false) {
     </div>
     <aside class="checkout-summary">
       <span class="eyebrow">A LOVELY LITTLE PLAN</span>
-      <h2>{{ say(copyText.ready_when_you_are_408829) }}</h2>
+      <LiftTitle as="h2" :text="say(copyText.ready_when_you_are_408829)"/>
       <p class="summary-caption">
         {{ say(copyText.priced_in_cad_paid_in_cny_53d8c7) }}
       </p>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from '../components/LiftTitle.vue';
 import { onMounted,ref } from 'vue';
 import AccountPanel from '../components/AccountPanel.vue';
 import { accountUser,completeSignIn,refreshAccount,type SignInResult } from '../account';
@@ -26,15 +27,17 @@ async function bind(){
   try{await commerceApi('/auth/wechat/bind',{method:'POST',body:JSON.stringify({state})});status.value='linked';}
   catch(e){error.value=(e as Error).message;}finally{busy.value=false;}
 }
+async function create(){busy.value=true;error.value='';try{await commerceApi('/auth/wechat/create-account',{method:'POST',body:JSON.stringify({state})});await read();}catch(e){error.value=(e as Error).message;}finally{busy.value=false;}}
 onMounted(read);
 </script>
 <template>
   <section class="container account-page wechat-return" aria-live="polite">
-    <h1>{{ say(copy.title) }}</h1>
+    <LiftTitle as="h1" :text="say(copy.title)"/>
     <p v-if="status==='loading'||status==='ready'">{{ say(copy.checking) }}</p>
     <template v-if="status==='needs_email'">
       <p class="account-note">{{ say(copy.first_link) }}</p>
       <AccountPanel v-if="!accountUser" embedded email-only />
+      <button v-if="!accountUser" type="button" class="text-link" :disabled="busy" @click="create">{{say(copy.new_account)}}</button>
       <template v-else>
         <p>{{ accountUser.email }}</p><button class="button button-primary" :disabled="busy" @click="bind">{{ say(copy.confirm_link) }}</button>
         <p class="account-note">{{ say(copy.link_preserves_account) }}</p>

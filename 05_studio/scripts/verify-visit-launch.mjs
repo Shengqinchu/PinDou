@@ -1,7 +1,7 @@
 import {chromium,webkit,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import fs from 'node:fs/promises';import assert from 'node:assert/strict';import {fileURLToPath} from 'node:url';
-const base='http://127.0.0.1:19678',out=new URL('../../artifacts/visit-launch/',import.meta.url);await fs.mkdir(out,{recursive:true});
+const base=process.env.PINDOU_QA_ORIGIN||'http://127.0.0.1:19678',out=new URL('../../artifacts/visit-launch/',import.meta.url);await fs.mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true,ignoreDefaultArgs:['--hide-scrollbars']});let page;const checks=[],metrics=[],errors=[],axes=[];
 const settle=async()=>{await expect(page.locator('.visit-step-enter-active,.visit-step-leave-active,.picker-swap-enter-active,.picker-swap-leave-active')).toHaveCount(0);};
 const measure=async label=>{await settle();const value=await page.evaluate(()=>{const s=document.querySelector('.visit-scroll'),f=document.querySelector('.visit-actions'),p=document.querySelector('.visit-flow-page');return {width:innerWidth,height:innerHeight,body:document.documentElement.scrollHeight,overflow:document.documentElement.scrollWidth>innerWidth+1,scroll:s.scrollHeight,client:s.clientHeight,footTop:f.getBoundingClientRect().top,footBottom:f.getBoundingClientRect().bottom,step:p.dataset.step};});metrics.push({label,...value});assert(!value.overflow,label);assert(value.footBottom<=value.height+1,label+' footer');assert(value.body<=value.height+1,label+' document');};

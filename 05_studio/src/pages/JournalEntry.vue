@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from '../components/LiftTitle.vue';
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-JournalEntry", copyTextDefault);
 
@@ -43,7 +44,7 @@ const body = computed(() =>
     >
     <header>
       <p><time :datetime="post.date">{{ post.date.slice(5) }}</time> · {{ say(copyText.xiaogou_shuangji_from_xiaohongshu_f76c2b) }}</p>
-      <h1><FlagText :text="tr(post.title,post.title_en)" /></h1>
+      <LiftTitle :text="tr(post.title,post.title_en)"/>
     </header>
     <div class="journal-entry-layout">
       <div class="journal-entry-text">
@@ -81,7 +82,7 @@ const body = computed(() =>
     </div>
   </article>
   <section v-else-if="!loading" class="container page-intro">
-    <h1>{{ say(copyText.this_story_is_not_here_1ceff6) }}</h1>
+    <LiftTitle as="h1" :text="say(copyText.this_story_is_not_here_1ceff6)"/>
     <RouterLink class="text-link" to="/journal">{{
       say(copyText.back_to_the_journal_b75447)
     }}<PhArrowUpRight /></RouterLink>

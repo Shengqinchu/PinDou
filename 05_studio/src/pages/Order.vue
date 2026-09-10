@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from '../components/LiftTitle.vue';
 import CopyContact from "../components/CopyContact.vue";
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-Order", copyTextDefault);
@@ -142,7 +143,7 @@ async function tryAgain() {
             say(copyText.then_something_lovely_98b831)
           }}</em>
         </h1>
-        <h1 v-else class="order-state-title">{{ statusText(order.status) }}</h1>
+        <LiftTitle v-else class="order-state-title" as="h1" :text="statusText(order.status)"/>
         <p v-if="order.status === 'paid'">
           {{
             tr(
@@ -243,7 +244,7 @@ async function tryAgain() {
       </div>
       <aside class="receipt">
         <span class="eyebrow">YOUR LITTLE PLAN</span>
-        <h2>{{ say(copyText.order_details_ef4c47) }}</h2>
+        <LiftTitle as="h2" :text="say(copyText.order_details_ef4c47)"/>
         <p class="order-number">{{ order.id }}</p>
         <article
           v-for="(line, i) in order.quote.lines"

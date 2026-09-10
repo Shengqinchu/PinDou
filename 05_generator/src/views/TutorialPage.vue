@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from "../../../05_studio/src/components/LiftTitle.vue";
 import { gt,generatorLocale } from '../i18n';
 import { RouterLink } from 'vue-router';
 import { computed } from 'vue';
@@ -93,7 +94,7 @@ const walletItems = computed(()=>[
     <header class="tutorial-hero">
       <div class="tutorial-hero__copy">
         <span class="tutorial-kicker">{{ gt("新手教程") }}</span>
-        <h1>{{ gt("从照片到拼豆图纸，一页看懂") }}</h1>
+        <LiftTitle as="h1" :text="gt('从照片到拼豆图纸，一页看懂')"/>
         <p>{{ gt("照着这条流程走：上传照片、选择模式、生成图纸、编辑配色、下载保存。第一次用也不会乱。") }}</p>
         <div class="tutorial-hero__actions">
           <RouterLink class="pd-btn pd-btn--primary" to="/tools">{{ gt("现在去上传") }}<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -119,7 +120,7 @@ const walletItems = computed(()=>[
     <section id="generate" class="tutorial-section">
       <div class="tutorial-section__heading">
         <span class="tutorial-kicker">01</span>
-        <h2>{{ gt("怎么生成图纸") }}</h2>
+        <LiftTitle as="h2" :text="gt('怎么生成图纸')"/>
         <p>{{ gt("上传、选择、生成、编辑、下载，五步就能拿到可照着摆的图纸。") }}</p>
       </div>
 
@@ -138,7 +139,7 @@ const walletItems = computed(()=>[
     <section id="mode" class="tutorial-section">
       <div class="tutorial-section__heading">
         <span class="tutorial-kicker">02</span>
-        <h2>{{ gt("普通 vs AI 怎么选") }}</h2>
+        <LiftTitle as="h2" :text="gt('普通 vs AI 怎么选')"/>
         <p>{{ gt("不需要纠结参数。看原图类型，选对模式就行。") }}</p>
       </div>
 
@@ -164,7 +165,7 @@ const walletItems = computed(()=>[
     <section id="wallet" class="tutorial-section">
       <div class="tutorial-section__heading">
         <span class="tutorial-kicker">03</span>
-        <h2>{{ gt("积分 / 会员 / CDK 怎么用") }}</h2>
+        <LiftTitle as="h2" :text="gt('积分 / 会员 / CDK 怎么用')"/>
         <p>{{ gt("一句话：AI 用积分，普通看时间卡或普通额度，CDK 可直接兑换到账户或设备。") }}</p>
       </div>
 
@@ -182,7 +183,7 @@ const walletItems = computed(()=>[
     <section id="faq" class="tutorial-section faq-section">
       <div class="tutorial-section__heading">
         <span class="tutorial-kicker">04</span>
-        <h2>{{ gt("避坑 / FAQ") }}</h2>
+        <LiftTitle as="h2" :text="gt('避坑 / FAQ')"/>
         <p>{{ gt("先把容易翻车的点记住，后面就省很多豆。") }}</p>
       </div>
 
@@ -208,7 +209,7 @@ const walletItems = computed(()=>[
 
     <section class="tutorial-cta">
       <span class="tutorial-kicker">Ready</span>
-      <h2>{{ gt("现在做一张自己的拼豆图纸") }}</h2>
+      <LiftTitle as="h2" :text="gt('现在做一张自己的拼豆图纸')"/>
       <p>{{ gt("先上传一张你喜欢的照片，PinDou 会帮你整理成可编辑、可下载、可保存的图纸。") }}</p>
       <RouterLink class="pd-btn pd-btn--primary" to="/tools">{{ gt("现在去上传") }}</RouterLink>
     </section>

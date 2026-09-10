@@ -144,7 +144,10 @@ def main():
         add_header Referrer-Policy "no-referrer" always;
     }
     # Assertions are exchanged over loopback, never through the public proxy.
-    location = /api/v1/studio-session/exchange { return 404; }
+    location ^~ /api/v1/studio-session/ { return 404; }
+    location = /api/v1/user/email/send-code { return 410; }
+    location = /api/v1/user/email/verify { return 410; }
+    location = /api/v1/user/register { return 410; }
     location = /studio-api/auth/wechat/callback {
         access_log off;
         proxy_pass http://127.0.0.1:8011;

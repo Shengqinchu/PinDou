@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LiftTitle from '../components/LiftTitle.vue';
 import CopyContact from "../components/CopyContact.vue";
 import OfferLabel from '../visit/OfferLabel.vue';
 import { contentModule } from "../content-store";
@@ -92,9 +93,7 @@ onBeforeUnmount(() => {
           say(copyText.lets_make_again_soon_12f0b9)
         }}</em>
       </h1>
-      <h1 v-else>
-        {{ say(copyText.this_reservation_was_cancelled_54b1d2) }}
-      </h1>
+      <LiftTitle v-else as="h1" :text="say(copyText.this_reservation_was_cancelled_54b1d2)"/>
       <p v-if="result.status === 'pending'">
         {{ say(copyText.the_host_will_review_your_plans_as_fec716) }}
       </p>
