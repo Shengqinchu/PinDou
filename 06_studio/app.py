@@ -81,6 +81,8 @@ def initialize():
     content.initialize(database, DB_PATH)
     import observability
     observability.initialize(database)
+    import owner_notifications
+    owner_notifications.initialize(database)
 
 
 @asynccontextmanager
@@ -92,13 +94,18 @@ async def lifespan(_app):
     with database() as db:
         db.execute("UPDATE studio_import_jobs SET status='failed',error='import_interrupted' WHERE status='running'")
     importer=asyncio.create_task(content.import_worker(database))
+    import owner_notifications
+    notifier=asyncio.create_task(owner_notifications.worker(database))
     yield
     worker.cancel()
     importer.cancel()
+    notifier.cancel()
     with contextlib.suppress(asyncio.CancelledError):
         await worker
     with contextlib.suppress(asyncio.CancelledError):
         await importer
+    with contextlib.suppress(asyncio.CancelledError):
+        await notifier
 
 
 app = FastAPI(title="PinDou Puppy Studio", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
@@ -310,3 +317,5 @@ import content
 content.register(app, database, admin_actor)
 import observability
 observability.install(app, database, admin_actor)
+import owner_notifications
+owner_notifications.register(app, database, admin_actor)

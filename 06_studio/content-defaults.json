@@ -5151,6 +5151,284 @@
       "https://www.xiaohongshu.com/collection/item/69dee77800ba000000000001"
     ]
   },
+  "owner-notifications": {
+    "title": [
+      "微信预约提醒",
+      "WeChat reservation alerts"
+    ],
+    "open": [
+      "微信提醒",
+      "WeChat alerts"
+    ],
+    "intro": [
+      "新预约和顾客取消预约时提醒你，关闭网站后仍会发送。",
+      "Receive alerts for new reservations and customer cancellations, even when the website is closed."
+    ],
+    "configured": [
+      "已配置 Server 酱",
+      "ServerChan configured"
+    ],
+    "not_configured": [
+      "尚未配置",
+      "Not configured"
+    ],
+    "paused": [
+      "提醒已暂停",
+      "Alerts paused"
+    ],
+    "get_key": [
+      "打开 Server 酱，扫码登录并获取 SendKey",
+      "Open ServerChan, sign in and get your SendKey"
+    ],
+    "key": [
+      "Server 酱 SendKey",
+      "ServerChan SendKey"
+    ],
+    "key_help": [
+      "填写 SCT 开头的密钥。已保存时留空即可保留；密钥不会显示在发送记录中。",
+      "Use the key beginning with SCT. Leave blank to keep a saved key. It will not appear in the activity log."
+    ],
+    "enabled": [
+      "开启微信提醒",
+      "Enable WeChat alerts"
+    ],
+    "quota": [
+      "Server 酱账号额度",
+      "ServerChan account allowance"
+    ],
+    "free": [
+      "免费账号 · 5 次",
+      "Free account · 5 requests"
+    ],
+    "member": [
+      "会员账号 · 1,000 次",
+      "Member account · 1,000 requests"
+    ],
+    "quota_help": [
+      "按最近 24 小时控制发送次数，请按实际账号选择。这里的选择不会开通付费会员。",
+      "Sending is limited over the last 24 hours. Select your actual account allowance; this does not purchase a subscription."
+    ],
+    "language": [
+      "提醒语言",
+      "Alert language"
+    ],
+    "zh": [
+      "中文",
+      "Chinese"
+    ],
+    "en": [
+      "英文",
+      "English"
+    ],
+    "save": [
+      "保存设置",
+      "Save settings"
+    ],
+    "saving": [
+      "正在保存…",
+      "Saving…"
+    ],
+    "saved": [
+      "提醒设置已保存。",
+      "Alert settings saved."
+    ],
+    "test": [
+      "发送测试提醒",
+      "Send a test alert"
+    ],
+    "test_queued": [
+      "测试已排队，请查看微信和下方发送记录。",
+      "Test queued. Check WeChat and the activity log below."
+    ],
+    "test_help": [
+      "测试会使用一次发送额度，每小时最多测试 3 次。",
+      "A test uses one request. Up to 3 tests are allowed per hour."
+    ],
+    "log": [
+      "最近发送记录",
+      "Recent activity"
+    ],
+    "refresh": [
+      "刷新记录",
+      "Refresh activity"
+    ],
+    "empty": [
+      "还没有提醒记录。",
+      "No alerts yet."
+    ],
+    "accepted_help": [
+      "服务已接收表示 Server 酱已接受请求，请以微信实际收到为准。失败会自动重试，超过 24 小时的提醒不再发送。",
+      "Accepted means ServerChan acknowledged the request. Check WeChat for delivery. Temporary failures are retried; alerts expire after 24 hours."
+    ],
+    "usage": [
+      "最近 24 小时已请求 {v0} / {v1} 次",
+      "Requests in the last 24 hours: {v0} / {v1}"
+    ],
+    "created": [
+      "新预约",
+      "New reservation"
+    ],
+    "cancelled": [
+      "顾客取消预约",
+      "Customer cancellation"
+    ],
+    "test_kind": [
+      "测试提醒",
+      "Test alert"
+    ],
+    "queued": [
+      "等待发送",
+      "Queued"
+    ],
+    "sending": [
+      "正在发送",
+      "Sending"
+    ],
+    "retry": [
+      "等待重试",
+      "Retry scheduled"
+    ],
+    "accepted": [
+      "服务已接收",
+      "Accepted by service"
+    ],
+    "failed": [
+      "发送失败",
+      "Failed"
+    ],
+    "expired": [
+      "已过期",
+      "Expired"
+    ],
+    "skipped": [
+      "未发送",
+      "Not sent"
+    ],
+    "retry_action": [
+      "重试",
+      "Retry"
+    ],
+    "not_enabled": [
+      "创建提醒时未开启微信通知。",
+      "WeChat alerts were not enabled when this event occurred."
+    ],
+    "superseded": [
+      "预约状态已更新，不再发送旧提醒。",
+      "Reservation status changed; the old alert is no longer needed."
+    ],
+    "local_quota": [
+      "已达到发送额度，稍后重试。",
+      "Request allowance reached. Retrying later."
+    ],
+    "provider_quota": [
+      "Server 酱限制了发送，稍后重试。",
+      "ServerChan limited requests. Retrying later."
+    ],
+    "provider_rejected": [
+      "Server 酱未接受请求，请检查密钥和微信接收渠道。",
+      "ServerChan rejected the request. Check the key and WeChat receiving channel."
+    ],
+    "key_invalid": [
+      "SendKey 无效，请重新配置。",
+      "Invalid SendKey. Please update it."
+    ],
+    "network_error": [
+      "暂时无法连接 Server 酱。",
+      "Temporarily unable to reach ServerChan."
+    ],
+    "provider_unavailable": [
+      "Server 酱暂时不可用。",
+      "ServerChan is temporarily unavailable."
+    ],
+    "worker_error": [
+      "提醒暂未发出，系统会重试。",
+      "The alert could not be sent yet. It will be retried."
+    ],
+    "retry_exhausted": [
+      "多次重试仍未成功，请检查连接设置。",
+      "Repeated attempts failed. Check the connection settings."
+    ],
+    "notification_settings_invalid": [
+      "请选择有效的提醒设置。",
+      "Select valid alert settings."
+    ],
+    "notification_key_invalid": [
+      "请填写 Server 酱 Turbo 的 SCT 开头密钥。",
+      "Enter a ServerChan Turbo key beginning with SCT."
+    ],
+    "notification_not_configured": [
+      "请先保存 SendKey 并开启微信提醒。",
+      "Save a SendKey and enable WeChat alerts first."
+    ],
+    "notification_test_limit": [
+      "本小时已测试 3 次，请稍后再试。",
+      "Three tests have been requested this hour. Try again later."
+    ],
+    "notification_not_found": [
+      "未找到这条提醒。",
+      "Alert not found."
+    ],
+    "notification_not_retryable": [
+      "这条提醒已发送、过期或达到重试上限。",
+      "This alert was accepted, expired or reached its retry limit."
+    ],
+    "version_conflict": [
+      "设置已在其他窗口更新，请刷新后再保存。",
+      "Settings changed in another window. Refresh before saving."
+    ],
+    "generic_error": [
+      "操作暂未完成，请重试。",
+      "Could not complete the action. Please try again."
+    ],
+    "loading": [
+      "正在读取提醒设置…",
+      "Loading alert settings…"
+    ],
+    "message_created": [
+      "小狗拼豆铺 · 新预约待确认",
+      "PinDou Puppy · New reservation request"
+    ],
+    "message_cancelled": [
+      "小狗拼豆铺 · 顾客取消预约",
+      "PinDou Puppy · Customer cancelled a reservation"
+    ],
+    "message_test": [
+      "小狗拼豆铺 · 微信提醒测试",
+      "PinDou Puppy · WeChat alert test"
+    ],
+    "message_test_body": [
+      "这是一条店主提醒测试。看到这条消息，表示微信接收渠道已连通。没有创建或更改任何顾客预约。",
+      "This is a test of your owner alerts. Receiving it confirms the WeChat channel is working. No customer reservation was created or changed."
+    ],
+    "message_name": [
+      "称呼",
+      "Name"
+    ],
+    "message_time": [
+      "到店时间",
+      "Visit time"
+    ],
+    "message_guests": [
+      "人数",
+      "Guests"
+    ],
+    "message_guests_unit": [
+      "人",
+      "guests"
+    ],
+    "message_reference": [
+      "预约编号",
+      "Reference"
+    ],
+    "message_timezone": [
+      "以上为汉密尔顿当地时间。",
+      "All times are local to Hamilton, Ontario."
+    ],
+    "message_open": [
+      "打开店主工作台",
+      "Open the host desk"
+    ]
+  },
   "pages-Cart": {
     "your_bag_fe50f1": [
       "你的购物车",

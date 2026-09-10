@@ -354,6 +354,8 @@ def register(app, database, admin_actor):
             db.execute("INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,'cancelled','')",
                        (reference,'customer:'+customer['id'],timestamp))
             row=db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone()
+            import owner_notifications
+            owner_notifications.enqueue(db,'cancelled',row)
             return {'reservation':public_row(row),'policy':cancellation_policy(db,customer['id'],row,current)}
 
     @app.get('/studio-api/auth/reservation-context')
@@ -432,6 +434,8 @@ def register(app, database, admin_actor):
             import booking_profile
             booking_profile.capture(db,customer['id'],json.loads(stored),payload.contact_profile_version,ref)
             row = db.execute("SELECT * FROM studio_reservations WHERE id=?", (ref,)).fetchone()
+            import owner_notifications
+            owner_notifications.enqueue(db, 'created', row)
             return public_row(row)
 
     @app.get("/studio-api/reservations/{reference}")
