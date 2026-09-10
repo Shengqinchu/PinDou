@@ -7,7 +7,7 @@
 - 当前有效 AppID：`wx9f2b4d171e92a5ef`，微信接口返回名称“双吉拼豆图纸定制”。旧项目配置尾号 95ec 已统一，密钥未进入代码和发布包。
 - 开发者工具登录成功，具有该 AppID 权限。真实 `wx.login` 返回的凭证经微信 `jscode2session` 交换成功，不再使用旧的 code 哈希占位身份。
 - `getwxacodeunlimit` 接口返回有效图片。未完成认证并未阻断本次已实测接口；这不代表具备网页内嵌、订阅消息或其他接口的全部资格。
-- 微信接受本次开发预览包，并成功上传开发版本 **0.1.0**，1,132,472 bytes。尚未设置体验版、提审或正式发布。
+- 微信已接受开发预览与代码上传。首次 0.1.0 为 1,132,472 bytes；修正版 **0.1.1** 为 1,128,956 bytes，已上传。店主已将版本设为体验版；尚未正式提审或发布。
 - 新增 35 项小程序身份／扫码测试；隔离 Python 缓存后的后端全套 289 项通过。网站中英文、390/1280 宽度、默认密码不请求二维码、自有渠道试用、绑定已有账号入口均通过浏览器检查。
 - 模拟器中文／英文确认页、确认／取消结果、过期提示、密码登录页与空表单禁用均已验证并留图。当前开发工具的旧自动化 SDK 元素查询会等待无返回，改由 WXML 已绑定处理函数执行状态测试并核对模拟器截图；这不是手机真实点击验收。
 - 开发工具模拟器启动时出现绘制问题，使用其官方 CLI 的 `--disable-gpu` 重启后恢复；没有改变网站或用户系统的动画设置。
@@ -16,13 +16,23 @@
 
 Studio **20260910184755-studio-v7** 已部署，366 个文件哈希通过；源代码提交 `e024ae8`。归档 SHA-256：`c728f6055cff4f602526d12f52b61be4857ea980b0f861992c7ef27d10902193`。
 
-服务端目前 `STUDIO_MINIAPP_ENABLED=1`、`STUDIO_MINIAPP_ENV=develop`、`STUDIO_WECHAT_PROVIDER=authing`。线上真实微信凭证交换与自有二维码生成均返回 200，公开默认仍是 Authing。凭据经私有环境文件写入，原环境文件已做 0600 备份。
+服务端目前 `STUDIO_MINIAPP_ENABLED=1`、`STUDIO_MINIAPP_ENV=trial`、`STUDIO_WECHAT_PROVIDER=authing`。线上真实微信凭证交换与自有二维码生成均返回 200，公开默认仍是 Authing。凭据经私有环境文件写入，原环境文件已做 0600 备份。
 
-发布后业务表与发布前备份逐表哈希一致；生成器发布目录、Server 酱启用状态／配额／密钥文件均保持。联调只建立短期扫码与身份验证会话，没有建立任何生产账号绑定或注册新顾客。
+首次部署后业务表与发布前备份逐表哈希一致；生成器发布目录、Server 酱启用状态／配额／密钥文件均保持。该次部署检查只建立短期扫码会话。后续店主亲自在手机进行账号操作和扫码确认，已验证真实网站登录；没有代店主合并账户、创建测试预约或修改账本余额。
 
-**当前必须由微信后台补齐 request 合法域名 `https://pindoupuppy.com`**。启用真实域名检查的模拟器明确返回 `request:fail url not in domain list`；没有以关闭域名检查冒充完成。已请店主在“开发管理 → 开发设置 → 服务器域名”保存，保存后需刷新项目域名信息并继续手机验证。
+店主已在微信后台保存 request、uploadFile、downloadFile 的 `https://pindoupuppy.com`。重新启动开发者工具并保持 `urlCheck=true` 后，真实 request 返回 200，原生登录页成功取得手机身份验证会话；公开品牌图片 downloadFile 返回 200。上传域名探针向只读 health 地址发送同一公开图标，收到预期的 405，证明请求已到服务器；没有生成订单、照片记录或业务账户。
 
-证据位于工作区忽略目录 `artifacts/miniapp-login/`：`account-check.json`、`wx-code-exchange.json`、`qr-api-check.json`、`live-probes.json`、`upload-info.json`、`backend-tests-fresh.txt`、`web-checks.json`、`native-checks.json`、`preservation.json` 及原生截图。凭据、原始登录 code、openid、session_key 与浏览器扫码状态不写入这些报告。
+**真机扫码登录已通过。** 店主两次扫描网站生成的 `develop` 小程序码，均在微信打开页面之前立即提示过期，网站没有收到 `/scan`；开发者工具直出的预览码则能打开。店主在后台设为体验版后，服务端切到 `trial`，校验码 7369 的网站二维码成功进入自有小狗授权页，店主确认完成操作。实际网站状态依次为 `qr_pending → qr_scanned → ready`，随后自动领取登录结果，页面显示账户、积分及退出登录入口。未放宽五分钟过期、原浏览器绑定或一次性领取保护。
+
+### 0.1.1 默认入口与旧云配置修复
+
+店主发现通用体验码仍指向 `pages/index/index`。0.1.1 将默认页面改为 `pages/auth/studio-login`；原生端旧首页路径兼容跳转到新入口，原图纸前端的 H5 首页源代码保留。授权完成后的“回到小程序首页”也进入同一小狗页面。开发者工具清理编译缓存后，默认启动和旧路径跳转均在真实运行时验证为新账号页。
+
+同时发现旧 `.env` 的 `VITE_API_BASE_URL` 仍覆盖 0.1.0 图纸接口，指向 CloudBase 的旧 HTTP 域名，尽管 `wx.cloud.callContainer` 已关闭。0.1.1 限定正式原生包使用 `https://pindoupuppy.com/api/v1`，正式 H5 使用同源 `/api/v1`；自定义环境和存储覆盖只在开发模式生效。实际运行时已验证 `BASE_URL=https://pindoupuppy.com/api/v1`、`USE_WX_CLOUD=false`。
+
+服务器只读核验：项目登记的上海移动云 8 核源站上，`pindou`、`pindou-studio`、`nginx`、`cloudflared` 都处于 active，两个服务健康检查及网站公网健康检查返回 200。旧 CloudBase 域名 `/health` 返回 404 / `INVALID_HOST`，因此不能作为可用的免费后端继续依赖；这不能证明其控制台资源已删除或没有计费，未读取其账单。
+
+证据位于工作区忽略目录 `artifacts/miniapp-login/`：`account-check.json`、`wx-code-exchange.json`、`qr-api-check.json`、`live-probes.json`、`upload-info.json`、`upload-0.1.1-info.json`、`backend-tests-fresh.txt`、`web-checks.json`、`native-checks.json`、`domain-validation.json`、`file-domain-validation.json`、`runtime-audit.json`、`runtime-0.1.1.json`、`trial-config.json`、`phone-trial-success.json`、`preservation.json` 及原生截图。凭据、原始登录 code、openid、session_key 与浏览器扫码令牌不写入这些报告。
 
 ## 产品与账号
 

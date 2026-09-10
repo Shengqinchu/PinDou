@@ -12,7 +12,7 @@ function fail(e:unknown){error.value=e instanceof MiniappError?t((e.code in copy
 async function load(){loading.value=true;error.value='';try{if(!/^[A-Za-z0-9_-]{24}$/.test(scene.value))throw new MiniappError('wechat_flow_expired');const proof=await miniSession();if(!alive)return;ticket.value=proof.ticket;const result=await studioCall<{status:string;mode:string;account:string;display_code:string}>(miniappPrefix+'/scan',{scene:scene.value},ticket.value);if(!alive)return;details.value=result;status.value=['linked','ready','needs_email','consumed'].includes(result.status)?'approved':result.status==='denied'?'denied':'qr_scanned';}catch(e){if(alive)fail(e);}finally{if(alive)loading.value=false;}}
 async function confirm(approve:boolean){if(busy.value||!details.value)return;busy.value=true;error.value='';try{const result=await studioCall<{status:string}>(miniappPrefix+'/confirm',{scene:scene.value,approve,display_code:details.value.display_code},ticket.value);if(alive)status.value=result.status;}catch(e){if(alive)fail(e);}finally{if(alive)busy.value=false;}}
 function changeLanguage(){language.value=language.value==='zh'?'en':'zh';uni.setStorageSync('pd_studio_language',language.value);}
-function home(){uni.switchTab({url:'/pages/index/index'});}
+function home(){uni.reLaunch({url:'/pages/auth/studio-login'});}
 onLoad(options=>{try{scene.value=decodeURIComponent(String(options?.scene||''));}catch{scene.value='';}void load();});
 onUnload(()=>{alive=false;ticket.value='';});
 </script>

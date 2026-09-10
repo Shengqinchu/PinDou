@@ -111,4 +111,4 @@
 
 Studio 当前发布 `20260910184755-studio-v7`，366 文件校验通过；只增加自有小程序登录试用接口及网站渠道选择。真实微信凭证交换、二维码生成、289 后端测试、网站与原生模拟器验证记录见 [STUDIO_MINIAPP_LOGIN.md](STUDIO_MINIAPP_LOGIN.md)。
 
-自有小程序 0.1.0 已上传为开发版本。网站默认仍为 Authing，试用入口为 `/account?wechat_provider=miniapp`；微信后台合法域名尚待店主配置后做真机联调。生成器服务目录不变，预约／钱包／资料业务表哈希与部署备份一致；Server 酱配置及运行状态不变，Telegram 仍未配置且暂停接入。
+自有小程序修正版 0.1.1 已上传，默认进入小狗账号页，正式小程序包统一使用网站 API。店主已保存三类合法域名；服务端切到 `STUDIO_MINIAPP_ENV=trial` 后完成真机扫码及网站登录。网站默认仍为 Authing，试用入口为 `/account?wechat_provider=miniapp`，尚未正式提审发布。生成器服务目录不变，首次部署检查时预约／钱包／资料业务表哈希与备份一致；Server 酱配置及运行状态不变，Telegram 仍未配置且暂停接入。

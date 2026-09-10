@@ -21,18 +21,19 @@ const runtimeEnv = {
   ...viteEnv,
   ...(typeof process !== 'undefined' && process.env ? process.env : {})
 };
-const isDev = runtimeEnv.DEV === true || runtimeEnv.NODE_ENV === 'development';
+const isDev = viteEnv.DEV === true || (viteEnv.PROD !== true && runtimeEnv.NODE_ENV === 'development');
 export const IS_H5_CLIENT = detectH5Client();
 const SAME_ORIGIN_API = '/api/v1';
 const PUBLIC_API = 'https://pindoupuppy.com/api/v1';
 const DEV_API = runtimeEnv.VITE_PINDOU_DEV_API || defaultDevApi();
-const PROD_API = runtimeEnv.VITE_API_BASE_URL || runtimeEnv.VITE_PINDOU_PROD_API || PUBLIC_API;
 const storageWxCloudFlag = uni.getStorageSync('pd_use_wx_cloud');
 const storageApiBase = uni.getStorageSync('pd_api_base_url');
-const configuredApiBase =
-  runtimeEnv.VITE_API_BASE_URL ||
-  (isDev ? storageApiBase : '') ||
-  (IS_H5_CLIENT ? (isDev ? DEV_API : SAME_ORIGIN_API) : (isDev ? DEV_API : PROD_API));
+// Release clients share the website's account/database. Historical local .env
+// values and browser storage must not route signed customer tokens to an old
+// CloudBase deployment. Custom endpoints remain available only for development.
+const configuredApiBase = isDev
+  ? runtimeEnv.VITE_API_BASE_URL || storageApiBase || DEV_API
+  : IS_H5_CLIENT ? SAME_ORIGIN_API : PUBLIC_API;
 
 export const BASE_URL = normalizeBaseUrl(configuredApiBase);
 export const USE_WX_CLOUD = IS_H5_CLIENT || !isDev ? false : storageWxCloudFlag

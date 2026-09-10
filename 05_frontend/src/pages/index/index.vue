@@ -1,4 +1,8 @@
 <template>
+  <!-- #ifdef MP-WEIXIN -->
+  <view />
+  <!-- #endif -->
+  <!-- #ifndef MP-WEIXIN -->
   <MiniProgramLayout variant="home" title="PinDou 拼豆" :scroll="true">
     <div class="home__container">
       <div class="home__hero-wash" aria-hidden="true"></div>
@@ -85,11 +89,19 @@
       </section>
     </div>
   </MiniProgramLayout>
+  <!-- #endif -->
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { onLoad } from '@dcloudio/uni-app';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
+
+// Preserve older experience-code paths while making the native account page
+// the entry point. The browser-based generator keeps its existing homepage.
+// #ifdef MP-WEIXIN
+onLoad(() => { uni.reLaunch({url:'/pages/auth/studio-login'}); });
+// #endif
 
 // 样张轮播数据
 const banners = [

@@ -1,6 +1,15 @@
 {
   "pages": [
     {
+      "path": "pages/auth/studio-login",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
       "path": "pages/index/index",
       "style": {
         "navigationBarTitleText": "PinDou 拼豆",
@@ -79,15 +88,6 @@
     },
     {
       "path": "pages/auth/studio-confirm",
-      "style": {
-        "navigationBarTitleText": "小狗拼豆铺",
-        "navigationBarBackgroundColor": "#ffffff",
-        "navigationBarTextStyle": "black",
-        "backgroundColor": "#ffffff"
-      }
-    },
-    {
-      "path": "pages/auth/studio-login",
       "style": {
         "navigationBarTitleText": "小狗拼豆铺",
         "navigationBarBackgroundColor": "#ffffff",
