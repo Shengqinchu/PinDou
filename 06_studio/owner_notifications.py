@@ -1,4 +1,4 @@
-"""Owner-only ServerChan Turbo alerts, with a transactional outbox.
+"""Independent owner notification channels sharing a transactional outbox.
 
 No network requests run in the reservation transaction. Secrets are kept in a
 0600 file beside the private database, never in responses, messages or logs.
@@ -56,6 +56,16 @@ def initialize(database):
         );
         CREATE INDEX IF NOT EXISTS owner_notification_attempt_time ON studio_owner_notification_attempts(created_at);
         """)
+        for table, name, definition in (
+            ('studio_owner_notifications','channel',"TEXT NOT NULL DEFAULT 'serverchan'"),
+            ('studio_owner_notifications','target',"TEXT NOT NULL DEFAULT ''"),
+            ('studio_owner_notification_attempts','channel',"TEXT NOT NULL DEFAULT 'serverchan'"),
+        ):
+            if name not in {r[1] for r in db.execute('PRAGMA table_info('+table+')')}:
+                db.execute('ALTER TABLE '+table+' ADD COLUMN '+name+' '+definition)
+        db.execute('CREATE INDEX IF NOT EXISTS owner_channel_due ON studio_owner_notifications(channel,state,next_attempt)')
+    import telegram_notifications
+    telegram_notifications.initialize(database)
 
 
 def secret_path(db):
@@ -91,12 +101,14 @@ def settings_for(db):
     return dict(db.execute('SELECT * FROM studio_owner_notification_settings WHERE id=1').fetchone())
 
 
-def enqueue(db, kind, row=None, *, event_key=None):
+def enqueue(db, kind, row=None, *, event_key=None, channel='serverchan'):
     """Called inside the same transaction as the source event; no history replay."""
     stamp = time.time()
-    settings = settings_for(db)
+    settings, send_key = channel_settings(db, channel)
     reference = row['id'] if row else ''
     key = event_key or f"{kind}:{reference}:{row['version']}"
+    if channel != 'serverchan':
+        key = channel+':'+key
     existing = db.execute('SELECT * FROM studio_owner_notifications WHERE event_key=?', (key,)).fetchone()
     if existing:
         return dict(existing)
@@ -105,14 +117,32 @@ def enqueue(db, kind, row=None, *, event_key=None):
         source = json.loads(row['payload'])
         # Contact details, customer notes and owner-private notes stay in the desk.
         payload = {'name': source.get('name', ''), 'booking': source['booking']}
-    enabled = settings['enabled'] and bool(read_key(db))
+    enabled = settings['enabled'] and bool(send_key)
     state, error = ('queued', '') if enabled else ('skipped', 'not_enabled')
     ident = uuid.uuid4().hex
     db.execute('''INSERT INTO studio_owner_notifications
-        (id,event_key,kind,reservation_id,payload,state,created_at,updated_at,next_attempt,expires_at,error)
-        VALUES(?,?,?,?,?,?,?,?,?,?,?)''',
-        (ident, key, kind, reference, json.dumps(payload, ensure_ascii=False), state, stamp, stamp, stamp, stamp+86400, error))
+        (id,event_key,kind,reservation_id,payload,state,created_at,updated_at,next_attempt,expires_at,error,channel,target)
+        VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+        (ident, key, kind, reference, json.dumps(payload, ensure_ascii=False), state, stamp, stamp, stamp, stamp+86400, error, channel, settings.get('target','')))
     return dict(db.execute('SELECT * FROM studio_owner_notifications WHERE id=?', (ident,)).fetchone())
+
+
+def channel_settings(db, channel):
+    if channel == 'serverchan':
+        return settings_for(db), read_key(db)
+    if channel == 'telegram':
+        import telegram_notifications as telegram
+        settings = telegram.settings_for(db)
+        settings.update(daily_limit=10000, target=str(settings['bot_id'])+':'+settings['chat_id'])
+        return settings, telegram.read_token(db) if settings['chat_id'] else ''
+    raise ValueError('Unknown owner notification channel')
+
+
+def enqueue_reservation(db, kind, row):
+    enqueue(db, kind, row)
+    settings, key = channel_settings(db, 'telegram')
+    if settings['enabled'] and key:
+        enqueue(db, kind, row, channel='telegram')
 
 
 def safe_text(value):
@@ -185,42 +215,46 @@ def obsolete(db, job):
     return not row or row['deleted_at'] or row['status'] != ('pending' if job['kind'] == 'created' else 'cancelled')
 
 
-def process_one(database):
+def process_one(database, channel='serverchan'):
     current = time.time()
     with database() as db:
         db.execute('BEGIN IMMEDIATE')
-        settings = settings_for(db)
-        key = read_key(db)
-        db.execute("UPDATE studio_owner_notifications SET state='expired',error='expired',updated_at=? WHERE state IN ('queued','retry','sending') AND expires_at<=? AND lease_until<=?", (current, current, current))
+        settings, key = channel_settings(db, channel)
+        db.execute("UPDATE studio_owner_notifications SET state='expired',error='expired',updated_at=? WHERE channel=? AND state IN ('queued','retry','sending') AND expires_at<=? AND lease_until<=?", (current, channel, current, current))
         if not settings['enabled'] or not key or settings['blocked_until'] > current:
             return False
-        row = db.execute("""SELECT * FROM studio_owner_notifications WHERE expires_at>? AND
+        row = db.execute("""SELECT * FROM studio_owner_notifications WHERE channel=? AND expires_at>? AND
             ((state IN ('queued','retry') AND next_attempt<=?) OR (state='sending' AND lease_until<=?))
-            ORDER BY created_at,id LIMIT 1""", (current, current, current)).fetchone()
+            ORDER BY created_at,id LIMIT 1""", (channel, current, current, current)).fetchone()
         if not row:
             return False
         job = dict(row)
-        if obsolete(db, job):
+        if obsolete(db, job) or job['target'] != settings.get('target',''):
             db.execute("UPDATE studio_owner_notifications SET state='skipped',error='superseded',updated_at=?,lease_until=0 WHERE id=?", (current, job['id']))
             return True
         if job['attempts'] >= MAX_ATTEMPTS:
             db.execute("UPDATE studio_owner_notifications SET state='failed',error='retry_exhausted',updated_at=?,lease_until=0 WHERE id=?", (current, job['id']))
             return True
         # Rolling windows also cover restarts and avoid assuming a provider timezone.
-        timestamps = [r[0] for r in db.execute('SELECT created_at FROM studio_owner_notification_attempts WHERE created_at>? ORDER BY created_at', (current-86400,))]
+        timestamps = [r[0] for r in db.execute('SELECT created_at FROM studio_owner_notification_attempts WHERE channel=? AND created_at>? ORDER BY created_at', (channel,current-86400))]
         recent = [t for t in timestamps if t > current-60]
         deferred = max(timestamps[-settings['daily_limit']]+86401 if len(timestamps) >= settings['daily_limit'] else 0,
-                       recent[-30]+61 if len(recent) >= 30 else 0)
+                       recent[-30]+61 if len(recent) >= 30 else 0,
+                       timestamps[-1]+1.1 if channel=='telegram' and timestamps else 0)
         if deferred > current:
             db.execute("UPDATE studio_owner_notifications SET state='retry',next_attempt=?,error='local_quota',lease_until=0,updated_at=? WHERE id=?", (deferred, current, job['id']))
             return False
         token = uuid.uuid4().hex
         db.execute("UPDATE studio_owner_notifications SET state='sending',attempts=attempts+1,lease_until=?,claim_token=?,updated_at=?,error='' WHERE id=?", (current+LEASE_SECONDS, token, current, job['id']))
-        db.execute('INSERT INTO studio_owner_notification_attempts(notification_id,created_at) VALUES(?,?)', (job['id'], current))
+        db.execute('INSERT INTO studio_owner_notification_attempts(notification_id,created_at,channel) VALUES(?,?,?)', (job['id'], current,channel))
         db.execute('DELETE FROM studio_owner_notification_attempts WHERE created_at<?', (current-172800,))
     try:
-        title, body = render_message(job, settings['language'])
-        outcome = deliver(key, title, body)
+        if channel == 'telegram':
+            import telegram_notifications
+            outcome = telegram_notifications.deliver(key, settings['chat_id'], job, settings['language'])
+        else:
+            title, body = render_message(job, settings['language'])
+            outcome = deliver(key, title, body)
     except Exception:
         # No exception/URL logging here: the provider's URL contains the SendKey.
         outcome = {'ok': False, 'error': 'worker_error', 'retry': True}
@@ -233,15 +267,16 @@ def process_one(database):
         db.execute('''UPDATE studio_owner_notifications SET state=?,updated_at=?,next_attempt=?,lease_until=0,
             error=?,provider_id=? WHERE id=? AND state='sending' AND claim_token=?''',
             (state, finished, finished+delay, outcome.get('error', ''), outcome.get('provider_id', ''), job['id'], token))
-        if outcome.get('error') == 'provider_quota':
-            db.execute('UPDATE studio_owner_notification_settings SET blocked_until=MAX(blocked_until,?) WHERE id=1', (finished+delay,))
+        if outcome.get('error') in ('provider_quota','telegram_rate_limit'):
+            table = 'studio_telegram_settings' if channel=='telegram' else 'studio_owner_notification_settings'
+            db.execute('UPDATE '+table+' SET blocked_until=MAX(blocked_until,?) WHERE id=1', (finished+delay,))
     return True
 
 
-async def worker(database):
+async def worker(database, channel='serverchan'):
     while True:
         try:
-            await asyncio.to_thread(process_one, database)
+            await asyncio.to_thread(process_one, database, channel)
         except Exception:
             LOG.warning('Owner notification worker will retry after an internal error')
         await asyncio.sleep(3)
@@ -267,8 +302,8 @@ def register(app, database, admin_actor):
         with database() as db:
             settings = settings_for(db)
             key = read_key(db)
-            rows = db.execute('SELECT * FROM studio_owner_notifications ORDER BY created_at DESC,id DESC LIMIT 30').fetchall()
-            used = db.execute('SELECT count(*) FROM studio_owner_notification_attempts WHERE created_at>?', (time.time()-86400,)).fetchone()[0]
+            rows = db.execute("SELECT * FROM studio_owner_notifications WHERE channel='serverchan' ORDER BY created_at DESC,id DESC LIMIT 30").fetchall()
+            used = db.execute("SELECT count(*) FROM studio_owner_notification_attempts WHERE channel='serverchan' AND created_at>?", (time.time()-86400,)).fetchone()[0]
         return {**settings, 'configured': bool(key), 'key_fingerprint': hashlib.sha256(key.encode()).hexdigest()[:8] if key else '',
                 'used': used, 'items': [public_job(r) for r in rows]}
 
@@ -299,7 +334,7 @@ def register(app, database, admin_actor):
             db.execute('BEGIN IMMEDIATE')
             if not settings_for(db)['enabled'] or not read_key(db):
                 raise HTTPException(409, 'notification_not_configured')
-            recent = db.execute("SELECT count(*) FROM studio_owner_notifications WHERE kind='test' AND created_at>?", (time.time()-3600,)).fetchone()[0]
+            recent = db.execute("SELECT count(*) FROM studio_owner_notifications WHERE channel='serverchan' AND kind='test' AND created_at>?", (time.time()-3600,)).fetchone()[0]
             event_key = 'test:'+str(payload.request_id)
             replay = db.execute('SELECT * FROM studio_owner_notifications WHERE event_key=?', (event_key,)).fetchone()
             if replay:
@@ -314,7 +349,7 @@ def register(app, database, admin_actor):
             db.execute('BEGIN IMMEDIATE')
             if not settings_for(db)['enabled'] or not read_key(db):
                 raise HTTPException(409, 'notification_not_configured')
-            row = db.execute('SELECT * FROM studio_owner_notifications WHERE id=?', (ident,)).fetchone()
+            row = db.execute("SELECT * FROM studio_owner_notifications WHERE id=? AND channel='serverchan'", (ident,)).fetchone()
             if not row:
                 raise HTTPException(404, 'notification_not_found')
             if row['state'] in ('queued', 'retry', 'sending'):

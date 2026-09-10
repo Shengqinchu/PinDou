@@ -18,6 +18,8 @@ files = {'site/studio/' + p.relative_to(dist).as_posix(): p for p in dist.rglob(
 for name in ['app.py', 'commerce.py', 'payments.py', 'reservations.py', 'reservation-offers.json', 'customer_auth.py', 'authing_login.py', 'wechat_qr.py', 'wallet.py', 'booking_profile.py', 'owner_notifications.py', 'observability.py', 'content.py', 'xhs_import.py', 'content-defaults.json', 'journal-defaults.json', 'requirements.txt', 'requirements.lock.txt']:
     files['service/' + name] = root / '06_studio' / name
 files['service/owner-notification-copy.json'] = root / '05_studio/src/content/owner-notifications.json'
+files['service/telegram_notifications.py'] = root / '06_studio/telegram_notifications.py'
+files['service/telegram-notification-copy.json'] = root / '05_studio/src/content/telegram-notifications.json'
 manifest = {'version': version, 'sha256': {name: hashlib.sha256(p.read_bytes()).hexdigest() for name, p in files.items()}}
 reused=set()
 if len(sys.argv)>1:

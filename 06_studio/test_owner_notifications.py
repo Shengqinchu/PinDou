@@ -28,7 +28,7 @@ def setup(tmp_path, monkeypatch):
     monkeypatch.setattr(customer_auth, 'upstream', fake_upstream)
     monkeypatch.setattr(studio, 'urlopen', reject_legacy_admin)
     monkeypatch.delenv('STUDIO_SERVERCHAN_SENDKEY', raising=False)
-    async def paused_worker(_database):
+    async def paused_worker(_database,channel='serverchan'):
         await asyncio.Event().wait()
     monkeypatch.setattr(alerts, 'worker', paused_worker)
     sent=[]

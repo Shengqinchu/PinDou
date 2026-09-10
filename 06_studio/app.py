@@ -96,16 +96,20 @@ async def lifespan(_app):
     importer=asyncio.create_task(content.import_worker(database))
     import owner_notifications
     notifier=asyncio.create_task(owner_notifications.worker(database))
+    telegram_notifier=asyncio.create_task(owner_notifications.worker(database,'telegram'))
     yield
     worker.cancel()
     importer.cancel()
     notifier.cancel()
+    telegram_notifier.cancel()
     with contextlib.suppress(asyncio.CancelledError):
         await worker
     with contextlib.suppress(asyncio.CancelledError):
         await importer
     with contextlib.suppress(asyncio.CancelledError):
         await notifier
+    with contextlib.suppress(asyncio.CancelledError):
+        await telegram_notifier
 
 
 app = FastAPI(title="PinDou Puppy Studio", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
@@ -319,3 +323,5 @@ import observability
 observability.install(app, database, admin_actor)
 import owner_notifications
 owner_notifications.register(app, database, admin_actor)
+import telegram_notifications
+telegram_notifications.register(app, database, admin_actor)
