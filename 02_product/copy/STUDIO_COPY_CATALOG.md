@@ -1910,6 +1910,29 @@
 | school_two_four_hours | 59.9 | 59.9 |
 | school_card_holder | 26.6 | 26.6 |
 
+## reservation-cancellation.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| action | 取消预约 | Cancel reservation |
+| title | 确认取消这次预约？ | Cancel this reservation? |
+| rule | 每个账号每个自然月最多自行取消 3 次，按汉密尔顿当地时间计算。 | Each account can cancel up to 3 reservations per calendar month, using Hamilton local time. |
+| count | 本月已取消 {v0} / {v1} 次。本次取消后还可取消 {v2} 次。 | You have used {v0} of {v1} cancellations this month. You will have {v2} left after this cancellation. |
+| reset | 次数将在 {v0} 重置。 | Your allowance resets on {v0}. |
+| keep | 保留预约 | Keep reservation |
+| confirm | 确认取消 | Confirm cancellation |
+| working | 正在取消… | Cancelling… |
+| loading | 正在核对本月次数… | Checking your monthly allowance… |
+| retry | 重新核对 | Check again |
+| done | 预约已取消 | Reservation cancelled |
+| contact | 联系店主 | Contact the host |
+| reservation_cancellation_limit | 本月已达到 3 次自行取消上限。如需调整，请联系店主。 | You have reached the limit of 3 cancellations this month. Please contact the host for changes. |
+| reservation_cancellation_unavailable | 这条预约目前无法自行取消，请联系店主处理。 | This reservation can no longer be cancelled here. Please contact the host. |
+| pending | 待店主确认 | Awaiting host confirmation |
+| confirmed | 已确认 | Confirmed |
+| completed | 已到店 | Attended |
+| cancelled | 已取消 | Cancelled |
+
 ## reservation-timetable.json
 
 | 键 | 中文 | English |
@@ -1925,7 +1948,7 @@
 | empty | 空闲 | No bookings |
 | guests | {v0} 人 | {v0} guests |
 | slot | {v0} {v1}，已确认 {v2} 人，待确认 {v3} 人，已到店 {v4} 人 | {v0} {v1}: {v2} confirmed, {v3} pending, {v4} attended |
-| help | 点击时段查看对应预约。数字为该半小时内的人数；待确认预约不占用已确认名额。 | Select a slot to see its bookings. Counts show guests during that half hour; pending bookings do not use confirmed capacity. |
+| help | 一组客人一个色块，显示称呼、备注和人数。重叠预约并排显示；点击色块查看详情，点击空白时段筛选预约。待确认预约不占用已确认名额。 | Each block shows one group's name, notes and guest count. Overlapping bookings appear side by side. Select a block for details or an empty slot to filter bookings. Pending bookings do not use confirmed capacity. |
 | help_label | 时段表说明 | About the timetable |
 | selected | 正在查看 {v0} {v1} 的预约 | Showing bookings for {v0} at {v1} |
 | clear | 清除时段筛选 | Clear time filter |

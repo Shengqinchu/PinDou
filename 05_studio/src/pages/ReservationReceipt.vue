@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import LiftTitle from '../components/LiftTitle.vue';
+import CancelReservation from '../components/CancelReservation.vue';
+import { reservationRevision } from '../cancellation';
 import CopyContact from "../components/CopyContact.vue";
 import OfferLabel from '../visit/OfferLabel.vue';
 import { contentModule } from "../content-store";
@@ -53,6 +55,7 @@ function visible() {
 }
 async function loginAndRefresh(){try{if(await ensureCustomer()&&alive)await refresh();}catch(e){error.value=(e as Error).message;}}
 watch(()=>[route.params.id,accountUser.value?.id],()=>{sequence++;result.value=undefined;busy.value=false;void refresh();});
+watch(reservationRevision,()=>{sequence++;busy.value=false;void refresh();});
 onMounted(() => {
   refresh();
   timer = setInterval(() => {
@@ -145,11 +148,11 @@ onBeforeUnmount(() => {
     </p>
     <p v-if="error" class="form-error" role="alert">{{ error }}</p>
     <button v-if="needsSignIn" class="button button-primary" @click="loginAndRefresh">{{ say(accountCopy.sign_in) }}</button>
-    <button type="button" class="text-link" :disabled="busy" @click="refresh">
+    <div class="reservation-receipt-actions"><button type="button" class="text-link" :disabled="busy" @click="refresh">
       <PhArrowClockwise :class="{ spinning: busy }" />{{
         say(copyText.refresh_reservation_30af18)
       }}
-    </button>
+    </button><CancelReservation v-if="result" :reservation="result"/></div>
     <p class="fine-print">
       {{ say(copyText.for_changes_contact_the_host_on_wechat_2921d8)
       }}<CopyContact :value="wechat" /> · {{ say(copyText.phone_0614da)

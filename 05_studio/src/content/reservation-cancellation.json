@@ -1,0 +1,20 @@
+{
+  "action": ["取消预约", "Cancel reservation"],
+  "title": ["确认取消这次预约？", "Cancel this reservation?"],
+  "rule": ["每个账号每个自然月最多自行取消 3 次，按汉密尔顿当地时间计算。", "Each account can cancel up to 3 reservations per calendar month, using Hamilton local time."],
+  "count": ["本月已取消 {v0} / {v1} 次。本次取消后还可取消 {v2} 次。", "You have used {v0} of {v1} cancellations this month. You will have {v2} left after this cancellation."],
+  "reset": ["次数将在 {v0} 重置。", "Your allowance resets on {v0}."],
+  "keep": ["保留预约", "Keep reservation"],
+  "confirm": ["确认取消", "Confirm cancellation"],
+  "working": ["正在取消…", "Cancelling…"],
+  "loading": ["正在核对本月次数…", "Checking your monthly allowance…"],
+  "retry": ["重新核对", "Check again"],
+  "done": ["预约已取消", "Reservation cancelled"],
+  "contact": ["联系店主", "Contact the host"],
+  "reservation_cancellation_limit": ["本月已达到 3 次自行取消上限。如需调整，请联系店主。", "You have reached the limit of 3 cancellations this month. Please contact the host for changes."],
+  "reservation_cancellation_unavailable": ["这条预约目前无法自行取消，请联系店主处理。", "This reservation can no longer be cancelled here. Please contact the host."],
+  "pending": ["待店主确认", "Awaiting host confirmation"],
+  "confirmed": ["已确认", "Confirmed"],
+  "completed": ["已到店", "Attended"],
+  "cancelled": ["已取消", "Cancelled"]
+}

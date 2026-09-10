@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import OfferLabel from '../visit/OfferLabel.vue';
+import CancelReservation from './CancelReservation.vue';
+import { reservationRevision,reservationStatus } from '../cancellation';
 import { onBeforeUnmount,onMounted,ref,watch } from 'vue';
 import { PhArrowClockwise,PhArrowRight } from '@phosphor-icons/vue';
 import { walletCopy as copy,duration,type WalletDetail,type WalletCategory } from '../wallet';
@@ -26,6 +28,7 @@ async function refresh(){
 function visibleRefresh(){if(document.visibilityState==='visible'&&!busy.value)void refresh();}
 watch(category,()=>{page.value=1;void refresh();});
 watch([page,bookingPage],()=>void refresh());
+watch(reservationRevision,()=>void refresh());
 onMounted(()=>{void refresh();timer=setInterval(visibleRefresh,15000);window.addEventListener('focus',visibleRefresh);document.addEventListener('visibilitychange',visibleRefresh);});
 onBeforeUnmount(()=>{sequence++;clearInterval(timer);window.removeEventListener('focus',visibleRefresh);document.removeEventListener('visibilitychange',visibleRefresh);});
 </script>
@@ -41,7 +44,7 @@ onBeforeUnmount(()=>{sequence++;clearInterval(timer);window.removeEventListener(
     </template>
     <template v-if="tab==='bookings'">
       <p v-if="!bookings.length&&!busy" class="account-note">{{say(accountCopy.no_reservations)}}</p>
-      <ul class="account-bookings wallet-bookings"><li v-for="booking in bookings" :key="booking.id"><RouterLink :to="'/reservation/'+booking.id" @click="closeAccount"><span><strong>{{prettyDate(booking.booking.date)}}</strong><small>{{booking.booking.start}}–{{booking.booking.end}} · {{statusText(booking.status)}}</small><small v-if="booking.offer"><OfferLabel :offer="booking.offer"/></small><small>{{say(copy.booked)}} · {{duration(booking.booked_minutes)}}</small><small>{{say(copy.actual)}} · {{booking.actual_minutes==null?say(copy.unrecorded):formatCopy(copy.per_guest,{v0:duration(booking.actual_minutes),v1:booking.actual_guests||booking.booking.guests})}}</small><p v-if="booking.public_note">{{booking.public_note}}</p></span><PhArrowRight :size="18"/></RouterLink></li></ul>
+      <ul class="account-bookings wallet-bookings"><li v-for="booking in bookings" :key="booking.id"><RouterLink :to="'/reservation/'+booking.id" @click="closeAccount"><span><strong>{{prettyDate(booking.booking.date)}}</strong><small>{{booking.booking.start}}–{{booking.booking.end}} · {{reservationStatus(booking.status)}}</small><small v-if="booking.offer"><OfferLabel :offer="booking.offer"/></small><small>{{say(copy.booked)}} · {{duration(booking.booked_minutes)}}</small><small>{{say(copy.actual)}} · {{booking.actual_minutes==null?say(copy.unrecorded):formatCopy(copy.per_guest,{v0:duration(booking.actual_minutes),v1:booking.actual_guests||booking.booking.guests})}}</small><p v-if="booking.public_note">{{booking.public_note}}</p></span><PhArrowRight :size="18"/></RouterLink><CancelReservation :reservation="booking"/></li></ul>
       <div v-if="bookingTotal>30" class="wallet-pagination"><button :disabled="bookingPage===1||busy" @click="bookingPage--">{{say(copy.previous)}}</button><span>{{formatCopy(copy.page,{v0:bookingPage,v1:bookingTotal})}}</span><button :disabled="bookingPage*30>=bookingTotal||busy" @click="bookingPage++">{{say(copy.next)}}</button></div>
     </template>
   </div>

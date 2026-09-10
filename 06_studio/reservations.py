@@ -47,6 +47,13 @@ def initialize(database):
           note TEXT NOT NULL DEFAULT '', actor TEXT NOT NULL, version INTEGER NOT NULL DEFAULT 1,
           created_at TEXT NOT NULL);
         CREATE INDEX IF NOT EXISTS blocks_day ON reservation_blocks(date,start);
+        CREATE TABLE IF NOT EXISTS reservation_customer_cancellations (
+          id INTEGER PRIMARY KEY, reservation_id TEXT NOT NULL, owner_id TEXT NOT NULL,
+          from_version INTEGER NOT NULL, month TEXT NOT NULL, created_at TEXT NOT NULL,
+          UNIQUE(reservation_id,from_version)
+        );
+        CREATE INDEX IF NOT EXISTS cancellation_owner_month
+          ON reservation_customer_cancellations(owner_id,month);
         """)
         if "settings" not in {row[1] for row in db.execute("PRAGMA table_info(reservation_policy)")}:
             db.execute("ALTER TABLE reservation_policy ADD COLUMN settings TEXT NOT NULL DEFAULT '{}'")
@@ -205,7 +212,26 @@ def public_row(row):
         "booking": booking, "name": data["name"],
         "booked_minutes": minute(booking['end'])-minute(booking['start']),
         "offer": data.get('offer_snapshot'),
+        "can_cancel": self_cancellable(row,now_local()),
     }
+
+def self_cancellable(row,current):
+    booking=json.loads(row['payload'])['booking']
+    starts=datetime.combine(date.fromisoformat(booking['date']),datetime.strptime(booking['start'],'%H:%M').time(),tzinfo=ZONE)
+    return bool(row['owner_id'] and not row['deleted_at'] and row['status'] in ('pending','confirmed')
+                and row['actual_minutes'] is None and starts>current)
+
+def cancellation_policy(db,owner_id,row,current):
+    current=current.astimezone(ZONE)
+    month=current.strftime('%Y-%m')
+    reset=(current.date().replace(day=1)+timedelta(days=32)).replace(day=1)
+    used=db.execute('SELECT count(*) FROM reservation_customer_cancellations WHERE owner_id=? AND month=?',(owner_id,month)).fetchone()[0]
+    reason='reservation_cancellation_unavailable' if not self_cancellable(row,current) else 'reservation_cancellation_limit' if used>=3 else None
+    return {'limit':3,'used':used,'remaining':max(0,3-used),'month':month,'reset_date':str(reset),
+            'timezone':str(ZONE),'eligible':reason is None,'reason':reason,'version':row['version']}
+
+class CustomerCancellation(Strict):
+    version: int = Field(ge=1,strict=True)
 
 class ReservationUpdate(Strict):
     status: Literal["pending", "confirmed", "completed", "cancelled"]
@@ -295,6 +321,41 @@ class Block(Strict):
         return self
 
 def register(app, database, admin_actor):
+    def owned_reservation(db,reference,customer):
+        row=db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone()
+        if not row or row['deleted_at'] or row['owner_id']!=customer['id']:
+            raise HTTPException(404,'reservation_not_found')
+        return row
+
+    @app.get('/studio-api/reservations/{reference}/cancellation')
+    def cancellation_details(reference:str,customer=Depends(require_customer)):
+        with database() as db:
+            row=owned_reservation(db,reference,customer)
+            return cancellation_policy(db,customer['id'],row,now_local())
+
+    @app.post('/studio-api/reservations/{reference}/cancel')
+    def cancel_reservation(reference:str,payload:CustomerCancellation,customer=Depends(require_customer)):
+        with database() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row=owned_reservation(db,reference,customer)
+            current=now_local().astimezone(ZONE)
+            # A lost response can be retried without spending another cancellation.
+            replay=db.execute('SELECT 1 FROM reservation_customer_cancellations WHERE reservation_id=? AND from_version=? AND owner_id=?',
+                              (reference,payload.version,customer['id'])).fetchone()
+            if row['status']=='cancelled' and replay:
+                return {'reservation':public_row(row),'policy':cancellation_policy(db,customer['id'],row,current)}
+            if row['version']!=payload.version:raise HTTPException(409,'version_conflict')
+            policy=cancellation_policy(db,customer['id'],row,current)
+            if policy['reason']:raise HTTPException(409,policy['reason'])
+            timestamp=current.isoformat()
+            db.execute("UPDATE studio_reservations SET status='cancelled',version=version+1,updated_at=? WHERE id=?",(timestamp,reference))
+            db.execute('INSERT INTO reservation_customer_cancellations(reservation_id,owner_id,from_version,month,created_at) VALUES(?,?,?,?,?)',
+                       (reference,customer['id'],payload.version,policy['month'],timestamp))
+            db.execute("INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,'cancelled','')",
+                       (reference,'customer:'+customer['id'],timestamp))
+            row=db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone()
+            return {'reservation':public_row(row),'policy':cancellation_policy(db,customer['id'],row,current)}
+
     @app.get('/studio-api/auth/reservation-context')
     def contact_context(customer=Depends(require_customer)):
         with database() as db:
@@ -423,10 +484,15 @@ def register(app, database, admin_actor):
         with database() as db:
             policy=read_policy(db)
             # Aggregate every overlapping booking, independently of the list's 30-row pagination.
-            rows=db.execute("SELECT status,json_extract(payload,'$.booking') FROM studio_reservations WHERE deleted_at IS NULL AND status IN ('pending','confirmed','completed') AND json_extract(payload,'$.booking.date')>=? AND json_extract(payload,'$.booking.date')<?",(str(first),str(last))).fetchall()
+            rows=db.execute("SELECT r.*,m.name AS member_name,m.staff_note AS member_note FROM studio_reservations r LEFT JOIN studio_members m ON m.owner_id=r.owner_id WHERE r.deleted_at IS NULL AND r.status IN ('pending','confirmed','completed') AND json_extract(r.payload,'$.booking.date')>=? AND json_extract(r.payload,'$.booking.date')<? ORDER BY r.id",(str(first),str(last))).fetchall()
             blocks=[dict(r) for r in db.execute('SELECT date,start,end FROM reservation_blocks WHERE date>=? AND date<?',(str(first),str(last)))]
         days=[]
-        booked=[(r[0],json.loads(r[1])) for r in rows]
+        booked=[(r['status'],json.loads(r['payload'])['booking']) for r in rows]
+        groups=[]
+        for row in rows:
+            data=json.loads(row['payload'])
+            note='\n'.join(dict.fromkeys(n.strip() for n in (row['member_note'] or '',row['staff_note'],data.get('notes','')) if n.strip()))
+            groups.append({'id':row['id'],'status':row['status'],'name':data.get('name') or row['member_name'] or row['id'],'note':note,**data['booking']})
         for index in range(14):
             day=first+timedelta(days=index);opening=hours(day,policy);slots=[]
             present=[(s,b) for s,b in booked if b['date']==str(day)]
@@ -438,7 +504,8 @@ def register(app, database, admin_actor):
                     overlaps=[b for s,b in present if s==state and b['start']<end and b['end']>begin]
                     slot[state]=sum(b['guests'] for b in overlaps);slot[state+'_groups']=len(overlaps)
                 slots.append(slot)
-            days.append({'date':str(day),'open':opening['open'],'close':opening['close'],'closed':not opening['enabled'],'slots':slots})
+            days.append({'date':str(day),'open':opening['open'],'close':opening['close'],'closed':not opening['enabled'],'slots':slots,
+                         'bookings':[g for g in groups if g['date']==str(day)]})
         return {'days':days,'timezone':str(ZONE),'policy_version':policy['version']}
 
     @app.patch("/studio-api/manage/reservations/{reference}")

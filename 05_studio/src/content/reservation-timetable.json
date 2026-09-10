@@ -10,7 +10,7 @@
   "empty": ["空闲", "No bookings"],
   "guests": ["{v0} 人", "{v0} guests"],
   "slot": ["{v0} {v1}，已确认 {v2} 人，待确认 {v3} 人，已到店 {v4} 人", "{v0} {v1}: {v2} confirmed, {v3} pending, {v4} attended"],
-  "help": ["点击时段查看对应预约。数字为该半小时内的人数；待确认预约不占用已确认名额。", "Select a slot to see its bookings. Counts show guests during that half hour; pending bookings do not use confirmed capacity."],
+  "help": ["一组客人一个色块，显示称呼、备注和人数。重叠预约并排显示；点击色块查看详情，点击空白时段筛选预约。待确认预约不占用已确认名额。", "Each block shows one group's name, notes and guest count. Overlapping bookings appear side by side. Select a block for details or an empty slot to filter bookings. Pending bookings do not use confirmed capacity."],
   "help_label": ["时段表说明", "About the timetable"],
   "selected": ["正在查看 {v0} {v1} 的预约", "Showing bookings for {v0} at {v1}"],
   "clear": ["清除时段筛选", "Clear time filter"],

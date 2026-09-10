@@ -49,6 +49,7 @@ export type ReservationPayload = {
   website: string;
 };
 export type Reservation = {
+  can_cancel: boolean;
   offer?: ReservationOffer | null;
   id: string;
   status: string;

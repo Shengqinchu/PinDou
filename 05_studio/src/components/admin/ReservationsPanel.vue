@@ -106,6 +106,13 @@ function inspect(item: Entry) {
   saveError.value = "";
   open.value = true;
 }
+let inspectSequence=0;
+async function inspectBooking(id:string){
+ const n=++inspectSequence;saveError.value='';
+ try{const data=await request<{items:Entry[]}>('/manage/reservations?search='+encodeURIComponent(id));if(n===inspectSequence&&props.active){const found=data.items.find(item=>item.id===id);if(found)inspect(found);}}
+ catch(e){if(n===inspectSequence)error.value=(e as Error).message;}
+}
+onBeforeUnmount(()=>{inspectSequence++;});
 async function save() {
   if (!entry.value || saving.value) return;
   if((actualMinutes.value==='')!==(actualGuests.value==='') || (actualMinutes.value!==''&&(!Number.isInteger(actualMinutes.value)||actualMinutes.value<1||actualMinutes.value>1440||!Number.isInteger(actualGuests.value)||Number(actualGuests.value)<1||Number(actualGuests.value)>99))){
@@ -241,7 +248,7 @@ defineExpose({ refresh: load });
       </button>
     </div>
     <ReservationSettings :active="active" @saved="load" />
-    <ReservationTimetable v-if="!deleted" :active="active" :refresh-key="timetableRevision" :selected-date="day" :selected-time="at" @select="value=>{day=value.date;at=value.at;status='all';search='';}"/>
+    <ReservationTimetable v-if="!deleted" :active="active" :refresh-key="timetableRevision" :selected-date="day" :selected-time="at" @inspect="inspectBooking" @select="value=>{day=value.date;at=value.at;status='all';search='';}"/>
     <div v-if="at&&day&&!deleted" class="timetable-filter"><span>{{formatCopy(timetableCopy.selected,{v0:prettyDate(day),v1:at})}}</span><button class="desk-link" @click="at=''">{{say(timetableCopy.clear)}}</button></div>
     <div class="reservation-deleted-toggle" role="group" :aria-label="say(walletCopy.deleted)"><button class="desk-link" :aria-pressed="!deleted" @click="deleted=false">{{say(walletCopy.active)}}</button><button class="desk-link" :aria-pressed="deleted" @click="deleted=true">{{say(walletCopy.deleted)}}</button></div>
     <div class="reservation-desk-filters">
