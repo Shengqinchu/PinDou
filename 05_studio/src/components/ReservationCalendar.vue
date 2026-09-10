@@ -4,6 +4,7 @@ const copyText = contentModule("components-ReservationCalendar", copyTextDefault
 
 import copyTextDefault from "../content/components-ReservationCalendar.json";
 import ReservationHoursNote from './ReservationHoursNote.vue';
+import InfoTip from './InfoTip.vue';
 import { say } from "../state";
 
 import {
@@ -27,6 +28,7 @@ const props = defineProps<{
   calendar: ReservationCalendar;
   booking: ReservationBooking;
   disabled?: boolean;
+  compact?: boolean;
 }>();
 const emit = defineEmits<{
   select: [value: { date: string; start: string; end: string }];
@@ -53,6 +55,7 @@ onMounted(() => {
     if (size !== pageSize.value) {
       offset.value = Math.floor(offset.value / size) * size;
       pageSize.value = size;
+      revealSelected();
     }
   });
   if (table.value) resize.observe(table.value);
@@ -125,6 +128,8 @@ function resetFocus() {
       (i) => available(i % columns.value, Math.floor(i / columns.value)),
     ) ?? -1;
 }
+function revealSelected(){const index=props.calendar.days.findIndex(d=>d.date===props.booking.date);if(index>=0)offset.value=Math.floor(index/pageSize.value)*pageSize.value;}
+watch(()=>props.booking.date,revealSelected,{immediate:true});
 function keyboard(event: KeyboardEvent, index: number) {
   const delta =
     event.key === "ArrowRight"
@@ -167,7 +172,7 @@ watch(
 );
 </script>
 <template>
-  <div class="reservation-calendar">
+  <div class="reservation-calendar" :class="{'is-compact':compact}">
     <div class="reservation-legend">
       <span><i />{{ say(copyText.available_to_book_9bb918) }}</span
       ><span><i class="chosen" />{{ say(copyText.your_selection_0fc834) }}</span
@@ -175,6 +180,7 @@ watch(
     </div>
     <div class="reservation-week-nav">
       <button
+        type="button"
         class="icon-button"
         :disabled="offset === 0 || disabled"
         :aria-label="say(copyText.previous_dates_314fc5)"
@@ -182,14 +188,16 @@ watch(
       >
         <PhArrowLeft />
       </button>
-      <div>
+      <div class="reservation-date-range">
         <strong>{{ say(copyText.the_next_two_weeks_59cce3) }}</strong
         ><span
           >{{ days[0]?.date.slice(5).replace("-", "/") }} —
           {{ days[days.length - 1]?.date.slice(5).replace("-", "/") }}</span
         >
       </div>
+      <InfoTip v-if="compact" :label="say(copyText.reservation_timetable_use_arrow_keys_to_move_3bb451)"><p>{{say(booking.plan==='day'?copyText.day_selection_help:copyText.choose_a_start_time_for_a_twohour_a3470d)}}</p><p>{{say(copyText.all_times_are_local_to_hamilton_the_8a3607)}}</p></InfoTip>
       <button
+        type="button"
         class="icon-button"
         :disabled="offset + pageSize >= calendar.days.length || disabled"
         :aria-label="say(copyText.next_dates_4c8209)"
@@ -198,7 +206,7 @@ watch(
         <PhArrowRight />
       </button>
     </div>
-    <p class="reservation-grid-help">
+    <p v-if="!compact" class="reservation-grid-help">
       {{ say(copyText.choose_a_start_time_for_a_twohour_a3470d) }}
     </p>
     <div ref="table" class="reservation-grid-scroll">
@@ -274,7 +282,7 @@ watch(
     </div>
     <ReservationHoursNote/>
     <p v-if="message" class="form-error" role="alert">{{ message }}</p>
-    <p class="reservation-hours">
+    <p v-if="!compact" class="reservation-hours">
       {{ say(copyText.all_times_are_local_to_hamilton_the_8a3607) }}
     </p>
   </div>

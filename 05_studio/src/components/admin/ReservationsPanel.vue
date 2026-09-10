@@ -361,6 +361,8 @@ defineExpose({ refresh: load });
           <div>
             <dt>{{ say(copyText.contact_b87aac) }}</dt>
             <dd>
+              <span v-if="!entry.payload.contact">{{say(copyText.returning_contact_omitted)}}</span>
+              <template v-else>
               {{
                 entry.payload.contact_method === "wechat"
                   ? say(copyText.wechat_2941d2)
@@ -370,6 +372,7 @@ defineExpose({ refresh: load });
                       ? say(copyText.email_8501ec)
                       : say(copyText.other_8b6752)
               }}：<CopyContact v-if="entry.payload.contact_method==='wechat'" :value="entry.payload.contact" /><span v-else>{{ entry.payload.contact }}</span>
+              </template>
             </dd>
           </div>
           <div v-if="entry.payload.notes">

@@ -110,9 +110,9 @@ class Visit(Strict):
 
 class Submission(Strict):
     booking: Visit
-    name: str = Field(min_length=1, max_length=80)
+    name: str = Field(default="", max_length=80)
     contact_method: Literal["wechat", "phone", "email", "other"]
-    contact: str = Field(min_length=3, max_length=180)
+    contact: str = Field(default="", max_length=180)
     notes: str = Field(default="", max_length=1500)
     # New booking forms submit directly. Keep the optional legacy flag so an
     # already-saved request can be retried unchanged; never synthesize consent.
@@ -124,6 +124,8 @@ class Submission(Strict):
 
     @model_validator(mode="after")
     def contact_valid(self):
+        if not self.contact:return self
+        if len(self.contact)<3:raise ValueError("Invalid contact")
         if self.contact_method == "phone" and (not re.fullmatch(r"[+\d ()-]{7,30}", self.contact) or len(re.sub(r"\D", "", self.contact)) < 7):
             raise ValueError("Invalid phone")
         if self.contact_method == "email" and not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", self.contact):
@@ -228,6 +230,38 @@ class DayHours(Strict):
             raise ValueError("Opening hours need at least two hours")
         return self
 
+
+def returning_customer(db, owner_id, current):
+    """Attendance is tied to the authenticated account, never a contact match."""
+    day=str(current.date())
+    completed=db.execute("""SELECT 1 FROM studio_reservations WHERE owner_id=?
+      AND status='completed' AND actual_minutes>0 AND deleted_at IS NULL
+      AND json_extract(payload,'$.booking.date')<=? LIMIT 1""",(owner_id,day)).fetchone()
+    used=db.execute("""SELECT 1 FROM studio_wallet_ledger l WHERE owner_id=? AND effective_date<=?
+      AND ((kind='usage' AND minutes_delta<0) OR kind='visit_reward')
+      AND NOT EXISTS(SELECT 1 FROM studio_wallet_ledger r WHERE r.reverses_id=l.id) LIMIT 1""",(owner_id,day)).fetchone()
+    return bool(completed or used)
+
+
+def reservation_contact(db, payload, customer, current):
+    if payload.name and payload.contact:return {}
+    if not returning_customer(db,customer['id'],current):
+        raise HTTPException(422,'reservation_contact_required')
+    # Resolve only this account's history. The request hash remains the original
+    # blank input so a retry returns the original receipt after history changes.
+    row=db.execute("""SELECT payload FROM studio_reservations WHERE owner_id=? AND deleted_at IS NULL
+      AND status IN ('completed','confirmed','pending') AND length(json_extract(payload,'$.contact'))>=3
+      ORDER BY (status='completed') DESC,created_at DESC,id DESC LIMIT 1""",(customer['id'],)).fetchone()
+    history=json.loads(row['payload']) if row else {}
+    values={'returning_customer':True}
+    if not payload.name:
+        member=db.execute('SELECT name FROM studio_members WHERE owner_id=?',(customer['id'],)).fetchone()
+        values['name']=(history.get('name') or customer.get('nickname') or (member['name'] if member else '') or customer.get('email') or customer['id'])[:80]
+    if not payload.contact:
+        values['contact']=history.get('contact') or customer.get('email') or ''
+        values['contact_method']=history.get('contact_method') if history.get('contact') else 'email' if customer.get('email') else 'other'
+    return values
+
 class ReservationPolicy(Strict):
     exclusive_groups: bool = False  # Kept for old desk clients; new desk edits explicit limits.
     max_guests_per_group: int = Field(default=4, ge=1, le=99, strict=True)
@@ -255,6 +289,11 @@ class Block(Strict):
         return self
 
 def register(app, database, admin_actor):
+    @app.get('/studio-api/auth/reservation-context')
+    def contact_context(customer=Depends(require_customer)):
+        with database() as db:
+            return {'can_omit_details':returning_customer(db,customer['id'],now_local())}
+
     @app.get("/studio-api/reservation-calendar")
     def calendar(request: Request, response: Response, guests: int = 1):
         visitor(request, response)
@@ -302,6 +341,7 @@ def register(app, database, admin_actor):
                 if wrong_owner or existing["payload_hash"] != digest:
                     raise HTTPException(409, "reservation_request_changed")
                 return public_row(existing)
+            contact=reservation_contact(db,payload,customer,current)
             settings = read_policy(db)
             validate_interval(payload.booking, current, settings)
             offer = validate_offer(db, payload, current)
@@ -316,7 +356,7 @@ def register(app, database, admin_actor):
             db.execute("INSERT INTO submission_limits VALUES(?,?,1) ON CONFLICT(client_hash,bucket) DO UPDATE SET count=count+1", (client,bucket))
             ref = "VIS-" + uuid.uuid4().hex[:16].upper()
             timestamp = current.isoformat()
-            stored = json.dumps(json.loads(encoded) | {'offer_snapshot': offer}, ensure_ascii=False, separators=(',', ':')) if offer else encoded
+            stored = json.dumps(json.loads(encoded) | contact | ({'offer_snapshot': offer} if offer else {}), ensure_ascii=False, separators=(',', ':')) if offer or contact else encoded
             db.execute("INSERT INTO studio_reservations(id,created_at,updated_at,payload,visitor_hash,idempotency_key,payload_hash,owner_id) VALUES(?,?,?,?,?,?,?,?)", (ref,timestamp,timestamp,stored,actor,idempotency_key,digest,customer["id"]))
             row = db.execute("SELECT * FROM studio_reservations WHERE id=?", (ref,)).fetchone()
             return public_row(row)

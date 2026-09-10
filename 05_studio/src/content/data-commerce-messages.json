@@ -211,6 +211,10 @@
     "服务更新中断了导入，原有日记未改动，请重试。",
     "A service update interrupted the import. Existing stories are unchanged. Please retry."
   ],
+  "reservation_contact_required": [
+    "首次预约请填写称呼和联系方式。",
+    "Please provide your name and contact details for your first visit."
+  ],
   "reservation_offer_invalid": [
     "此套餐需选择两人、连续四小时，请重新选择。",
     "This offer requires two guests and four consecutive hours. Please select again."

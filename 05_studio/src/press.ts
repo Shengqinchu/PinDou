@@ -30,6 +30,8 @@ const controls = [
   ".visit-duration button",
   ".visit-times button",
   ".auth-method-choice",
+  ".visit-guest-trigger",
+  ".visit-guest-options button",
 ].join(",");
 
 type Frame = { transform: string; boxShadow: string };

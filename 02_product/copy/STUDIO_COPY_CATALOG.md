@@ -535,6 +535,7 @@
 
 | 键 | 中文 | English |
 |---|---|---|
+| returning_contact_omitted | 老客已省略联系信息，可查看顾客账户。 | A returning guest left contact details blank. Check their customer account. |
 | pending_5c3b18 | 待确认 | Pending |
 | confirmed_b1c92b | 已确认 | Confirmed |
 | completed_ff8af6 | 已完成 | Completed |
@@ -790,6 +791,7 @@
 | 键 | 中文 | English |
 |---|---|---|
 | enca_9cd218 | zh-CN | en-CA |
+| day_selection_help | 点击到店时间，安排至当天闭店。 | Choose your arrival time for a visit until that day's closing time. |
 | choose_an_earlier_or_another_available_time_f98d07 | 这里无法安排至少两小时，请选择更早或其他可用时段。 | Choose an earlier or another available time for a visit of at least two hours. |
 | available_to_book_9bb918 | 可以预约 | Available to book |
 | your_selection_0fc834 | 已选时段 | Your selection |
@@ -910,6 +912,7 @@
 | import_queue_full | 还有导入正在处理，请稍后重试。 | Other imports are still running. Please retry shortly. |
 | import_job_not_found | 未找到这次导入记录，请重新粘贴分享链接。 | This import record was not found. Paste the share link again. |
 | import_interrupted | 服务更新中断了导入，原有日记未改动，请重试。 | A service update interrupted the import. Existing stories are unchanged. Please retry. |
+| reservation_contact_required | 首次预约请填写称呼和联系方式。 | Please provide your name and contact details for your first visit. |
 | reservation_offer_invalid | 此套餐需选择两人、连续四小时，请重新选择。 | This offer requires two guests and four consecutive hours. Please select again. |
 | reservation_offer_expired | 此套餐不适用于所选日期，请选择其他体验。 | This offer is unavailable for the selected date. Choose another experience. |
 | reservation_offer_changed | 套餐信息已更新，请核对后重新提交。 | The offer has changed. Review it before submitting again. |
@@ -1935,8 +1938,8 @@
 
 | 键 | 中文 | English |
 |---|---|---|
-| step_experience | 体验与人数 | Experience & guests |
-| step_time | 日期与时间 | Date & time |
+| step_experience | 选择体验 | Choose an experience |
+| step_time | 人数与时间 | Guests & time |
 | step_contact | 联系与确认 | Contact & review |
 | progress | 预约进度 | Booking progress |
 | experience | 先选一种体验 | Choose your experience |
@@ -1956,7 +1959,7 @@
 | back | 上一步 | Back |
 | back_experience | 返回体验选择 | Back to experiences |
 | edit | 修改 | Edit |
-| next_time | 下一步：选时间 | Next: date & time |
+| next_time | 下一步：人数与时间 | Next: guests & time |
 | next_contact | 下一步：确认信息 | Next: contact & review |
 | next_two_weeks | 未来两周 | The next two weeks |
 | choose_date | 选择日期 | Choose a date |
@@ -1974,7 +1977,9 @@
 | closed | 休息 | Closed |
 | no_time | 这一天没有符合条件的时段，可以换一天或缩短时长。 | No times fit this selection. Choose another day or a shorter visit. |
 | no_duo_time | 这一天没有完整四小时的空位，可以换一天看看。 | No four-hour time slots are available on this day. Try another date. |
-| choose_first | 先选择一种体验和人数。 | Choose an experience and guest count first. |
+| choose_first | 先选择一种体验。 | Choose an experience first. |
+| returning_help | 如果您已登录且来玩耍过可忽略 | If you are signed in and have visited before, you can leave these blank. |
+| confirmation_note | 提交预约后待店主确认，届时预约就安排好啦 | After submitting, wait for the host to confirm. Then your visit is all arranged! |
 | choose_available | 先选择可预约的日期和时间。 | Choose an available date and time first. |
 | offer_changed | 套餐信息已更新，请重新选择。其他资料已保留。 | This offer has changed. Please select it again. Your other details are saved. |
 | offer_unavailable | 此套餐暂不可预约，可以选择其他体验。 | This offer is unavailable. Choose another experience. |

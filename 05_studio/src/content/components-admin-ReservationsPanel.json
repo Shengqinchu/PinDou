@@ -1,4 +1,5 @@
 {
+  "returning_contact_omitted": ["老客已省略联系信息，可查看顾客账户。", "A returning guest left contact details blank. Check their customer account."],
   "pending_5c3b18": ["待确认", "Pending"],
   "confirmed_b1c92b": ["已确认", "Confirmed"],
   "completed_ff8af6": ["已完成", "Completed"],

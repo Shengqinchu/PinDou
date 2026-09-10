@@ -1,5 +1,6 @@
 {
   "enca_9cd218": ["zh-CN", "en-CA"],
+  "day_selection_help": ["点击到店时间，安排至当天闭店。", "Choose your arrival time for a visit until that day's closing time."],
   "choose_an_earlier_or_another_available_time_f98d07": [
     "这里无法安排至少两小时，请选择更早或其他可用时段。",
     "Choose an earlier or another available time for a visit of at least two hours."
