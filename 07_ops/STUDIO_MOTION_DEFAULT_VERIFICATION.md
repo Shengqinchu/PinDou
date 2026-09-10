@@ -21,3 +21,10 @@
 - 脚本开发中修正一处测试前提：保留 `?motion=system` 的 URL 在刷新后仍是显式选择；测试清除本站选择后回到普通 URL 再验证默认。该行为符合 URL 优先规则。
 
 证据目录：`artifacts/studio-motion-default/`，包括线上 before.json、browser-test.log、verification.json；发布核对将追加在下方。
+
+## 线上结果
+
+- 实现提交 `bc81349` 已推送。发布 `20260910030309-studio-v7`，构建 `2026-09-10T02:57:02.099Z`，357 文件哈希通过。归档 343618 字节，SHA-256 `ca58cb7cac976f6be70bee0e694d31ff2368b4cdfd1eda9f3d5b818f7448a191`。
+- 线上原生 Windows、模拟 reduce 的 Chromium、手机 WebKit 全新会话均 source=full/motion=full、saved=null；标题抬升 -7.38px，狗图捏捏 scaleY 约0.80–0.81，刷新仍 full。应用内真实窗口也读取到新构建和 full，而系统仍 reduced，预约人数2人及当前第二步保留。
+- 原始线上检查记录了 Cloudflare `/cdn-cgi/rum` 性能统计请求；其中手机 WebKit 报一条访问控制错误。该统计请求不影响已通过的动效断言，记录保留在 live-browser.json，不把它描述为零浏览器错误。未发生本站登录、邮件、生成或预约写入请求。
+- 发布前后业务数据指纹完全一致；生成器原服务/HTML保持不变，两个服务均 active。证据为 before-deploy.json、after-deploy.json、preservation.json 与 deploy-result.json。
