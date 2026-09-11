@@ -1,23 +1,27 @@
 <script setup lang="ts">
 import {ref} from 'vue';
-import {onShow,onUnload} from '@dcloudio/uni-app';
+import {onShow,onHide,onUnload} from '@dcloudio/uni-app';
 import StudioAdminShell from '../../components/StudioAdminShell.vue';
 import StudioGlyph from '../../components/StudioGlyph.vue';
 import {useStudioNative} from '../../utils/studio-native';
 import {adminCall,adminError,goAdmin} from '../../utils/studio-admin';
+import {adminView} from '../../utils/studio-admin-cache';
 import copy from '../../../../05_studio/src/content/workbench.json';
 import business from '../../../../05_studio/src/content/business.json';
 import {money,type FinanceSummary} from '../../../../05_studio/src/business-model';
 const {language,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();
-const busy=ref(false),error=ref(''),data=ref<{today:string;pending:number;visits:number;unread:number;finance:FinanceSummary}>();
+type Summary={today:string;pending:number;visits:number;unread:number;finance:FinanceSummary};
+const view=adminView<{data?:Summary}>('home');
+const busy=ref(false),error=ref(''),data=ref<Summary|undefined>(view.snapshot?.data);
 let alive=true;
-async function refresh(){if(busy.value)return;busy.value=true;error.value='';try{const value=await adminCall<typeof data.value>('/manage/desk-summary');if(alive)data.value=value;}catch(e){error.value=adminError(e,say);data.value=undefined;}finally{busy.value=false;}}
+const remember=()=>view.save({data:data.value});
+async function refresh(force=true){if(!view.valid())data.value=undefined;if(busy.value||(!force&&view.fresh()))return;busy.value=true;error.value='';const revision=view.begin();try{const value=await adminCall<Summary>('/manage/desk-summary');if(alive){data.value=value;view.loaded(revision);remember();}}catch(e){error.value=adminError(e,say);if(!view.valid())data.value=undefined;}finally{busy.value=false;}}
 const entries=[{page:'-reservations',label:copy.reservations,icon:'calendar'},{page:'-messages',label:copy.messages,icon:'wechat'},{page:'-members',label:copy.members,icon:'user'},{page:'-finance',label:copy.finance,icon:'grid'},{page:'-calendar',label:copy.calendar,icon:'calendar'}];
 function openAlerts(){uni.navigateTo({url:'/pages/studio/owner'});}
-onShow(()=>void refresh());onUnload(()=>{alive=false;});
+onShow(()=>void refresh(false));onHide(remember);onUnload(()=>{remember();alive=false;});
 </script>
 <template>
- <StudioAdminShell :title="say(copy.title)" :language="language" :shell-style="shellStyle" :keyboard-open="keyboardOpen" :busy="busy" :error="error" @refresh="refresh" @language="changeLanguage">
+ <StudioAdminShell :title="say(copy.title)" :language="language" :shell-style="shellStyle" :keyboard-open="keyboardOpen" :busy="busy&&!data" :error="error" @refresh="refresh()" @language="changeLanguage">
   <template v-if="data"><view class="admin-home-metrics"><button class="admin-card" hover-class="admin-pressed" @tap="goAdmin('-reservations')"><text class="admin-muted">{{say(copy.pending)}}</text><text class="admin-home-number">{{data.pending}}</text></button><button class="admin-card" hover-class="admin-pressed" @tap="goAdmin('-reservations','date='+data.today+'&status=all')"><text class="admin-muted">{{say(copy.today)}}</text><text class="admin-home-number">{{data.visits}}</text></button><button class="admin-card" hover-class="admin-pressed" @tap="goAdmin('-messages')"><text class="admin-muted">{{say(copy.unread)}}</text><text class="admin-home-number">{{data.unread}}</text></button></view>
   <view class="admin-card admin-stack"><view class="admin-row"><text class="admin-name">{{say(business.month)}} · {{say(business.title)}}</text><text class="admin-muted">{{data.today}}</text></view><view class="admin-pair"><view class="admin-stack"><text class="admin-muted">{{say(business.income)}}</text><text class="admin-name">{{money(data.finance.income_cents)}}</text></view><view class="admin-stack"><text class="admin-muted">{{say(business.expense)}}</text><text class="admin-name">{{money(data.finance.expense_cents)}}</text></view></view><text v-if="data.finance.needs_amount" class="admin-muted">{{say(business.pending_count).replace('{count}',String(data.finance.needs_amount))}}</text></view>
   <view class="admin-home-links"><button v-for="entry in entries" :key="entry.page" class="admin-card admin-row" hover-class="admin-pressed" @tap="goAdmin(entry.page)"><StudioGlyph :name="entry.icon"/><text>{{say(entry.label)}}</text><StudioGlyph name="arrow" :size="18"/></button><button class="admin-card admin-row" hover-class="admin-pressed" @tap="openAlerts"><StudioGlyph name="info"/><text>{{say(copy.alerts)}}</text><StudioGlyph name="arrow" :size="18"/></button></view></template>

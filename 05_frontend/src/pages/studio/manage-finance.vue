@@ -1,22 +1,27 @@
 <script setup lang="ts">
 import {computed,ref} from 'vue';
-import {onShow,onUnload} from '@dcloudio/uni-app';
+import {onShow,onHide,onUnload} from '@dcloudio/uni-app';
 import StudioAdminShell from '../../components/StudioAdminShell.vue';
 import {useStudioNative} from '../../utils/studio-native';
 import {adminCall,adminError,goAdmin,today} from '../../utils/studio-admin';
+import {adminView} from '../../utils/studio-admin-cache';
 import copy from '../../../../05_studio/src/content/business.json';
 import {money,type FinancePage} from '../../../../05_studio/src/business-model';
 const {language,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();
-const start=ref(today().slice(0,7)+'-01'),end=ref(today()),kind=ref('all'),category=ref(''),search=ref(''),page=ref(1),pending=ref(false),data=ref<FinancePage>(),busy=ref(false),error=ref('');let sequence=0;
+type State={start:string;end:string;kind:string;category:string;search:string;page:number;pending:boolean;data?:FinancePage};
+const view=adminView<State>('finance'),saved=view.snapshot;
+const start=ref(saved?.start||today().slice(0,7)+'-01'),end=ref(saved?.end||today()),kind=ref(saved?.kind||'all'),category=ref(saved?.category||''),search=ref(saved?.search||''),page=ref(saved?.page||1),pending=ref(saved?.pending||false),data=ref<FinancePage|undefined>(saved?.data),busy=ref(false),error=ref('');let sequence=0;
 const choices=computed(()=>[{id:'',zh:copy.all[0],en:copy.all[1]},...(data.value?.categories||[])]);
 const categoryNames=computed(()=>choices.value.map(c=>language.value==='zh'?c.zh:c.en));
 const categoryText=(id:string)=>{const c=data.value?.categories.find(c=>c.id===id);return c?(language.value==='zh'?c.zh:c.en):say(copy.expense);};
-async function load(more=false){const n=++sequence;busy.value=true;error.value='';if(!more)page.value=1;
- try{const result=await adminCall<FinancePage>('/manage/finance',{start:start.value,end:end.value,kind:kind.value,category:category.value,search:search.value,page:page.value,needs_amount:pending.value});if(n===sequence)data.value=more&&data.value?{...result,items:[...data.value.items,...result.items]}:result;}catch(e){error.value=adminError(e,say);}finally{busy.value=false;}}
+const remember=()=>view.save({start:start.value,end:end.value,kind:kind.value,category:category.value,search:search.value,page:page.value,pending:pending.value,data:data.value});
+async function load(more=false,force=true){if(!view.valid())data.value=undefined;if(!force&&(busy.value||view.fresh()))return;const n=++sequence,revision=view.begin();busy.value=true;error.value='';if(!more&&force)page.value=1;
+ const pages=more?[page.value]:Array.from({length:page.value},(_,i)=>i+1);
+ try{const results=await Promise.all(pages.map(p=>adminCall<FinancePage>('/manage/finance',{start:start.value,end:end.value,kind:kind.value,category:category.value,search:search.value,page:p,needs_amount:pending.value})));if(n===sequence){const items=results.flatMap(r=>r.items);data.value={...results[0],items:more&&data.value?[...data.value.items,...items]:items};view.loaded(revision);remember();}}catch(e){if(n===sequence){error.value=adminError(e,say);if(!view.valid())data.value=undefined;}}finally{if(n===sequence)busy.value=false;}}
 function choose(value:string){kind.value=value;category.value='';void load();}
-onShow(()=>void load());onUnload(()=>{sequence++;});
+onShow(()=>void load(false,false));onHide(remember);onUnload(()=>{remember();sequence++;});
 </script>
-<template><StudioAdminShell :title="say(copy.title)" active="finance" :language="language" :shell-style="shellStyle" :keyboard-open="keyboardOpen" :busy="busy" :error="error" @refresh="load()" @language="changeLanguage">
+<template><StudioAdminShell :title="say(copy.title)" active="finance" :language="language" :shell-style="shellStyle" :keyboard-open="keyboardOpen" :busy="busy&&!data" :error="error" @refresh="load()" @language="changeLanguage">
  <view v-if="data" class="native-finance-totals"><view class="admin-card"><text class="admin-muted">{{say(copy.income)}}</text><text class="admin-name">{{money(data.summary.income_cents)}}</text></view><view class="admin-card"><text class="admin-muted">{{say(copy.expense)}}</text><text class="admin-name">{{money(data.summary.expense_cents)}}</text></view><view class="admin-card"><text class="admin-muted">{{say(copy.balance)}}</text><text class="admin-name">{{money(data.summary.balance_cents)}}</text></view></view>
  <view class="admin-pair"><view class="admin-field"><text class="admin-label">{{say(copy.start)}}</text><picker mode="date" :value="start" @change="start=$event.detail.value;load()"><view class="admin-input">{{start}}</view></picker></view><view class="admin-field"><text class="admin-label">{{say(copy.end)}}</text><picker mode="date" :value="end" @change="end=$event.detail.value;load()"><view class="admin-input">{{end}}</view></picker></view></view>
  <input v-model="search" class="admin-input" :placeholder="say(copy.search)" confirm-type="search" @confirm="load()"/>

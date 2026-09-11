@@ -4,15 +4,19 @@ import {onShow,onHide,onUnload} from '@dcloudio/uni-app';
 import StudioAdminShell from '../../components/StudioAdminShell.vue';
 import {useStudioNative} from '../../utils/studio-native';
 import {adminCall,adminError,goAdmin} from '../../utils/studio-admin';
+import {adminView} from '../../utils/studio-admin-cache';
 import copy from '../../../../05_studio/src/content/messaging.json';
 const {language,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();
-const data=ref<any>(),busy=ref(false),error=ref(''),query=ref(''),unread=ref(false),adding=ref(false),phone=ref(''),name=ref('');let active=false,timer:ReturnType<typeof setInterval>|undefined;
-async function load(more=false){if(busy.value)return;busy.value=true;error.value='';try{const result=await adminCall<any>('/manage/messages/threads',{query:query.value,unread:unread.value,...(more&&data.value?.next_cursor?{cursor:data.value.next_cursor}:{})});if(active)data.value=more&&data.value?{...result,items:[...data.value.items,...result.items]}:result;}catch(e){error.value=adminError(e,say);}finally{busy.value=false;}}
+type State={data:any;query:string;unread:boolean;adding:boolean;phone:string;name:string};
+const view=adminView<State>('messages'),saved=view.snapshot;
+const data=ref<any>(saved?.data),busy=ref(false),error=ref(''),query=ref(saved?.query||''),unread=ref(saved?.unread||false),adding=ref(saved?.adding||false),phone=ref(saved?.phone||''),name=ref(saved?.name||'');let active=false,alive=true,sequence=0,timer:ReturnType<typeof setInterval>|undefined;
+const remember=()=>view.save({data:data.value,query:query.value,unread:unread.value,adding:adding.value,phone:phone.value,name:name.value});
+async function load(more=false,force=true){if(!view.valid())data.value=undefined;if(!force&&(busy.value||view.fresh()))return;const n=++sequence,revision=view.begin();busy.value=true;error.value='';try{const result=await adminCall<any>('/manage/messages/threads',{query:query.value,unread:unread.value,...(more&&data.value?.next_cursor?{cursor:data.value.next_cursor}:{})});if(alive&&n===sequence){data.value=more&&data.value?{...result,items:[...data.value.items,...result.items]}:result;view.loaded(revision);remember();}}catch(e){if(n===sequence){error.value=adminError(e,say);if(!view.valid())data.value=undefined;}}finally{if(n===sequence)busy.value=false;}}
 async function create(){if(busy.value||!phone.value.trim())return;busy.value=true;error.value='';try{const thread=await adminCall<{id:string}>('/manage/messages/threads',{phone:phone.value,name:name.value},'POST');adding.value=false;phone.value='';name.value='';goAdmin('-conversation','id='+thread.id);}catch(e){error.value=adminError(e,say);}finally{busy.value=false;}}
-function stop(){active=false;clearInterval(timer);timer=undefined;}
-onShow(()=>{active=true;void load();clearInterval(timer);timer=setInterval(()=>{if(active)void load();},5000);});onHide(stop);onUnload(stop);
+function stop(){active=false;clearInterval(timer);timer=undefined;remember();}
+onShow(()=>{active=true;void load(false,false);clearInterval(timer);timer=setInterval(()=>{if(active&&!busy.value)void load();},5000);});onHide(stop);onUnload(()=>{stop();alive=false;sequence++;});
 </script>
-<template><StudioAdminShell :title="say(copy.title)" active="messages" :language="language" :shell-style="shellStyle" :keyboard-open="keyboardOpen" :busy="busy" :error="error" @refresh="load()" @language="changeLanguage">
+<template><StudioAdminShell :title="say(copy.title)" active="messages" :language="language" :shell-style="shellStyle" :keyboard-open="keyboardOpen" :busy="busy&&!data" :error="error" @refresh="load()" @language="changeLanguage">
  <input v-model="query" class="admin-input" :placeholder="say(copy.search)" confirm-type="search" @confirm="load()"/>
  <view class="admin-filters"><button :class="{chosen:!unread}" @tap="unread=false;load()">{{say(copy.all)}}</button><button :class="{chosen:unread}" @tap="unread=true;load()">{{say(copy.unread)}}</button><button @tap="adding=!adding">+ {{say(copy.new_conversation)}}</button></view>
  <view v-if="adding" class="admin-card admin-stack"><input v-model="name" class="admin-input" :placeholder="say(copy.name)" maxlength="80"/><input v-model="phone" class="admin-input" type="text" :placeholder="say(copy.phone)" maxlength="40"/><text class="admin-muted">{{say(copy.number_hint)}}</text><text class="admin-muted">{{say(copy.sync_hint)}}</text><button class="admin-primary" :disabled="busy||!phone.trim()" @tap="create">{{say(copy.connect)}}</button></view>

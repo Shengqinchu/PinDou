@@ -5,11 +5,15 @@ import business from '../../../05_studio/src/content/business.json';
 import wallet from '../../../05_studio/src/content/wallet.json';
 import commerce from '../../../05_studio/src/content/commerce.json';
 import messaging from '../../../05_studio/src/content/messaging.json';
+import {clearAdminViews,invalidateAdminViews} from './studio-admin-cache';
 let ticket='',until=0,inFlight:ReturnType<typeof miniSession>|null=null;
 async function proof(){
  if(ticket&&Date.now()<until)return ticket;
  if(!inFlight)inFlight=miniSession();
  try{const session=await inFlight;ticket=session.ticket;until=Date.now()+Math.max(10,session.expires_in-30)*1000;return ticket;}finally{inFlight=null;}
+}
+function clearRejectedAdmin(error:unknown){
+ if(error instanceof MiniappError&&[401,403].includes(error.status))clearAdminViews();
 }
 export async function adminCall<T>(path:string,data:unknown={},method:'GET'|'POST'|'PUT'|'PATCH'|'DELETE'='GET',extra:Record<string,string>={}):Promise<T>{
  if(!path.startsWith('/manage/'))throw new Error('invalid_admin_path');
@@ -18,11 +22,14 @@ export async function adminCall<T>(path:string,data:unknown={},method:'GET'|'POS
  const requestMethod=method==='PATCH'?'POST':method;
  if(method==='PATCH')path+='/update';
  // #ifdef MP-WEIXIN
- try{return await studioCall<T>(path,data,await proof(),'',requestMethod,extra);}
- catch(e){if(e instanceof MiniappError&&e.status===401){ticket='';return studioCall<T>(path,data,await proof(),'',requestMethod,extra);}throw e;}
+ try{const result=await studioCall<T>(path,data,await proof(),'',requestMethod,extra);if(requestMethod!=='GET')invalidateAdminViews(path);return result;}
+ catch(e){
+  if(e instanceof MiniappError&&e.status===401){ticket='';try{const result=await studioCall<T>(path,data,await proof(),'',requestMethod,extra);if(requestMethod!=='GET')invalidateAdminViews(path);return result;}catch(retry){clearRejectedAdmin(retry);throw retry;}}
+  clearRejectedAdmin(e);throw e;
+ }
  // #endif
  // #ifndef MP-WEIXIN
- return studioCall<T>(path,data,'',useUserStore().token,requestMethod,extra);
+ try{const result=await studioCall<T>(path,data,'',useUserStore().token,requestMethod,extra);if(requestMethod!=='GET')invalidateAdminViews(path);return result;}catch(e){clearRejectedAdmin(e);throw e;}
  // #endif
 }
 export function adminError(error:unknown,say:(s:string[])=>string){
