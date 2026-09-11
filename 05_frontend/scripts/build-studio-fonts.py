@@ -15,6 +15,16 @@ headings = ''.join(''.join(miniapp[key]) for key in (
 ))
 for module, key in (('account', 'account'), ('booking-profile', 'title')):
     headings += ''.join(json.loads((root / f'05_studio/src/content/{module}.json').read_text('utf-8'))[key])
+for module, keys in {
+    'account': ['my_reservations','reservation_title'],
+    'pages-Home': ['a_little_time_all_yours_9e9d60','make_something_lovely_04db64'],
+    'visit-flow': ['experience','time','contact'],
+    'pages-Details': ['a_little_guide_to_the_studio_1b38da','studio_address_171634','parking_8188de','seats_and_tools_4b0a0a'],
+    'reservation-cancellation': ['title','contact'],
+    'pages-ReservationReceipt': ['the_host_will_confirm_it_ae62ce','your_visit_is_confirmed_94453d','thank_you_for_coming_285672','this_reservation_was_cancelled_54b1d2','see_you_at_the_studio_add3a5','lets_make_again_soon_12f0b9'],
+}.items():
+    words=json.loads((root / f'05_studio/src/content/{module}.json').read_text('utf-8'))
+    headings+=''.join(''.join(words[key]) for key in keys)
 font = TTFont(root / 'artifacts/vision3/research/Xiaolai-Regular.ttf')
 options = subset.Options()
 options.recalc_timestamp = False

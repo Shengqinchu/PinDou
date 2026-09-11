@@ -8,6 +8,7 @@ import StudioGlyph from '../../components/StudioGlyph.vue';
 import { useStudioNative } from '../../utils/studio-native';
 import { miniSession, studioCall, miniappPrefix, MiniappError, type SharedSession } from '../../utils/miniapp-client';
 import { useUserStore } from '../../store/user';
+import { studioWords } from '../../utils/studio-content';
 const user = useUserStore();
 const { language, keyboardOpen, shellStyle, say, t, changeLanguage, website } = useStudioNative();
 type Method = 'register' | 'password' | 'wechat';
@@ -50,7 +51,7 @@ function complete(result: SharedSession) {
   password.value = ''; confirmation.value = '';
   const previous = getCurrentPages().slice(-2)[0]?.route || '';
   if (getCurrentPages().length > 1 && !/pages\/(auth|index|user)\//.test(previous)) uni.navigateBack({ delta: 1 });
-  else uni.redirectTo({ url: '/pages/auth/studio-account' });
+  else uni.redirectTo({ url: '/pages/studio/home' });
 }
 async function signIn() {
   if (busy.value || !valid.value) return;
@@ -78,7 +79,8 @@ async function wechat() {
   finally { if (alive) busy.value = false; }
 }
 function recover() { uni.showModal({ title: t('forgot'), content: t('recovery_help'), showCancel: false }); }
-onLoad(() => { if (user.token) uni.redirectTo({ url: '/pages/auth/studio-account' }); });
+function home() { uni.reLaunch({url:'/pages/studio/home'}); }
+onLoad(() => { if (user.token) uni.redirectTo({ url: '/pages/studio/home' }); });
 onUnload(() => { alive = false; ticket.value = ''; password.value = ''; confirmation.value = ''; });
 </script>
 <template>
@@ -106,6 +108,6 @@ onUnload(() => { alive = false; ticket.value = ''; password.value = ''; confirma
         <text class="studio-native-body studio-native-small">{{t('website_account')}}</text>
       </view>
     </view>
-    <view class="studio-native-footer"><text class="studio-native-site">pindoupuppy.com</text><button class="studio-native-link" hover-class="studio-native-pressed" @tap="website"><StudioGlyph name="copy" :size="16"/>{{t('visit_website')}}</button></view>
+    <view class="studio-native-footer"><text class="studio-native-site">pindoupuppy.com</text><view class="studio-login-links"><button class="studio-native-link" hover-class="studio-native-pressed" @tap="home"><StudioGlyph name="home" :size="16"/>{{say(studioWords('app','home_76c92b'))}}</button><button class="studio-native-link" hover-class="studio-native-pressed" @tap="website"><StudioGlyph name="copy" :size="16"/>{{t('visit_website')}}</button></view></view>
   </StudioShell>
 </template>

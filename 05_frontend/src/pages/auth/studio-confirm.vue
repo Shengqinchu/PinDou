@@ -40,7 +40,7 @@ async function confirm(approve: boolean) {
   } catch (e) { if (alive) fail(e); }
   finally { if (alive) busy.value = false; }
 }
-function home() { uni.reLaunch({url:'/pages/auth/studio-login'}); }
+function home() { uni.reLaunch({url:'/pages/studio/home'}); }
 onLoad(options => { try { scene.value = decodeURIComponent(String(options?.scene || '')); } catch { scene.value = ''; } void load(); });
 onUnload(() => { alive = false; ticket.value = ''; });
 </script>

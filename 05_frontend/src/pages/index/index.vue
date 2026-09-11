@@ -100,7 +100,7 @@ import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 // Preserve older experience-code paths while making the native account page
 // the entry point. The browser-based generator keeps its existing homepage.
 // #ifdef MP-WEIXIN
-onLoad(() => { uni.reLaunch({url:'/pages/auth/studio-login'}); });
+onLoad(() => { uni.reLaunch({url:'/pages/studio/home'}); });
 // #endif
 
 // 样张轮播数据

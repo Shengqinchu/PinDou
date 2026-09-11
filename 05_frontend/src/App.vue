@@ -42,7 +42,8 @@ async function refreshProfileInBackground(userStore: ReturnType<typeof useUserSt
     }
   } catch (e) {
     console.warn("自动登录拉取 Profile 失败，可能登录态已失效:", e);
-    userStore.logout();
+    // fetchProfile clears confirmed invalid credentials itself. An outage must
+    // not discard a valid saved session while a customer is booking.
   }
 }
 
@@ -69,6 +70,7 @@ function initWxCloud() {
 @import "./static/styles/components.css";
 /* Shared across the native auth shell, its slot content and child components. */
 @import "./static/styles/studio-auth.css";
+@import "./static/styles/studio-booking.css";
 
 /* 适配小程序 page 容器 */
 page {

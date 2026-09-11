@@ -46,11 +46,13 @@ async function refresh() {
 }
 function logout() { ++sequence; user.logout(); profile.value = undefined; wallet.value = undefined; uni.reLaunch({url:'/pages/auth/studio-login'}); }
 function patterns() { uni.navigateTo({url:'/pages/upload/upload'}); }
+function visit() { uni.navigateTo({url:'/pages/studio/visit'}); }
+function reservations() { uni.navigateTo({url:'/pages/studio/reservations'}); }
 onShow(() => void refresh());
 onUnload(() => { ++sequence; });
 </script>
 <template>
-  <StudioShell :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" @language="changeLanguage">
+  <StudioShell :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" nav="account" @language="changeLanguage">
     <view class="studio-native-main">
       <view class="studio-native-section-head"><text class="studio-native-title">{{say(accountCopy.account)}}</text><button class="studio-native-eye" :disabled="busy" :aria-label="say(walletCopy.refresh)" hover-class="studio-native-pressed" @tap="refresh"><view v-if="busy" class="studio-native-progress"/><StudioGlyph v-else name="refresh" :size="21"/></button></view>
       <view class="studio-native-profile">
@@ -74,7 +76,7 @@ onUnload(() => { ++sequence; });
           <text v-else class="studio-native-body">{{say(bookingCopy.empty)}}</text>
         </view>
       </view>
-      <view class="studio-native-menu"><button class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="patterns"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(accountCopy.pattern_tool)}}</text><StudioGlyph name="arrow" :size="18"/></button><button class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="website"><StudioGlyph name="copy"/><text class="studio-native-menu-label">{{t('visit_website')}}</text><StudioGlyph name="arrow" :size="18"/></button></view>
+      <view class="studio-native-menu"><button class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(visitCopy.come_make_something_f834ec)}}</text><StudioGlyph name="arrow" :size="18"/></button><button class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="reservations"><StudioGlyph name="clock"/><text class="studio-native-menu-label">{{say(accountCopy.my_reservations)}}</text><StudioGlyph name="arrow" :size="18"/></button><button class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="patterns"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(accountCopy.pattern_tool)}}</text><StudioGlyph name="arrow" :size="18"/></button></view>
       <button class="studio-native-link" hover-class="studio-native-pressed" @tap="logout">{{say(accountCopy.sign_out)}}</button>
     </view>
     <view class="studio-native-footer"><text class="studio-native-site">pindoupuppy.com</text></view>

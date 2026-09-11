@@ -1,6 +1,51 @@
 {
   "pages": [
     {
+      "path": "pages/studio/home",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "path": "pages/studio/visit",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "path": "pages/studio/reservations",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "path": "pages/studio/reservation",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "path": "pages/studio/details",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
       "path": "pages/auth/studio-login",
       "style": {
         "navigationBarTitleText": "小狗拼豆铺",
