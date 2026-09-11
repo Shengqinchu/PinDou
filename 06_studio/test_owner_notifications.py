@@ -13,6 +13,7 @@ from fastapi.testclient import TestClient
 import app as studio
 import customer_auth
 import owner_notifications as alerts
+import owner_wechat
 import reservations
 from auth_fixture import fake_upstream, reject_legacy_admin
 
@@ -31,6 +32,7 @@ def setup(tmp_path, monkeypatch):
     async def paused_worker(_database,channel='serverchan'):
         await asyncio.Event().wait()
     monkeypatch.setattr(alerts, 'worker', paused_worker)
+    monkeypatch.setattr(owner_wechat, 'worker', paused_worker)
     sent=[]
     def deliver(key,title,body):
         sent.append((key,title,body))

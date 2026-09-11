@@ -143,6 +143,10 @@ def enqueue_reservation(db, kind, row):
     settings, key = channel_settings(db, 'telegram')
     if settings['enabled'] and key:
         enqueue(db, kind, row, channel='telegram')
+    import sms_inbox
+    sms_inbox.on_reservation(db, kind, row)
+    import owner_wechat
+    owner_wechat.on_reservation(db, kind, row)
 
 
 def safe_text(value):

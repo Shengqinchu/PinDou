@@ -16,6 +16,7 @@
     "gsap": "^3.13.0",
     "pinia": "2.3.1",
     "vue": "^3.5.18",
+    "vue-advanced-chat": "2.1.2",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {

@@ -9,6 +9,7 @@ import { say } from "../state";
 
 import {
   computed,
+  defineAsyncComponent,
   nextTick,
   onBeforeUnmount,
   onMounted,
@@ -32,6 +33,7 @@ import {
   PhX,
   PhCaretRight,
   PhArrowClockwise,
+  PhChatCircle,
 } from "@phosphor-icons/vue";
 import { gsap } from "gsap";
 import { arrive } from "../motion";
@@ -51,6 +53,8 @@ import ReservationNotifications from "./admin/ReservationNotifications.vue";
 import ReservationsPanel from "./admin/ReservationsPanel.vue";
 import MembersPanel from './admin/MembersPanel.vue';
 import { walletCopy } from '../wallet';
+import { messageCopy } from '../messaging';
+const MessagesPanel=defineAsyncComponent(()=>import('./admin/MessagesPanel.vue'));
 const props = defineProps<{ token: string }>();
 const emit = defineEmits<{ logout: []; expired: [] }>();
 const desk = createDesk(props.token, () => emit("expired"));
@@ -61,6 +65,7 @@ const mobileMenu = ref(false);
 const reservationList = ref<InstanceType<typeof ReservationsPanel>>();
 const reservationCalendar = ref<InstanceType<typeof ReservationsPanel>>();
 const memberPanel=ref<InstanceType<typeof MembersPanel>>();
+const messagePanel=ref<{refresh:()=>Promise<void>}>();
 const mobileMedia = matchMedia("(max-width: 900px)");
 const isMobile = ref(mobileMedia.matches);
 const sidebar = ref<HTMLElement>();
@@ -119,6 +124,7 @@ const navigation = computed(() => [
   {id:"content",zh:copyText.editor_content[0],en:copyText.editor_content[1],icon:PhSquaresFour},
   {id:"journal-editor",zh:copyText.editor_journal[0],en:copyText.editor_journal[1],icon:PhArchive},
   {id:'members',zh:walletCopy.members[0],en:walletCopy.members[1],icon:PhWallet},
+  {id:'messages',zh:messageCopy.title[0],en:messageCopy.title[1],icon:PhChatCircle},
   {
     id: "reservations",
     zh: copyText.nav_c557d2fc[0],
@@ -211,7 +217,8 @@ watch(view, async () => {
 });
 onMounted(desk.loadSetup);
 function refreshCurrent() {
-  if(view.value==='members') memberPanel.value?.refresh();
+  if(view.value==='messages') void messagePanel.value?.refresh();
+  else if(view.value==='members') memberPanel.value?.refresh();
   else if (view.value === "reservations") reservationList.value?.refresh();
   else if (view.value === "reservation-calendar")
     reservationCalendar.value?.refresh();
@@ -350,9 +357,10 @@ const readableDate = computed(() =>
         <ReservationNotifications />
         <KeepAlive><ContentEditor v-if="view === 'content'" :active="view === 'content'" /></KeepAlive>
         <KeepAlive><JournalEditor v-if="view === 'journal-editor'" :active="view === 'journal-editor'" /></KeepAlive>
+        <KeepAlive><MessagesPanel v-if="view==='messages'" ref="messagePanel" :active="view==='messages'"/></KeepAlive>
         <p
           v-if="
-            !['reservations', 'reservation-calendar', 'legacy', 'content', 'journal-editor','members'].includes(view)
+            !['reservations', 'reservation-calendar', 'legacy', 'content', 'journal-editor','members','messages'].includes(view)
           "
           class="reservation-commerce-note"
         >

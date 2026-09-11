@@ -8202,5 +8202,481 @@
       "width": 1280,
       "height": 1707
     }
+  },
+  "messaging": {
+    "title": [
+      "顾客消息",
+      "Customer messages"
+    ],
+    "subtitle": [
+      "在这里查看顾客的短信与回复。",
+      "Read and reply to customer messages here."
+    ],
+    "new_conversation": [
+      "联系顾客",
+      "Contact a customer"
+    ],
+    "name": [
+      "顾客称呼",
+      "Customer name"
+    ],
+    "phone": [
+      "手机号码",
+      "Phone number"
+    ],
+    "reservation": [
+      "关联预约",
+      "Related reservation"
+    ],
+    "number_hint": [
+      "支持 +1 号码。",
+      "+1 numbers are supported."
+    ],
+    "sync_hint": [
+      "仅同步接入后的这位顾客消息。",
+      "Only this customer's messages from connection onward are synced."
+    ],
+    "connect": [
+      "打开会话",
+      "Open conversation"
+    ],
+    "cancel": [
+      "取消",
+      "Cancel"
+    ],
+    "all": [
+      "全部",
+      "All"
+    ],
+    "unread": [
+      "未读",
+      "Unread"
+    ],
+    "refresh": [
+      "刷新",
+      "Refresh"
+    ],
+    "online": [
+      "收发通道已连接",
+      "Messaging connection online"
+    ],
+    "offline": [
+      "收发通道离线，消息将等待发送",
+      "Messaging connection offline; messages will wait to send"
+    ],
+    "not_ready": [
+      "短信通道尚未启用",
+      "SMS sending is not enabled yet"
+    ],
+    "empty": [
+      "还没有顾客消息",
+      "No customer messages yet"
+    ],
+    "no_messages": [
+      "暂无消息记录",
+      "No messages yet"
+    ],
+    "select_conversation": [
+      "选择一位顾客查看消息",
+      "Choose a customer to view messages"
+    ],
+    "search": [
+      "搜索顾客或号码",
+      "Search customers or numbers"
+    ],
+    "write": [
+      "回复顾客…",
+      "Reply to customer…"
+    ],
+    "send": [
+      "发送消息",
+      "Send message"
+    ],
+    "sending": [
+      "正在发送",
+      "Sending"
+    ],
+    "queued": [
+      "等待发送",
+      "Queued"
+    ],
+    "submitted": [
+      "已提交手机发送",
+      "Submitted to phone"
+    ],
+    "sent": [
+      "已发送",
+      "Sent"
+    ],
+    "delivered": [
+      "设备报告已送达",
+      "Device reported delivered"
+    ],
+    "received": [
+      "已收到",
+      "Received"
+    ],
+    "failed": [
+      "发送失败",
+      "Send failed"
+    ],
+    "unknown": [
+      "结果待核对",
+      "Outcome needs checking"
+    ],
+    "skipped": [
+      "已停止发送",
+      "Stopped"
+    ],
+    "desk_source": [
+      "后台",
+      "Desk"
+    ],
+    "phone_source": [
+      "手机",
+      "Phone"
+    ],
+    "close": [
+      "标记已处理",
+      "Mark handled"
+    ],
+    "reopen": [
+      "重新打开",
+      "Reopen"
+    ],
+    "owner_notifications": [
+      "店主手机提醒",
+      "Owner phone alerts"
+    ],
+    "owner_phone": [
+      "接收提醒的号码",
+      "Alert recipient"
+    ],
+    "owner_enabled": [
+      "新预约手机提醒",
+      "New booking phone alerts"
+    ],
+    "save": [
+      "保存",
+      "Save"
+    ],
+    "saved": [
+      "已保存",
+      "Saved"
+    ],
+    "owner_channel_note": [
+      "使用独立发信通道提醒店主。",
+      "Owner alerts use a separate sending connection."
+    ],
+    "recent_notifications": [
+      "最近提醒",
+      "Recent alerts"
+    ],
+    "no_notifications": [
+      "暂无提醒记录",
+      "No alert history yet"
+    ],
+    "generic_error": [
+      "暂时未能完成，请稍后再试。",
+      "Could not complete this. Please try again."
+    ],
+    "sms_invalid_number": [
+      "请输入有效的 +1 手机号码。",
+      "Enter a valid +1 phone number."
+    ],
+    "sms_number_required": [
+      "这份预约没有手机号码，请填写后联系。",
+      "Add a phone number to contact this customer."
+    ],
+    "sms_bridge_not_ready": [
+      "短信通道尚未启用，内容已保留。",
+      "SMS sending is not enabled. Your draft is kept."
+    ],
+    "sms_owner_channel_required": [
+      "请先连接店主提醒的独立发信通道。",
+      "Connect a separate sender for owner alerts first."
+    ],
+    "sms_request_changed": [
+      "这次发送内容已变化，请核对后重新发送。",
+      "This send request changed. Check it before sending again."
+    ],
+    "sms_content_invalid": [
+      "请输入有效的消息内容。",
+      "Enter a valid message."
+    ],
+    "sms_send_rate_limit": [
+      "发送较频繁，请稍候。",
+      "Messages are being sent too quickly. Please wait."
+    ],
+    "send_uncertain": [
+      "提交结果待核对，内容已保留；请先刷新查看，不要重复发送。",
+      "Submission needs checking. Your draft is kept; refresh before sending again."
+    ],
+    "owner_sms": [
+      "小狗拼豆铺：有新的预约申请。{name}，{guests}人，{date} {start}-{end}（汉密尔顿时间）。请处理：https://pindoupuppy.com/manage?view=reservations",
+      "PinDou Puppy: new booking request. {name}, {guests} guests, {date} {start}-{end} (Hamilton). Review: https://pindoupuppy.com/manage?view=reservations"
+    ],
+    "today": [
+      "今天",
+      "Today"
+    ],
+    "yesterday": [
+      "昨天",
+      "Yesterday"
+    ],
+    "loading": [
+      "加载中",
+      "Loading"
+    ],
+    "new_messages": [
+      "新消息",
+      "New messages"
+    ],
+    "more_customers": [
+      "更多顾客",
+      "More customers"
+    ],
+    "account_unavailable": [
+      "手机发送暂不可用，消息将等待发送",
+      "Phone sending is unavailable; messages will wait"
+    ],
+    "permission_required": [
+      "收发设备需要授权",
+      "Messaging device needs permission"
+    ],
+    "sender_mismatch": [
+      "发信号码需要核对",
+      "Sending number needs checking"
+    ],
+    "notification_settings": [
+      "通知设置",
+      "Notification settings"
+    ],
+    "channel_hint": [
+      "按手机号联系，实际使用的短信或 iMessage 会显示在消息旁。",
+      "Contact this phone number; each message shows its actual SMS or iMessage channel."
+    ]
+  },
+  "owner-wechat": {
+    "channels": [
+      "短信与小程序提醒",
+      "SMS and mini-program alerts"
+    ],
+    "wechat_only": [
+      "请在微信小程序中允许提醒。",
+      "Allow alerts in the WeChat mini-program."
+    ],
+    "title": [
+      "店主微信提醒",
+      "Owner WeChat alerts"
+    ],
+    "page_title": [
+      "店主预约提醒",
+      "Owner booking alerts"
+    ],
+    "studio": [
+      "小狗拼豆铺",
+      "PinDou Puppy"
+    ],
+    "customer": [
+      "顾客",
+      "Customer"
+    ],
+    "card_note": [
+      "{guests}人 · 汉密尔顿时间",
+      "{guests} guests · Hamilton time"
+    ],
+    "setup_template": [
+      "配置新预约通知",
+      "Set up booking notifications"
+    ],
+    "template_ready": [
+      "通知模板已配置",
+      "Notification template configured"
+    ],
+    "enabled": [
+      "启用小程序提醒",
+      "Enable mini-program alerts"
+    ],
+    "bind": [
+      "绑定店主微信",
+      "Link owner WeChat"
+    ],
+    "label": [
+      "接收人称呼",
+      "Recipient name"
+    ],
+    "owner": [
+      "店主",
+      "Owner"
+    ],
+    "scan": [
+      "请用接收提醒的微信扫码，在小程序内确认绑定。",
+      "Scan with the receiving WeChat account and confirm in the mini-program."
+    ],
+    "expires": [
+      "二维码有效期 5 分钟。",
+      "This code is valid for 5 minutes."
+    ],
+    "expired": [
+      "二维码已过期，请重新生成。",
+      "This code expired. Generate a new one."
+    ],
+    "confirm_binding": [
+      "确认绑定店主身份",
+      "Confirm owner linking"
+    ],
+    "binding_explanation": [
+      "绑定后可查看预约申请，并接收你允许的预约提醒。",
+      "Once linked, you can view booking requests and receive alerts you allow."
+    ],
+    "bound": [
+      "店主身份已绑定",
+      "Owner linked"
+    ],
+    "unbound": [
+      "请先在管理员后台生成绑定二维码。",
+      "Generate a linking code in the admin desk first."
+    ],
+    "subscribe": [
+      "接收新预约提醒",
+      "Receive booking alerts"
+    ],
+    "subscription_note": [
+      "每次允许可接收一条新预约提醒，用完后请再次允许。",
+      "Each permission allows one booking alert. Allow again when it is used."
+    ],
+    "subscription_saved": [
+      "本次提醒已允许",
+      "This alert is allowed"
+    ],
+    "subscription_denied": [
+      "本次未允许微信提醒。",
+      "WeChat alerts were not allowed this time."
+    ],
+    "authorization_available": [
+      "有可用的提醒授权",
+      "Alert permission available"
+    ],
+    "authorization_needed": [
+      "需要在小程序内允许提醒",
+      "Allow alerts in the mini-program"
+    ],
+    "pending": [
+      "待处理预约",
+      "Pending bookings"
+    ],
+    "empty": [
+      "目前没有待处理的预约。",
+      "No pending bookings right now."
+    ],
+    "guests": [
+      "{count}人",
+      "{count} guests"
+    ],
+    "refresh": [
+      "刷新",
+      "Refresh"
+    ],
+    "save": [
+      "保存",
+      "Save"
+    ],
+    "saved": [
+      "已保存",
+      "Saved"
+    ],
+    "revoke": [
+      "取消绑定",
+      "Unlink"
+    ],
+    "close": [
+      "关闭",
+      "Close"
+    ],
+    "accepted": [
+      "微信已接受推送",
+      "Accepted by WeChat"
+    ],
+    "queued": [
+      "等待推送",
+      "Queued"
+    ],
+    "waiting_subscription": [
+      "等待允许提醒",
+      "Waiting for permission"
+    ],
+    "failed": [
+      "推送失败",
+      "Push failed"
+    ],
+    "unknown": [
+      "推送结果待核对",
+      "Push outcome needs checking"
+    ],
+    "skipped": [
+      "已停止推送",
+      "Stopped"
+    ],
+    "expired_job": [
+      "提醒已过期",
+      "Alert expired"
+    ],
+    "recent": [
+      "最近微信提醒",
+      "Recent WeChat alerts"
+    ],
+    "owner_wechat_binding_required": [
+      "请先绑定店主微信。",
+      "Link the owner WeChat account first."
+    ],
+    "owner_wechat_binding_expired": [
+      "绑定二维码已过期或已使用。",
+      "This linking code expired or was already used."
+    ],
+    "owner_wechat_template_required": [
+      "请先配置新预约通知模板。",
+      "Set up the booking template first."
+    ],
+    "owner_wechat_template_invalid": [
+      "微信通知模板需要重新核对。",
+      "The WeChat template needs checking."
+    ],
+    "owner_wechat_prompt_expired": [
+      "请刷新后再次允许提醒。",
+      "Refresh and allow alerts again."
+    ],
+    "owner_wechat_subscription_required": [
+      "请在小程序内再次允许预约提醒。",
+      "Allow booking alerts again in the mini-program."
+    ],
+    "owner_wechat_binding_limit": [
+      "操作较频繁，请稍后再试。",
+      "Please wait before trying again."
+    ],
+    "owner_wechat_provider_quota": [
+      "微信推送额度暂不可用。",
+      "WeChat push quota is temporarily unavailable."
+    ],
+    "owner_wechat_provider_rejected": [
+      "微信暂未接受此次请求。",
+      "WeChat did not accept this request."
+    ],
+    "generic_error": [
+      "暂时未能完成，请稍后重试。",
+      "Could not complete this. Please try again."
+    ],
+    "timezone": [
+      "汉密尔顿当地时间",
+      "Hamilton local time"
+    ],
+    "open_desk": [
+      "复制后台地址",
+      "Copy admin desk address"
+    ],
+    "copied": [
+      "后台地址已复制",
+      "Admin address copied"
+    ]
   }
 }

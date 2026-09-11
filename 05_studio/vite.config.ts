@@ -12,7 +12,7 @@ export default defineConfig({
   base: "/",
   define: { __STUDIO_BUILD__: JSON.stringify(build) },
   plugins: [
-    vue(),
+    vue({template:{compilerOptions:{isCustomElement:tag=>tag==='vue-advanced-chat'}}}),
     {
       name: "studio-release-identity",
       generateBundle() {

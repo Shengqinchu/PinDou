@@ -1,6 +1,24 @@
+> 2026-09-11 新进展：后台“顾客消息”已上线，Mac私有工作器已接入；A1后台发信在两个用户的消息库中匹配，实际为iMessage（4360→5680），不是纯SMS。店主反向提醒B1仍无验证收件，自动提醒关闭，不能把工具在线视为短信已送达。接入结构、通道状态与后续步骤见 [消息接入记录](STUDIO_MESSAGING_INTEGRATION.md)。下文旧测试状态按历史保留。
+
 # CTExcel / iPhone / Mac 短信测试准备
 
-2026-09-11。首版范围已按店主最新要求调整为 **+1 客户短信**，+86 排查和接入暂停。优先使用女朋友的手机及 Mac 独立用户 `pindou_sms`。经现有 SMS 对话自动发往 +1 的测试已由收件人确认收到；发件号码、首次发信、回复同步和后台接入仍待验收。下方保留原 CTExcel / +86 测试历史，不代表当前首版支持 +86 或预约短信已上线。
+2026-09-11。首版范围已按店主最新要求调整为 **+1 客户短信**，+86 排查和接入暂停。优先使用女朋友的手机及 Mac 独立用户 `pindou_sms`。经现有 SMS 对话自动发往 +1 的测试已由收件人确认收到，随后也从两端数据库核实了发件号码；用户的 iMessage 回复已实际读取。新顾客首次发信、纯 SMS 回传和后台接入仍待验收。下方保留原 CTExcel / +86 测试历史，不代表当前首版支持 +86 或预约短信已上线。
+
+## 最新验证：18:14–18:18 UTC
+
+- 用户完成首次授权后，重开 Peekaboo：两个用户的 GUI Bridge 均报告录屏已允许；辅助功能和事件输入仍未允许。通过新工具成功截取 `chix` 的系统设置窗口，画面也确认 Peekaboo 的辅助功能开关关闭。已将准确位置告知用户，待开启后验证控件操作。
+- `pindou_sms` 身份下的 SSH 只读 SQLite 结构检查实际通过，随后指定测试回复查询也通过；不再把数据库读取列为当前阻塞。此前拒绝访问的根因尚未唯一确定，不将成功归因于录屏授权。
+- 对 `partner_ca_existing_chat_20260911_03` 仅按已获准的收件人、完整固定测试文案与发送开始前 5 秒至后 180 秒查询。`pindou_sms` 发件记录为 SMS、发出线路尾号 4360，`chix` 对应收件记录为 SMS、对方号码尾号 4360、接收线路尾号 5680；两端记录相隔约 5.74 秒。结合用户已确认实收，发件号码核对完成。此为两端设备记录，不称为运营商回执。
+- 已保存独立私有 `database-delivery-verification.json`（0600、UID 503），没有改写原始用户确认或发送结果。没有输出其他聊天正文，没有新增发送。
+- 指定回复标记 `PINDOU-5680-0911C` 的查询成功但匹配数为零；“读取可用”不等于双向回复已经验收。
+
+18:20 UTC 后续：用户开启 Peekaboo 的辅助功能后，两个 GUI Bridge 均实际报告 `accessibility: true`。已读取系统设置控件树，并通过精确快照中的“返回”按钮执行背景点击；随后再次观察，窗口由“辅助功能”变为“隐私与安全性”，控件操作验证通过。`postEvent` 仍为 false，尚未验证原始键盘/鼠标事件，不把 AX 按钮可用扩大为所有输入方式均可用。
+
+18:24 UTC 后续：用户把上一条“回复测试”指引理解为已发出了新短信，实际当时只查询旧记录。已澄清，并从 `pindou_sms` 的本地 Terminal 执行一个独立的新测试 `partner_ca_two_way_20260911_04`，目录 `canada-two-way-test-20260911`。启动器同时校验 UID 503 和主目录，并留下执行用户证据；仍使用经核验的现有 SMS 对话和原固定文案。18:24:48 UTC 发件记录为 4360 → 5680、SMS，18:24:50 UTC 接收端记录匹配（约 2.12 秒）。私有发送日志与两端数据库证据分开保存，未重放旧请求。已请用户回复新标记 `PINDOU-5680-0911D`；旧标记 C 不作为新请求的回复凭据。
+
+18:26–18:34 UTC 后续：用户确认已回复；实际查到的正文标记为 `PINDOU-5680-0911C`，从 5680 发到 4360，渠道为 **iMessage**。两端均有匹配记录，`pindou_sms` 下原测试 C 的精确回复查询返回 `iMessage: 1`。因此用户回复读取已验证，但不标为普通 SMS 回传通过，也不改写为标记 D。
+
+为单独核对 SMS 回传，随后明确说明反向测试用途，从 `chix`（即获准测试收件人一端，UID 501）准备并只执行一次 `reverse_sms_reply_20260911_01`。目标为她的 4360，正文为测试标记 D，使用从已验证收件记录定位出的唯一 SMS 直接对话；启动器校验用户、主目录、号码和固定标记，调用前先持久化请求。工具超时，状态保留 `outcome_unknown`；截至 18:34 UTC，两端没有匹配到该次 SMS，未重复发送或自动切换渠道。这是反向补充测试，不是把工作室发信用户改为 `chix`。正式工作室发件仍使用 `pindou_sms`。
 
 ## 已完成
 
@@ -71,7 +89,34 @@
 - 原生 imsg 也执行了 `chats --limit 0 --json` 读取检查。已从 v0.4.0 源码确认 0 会传入 SQL LIMIT 0，不返回会话行；在本地 Terminal、UID 503 下仍退出 1，错误分类包含 `authorization`、`permissionDenied`。因此读取失败不限于 Python SQLite；没有请求或返回私人聊天内容。已请求 Mac 打开“完全磁盘访问权限”设置页，待核对实际授权。
 - 13 项离线测试通过，覆盖直接会话的号码/服务约束、固定测试文案和不确定结果禁止重放；脚本语法检查通过。新增发送行为仅用于独立测试，没有接入预约生产事件。
 
-当前下一步：核对 `pindou_sms` 中 Terminal 的有效完全磁盘授权，确保实际只读检查通过，再验证 +1 发件号码、指定标记回复、新顾客首次发信及切回 `chix` 后共存。首版集中完成 +1 自动通知和后台双向收发，+86 暂停，不再继续要求用户执行相关测试。各次测试日志分别保留，不能把未收到的请求直接自动重放为“重试成功”。
+当前下一步：完成纯 SMS 回传、新顾客首次发信、持续收发共存和后台收件箱。Peekaboo 截图与 AX 控件操作、数据库读取、+1 发件号码和用户 iMessage 回复读取已通过最新检查，见文档开头；工作室新测试发出时前台用户为 `chix`，执行发件的用户仍为 `pindou_sms`。后台应保留 SMS/iMessage 原始渠道，不能把 iMessage 回信写成 SMS 回执。首版集中完成 +1 自动通知和后台双向收发，+86 暂停。各次测试日志分别保留，不能把未收到的请求直接自动重放为“重试成功”。
+
+## 原生 Mac 操作工具：Peekaboo 已安装，首次界面授权待完成
+
+2026-09-11，按店主要求在 GitHub 比较 Mac 控制工具与 skills。选用 [Peekaboo](https://github.com/openclaw/Peekaboo)，保留 [macos-automator-mcp](https://github.com/steipete/macos-automator-mcp) 作为 AppleScript/JXA 备选；[mac-use-mcp](https://github.com/antbotlab/mac-use-mcp) 规模较小，暂不安装。三者均不能替代 macOS 的用户授权。
+
+- 原 Homebrew Peekaboo 为 `3.0.0-beta3`，没有配套 GUI app，录屏和辅助功能均未授权。
+- 已安装官方 [4.3.3 发布版](https://github.com/openclaw/Peekaboo/releases/tag/v4.3.3)：`/Applications/Peekaboo.app` 和 `/usr/local/libexec/pindou-peekaboo/4.3.3/peekaboo-macos-universal/peekaboo`。下载 SHA-256 与发布信息匹配，代码签名通过，Team ID 为 `FWJYW4S8P8`。旧 Homebrew 可执行文件未替换。
+- `chix` 与 `pindou_sms` 的 `~/bin/peekaboo` 均指向新 CLI。两个用户各自的 GUI Bridge 已实际连接，返回 `hostKind: gui`、版本 `4.3.3 (4030399)`。这证明进程连接成功，尚不证明可以截图或点击。
+- 18:09 UTC 实测两个 GUI Bridge 均报告 `screenRecording: false`、`accessibility: false`、`postEvent: false`。已在 `pindou_sms` 下请求打开 Peekaboo 与辅助功能设置，首次授权待用户完成。
+- 官方维护者的 [Peekaboo skill](https://github.com/steipete/agent-scripts/blob/main/skills/peekaboo/SKILL.md) 已安装到 Windows Codex 的 `D:/Users/123/.codex/skills/peekaboo/SKILL.md`；新回合可发现该 skill。
+- 已通过实际设置界面及只读权限记录核对：Terminal 的完全磁盘访问为允许（`auth_value=2`），辅助功能为未允许（`auth_value=0`）。此前“权限记录查询也被拒绝”是早期检查结果，不是当前结果。没有修改 TCC 数据库。
+- RustDesk 当时连接的是前台 `chix` 桌面；没有通过该路径验证 `pindou_sms` 的“信息”设置。改用原生 GUI Bridge 分别选定用户，不以远程桌面显示的用户替代发送用户身份。
+
+在 `PinDou SMS` 用户中，需为 **Peekaboo** 开启“隐私与安全性 → 辅助功能”和“屏幕与系统音频录制／屏幕录制”；如果列表无该应用，使用加号选取 `/Applications/Peekaboo.app`。若系统要求重新打开应用，完成重开后再次检查。保留 `chix` 登录，无需退出该用户或重启 Mac。
+
+在正确 Mac 用户环境中检查：
+
+```sh
+PB="$HOME/bin/peekaboo"
+BRIDGE="$HOME/Library/Application Support/Peekaboo/bridge.sock"
+"$PB" bridge status --json --bridge-socket "$BRIDGE"
+"$PB" permissions status --all-sources --json --bridge-socket "$BRIDGE"
+```
+
+后续操作显式指定 GUI socket，避免默认路由选择权限不同的 daemon。使用 v4 的 `app list`、`window list`、`see`、`click`、`press`；先观察实际窗口和控件，再操作并重新观察。不沿用旧 beta 的 `image`、`list`、`hotkey` 语法，也不凭旧截图坐标盲点。
+
+本轮没有新增短信发送、启用生产收发、退出 `chix`，或重启反代与交易服务。
 
 ## 设备与单条测试步骤
 

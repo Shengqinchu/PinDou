@@ -85,6 +85,10 @@ def initialize():
     observability.initialize(database)
     import owner_notifications
     owner_notifications.initialize(database)
+    import sms_inbox
+    sms_inbox.initialize(database)
+    import owner_wechat
+    owner_wechat.initialize(database)
 
 
 @asynccontextmanager
@@ -99,11 +103,14 @@ async def lifespan(_app):
     import owner_notifications
     notifier=asyncio.create_task(owner_notifications.worker(database))
     telegram_notifier=asyncio.create_task(owner_notifications.worker(database,'telegram'))
+    import owner_wechat
+    miniapp_notifier=asyncio.create_task(owner_wechat.worker(database))
     yield
     worker.cancel()
     importer.cancel()
     notifier.cancel()
     telegram_notifier.cancel()
+    miniapp_notifier.cancel()
     with contextlib.suppress(asyncio.CancelledError):
         await worker
     with contextlib.suppress(asyncio.CancelledError):
@@ -112,6 +119,8 @@ async def lifespan(_app):
         await notifier
     with contextlib.suppress(asyncio.CancelledError):
         await telegram_notifier
+    with contextlib.suppress(asyncio.CancelledError):
+        await miniapp_notifier
 
 
 app = FastAPI(title="PinDou Puppy Studio", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
@@ -128,7 +137,7 @@ async def tracked_http_error(request:Request,exc:StarletteHTTPException):
 @app.middleware("http")
 async def response_controls(request: Request, call_next):
     length = request.headers.get("content-length", "0")
-    limit = 12 * 1024 * 1024 if request.url.path == "/studio-api/manage/media" else 2 * 1024 * 1024 if request.url.path.startswith(("/studio-api/manage/content", "/studio-api/manage/journal")) else 16000
+    limit = 12 * 1024 * 1024 if request.url.path == "/studio-api/manage/media" else 2 * 1024 * 1024 if request.url.path.startswith(("/studio-api/manage/content", "/studio-api/manage/journal")) else 256 * 1024 if request.url.path.startswith('/studio-api/message-bridge/') else 16000
     if not length.isdigit() or int(length) > limit:
         from fastapi.responses import JSONResponse
         return JSONResponse({"detail": "Request too large"}, status_code=413)
@@ -329,3 +338,7 @@ import owner_notifications
 owner_notifications.register(app, database, admin_actor)
 import telegram_notifications
 telegram_notifications.register(app, database, admin_actor)
+import sms_inbox
+sms_inbox.register(app, database, admin_actor)
+import owner_wechat
+owner_wechat.register(app, database, admin_actor)

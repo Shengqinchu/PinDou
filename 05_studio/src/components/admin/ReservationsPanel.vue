@@ -27,12 +27,13 @@ import timetableWords from '../../content/reservation-timetable.json';
 import { formatCopy } from '../../state';
 const timetableCopy=contentModule('reservation-timetable',timetableWords);
 import { walletCopy,duration } from '../../wallet';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { messageCopy } from '../../messaging';
 type Entry = Reservation & { payload: ReservationPayload; staff_note: string;owner_id:string;deleted_at:string|null };
 const props = defineProps<{ active: boolean; calendar?: boolean }>();
 const at=ref(''),timetableRevision=ref(0);
 const { request } = useDesk();
-const router=useRouter();
+const router=useRouter(),route=useRoute();
 const deleted=ref(false),deleting=ref(false),deleteReason=ref(''),publicNote=ref('');
 const actualMinutes=ref<number|''>(''),actualGuests=ref<number|''>('');
 const items = ref<Entry[]>([]),
@@ -149,6 +150,8 @@ async function removeOrRestore(){
   }catch(e){saveError.value=(e as Error).message;}finally{saving.value=false;}
 }
 function openWallet(){if(!entry.value?.owner_id)return;open.value=false;void router.push({path:'/manage',query:{view:'members',member:entry.value.owner_id,booking:entry.value.id}});}
+function openMessages(){if(!entry.value)return;open.value=false;void router.push({path:'/manage',query:{view:'messages',reservation:entry.value.id}});}
+watch(()=>[props.active,route.query.booking],()=>{if(props.active&&typeof route.query.booking==='string')void inspectBooking(route.query.booking);},{immediate:true});
 async function changePolicy(value: boolean) {
   if (policyBusy.value) return;
   policyBusy.value = true;
@@ -388,6 +391,7 @@ defineExpose({ refresh: load });
           </div>
         </dl>
         <button v-if="entry.owner_id" class="desk-button secondary" @click="openWallet">{{say(walletCopy.open_wallet)}}<PhArrowRight/></button>
+        <button v-if="!entry.deleted_at" class="desk-button secondary" @click="openMessages">{{say(messageCopy.new_conversation)}}<PhArrowRight/></button>
         <div v-if="!entry.deleted_at" class="reservation-attendance">
           <p class="fine-print">{{say(walletCopy.booked)}} · {{duration(entry.booked_minutes)}}</p>
           <div class="wallet-input-grid"><label class="desk-field">{{say(walletCopy.actual_minutes)}}<input v-model.number="actualMinutes" type="number" min="1" max="1440" step="1" :disabled="saving"/></label><label class="desk-field">{{say(walletCopy.actual_guests)}}<input v-model.number="actualGuests" type="number" min="1" max="99" step="1" :disabled="saving"/></label></div>

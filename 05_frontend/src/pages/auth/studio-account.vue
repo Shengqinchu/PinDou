@@ -13,11 +13,13 @@ import { MiniappError } from '../../utils/miniapp-client';
 import {peekStudioSnapshot,readStudioCached} from '../../utils/studio-cache';
 import { useUserStore } from '../../store/user';
 import profileCopy from '../../../../05_studio/src/content/profile.json';
+import ownerCopy from '../../../../05_studio/src/content/owner-wechat.json';
 type Profile = {nickname:string;email:string;avatar?:string};
 type Wallet = {account:{minutes:number;points:number};booking_profile:{name:string;contact_method:string;contact:string;complete:boolean}};
 const user = useUserStore();
 const { language, keyboardOpen, shellStyle, say, t, changeLanguage, website } = useStudioNative();
 const profile = ref<Profile>(), wallet = ref<Wallet>(), busy = ref(false), failed = ref(false), avatarFailed = ref(false);
+const isOwner=ref(false);
 let sequence = 0;
 const name = computed(() => profile.value?.nickname || profile.value?.email || user.userInfo?.nickname || user.userInfo?.email || '—');
 const hours = computed(() => wallet.value ? say(walletCopy.whole_hours).replace('{v0}',String(Math.round(wallet.value.account.minutes / 60 * 100) / 100)) : '—');
@@ -32,12 +34,15 @@ async function refresh(force=false) {
   const token = user.token, current = ++sequence;
   failed.value=false;
   const cachedProfile=peekStudioSnapshot<{user:Profile}>('/auth/me',token),cachedWallet=peekStudioSnapshot<Wallet>('/auth/wallet',token);
+  const cachedOwner=peekStudioSnapshot<{bound:boolean}>('/auth/owner-notifications',token);
+  if(cachedOwner)isOwner.value=cachedOwner.data.bound;
   if(cachedProfile){if(cachedProfile.data.user.avatar!==profile.value?.avatar)avatarFailed.value=false;profile.value=cachedProfile.data.user;}
   if(cachedWallet)wallet.value=cachedWallet.data;
-  if(!force&&cachedProfile&&cachedWallet&&cachedProfile.age<30000&&cachedWallet.age<30000)return;
+  if(!force&&cachedProfile&&cachedWallet&&cachedOwner&&cachedProfile.age<30000&&cachedWallet.age<30000&&cachedOwner.age<30000)return;
   busy.value = true; failed.value = false;
   const results = await Promise.allSettled([
     readStudioCached<{user:Profile}>('/auth/me',token,30000,force), readStudioCached<Wallet>('/auth/wallet',token,30000,force),
+    readStudioCached<{bound:boolean}>('/auth/owner-notifications',token,30000,force),
   ]);
   if (current !== sequence || token !== user.token) return;
   if (results.some(result => result.status === 'rejected' && result.reason instanceof MiniappError && result.reason.status === 401)) { logout(); return; }
@@ -50,14 +55,16 @@ async function refresh(force=false) {
     const next = results[1].value;
     wallet.value = {account:{minutes:next.account.minutes,points:next.account.points},booking_profile:next.booking_profile};
   }
-  failed.value = results.some(result => result.status === 'rejected'); busy.value = false;
+  isOwner.value=results[2].status==='fulfilled'&&results[2].value.bound;
+  failed.value = results.slice(0,2).some(result => result.status === 'rejected'); busy.value = false;
 }
 function logout() { ++sequence; user.logout(); profile.value = undefined; wallet.value = undefined; uni.reLaunch({url:'/pages/auth/studio-login'}); }
 function patterns() { uni.navigateTo({url:'/pages/upload/upload'}); }
 function visit() { uni.navigateTo({url:'/pages/studio/visit'}); }
 function reservations() { uni.navigateTo({url:'/pages/studio/reservations'}); }
 function edit() { uni.navigateTo({url:'/pages/auth/studio-profile'}); }
-watch(()=>user.token,()=>{sequence++;profile.value=undefined;wallet.value=undefined;busy.value=false;failed.value=false;});
+function ownerAlerts(){uni.navigateTo({url:'/pages/studio/owner'});}
+watch(()=>user.token,()=>{sequence++;profile.value=undefined;wallet.value=undefined;isOwner.value=false;busy.value=false;failed.value=false;});
 onShow(() => void refresh());
 onUnload(() => { ++sequence; });
 </script>
@@ -87,6 +94,7 @@ onUnload(() => { ++sequence; });
         </view>
       </view>
       <view class="studio-native-menu"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(visitCopy.come_make_something_f834ec)}}</text><StudioGlyph name="arrow" :size="18"/></button><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="patterns"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(accountCopy.pattern_tool)}}</text><StudioGlyph name="arrow" :size="18"/></button></view>
+      <button v-if="isOwner" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="ownerAlerts"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(ownerCopy.page_title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
       <view class="studio-account-end"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-link" hover-class="studio-native-pressed" @tap="logout">{{say(accountCopy.sign_out)}}</button><StudioLegalLinks :language="language"/></view>
     </view>
   </StudioShell>

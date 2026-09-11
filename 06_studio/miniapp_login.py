@@ -70,7 +70,7 @@ def initialize(database):
         ''')
 
 
-def wx_request(path,body=None,params=None,binary=False):
+def wx_request(path,body=None,params=None,binary=False,return_errors=False):
     url='https://api.weixin.qq.com/'+path
     if params:url+='?'+urlencode(params)
     request=URLRequest(url,data=None if body is None else json.dumps(body).encode(),
@@ -83,7 +83,7 @@ def wx_request(path,body=None,params=None,binary=False):
             return data
         result=json.loads(data)
         if not isinstance(result,dict):raise ValueError()
-        if result.get('errcode'):
+        if result.get('errcode') and not return_errors:
             error='miniapp_code_expired' if result['errcode'] in (40029,40163) else 'miniapp_provider_unavailable'
             raise HTTPException(400 if error=='miniapp_code_expired' else 503,error)
         if binary:raise ValueError()

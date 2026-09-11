@@ -1,5 +1,5 @@
 {
-  "source": "owner-miniapp-publication-20260911",
+  "source": "owner-messaging-and-miniapp-alerts-20260911",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -74,6 +74,8 @@
     "telegram-notifications.json": "62f79e51391e39d86b83e0aa43dc81491b862b1d7e943234df6e0f34b1b98cf5",
     "visit-flow.json": "eb897e136b63d67ec9038ae8a327c4a599b00f96119549c51e9916621953db81",
     "wallet.json": "b51553b78c0f164bcb99288b7c19d939e95ab8dde41c41a3c0d64d73259b3002",
-    "wechat.json": "ec03e405ce841460edd8350968393173d7cc037bb950d6d552563366c8b043d5"
+    "wechat.json": "ec03e405ce841460edd8350968393173d7cc037bb950d6d552563366c8b043d5",
+    "messaging.json": "0fb6e2c3a1ccdc4ead68e67f6530a44cc0bde9580ac4959cd05d88f58af76af7",
+    "owner-wechat.json": "2d4bce47dad11ef65aaa01ad2c730ebc85d8433b34ae48a2e4ada40c7a20e002"
   }
 }
