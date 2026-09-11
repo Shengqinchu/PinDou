@@ -30,7 +30,7 @@ onShow(()=>{void refreshStudioContent();void refresh();clearInterval(timer);time
 onHide(()=>clearInterval(timer));onUnload(()=>{alive=false;sequence++;clearInterval(timer);});
 </script>
 <template>
- <StudioShell id="studio-shell" :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" nav="bookings" @language="changeLanguage">
+ <StudioShell id="studio-shell" fitted :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" nav="bookings" @language="changeLanguage">
   <view class="studio-native-main">
    <view class="studio-native-section-head"><text class="studio-native-title">{{words('account','my_reservations')}}</text><button class="studio-native-eye" :disabled="loading||!user.token" :aria-label="words('wallet','refresh')" @tap="refresh"><view v-if="loading" class="studio-native-progress"/><StudioGlyph v-else name="refresh" :size="21"/></button></view>
    <template v-if="!user.token"><text class="studio-native-body">{{words('account','account_login_required')}}</text><button class="studio-native-primary" hover-class="studio-native-pressed" @tap="login">{{words('account','sign_in')}}</button></template>

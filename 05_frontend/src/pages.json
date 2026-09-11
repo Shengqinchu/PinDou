@@ -15,7 +15,8 @@
         "navigationBarTitleText": "小狗拼豆铺",
         "navigationBarBackgroundColor": "#ffffff",
         "navigationBarTextStyle": "black",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "disableScroll": true
       }
     },
     {
@@ -24,7 +25,8 @@
         "navigationBarTitleText": "小狗拼豆铺",
         "navigationBarBackgroundColor": "#ffffff",
         "navigationBarTextStyle": "black",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "disableScroll": true
       }
     },
     {
@@ -33,7 +35,8 @@
         "navigationBarTitleText": "小狗拼豆铺",
         "navigationBarBackgroundColor": "#ffffff",
         "navigationBarTextStyle": "black",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "disableScroll": true
       }
     },
     {
@@ -42,7 +45,8 @@
         "navigationBarTitleText": "小狗拼豆铺",
         "navigationBarBackgroundColor": "#ffffff",
         "navigationBarTextStyle": "black",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "disableScroll": true
       }
     },
     {
@@ -60,7 +64,18 @@
         "navigationBarTitleText": "小狗拼豆铺",
         "navigationBarBackgroundColor": "#ffffff",
         "navigationBarTextStyle": "black",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/auth/studio-profile",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#ffffff",
+        "disableScroll": true
       }
     },
     {

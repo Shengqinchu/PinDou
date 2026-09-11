@@ -16,9 +16,10 @@ import generic from '../../../05_studio/src/content/commerce.json';
 import miniapp from '../../../05_studio/src/content/miniapp.json';
 import rates from '../../../05_studio/src/content/experience-rates.json';
 import studio from '../../../05_studio/src/content/studio-profile.json';
+import profile from '../../../05_studio/src/content/profile.json';
 
-const defaults={home,visit,flow,calendar,receipt,cancellation,booking,account,wallet,app,details,errors,generic,miniapp};
-const names:Record<keyof typeof defaults,string>={home:'pages-Home',visit:'pages-Visit',flow:'visit-flow',calendar:'components-ReservationCalendar',receipt:'pages-ReservationReceipt',cancellation:'reservation-cancellation',booking:'booking-profile',account:'account',wallet:'wallet',app:'App',details:'pages-Details',errors:'data-commerce-messages',generic:'commerce',miniapp:'miniapp'};
+const defaults={home,visit,flow,calendar,receipt,cancellation,booking,account,wallet,app,details,errors,generic,miniapp,profile};
+const names:Record<keyof typeof defaults,string>={home:'pages-Home',visit:'pages-Visit',flow:'visit-flow',calendar:'components-ReservationCalendar',receipt:'pages-ReservationReceipt',cancellation:'reservation-cancellation',booking:'booking-profile',account:'account',wallet:'wallet',app:'App',details:'pages-Details',errors:'data-commerce-messages',generic:'commerce',miniapp:'miniapp',profile:'profile'};
 const published=shallowRef<Record<string,Record<string,unknown>>>({});
 let pending:Promise<void>|undefined,updated=0;
 export function refreshStudioContent(){

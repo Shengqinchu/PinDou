@@ -31,7 +31,7 @@ function captureCookie(path:string,response:UniApp.RequestSuccessCallbackResult)
   if(value){reservationCookie=value;cookieExpires=Date.now()+30*86400000;try{uni.setStorageSync(cookieKey,{value,expires:cookieExpires});}catch{}}
   // #endif
 }
-export function studioCall<T>(path:string,data:unknown={},ticket='',token='',method:'POST'|'GET'='POST',extraHeaders:Record<string,string>={}):Promise<T>{
+export function studioCall<T>(path:string,data:unknown={},ticket='',token='',method:'POST'|'GET'|'PUT'='POST',extraHeaders:Record<string,string>={}):Promise<T>{
   const cookie=nativeCookie(path);
   return new Promise((resolve,reject)=>uni.request({
     url:origin+path,method,data,

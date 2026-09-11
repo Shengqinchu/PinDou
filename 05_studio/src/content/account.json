@@ -215,6 +215,7 @@
     "邮箱验证码仅用于找回账号，请使用微信或密码登录。",
     "Email codes are for account recovery only. Sign in with WeChat or your password."
   ],
+  "default_name_with_suffix": ["拼豆用户_{v0}", "PinDou member_{v0}"],
   "default_name": [
     "拼豆用户",
     "PinDou member"

@@ -10,13 +10,14 @@ import StudioGlyph from '../../components/StudioGlyph.vue';
 import { useStudioNative } from '../../utils/studio-native';
 import { studioRead, MiniappError } from '../../utils/miniapp-client';
 import { useUserStore } from '../../store/user';
+import profileCopy from '../../../../05_studio/src/content/profile.json';
 type Profile = {nickname:string;email:string;avatar?:string};
 type Wallet = {account:{minutes:number;points:number};booking_profile:{name:string;contact_method:string;contact:string;complete:boolean}};
 const user = useUserStore();
 const { language, keyboardOpen, shellStyle, say, t, changeLanguage, website } = useStudioNative();
 const profile = ref<Profile>(), wallet = ref<Wallet>(), busy = ref(false), failed = ref(false), avatarFailed = ref(false);
 let sequence = 0;
-const name = computed(() => profile.value?.nickname || profile.value?.email || user.userInfo?.nickname || user.userInfo?.email || say(accountCopy.default_name));
+const name = computed(() => profile.value?.nickname || profile.value?.email || user.userInfo?.nickname || user.userInfo?.email || '—');
 const hours = computed(() => wallet.value ? say(walletCopy.whole_hours).replace('{v0}',String(Math.round(wallet.value.account.minutes / 60 * 100) / 100)) : '—');
 const contactLabel = computed(() => say(({wechat:visitCopy.wechat_2941d2,phone:visitCopy.phone_ac7a62,email:accountCopy.email,other:visitCopy.another_way_f489b4} as Record<string,string[]>)[wallet.value?.booking_profile?.contact_method || 'wechat'] || bookingCopy.contact));
 const avatar = computed(() => {
@@ -48,17 +49,18 @@ function logout() { ++sequence; user.logout(); profile.value = undefined; wallet
 function patterns() { uni.navigateTo({url:'/pages/upload/upload'}); }
 function visit() { uni.navigateTo({url:'/pages/studio/visit'}); }
 function reservations() { uni.navigateTo({url:'/pages/studio/reservations'}); }
+function edit() { uni.navigateTo({url:'/pages/auth/studio-profile'}); }
 onShow(() => void refresh());
 onUnload(() => { ++sequence; });
 </script>
 <template>
-  <StudioShell :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" nav="account" @language="changeLanguage">
-    <view class="studio-native-main">
+  <StudioShell id="studio-shell" fitted :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" nav="account" @language="changeLanguage">
+    <view class="studio-native-main studio-account">
       <view class="studio-native-section-head"><text class="studio-native-title">{{say(accountCopy.account)}}</text><button class="studio-native-eye" :disabled="busy" :aria-label="say(walletCopy.refresh)" hover-class="studio-native-pressed" @tap="refresh"><view v-if="busy" class="studio-native-progress"/><StudioGlyph v-else name="refresh" :size="21"/></button></view>
       <view class="studio-native-profile">
-        <image v-if="avatar&&!avatarFailed" class="studio-native-avatar" :src="avatar" mode="aspectFill" @error="avatarFailed=true"/>
-        <view v-else class="studio-native-avatar"><StudioGlyph name="user" :size="30"/></view>
+        <button class="studio-avatar-edit" :aria-label="say(profileCopy.edit)" @tap="edit"><image v-if="avatar&&!avatarFailed" class="studio-native-avatar" :src="avatar" mode="aspectFill" @error="avatarFailed=true"/><view v-else class="studio-native-avatar"><StudioGlyph name="user" :size="28"/></view></button>
         <view class="studio-native-profile-text"><text class="studio-native-name">{{name}}</text><text v-if="profile?.email&&profile.email!==name" class="studio-native-body">{{profile.email}}</text><text class="studio-native-label">{{say(accountCopy.signed_in)}}</text></view>
+        <button class="studio-native-link studio-profile-edit" @tap="edit">{{say(profileCopy.edit)}}</button>
       </view>
       <text v-if="failed" class="studio-native-error" role="alert">{{t('generic_error')}}</text>
       <view v-if="busy&&!wallet" class="studio-native-status"><view class="studio-native-progress"/><text class="studio-native-body">{{say(walletCopy.loading)}}</text></view>
@@ -67,7 +69,7 @@ onUnload(() => { ++sequence; });
         <view class="studio-native-balance"><text class="studio-native-label">{{say(walletCopy.remaining_points)}}</text><text class="studio-native-balance-value">{{wallet?wallet.account.points:'—'}}</text></view>
       </view>
       <view v-if="wallet" class="studio-native-section">
-        <text class="studio-native-subtitle">{{say(bookingCopy.title)}}</text>
+        <view class="studio-native-section-head"><text class="studio-native-subtitle">{{say(bookingCopy.title)}}</text><button class="studio-native-link" @tap="edit">{{say(bookingCopy.edit)}}</button></view>
         <view class="studio-native-definition">
           <template v-if="wallet.booking_profile?.complete">
             <view class="studio-native-definition-row"><text class="studio-native-label">{{say(bookingCopy.name)}}</text><text class="studio-native-account-value">{{wallet.booking_profile.name}}</text></view>
@@ -76,9 +78,8 @@ onUnload(() => { ++sequence; });
           <text v-else class="studio-native-body">{{say(bookingCopy.empty)}}</text>
         </view>
       </view>
-      <view class="studio-native-menu"><button class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(visitCopy.come_make_something_f834ec)}}</text><StudioGlyph name="arrow" :size="18"/></button><button class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="reservations"><StudioGlyph name="clock"/><text class="studio-native-menu-label">{{say(accountCopy.my_reservations)}}</text><StudioGlyph name="arrow" :size="18"/></button><button class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="patterns"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(accountCopy.pattern_tool)}}</text><StudioGlyph name="arrow" :size="18"/></button></view>
+      <view class="studio-native-menu"><button class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(visitCopy.come_make_something_f834ec)}}</text><StudioGlyph name="arrow" :size="18"/></button><button class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="patterns"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(accountCopy.pattern_tool)}}</text><StudioGlyph name="arrow" :size="18"/></button></view>
       <button class="studio-native-link" hover-class="studio-native-pressed" @tap="logout">{{say(accountCopy.sign_out)}}</button>
     </view>
-    <view class="studio-native-footer"><text class="studio-native-site">pindoupuppy.com</text></view>
   </StudioShell>
 </template>

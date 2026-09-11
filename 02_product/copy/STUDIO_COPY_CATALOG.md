@@ -60,6 +60,7 @@
 | recovery_sent | 若该邮箱已注册，将收到找回账号验证码，5 分钟内有效。 | If this email is registered, a recovery code will arrive. It is valid for 5 minutes. |
 | recovery_done | 密码已重设，请使用新密码登录。 | Your password has been reset. Sign in with your new password. |
 | account_code_login_disabled | 邮箱验证码仅用于找回账号，请使用微信或密码登录。 | Email codes are for account recovery only. Sign in with WeChat or your password. |
+| default_name_with_suffix | 拼豆用户_{v0} | PinDou member_{v0} |
 | default_name | 拼豆用户 | PinDou member |
 
 ## admin.json

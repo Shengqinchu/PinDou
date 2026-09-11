@@ -71,6 +71,7 @@ function initWxCloud() {
 /* Shared across the native auth shell, its slot content and child components. */
 @import "./static/styles/studio-auth.css";
 @import "./static/styles/studio-booking.css";
+@import "./static/styles/studio-compact.css";
 
 /* 适配小程序 page 容器 */
 page {

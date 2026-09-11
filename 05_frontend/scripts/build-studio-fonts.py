@@ -17,6 +17,7 @@ for module, key in (('account', 'account'), ('booking-profile', 'title')):
     headings += ''.join(json.loads((root / f'05_studio/src/content/{module}.json').read_text('utf-8'))[key])
 for module, keys in {
     'account': ['my_reservations','reservation_title'],
+    'profile': ['edit'],
     'pages-Home': ['a_little_time_all_yours_9e9d60','make_something_lovely_04db64'],
     'visit-flow': ['experience','time','contact'],
     'pages-Details': ['a_little_guide_to_the_studio_1b38da','studio_address_171634','parking_8188de','seats_and_tools_4b0a0a'],

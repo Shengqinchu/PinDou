@@ -90,7 +90,12 @@ def public_user(data: dict) -> dict:
         or not (EMAIL.fullmatch(email) or (not email and re.fullmatch(r'wechat_authing_[a-f0-9]{64}',ident)))):
         raise HTTPException(401,"account_email_required")
     avatar=data.get("avatar")
-    return {"id":ident,"email":email,"nickname":str(data.get("nickname") or "")[:80],
+    nickname=str(data.get("nickname") or "")[:80]
+    if not nickname.strip():
+        import content
+        template=content.DEFAULTS.get('account',{}).get('default_name_with_suffix',['PinDou guest_{v0}'])[0]
+        nickname=template.replace('{v0}',hashlib.sha256(ident.encode()).hexdigest()[:8].upper())
+    return {"id":ident,"email":email,"nickname":nickname,
             "avatar":avatar if isinstance(avatar,str) and len(avatar)<=2048 else ""}
 
 
