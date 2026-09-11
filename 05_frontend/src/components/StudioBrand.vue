@@ -4,7 +4,7 @@ defineOptions({ options: { styleIsolation: 'shared' } });
 defineProps<{ language: string; puppy?: boolean }>();
 </script>
 <template>
-  <button class="studio-brand-touch" :class="{'studio-brand-touch--puppy':puppy}" hover-class="studio-brand-squeezed" :hover-stay-time="260" :aria-label="motifCopy.puppy[language==='en'?1:0]">
+  <button :hover-start-time="0" class="studio-brand-touch" :class="{'studio-brand-touch--puppy':puppy}" hover-class="studio-brand-squeezed" :hover-stay-time="260" :aria-label="motifCopy.puppy[language==='en'?1:0]">
     <view v-if="puppy" class="studio-brand-puppy"><image src="/static/studio/puppy.png" mode="aspectFit" /></view>
     <view v-else class="studio-brand-window" :class="{'studio-brand-window--en':language==='en'}"><image :src="language==='en'?'/static/studio/logo-en.jpg':'/static/studio/logo-zh.jpg'" mode="widthFix" /></view>
   </button>

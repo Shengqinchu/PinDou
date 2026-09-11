@@ -19,7 +19,7 @@ for module, keys in {
     'account': ['my_reservations','reservation_title'],
     'profile': ['edit'],
     'pages-Home': ['a_little_time_all_yours_9e9d60','make_something_lovely_04db64'],
-    'visit-flow': ['experience','time','contact'],
+    'visit-flow': ['experience','time','contact','review'],
     'pages-Details': ['a_little_guide_to_the_studio_1b38da','studio_address_171634','parking_8188de','seats_and_tools_4b0a0a'],
     'reservation-cancellation': ['title','contact'],
     'pages-ReservationReceipt': ['the_host_will_confirm_it_ae62ce','your_visit_is_confirmed_94453d','thank_you_for_coming_285672','this_reservation_was_cancelled_54b1d2','see_you_at_the_studio_add3a5','lets_make_again_soon_12f0b9'],

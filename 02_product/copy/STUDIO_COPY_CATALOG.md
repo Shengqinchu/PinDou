@@ -2047,6 +2047,7 @@
 | title | 确认取消这次预约？ | Cancel this reservation? |
 | rule | 每个账号每个自然月最多自行取消 3 次，按汉密尔顿当地时间计算。 | Each account can cancel up to 3 reservations per calendar month, using Hamilton local time. |
 | count | 本月已取消 {v0} / {v1} 次。本次取消后还可取消 {v2} 次。 | You have used {v0} of {v1} cancellations this month. You will have {v2} left after this cancellation. |
+| remaining_short | 本月剩余可取消次数：{v0}/{v1} | Cancellations left this month: {v0}/{v1} |
 | reset | 次数将在 {v0} 重置。 | Your allowance resets on {v0}. |
 | keep | 保留预约 | Keep reservation |
 | confirm | 确认取消 | Confirm cancellation |
@@ -2196,6 +2197,8 @@
 | calendar_error | 时段暂时没有加载出来，请重试。 | Times could not be loaded. Try again. |
 | retry | 重试 | Retry |
 | review | 核对预约 | Review your visit |
+| confirm_submit | 确认提交 | Confirm request |
+| back_to_edit | 返回修改 | Back to edit |
 | continue | 继续 | Continue |
 | close | 关闭 | Close |
 

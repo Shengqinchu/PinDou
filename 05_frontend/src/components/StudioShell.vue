@@ -12,11 +12,12 @@ defineEmits<{ language: [] }>();
   <view class="studio-native" :class="{'studio-native--en':language==='en','studio-native--keyboard':keyboardOpen,'studio-native--nav':nav,'studio-native--fitted':fitted}" :style="shellStyle">
     <view class="studio-native-top">
       <StudioBrand :language="language" />
-      <button class="studio-native-language" hover-class="studio-native-pressed" :hover-stay-time="180" @tap="$emit('language')">{{language==='zh'?'English':'中文'}}</button>
+      <button :hover-start-time="0" class="studio-native-language" hover-class="studio-native-pressed" :hover-stay-time="180" @tap="$emit('language')">{{language==='zh'?'English':'中文'}}</button>
     </view>
     <scroll-view v-if="fitted" class="studio-native-scroll" scroll-y :scroll-top="scrollTop" :show-scrollbar="false" :scroll-with-animation="false"><view class="studio-native-scroll-inner"><slot /></view></scroll-view>
     <slot v-else />
     <view class="studio-native-dock"><slot name="actions"/></view>
     <StudioNav v-if="nav&&!keyboardOpen" id="studio-navigation" :active="nav" :language="language"/>
+    <slot name="overlay"/>
   </view>
 </template>

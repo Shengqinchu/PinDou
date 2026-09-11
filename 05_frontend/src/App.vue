@@ -72,6 +72,7 @@ function initWxCloud() {
 @import "./static/styles/studio-auth.css";
 @import "./static/styles/studio-booking.css";
 @import "./static/styles/studio-compact.css";
+@import "./static/styles/studio-motion.css";
 
 /* 适配小程序 page 容器 */
 page {

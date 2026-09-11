@@ -62,12 +62,12 @@ onUnload(() => { alive = false; ticket.value = ''; });
       <text v-if="errorCode" class="studio-native-error" role="alert">{{error}}</text>
     </view>
     <view class="studio-native-actions">
-      <button v-if="done||terminal" class="studio-native-primary" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="home"><text class="studio-native-primary-label">{{t('home')}}</text><view class="studio-native-button-arrow"><StudioGlyph name="arrow" :size="18"/></view></button>
+      <button :hover-start-time="0" v-if="done||terminal" class="studio-native-primary" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="home"><text class="studio-native-primary-label">{{t('home')}}</text><view class="studio-native-button-arrow"><StudioGlyph name="arrow" :size="18"/></view></button>
       <template v-else-if="details&&!loading">
-        <button class="studio-native-primary" :disabled="busy" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="confirm(true)"><view v-if="busy" class="studio-native-progress"/><text class="studio-native-primary-label">{{t(busy?'working':details.mode==='link'?'link':'confirm')}}</text><view v-if="!busy" class="studio-native-button-arrow"><StudioGlyph name="arrow" :size="18"/></view></button>
-        <button class="studio-native-link" :disabled="busy" hover-class="studio-native-pressed" @tap="confirm(false)">{{t('cancel')}}</button>
+        <button :hover-start-time="0" class="studio-native-primary" :disabled="busy" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="confirm(true)"><view v-if="busy" class="studio-native-progress"/><text class="studio-native-primary-label">{{t(busy?'working':details.mode==='link'?'link':'confirm')}}</text><view v-if="!busy" class="studio-native-button-arrow"><StudioGlyph name="arrow" :size="18"/></view></button>
+        <button :hover-stay-time="180" :hover-start-time="0" class="studio-native-link" :disabled="busy" hover-class="studio-native-pressed" @tap="confirm(false)">{{t('cancel')}}</button>
       </template>
-      <button v-else-if="errorCode" class="studio-native-secondary" :disabled="loading" hover-class="studio-native-pressed" @tap="load">{{t('retry')}}</button>
+      <button :hover-stay-time="180" :hover-start-time="0" v-else-if="errorCode" class="studio-native-secondary" :disabled="loading" hover-class="studio-native-pressed" @tap="load">{{t('retry')}}</button>
     </view>
   </StudioShell>
 </template>

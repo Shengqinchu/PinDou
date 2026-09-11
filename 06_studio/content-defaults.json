@@ -6922,6 +6922,10 @@
       "本月已取消 {v0} / {v1} 次。本次取消后还可取消 {v2} 次。",
       "You have used {v0} of {v1} cancellations this month. You will have {v2} left after this cancellation."
     ],
+    "remaining_short": [
+      "本月剩余可取消次数：{v0}/{v1}",
+      "Cancellations left this month: {v0}/{v1}"
+    ],
     "reset": [
       "次数将在 {v0} 重置。",
       "Your allowance resets on {v0}."
@@ -7397,6 +7401,14 @@
     "review": [
       "核对预约",
       "Review your visit"
+    ],
+    "confirm_submit": [
+      "确认提交",
+      "Confirm request"
+    ],
+    "back_to_edit": [
+      "返回修改",
+      "Back to edit"
     ],
     "continue": [
       "继续",

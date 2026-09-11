@@ -1,9 +1,14 @@
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref,watch } from 'vue';
 import { onResize, onShow } from '@dcloudio/uni-app';
 import miniappCopy from '../../../05_studio/src/content/miniapp.json';
+import {useUserStore} from '../store/user';
+import {setStudioCacheOwner} from './studio-cache';
+import {studioPageShown} from './studio-navigation';
 
 export type NativeLanguage = 'zh' | 'en';
 export function useStudioNative() {
+  const user=useUserStore();setStudioCacheOwner(user.token);
+  watch(()=>user.token,setStudioCacheOwner,{flush:'sync'});
   const language = ref<NativeLanguage>(uni.getStorageSync('pd_studio_language') ||
     (/^en/i.test(uni.getSystemInfoSync().language || '') ? 'en' : 'zh'));
   const height = ref(uni.getSystemInfoSync().windowHeight);
@@ -31,7 +36,7 @@ export function useStudioNative() {
   onMounted(() => uni.onKeyboardHeightChange?.(keyboard));
   onUnmounted(() => {uni.offKeyboardHeightChange?.(keyboard);clearTimeout(resizeTimer);});
   onResize(event => { const rotated=width.value!==event.size.windowWidth;height.value = event.size.windowHeight; width.value = event.size.windowWidth;clearTimeout(resizeTimer);if(rotated){fullHeight.value=height.value;syncSafeArea();}else if(!keyboardOpen.value)resizeTimer=setTimeout(()=>{if(!keyboardOpen.value)fullHeight.value=height.value;},200); });
-  onShow(()=>{syncLanguage();syncSafeArea();const info=uni.getSystemInfoSync();height.value=info.windowHeight;width.value=info.windowWidth;if(!keyboardOpen.value)fullHeight.value=height.value;});
+  onShow(()=>{syncLanguage();syncSafeArea();const info=uni.getSystemInfoSync();height.value=info.windowHeight;width.value=info.windowWidth;if(!keyboardOpen.value)fullHeight.value=height.value;studioPageShown(getCurrentPages().slice(-1)[0]?.route||'');});
   // iOS overlays its keyboard; Android may already have resized the window.
   const availableHeight=computed(()=>Math.max(180,keyboardOpen.value?Math.min(height.value,fullHeight.value-keyboardHeight.value):height.value));
   const shellStyle = computed(() => ({ '--studio-window-height': `${availableHeight.value}px`, '--studio-window-width':`${width.value}px`, '--studio-safe-bottom':`${keyboardOpen.value?0:safeBottom.value}px` }));

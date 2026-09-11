@@ -1,4 +1,5 @@
 import {useUserStore} from '../store/user';
+import {invalidateStudioSnapshots} from './studio-cache';
 export type SharedProfile={user_id:string;nickname:string;avatar:string;email?:string;[key:string]:any};
 export class ProfileError extends Error{constructor(public code:string,public status=0){super(code);}}
 export const normalizedName=(value:string)=>value.trim().replace(/\s+/gu,' ');
@@ -10,7 +11,7 @@ export function assertProfileOwner(token:string,id:string){
 function responseProfile(data:any,token:string,id:string){
  assertProfileOwner(token,id);
  if(data?.user_id!==id||typeof data.nickname!=='string'||(data.avatar!=null&&typeof data.avatar!=='string'))throw new ProfileError('save_error');
- const user=useUserStore();user.userInfo={...user.userInfo,...data};uni.setStorageSync('pd_user',JSON.stringify(user.userInfo));return data as SharedProfile;
+ const user=useUserStore();invalidateStudioSnapshots(token);user.userInfo={...user.userInfo,...data};uni.setStorageSync('pd_user',JSON.stringify(user.userInfo));return data as SharedProfile;
 }
 export function saveNickname(token:string,id:string,nickname:string):Promise<SharedProfile>{
  assertProfileOwner(token,id);if(!validName(nickname))throw new ProfileError('name_invalid');
