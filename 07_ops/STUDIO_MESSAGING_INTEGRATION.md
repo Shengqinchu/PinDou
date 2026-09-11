@@ -79,3 +79,5 @@
 - 用户已完成扫码，生产库已核实店主绑定成功。最初总开关关闭，原生按钮也随之禁用；当时用户报告允许，但服务器实际没有订阅记录。已按原授权开启微信提醒总开关，请用户刷新原生页面后再次点“接收新预约提醒”。绑定、订阅和真正推送分别核验。
 - 随后生产库记录一次 `accept` 订阅，已成功核验授权。17:36 Hamilton 发出一条明确标注“通知连通测试 / 仅测试，不会创建预约”的通知，微信返回 `errcode=0, errmsg=ok`；任务 `33fd6d58ef264857bd362a321b070135` 为 accepted。测试保存在提醒日志，原子扣除一次本地授权，没有创建或改动预约。接受推送不等于用户看到通知，已请用户核对并再次允许下一条提醒。
 - 旧绑定码消费后不可再次使用。另用 `wxa/getwxacode`、`path=pages/studio/owner`、`env_version=trial` 成功生成直接进入提醒页的入口码，不携带绑定凭据。当前可保存在 `artifacts/messaging-integration/owner-entry.jpg`，绑定码与日常入口区分使用。
+- 用户确认收到服务通知，随后17:40手机截图显示正确的“店主预约提醒”页、身份已绑定、待处理为空；不是白屏。测试没有创建预约，后台待处理数确为0，因此页面为空属预期。后续已有5次 `accept` 授权记录，启用状态为true，绑定error为空；可用推送机会仍以微信真实响应为准。店主手机4360的独立短信提醒依然未验证、未启用，不与已验证的微信通知混同。
+- 已用官方新文档核对 `page` 与 `miniprogram_state=trial`，发送参数符合接口定义，体验版 `app.json` 中存在 `pages/studio/owner`。本次没有因为用户对空列表的疑问盲改跳转或另发重复测试。[微信发送订阅消息](https://developers.weixin.qq.com/miniprogram/dev/server/API/mp-message-management/subscribe-message/api_sendmessage.html)
