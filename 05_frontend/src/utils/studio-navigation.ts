@@ -11,8 +11,10 @@ export function studioPageShown(route:string){
  finish(sequence);
 }
 export function navigateStudio(url:string){
+ const pages=getCurrentPages();
+ if(navigating&&pages[pages.length-1]?.route===target){navigating=false;queued='';}
  if(navigating){queued=url;return;}
- const pages=getCurrentPages(),route=url.replace(/^\//,'');
+ const route=url.replace(/^\//,'');
  if(pages[pages.length-1]?.route===route)return;
  const previous=pages.map(page=>page.route).lastIndexOf(route);
  navigating=true;target=route;const id=++sequence;

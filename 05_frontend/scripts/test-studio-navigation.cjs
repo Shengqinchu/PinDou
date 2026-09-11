@@ -11,4 +11,5 @@ ex.navigateStudio('/pages/studio/reservations');ex.navigateStudio('/pages/auth/s
 pages=Array.from({length:8},(_,i)=>({route:'detail/'+i}));ex.navigateStudio('/pages/auth/studio-account');assert.equal(calls.at(-1).type,'replace');finish();assert.equal(pages.length,8);
 pages=[{route:'pages/studio/home'}];ex.navigateStudio('/pages/studio/reservations');const interrupted=calls.at(-1);ex.navigateStudio('/pages/auth/studio-account');ex.studioPageShown('pages/studio/home');
 const count=calls.length;ex.navigateStudio('/pages/auth/studio-account');assert.equal(calls.length,count+1);interrupted.options.complete();ex.navigateStudio('/pages/studio/home');assert.equal(calls.length,count+1);finish();assert.equal(calls.at(-1).type,'back');finish();
+ex.navigateStudio('/pages/studio/reservations');pages.push({route:'pages/studio/reservations'});const shown=calls.length;ex.navigateStudio('/pages/auth/studio-account');assert.equal(calls.length,shown+1);finish();
 console.log('Navigation checks passed: no-op current tab, keep existing pages, latest target, bounded stack, interrupted navigation recovery and stale callback protection.');
