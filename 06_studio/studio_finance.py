@@ -13,6 +13,7 @@ from zoneinfo import ZoneInfo
 
 from fastapi import Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+import finance_fx
 
 COPY_PATH = Path(__file__).with_name('business-copy.json')
 if not COPY_PATH.exists():
@@ -49,6 +50,14 @@ def initialize(database):
         CREATE TRIGGER IF NOT EXISTS studio_finance_history_delete BEFORE DELETE ON studio_finance_events
           BEGIN SELECT RAISE(ABORT,'finance history is append-only'); END;
         """)
+        columns={r['name'] for r in db.execute('PRAGMA table_info(studio_finance_entries)')}
+        for name,definition in [('currency',"TEXT NOT NULL DEFAULT 'CAD'"),('fx_rate',"TEXT DEFAULT '1'"),
+                                ('fx_date','TEXT'),('fx_source',"TEXT NOT NULL DEFAULT 'identity'"),('cad_amount_cents','INTEGER')]:
+            if name not in columns:
+                db.execute(f'ALTER TABLE studio_finance_entries ADD COLUMN {name} {definition}')
+        if 'cad_amount_cents' not in columns:
+            db.execute('UPDATE studio_finance_entries SET cad_amount_cents=amount_cents')
+        finance_fx.initialize(db)
         for code in ('experience', 'finished', 'other'):
             zh,en = words(code)
             db.execute('INSERT OR IGNORE INTO studio_finance_categories VALUES(?,?,?,?,?)', (code,zh,en,time.time(),'initial'))
@@ -92,13 +101,13 @@ def from_completed(db, row, actor):
 
 def summary(db, start, end):
     row=db.execute("""SELECT
-      coalesce(sum(CASE WHEN kind='income' THEN amount_cents ELSE 0 END),0) AS income_cents,
-      coalesce(sum(CASE WHEN kind='expense' THEN amount_cents ELSE 0 END),0) AS expense_cents,
+      coalesce(sum(CASE WHEN kind='income' THEN cad_amount_cents ELSE 0 END),0) AS income_cents,
+      coalesce(sum(CASE WHEN kind='expense' THEN cad_amount_cents ELSE 0 END),0) AS expense_cents,
       sum(CASE WHEN amount_cents IS NULL THEN 1 ELSE 0 END) AS needs_amount
       FROM studio_finance_entries WHERE deleted_at IS NULL AND occurred_on>=? AND occurred_on<=?""",(start,end)).fetchone()
-    result=dict(row);result['needs_amount']=result['needs_amount'] or 0
+    result=dict(row);result['needs_amount']=result['needs_amount'] or 0;result['currency']='CAD'
     result['balance_cents']=result['income_cents']-result['expense_cents']
-    result['categories']=[dict(r) for r in db.execute("""SELECT category,coalesce(sum(amount_cents),0) AS amount_cents
+    result['categories']=[dict(r) for r in db.execute("""SELECT category,coalesce(sum(cad_amount_cents),0) AS amount_cents
       FROM studio_finance_entries WHERE deleted_at IS NULL AND kind='income' AND occurred_on>=? AND occurred_on<=? GROUP BY category""",(start,end))]
     return result
 
@@ -114,6 +123,7 @@ class Entry(Strict):
     customer_name: str = Field(default='',max_length=120)
     items: list[str] = Field(min_length=1,max_length=50)
     amount_cents: int | None = Field(default=None,ge=0,le=100000000,strict=True)
+    currency: Literal['CAD','CNY'] | None = None
     payment_method: str = Field(default='',max_length=80)
     note: str = Field(default='',max_length=1000)
 
@@ -150,8 +160,39 @@ def category_for(db,payload):
     return payload.category
 
 
+def payment_method(value):
+    for key in ('cash','transfer','wechat_alipay','stored'):
+        if value.casefold() in [key,*[s.casefold() for s in words(key)]]:
+            return key
+    if value.casefold() in [s.casefold() for s in words('transfer_legacy')]+['e-transfer']:
+        return 'transfer'
+    return value
+
+
+def entry_money(database,payload,old=None):
+    if old and old['currency']=='CNY' and payload.currency is None:
+        raise HTTPException(409,'finance_client_update_required')
+    method=payment_method(payload.payment_method)
+    currency=('CNY' if method=='wechat_alipay' else 'CAD') if payload.kind=='income' else (payload.currency or 'CAD')
+    if payload.kind=='income' and payload.currency is not None and payload.currency!=currency:
+        raise HTTPException(422,'finance_currency_mismatch')
+    if currency=='CAD':
+        return (currency,'1',None,'identity',payload.amount_cents,method)
+    if payload.amount_cents is None:
+        return (currency,None,None,'',None,method)
+    if old and old['currency']=='CNY' and old['occurred_on']==payload.occurred_on.isoformat() and old['fx_rate']:
+        rate={'rate':old['fx_rate'],'rate_date':old['fx_date'],'source':old['fx_source']}
+    else:
+        rate=finance_fx.quote(database,payload.occurred_on)
+    return (currency,rate['rate'],rate['rate_date'],rate['source'],finance_fx.cad_cents(payload.amount_cents,rate['rate']),method)
+
+
 def register(app,database,admin_actor):
     prefix='/studio-api/manage/finance'
+
+    @app.get(prefix+'/exchange-rate')
+    def exchange_rate(on:date,_actor=Depends(admin_actor)):
+        return {'currency':'CNY',**finance_fx.quote(database,on)}
 
     @app.get(prefix)
     def entries(start:date|None=None,end:date|None=None,kind:Literal['all','income','expense']='all',category:str='',
@@ -183,7 +224,14 @@ def register(app,database,admin_actor):
 
     @app.post(prefix,status_code=201)
     def create(payload:NewEntry,actor=Depends(admin_actor)):
-        digest=hashlib.sha256(payload.model_dump_json().encode()).hexdigest();key=str(payload.request_id)
+        digest=hashlib.sha256(payload.model_dump_json(exclude={'currency'} if payload.currency is None else set()).encode()).hexdigest();key=str(payload.request_id)
+        with database() as db:
+            old=db.execute('SELECT * FROM studio_finance_entries WHERE request_id=?',(key,)).fetchone()
+            if old:
+                if old['request_hash']!=digest:raise HTTPException(409,'finance_request_changed')
+                return public(old)
+        if payload.amount_cents is None:raise HTTPException(422,'finance_amount_required')
+        currency,rate,rate_date,rate_source,cad_amount,method=entry_money(database,payload)
         with database() as db:
             db.execute('BEGIN IMMEDIATE')
             old=db.execute('SELECT * FROM studio_finance_entries WHERE request_id=?',(key,)).fetchone()
@@ -193,14 +241,19 @@ def register(app,database,admin_actor):
             if payload.amount_cents is None:raise HTTPException(422,'finance_amount_required')
             category=category_for(db,payload);ident='FIN-'+uuid.uuid4().hex;stamp=time.time()
             db.execute("""INSERT INTO studio_finance_entries(id,kind,category,occurred_on,customer_name,items,amount_cents,
-              payment_method,note,source,request_id,request_hash,created_at,updated_at,actor)
-              VALUES(?,?,?,?,?,?,?,?,?,'manual',?,?,?,?,?)""",(ident,payload.kind,category,payload.occurred_on.isoformat(),payload.customer_name,
-              json.dumps(payload.items,ensure_ascii=False),payload.amount_cents,payload.payment_method,payload.note,key,digest,stamp,stamp,actor))
+              payment_method,note,source,request_id,request_hash,created_at,updated_at,actor,currency,fx_rate,fx_date,fx_source,cad_amount_cents)
+              VALUES(?,?,?,?,?,?,?,?,?,'manual',?,?,?,?,?,?,?,?,?,?)""",(ident,payload.kind,category,payload.occurred_on.isoformat(),payload.customer_name,
+              json.dumps(payload.items,ensure_ascii=False),payload.amount_cents,method,payload.note,key,digest,stamp,stamp,actor,currency,rate,rate_date,rate_source,cad_amount))
             audit(db,ident,actor,'create')
             return public(db.execute('SELECT * FROM studio_finance_entries WHERE id=?',(ident,)).fetchone())
 
     @app.put(prefix+'/{ident}')
     def edit(ident:str,payload:EditEntry,actor=Depends(admin_actor)):
+        with database() as db:
+            old=db.execute('SELECT * FROM studio_finance_entries WHERE id=? AND deleted_at IS NULL',(ident,)).fetchone()
+            if not old:raise HTTPException(404,'finance_entry_missing')
+            if old['version']!=payload.version:raise HTTPException(409,'version_conflict')
+        currency,rate,rate_date,rate_source,cad_amount,method=entry_money(database,payload,old)
         with database() as db:
             db.execute('BEGIN IMMEDIATE')
             old=db.execute('SELECT * FROM studio_finance_entries WHERE id=? AND deleted_at IS NULL',(ident,)).fetchone()
@@ -210,8 +263,8 @@ def register(app,database,admin_actor):
                 raise HTTPException(422,'finance_amount_required')
             category=category_for(db,payload)
             db.execute("""UPDATE studio_finance_entries SET kind=?,category=?,occurred_on=?,customer_name=?,items=?,amount_cents=?,
-              payment_method=?,note=?,version=version+1,updated_at=?,actor=? WHERE id=?""",(payload.kind,category,payload.occurred_on.isoformat(),
-              payload.customer_name,json.dumps(payload.items,ensure_ascii=False),payload.amount_cents,payload.payment_method,payload.note,time.time(),actor,ident))
+              payment_method=?,note=?,currency=?,fx_rate=?,fx_date=?,fx_source=?,cad_amount_cents=?,version=version+1,updated_at=?,actor=? WHERE id=?""",(payload.kind,category,payload.occurred_on.isoformat(),
+              payload.customer_name,json.dumps(payload.items,ensure_ascii=False),payload.amount_cents,method,payload.note,currency,rate,rate_date,rate_source,cad_amount,time.time(),actor,ident))
             audit(db,ident,actor,'edit')
             return public(db.execute('SELECT * FROM studio_finance_entries WHERE id=?',(ident,)).fetchone())
 

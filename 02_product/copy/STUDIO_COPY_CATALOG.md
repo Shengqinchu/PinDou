@@ -144,7 +144,12 @@
 | date | 日期 | Date |
 | start | 开始日期 | From |
 | end | 结束日期 | To |
-| amount | 金额（CAD） | Amount (CAD) |
+| amount | 金额 | Amount |
+| currency | 币种 | Currency |
+| converted | 折合 {amount} | Equivalent to {amount} |
+| fx_loading | 正在获取汇率… | Loading exchange rate… |
+| fx_rate | 1 RMB = {rate} CAD · {date} | 1 RMB = {rate} CAD · {date} |
+| fx_note | 按记录日期的加拿大央行参考汇率折算，保存后固定。 | Converted using the Bank of Canada reference rate for the record date, fixed when saved. |
 | customer | 客户名称 | Customer |
 | category | 收入分类 | Income category |
 | shopping | 购物清单 | Shopping list |
@@ -156,7 +161,9 @@
 | remove_item | 移除此项 | Remove item |
 | payment | 收款方式 | Payment method |
 | cash | 现金 | Cash |
-| transfer | 电子转账 | E-transfer |
+| transfer | EMT | EMT |
+| transfer_legacy | 电子转账 | E-transfer |
+| wechat_alipay | 微信/支付宝 | WeChat / Alipay |
 | card | 银行卡 | Card |
 | stored | 储值抵扣 | Prepaid time |
 | other_payment | 其他 | Other |
@@ -171,7 +178,7 @@
 | empty | 这个时间段暂无记录。 | No records in this date range. |
 | pending | 待补金额 | Amount needed |
 | pending_count | {count} 条待补金额 | {count} amounts needed |
-| cash_note | 按实际收款记录；待补金额的记录不计入合计。 | Record cash actually received. Entries awaiting an amount are excluded from totals. |
+| cash_note | 按实际收款记录，汇总折算为 CAD；待补金额的记录不计入合计。 | Record cash actually received. Totals are converted to CAD; entries awaiting an amount are excluded. |
 | source_note | 来自已完成预约，可独立修改，不会改动原预约。 | Imported from a completed booking. Edits here do not change the booking. |
 | source | 关联预约 | Linked booking |
 | manual | 手动录入 | Manual entry |
@@ -186,6 +193,10 @@
 | next | 下一页 | Next |
 | page | 第 {page} 页 · 共 {total} 条 | Page {page} · {total} records |
 | finance_amount_required | 请填写实际金额，最多保留两位小数。 | Enter the actual amount with up to two decimal places. |
+| finance_currency_mismatch | 微信/支付宝按 RMB 记录，其他收款方式按 CAD 记录。 | WeChat / Alipay amounts use RMB; other payment methods use CAD. |
+| finance_client_update_required | 这条记录使用 RMB，请刷新网页或更新小程序后再编辑。 | This record uses RMB. Refresh the website or update the mini program before editing. |
+| finance_fx_future_date | 未来日期尚无参考汇率，请选择实际收支日期。 | No reference rate is available for a future date. Select the actual transaction date. |
+| finance_rate_unavailable | 暂时无法获取汇率，请稍后重试。填写内容已保留。 | The exchange rate is unavailable. Please retry; your input has been retained. |
 | finance_category_invalid | 请选择有效的收入分类。 | Choose a valid income category. |
 | finance_invalid_filter | 请检查日期范围。 | Check the date range. |
 | finance_request_changed | 此操作已保存，请刷新后再编辑。 | This request was saved. Refresh before editing. |

@@ -21,7 +21,7 @@ files['service/owner-notification-copy.json'] = root / '05_studio/src/content/ow
 files['service/telegram_notifications.py'] = root / '06_studio/telegram_notifications.py'
 files['service/telegram-notification-copy.json'] = root / '05_studio/src/content/telegram-notifications.json'
 files['service/miniapp_login.py'] = root / '06_studio/miniapp_login.py'
-for name in ('sms_inbox.py','owner_wechat.py','studio_staff.py','studio_finance.py'):
+for name in ('sms_inbox.py','owner_wechat.py','studio_staff.py','studio_finance.py','finance_fx.py'):
     files['service/'+name] = root / '06_studio' / name
 files['service/messaging-copy.json'] = root / '05_studio/src/content/messaging.json'
 files['service/owner-wechat-copy.json'] = root / '05_studio/src/content/owner-wechat.json'

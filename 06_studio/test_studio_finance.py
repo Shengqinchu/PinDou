@@ -8,6 +8,8 @@ import studio_finance as finance
 import studio_staff
 import authing_login
 import miniapp_login
+import finance_fx
+from datetime import date
 from test_owner_notifications import setup, host, create
 
 
@@ -102,6 +104,7 @@ def test_shared_customer_role_is_studio_only_and_mobile_update_aliases(setup):
     client,_,_=setup
     assert client.get('/studio-api/auth/me').json()['user']['is_admin'] is False
     assert client.get('/studio-api/manage/session').status_code==401
+
     with studio.database() as db:
         db.execute("INSERT INTO studio_staff_accounts VALUES('qa-owner','admin',1,'Local',?,?,?)",(time.time(),time.time(),'test'))
     assert client.get('/studio-api/auth/me').json()['user']['is_admin'] is True
@@ -114,3 +117,91 @@ def test_shared_customer_role_is_studio_only_and_mobile_update_aliases(setup):
     assert note.status_code==200 and note.json()['account']['staff_note']=='New mobile note'
     with studio.database() as db:db.execute("UPDATE studio_staff_accounts SET enabled=0 WHERE user_id='qa-owner'")
     assert client.get('/studio-api/manage/session').status_code==401
+
+
+def test_rmb_income_expense_conversion_and_method_inference(setup,monkeypatch):
+    client,_,_=setup;host()
+    monkeypatch.setattr(finance_fx,'fetch_quote',lambda day:{'rate':'0.2067','rate_date':'2026-09-11','source':'Bank of Canada'})
+    income=client.post('/studio-api/manage/finance',json=new(kind='income',category='experience',payment_method='WeChat / Alipay',amount_cents=10000))
+    assert income.status_code==201,income.text
+    assert income.json()['currency']=='CNY' and income.json()['payment_method']=='wechat_alipay'
+    assert income.json()['cad_amount_cents']==2067 and income.json()['fx_rate']=='0.2067'
+    expense=client.post('/studio-api/manage/finance',json=new(currency='CNY',amount_cents=9000))
+    assert expense.status_code==201,expense.text
+    assert expense.json()['cad_amount_cents']==1860
+    assert client.post('/studio-api/manage/finance',json=new(kind='income',category='other',payment_method='EMT',amount_cents=2000)).json()['currency']=='CAD'
+    listing=client.get('/studio-api/manage/finance?start=2026-09-01&end=2026-09-30').json()
+    assert listing['summary']['currency']=='CAD'
+    assert listing['summary']['income_cents']==4067 and listing['summary']['expense_cents']==1860
+    assert listing['summary']['balance_cents']==2207
+    assert client.post('/studio-api/manage/finance',json=new(kind='income',payment_method='wechat_alipay',currency='CAD')).status_code==422
+    assert client.post('/studio-api/manage/finance',json=new(kind='income',payment_method='cash',currency='CNY')).status_code==422
+    assert finance_fx.cad_cents(5,'0.1')==1
+
+
+def test_rate_is_frozen_for_edits_and_retry_and_reselected_for_new_date(setup,monkeypatch):
+    client,_,_=setup;host()
+    calls=[]
+    def rate(day):
+        calls.append(day)
+        return {'rate':'0.2' if len(calls)==1 else '0.3','rate_date':day.isoformat(),'source':'Bank of Canada'}
+    monkeypatch.setattr(finance_fx,'fetch_quote',rate)
+    payload=new(currency='CNY',amount_cents=10000)
+    entry=client.post('/studio-api/manage/finance',json=payload).json()
+    assert entry['cad_amount_cents']==2000
+    legacy={key:entry[key] for key in finance.EditEntry.model_fields if key!='currency'}
+    assert client.put('/studio-api/manage/finance/'+entry['id'],json=legacy).status_code==409
+    finance.initialize(studio.database)
+    assert client.post('/studio-api/manage/finance',json=payload).json()['cad_amount_cents']==2000
+    edit={key:entry[key] for key in finance.EditEntry.model_fields}
+    changed=client.put('/studio-api/manage/finance/'+entry['id'],json={**edit,'amount_cents':15000,'note':'Only change original amount'}).json()
+    assert changed['cad_amount_cents']==3000 and len(calls)==1
+    edit.update(version=changed['version'],occurred_on='2026-09-10')
+    dated=client.put('/studio-api/manage/finance/'+entry['id'],json=edit).json()
+    assert dated['cad_amount_cents']==3000 and dated['fx_rate']=='0.3' and len(calls)==2
+    history=client.get('/studio-api/manage/finance/'+entry['id']).json()['history']
+    assert history[-1]['snapshot']['fx_rate']=='0.2'
+
+
+def test_missing_rate_never_saves_wrong_currency_or_amount(setup,monkeypatch):
+    client,_,_=setup
+    assert client.get('/studio-api/manage/finance/exchange-rate?on=2026-09-11').status_code==401
+    host()
+    def unavailable(day):raise OSError('offline')
+    monkeypatch.setattr(finance_fx,'fetch_quote',unavailable)
+    response=client.post('/studio-api/manage/finance',json=new(currency='CNY'))
+    assert response.status_code==503 and response.json()['detail']=='finance_rate_unavailable'
+    assert client.get('/studio-api/manage/finance').json()['total']==0
+    assert client.get('/studio-api/manage/finance/exchange-rate?on=2099-09-11').status_code==422
+    assert client.post('/studio-api/manage/finance',json=new()).status_code==201
+
+
+def test_legacy_cad_migration_preserves_original_values_and_audit(setup):
+    client,_,_=setup;host()
+    payload=new(amount_cents=12345)
+    entry=client.post('/studio-api/manage/finance',json=payload).json()
+    with studio.database() as db:
+        history=[tuple(r) for r in db.execute('SELECT * FROM studio_finance_events')]
+        for name in ('currency','fx_rate','fx_date','fx_source','cad_amount_cents'):
+            db.execute('ALTER TABLE studio_finance_entries DROP COLUMN '+name)
+    finance.initialize(studio.database)
+    finance.initialize(studio.database)
+    saved=client.get('/studio-api/manage/finance/'+entry['id']).json()['entry']
+    assert saved['currency']=='CAD' and saved['amount_cents']==saved['cad_amount_cents']==12345
+    assert saved['version']==1
+    with studio.database() as db:assert [tuple(r) for r in db.execute('SELECT * FROM studio_finance_events')]==history
+    assert client.post('/studio-api/manage/finance',json=payload).json()['id']==entry['id']
+
+
+def test_fx_uses_latest_prior_business_day_and_never_future_or_invalid(monkeypatch):
+    class Response:
+        def __enter__(self):return self
+        def __exit__(self,*args):pass
+        def read(self,_):return json.dumps({'observations':[
+          {'d':'2026-09-14','FXCNYCAD':{'v':'0.25'}},
+          {'d':'2026-09-11','FXCNYCAD':{'v':'0.2067'}},
+          {'d':'2026-09-12','FXCNYCAD':{'v':'NaN'}},
+          {'d':'2026-09-10','FXCNYCAD':{'v':'0.2061'}}]}).encode()
+    monkeypatch.setattr(finance_fx,'urlopen',lambda *args,**kwargs:Response())
+    value=finance_fx.fetch_quote(date(2026,9,13))
+    assert value=={'rate':'0.2067','rate_date':'2026-09-11','source':'Bank of Canada'}
