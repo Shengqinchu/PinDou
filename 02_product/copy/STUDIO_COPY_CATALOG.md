@@ -822,6 +822,8 @@
 | full_buffer | 满员时段前后 30 分钟不可预约。 | The 30 minutes before and after a fully booked period are unavailable. |
 | previous_dates_314fc5 | 上一组日期 | Previous dates |
 | the_next_two_weeks_59cce3 | 未来两周 | The next two weeks |
+| date_label | 日期 | Dates |
+| booking_window | 只开放未来两周座位 | Booking opens for the next two weeks only |
 | next_dates_4c8209 | 下一组日期 | Next dates |
 | choose_a_start_time_for_a_twohour_a3470d | 点击开始时间，默认选择两小时；再点同一天较晚的格子可延长。使用日期上方箭头查看其他日期。 | Choose a start time for a two-hour visit, then a later cell to extend it. Use the date arrows to see other days. |
 | reservation_timetable_use_arrow_keys_to_move_3bb451 | 预约时间表，使用方向键移动，回车选择 | Reservation timetable. Use arrow keys to move and Enter to select. |

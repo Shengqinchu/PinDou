@@ -2738,6 +2738,14 @@
       "未来两周",
       "The next two weeks"
     ],
+    "date_label": [
+      "日期",
+      "Dates"
+    ],
+    "booking_window": [
+      "只开放未来两周座位",
+      "Booking opens for the next two weeks only"
+    ],
     "next_dates_4c8209": [
       "下一组日期",
       "Next dates"

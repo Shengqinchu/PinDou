@@ -26,10 +26,22 @@
 html.keyboard-open .visit-flow-heading,html.keyboard-open .visit-progress,html.keyboard-open .visit-review{display:none}
 html[data-motion=reduced] :is(.visit-step-enter-active,.visit-step-leave-active,.visit-progress i){transition:none;transform:none;opacity:1}
 
-/* Keep the selection beside the guest control on wide screens. Very short
-   windows may scroll this one stage instead of clipping interactive rows. */
-.visit-time-tools{position:relative;justify-content:center;padding-inline:48px;min-height:46px}.visit-time-group{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 16px;min-width:0;max-width:100%}.visit-time-group>.visit-time-selection{margin:0;min-width:0;text-align:center;justify-content:center;flex-wrap:wrap}.visit-time-tools>.icon-button{position:absolute;right:0;top:0}
-@media(max-width:700px){.visit-time-group{gap:5px}.visit-time-group>.visit-time-selection{flex-basis:100%;min-height:0}.visit-time-tools{padding-inline:44px}.visit-time-group .visit-guest-select{gap:8px}.visit-time-group .visit-guest-trigger{min-width:130px}}
+/* Both rows share label, value and hint tracks, including translated text. */
+.visit-time-tools{justify-content:center;min-height:46px}
+.visit-time-group,.visit-flow-page .is-compact .reservation-date-range{display:grid;grid-template-columns:48px 160px minmax(0,1fr);gap:16px;align-items:center;width:min(560px,calc(100% - 272px));min-width:0;margin-inline:auto;text-align:left;font-size:14px}
+.visit-time-group .visit-guest-select{display:contents}.visit-time-group .visit-guest-trigger{min-width:0;width:100%}
+.visit-time-group>.visit-time-selection{margin:0;min-width:0;text-align:left;justify-content:flex-start;flex-wrap:wrap;line-height:1.5}
+.visit-flow-page .is-compact .reservation-week-nav{position:relative;display:block;min-height:46px;margin-top:2px}
+.visit-flow-page .is-compact .reservation-date-range{min-height:46px}
+.visit-flow-page .is-compact .reservation-date-label{font-size:inherit;color:var(--ink);margin:0}
+.visit-flow-page .is-compact .reservation-date-value{font-size:inherit;color:var(--ink);white-space:nowrap;text-align:center;margin:0;font-variant-numeric:tabular-nums}
+.visit-flow-page .is-compact .reservation-date-hint{font-size:12px;line-height:1.5;margin:0}
+.reservation-week-nav>.reservation-date-actions{display:flex;flex-direction:row;align-items:center;gap:0}
+.is-compact .reservation-previous-dates{position:absolute;left:0;top:0}.is-compact .reservation-date-actions{position:absolute;right:0;top:0;min-height:44px}
+@media(min-width:1400px){.visit-time-group,.visit-flow-page .is-compact .reservation-date-range{font-size:16px}.visit-flow-page .is-compact .reservation-date-hint{font-size:14px}.visit-flow-page .is-compact .reservation-date-range{min-height:52px}}
+@media(max-width:700px){.visit-time-group,.visit-flow-page .is-compact .reservation-date-range{width:100%;grid-template-columns:42px 120px minmax(0,1fr);gap:8px;font-size:13px}.visit-time-group>.visit-time-selection,.visit-flow-page .is-compact .reservation-date-hint{font-size:11px;min-height:0;line-height:1.5}.visit-flow-page .is-compact .reservation-week-nav{padding-bottom:44px}.is-compact .reservation-previous-dates,.is-compact .reservation-date-actions{top:auto;bottom:0}}
+/* Short phones must retain usable time cells below the sticky date headings. */
+@media(max-width:700px) and (max-height:650px){.visit-flow-page[data-step="2"] .visit-scroll{display:block;overflow:auto}.visit-flow-page[data-step="2"] .visit-fields{display:block}.visit-flow-page[data-step="2"] .visit-stage{display:flex}.visit-flow-page .reservation-calendar.is-compact{flex:none}.visit-flow-page .is-compact .reservation-grid-scroll{flex:none;height:150px;min-height:150px}}
 @media(max-height:520px){.vision-header.visit-header{padding-block:4px;min-height:54px}.vision-header.visit-header .vision-brand{flex:0 1 130px}.vision-header.visit-header .vision-brand .puppy-brandmark{width:130px}.is-compact .reservation-grid thead th span,.is-compact .reservation-grid thead th strong{display:inline;font-size:11px;margin:0}.is-compact .reservation-grid thead th strong{margin-left:4px}.is-compact .reservation-grid thead th{padding-block:7px}.is-compact .reservation-week-nav{min-height:44px}.is-compact .reservation-legend{margin:2px 0 5px}}
 @media(max-height:440px){.visit-flow-page[data-step="2"] .visit-scroll{display:block;overflow:auto}.visit-flow-page[data-step="2"] .visit-fields{display:block}.visit-flow-page[data-step="2"] .visit-stage{display:flex}.reservation-calendar.is-compact{flex:none;min-height:190px}.is-compact .reservation-grid-scroll{flex:none;min-height:110px;height:110px}.is-compact .reservation-grid-scroll{scroll-padding-top:36px}}
 

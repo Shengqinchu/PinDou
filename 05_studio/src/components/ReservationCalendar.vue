@@ -188,7 +188,7 @@ watch(
     <div class="reservation-week-nav">
       <button
         type="button"
-        class="icon-button"
+        class="icon-button reservation-previous-dates"
         :disabled="offset === 0 || disabled"
         :aria-label="say(copyText.previous_dates_314fc5)"
         @click="moveWeek(-1)"
@@ -196,12 +196,19 @@ watch(
         <PhArrowLeft />
       </button>
       <div class="reservation-date-range">
-        <strong>{{ say(copyText.the_next_two_weeks_59cce3) }}</strong
+        <template v-if="compact">
+          <span class="reservation-date-label">{{say(copyText.date_label)}}</span>
+          <span class="reservation-date-value" aria-live="polite">{{days[0]?.date.slice(5).replace('-', '/')}}-{{days[days.length-1]?.date.slice(5).replace('-', '/')}}</span>
+          <span class="reservation-date-hint">{{say(copyText.booking_window)}}</span>
+        </template>
+        <template v-else><strong>{{ say(copyText.the_next_two_weeks_59cce3) }}</strong
         ><span
           >{{ days[0]?.date.slice(5).replace("-", "/") }} —
           {{ days[days.length - 1]?.date.slice(5).replace("-", "/") }}</span
-        >
+        ></template>
       </div>
+      <div class="reservation-date-actions">
+      <slot name="tools"/>
       <InfoTip v-if="compact" :label="say(copyText.reservation_timetable_use_arrow_keys_to_move_3bb451)"><p>{{say(booking.plan==='day'?copyText.day_selection_help:copyText.choose_a_start_time_for_a_twohour_a3470d)}}</p><p>{{say(copyText.full_buffer)}}</p><p>{{say(copyText.all_times_are_local_to_hamilton_the_8a3607)}}</p></InfoTip>
       <button
         type="button"
@@ -212,6 +219,7 @@ watch(
       >
         <PhArrowRight />
       </button>
+      </div>
     </div>
     <p v-if="!compact" class="reservation-grid-help">
       {{ say(copyText.choose_a_start_time_for_a_twohour_a3470d) }}
