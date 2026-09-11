@@ -28,8 +28,8 @@ html[data-motion=reduced] :is(.visit-step-enter-active,.visit-step-leave-active,
 
 /* Keep the selection beside the guest control on wide screens. Very short
    windows may scroll this one stage instead of clipping interactive rows. */
-.visit-time-tools{flex-wrap:wrap}.visit-time-tools>.visit-time-selection{flex:1;order:1;min-width:200px;margin:0}.visit-time-tools>.icon-button{order:2}
-@media(max-width:700px){.visit-time-tools>.visit-time-selection{flex-basis:100%;order:3;min-width:0}.visit-time-tools{gap:4px 12px}}
+.visit-time-tools{position:relative;justify-content:center;padding-inline:48px;min-height:46px}.visit-time-group{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 16px;min-width:0;max-width:100%}.visit-time-group>.visit-time-selection{margin:0;min-width:0;text-align:center;justify-content:center;flex-wrap:wrap}.visit-time-tools>.icon-button{position:absolute;right:0;top:0}
+@media(max-width:700px){.visit-time-group{gap:5px}.visit-time-group>.visit-time-selection{flex-basis:100%;min-height:0}.visit-time-tools{padding-inline:44px}.visit-time-group .visit-guest-select{gap:8px}.visit-time-group .visit-guest-trigger{min-width:130px}}
 @media(max-height:520px){.vision-header.visit-header{padding-block:4px;min-height:54px}.vision-header.visit-header .vision-brand{flex:0 1 130px}.vision-header.visit-header .vision-brand .puppy-brandmark{width:130px}.is-compact .reservation-grid thead th span,.is-compact .reservation-grid thead th strong{display:inline;font-size:11px;margin:0}.is-compact .reservation-grid thead th strong{margin-left:4px}.is-compact .reservation-grid thead th{padding-block:7px}.is-compact .reservation-week-nav{min-height:44px}.is-compact .reservation-legend{margin:2px 0 5px}}
 @media(max-height:440px){.visit-flow-page[data-step="2"] .visit-scroll{display:block;overflow:auto}.visit-flow-page[data-step="2"] .visit-fields{display:block}.visit-flow-page[data-step="2"] .visit-stage{display:flex}.reservation-calendar.is-compact{flex:none;min-height:190px}.is-compact .reservation-grid-scroll{flex:none;min-height:110px;height:110px}.is-compact .reservation-grid-scroll{scroll-padding-top:36px}}
 

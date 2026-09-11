@@ -2,7 +2,7 @@
 // This module is platform-independent so calendar edge cases can be tested.
 export type Plan='hourly'|'day'|'';
 export type Booking={date:string;start:string;end:string;plan:Plan;guests:number};
-export type Slot={start:string;end:string;available:boolean;reason:string|null};
+export type Slot={start:string;end:string;available:boolean;reason:string|null;remaining_seats?:number|null;capacity_full?:boolean;buffered?:boolean;low_capacity?:boolean};
 export type Day={date:string;open:string;close:string;closed:boolean;slots:Slot[]};
 export type Calendar={today:string;timezone:string;minimum_minutes:number;max_guests_per_group:number;policy_version:number;days:Day[]};
 export type Contact={name:string;contact_method:'wechat'|'phone'|'email'|'other';contact:string};

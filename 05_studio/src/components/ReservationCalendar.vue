@@ -5,7 +5,7 @@ const copyText = contentModule("components-ReservationCalendar", copyTextDefault
 import copyTextDefault from "../content/components-ReservationCalendar.json";
 import ReservationHoursNote from './ReservationHoursNote.vue';
 import InfoTip from './InfoTip.vue';
-import { say } from "../state";
+import { say,formatCopy } from "../state";
 
 import {
   computed,
@@ -23,6 +23,7 @@ import {
   validSelection,
   type ReservationBooking,
   type ReservationCalendar,
+  type ReservationSlot,
 } from "../reservations";
 const props = defineProps<{
   calendar: ReservationCalendar;
@@ -77,6 +78,11 @@ function selected(day: string, time: string) {
 }
 function available(di: number, ri: number) {
   return !!days.value[di]?.slots[ri]?.available && !props.disabled;
+}
+function capacityLabel(slot:ReservationSlot|undefined){
+  if(slot?.buffered)return say(copyText.full_buffer);
+  if(slot?.capacity_full)return say(copyText.full);
+  return slot?.low_capacity?formatCopy(copyText.remaining_seats,{v0:slot.remaining_seats!}):'';
 }
 function choose(di: number, ri: number) {
   if (!available(di, ri)) return;
@@ -177,6 +183,7 @@ watch(
       <span><i />{{ say(copyText.available_to_book_9bb918) }}</span
       ><span><i class="chosen" />{{ say(copyText.your_selection_0fc834) }}</span
       ><span><i class="closed" />{{ say(copyText.unavailable_fb3489) }}</span>
+      <span><i class="low-capacity" />{{ say(copyText.low_seats) }}</span>
     </div>
     <div class="reservation-week-nav">
       <button
@@ -195,7 +202,7 @@ watch(
           {{ days[days.length - 1]?.date.slice(5).replace("-", "/") }}</span
         >
       </div>
-      <InfoTip v-if="compact" :label="say(copyText.reservation_timetable_use_arrow_keys_to_move_3bb451)"><p>{{say(booking.plan==='day'?copyText.day_selection_help:copyText.choose_a_start_time_for_a_twohour_a3470d)}}</p><p>{{say(copyText.all_times_are_local_to_hamilton_the_8a3607)}}</p></InfoTip>
+      <InfoTip v-if="compact" :label="say(copyText.reservation_timetable_use_arrow_keys_to_move_3bb451)"><p>{{say(booking.plan==='day'?copyText.day_selection_help:copyText.choose_a_start_time_for_a_twohour_a3470d)}}</p><p>{{say(copyText.full_buffer)}}</p><p>{{say(copyText.all_times_are_local_to_hamilton_the_8a3607)}}</p></InfoTip>
       <button
         type="button"
         class="icon-button"
@@ -244,6 +251,8 @@ watch(
                 :class="{
                   chosen: selected(day.date, time),
                   unavailable: !day.slots[ri]?.available,
+                  'low-capacity': !!day.slots[ri]?.low_capacity,
+                  buffered: !!day.slots[ri]?.buffered,
                   start: selected(day.date, time) && booking.start === time,
                 }"
                 :aria-label="
@@ -255,8 +264,9 @@ watch(
                   ' ' +
                   (day.slots[ri]?.available
                     ? say(copyText.available_d07da8)
-                    : say(copyText.unavailable_e939b7))
+                    : say(copyText.unavailable_e939b7)) + ' ' + capacityLabel(day.slots[ri])
                 "
+                :title="capacityLabel(day.slots[ri])"
                 @focus="focusIndex = ri * columns + di"
                 @keydown="keyboard($event, ri * columns + di)"
                 @click="choose(di, ri)"

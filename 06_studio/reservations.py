@@ -159,22 +159,36 @@ def overlaps(db, booking, exclude=""):
     return any(minute(json.loads(r["payload"])["booking"]["start"]) < minute(booking.end)
                and minute(json.loads(r["payload"])["booking"]["end"]) > minute(booking.start) for r in rows)
 
-def capacity_available(confirmed, day, start, end, guests, policy):
+def capacity_grid(confirmed, day, policy):
+    """One authoritative half-hour map, independent of the requested group size."""
     group_limit = 1 if policy["exclusive_groups"] else policy["max_concurrent_groups"]
     people_limit = policy["max_concurrent_guests"]
-    for at in range(start, end, 30):
+    slots = {}
+    for at in range(0, 1440, 30):
         present = [b for b in confirmed if b["date"] == str(day) and minute(b["start"]) < at + 30 and minute(b["end"]) > at]
-        if group_limit is not None and len(present) + 1 > group_limit:
-            return False
-        if people_limit is not None and sum(b["guests"] for b in present) + guests > people_limit:
-            return False
-    return True
+        group_full = group_limit is not None and len(present) >= group_limit
+        remaining = max(0, people_limit - sum(b["guests"] for b in present)) if people_limit is not None else None
+        full = group_full or remaining == 0
+        slots[at] = {"remaining_seats": 0 if group_full else remaining, "capacity_full": full}
+    # Only genuinely full intervals create padding. Padding never creates more padding.
+    full_slots = {at for at, slot in slots.items() if slot["capacity_full"]}
+    for at, slot in slots.items():
+        slot["buffered"] = not slot["capacity_full"] and (at - 30 in full_slots or at + 30 in full_slots)
+        slot["low_capacity"] = not slot["buffered"] and slot["remaining_seats"] is not None and 0 < slot["remaining_seats"] <= 2
+    return slots
 
-def has_capacity(db, booking, policy, exclude=""):
+def capacity_available(confirmed, day, start, end, guests, policy, *, include_buffer=True):
+    slots = capacity_grid(confirmed, day, policy)
+    return all(not slots[at]["capacity_full"]
+               and (not include_buffer or not slots[at]["buffered"])
+               and (slots[at]["remaining_seats"] is None or slots[at]["remaining_seats"] >= guests)
+               for at in range(start, end, 30))
+
+def has_capacity(db, booking, policy, exclude="", *, include_buffer=True):
     if db.execute('SELECT 1 FROM reservation_blocks WHERE date=? AND start<? AND end>? LIMIT 1', (str(booking.date),booking.end,booking.start)).fetchone():
         return False
     confirmed = [json.loads(r[0])["booking"] for r in db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed' AND id!=? AND json_extract(payload,'$.booking.date')=?", (exclude, str(booking.date)))]
-    return capacity_available(confirmed, booking.date, minute(booking.start), minute(booking.end), booking.guests, policy)
+    return capacity_available(confirmed, booking.date, minute(booking.start), minute(booking.end), booking.guests, policy, include_buffer=include_buffer)
 
 def available_offer(db, current):
     from pathlib import Path
@@ -384,14 +398,17 @@ def register(app, database, admin_actor):
             day = current.date() + timedelta(days=n)
             slots = []
             opening = hours(day, settings)
+            capacity = capacity_grid(confirmed, day, settings)
             for start in range(grid_start, grid_end, 30):
                 past = datetime.combine(day, datetime.min.time(), tzinfo=ZONE) + timedelta(minutes=start) <= current
-                busy = not capacity_available(confirmed, day, start, start + 30, guests, settings)
+                state = capacity[start]
+                busy = state["capacity_full"] or state["remaining_seats"] is not None and state["remaining_seats"] < guests
                 closed = not opening["enabled"] or start < minute(opening["open"]) or start >= minute(opening["close"]) or any(b['date']==str(day) and minute(b['start'])<start+30 and minute(b['end'])>start for b in blocks)
-                reason = "closed" if closed else "past" if past else "capacity" if busy or guests > settings["max_guests_per_group"] else None
-                slots.append({"start": clock(start), "end": clock(start + 30), "available": reason is None, "reason": reason})
+                reason = "closed" if closed else "past" if past else "capacity" if busy or guests > settings["max_guests_per_group"] else "buffer" if state["buffered"] else None
+                slots.append({**state, "start": clock(start), "end": clock(start + 30), "available": reason is None, "reason": reason,
+                              "low_capacity": state["low_capacity"] and not closed and not past})
             days.append({"date": str(day), "open": opening["open"], "close": opening["close"], "closed": not opening["enabled"], "slots": slots})
-        return {"today": str(current.date()), "timezone": "America/Toronto", "minimum_minutes": 120, "max_guests_per_group": settings["max_guests_per_group"], "weekly_hours": settings["weekly_hours"], "policy_version": settings["version"], "days": days, "offers": [offer] if offer and settings['max_guests_per_group'] >= 2 else []}
+        return {"today": str(current.date()), "timezone": "America/Toronto", "minimum_minutes": 120, "capacity_buffer_minutes": 30, "max_guests_per_group": settings["max_guests_per_group"], "weekly_hours": settings["weekly_hours"], "policy_version": settings["version"], "days": days, "offers": [offer] if offer and settings['max_guests_per_group'] >= 2 else []}
 
     @app.post("/studio-api/reservations", status_code=201)
     def submit(payload: Submission, request: Request, idempotency_key: Annotated[str, Header()], customer=Depends(require_customer)):
@@ -500,17 +517,19 @@ def register(app, database, admin_actor):
         for index in range(14):
             day=first+timedelta(days=index);opening=hours(day,policy);slots=[]
             present=[(s,b) for s,b in booked if b['date']==str(day)]
+            capacity=capacity_grid([b for s,b in present if s=='confirmed'],day,policy)
             for at in range(0,1440,30):
                 begin,end=clock(at),clock(at+30)
-                slot={'start':begin,'end':end,'closed':not opening['enabled'] or begin<opening['open'] or end>opening['close'],
+                slot={**capacity[at],'start':begin,'end':end,'closed':not opening['enabled'] or begin<opening['open'] or end>opening['close'],
                       'blocked':any(b['date']==str(day) and b['start']<end and b['end']>begin for b in blocks)}
+                slot['low_capacity']=slot['low_capacity'] and not slot['closed'] and not slot['blocked']
                 for state in ('pending','confirmed','completed'):
                     overlaps=[b for s,b in present if s==state and b['start']<end and b['end']>begin]
                     slot[state]=sum(b['guests'] for b in overlaps);slot[state+'_groups']=len(overlaps)
                 slots.append(slot)
             days.append({'date':str(day),'open':opening['open'],'close':opening['close'],'closed':not opening['enabled'],'slots':slots,
                          'bookings':[g for g in groups if g['date']==str(day)]})
-        return {'days':days,'timezone':str(ZONE),'policy_version':policy['version']}
+        return {'days':days,'timezone':str(ZONE),'policy_version':policy['version'],'capacity_buffer_minutes':30}
 
     @app.patch("/studio-api/manage/reservations/{reference}")
     def update(reference: str, payload: ReservationUpdate, actor=Depends(admin_actor)):
@@ -626,7 +645,8 @@ def register(app, database, admin_actor):
             for row in future:
                 booking = Visit(**json.loads(row["payload"])["booking"])
                 opening = hours(booking.date, settings)
-                if (not opening["enabled"] or booking.start < opening["open"] or booking.end > opening["close"] or booking.guests > settings["max_guests_per_group"] or not has_capacity(db, booking, settings, row["id"])):
+                # New buffers must not retroactively invalidate accepted visits.
+                if (not opening["enabled"] or booking.start < opening["open"] or booking.end > opening["close"] or booking.guests > settings["max_guests_per_group"] or not has_capacity(db, booking, settings, row["id"], include_buffer=False)):
                     raise HTTPException(409, "reservation_policy_conflict")
             encoded = {k:v for k,v in settings.items() if k not in ("exclusive_groups", "version")}
             db.execute("UPDATE reservation_policy SET exclusive_groups=?,settings=?,version=version+1 WHERE id=1", (settings["exclusive_groups"], json.dumps(encoded)))

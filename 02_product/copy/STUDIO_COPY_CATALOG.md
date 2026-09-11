@@ -815,6 +815,10 @@
 | available_to_book_9bb918 | 可以预约 | Available to book |
 | your_selection_0fc834 | 已选时段 | Your selection |
 | unavailable_fb3489 | 不可预约 | Unavailable |
+| low_seats | 座位数≤2 | Seats left ≤ 2 |
+| remaining_seats | 剩余 {v0} 个座位 | {v0} seats left |
+| full | 已满员 | Fully booked |
+| full_buffer | 满员时段前后 30 分钟不可预约。 | The 30 minutes before and after a fully booked period are unavailable. |
 | previous_dates_314fc5 | 上一组日期 | Previous dates |
 | the_next_two_weeks_59cce3 | 未来两周 | The next two weeks |
 | next_dates_4c8209 | 下一组日期 | Next dates |

@@ -39,7 +39,7 @@ def test_calendar_window_and_blocked_hours(client):
     assert all(s["available"] == (s["start"] < "16:00") for s in wed["slots"])
     assert all(s["available"] == (s["start"] < "18:00") for s in thu["slots"])
     assert result["max_guests_per_group"] == 4
-    assert "remaining" not in str(result)
+    assert all(s['remaining_seats'] is None and not s['low_capacity'] for d in result['days'] for s in d['slots'])
 
 @pytest.mark.parametrize("day,start,end,plan",[
     ("2026-09-21","10:00","12:00","hourly"),

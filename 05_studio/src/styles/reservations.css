@@ -367,6 +367,7 @@
 .reservation-legend i.closed {
   background: #dce3e6;
 }
+.reservation-legend i.low-capacity { background:#fff0f4; border-color:#efd0da; }
 .reservation-grid-help,
 .reservation-hours {
   font-size: 12px;
@@ -464,6 +465,7 @@
   color: #747477;
   opacity: 1;
 }
+.reservation-grid td > button.low-capacity:not(.chosen) { background:#fff0f4; color:#805764; }
 .reservation-grid td > button:focus-visible {
   outline-offset: -4px;
   outline: 2px solid #102f3b;

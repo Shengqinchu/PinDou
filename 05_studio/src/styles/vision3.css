@@ -1,5 +1,6 @@
 /* VISION3: owner's handwriting, supplied illustration, white + pale blue. */
 :root { --chinese-display: "Outfit Variable", "PinDou Hand SC", "PinDou Sans SC", "Microsoft YaHei", sans-serif; }
+:lang(zh-CN) .vision-menu a > span:not(.vision-menu-number) { font-family:var(--chinese-display); font-weight:400; }
 :lang(zh-CN) :is(h1,h2,h3,h4,h5,h6),
 :lang(zh-CN) :is(.vision-title,.vision-detail-heading h1,.reservation-intro h1),
 :lang(zh-CN) .studio-desk :is(h1,h2,h3),

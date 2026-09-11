@@ -2710,6 +2710,22 @@
       "不可预约",
       "Unavailable"
     ],
+    "low_seats": [
+      "座位数≤2",
+      "Seats left ≤ 2"
+    ],
+    "remaining_seats": [
+      "剩余 {v0} 个座位",
+      "{v0} seats left"
+    ],
+    "full": [
+      "已满员",
+      "Fully booked"
+    ],
+    "full_buffer": [
+      "满员时段前后 30 分钟不可预约。",
+      "The 30 minutes before and after a fully booked period are unavailable."
+    ],
     "previous_dates_314fc5": [
       "上一组日期",
       "Previous dates"
