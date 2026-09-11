@@ -15,6 +15,8 @@ const route=useRoute();
 const threads=ref<MessageThread[]>([]),messages=ref<CustomerMessage[]>([]),bridge=ref<MessageBridge|null>(null);
 const selectedId=ref(''),selected=ref<MessageThread|null>(null),query=ref(''),unreadOnly=ref(false);
 const error=ref(''),busy=ref(false),loading=ref(false),sending=ref(false),newOpen=ref(false);
+const syncErrors=reactive({threads:'',messages:''});
+const displayedError=computed(()=>error.value||syncErrors.messages||syncErrors.threads);
 const roomCursor=ref(''),before=ref<number|null>(null),messagesDone=ref(true);
 const form=reactive({phone:'',name:'',reservation_id:''});
 const drafts=reactive<Record<string,string>>({}),pending=new Map<string,{id:string;content:string}>();
@@ -27,40 +29,52 @@ const timeText=(stamp:number)=>new Intl.DateTimeFormat(locale.value==='zh'?'zh-C
 const chatMessages=computed(()=>messages.value.map(m=>({_id:m.id,indexId:m.seq,content:m.content,senderId:m.direction==='outbound'?'owner':'customer',username:[m.channel,say(m.source==='desk'?copy.desk_source:copy.phone_source),m.direction==='outbound'?stateLabel(m.state):''].filter(Boolean).join(' · '),date:dateText(m.created_at),timestamp:timeText(m.created_at),saved:['sent','delivered'].includes(m.state),distributed:m.state==='delivered',seen:false,disableActions:true,disableReactions:true})));
 const textMessages=computed(()=>({ROOMS_EMPTY:say(copy.empty),ROOM_EMPTY:say(copy.no_messages),NEW_MESSAGES:say(copy.new_messages),MESSAGE_DELETED:'',MESSAGES_EMPTY:say(copy.no_messages),CONVERSATION_STARTED:'',TYPE_MESSAGE:say(copy.write),SEARCH:say(copy.search),IS_ONLINE:say(copy.online),LAST_SEEN:'',IS_TYPING:'',CANCEL_SELECT_MESSAGE:say(copy.cancel)}));
 const chatStyles={general:{background:'#ffffff',color:'#29343a',borderStyle:'none'},container:{borderRadius:'0',boxShadow:'none'},content:{background:'#ffffff'},message:{background:'#f1f5f7',backgroundMe:'#e8f2f8',color:'#29343a',colorMe:'#29343a'}};
-let interval:ReturnType<typeof setInterval>|undefined,searchTimer:ReturnType<typeof setTimeout>|undefined,active=true,listSequence=0,messageSequence=0,loadedThread='',listBusy=false,messageBusy=false;
+let interval:ReturnType<typeof setInterval>|undefined,messageInterval:ReturnType<typeof setInterval>|undefined,searchTimer:ReturnType<typeof setTimeout>|undefined,active=true,listSequence=0,messageSequence=0,loadedThread='',listBusy=false,messageBusy=false;
+const syncRequests=new Set<AbortController>(),readThrough=new Map<string,number>();
 function messageError(e:unknown){const code=(e as {code?:string;message?:string}).code||(e as Error).message;return say((copy as Record<string,string[]>)[code]||copy.generic_error);}
-function shown(){return active&&props.active&&document.visibilityState==='visible';}
+function isActive(){return active&&props.active;}
+function shown(){return isActive()&&document.visibilityState==='visible';}
+async function syncRequest<T>(path:string,init:RequestInit={}):Promise<T>{
+  const controller=new AbortController();syncRequests.add(controller);
+  const timeout=setTimeout(()=>controller.abort(),8000);
+  try{return await request<T>(path,{...init,signal:controller.signal});}
+  finally{clearTimeout(timeout);syncRequests.delete(controller);}
+}
 async function loadThreads(append=false){
   if(listBusy)return;listBusy=true;const sequence=++listSequence;
   try{
     const params=new URLSearchParams({query:query.value,unread:String(unreadOnly.value)});
     if(append&&roomCursor.value)params.set('cursor',roomCursor.value);
-    const result=await request<ThreadPage>('/manage/messages/threads?'+params);
+    const result=await syncRequest<ThreadPage>('/manage/messages/threads?'+params);
     if(sequence!==listSequence)return;
     const merged=append?[...threads.value,...result.items]:result.items;
     threads.value=[...new Map(merged.map(t=>[t.id,t])).values()];roomCursor.value=result.next_cursor;bridge.value=result.bridge;
-  }catch(e){error.value=messageError(e);}finally{listBusy=false;}
+    syncErrors.threads='';
+  }catch(e){if(sequence===listSequence&&isActive())syncErrors.threads=messageError(e);}finally{if(sequence===listSequence)listBusy=false;}
 }
 async function loadMessages(older=false){
   const ident=selectedId.value;if(!ident||messageBusy||(older&&!before.value))return;
   messageBusy=true;const sequence=++messageSequence;
   try{
-    const result=await request<MessagePage>(`/manage/messages/threads/${ident}${older?'?before='+before.value:''}`);
+    const result=await syncRequest<MessagePage>(`/manage/messages/threads/${ident}${older?'?before='+before.value:''}`);
     if(sequence!==messageSequence||ident!==selectedId.value)return;
-    selected.value=result.thread;loadedThread=ident;
+    selected.value=result.thread;loadedThread=ident;syncErrors.messages='';
     messages.value=[...new Map([...messages.value,...result.items].map(m=>[m.id,m])).values()].sort((a,b)=>a.seq-b.seq);
     if(older||before.value===null){before.value=result.next_before;messagesDone.value=!result.has_more;}
     await nextTick();
     if(shown()&&ident===selectedId.value&&result.items.length){
       const seq=Math.max(...result.items.map(m=>m.seq));
-      await request(`/manage/messages/threads/${ident}/read`,{method:'POST',body:JSON.stringify({through_seq:seq})});
+      if(seq>(readThrough.get(ident)||0)){
+        await syncRequest(`/manage/messages/threads/${ident}/read`,{method:'POST',body:JSON.stringify({through_seq:seq})});
+        readThrough.set(ident,seq);
+      }
       const found=threads.value.find(t=>t.id===ident);if(found)found.unread=0;
     }
-  }catch(e){if(sequence===messageSequence)error.value=messageError(e);}finally{if(sequence===messageSequence)messageBusy=false;}
+  }catch(e){if(sequence===messageSequence&&isActive())syncErrors.messages=messageError(e);}finally{if(sequence===messageSequence)messageBusy=false;}
 }
 async function selectThread(value:MessageThread){
   if(selectedId.value===value.id)return;
-  ++messageSequence;selectedId.value=value.id;selected.value=value;messages.value=[];before.value=null;messagesDone.value=true;loadedThread='';messageBusy=false;error.value='';
+  ++messageSequence;selectedId.value=value.id;selected.value=value;messages.value=[];before.value=null;messagesDone.value=true;loadedThread='';messageBusy=false;error.value='';syncErrors.messages='';
   await loadMessages();
 }
 function fetchOlder(event:Event){const raw=(event as CustomEvent).detail,data=Array.isArray(raw)?raw[0]:raw;if(data?.options?.reset){if(loadedThread!==selectedId.value)void loadMessages();}else void loadMessages(true);}
@@ -82,14 +96,24 @@ async function create(){
   catch(e){error.value=messageError(e);}finally{busy.value=false;}
 }
 async function setHandled(){if(!selected.value)return;try{const status=selected.value.status==='open'?'closed':'open';await request(`/manage/messages/threads/${selectedId.value}`,{method:'PATCH',body:JSON.stringify({status})});selected.value.status=status;await loadThreads();}catch(e){error.value=messageError(e);}}
-async function refresh(){loading.value=true;try{await loadThreads();await loadMessages();}finally{loading.value=false;}}
+async function refresh(){loading.value=true;try{await Promise.all([loadThreads(),loadMessages()]);}finally{loading.value=false;}}
 function changed(){if(searchTimer)clearTimeout(searchTimer);searchTimer=setTimeout(()=>void loadThreads(),250);}
 watch([query,unreadOnly],changed);
-function visibility(){if(shown())void refresh();}
-onMounted(async()=>{
-  await refresh();
-  interval=setInterval(()=>{if(shown())void refresh();},7000);document.addEventListener('visibilitychange',visibility);
-});
+function resume(){if(isActive())void refresh();}
+function startSync(){
+  active=true;if(interval)return;
+  // Embedded browser panes can report "hidden" while the conversation is on screen.
+  // Keep receiving while this panel is active; visibility only controls read receipts.
+  interval=setInterval(()=>{if(isActive())void loadThreads();},7000);
+  messageInterval=setInterval(()=>{if(isActive())void loadMessages();},2000);
+  void refresh();
+}
+function stopSync(){
+  active=false;++listSequence;++messageSequence;listBusy=false;messageBusy=false;
+  clearInterval(interval);clearInterval(messageInterval);interval=undefined;messageInterval=undefined;
+  for(const controller of syncRequests)controller.abort();
+}
+onMounted(()=>{startSync();document.addEventListener('visibilitychange',resume);window.addEventListener('focus',resume);window.addEventListener('online',resume);});
 let openedReservation='';
 watch(()=>[props.active,route.query.reservation],async()=>{
   const ident=route.query.reservation;if(!props.active||typeof ident!=='string'||ident===openedReservation)return;
@@ -97,8 +121,8 @@ watch(()=>[props.active,route.query.reservation],async()=>{
   try{const value=await request<MessageThread>('/manage/messages/threads',{method:'POST',body:JSON.stringify({reservation_id:ident})});await loadThreads();await selectThread(value);}
   catch(e){if((e as {status?:number}).status===422){newOpen.value=true;}else error.value=messageError(e);}
 },{immediate:true});
-onActivated(()=>{active=true;void refresh();});onDeactivated(()=>{active=false;});
-onBeforeUnmount(()=>{active=false;++listSequence;++messageSequence;clearInterval(interval);clearTimeout(searchTimer);document.removeEventListener('visibilitychange',visibility);});
+onActivated(startSync);onDeactivated(stopSync);
+onBeforeUnmount(()=>{stopSync();clearTimeout(searchTimer);document.removeEventListener('visibilitychange',resume);window.removeEventListener('focus',resume);window.removeEventListener('online',resume);});
 defineExpose({refresh});
 </script>
 
@@ -106,7 +130,7 @@ defineExpose({refresh});
   <section class="sms-workspace" :class="{'sms-has-selection':selectedId}">
     <header class="sms-heading"><div><h1>{{say(copy.title)}}</h1><p>{{say(copy.subtitle)}}</p></div><div class="sms-heading-actions"><button class="desk-link" :disabled="loading" @click="refresh"><PhArrowClockwise :class="{spinning:loading}"/>{{say(copy.refresh)}}</button><button class="desk-button" @click="newOpen=true"><PhPlus/>{{say(copy.new_conversation)}}</button></div></header>
     <p class="sms-connection" :class="{'is-ready':ready&&bridge?.online&&!bridge?.health.error}">{{!ready?say(copy.not_ready):bridge?.health.error?say((copy as Record<string,string[]>)[String(bridge.health.error)]||copy.account_unavailable):bridge?.online?say(copy.online):say(copy.offline)}}<span v-if="bridge"> · {{bridge.sender}}</span></p>
-    <p v-if="error" class="desk-error" role="alert">{{error}}</p>
+    <p v-if="displayedError" class="desk-error" role="alert">{{displayedError}}</p>
     <div class="sms-inbox">
       <aside class="sms-threads" :aria-label="say(copy.title)">
         <input v-model="query" type="search" :placeholder="say(copy.search)" :aria-label="say(copy.search)"/>
