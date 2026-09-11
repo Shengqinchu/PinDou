@@ -123,8 +123,8 @@ export function useStudioVisit(language:{value:string}){
       if(failure.status===401){user.logout();return;}
       if(attempt.value&&!retryUnchanged(failure.status,failure.code)){
         uni.removeStorageSync(attemptKey(owner));attempt.value=null;
-        if(failure.code==='booking_profile_changed'){await loadContact();profileConflict.value=true;}
-        else if(failure.status===409||failure.status===422){await loadCalendar();if(!validBooking(calendar.value,booking))step.value=1;}
+        if(failure.code==='booking_profile_changed'){await loadContact(true);profileConflict.value=true;}
+        else if(failure.status===409||failure.status===422){await loadCalendar(true);if(!validBooking(calendar.value,booking))step.value=1;}
       }
     }finally{if(alive)sending.value=false;}
   }
