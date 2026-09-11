@@ -30,6 +30,11 @@ def prepare(tmp_path, **changes):
     {'approved_at': None},
     {'recipient': '+14165550100; echo injected'},
     {'request_id': '../../unsafe'},
+    {'chat_guid': 'iMessage;-;+14165550100'},
+    {'chat_guid': 'SMS;-;+14165550101'},
+    {'chat_guid': 'SMS;+;chat123456'},
+    {'chat_guid': ''},
+    {'chat_guid': 123},
 ])
 def test_invalid_config_cannot_dispatch(tmp_path, changes):
     tool = prepare(tmp_path, **changes)
@@ -60,6 +65,25 @@ def test_uncertain_timeout_is_not_retried(tmp_path):
     assert result['state'] == 'outcome_unknown'
     again = probe.dispatch(tmp_path, tool, lambda *a, **k: pytest.fail('no retry after timeout'))
     assert not again['dispatched']
+
+
+def test_existing_sms_chat_is_targeted_without_changing_recipient_or_replaying(tmp_path):
+    guid = 'SMS;-;+14165550100'
+    tool = prepare(tmp_path, chat_guid=guid)
+    calls = []
+
+    def runner(command, **options):
+        calls.append(command)
+        return SimpleNamespace(returncode=0, stdout='accepted')
+
+    result = probe.dispatch(tmp_path, tool, runner)
+    assert result['dispatched'] and not result['delivery_verified']
+    assert calls[0][calls[0].index('--chat-guid') + 1] == guid
+    assert '--to' not in calls[0]
+    assert calls[0][calls[0].index('--service') + 1] == 'sms'
+    assert calls[0][calls[0].index('--text') + 1] == probe.TEST_TEXT
+    again = probe.dispatch(tmp_path, tool, runner)
+    assert not again['dispatched'] and len(calls) == 1
 
 
 def test_crash_after_dispatch_started_does_not_resend(tmp_path):

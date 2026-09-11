@@ -46,6 +46,7 @@ def dispatch(directory, tool=DEFAULT_TOOL, runner=subprocess.run):
         raise ValueError('private_config_permissions_required')
     value = json.loads(config.read_text(encoding='utf-8'))
     recipient = value.get('recipient', '')
+    chat_guid = value.get('chat_guid')
     request_id = value.get('request_id', '')
     approved_at = value.get('approved_at')
     if (value.get('approved_text') != TEST_TEXT
@@ -54,6 +55,9 @@ def dispatch(directory, tool=DEFAULT_TOOL, runner=subprocess.run):
         raise ValueError('explicit_test_authorization_required')
     if not re.fullmatch(r'(?:\+1[2-9][0-9]{9}|\+861[3-9][0-9]{9})', recipient):
         raise ValueError('supported_test_phone_required')
+    if chat_guid is not None and (not isinstance(chat_guid, str)
+            or not re.fullmatch(r'SMS;[+-];' + re.escape(recipient), chat_guid)):
+        raise ValueError('matching_direct_sms_chat_required')
     if not re.fullmatch(r'[a-zA-Z0-9_-]{16,80}', request_id):
         raise ValueError('request_id_required')
     if not Path(tool).is_file():
@@ -70,7 +74,8 @@ def dispatch(directory, tool=DEFAULT_TOOL, runner=subprocess.run):
                     'reason': 'request_already_attempted', 'delivery_verified': False}
         db.execute('INSERT INTO attempts VALUES (?,?,?)', (request_id, time.time(), 'started'))
         db.commit()
-        command = [str(tool), 'send', '--to', recipient, '--text', TEST_TEXT,
+        target = ['--chat-guid', chat_guid] if chat_guid else ['--to', recipient]
+        command = [str(tool), 'send', *target, '--text', TEST_TEXT,
                    '--service', 'sms', '--region', 'CN' if recipient.startswith('+86') else 'CA', '--json']
         try:
             completed = runner(command, capture_output=True, text=True,
