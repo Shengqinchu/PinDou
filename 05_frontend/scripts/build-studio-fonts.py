@@ -18,6 +18,7 @@ for module, key in (('account', 'account'), ('booking-profile', 'title')):
 for module, keys in {
     'account': ['my_reservations','reservation_title'],
     'profile': ['edit'],
+    'miniapp-legal': ['privacy_title','agreement_title'],
     'pages-Home': ['a_little_time_all_yours_9e9d60','make_something_lovely_04db64'],
     'visit-flow': ['experience','time','contact','review'],
     'pages-Details': ['a_little_guide_to_the_studio_1b38da','studio_address_171634','parking_8188de','seats_and_tools_4b0a0a'],

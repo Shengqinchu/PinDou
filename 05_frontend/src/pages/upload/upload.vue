@@ -35,8 +35,8 @@
       <div class="upload__spacer"></div>
 
       <p class="footnote upload__footnote">
-        上传即同意 <span class="footnote-link" @click="openContract('agreement')">《用户服务协议》</span>
-        与 <span class="footnote-link" @click="openContract('privacy')">《隐私政策说明》</span>，请勿上传他人肖像
+        {{legal('footer_lead')}} <span class="footnote-link" @click="openContract('agreement')">{{legal('agreement_title')}}</span>
+        {{legal('and')}} <span class="footnote-link" @click="openContract('privacy')">{{legal('privacy_title')}}</span>
       </p>
     </section>
 
@@ -59,23 +59,17 @@
     <!-- ===== 敏感肖像授权合规 Modal (ADR-009) ===== -->
     <div v-if="showConsentModal" class="consent-modal-overlay">
       <div class="consent-modal pd-card">
-        <h3 class="consent-modal__title">肖像隐私授权说明</h3>
+        <h3 class="consent-modal__title">{{legal('upload_title')}}</h3>
         <scroll-view scroll-y class="consent-modal__scroll">
-          <p class="consent-modal__text">
-            PinDou 极其重视您的照片安全与肖像隐私。根据 <strong>ADR-009 隐私安全规范</strong>，我们向您郑重承诺：
-          </p>
-          <p class="consent-modal__text">
-            1. <strong>隐私合规使用</strong>：您上传的照片仅流向专用的安全 AI 反代服务用于 Q 版化设计和拼豆量化，绝对不用于训练模型或泄露给任何第三方广告商。<br />
-            2. <strong>30天自动销毁</strong>：上传的原图在 30 天后自动启动定时物理清理任务进行完全抹除，无法恢复。<br />
-            3. <strong>数字资产归属</strong>：由照片生成出的拼豆图纸、色卡等交付物作为无敏感信息的数字资产，将永久留存并归属于您的个人账户。
-          </p>
-          <p class="consent-modal__text">
-            您是否同意授权上传并调用 AI 拼豆设计系统？
-          </p>
+          <p class="consent-modal__text">{{legal('upload_intro')}}</p>
+          <p class="consent-modal__text">{{legal('upload_processing')}}</p>
+          <p class="consent-modal__text">{{legal('upload_personal')}}</p>
+          <p class="consent-modal__text">{{legal('upload_storage')}}</p>
+          <StudioLegalLinks :language="language"/>
         </scroll-view>
         <div class="consent-modal__buttons">
-          <button class="btn btn--secondary btn--sm" @click="handleConsentCancel">拒绝</button>
-          <button class="btn btn--primary btn--sm" @click="handleConsentAgree">同意并继续</button>
+          <button class="btn btn--secondary btn--sm" @click="handleConsentCancel">{{legal('decline')}}</button>
+          <button class="btn btn--primary btn--sm" @click="handleConsentAgree">{{legal('agree_upload')}}</button>
         </div>
       </div>
     </div>
@@ -84,11 +78,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
+import legalCopy from '../../../../05_studio/src/content/miniapp-legal.json';
+import StudioLegalLinks from '../../components/StudioLegalLinks.vue';
 import MiniProgramLayout from '../../components/MiniProgramLayout.vue';
 import { useUserStore } from '../../store/user';
 
 const userStore = useUserStore();
+const language=ref(uni.getStorageSync('pd_studio_language')||'zh');
+const legal=(key:keyof typeof legalCopy)=>legalCopy[key][language.value==='en'?1:0];
+onShow(()=>{language.value=uni.getStorageSync('pd_studio_language')||'zh';});
 
 // 路由传入的预设风格
 const stylePreset = ref('cartoon_fallback');
@@ -149,7 +148,7 @@ const handleNext = () => {
 const handleConsentAgree = async () => {
   try {
     showConsentModal.value = false;
-    uni.showLoading({ title: '授权留痕中...' });
+    uni.showLoading({ title: legal('recording') });
     await userStore.giveConsent('sensitive');
     uni.hideLoading();
     // 授权留痕成功，调用相机或相册
@@ -166,7 +165,7 @@ const handleConsentAgree = async () => {
 
 const handleConsentCancel = () => {
   showConsentModal.value = false;
-  uni.showToast({ title: '需要同意肖像授权才能体验拼豆哦~', icon: 'none' });
+  uni.showToast({ title: legal('upload_denied'), icon: 'none' });
 };
 
 const openContract = (type: 'agreement' | 'privacy') => {

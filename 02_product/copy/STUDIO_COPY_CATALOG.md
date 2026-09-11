@@ -1536,6 +1536,54 @@
 | collection_url | https://www.xiaohongshu.com/collection/item/69dee77800ba000000000001 | |
 | checked_at | 2026-09-08 | |
 
+## miniapp-legal.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| privacy_title | 隐私政策说明 | Privacy notice |
+| agreement_title | 用户服务协议 | Service terms |
+| updated | 更新日期：2026 年 9 月 11 日 | Updated: September 11, 2026 |
+| privacy_intro | 本说明适用于小狗拼豆铺（PinDou Puppy）的小程序及共用的账号、预约和图纸服务。我们按你使用的功能处理相应信息。你可以先浏览首页和店铺信息，再决定是否登录、预约或上传图片。 | This notice covers the PinDou Puppy mini program and its shared account, booking and pattern services. We process information for the features you choose. You can browse the home page and studio information before deciding to sign in, book or upload an image. |
+| identity_title | 账号与个人资料 | Account and profile |
+| identity_body | 微信登录使用微信提供的登录凭证与身份标识，用于验证登录、关联账号和完成网站扫码授权。邮箱登录使用你填写的邮箱和密码。昵称、头像由你主动填写或选择，用于账号展示。打开首页不会自动取得微信手机号、昵称或头像。 | WeChat login uses credentials and identifiers supplied by WeChat to authenticate you, link your account and approve website sign-in. Email login uses the email address and password you enter. Your chosen nickname and avatar identify your profile. Opening the home page does not automatically give us your WeChat phone number, nickname or avatar. |
+| booking_title | 预约与联系资料 | Bookings and contact details |
+| booking_body | 预约使用你选择的体验、人数、日期和时间，以及填写的称呼、联系方式和备注，供店主查看和确认安排。首次预约填写的称呼及联系方式会保存到当前账号，供再次预约复用，也可在个人资料中修改。店主会通过你提供的方式联系你。 | Bookings use your chosen experience, party size, date and time, together with your name, contact details and notes, so the host can review and confirm arrangements. The name and contact details from your first booking are saved to your account for future bookings and can be edited in your profile. The host may contact you using these details. |
+| images_title | 图片与图纸 | Images and patterns |
+| images_body | 选择头像或生成图纸时，我们处理你主动选择或拍摄的图片。图片及生成结果可能包含个人信息，请只使用你有权处理的内容。选择 AI 生成时，图片会通过图像处理服务传给相应 AI 服务提供方；直接转换用于拼豆量化。保存到相册只在你点击保存并允许权限后执行。 | We process the image you select or photograph for an avatar or pattern. Images and generated results may contain personal information; only use content you are entitled to process. For AI generation, the image is sent through the image-processing service to the relevant AI provider. Direct conversion uses it for bead-pattern quantization. Saving to your photo album requires your action and permission. |
+| permissions_title | 设备权限与本地存储 | Permissions and local storage |
+| permissions_body | 相册、相机、头像选择和相册保存按你使用的功能申请，你可以拒绝或在微信设置中管理权限。本机保存登录状态、语言及预约草稿，便于继续操作；账号和预约的短时数据缓存按当前登录隔离。复制店铺信息和拨打店主电话由你主动触发，不用于读取通讯录或获取定位。 | Photo library, camera, avatar selection and album-saving permissions are requested for the features you use. You may decline or manage them in WeChat settings. Login state, language and booking drafts are stored locally so you can continue later. Temporary account and booking caches are isolated by login. Copying studio information and calling the host are actions you initiate; they do not read your contacts or location. |
+| providers_title | 服务支持与信息传输 | Service providers and transfers |
+| providers_body | 微信提供小程序运行和身份验证，服务器及网络服务支持账号、预约和图片处理。选择 AI 生成时，相应服务提供方会接收用于生成的图片。相关基础设施可能位于中国境外。服务器记录必要的请求时间、接口状态等运行信息，用于维护安全和排查故障。微信平台登记的个人信息处理事项可通过下方入口查看。 | WeChat provides the runtime and authentication. Server and network services support accounts, bookings and image processing. If you choose AI generation, its provider receives the image needed for generation. Supporting infrastructure may be outside China. Servers record necessary operational information such as request times and response status for security and troubleshooting. You can view the disclosures registered with WeChat using the button below. |
+| storage_title | 保存与删除 | Retention and deletion |
+| storage_body | 账号、预约及相关账务记录用于提供服务、处理安排和核对历史记录。图片与图纸按你使用的功能保存在服务中；已保存的作品可在作品集中删除。退出登录不会删除服务器资料。如需删除账号、预约资料或查询保存情况，请联系店主。处理前需要验证账号归属，并说明哪些记录仍因必要的服务或法律要求需要保留。 | Account, booking and related ledger records support service delivery, arrangements and historical reconciliation. Images and patterns are retained by the features you use; saved works can be deleted from your collection. Signing out does not delete server-side information. Contact the host to request account or booking-data deletion or ask about retention. We need to verify ownership and explain any records that must remain for necessary service or legal requirements. |
+| choices_title | 你的选择 | Your choices |
+| choices_body | 你可以查看和修改个人资料、管理预约、删除作品，或停止使用需要相关信息的功能。如需查询、更正、删除信息或撤回后续处理的同意，请联系店主。阅读本说明不会替你同意授权；微信权限选择和图片上传前的确认分别生效。 | You can view and edit your profile, manage bookings, delete works or stop using features that need the information. Contact the host to request access, correction, deletion or withdrawal of consent for future processing. Reading this notice does not grant consent. WeChat permission choices and the confirmation before image upload are separate actions. |
+| terms_intro | 小狗拼豆铺提供到店拼豆体验预约、账号管理与拼豆图纸工具。使用相应功能前，请阅读以下说明及隐私政策。 | PinDou Puppy provides studio-experience bookings, account management and bead-pattern tools. Please read these terms and the privacy notice before using the relevant features. |
+| service_title | 到店预约 | Studio bookings |
+| service_body | 提交预约表示向店主提出到访申请，需要店主确认后才安排完成。请核对人数、体验、联系方式及汉密尔顿当地日期和时间。实际接待以店主确认的安排为准。展示价格用于了解体验，预约提交本身不会收取线上费用。 | Submitting a booking sends a visit request to the host; the arrangement is complete after confirmation. Check the party size, experience, contact details and Hamilton local date and time. The confirmed arrangement governs your visit. Displayed prices describe the experience; submitting a booking does not charge an online payment. |
+| cancellation_title | 更改与取消 | Changes and cancellations |
+| cancellation_body | 可取消的预约可在“我的预约”或预约详情中自行取消，每账号每自然月最多自行取消 3 次，按汉密尔顿当地时间计算。操作前会显示当前剩余次数。达到上限或需要其他调整时，请联系店主。 | Eligible bookings can be cancelled in My bookings or the booking details. Each account can make up to three self-service cancellations per calendar month, measured in Hamilton local time. The remaining allowance is shown before cancellation. Contact the host after reaching the limit or for other changes. |
+| materials_title | 图片与生成结果 | Content and generated results |
+| materials_body | 请仅上传你有权使用和处理的图片，并取得涉及的他人肖像或作品授权。不要提交违法内容或与图纸制作无关的敏感资料。图纸及 AI 生成结果供制作参考，可能存在细节、色彩和材料差异，制作前请自行核对。生成结果并不自动消除原素材的肖像、版权或其他权利。 | Only upload images you have the right to use and process, including permission for other people's likenesses or work. Do not submit unlawful content or sensitive information unrelated to making a pattern. Patterns and AI-generated results are references and may differ in detail, colour or materials; check them before crafting. Generation does not remove likeness, copyright or other rights in the source material. |
+| security_title | 账号与服务使用 | Accounts and service use |
+| security_body | 请妥善保管登录凭据，并提供便于店主联系的资料。账号异常或提交失败时，可联系店主协助处理。网络、系统维护或第三方故障可能暂时影响服务。不要反复创建同一预约来判断是否提交成功，可先查看“我的预约”。 | Keep your login credentials secure and provide contact details the host can use. Contact the host about account problems or unsuccessful submissions. Network, maintenance or third-party problems may temporarily affect availability. Check My bookings before creating the same booking again to determine whether it was received. |
+| support_title | 联系店主 | Contact the host |
+| support_body | 关于预约、账号、作品或个人信息的问题，可通过以下方式联系店主。涉及账号资料的操作需要核实归属。 | Contact the host below about bookings, accounts, works or personal information. Requests involving account information require ownership verification. |
+| wechat_contract | 查看微信隐私保护指引 | View WeChat privacy disclosures |
+| contract_unavailable | 暂时无法打开微信隐私保护指引，请稍后重试或联系店主。 | The WeChat privacy disclosures could not be opened. Please try again later or contact the host. |
+| back | 返回 | Back |
+| upload_title | 图片处理说明 | Image processing |
+| upload_intro | 继续前，请确认你有权使用所选图片，并阅读用户协议和隐私政策。 | Before continuing, confirm that you have the right to use the image and read the service terms and privacy notice. |
+| upload_processing | 所选图片将用于制作拼豆图纸。选择 AI 生成时，图片会经图像处理服务传给相应 AI 服务提供方；相关基础设施可能位于中国境外。 | The image will be used to create a bead pattern. For AI generation, it is sent through the image-processing service to the relevant AI provider. Supporting infrastructure may be outside China. |
+| upload_personal | 图片和生成结果可能包含个人信息。请勿上传未经许可的他人肖像或与图纸制作无关的敏感资料。你可以拒绝本次图片处理，继续使用其他功能。 | Images and generated results may contain personal information. Do not upload another person's likeness without permission or unrelated sensitive information. You can decline this image processing and continue using other features. |
+| upload_storage | 图片、生成结果的使用、保存和删除方式见隐私政策。 | See the privacy notice for how images and generated results are used, retained and deleted. |
+| decline | 暂不上传 | Not now |
+| agree_upload | 同意并继续 | Agree and continue |
+| recording | 正在保存确认… | Saving your confirmation… |
+| upload_denied | 本次未上传图片 | No image was uploaded |
+| footer_lead | 上传前请阅读 | Before uploading, read |
+| and | 和 | and |
+
 ## miniapp.json
 
 | 键 | 中文 | English |

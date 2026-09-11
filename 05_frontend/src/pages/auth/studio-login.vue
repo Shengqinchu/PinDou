@@ -5,6 +5,7 @@ import copy from '../../../../05_studio/src/content/miniapp.json';
 import accountCopy from '../../../../05_studio/src/content/account.json';
 import StudioShell from '../../components/StudioShell.vue';
 import StudioGlyph from '../../components/StudioGlyph.vue';
+import StudioLegalLinks from '../../components/StudioLegalLinks.vue';
 import { useStudioNative } from '../../utils/studio-native';
 import { miniSession, studioCall, miniappPrefix, MiniappError, type SharedSession } from '../../utils/miniapp-client';
 import { useUserStore } from '../../store/user';
@@ -109,5 +110,6 @@ onUnload(() => { alive = false; ticket.value = ''; password.value = ''; confirma
       </view>
     </view>
     <view class="studio-native-footer"><text class="studio-native-site">pindoupuppy.com</text><view class="studio-login-links"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-link" hover-class="studio-native-pressed" @tap="home"><StudioGlyph name="home" :size="16"/>{{say(studioWords('app','home_76c92b'))}}</button><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-link" hover-class="studio-native-pressed" @tap="website"><StudioGlyph name="copy" :size="16"/>{{t('visit_website')}}</button></view></view>
+    <StudioLegalLinks :language="language"/>
   </StudioShell>
 </template>

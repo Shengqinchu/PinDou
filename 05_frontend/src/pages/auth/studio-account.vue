@@ -7,6 +7,7 @@ import bookingCopy from '../../../../05_studio/src/content/booking-profile.json'
 import visitCopy from '../../../../05_studio/src/content/pages-Visit.json';
 import StudioShell from '../../components/StudioShell.vue';
 import StudioGlyph from '../../components/StudioGlyph.vue';
+import StudioLegalLinks from '../../components/StudioLegalLinks.vue';
 import { useStudioNative } from '../../utils/studio-native';
 import { MiniappError } from '../../utils/miniapp-client';
 import {peekStudioSnapshot,readStudioCached} from '../../utils/studio-cache';
@@ -86,7 +87,11 @@ onUnload(() => { ++sequence; });
         </view>
       </view>
       <view class="studio-native-menu"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(visitCopy.come_make_something_f834ec)}}</text><StudioGlyph name="arrow" :size="18"/></button><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="patterns"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(accountCopy.pattern_tool)}}</text><StudioGlyph name="arrow" :size="18"/></button></view>
-      <button :hover-stay-time="180" :hover-start-time="0" class="studio-native-link" hover-class="studio-native-pressed" @tap="logout">{{say(accountCopy.sign_out)}}</button>
+      <view class="studio-account-end"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-link" hover-class="studio-native-pressed" @tap="logout">{{say(accountCopy.sign_out)}}</button><StudioLegalLinks :language="language"/></view>
     </view>
   </StudioShell>
 </template>
+
+<style scoped>
+.studio-account-end{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+</style>
