@@ -408,6 +408,7 @@ def register(app, database, admin_actor):
         return {"ok": True}
 
     @app.patch(prefix + "/threads/{ident}")
+    @app.post(prefix + "/threads/{ident}/update")
     def update_thread(ident: str, payload: ThreadUpdate, _actor=Depends(admin_actor)):
         with database() as db:
             changed = db.execute("UPDATE studio_sms_threads SET status=? WHERE id=?", (payload.status, ident)).rowcount

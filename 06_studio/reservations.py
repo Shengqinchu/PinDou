@@ -532,6 +532,7 @@ def register(app, database, admin_actor):
         return {'days':days,'timezone':str(ZONE),'policy_version':policy['version'],'capacity_buffer_minutes':30}
 
     @app.patch("/studio-api/manage/reservations/{reference}")
+    @app.post("/studio-api/manage/reservations/{reference}/update")
     def update(reference: str, payload: ReservationUpdate, actor=Depends(admin_actor)):
         current = now_local()
         with database() as db:
@@ -559,6 +560,8 @@ def register(app, database, admin_actor):
             if payload.status=='completed':
                 from wallet import reward_visit
                 reward_visit(db,db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone(),actor)
+                from studio_finance import from_completed
+                from_completed(db,db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone(),actor)
             db.execute("INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)", (reference,actor,current.isoformat(),payload.status,payload.staff_note))
             if (actual,guests,public_note)!=(row['actual_minutes'],row['actual_guests'],row['public_note']):
                 db.execute('INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)',

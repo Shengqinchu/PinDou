@@ -95,8 +95,9 @@ def public_user(data: dict) -> dict:
         import content
         template=content.DEFAULTS.get('account',{}).get('default_name_with_suffix',['PinDou guest_{v0}'])[0]
         nickname=template.replace('{v0}',hashlib.sha256(ident.encode()).hexdigest()[:8].upper())
+    import studio_staff
     return {"id":ident,"email":email,"nickname":nickname,
-            "avatar":avatar if isinstance(avatar,str) and len(avatar)<=2048 else ""}
+            "avatar":avatar if isinstance(avatar,str) and len(avatar)<=2048 else "", "is_admin":studio_staff.is_admin(ident)}
 
 
 def require_customer(request: Request, authorization: Annotated[str | None, Header()] = None) -> dict:

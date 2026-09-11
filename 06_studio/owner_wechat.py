@@ -307,7 +307,9 @@ def register(app, database, admin_actor):
                 raise HTTPException(429,"owner_wechat_binding_limit")
             db.execute("INSERT INTO studio_owner_wechat_subscriptions(nonce_hash,binding_id,template_id,created_at,expires_at) VALUES(?,?,?,?,?)",
                        (key_hash(nonce), row["id"], settings["template_id"], time.time(), time.time() + 300))
-            return {"bound": True, "binding": public_binding(row), "template_id": settings["template_id"], "enabled": bool(settings["enabled"]), "nonce": nonce}
+            administrator=db.execute("""SELECT 1 FROM studio_staff_accounts s JOIN studio_miniapp_identities i ON s.user_id=i.user_id
+              WHERE i.app_id=? AND i.openid=? AND s.enabled=1 AND s.role='admin'""",(ticket['app_id'],ticket['openid'])).fetchone()
+            return {"bound": True, "binding": public_binding(row), "template_id": settings["template_id"], "enabled": bool(settings["enabled"]), "nonce": nonce,"admin":bool(administrator)}
 
     from customer_auth import require_customer
 

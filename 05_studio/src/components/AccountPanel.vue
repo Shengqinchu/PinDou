@@ -11,6 +11,9 @@ import CustomerWallet from './CustomerWallet.vue';
 import WechatQr from './WechatQr.vue';
 import SlideOver from './SlideOver.vue';
 import LiftTitle from './LiftTitle.vue';
+import {contentModule} from '../content-store';
+import workbenchDefaults from '../content/workbench.json';
+const workbenchCopy=contentModule('workbench',workbenchDefaults);
 const props=defineProps<{embedded?:boolean;emailOnly?:boolean}>();
 const emit=defineEmits<{signedIn:[]}>();
 type Method='register'|'password'|'wechat'|'recovery';
@@ -85,7 +88,7 @@ onBeforeUnmount(()=>{alive=false;clearInterval(timer);});
    </template>
    </div>
   </template>
-  <template v-else><AccountIdentity :key="accountUser.id" :email-only="emailOnly" :link-to-center="!embedded&&!emailOnly"/><CustomerWallet v-if="!emailOnly" :key="accountUser.id"/><button v-if="!emailOnly" class="text-link account-signout" type="button" @click="signOut">{{say(copy.sign_out)}}</button></template>
+  <template v-else><AccountIdentity :key="accountUser.id" :email-only="emailOnly" :link-to-center="!embedded&&!emailOnly"/><RouterLink v-if="accountUser.is_admin&&!emailOnly" class="text-link" to="/manage" @click="closeAccount">{{say(workbenchCopy.entry)}}<PhArrowRight/></RouterLink><CustomerWallet v-if="!emailOnly" :key="accountUser.id"/><button v-if="!emailOnly" class="text-link account-signout" type="button" @click="signOut">{{say(copy.sign_out)}}</button></template>
  </div>
  </component>
 </template>

@@ -31,10 +31,10 @@ function captureCookie(path:string,response:UniApp.RequestSuccessCallbackResult)
   if(value){reservationCookie=value;cookieExpires=Date.now()+30*86400000;try{uni.setStorageSync(cookieKey,{value,expires:cookieExpires});}catch{}}
   // #endif
 }
-export function studioCall<T>(path:string,data:unknown={},ticket='',token='',method:'POST'|'GET'|'PUT'='POST',extraHeaders:Record<string,string>={}):Promise<T>{
+export function studioCall<T>(path:string,data:unknown={},ticket='',token='',method:'POST'|'GET'|'PUT'|'DELETE'='POST',extraHeaders:Record<string,string>={}):Promise<T>{
   const cookie=nativeCookie(path);
   return new Promise((resolve,reject)=>uni.request({
-    url:origin+path,method,data,
+    url:origin+path,method,data:data as UniApp.RequestOptions['data'],
     header:{'Content-Type':'application/json',...extraHeaders,...(ticket?{'X-Pindou-Miniapp':ticket}:{}),...(token?{Authorization:'Bearer '+token}:{}),...(cookie?{Cookie:cookie}:{})},
     timeout:20000,
     success:(response)=>{const body=response.data as any;if(response.statusCode>=200&&response.statusCode<300){captureCookie(path,response);resolve(body);}else reject(new MiniappError(typeof body?.detail==='string'?body.detail:'generic_error',response.statusCode));},

@@ -11,6 +11,7 @@ import { PhArrowRight, PhArrowClockwise, PhFlower } from "@phosphor-icons/vue";
 import { prettyDate, products, tr, media } from "../state";
 import { commerceApi as api, CommerceError } from "../commerce";
 import CommerceManager from "../components/CommerceManager.vue";
+import {customerToken} from '../account-storage';
 
 type Entry = {
   id: string;
@@ -58,11 +59,14 @@ function saveToken(value: string) {
     /* Session remains in memory. */
   }
 }
-onMounted(() => {
+onMounted(async() => {
   try {
     token.value = sessionStorage.getItem("puppy-studio-admin") || "";
   } catch {
     /* Sign in normally. */
+  }
+  if(!token.value&&customerToken()){
+    try{const result=await api<{admin:boolean}>('/auth/admin-access',{headers:{Authorization:'Bearer '+customerToken()}});if(result.admin)saveToken(customerToken());}catch{}
   }
   if (token.value) load();
 });

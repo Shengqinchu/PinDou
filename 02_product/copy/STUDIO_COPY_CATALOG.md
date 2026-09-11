@@ -124,6 +124,78 @@
 | save | 保存 | Save |
 | cancel | 取消修改 | Cancel changes |
 
+## business.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| title | 营业状况 | Business records |
+| income | 收入 | Income |
+| expense | 支出 | Expenses |
+| balance | 收支结余 | Net recorded cash |
+| experience | 拼豆体验收入 | Beading sessions |
+| finished | 拼豆成品收入 | Finished beadwork |
+| other | 其他商品收入 | Other products |
+| hourly | 按时体验 | Hourly session |
+| day | 全天体验 | Day session |
+| duo4h | 双人成行，4h 畅拼 | Two people, four hours |
+| add_expense | 增加支出 | Add expense |
+| add_income | 增加收入 | Add income |
+| edit | 编辑记录 | Edit record |
+| date | 日期 | Date |
+| start | 开始日期 | From |
+| end | 结束日期 | To |
+| amount | 金额（CAD） | Amount (CAD) |
+| customer | 客户名称 | Customer |
+| category | 收入分类 | Income category |
+| shopping | 购物清单 | Shopping list |
+| purchased | 购买物品 | Purchased items |
+| session | 体验项目 | Session |
+| items | 项目清单 | Items |
+| item | 项目 | Item |
+| add_item | 增加一项 | Add item |
+| remove_item | 移除此项 | Remove item |
+| payment | 收款方式 | Payment method |
+| cash | 现金 | Cash |
+| transfer | 电子转账 | E-transfer |
+| card | 银行卡 | Card |
+| stored | 储值抵扣 | Prepaid time |
+| other_payment | 其他 | Other |
+| note | 备注 | Notes |
+| save | 保存记录 | Save record |
+| saving | 正在保存… | Saving… |
+| saved | 记录已保存 | Record saved |
+| cancel | 取消 | Cancel |
+| refresh | 刷新 | Refresh |
+| all | 全部 | All |
+| search | 搜索客户或项目 | Search customer or item |
+| empty | 这个时间段暂无记录。 | No records in this date range. |
+| pending | 待补金额 | Amount needed |
+| pending_count | {count} 条待补金额 | {count} amounts needed |
+| cash_note | 按实际收款记录；待补金额的记录不计入合计。 | Record cash actually received. Entries awaiting an amount are excluded from totals. |
+| source_note | 来自已完成预约，可独立修改，不会改动原预约。 | Imported from a completed booking. Edits here do not change the booking. |
+| source | 关联预约 | Linked booking |
+| manual | 手动录入 | Manual entry |
+| history | 修改记录 | Edit history |
+| new_category | 新增收入分类 | Add income category |
+| category_zh | 中文名称 | Chinese name |
+| category_en | 英文名称 | English name |
+| void | 作废记录 | Void record |
+| void_reason | 作废原因 | Reason |
+| void_confirm | 作废后不再计入合计，修改记录仍会保留。 | Voided records are excluded from totals. The edit history is retained. |
+| previous | 上一页 | Previous |
+| next | 下一页 | Next |
+| page | 第 {page} 页 · 共 {total} 条 | Page {page} · {total} records |
+| finance_amount_required | 请填写实际金额，最多保留两位小数。 | Enter the actual amount with up to two decimal places. |
+| finance_category_invalid | 请选择有效的收入分类。 | Choose a valid income category. |
+| finance_invalid_filter | 请检查日期范围。 | Check the date range. |
+| finance_request_changed | 此操作已保存，请刷新后再编辑。 | This request was saved. Refresh before editing. |
+| finance_category_limit | 收入分类已达到上限。 | The income category limit has been reached. |
+| finance_entry_missing | 此记录不存在或已作废。 | This entry is missing or voided. |
+| version_conflict | 记录已被更新，请刷新后再编辑。 | This record changed. Refresh before editing. |
+| invalid_items | 请填写至少一个项目，每项不超过 200 字。 | Enter at least one item, up to 200 characters each. |
+| generic_error | 暂时未能完成，请稍后重试。 | Could not complete this. Please try again. |
+| month | 本月 | This month |
+
 ## carousel-labels.json
 
 | 键 | 中文 | English |
@@ -2513,3 +2585,70 @@
 | new_account | 创建新账号 | Create a new account |
 | qr_alt | 微信登录二维码 | WeChat sign-in QR code |
 | refresh_qr | 刷新二维码 | Refresh QR code |
+
+## workbench.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| title | 店主工作台 | Owner workspace |
+| admin | 管理员 | Administrator |
+| entry | 管理员后台 | Admin workspace |
+| home | 工作台 | Workspace |
+| reservations | 预约管理 | Bookings |
+| messages | 顾客消息 | Messages |
+| members | 顾客账户 | Customers |
+| finance | 营业状况 | Business |
+| alerts | 微信预约提醒 | WeChat alerts |
+| today | 今日到访 | Today's visits |
+| pending | 待确认 | Pending |
+| confirmed | 已确认 | Confirmed |
+| completed | 已完成 | Completed |
+| cancelled | 已取消 | Cancelled |
+| unread | 未读消息 | Unread messages |
+| refresh | 刷新 | Refresh |
+| back | 返回 | Back |
+| all | 全部 | All |
+| search | 姓名或预约编号 | Name or booking reference |
+| date | 到店日期 | Visit date |
+| clear | 清除筛选 | Clear filters |
+| empty | 暂无符合条件的记录。 | No matching records. |
+| more | 加载更多 | Load more |
+| loading | 正在加载… | Loading… |
+| details | 预约详情 | Booking details |
+| guests | {count} 人 | {count} guests |
+| contact | 联系方式 | Contact |
+| customer_note | 顾客备注 | Customer note |
+| staff_note | 店主备注 | Private note |
+| public_note | 给顾客的说明 | Note for the customer |
+| status | 预约状态 | Booking status |
+| actual_minutes | 实际游玩分钟数 | Actual minutes |
+| actual_guests | 实际游玩人数 | Actual guests |
+| save | 保存 | Save |
+| saving | 正在保存… | Saving… |
+| saved | 已保存 | Saved |
+| confirm_save | 确认保存这次修改？ | Save these changes? |
+| confirm_complete | 完成后将自动加入体验收入，实收金额可在营业状况中填写。 | Completion adds a session income entry. Fill in the cash received in Business records. |
+| confirm | 确认 | Confirm |
+| cancel | 取消 | Cancel |
+| profile | 顾客资料 | Customer details |
+| member_search | 搜索顾客或联系方式 | Search customers or contact details |
+| minutes | 剩余 {count} 分钟 | {count} minutes left |
+| points | {count} 积分 | {count} points |
+| ledger | 账户明细 | Account history |
+| adjust | 调整账户 | Update account |
+| time_add | 增加时长 | Add time |
+| time_use | 扣减时长 | Use time |
+| points_adjust | 调整积分 | Adjust points |
+| change_value | 变动数值 | Change amount |
+| change_note | 填写原因 | Reason |
+| account_confirm | 确认本次账户变动？保存后会留下明细记录。 | Confirm this account change? It will be recorded in the account history. |
+| read_only_history | 明细保留每次变动记录。 | Each account change is retained in the history. |
+| timezone | 汉密尔顿当地时间 | Hamilton local time |
+| studio_admin_required | 当前微信没有店铺管理员权限。 | This WeChat account is not a studio administrator. |
+| account_login_required | 请重新登录。 | Sign in again. |
+| generic_error | 暂时未能完成，请稍后重试。 | Could not complete this. Please try again. |
+| web_login | 使用当前店铺账号进入 | Use your signed-in studio account |
+| version_conflict | 记录已被更新，请刷新后再修改。 | This record changed. Refresh before editing. |
+| invalid_number | 请填写有效的整数。 | Enter a valid whole number. |
+| calendar | 预约日历 | Booking calendar |
+| rules | 营业时间与预约规则 | Hours and booking rules |

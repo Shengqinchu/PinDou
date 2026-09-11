@@ -4,7 +4,7 @@ import defaults from "./content/account.json";
 import { commerceApi, CommerceError } from "./commerce";
 import { customerToken,storeCustomer,clearCustomer } from "./account-storage";
 export const accountCopy=contentModule("account",defaults);
-export type Customer={id:string;email:string;nickname:string;avatar?:string};
+export type Customer={id:string;email:string;nickname:string;avatar?:string;is_admin?:boolean};
 export type SignInResult={token:string;user:Customer;shared_user:Record<string,unknown>};
 export const accountUser=ref<Customer|null>(null);
 export const accountOpen=ref(false);
@@ -47,7 +47,7 @@ export function signOut(){++sequence;clearCustomer();accountUser.value=null;clos
 export function applyAccountProfile(profile:Record<string,unknown>,token:string):boolean{
   if(token!==customerToken()||profile.user_id!==accountUser.value?.id)return false;
   ++sequence;storeCustomer(token,profile);
-  accountUser.value={id:String(profile.user_id),email:String(profile.email||''),nickname:String(profile.nickname||''),avatar:typeof profile.avatar==='string'?profile.avatar:''};
+  accountUser.value={id:String(profile.user_id),email:String(profile.email||''),nickname:String(profile.nickname||''),avatar:typeof profile.avatar==='string'?profile.avatar:'',is_admin:accountUser.value?.is_admin};
   return true;
 }
 export function installAccount(){

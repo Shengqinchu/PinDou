@@ -6,7 +6,8 @@ import StudioGlyph from '../../components/StudioGlyph.vue';
 import {useStudioNative} from '../../utils/studio-native';
 import {miniSession,studioCall,MiniappError} from '../../utils/miniapp-client';
 import copy from '../../../../05_studio/src/content/owner-wechat.json';
-type OwnerState={bound:boolean;enabled?:boolean;template_id?:string;nonce?:string;binding?:{label:string;authorization_available:boolean}};
+import workbenchCopy from '../../../../05_studio/src/content/workbench.json';
+type OwnerState={bound:boolean;admin?:boolean;enabled?:boolean;template_id?:string;nonce?:string;binding?:{label:string;authorization_available:boolean}};
 type Booking={id:string;status:string;name:string;booking:{date:string;start:string;end:string;guests:number}};
 const {language,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();
 const state=ref<OwnerState>(),candidate=ref<{label:string;expires_at:number}>(),items=ref<Booking[]>([]);
@@ -48,6 +49,7 @@ function subscribe(){
   // #endif
 }
 function openDesk(){uni.setClipboardData({data:'https://pindoupuppy.com/manage?view=reservations',success:()=>uni.showToast({title:words('copied'),icon:'none'})});}
+function openWorkbench(){uni.navigateTo({url:'/pages/studio/manage'});}
 onLoad(query=>{scene=typeof query?.scene==='string'?decodeURIComponent(query.scene):'';reference=typeof query?.reservation==='string'?query.reservation:'';});
 onShow(()=>void refresh());onUnload(()=>{alive=false;++sequence;});
 </script>
@@ -56,6 +58,7 @@ onShow(()=>void refresh());onUnload(()=>{alive=false;++sequence;});
     <view class="studio-native-main owner-screen">
       <view class="studio-native-section-head"><text class="studio-native-title">{{words('page_title')}}</text><button class="studio-native-eye" :disabled="busy" :aria-label="words('refresh')" hover-class="studio-native-pressed" @tap="refresh"><StudioGlyph name="refresh" :size="21"/></button></view>
       <text v-if="error" class="studio-native-error" role="alert">{{error}}</text><text v-if="note" class="studio-native-body" role="status">{{note}}</text>
+      <button v-if="state?.admin" class="studio-native-primary" hover-class="studio-native-pressed" @tap="openWorkbench">{{say(workbenchCopy.entry)}}</button>
       <view v-if="candidate" class="owner-permission"><text class="studio-native-subtitle">{{candidate.label}}</text><text class="studio-native-body">{{words('binding_explanation')}}</text><button class="studio-native-primary" :disabled="busy" hover-class="studio-native-pressed" @tap="confirmBinding">{{words('confirm_binding')}}</button></view>
       <view v-else-if="state?.bound" class="owner-permission"><text class="studio-native-body">{{state.binding?.label}} · {{words('bound')}}</text><button class="studio-native-primary" :disabled="subscribing||!state.enabled||!state.template_id" hover-class="studio-native-pressed" @tap="subscribe">{{words('subscribe')}}</button><text class="studio-native-label">{{words('subscription_note')}}</text><text v-if="!state.template_id" class="studio-native-label">{{words('owner_wechat_template_required')}}</text></view>
       <text v-else-if="state" class="studio-native-body">{{words('unbound')}}</text>

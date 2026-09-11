@@ -14,7 +14,8 @@ import {peekStudioSnapshot,readStudioCached} from '../../utils/studio-cache';
 import { useUserStore } from '../../store/user';
 import profileCopy from '../../../../05_studio/src/content/profile.json';
 import ownerCopy from '../../../../05_studio/src/content/owner-wechat.json';
-type Profile = {nickname:string;email:string;avatar?:string};
+import workbenchCopy from '../../../../05_studio/src/content/workbench.json';
+type Profile = {nickname:string;email:string;avatar?:string;is_admin?:boolean};
 type Wallet = {account:{minutes:number;points:number};booking_profile:{name:string;contact_method:string;contact:string;complete:boolean}};
 const user = useUserStore();
 const { language, keyboardOpen, shellStyle, say, t, changeLanguage, website } = useStudioNative();
@@ -49,7 +50,7 @@ async function refresh(force=false) {
   if (results[0].status === 'fulfilled') {
     const next = results[0].value.user;
     if (next.avatar !== profile.value?.avatar) avatarFailed.value = false;
-    profile.value = {nickname:next.nickname,email:next.email,avatar:next.avatar};
+    profile.value = {nickname:next.nickname,email:next.email,avatar:next.avatar,is_admin:next.is_admin};
   }
   if (results[1].status === 'fulfilled') {
     const next = results[1].value;
@@ -64,6 +65,7 @@ function visit() { uni.navigateTo({url:'/pages/studio/visit'}); }
 function reservations() { uni.navigateTo({url:'/pages/studio/reservations'}); }
 function edit() { uni.navigateTo({url:'/pages/auth/studio-profile'}); }
 function ownerAlerts(){uni.navigateTo({url:'/pages/studio/owner'});}
+function openWorkbench(){uni.navigateTo({url:'/pages/studio/manage'});}
 watch(()=>user.token,()=>{sequence++;profile.value=undefined;wallet.value=undefined;isOwner.value=false;busy.value=false;failed.value=false;});
 onShow(() => void refresh());
 onUnload(() => { ++sequence; });
@@ -74,7 +76,7 @@ onUnload(() => { ++sequence; });
       <view class="studio-native-section-head"><text class="studio-native-title">{{say(accountCopy.account)}}</text><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-eye" :disabled="busy" :aria-label="say(walletCopy.refresh)" hover-class="studio-native-pressed" @tap="refresh(true)"><view v-if="busy" class="studio-native-progress"/><StudioGlyph v-else name="refresh" :size="21"/></button></view>
       <view class="studio-native-profile">
         <button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-avatar-edit" :aria-label="say(profileCopy.edit)" @tap="edit"><image v-if="avatar&&!avatarFailed" class="studio-native-avatar" :src="avatar" mode="aspectFill" @error="avatarFailed=true"/><view v-else class="studio-native-avatar"><StudioGlyph name="user" :size="28"/></view></button>
-        <view class="studio-native-profile-text"><text class="studio-native-name">{{name}}</text><text v-if="profile?.email&&profile.email!==name" class="studio-native-body">{{profile.email}}</text><text class="studio-native-label">{{say(accountCopy.signed_in)}}</text></view>
+        <view class="studio-native-profile-text"><text class="studio-native-name">{{name}}</text><text v-if="profile?.email&&profile.email!==name" class="studio-native-body">{{profile.email}}</text><text class="studio-native-label">{{say(profile?.is_admin?workbenchCopy.admin:accountCopy.signed_in)}}</text></view>
         <button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-link studio-profile-edit" @tap="edit">{{say(profileCopy.edit)}}</button>
       </view>
       <text v-if="failed" class="studio-native-error" role="alert">{{t('generic_error')}}</text>
@@ -95,6 +97,7 @@ onUnload(() => { ++sequence; });
       </view>
       <view class="studio-native-menu"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(visitCopy.come_make_something_f834ec)}}</text><StudioGlyph name="arrow" :size="18"/></button><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="patterns"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(accountCopy.pattern_tool)}}</text><StudioGlyph name="arrow" :size="18"/></button></view>
       <button v-if="isOwner" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="ownerAlerts"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(ownerCopy.page_title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
+      <button v-if="profile?.is_admin" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="openWorkbench"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(workbenchCopy.entry)}}</text><StudioGlyph name="arrow" :size="18"/></button>
       <view class="studio-account-end"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-link" hover-class="studio-native-pressed" @tap="logout">{{say(accountCopy.sign_out)}}</button><StudioLegalLinks :language="language"/></view>
     </view>
   </StudioShell>

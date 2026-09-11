@@ -93,10 +93,10 @@ def test_fixed_upstream_allowlist_no_redirect_and_failure_closed(monkeypatch):
 
 def test_account_profile_exposes_shared_avatar_but_no_provider_or_private_fields(client,monkeypatch):
     monkeypatch.setattr(auth,'upstream',lambda *a,**kw:{'user_id':'qa-owner','email':'qa@example.test',
-        'nickname':'Shared name','avatar':'/static/thumbnails/avatar_test.png','phone':'private',
+        'nickname':'Shared name','avatar':'/static/thumbnails/avatar_test.png','phone':'private','is_admin':True,
         'password_hash':'private','wechat_openid':'private','paid_credits':188})
     assert client.get('/studio-api/auth/me').json()['user']=={
-        'id':'qa-owner','email':'qa@example.test','nickname':'Shared name','avatar':'/static/thumbnails/avatar_test.png'}
+        'id':'qa-owner','email':'qa@example.test','nickname':'Shared name','avatar':'/static/thumbnails/avatar_test.png','is_admin':False}
 
 
 def test_password_signup_uses_bridge_and_rewards_once(client,monkeypatch):

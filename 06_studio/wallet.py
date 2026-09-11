@@ -243,6 +243,7 @@ def register(app, database, admin_actor):
             return detail(db,owner_id,page,category,True)
 
     @app.patch('/studio-api/manage/members/{owner_id}')
+    @app.post('/studio-api/manage/members/{owner_id}/update')
     def update_note(owner_id:str,payload:MemberNote,actor=Depends(admin_actor)):
         with database() as db:
             db.execute('BEGIN IMMEDIATE')

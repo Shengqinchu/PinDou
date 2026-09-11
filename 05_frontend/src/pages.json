@@ -89,6 +89,106 @@
       }
     },
     {
+      "path": "pages/studio/manage",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/studio/manage-reservations",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/studio/manage-reservation",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/studio/manage-messages",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/studio/manage-conversation",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/studio/manage-finance",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/studio/manage-finance-edit",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/studio/manage-members",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/studio/manage-member",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/studio/manage-calendar",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
       "path": "pages/index/index",
       "style": {
         "navigationBarTitleText": "PinDou 拼豆",

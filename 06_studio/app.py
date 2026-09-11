@@ -89,6 +89,10 @@ def initialize():
     sms_inbox.initialize(database)
     import owner_wechat
     owner_wechat.initialize(database)
+    import studio_staff
+    studio_staff.initialize(database)
+    import studio_finance
+    studio_finance.initialize(database)
 
 
 @asynccontextmanager
@@ -219,8 +223,11 @@ class Inquiry(StrictModel):
         return self
 
 
-def admin_actor(authorization: Annotated[str | None, Header()] = None) -> str:
+def admin_actor(request: Request, authorization: Annotated[str | None, Header()] = None) -> str:
     """Validate against the existing admin service; do not duplicate its secrets."""
+    if request.headers.get('X-Pindou-Miniapp'):
+        import studio_staff
+        return studio_staff.native_actor(database, request)
     if not authorization or not authorization.startswith("Bearer ") or len(authorization) > 5000:
         raise HTTPException(401, "Administrator sign-in required")
     # Only the fixed loopback origin receives this token. Never use caller-supplied URLs.
@@ -230,6 +237,9 @@ def admin_actor(authorization: Annotated[str | None, Header()] = None) -> str:
             if response.status != 200:
                 raise HTTPException(401, "Administrator sign-in required")
     except HTTPError as exc:
+        if exc.code in (401, 403):
+            import studio_staff
+            return studio_staff.customer_actor(database, request, authorization)
         raise HTTPException(401 if exc.code in (401, 403) else 503, "Administrator verification unavailable") from exc
     except (URLError, TimeoutError) as exc:
         raise HTTPException(503, "Administrator verification unavailable") from exc
@@ -342,3 +352,7 @@ import sms_inbox
 sms_inbox.register(app, database, admin_actor)
 import owner_wechat
 owner_wechat.register(app, database, admin_actor)
+import studio_staff
+studio_staff.register(app, database, admin_actor)
+import studio_finance
+studio_finance.register(app, database, admin_actor)

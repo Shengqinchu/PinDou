@@ -21,10 +21,11 @@ files['service/owner-notification-copy.json'] = root / '05_studio/src/content/ow
 files['service/telegram_notifications.py'] = root / '06_studio/telegram_notifications.py'
 files['service/telegram-notification-copy.json'] = root / '05_studio/src/content/telegram-notifications.json'
 files['service/miniapp_login.py'] = root / '06_studio/miniapp_login.py'
-for name in ('sms_inbox.py','owner_wechat.py'):
+for name in ('sms_inbox.py','owner_wechat.py','studio_staff.py','studio_finance.py'):
     files['service/'+name] = root / '06_studio' / name
 files['service/messaging-copy.json'] = root / '05_studio/src/content/messaging.json'
 files['service/owner-wechat-copy.json'] = root / '05_studio/src/content/owner-wechat.json'
+files['service/business-copy.json'] = root / '05_studio/src/content/business.json'
 manifest = {'version': version, 'sha256': {name: hashlib.sha256(p.read_bytes()).hexdigest() for name, p in files.items()}}
 reused=set()
 if len(sys.argv)>1:

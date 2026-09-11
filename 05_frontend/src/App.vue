@@ -65,6 +65,7 @@ function initWxCloud() {
 </script>
 
 <style lang="scss">
+@import "./static/styles/studio-admin.css";
 /* 导入小程序版 Design Tokens 与全局公共组件 */
 @import "./static/styles/colors_and_type.css";
 @import "./static/styles/components.css";
