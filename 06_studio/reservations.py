@@ -551,11 +551,14 @@ def register(app, database, admin_actor):
             actual=payload.actual_minutes if 'actual_minutes' in payload.model_fields_set else row['actual_minutes']
             guests=payload.actual_guests if 'actual_guests' in payload.model_fields_set else row['actual_guests']
             public_note=payload.public_note if 'public_note' in payload.model_fields_set else row['public_note']
-            if (actual is None)!=(guests is None): raise HTTPException(422,'wallet_actual_details_required')
+            if {'actual_minutes','actual_guests'} & payload.model_fields_set and (actual is None)!=(guests is None):
+                raise HTTPException(422,'wallet_actual_details_required')
             # Once attendance has earned points, status cannot quietly erase the visit.
             earned=db.execute('SELECT 1 FROM studio_wallet_ledger l WHERE idempotency_key=? AND NOT EXISTS(SELECT 1 FROM studio_wallet_ledger r WHERE r.reverses_id=l.id)',('visit-reward:'+reference,)).fetchone()
             if earned and (payload.status!='completed' or actual is None):
                 raise HTTPException(409,'wallet_completed_record_locked')
+            if payload.status=='completed' and (not actual or not guests):
+                raise HTTPException(422,'wallet_actual_hours_details_required')
             db.execute("UPDATE studio_reservations SET status=?,staff_note=?,actual_minutes=?,actual_guests=?,public_note=?,version=version+1,updated_at=? WHERE id=?", (payload.status,payload.staff_note,actual,guests,public_note,current.isoformat(),reference))
             if payload.status=='completed':
                 from wallet import reward_visit

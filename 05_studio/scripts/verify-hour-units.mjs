@@ -18,7 +18,7 @@ for(const [engine,type] of [['chromium',chromium],['webkit',webkit]]){
   await api('/manage/reservations/'+seed.id,'PATCH',{version:row.version,status:'confirmed',actual_minutes:90,actual_guests:2,staff_note:'',public_note:''});
   const openBooking=async()=>{await page.goto(base+'/manage?view=reservations&booking='+seed.id);await expect(page.locator('dialog[open]')).toBeVisible();};
   const dialog=()=>page.locator('dialog[open]');
-  await openBooking();await expect(dialog().getByLabel(word('actual_hours'),{exact:true})).toHaveValue('1.5');
+  await openBooking();await expect(dialog().getByLabel(word('actual_hours'),{exact:true})).toHaveCount(0);await dialog().locator('select').selectOption('completed');await expect(dialog().getByLabel(word('actual_hours'),{exact:true})).toHaveValue('1.5');
   for(const [width,height] of [[320,568],[390,844],[844,390],[1440,1000]]){
    await page.setViewportSize({width,height});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
    assert((await dialog().getByLabel(word('actual_hours'),{exact:true}).getAttribute('inputmode'))==='decimal');

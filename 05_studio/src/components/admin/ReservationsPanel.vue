@@ -122,8 +122,8 @@ async function inspectBooking(id:string){
 onBeforeUnmount(()=>{inspectSequence++;customerSequence++;});
 async function save() {
   if (!entry.value || saving.value) return;
-  const emptyHours=String(actualHours.value).trim()==='',actualMinutes=emptyHours?null:minutesFromHours(actualHours.value);
-  if(emptyHours!==(actualGuests.value==='') || (!emptyHours&&(actualMinutes===null||actualMinutes<1||actualMinutes>1440||!Number.isInteger(actualGuests.value)||Number(actualGuests.value)<1||Number(actualGuests.value)>99))){
+  const completing=nextStatus.value==='completed',actualMinutes=completing?minutesFromHours(actualHours.value):null;
+  if(completing&&(actualMinutes===null||actualMinutes<1||actualMinutes>1440||!Number.isInteger(actualGuests.value)||Number(actualGuests.value)<1||Number(actualGuests.value)>99)){
     saveError.value=say(walletCopy.wallet_actual_hours_details_required);return;
   }
   saving.value = true;
@@ -135,8 +135,7 @@ async function save() {
         status: nextStatus.value,
         staff_note: note.value,
         version: entry.value.version,
-        actual_minutes:actualMinutes,
-        actual_guests:actualGuests.value===''?null:actualGuests.value,
+        ...(completing?{actual_minutes:actualMinutes,actual_guests:actualGuests.value}:{}),
         public_note:publicNote.value,
       }),
     });
@@ -148,6 +147,7 @@ async function save() {
     saving.value = false;
   }
 }
+watch(nextStatus,()=>{saveError.value='';});
 async function removeOrRestore(){
   if(!entry.value||saving.value||!deleteReason.value.trim())return;
   saving.value=true;saveError.value='';
@@ -401,8 +401,6 @@ defineExpose({ refresh: load });
         <button v-if="!entry.deleted_at" class="desk-button secondary" @click="openMessages">{{say(messageCopy.new_conversation)}}<PhArrowRight/></button>
         <div v-if="!entry.deleted_at" class="reservation-attendance">
           <p class="fine-print">{{say(walletCopy.booked)}} · {{duration(entry.booked_minutes)}}</p>
-          <div class="wallet-input-grid"><label class="desk-field">{{say(walletCopy.actual_hours)}}<input v-model="actualHours" type="number" inputmode="decimal" min="0" max="24" step="any" :disabled="saving"/></label><label class="desk-field">{{say(walletCopy.actual_guests)}}<input v-model.number="actualGuests" type="number" min="1" max="99" step="1" :disabled="saving"/></label></div>
-          <p class="wallet-rule">{{say(walletCopy.attendance_help)}}</p>
           <label class="desk-field">{{say(walletCopy.public_note)}}<textarea v-model="publicNote" rows="3" maxlength="600" :disabled="saving"/></label>
         </div>
         <p class="fine-print">
@@ -420,8 +418,12 @@ defineExpose({ refresh: load });
             <option v-for="(label, key) in labels" :key="key" :value="key">
               {{ label }}
             </option>
-          </select></label
-        ><label class="desk-field"
+          </select></label>
+        <template v-if="nextStatus==='completed'&&!entry.deleted_at">
+          <div class="wallet-input-grid"><label class="desk-field">{{say(walletCopy.actual_hours)}}<input v-model="actualHours" type="number" inputmode="decimal" min="0" max="24" step="any" :disabled="saving"/></label><label class="desk-field">{{say(walletCopy.actual_guests)}}<input v-model.number="actualGuests" type="number" min="1" max="99" step="1" :disabled="saving"/></label></div>
+          <p class="wallet-rule">{{say(walletCopy.attendance_help)}}</p>
+        </template>
+        <label class="desk-field"
           >{{ say(copyText.staff_note_private_53d294)
           }}<textarea
             v-model="note"

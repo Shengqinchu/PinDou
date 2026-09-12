@@ -15,7 +15,7 @@ try{for(const viewport of [{width:390,height:844},{width:320,height:568},{width:
  const base='http://127.0.0.1:5190/h5/#/pages/studio/';
  await page.goto(base+'manage-reservation?id='+seed.id);await expect(page.locator('.admin-loading')).toHaveCount(0);
  const hours=page.locator('.admin-field').filter({hasText:'实际游玩时长（小时／人）'}).locator('input');
- await expect(hours).toHaveValue('1.5');await hours.fill('0.5');
+ await expect(hours).toHaveCount(0);await page.locator('uni-picker').click();const completed=page.locator('uni-picker-view .uni-picker-item:visible').filter({hasText:'已完成'}).first();await expect.poll(async()=>{const b=await completed.boundingBox();return !!b&&b.y>=0&&b.y+b.height<=viewport.height;}).toBe(true);await completed.click({force:true});await page.locator('.uni-picker-action-confirm:visible').first().click();await expect(page.locator('.uni-picker-action-confirm:visible')).toHaveCount(0);await expect(hours).toHaveValue('1.5');await hours.fill('0.5');
  await page.locator('uni-button.admin-primary').filter({hasText:'保存'}).click();
  await page.locator('.uni-modal__btn_primary').click();
  await expect.poll(async()=>(await api('/manage/reservations?search='+seed.id)).items[0].actual_minutes).toBe(30);

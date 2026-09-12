@@ -42,12 +42,14 @@ def test_income_expenses_filters_and_retry(setup):
     assert client.get('/studio-api/manage/finance?start=2026-09-01&end=2026-09-30&kind=income&category=finished&search=Local').json()['total']==1
 
 
-def test_completion_imports_once_and_never_overwrites_manual_edits(setup):
+def test_completion_imports_once_and_never_overwrites_manual_edits(setup, monkeypatch):
+    import wallet
+    monkeypatch.setattr(wallet,'now',lambda:'2026-09-11T18:00:00-04:00')
     client,_,_=setup;host()
     r=create(client);assert r.status_code==201,r.text
     ident=r.json()['id']
     assert client.patch('/studio-api/manage/reservations/'+ident,json={'version':1,'status':'confirmed','staff_note':''}).status_code==200
-    assert client.patch('/studio-api/manage/reservations/'+ident,json={'version':2,'status':'completed','staff_note':''}).status_code==200
+    assert client.patch('/studio-api/manage/reservations/'+ident,json={'version':2,'status':'completed','staff_note':'','actual_minutes':120,'actual_guests':2}).status_code==200
     with studio.database() as db:
         row=db.execute('SELECT * FROM studio_reservations WHERE id=?',(ident,)).fetchone()
         finance.from_completed(db,row,'local-qa')
