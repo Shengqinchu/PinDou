@@ -13,7 +13,15 @@
 
 - `python -m pytest -q 07_ops/test_studio_static_history.py`：5 项通过，覆盖跨版本依赖保留、重复执行、同名冲突、文件篡改、私有路径排除。
 - `npm --prefix 05_studio run build`：文案合同、类型检查、构建通过。批准文案哈希未修改。
-- `node 05_studio/scripts/verify-generator-kitty.mjs`：隔离接口；检查上传后作品/返回保留草稿、生成后作品列表与再次打开、104×104 全文显示、中英教程 14 张图像哈希、320–2560 宽及横屏、Chromium / WebKit 与减少动效。
+- `node 05_studio/scripts/verify-generator-kitty.mjs`：32 组记录通过、零页面异常；隔离接口检查上传后作品/返回保留草稿、生成后作品列表与再次打开、104×104 全文显示、中英教程 14 张图像哈希、320–2560 宽及横屏、Chromium / WebKit 与减少动效。
 - 生产资源预检查：53 个已有版本、1563 个不同静态资源，无路径缺失及同名不同内容。
 
-生产发布和保留页面的验收结果将在发布后补充。证据目录：`artifacts/generator-kitty-fix/`。
+## 已上线
+
+- 代码提交 `bf808a2` 已同步 GitHub；发布 **20260912021713-studio-v7**，build `2026-09-12T02:16:08.562Z`，389 文件校验通过，历史目录保留 1622 个不同静态资源。
+- 保留的旧页面在发布后直接点击“我的作品”成功，旧 JS 返回 200、文档实例未刷新、返回后上传仍保留。另以更早的 HTML 引用真实线上资源验证成功；旧路径 `/studio/studio-assets/` 同样返回正确模块，不存在的文件仍为 404。
+- 公网中英 14 张教程图与本地批准截图的 SHA-256 一致，健康接口 200，两个业务服务正常。
+- 生成器数据及发布目录不变；服务端发布文件哈希全部与上一版相同。长时基线期间预约/钱包有变化，已额外与切换前即时备份逐表核对：预约、事件、成员、钱包及三张营业账表全部一致，未覆盖运行中的业务更新。
+- 小程序审核状态没有改动。当前浏览器若已缓存过失败的动态模块，重新载入一次可清除该失败状态；后续发布继续保留旧模块，不强制刷新或丢弃草稿。
+
+证据目录：`artifacts/generator-kitty-fix/`，包含 `navigation-before.json`、`navigation-after.json`、`public-verification.json`、`browser-verification.json`、`backup-verification.json` 和构建／发布记录。
