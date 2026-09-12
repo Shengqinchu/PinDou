@@ -199,7 +199,7 @@ def send_email(job,payload):
     title=html.escape(payload['title']);body=html.escape(payload['body']).replace('\n','<br>');url=html.escape(payload['url'],quote=True)
     markup=f'<div style="max-width:560px;margin:auto;padding:24px;font:16px/1.7 Arial,sans-serif;color:#26343d"><h2>{title}</h2><p>{body}</p><p><a href="{url}">{html.escape(words("view_booking",payload["locale"]))}</a></p><p><a href="https://pindoupuppy.com/account?notifications=1">{html.escape(words("notification_settings",payload["locale"]))}</a></p></div>'
     data={'from':sender,'to':[job['recipient']],'subject':words('place',payload['locale'])+' · '+payload['title'],'text':payload['body'],'html':markup}
-    request=URLRequest('https://api.resend.com/emails',data=json.dumps(data).encode(),headers={'Authorization':'Bearer '+key,'Content-Type':'application/json','Idempotency-Key':'booking-'+job['id']})
+    request=URLRequest('https://api.resend.com/emails',data=json.dumps(data).encode(),headers={'Authorization':'Bearer '+key,'Content-Type':'application/json','User-Agent':'PinDouStudio/1.0','Idempotency-Key':'booking-'+job['id']})
     try:
         with urlopen(request,timeout=12) as response:result=json.loads(response.read(64000))
         return ('accepted','',str(result.get('id',''))[:160])

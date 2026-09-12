@@ -225,3 +225,20 @@ def test_owner_site_message_alert_uses_separate_sender(setup):
     now[0]+=61;drain();job=claim(client,'owner_alert')
     assert job and job['recipient']=='+14165550100' and 'manage?view=messages' in job['content']
     assert begin(client,job,'owner_alert').json()['send'] is True
+
+
+def test_email_transport_identity_idempotency_and_html_escaping(monkeypatch):
+    import io
+    monkeypatch.setenv('STUDIO_EMAIL_API_KEY','local-test-key')
+    monkeypatch.setenv('STUDIO_EMAIL_FROM','PinDou <local@example.test>')
+    requests=[]
+    def transport(request,**kwargs):
+        requests.append(request)
+        return io.BytesIO(b'{"id":"local-provider-id"}')
+    monkeypatch.setattr(notices,'urlopen',transport)
+    job={'id':'repeatable-test','recipient':'local@example.test'}
+    payload={'title':'<script>test</script>','body':'<img src=x>','url':'https://pindoupuppy.com/messages','locale':'en'}
+    for _ in range(2):assert notices.send_email(job,payload)==('accepted','','local-provider-id')
+    assert requests[0].get_header('User-agent')=='PinDouStudio/1.0'
+    assert requests[0].get_header('Idempotency-key')==requests[1].get_header('Idempotency-key')=='booking-repeatable-test'
+    body=json.loads(requests[0].data);assert '<script>' not in body['html'] and '&lt;img' in body['html']
