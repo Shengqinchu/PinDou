@@ -1084,6 +1084,7 @@
 | image_too_large | 图片不能超过 12 MB。 | Images must be 12 MB or smaller. |
 | import_url_not_supported | 请粘贴小红书的帖子分享链接。 | Paste a Xiaohongshu post share link. |
 | import_source_unavailable | 小红书暂未提供可读取的完整内容。请从帖子重新复制分享链接后重试，或手动添加图文。 | Xiaohongshu did not provide the complete post. Copy a fresh share link and retry, or add the text and images manually. |
+| import_browser_login_required | 小红书要求登录或验证，暂时无法读取完整文章，未创建草稿。请使用可打开的帖子分享链接，或手动添加图文。 | Xiaohongshu requires sign-in or verification. The complete post could not be read, so no draft was created. Use a readable post share link, or add the text and images manually. |
 | import_author_mismatch | 这篇帖子不属于小狗双吉账号，请检查链接。 | This post is not from the Xiaogou Shuangji account. Check the link. |
 | import_incomplete | 原帖信息不完整，未生成日记。请重新分享链接或手动添加。 | The original post was incomplete. No story was created. Share it again or add it manually. |
 | journal_already_exists | 这篇日记已经导入，请在列表中选择它继续编辑。 | This story is already imported. Select it in the list to edit. |

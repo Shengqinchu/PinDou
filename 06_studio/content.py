@@ -108,7 +108,7 @@ def process_import_job(database):
         code=exc.detail if isinstance(exc,HTTPException) else 'import_source_unavailable'
         with database() as db:db.execute("UPDATE studio_import_jobs SET status='failed',error=?,updated_at=? WHERE id=?",(code,int(time.time()),job['id']))
         import logging
-        logging.getLogger('uvicorn.error').warning('studio_import_failed job=%s code=%s',job['id'],code)
+        logging.getLogger('uvicorn.error').warning('studio_import_failed job=%s code=%s error_type=%s',job['id'],code,type(exc).__name__)
     return True
 
 async def import_worker(database):

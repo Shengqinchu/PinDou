@@ -1,7 +1,7 @@
 """Read the owner's publicly shared Xiaohongshu notes without executing page code.
 
-Only explicit allowlisted HTTPS hosts are fetched. Login/challenge pages fail closed;
-they are never treated as complete posts and no cookies or account tokens are used.
+Only allowlisted HTTPS hosts are fetched. A browser-compatible transport can read
+public pages that direct requests cannot access. No user's cookies are copied.
 """
 from __future__ import annotations
 import json, re
@@ -55,11 +55,19 @@ def parse_note(html, expected_id=None):
         note=next(v['note'] for v in notes.values() if v.get('note',{}).get('noteId') and (not expected_id or v['note']['noteId']==expected_id))
     except (ValueError,KeyError,TypeError,StopIteration):
         raise HTTPException(422,'import_source_unavailable')
+    return validate_note(note,expected_id)
+
+
+def validate_note(note,expected_id=None):
+    if not isinstance(note,dict) or not isinstance(note.get('user'),dict):raise HTTPException(422,'import_incomplete')
+    if not re.fullmatch(r'[a-f0-9]{24}',str(note.get('noteId',''))) or (expected_id and note['noteId']!=expected_id):raise HTTPException(422,'import_source_unavailable')
     if note.get('user',{}).get('userId')!=OWNER_ID:
         raise HTTPException(422,'import_author_mismatch')
     if not note.get('title') or not note.get('desc') or not note.get('time') or not note.get('imageList'):
         raise HTTPException(422,'import_incomplete')
-    if len(note['imageList'])>40:
+    if not isinstance(note['title'],str) or not isinstance(note['desc'],str) or len(note['title'])>250 or len(note['desc'])>25000:
+        raise HTTPException(422,'import_incomplete')
+    if not isinstance(note['time'],(int,float)) or isinstance(note['time'],bool) or not isinstance(note['imageList'],list) or len(note['imageList'])>40:
         raise HTTPException(422,'import_incomplete')
     return note
 
@@ -72,10 +80,24 @@ def retrieve(share):
     if parsed.scheme=='http' and parsed.hostname in PAGE_HOSTS:
         source=urlunparse(parsed._replace(scheme='https'))
     checked_url(source)
-    data,final=fetch(source)
-    ident=re.search(r'/(?:explore|discovery/item)/([a-f0-9]{24})',final)
-    note=parse_note(data.decode('utf8','replace'),ident[1] if ident else None)
-    return note,final
+    expected=re.search(r'/(?:explore|discovery/item)/([a-f0-9]{24})',source)
+    try:
+        data,final=fetch(source)
+        ident=expected or re.search(r'/(?:explore|discovery/item)/([a-f0-9]{24})',final)
+        return parse_note(data.decode('utf8','replace'),ident[1] if ident else None),final
+    except HTTPException as exc:
+        if exc.detail!='import_source_unavailable':raise
+        import xhs_browser
+        if not xhs_browser.configured():raise
+        try:note,final=xhs_browser.read_note(source,expected[1] if expected else None)
+        except xhs_browser.BrowserReadError as error:raise HTTPException(422,str(error)) from None
+        checked_url(final)
+        ident=expected or re.search(r'/(?:explore|discovery/item)/([a-f0-9]{24})',final)
+        if not ident:raise HTTPException(422,'import_source_unavailable')
+        note=validate_note(note,ident[1])
+        import logging
+        logging.getLogger('uvicorn.error').info('studio_xhs_read reader=browser_transport note=%s images=%d',note['noteId'],len(note['imageList']))
+        return note,final
 
 def photo_url(photo):
     value=photo.get('urlDefault') or next((x.get('url') for x in photo.get('infoList',[]) if x.get('imageScene')=='WB_DFT'),None)

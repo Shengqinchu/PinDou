@@ -23,6 +23,8 @@ files['service/telegram-notification-copy.json'] = root / '05_studio/src/content
 files['service/miniapp_login.py'] = root / '06_studio/miniapp_login.py'
 for name in ('sms_inbox.py','owner_wechat.py','studio_staff.py','studio_finance.py','finance_fx.py','studio_messages.py','customer_notifications.py'):
     files['service/'+name] = root / '06_studio' / name
+for name in ('xhs_browser.py',):
+    files['service/'+name] = root / '06_studio' / name
 files['service/messaging-copy.json'] = root / '05_studio/src/content/messaging.json'
 files['service/owner-wechat-copy.json'] = root / '05_studio/src/content/owner-wechat.json'
 files['service/business-copy.json'] = root / '05_studio/src/content/business.json'

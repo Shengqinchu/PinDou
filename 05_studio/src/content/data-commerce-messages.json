@@ -123,6 +123,10 @@
     "小红书暂未提供可读取的完整内容。请从帖子重新复制分享链接后重试，或手动添加图文。",
     "Xiaohongshu did not provide the complete post. Copy a fresh share link and retry, or add the text and images manually."
   ],
+  "import_browser_login_required": [
+    "小红书要求登录或验证，暂时无法读取完整文章，未创建草稿。请使用可打开的帖子分享链接，或手动添加图文。",
+    "Xiaohongshu requires sign-in or verification. The complete post could not be read, so no draft was created. Use a readable post share link, or add the text and images manually."
+  ],
   "import_author_mismatch": [
     "这篇帖子不属于小狗双吉账号，请检查链接。",
     "This post is not from the Xiaogou Shuangji account. Check the link."

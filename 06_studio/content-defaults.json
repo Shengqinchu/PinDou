@@ -3109,6 +3109,10 @@
     "reservation_offer_changed": [
       "套餐信息已更新，请核对后重新提交。",
       "The offer has changed. Review it before submitting again."
+    ],
+    "import_browser_login_required": [
+      "小红书要求登录或验证，暂时无法读取完整文章，未创建草稿。请使用可打开的帖子分享链接，或手动添加图文。",
+      "Xiaohongshu requires sign-in or verification. The complete post could not be read, so no draft was created. Use a readable post share link, or add the text and images manually."
     ]
   },
   "data-editor-module-labels": {

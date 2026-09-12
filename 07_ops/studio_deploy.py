@@ -120,7 +120,7 @@ def main():
     if not dependencies.exists():
         dependencies = release / "service/requirements.txt"
     run(str(venv / "bin/pip"), "install", "--disable-pip-version-check", "-r", str(dependencies))
-    run(str(venv / "bin/python"), "-c", "import fastapi,uvicorn; from zoneinfo import ZoneInfo; ZoneInfo('America/Toronto')")
+    run(str(venv / "bin/python"), "-c", "import fastapi,uvicorn,curl_cffi; from zoneinfo import ZoneInfo; ZoneInfo('America/Toronto')")
     old_nginx = NGINX.read_text()
     old_unit = UNIT.read_text() if UNIT.exists() else None
     current = ROOT / "current"
