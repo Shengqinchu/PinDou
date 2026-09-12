@@ -21,7 +21,7 @@ function choose(di:number,ri:number){
   choosingEnd.value=result.choosingEnd;message.value=false;emit('select',result.booking);
 }
 function page(delta:number){offset.value=Math.max(0,Math.min(Math.floor((props.calendar.days.length-1)/count.value)*count.value,offset.value+delta*count.value));}
-function help(){uni.showModal({title:studioWords('flow','time')[props.language==='en'?1:0],content:text(props.booking.plan==='day'?'day_selection_help':'choose_a_start_time_for_a_twohour_a3470d')+'\n'+text('full_buffer'),showCancel:false});}
+function help(){uni.showModal({title:studioWords('flow','time')[props.language==='en'?1:0],content:text(props.booking.plan==='day'?'day_selection_help':'choose_a_start_time_for_a_twohour_a3470d'),showCancel:false});}
 watch(()=>[props.booking.date,count.value],()=>{const index=props.calendar.days.findIndex(day=>day.date===props.booking.date);if(index>=0)offset.value=Math.floor(index/count.value)*count.value;},{immediate:true});
 watch(()=>props.booking.plan,()=>{choosingEnd.value=false;message.value=false;});
 </script>

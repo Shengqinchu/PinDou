@@ -209,7 +209,7 @@ watch(
       </div>
       <div class="reservation-date-actions">
       <slot name="tools"/>
-      <InfoTip v-if="compact" :label="say(copyText.reservation_timetable_use_arrow_keys_to_move_3bb451)"><p>{{say(booking.plan==='day'?copyText.day_selection_help:copyText.choose_a_start_time_for_a_twohour_a3470d)}}</p><p>{{say(copyText.full_buffer)}}</p><p>{{say(copyText.all_times_are_local_to_hamilton_the_8a3607)}}</p></InfoTip>
+      <InfoTip v-if="compact" :label="say(copyText.reservation_timetable_use_arrow_keys_to_move_3bb451)"><p>{{say(booking.plan==='day'?copyText.day_selection_help:copyText.choose_a_start_time_for_a_twohour_a3470d)}}</p></InfoTip>
       <button
         type="button"
         class="icon-button"

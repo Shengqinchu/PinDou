@@ -11,6 +11,8 @@ import CustomerWallet from './CustomerWallet.vue';
 import WechatQr from './WechatQr.vue';
 import SlideOver from './SlideOver.vue';
 import LiftTitle from './LiftTitle.vue';
+import NotificationPreferences from './NotificationPreferences.vue';
+import noticeCopy from '../content/customer-notifications.json';
 import {contentModule} from '../content-store';
 import workbenchDefaults from '../content/workbench.json';
 const workbenchCopy=contentModule('workbench',workbenchDefaults);
@@ -88,7 +90,7 @@ onBeforeUnmount(()=>{alive=false;clearInterval(timer);});
    </template>
    </div>
   </template>
-  <template v-else><AccountIdentity :key="accountUser.id" :email-only="emailOnly" :link-to-center="!embedded&&!emailOnly"/><RouterLink v-if="accountUser.is_admin&&!emailOnly" class="text-link" to="/manage" @click="closeAccount">{{say(workbenchCopy.entry)}}<PhArrowRight/></RouterLink><CustomerWallet v-if="!emailOnly" :key="accountUser.id"/><button v-if="!emailOnly" class="text-link account-signout" type="button" @click="signOut">{{say(copy.sign_out)}}</button></template>
+  <template v-else><AccountIdentity :key="accountUser.id" :email-only="emailOnly" :link-to-center="!embedded&&!emailOnly"/><RouterLink v-if="accountUser.is_admin&&!emailOnly" class="text-link" to="/manage" @click="closeAccount">{{say(workbenchCopy.entry)}}<PhArrowRight/></RouterLink><RouterLink v-if="!emailOnly" class="text-link" to="/messages" @click="closeAccount">{{say(noticeCopy.messages)}}<PhArrowRight/></RouterLink><details v-if="!emailOnly" :open="route.query.notifications!==undefined"><summary>{{say(noticeCopy.title)}}</summary><NotificationPreferences/></details><CustomerWallet v-if="!emailOnly" :key="accountUser.id"/><button v-if="!emailOnly" class="text-link account-signout" type="button" @click="signOut">{{say(copy.sign_out)}}</button></template>
  </div>
  </component>
 </template>

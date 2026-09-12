@@ -563,6 +563,9 @@ def register(app, database, admin_actor):
                 from studio_finance import from_completed
                 from_completed(db,db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone(),actor)
             db.execute("INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)", (reference,actor,current.isoformat(),payload.status,payload.staff_note))
+            if payload.status!=row['status'] and payload.status in ('confirmed','cancelled'):
+                import customer_notifications
+                customer_notifications.on_reservation(db,payload.status,db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone())
             if (actual,guests,public_note)!=(row['actual_minutes'],row['actual_guests'],row['public_note']):
                 db.execute('INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)',
                     (reference,actor,current.isoformat(),'attendance',json.dumps({'minutes':actual,'guests':guests,'public_note':public_note},ensure_ascii=False)))

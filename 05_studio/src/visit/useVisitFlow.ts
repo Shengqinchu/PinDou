@@ -8,6 +8,7 @@ import { isContentPreview } from '../preview-context';
 import { locale,say } from '../state';
 import { reservationDraft as draft,readSession,saveSession,validSelection,minutes,type Reservation,type ReservationPayload,type ReservationCalendar } from '../reservations';
 import { copy,words } from './copy';
+import {saveNotificationPreferences} from '../customer-notifications';
 
 export function useVisitFlow(){
  const route=useRoute(),router=useRouter();
@@ -98,6 +99,7 @@ export function useVisitFlow(){
   finally{checkingAccount.value=false;}
   const request=attempt.value;sending.value=true;error.value='';
   try{
+   await saveNotificationPreferences();
    const receipt=await commerceApi<Reservation>('/reservations',{method:'POST',headers:{'Idempotency-Key':request.key},body:JSON.stringify(request.body)});
    if(request.owner&&request.owner!==accountUser.value?.id){error.value=say(accountCopy.account_login_required);return;}
    saveSession('puppy-reservation-attempt-v1',null);saveSession('puppy-last-reservation',receipt.id);saveSession('puppy-visit-flow-v1',null);

@@ -951,6 +951,87 @@
 | parking_1 | 75 John St N, Hamilton, ON L8R 1H7 | 75 John St N, Hamilton, ON L8R 1H7 |
 | parking_2 | 115 King William St, Hamilton, ON L8R 1H8 | 115 King William St, Hamilton, ON L8R 1H8 |
 
+## customer-notifications.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| title | 预约提醒 | Booking notifications |
+| help | 选择接收方式，仅用于预约状态、到店提醒和本次沟通。 | Choose how to receive booking updates, visit reminders and related replies. |
+| email | 邮箱提醒 | Email notifications |
+| sms | 手机消息提醒 | Phone notifications |
+| phone | 加拿大/美国手机号（+1） | Canada / US phone number (+1) |
+| email_address | 接收邮箱 | Email address |
+| save | 保存提醒设置 | Save notification settings |
+| saved | 提醒设置已保存 | Notification settings saved |
+| saving | 正在保存… | Saving… |
+| wechat | 接收微信预约提醒 | Receive WeChat booking notifications |
+| wechat_help | 可订阅预约成功、取消和到店前提醒，每种通知每次授权可接收一条。 | Subscribe to confirmation, cancellation and pre-visit notices. Each approval allows one notice per type. |
+| wechat_ready | 微信提醒已允许 | WeChat notifications allowed |
+| wechat_declined | 未开启微信提醒，仍可在我的预约中查看状态。 | WeChat notifications were not enabled. You can still check My bookings. |
+| wechat_unavailable | 微信提醒暂不可用，其他接收方式不受影响。 | WeChat notifications are temporarily unavailable. Other channels are unaffected. |
+| contact_host | 联系店主 | Message the host |
+| messages | 我的消息 | My messages |
+| site_messages | 站内消息 | In-app messages |
+| phone_messages | 手机消息 | Phone messages |
+| automatic | 自动提醒 | Automatic notice |
+| customer | 顾客 | Customer |
+| delivery_log | 顾客通知记录 | Customer notification history |
+| delivery_empty | 还没有顾客通知记录。 | No customer notices yet. |
+| email_missing | 邮件通道尚未配置 | Email channel is not configured |
+| accepted | 服务商已接受 | Accepted by provider |
+| queued | 等待发送 | Queued |
+| retry | 等待重试 | Retry pending |
+| waiting_config | 等待通道连接 | Waiting for channel |
+| waiting_subscription | 等待微信授权 | Waiting for WeChat approval |
+| handed_off | 手机正在发送 | Phone is sending |
+| sending | 正在发送… | Sending… |
+| sent | 设备报告已发出 | Device reports sent |
+| delivered | 设备报告已送达 | Device reports delivered |
+| unknown | 发送结果待核对 | Delivery needs verification |
+| failed | 发送失败 | Delivery failed |
+| skipped | 已停止发送 | Stopped |
+| sign_in | 登录后查看消息 | Sign in to view messages |
+| reply_title | 店主回复了你 | The host replied |
+| reply_body | 店主发来新消息，查看并回复：{url} | You have a new message from the host. Read and reply: {url} |
+| customer_message_title | 有新的顾客消息 | New customer message |
+| customer_message_body | 顾客发来新消息，请在后台查看并回复：{url} | A customer sent a new message. Read and reply in your workspace: {url} |
+| reply | 输入消息… | Write a message… |
+| send | 发送 | Send |
+| empty | 有问题可以在这里联系店主。 | Send the host a message here. |
+| system | 预约动态 | Booking update |
+| host | 店主 | Host |
+| you | 我 | You |
+| more | 查看更早消息 | Earlier messages |
+| refresh | 刷新 | Refresh |
+| all | 全部 | All |
+| unread | 未读 | Unread |
+| search | 搜索顾客 | Search customers |
+| place | 小狗拼豆铺 | PinDou Puppy |
+| pending_title | 预约申请已收到 | Booking request received |
+| confirmed_title | 预约成功 | Booking confirmed |
+| cancelled_title | 预约已取消 | Booking cancelled |
+| reminder_title | 到店提醒 | Your visit is coming up |
+| pending_body | {name}，你的预约申请已收到，正在等待店主确认。<br>{date} {start}–{end} · {guests} 人<br>汉密尔顿当地时间<br>查看预约或联系店主：{url} | Hi {name}, your booking request is waiting for the host to confirm.<br>{date} {start}–{end} · {guests} guest(s)<br>Hamilton local time<br>View your booking or message the host: {url} |
+| confirmed_body | {name}，店主已确认你的预约。<br>{date} {start}–{end} · {guests} 人<br>汉密尔顿当地时间<br>地址：{address}<br>查看预约或联系店主：{url} | Hi {name}, the host has confirmed your booking.<br>{date} {start}–{end} · {guests} guest(s)<br>Hamilton local time<br>Address: {address}<br>View your booking or message the host: {url} |
+| cancelled_body | {name}，你在 {date} {start}–{end} 的预约已取消。<br>如需重新预约或联系店主：{url} | Hi {name}, your booking for {date} {start}–{end} has been cancelled.<br>View details or contact the host: {url} |
+| reminder_body | {name}，你在小狗拼豆铺的预约即将开始。<br>{date} {start}–{end} · {guests} 人<br>汉密尔顿当地时间<br>地址：{address}<br>查看预约或联系店主：{url} | Hi {name}, your visit to PinDou Puppy is coming up.<br>{date} {start}–{end} · {guests} guest(s)<br>Hamilton local time<br>Address: {address}<br>View your booking or contact the host: {url} |
+| view_booking | 查看预约 | View booking |
+| notification_settings | 修改提醒设置 | Notification preferences |
+| card_confirmed | 共{guests}人，请按约定时间到店 | {guests} guest(s), see you soon |
+| card_cancelled | 预约已取消，可重新选择时间 | Cancelled. You can book again |
+| card_reminder | 预约即将开始，点击查看 | Your visit is coming up |
+| hourly | 按时拼豆体验 | Hourly beading |
+| day | 全天拼豆体验 | Day beading session |
+| notification_contact_invalid | 请填写有效的邮箱或 +1 手机号码。 | Enter a valid email address or +1 phone number. |
+| notification_preferences_changed | 提醒设置已被修改，请刷新后重试。 | Notification settings changed. Refresh and try again. |
+| notification_wechat_unavailable | 暂时无法开启微信提醒，请稍后重试。 | Could not enable WeChat notifications. Please retry. |
+| notification_wechat_expired | 授权页面已过期，请刷新后再允许提醒。 | This authorization page expired. Refresh before subscribing. |
+| message_request_changed | 消息内容已变化，请刷新后再发送。 | The message changed. Refresh before sending. |
+| message_rate_limited | 发送较频繁，请稍等片刻。 | Please wait a moment before sending more messages. |
+| message_thread_missing | 此会话不存在。 | This conversation was not found. |
+| message_invalid_cursor | 请刷新消息列表。 | Please refresh the message list. |
+| generic_error | 暂时未能完成，请稍后重试。 | Could not complete this. Please try again. |
+
 ## data-commerce-labels.json
 
 | 键 | 中文 | English |

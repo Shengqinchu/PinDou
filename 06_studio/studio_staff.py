@@ -78,4 +78,6 @@ def register(app, database, admin_actor):
             unread = db.execute("""SELECT count(*) FROM studio_sms_messages m JOIN studio_sms_threads t ON t.id=m.thread_id
               WHERE t.enabled=1 AND m.direction='inbound' AND m.seq>t.read_seq""").fetchone()[0]
             money = studio_finance.summary(db, today[:7]+'-01', today)
+            import studio_messages
+            unread+=studio_messages.unread_count(db)
         return {'today': today, 'pending': pending, 'visits': visits, 'unread': unread, 'finance': money}

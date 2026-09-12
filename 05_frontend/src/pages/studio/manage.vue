@@ -7,6 +7,7 @@ import {useStudioNative} from '../../utils/studio-native';
 import {adminCall,adminError,goAdmin} from '../../utils/studio-admin';
 import {adminView} from '../../utils/studio-admin-cache';
 import copy from '../../../../05_studio/src/content/workbench.json';
+import notices from '../../../../05_studio/src/content/customer-notifications.json';
 import business from '../../../../05_studio/src/content/business.json';
 import {money,type FinanceSummary} from '../../../../05_studio/src/business-model';
 const {language,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();
@@ -16,7 +17,7 @@ const busy=ref(false),error=ref(''),data=ref<Summary|undefined>(view.snapshot?.d
 let alive=true;
 const remember=()=>view.save({data:data.value});
 async function refresh(force=true){if(!view.valid())data.value=undefined;if(busy.value||(!force&&view.fresh()))return;busy.value=true;error.value='';const revision=view.begin();try{const value=await adminCall<Summary>('/manage/desk-summary');if(alive){data.value=value;view.loaded(revision);remember();}}catch(e){error.value=adminError(e,say);if(!view.valid())data.value=undefined;}finally{busy.value=false;}}
-const entries=[{page:'-reservations',label:copy.reservations,icon:'calendar'},{page:'-messages',label:copy.messages,icon:'wechat'},{page:'-members',label:copy.members,icon:'user'},{page:'-finance',label:copy.finance,icon:'grid'},{page:'-calendar',label:copy.calendar,icon:'calendar'}];
+const entries=[{page:'-notifications',label:notices.delivery_log,icon:'info'},{page:'-reservations',label:copy.reservations,icon:'calendar'},{page:'-messages',label:copy.messages,icon:'wechat'},{page:'-members',label:copy.members,icon:'user'},{page:'-finance',label:copy.finance,icon:'grid'},{page:'-calendar',label:copy.calendar,icon:'calendar'}];
 function openAlerts(){uni.navigateTo({url:'/pages/studio/owner'});}
 onShow(()=>void refresh(false));onHide(remember);onUnload(()=>{remember();alive=false;});
 </script>

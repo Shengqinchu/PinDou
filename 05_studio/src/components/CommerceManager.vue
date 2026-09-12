@@ -54,7 +54,7 @@ import ReservationsPanel from "./admin/ReservationsPanel.vue";
 import MembersPanel from './admin/MembersPanel.vue';
 import { walletCopy } from '../wallet';
 import { messageCopy } from '../messaging';
-const MessagesPanel=defineAsyncComponent(()=>import('./admin/MessagesPanel.vue'));
+const MessagesPanel=defineAsyncComponent(()=>import('./admin/CustomerMessages.vue'));
 const FinancePanel=defineAsyncComponent(()=>import('./admin/FinancePanel.vue'));
 import businessDefaults from '../content/business.json';
 const businessCopy=contentModule('business',businessDefaults);

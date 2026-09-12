@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import LiftTitle from '../components/LiftTitle.vue';
 import CancelReservation from '../components/CancelReservation.vue';
+import notices from '../content/customer-notifications.json';
 import { reservationRevision } from '../cancellation';
 import CopyContact from "../components/CopyContact.vue";
 import OfferLabel from '../visit/OfferLabel.vue';
@@ -153,6 +154,7 @@ onBeforeUnmount(() => {
         say(copyText.refresh_reservation_30af18)
       }}
     </button><CancelReservation v-if="result" :reservation="result"/></div>
+    <div v-if="result" class="reservation-receipt-actions"><RouterLink class="button button-primary" :to="{path:'/messages',query:{reservation:result.id}}">{{say(notices.contact_host)}}</RouterLink><RouterLink class="text-link" to="/account?notifications=1">{{say(notices.notification_settings)}}</RouterLink></div>
     <p class="fine-print">
       {{ say(copyText.for_changes_contact_the_host_on_wechat_2921d8)
       }}<CopyContact :value="wechat" /> · {{ say(copyText.phone_0614da)

@@ -19,6 +19,7 @@ const wechatMessages=contentModule('wechat',wechatDefaults) as Record<string,str
 import bookingProfileDefaults from './content/booking-profile.json';
 const bookingProfileMessages=contentModule('booking-profile',bookingProfileDefaults);
 import cancellationDefaults from './content/reservation-cancellation.json';
+import notificationMessages from './content/customer-notifications.json';
 import miniappDefaults from './content/miniapp.json';
 const miniappMessages=contentModule('miniapp',miniappDefaults) as Record<string,string[]>;
 const cancellationMessages=contentModule('reservation-cancellation',cancellationDefaults) as Record<string,string[]>;
@@ -163,7 +164,7 @@ export async function commerceApi<T>(
   }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const words = (data.detail==='booking_profile_changed'?bookingProfileMessages.changed:undefined) || cancellationMessages[data.detail] || messages[data.detail] || accountMessages[data.detail] || walletMessages[data.detail] || wechatMessages[data.detail] || miniappMessages[data.detail];
+    const words = (data.detail==='booking_profile_changed'?bookingProfileMessages.changed:undefined) || (notificationMessages as Record<string,string[]>)[data.detail] || cancellationMessages[data.detail] || messages[data.detail] || accountMessages[data.detail] || walletMessages[data.detail] || wechatMessages[data.detail] || miniappMessages[data.detail];
     if (words)
       throw new CommerceError(say(words), response.status, data.detail, response.headers.get('X-Request-ID') || undefined);
     if (response.status === 401 || response.status === 403)

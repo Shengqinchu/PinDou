@@ -56,6 +56,7 @@ const router = createRouter({
     { path: "/", component: Home },
     { path: "/visit", component: routeLoaders.visit },
     { path: "/account", component: () => import('./pages/Account.vue') },
+    { path: '/messages', component: () => import('./pages/Messages.vue') },
     { path: "/auth/wechat", component: () => import('./pages/WechatReturn.vue') },
     { path:'/tools',component:()=>import('../../05_generator/src/Workspace.vue'),children:generatorRoutes },
     ...['upload','loading','result/:id','editor/:id','works','tutorial','me'].map(path=>({path:'/'+path,redirect:(to:any)=>({path:'/tools'+(path==='upload'?'':path==='me'?'/works':to.path),query:to.query,hash:to.hash})})),

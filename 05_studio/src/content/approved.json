@@ -1,5 +1,5 @@
 {
-  "source": "owner-finance-rmb-cad-and-payment-methods-20260911",
+  "source": "user-20260911-complete-customer-owner-notifications-and-calendar-screenshot48cb0a39",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -38,6 +38,7 @@
     "components-StudioCarousel.json": "3d95089ba11a06f03e6ecc8592208dcafa3be2fe1afbc6b592667c4ee30323a9",
     "components-StudioToast.json": "3901e64e5116ccf047f593172fa5945a6df55fff548cd84df0e293f72efa7f52",
     "contact-fields.json": "cc1879ad8ac262c92f74045c165b46ee15360923d53992667349bc0e1ac7a7fc",
+    "customer-notifications.json": "f7ef57cbeaef3f124b429f751d96df8b3299ff185491fda2463f3a2f754e2879",
     "data-commerce-labels.json": "5155567d136dedbf4dc78ab99e7b35a7748a5b1284b6c8577cd87d1a6c80c1e5",
     "data-commerce-messages.json": "4d1e7581b869c6f6f806638350d1f145948f738f93d44a4e0a75aa8b0f8cb637",
     "data-components-admin-SchedulePanel-labels.json": "5800653cc2886f2313e67babd9486fb8190ccbe74cd2f47a8c57877517aec97a",

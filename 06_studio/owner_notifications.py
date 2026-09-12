@@ -147,6 +147,8 @@ def enqueue_reservation(db, kind, row):
     sms_inbox.on_reservation(db, kind, row)
     import owner_wechat
     owner_wechat.on_reservation(db, kind, row)
+    import customer_notifications
+    customer_notifications.on_reservation(db,kind,row)
 
 
 def safe_text(value):

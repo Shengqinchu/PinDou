@@ -93,6 +93,9 @@ def initialize():
     studio_staff.initialize(database)
     import studio_finance
     studio_finance.initialize(database)
+    import studio_messages,customer_notifications
+    studio_messages.initialize(database)
+    customer_notifications.initialize(database)
 
 
 @asynccontextmanager
@@ -109,12 +112,15 @@ async def lifespan(_app):
     telegram_notifier=asyncio.create_task(owner_notifications.worker(database,'telegram'))
     import owner_wechat
     miniapp_notifier=asyncio.create_task(owner_wechat.worker(database))
+    import customer_notifications
+    customer_notifier=asyncio.create_task(customer_notifications.worker(database))
     yield
     worker.cancel()
     importer.cancel()
     notifier.cancel()
     telegram_notifier.cancel()
     miniapp_notifier.cancel()
+    customer_notifier.cancel()
     with contextlib.suppress(asyncio.CancelledError):
         await worker
     with contextlib.suppress(asyncio.CancelledError):
@@ -125,6 +131,8 @@ async def lifespan(_app):
         await telegram_notifier
     with contextlib.suppress(asyncio.CancelledError):
         await miniapp_notifier
+    with contextlib.suppress(asyncio.CancelledError):
+        await customer_notifier
 
 
 app = FastAPI(title="PinDou Puppy Studio", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
@@ -356,3 +364,6 @@ import studio_staff
 studio_staff.register(app, database, admin_actor)
 import studio_finance
 studio_finance.register(app, database, admin_actor)
+import studio_messages,customer_notifications
+studio_messages.register(app,database,admin_actor)
+customer_notifications.register(app,database,admin_actor)

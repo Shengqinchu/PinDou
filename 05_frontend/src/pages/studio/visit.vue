@@ -4,6 +4,7 @@ import StudioShell from '../../components/StudioShell.vue';
 import StudioGlyph from '../../components/StudioGlyph.vue';
 import StudioCalendar from '../../components/StudioCalendar.vue';
 import StudioSubmitConfirm from '../../components/StudioSubmitConfirm.vue';
+import StudioNotificationChoices from '../../components/StudioNotificationChoices.vue';
 import { useUserStore } from '../../store/user';
 import { useStudioNative } from '../../utils/studio-native';
 import { useStudioVisit } from '../../utils/use-studio-visit';
@@ -61,6 +62,7 @@ function editContact(){flow.editing=true;}
     </template>
     <view v-else class="studio-native-section"><text class="studio-native-subtitle">{{words('account','reservation_title')}}</text><text class="studio-native-body">{{words('account','draft_saved')}}</text></view>
     <text class="studio-native-body studio-native-small">{{words('flow','confirmation_note')}}</text>
+    <StudioNotificationChoices v-if="user.token" compact :language="language" :method="flow.contact.contact_method" :contact="flow.contact.contact"/>
    </template>
    <text v-if="flow.errorCode" class="studio-native-error" role="alert">{{error}}</text>
   </view>

@@ -17,6 +17,7 @@ import miniapp from '../../../05_studio/src/content/miniapp.json';
 import rates from '../../../05_studio/src/content/experience-rates.json';
 import studio from '../../../05_studio/src/content/studio-profile.json';
 import profile from '../../../05_studio/src/content/profile.json';
+import notifications from '../../../05_studio/src/content/customer-notifications.json';
 
 const defaults={home,visit,flow,calendar,receipt,cancellation,booking,account,wallet,app,details,errors,generic,miniapp,profile};
 const names:Record<keyof typeof defaults,string>={home:'pages-Home',visit:'pages-Visit',flow:'visit-flow',calendar:'components-ReservationCalendar',receipt:'pages-ReservationReceipt',cancellation:'reservation-cancellation',booking:'booking-profile',account:'account',wallet:'wallet',app:'App',details:'pages-Details',errors:'data-commerce-messages',generic:'commerce',miniapp:'miniapp',profile:'profile'};
@@ -43,6 +44,7 @@ export function studioPhoto(){
 }
 export const studioProfile=studio;
 export function bookingError(code:string):string[]{
+  if(code in notifications)return (notifications as Record<string,string[]>)[code];
   if(code==='booking_profile_changed')return booking.changed;
   if(code==='booking_contact_invalid')return booking.incomplete;
   for(const group of ['errors','cancellation','account','miniapp'] as const)if(code in defaults[group])return studioWords(group,code);

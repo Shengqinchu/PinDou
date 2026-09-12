@@ -13,7 +13,7 @@ export function invalidateAdminViews(path:string){
  currentScope();
  const keys=path.startsWith('/manage/finance')?['home','finance']:
  path.startsWith('/manage/reservations')?['home','reservations','calendar','finance','members']:
- path.startsWith('/manage/messages')?['home','messages']:
+ path.startsWith('/manage/messages')||path.startsWith('/manage/site-messages')?['home','messages']:
  path.startsWith('/manage/members')?['home','members']:[];
  for(const key of keys)revisions.set(key,(revisions.get(key)||0)+1);
 }

@@ -6,6 +6,7 @@ import {useStudioNative} from '../../utils/studio-native';
 import {adminCall,adminError,goAdmin} from '../../utils/studio-admin';
 import {adminView} from '../../utils/studio-admin-cache';
 import copy from '../../../../05_studio/src/content/messaging.json';
+import notices from '../../../../05_studio/src/content/customer-notifications.json';
 const {language,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();
 type State={data:any;query:string;unread:boolean;adding:boolean;phone:string;name:string};
 const view=adminView<State>('messages'),saved=view.snapshot;
@@ -17,7 +18,7 @@ function stop(){active=false;clearInterval(timer);timer=undefined;remember();}
 onShow(()=>{active=true;void load(false,false);clearInterval(timer);timer=setInterval(()=>{if(active&&!busy.value)void load();},5000);});onHide(stop);onUnload(()=>{stop();alive=false;sequence++;});
 </script>
 <template><StudioAdminShell :title="say(copy.title)" active="messages" :language="language" :shell-style="shellStyle" :keyboard-open="keyboardOpen" :busy="busy&&!data" :error="error" @refresh="load()" @language="changeLanguage">
- <input v-model="query" class="admin-input" :placeholder="say(copy.search)" confirm-type="search" @confirm="load()"/>
+ <button class="admin-secondary" style="margin-bottom:12px" @tap="goAdmin('-site-messages')">{{say(notices.site_messages)}}</button><input v-model="query" class="admin-input" :placeholder="say(copy.search)" confirm-type="search" @confirm="load()"/>
  <view class="admin-filters"><button :class="{chosen:!unread}" @tap="unread=false;load()">{{say(copy.all)}}</button><button :class="{chosen:unread}" @tap="unread=true;load()">{{say(copy.unread)}}</button><button @tap="adding=!adding">+ {{say(copy.new_conversation)}}</button></view>
  <view v-if="adding" class="admin-card admin-stack"><input v-model="name" class="admin-input" :placeholder="say(copy.name)" maxlength="80"/><input v-model="phone" class="admin-input" type="text" :placeholder="say(copy.phone)" maxlength="40"/><text class="admin-muted">{{say(copy.number_hint)}}</text><text class="admin-muted">{{say(copy.sync_hint)}}</text><button class="admin-primary" :disabled="busy||!phone.trim()" @tap="create">{{say(copy.connect)}}</button></view>
  <text v-if="data?.bridge" class="admin-muted">{{say(data.bridge.online?copy.online:copy.offline)}} · {{data.bridge.sender}}</text>

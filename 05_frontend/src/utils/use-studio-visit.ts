@@ -1,5 +1,6 @@
 import { computed, reactive, ref, shallowRef,watch } from 'vue';
 import { onShow, onHide, onUnload } from '@dcloudio/uni-app';
+import {saveNotifications,subscribeWechat} from './customer-notifications';
 import { useUserStore } from '../store/user';
 import { MiniappError, studioCall } from './miniapp-client';
 import {peekStudioSnapshot,readStudioCached,invalidateStudioSnapshots,rememberStudioSnapshot} from './studio-cache';
@@ -14,7 +15,8 @@ export function useStudioVisit(language:{value:string}){
   let alive=true,visible=true,calendarSeq=0,contactSeq=0,owner='',ownerToken='',timer:ReturnType<typeof setInterval>|undefined,restoring=false,resolveConfirmation:((value:boolean)=>void)|undefined;
   function settleConfirmation(value:boolean){const resolve=resolveConfirmation;resolveConfirmation=undefined;confirmation.value=null;resolve?.(value);}
   function dismissSubmission(){settleConfirmation(false);}
-  function confirmSubmission(){settleConfirmation(true);}
+  let confirming=false;
+  async function confirmSubmission(){if(confirming)return;confirming=true;try{await subscribeWechat(user.token);}catch{}finally{confirming=false;settleConfirmation(true);}}
   function review(body:Payload){return new Promise<boolean>(resolve=>{if(!alive||!visible){resolve(false);return;}resolveConfirmation=resolve;confirmation.value=body;});}
   const locked=computed(()=>sending.value||!!attempt.value);
   const selected=computed(()=>!loading.value&&!calendarError.value&&validBooking(calendar.value,booking));
@@ -112,6 +114,7 @@ export function useStudioVisit(language:{value:string}){
       }else if(!await loadCalendar(true))return;
       if(!alive||token!==user.token)return;
       const request=attempt.value!;
+      await saveNotifications(token);
       const result=await studioCall<Receipt>('/reservations',request.body,'',token,'POST',{'Idempotency-Key':request.key});
       if(token!==user.token)return;
       invalidateStudioSnapshots(token);rememberStudioSnapshot('/reservations/'+result.id,token,result);

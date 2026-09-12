@@ -488,6 +488,11 @@ def register(app, database, admin_actor):
             job = db.execute("SELECT * FROM studio_sms_jobs WHERE bridge_id=? AND state='queued' ORDER BY created_at,id LIMIT 1", (bridge["id"],)).fetchone()
             if not job:
                 return {"job": None}
+            import customer_notifications
+            if not customer_notifications.valid_sms(db,job):
+                db.execute("UPDATE studio_sms_jobs SET state='skipped',error='superseded' WHERE id=?",(job['id'],))
+                if job['message_id']:db.execute("UPDATE studio_sms_messages SET state='skipped',error='superseded' WHERE id=?",(job['message_id'],))
+                return {'job':None}
             if job["notification_key"]:
                 reservation = db.execute("SELECT status,deleted_at FROM studio_reservations WHERE id=?", (job["reservation_id"],)).fetchone()
                 current = db.execute("SELECT * FROM studio_sms_settings WHERE id=1").fetchone()
@@ -516,6 +521,11 @@ def register(app, database, admin_actor):
             current_bridge = db.execute("SELECT enabled,send_enabled FROM studio_sms_bridges WHERE id=?", (bridge["id"],)).fetchone()
             if not current_bridge["enabled"] or not current_bridge["send_enabled"] or job["lease_until"] < stamp or job["expires_at"] <= stamp:
                 raise HTTPException(409, "sms_claim_expired")
+            import customer_notifications
+            if not customer_notifications.valid_sms(db,job):
+                db.execute("UPDATE studio_sms_jobs SET state='skipped',error='superseded' WHERE id=?",(ident,))
+                if job['message_id']:db.execute("UPDATE studio_sms_messages SET state='skipped',error='superseded' WHERE id=?",(job['message_id'],))
+                return {'send':False,'state':'skipped'}
             if job["notification_key"]:
                 reservation = db.execute("SELECT status,deleted_at FROM studio_reservations WHERE id=?", (job["reservation_id"],)).fetchone()
                 current = db.execute("SELECT * FROM studio_sms_settings WHERE id=1").fetchone()

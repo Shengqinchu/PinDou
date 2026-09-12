@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import notices from '../../content/customer-notifications.json';
 import {computed,nextTick,onActivated,onBeforeUnmount,onDeactivated,onMounted,reactive,ref,watch} from 'vue';
 import {useRoute} from 'vue-router';
 import {register} from 'vue-advanced-chat';
@@ -26,7 +27,7 @@ const room=computed(()=>selected.value?[{roomId:selected.value.id,roomName:selec
 const stateLabel=(state:string)=>say((copy as Record<string,string[]>)[state]||copy.unknown);
 const dateText=(stamp:number)=>new Intl.DateTimeFormat(locale.value==='zh'?'zh-CN':'en-CA',{timeZone:'America/Toronto',month:'short',day:'numeric'}).format(stamp*1000);
 const timeText=(stamp:number)=>new Intl.DateTimeFormat(locale.value==='zh'?'zh-CN':'en-CA',{timeZone:'America/Toronto',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp*1000);
-const chatMessages=computed(()=>messages.value.map(m=>({_id:m.id,indexId:m.seq,content:m.content,senderId:m.direction==='outbound'?'owner':'customer',username:[m.channel,say(m.source==='desk'?copy.desk_source:copy.phone_source),m.direction==='outbound'?stateLabel(m.state):''].filter(Boolean).join(' · '),date:dateText(m.created_at),timestamp:timeText(m.created_at),saved:['sent','delivered'].includes(m.state),distributed:m.state==='delivered',seen:false,disableActions:true,disableReactions:true})));
+const chatMessages=computed(()=>messages.value.map(m=>({_id:m.id,indexId:m.seq,content:m.content,senderId:m.direction==='outbound'?'owner':'customer',username:[m.channel,say(m.source==='notification'?notices.automatic:m.source==='desk'?copy.desk_source:copy.phone_source),m.direction==='outbound'?stateLabel(m.state):''].filter(Boolean).join(' · '),date:dateText(m.created_at),timestamp:timeText(m.created_at),saved:['sent','delivered'].includes(m.state),distributed:m.state==='delivered',seen:false,disableActions:true,disableReactions:true})));
 const textMessages=computed(()=>({ROOMS_EMPTY:say(copy.empty),ROOM_EMPTY:say(copy.no_messages),NEW_MESSAGES:say(copy.new_messages),MESSAGE_DELETED:'',MESSAGES_EMPTY:say(copy.no_messages),CONVERSATION_STARTED:'',TYPE_MESSAGE:say(copy.write),SEARCH:say(copy.search),IS_ONLINE:say(copy.online),LAST_SEEN:'',IS_TYPING:'',CANCEL_SELECT_MESSAGE:say(copy.cancel)}));
 const chatStyles={general:{background:'#ffffff',color:'#29343a',borderStyle:'none'},container:{borderRadius:'0',boxShadow:'none'},content:{background:'#ffffff'},message:{background:'#f1f5f7',backgroundMe:'#e8f2f8',color:'#29343a',colorMe:'#29343a'}};
 let interval:ReturnType<typeof setInterval>|undefined,messageInterval:ReturnType<typeof setInterval>|undefined,searchTimer:ReturnType<typeof setTimeout>|undefined,active=true,listSequence=0,messageSequence=0,loadedThread='',listBusy=false,messageBusy=false;

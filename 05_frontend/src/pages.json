@@ -89,6 +89,46 @@
       }
     },
     {
+      "path": "pages/studio/manage-notifications",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/studio/manage-site-messages",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/studio/notifications",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/studio/messages",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7fafc",
+        "disableScroll": true
+      }
+    },
+    {
       "path": "pages/studio/manage",
       "style": {
         "navigationBarTitleText": "小狗拼豆铺",

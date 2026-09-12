@@ -7,6 +7,7 @@ import { copy,words,guestCount } from './copy';
 import BookingContactFields from '../components/BookingContactFields.vue';
 import { bookingProfileCopy as profileCopy,contactMethodLabel } from '../booking-profile';
 import MoneyText from '../components/MoneyText.vue';
+import NotificationPreferences from '../components/NotificationPreferences.vue';
 import type { VisitFlow } from './useVisitFlow';
 const props=defineProps<{flow:VisitFlow}>();
 const fields=ref<InstanceType<typeof BookingContactFields>>();
@@ -21,4 +22,5 @@ async function edit(){props.flow.beginDetailsEdit();await nextTick();fields.valu
  <template v-else-if="!flow.contactLoading||flow.attempt"><BookingContactFields ref="fields" class="visit-contact" :model-value="flow.draft" @update:model-value="flow.editDetails" :name-label="say(words.guest_name_e468f6)" :disabled="flow.locked"/><button v-if="flow.contactProfile?.complete&&!flow.attempt" type="button" class="text-link visit-contact-cancel" :disabled="flow.locked" @click="flow.useSavedDetails()">{{say(profileCopy.cancel)}}</button></template>
  <details class="visit-notes"><summary>{{say(words.anything_you_would_like_us_to_know_eef3ab)}}</summary><textarea v-model="flow.draft.notes" :aria-label="say(words.anything_you_would_like_us_to_know_eef3ab)" rows="2" maxlength="1500"/></details>
  <p class="visit-confirmation-note">{{say(copy.confirmation_note)}}</p>
+ <NotificationPreferences compact :method="flow.draft.contact_method" :contact="flow.draft.contact"/>
 </template>

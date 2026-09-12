@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import notices from '../../../../05_studio/src/content/customer-notifications.json';
 import {nextTick,ref} from 'vue';
 import {onLoad,onShow,onHide,onUnload} from '@dcloudio/uni-app';
 import StudioAdminShell from '../../components/StudioAdminShell.vue';
@@ -30,7 +31,7 @@ onLoad(q=>{ident=typeof q?.id==='string'?q.id:'';});onShow(()=>{active=true;void
  <view v-if="thread" class="admin-row native-chat-tools"><text class="admin-muted">{{thread.phone}}</text><button class="admin-secondary" @tap="handled">{{say(thread.status==='open'?copy.close:copy.reopen)}}</button></view>
  <view v-if="thread?.reservations?.length" class="admin-card admin-stack"><button class="admin-row" @tap="showBookings=!showBookings"><text>{{say(copy.reservation)}} · {{thread.reservations.length}}</text><text>{{showBookings?'−':'+'}}</text></button><template v-if="showBookings"><button v-for="booking in thread.reservations" :key="booking.id" class="admin-secondary" @tap="goAdmin('-reservation','id='+booking.id)">{{booking.name}} · {{booking.booking.date}}</button></template></view>
  <button v-if="before" class="admin-secondary" :disabled="busy" @tap="load(true)">{{say(workbenchCopy.more)}}</button>
- <view v-for="message in messages" :key="message.id" :id="'message-'+message.id" :class="['native-chat-line',{'is-outbound':message.direction==='outbound'}]"><view class="native-chat-bubble"><text class="admin-muted">{{message.channel}} · {{say(message.source==='desk'?copy.desk_source:copy.phone_source)}}</text><text class="native-chat-content" selectable>{{message.content}}</text><text class="native-chat-time">{{dateText(message.created_at)}}<text v-if="message.direction==='outbound'"> · {{words(message.state)}}</text></text></view></view>
+ <view v-for="message in messages" :key="message.id" :id="'message-'+message.id" :class="['native-chat-line',{'is-outbound':message.direction==='outbound'}]"><view class="native-chat-bubble"><text class="admin-muted">{{message.channel}} · {{say(message.source==='notification'?notices.automatic:message.source==='desk'?copy.desk_source:copy.phone_source)}}</text><text class="native-chat-content" selectable>{{message.content}}</text><text class="native-chat-time">{{dateText(message.created_at)}}<text v-if="message.direction==='outbound'"> · {{words(message.state)}}</text></text></view></view>
  <view v-if="!busy&&!messages.length" class="admin-empty">{{say(copy.no_messages)}}</view>
  <template #actions><view class="native-chat-composer"><textarea v-model="draft" class="admin-textarea" :placeholder="say(copy.write)" maxlength="2000" :adjust-position="false" :disabled="sending"/><button class="admin-primary" :disabled="sending||!draft.trim()||!bridge?.send_enabled" hover-class="admin-pressed" @tap="send">{{say(sending?copy.sending:copy.send)}}</button></view></template>
  </StudioAdminShell></template>
