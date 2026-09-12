@@ -8,15 +8,33 @@ import { shopWords as w, shopImage, loadShop, type ShopCatalog, type ShopProduct
 import { uploadMedia } from '../../editor';
 import MediaUpload from './MediaUpload.vue';
 import SlideOver from '../SlideOver.vue';
+import ShopBatchEditor from './ShopBatchEditor.vue';
+import { contentModule } from '../../content-store';
+import batchDefaults from '../../content/shop-batch.json';
 import '../../styles/shop.css';
+import '../../styles/shop-batch.css';
 defineProps<{active?:boolean}>();
 const {request}=useDesk();
+const b=contentModule('shop-batch',batchDefaults);
+const selected=ref<string[]>([]),batchOpen=ref(false),batchProducts=ref<ShopProduct[]>([]),priceState=ref('all'),imageState=ref('all');
 const data=ref<ShopCatalog>(),busy=ref(false),error=ref(''),success=ref(''),search=ref(''),collection=ref('all'),category=ref('all');
 const categoryMode=ref(false),edit=ref<ShopProduct>(),categoryEdit=ref<ShopCategory>(),open=ref(false),categoryOpen=ref(false),price=ref('');
 const drafts=new Map<string,{product:ShopProduct;price:string}>();
 const clone=<T,>(v:T):T=>JSON.parse(JSON.stringify(v));
 const leaves=computed(()=>data.value?.categories.filter(c=>c.parent_id)||[]);
-const visible=computed(()=>data.value?.products.filter(p=>(collection.value==='all'||p.shop_collection===collection.value)&&(category.value==='all'||p.shop_category_id===category.value)&&`${p.zh} ${p.en} ${p.code}`.toLowerCase().includes(search.value.trim().toLowerCase()))||[]);
+const visible=computed(()=>data.value?.products.filter(p=>(collection.value==='all'||p.shop_collection===collection.value)&&(category.value==='all'||p.shop_category_id===category.value)&&(priceState.value==='all'||(priceState.value==='unpriced'?p.price_cents===null:p.price_cents!==null))&&(imageState.value==='all'||(imageState.value==='missing'?!p.images.length:!!p.images.length))&&`${p.zh} ${p.en} ${p.code}`.toLowerCase().includes(search.value.trim().toLowerCase()))||[]);
+const allSelected=computed(()=>!!visible.value.length&&visible.value.every(p=>selected.value.includes(p.id)));
+function selectFiltered(){const ids=new Set(visible.value.map(p=>p.id));selected.value=allSelected.value?selected.value.filter(id=>!ids.has(id)):[...new Set([...selected.value,...ids])];}
+async function startBatch(){
+ if(busy.value)return;const ids=[...selected.value];keepDraft();busy.value=true;error.value='';
+ try{
+  data.value=await request<ShopCatalog>('/manage/shop');
+  batchProducts.value=clone(data.value.products.filter(p=>ids.includes(p.id)));
+  for(const p of batchProducts.value){const d=drafts.get(p.id);if(d&&JSON.stringify(d.product)===JSON.stringify(p)&&d.price===(p.price_cents===null?'':String(p.price_cents/100)))drafts.delete(p.id);}
+  batchOpen.value=!!batchProducts.value.length;
+ }catch(e){fail(e)}finally{busy.value=false;}
+}
+async function batchSaved(count:number){edit.value=undefined;await refresh();void loadShop(true).catch(()=>{});success.value=formatCopy(b.saved,{v0:count});selected.value=[];}
 const roots=computed(()=>data.value?.categories.filter(c=>!c.parent_id&&c.id!==categoryEdit.value?.id)||[]);
 function fail(e:unknown){const x=e as CommerceError;error.value=say(x.code==='version_conflict'?w.conflict:x.code==='shop_category_invalid'?w.invalidCategory:x.code==='shop_category_in_use'?w.categoryUsed:[])||x.message;}
 async function refresh(){error.value='';try{data.value=await request<ShopCatalog>('/manage/shop')}catch(e){fail(e)}}
@@ -43,7 +61,7 @@ function cover(index:number){if(!edit.value||busy.value)return;edit.value.images
 function editCat(c?:ShopCategory){if(busy.value)return;categoryEdit.value=clone(c||{id:'category-'+crypto.randomUUID().slice(0,12),parent_id:null,zh:'',en:'',visible:true,version:1,sort:50});error.value='';success.value='';categoryOpen.value=true;}
 async function saveCat(){if(!categoryEdit.value||busy.value)return;busy.value=true;error.value='';try{await request('/manage/shop/categories/'+categoryEdit.value.id,{method:'PUT',body:JSON.stringify(categoryEdit.value)});await refresh();void loadShop(true).catch(()=>{});categoryOpen.value=false;success.value=say(w.saved)}catch(e){fail(e)}finally{busy.value=false}}
 async function reloadCat(){const id=categoryEdit.value?.id;await refresh();const c=data.value?.categories.find(c=>c.id===id);if(c)editCat(c)}
-onMounted(refresh);onDeactivated(()=>{keepDraft();open.value=false;categoryOpen.value=false;});defineExpose({refresh});
+onMounted(refresh);onDeactivated(()=>{keepDraft();open.value=false;categoryOpen.value=false;batchOpen.value=false;});defineExpose({refresh});
 </script>
 <template>
  <section class="shop-admin">
@@ -52,12 +70,14 @@ onMounted(refresh);onDeactivated(()=>{keepDraft();open.value=false;categoryOpen.
   <p v-if="error&&!open&&!categoryOpen" role="alert" class="shop-error">{{error}}</p><p v-if="success" role="status">{{success}}</p>
   <template v-if="!categoryMode">
    <div class="shop-admin-tools"><select v-model="collection" :aria-label="say(w.collection)"><option value="all">{{say(w.all)}}</option><option v-for="s in (['home','finished','services'] as const)" :key="s" :value="s">{{say(w[s])}}</option></select><select v-model="category" :aria-label="say(w.category)"><option value="all">{{say(w.all)}}</option><option v-for="c in leaves" :key="c.id" :value="c.id">{{tr(c.zh,c.en)}}</option></select><input v-model="search" type="search" :placeholder="say(w.search)" :aria-label="say(w.search)"/></div>
-   <p class="shop-notice">{{formatCopy(w.count,{v0:visible.length})}}</p>
-   <div class="shop-admin-list"><button v-for="p in visible" :key="p.id" class="shop-admin-row" @click="editProduct(p)"><img v-if="p.images.length" :src="shopImage(p.images[0])" alt="" loading="lazy"/><span v-else class="shop-bag-thumb">{{p.code||'—'}}</span><span><strong>{{tr(p.zh,p.en)}}</strong><small>{{p.code}}</small></span><span>{{p.price_cents===null?say(w.unpriced):money(p.price_cents)}}</span><span>{{say(p.shop_visible?w.visible:w.hidden)}}<PhPencilSimple/></span></button></div>
+   <div class="shop-admin-tools"><select v-model="priceState" :aria-label="say(b.priceState)"><option value="all">{{say(b.priceState)}} · {{say(w.all)}}</option><option value="unpriced">{{say(b.unpriced)}}</option><option value="priced">{{say(b.priced)}}</option></select><select v-model="imageState" :aria-label="say(b.imageState)"><option value="all">{{say(b.imageState)}} · {{say(w.all)}}</option><option value="missing">{{say(b.missing)}}</option><option value="has-image">{{say(b.hasImage)}}</option></select></div>
+   <div class="shop-selection-bar"><label><input type="checkbox" :checked="allSelected" :disabled="busy" @change="selectFiltered"/>{{say(b.selectFiltered)}}</label><span>{{formatCopy(b.selected,{v0:selected.length})}} / {{formatCopy(w.count,{v0:visible.length})}}</span><button class="desk-button secondary" :disabled="busy||!selected.length" @click="selected=[]">{{say(b.clear)}}</button><button class="desk-button primary" :disabled="busy||!selected.length||selected.length>500" @click="startBatch">{{say(b.edit)}}</button></div>
+   <div class="shop-admin-list"><div v-for="p in visible" :key="p.id" class="shop-select-row"><input v-model="selected" type="checkbox" :value="p.id" :aria-label="formatCopy(b.select,{v0:tr(p.zh,p.en)})"/><button class="shop-admin-row" @click="editProduct(p)"><img v-if="p.images.length" :src="shopImage(p.images[0])" alt="" loading="lazy"/><span v-else class="shop-bag-thumb">{{p.code||'—'}}</span><span><strong>{{tr(p.zh,p.en)}}</strong><small>{{p.code}}</small></span><span>{{p.price_cents===null?say(w.unpriced):money(p.price_cents)}}</span><span>{{say(p.shop_visible?w.visible:w.hidden)}}<PhPencilSimple/></span></button></div></div>
    <p v-if="!visible.length" class="shop-state">{{say(w.noMatch)}}</p>
   </template>
   <div v-else class="shop-admin-categories"><button v-for="c in data?.categories" :key="c.id" :class="{child:c.parent_id}" @click="editCat(c)">{{tr(c.zh,c.en)}}<small v-if="!c.visible"> · {{say(w.hidden)}}</small></button></div>
  </section>
+ <ShopBatchEditor v-model="batchOpen" :products="batchProducts" @saved="batchSaved"/>
  <SlideOver v-model="open" :title="say(w.editProduct)" :busy="busy">
   <form v-if="edit" id="shop-product-editor" class="shop-edit-form" @submit.prevent="save">
    <div class="shop-edit-pair"><label>{{say(w.nameZh)}}<input v-model="edit.zh" maxlength="90" required/></label><label>{{say(w.nameEn)}}<input v-model="edit.en" maxlength="140" required/></label></div>

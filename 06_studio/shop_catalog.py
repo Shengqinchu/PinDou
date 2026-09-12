@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import json
+import uuid
 from pathlib import Path
+from typing import Literal
 from fastapi import Depends
-from pydantic import Field
+from pydantic import Field, ValidationError, model_validator
 import commerce
 
 database = None
@@ -18,6 +20,30 @@ class Category(commerce.Strict):
     sort: int = Field(default=0, ge=0, le=100000, strict=True)
     visible: bool = True
     version: int = Field(default=1, ge=1, strict=True)
+
+
+class ProductChange(commerce.Strict):
+    id: str = Field(pattern=r"^[a-z][a-z0-9_-]{0,39}$")
+    version: int = Field(ge=1, strict=True)
+    price_cents: int | None = Field(default=None, ge=1, le=1000000, strict=True)
+    images: list[str] | None = Field(default=None, max_length=12)
+    image_mode: Literal['append', 'replace'] = 'append'
+
+    @model_validator(mode='after')
+    def changed_fields(self):
+        if 'price_cents' not in self.model_fields_set and self.images is None:
+            raise ValueError('Choose a price or image change')
+        return self
+
+
+class ProductBatch(commerce.Strict):
+    items: list[ProductChange] = Field(min_length=1, max_length=500)
+
+    @model_validator(mode='after')
+    def unique_products(self):
+        if len({p.id for p in self.items}) != len(self.items):
+            raise ValueError('Duplicate products')
+        return self
 
 
 def initialize(db_func):
@@ -67,6 +93,48 @@ def catalog_for(db, admin=False):
 
 
 def register(app, admin_actor):
+    @app.patch('/studio-api/manage/shop/products/batch')
+    def update_products(payload: ProductBatch, actor=Depends(admin_actor)):
+        batch_id = uuid.uuid4().hex
+        with database() as db:
+            db.execute('BEGIN IMMEDIATE')
+            changes = []
+            # Validate the complete selection before any product or audit write.
+            for patch in payload.items:
+                row = db.execute('SELECT payload FROM commerce_products WHERE id=?', (patch.id,)).fetchone()
+                if not row:
+                    commerce.fail('product_unavailable', 404)
+                old = json.loads(row[0])
+                if not old.get('shop_collection'):
+                    commerce.fail('invalid_product', 422)
+                if old['version'] != patch.version:
+                    commerce.fail('version_conflict')
+                value = dict(old)
+                if 'price_cents' in patch.model_fields_set:
+                    value['price_cents'] = patch.price_cents
+                if patch.images is not None:
+                    images = (value.get('images', []) if patch.image_mode == 'append' else []) + patch.images
+                    value['images'] = list(dict.fromkeys(images))
+                    if len(value['images']) > 12:
+                        commerce.fail('shop_too_many_images', 422)
+                    value['image'] = value['images'][0] if value['images'] else ''
+                # Preserve title, stock, visibility and payment flags.
+                try:
+                    product = commerce.Product.model_validate(value)
+                except ValidationError:
+                    commerce.fail('invalid_product', 422)
+                validate_product_category(db, product)
+                normalized = product.model_dump()
+                if normalized == commerce.Product.model_validate(old).model_dump():
+                    continue
+                normalized['version'] += 1
+                changes.append((patch.id, old, normalized))
+            for product_id, old, value in changes:
+                db.execute('UPDATE commerce_products SET payload=? WHERE id=?', (json.dumps(value, ensure_ascii=False), product_id))
+                commerce.audit(db, product_id, 'shop_product_batch_updated', actor,
+                               json.dumps({'batch_id':batch_id, 'before':old, 'after':value}, ensure_ascii=False))
+        return {'batch_id':batch_id, 'updated':len(changes), 'products':[v for _,_,v in changes]}
+
     @app.get('/studio-api/shop/catalog')
     def public_catalog():
         with database() as db:
