@@ -219,6 +219,7 @@ const walletItems = computed(()=>[
 <style scoped>
 .tutorial-page {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: clamp(18px, 3vw, 28px);
   padding-bottom: 36px;
 }
@@ -226,6 +227,7 @@ const walletItems = computed(()=>[
 .tutorial-hero,
 .tutorial-section,
 .tutorial-cta {
+  min-width: 0;
   border: 1px solid rgba(242, 247, 250, 0.88);
   border-radius: 30px;
   background:
@@ -245,6 +247,8 @@ const walletItems = computed(()=>[
 
 .tutorial-hero__copy {
   display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-content: center;
 }
@@ -606,7 +610,13 @@ const walletItems = computed(()=>[
 }
 
 .tutorial-cta {
+  grid-template-columns: minmax(0, 1fr);
   justify-items: start;
+}
+
+.tutorial-cta > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .tutorial-cta .pd-btn {
@@ -616,11 +626,11 @@ const walletItems = computed(()=>[
 
 @media (max-width: 900px) {
   .tutorial-hero {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .wallet-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .wallet-card {
@@ -647,11 +657,11 @@ const walletItems = computed(()=>[
   .mode-grid,
   .tutorial-screenshot-pair,
   .faq-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .wallet-card {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .tutorial-anchor-nav {

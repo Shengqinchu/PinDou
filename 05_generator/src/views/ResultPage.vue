@@ -208,7 +208,7 @@ async function downloadPattern(): Promise<void> {
           <dl class="result-stats" :aria-label='gt("图纸摘要")'>
             <div>
               <dt>{{ gt("尺寸") }}</dt>
-              <dd>{{ gt(selectedSizeNumber) }}</dd>
+              <dd class="result-size-number">{{ gt(selectedSizeNumber) }}</dd>
               <small>{{ gt("格") }}</small>
             </div>
             <div>
@@ -825,6 +825,7 @@ async function downloadPattern(): Promise<void> {
 
 .result-stats div {
   display: grid;
+  container-type: inline-size;
   min-width: 0;
   min-height: 104px;
   align-content: center;
@@ -860,6 +861,13 @@ async function downloadPattern(): Promise<void> {
   color: var(--pd-fg-2);
   font-size: 12px;
   font-weight: 600;
+}
+
+/* The complete grid size is useful data, including three-digit presets. */
+.result-stats dd.result-size-number {
+  font-size: clamp(12px, 17cqi, 28px);
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .palette-heading {

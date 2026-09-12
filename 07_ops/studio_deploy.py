@@ -34,6 +34,48 @@ def switch_link(link, target):
     temporary.replace(link)
 
 
+def retain_static_assets(releases: Path, history: Path):
+    """Keep manifest-verified public assets usable by already-open browser tabs."""
+    history.mkdir(parents=True, exist_ok=True)
+    history.chmod(0o755)
+    seen = {}
+    added = 0
+    for release in sorted(releases.iterdir()):
+        manifest_path = release / "manifest.json"
+        if not re.fullmatch(r"[0-9]{14}-studio-v[1234567]", release.name) or not manifest_path.is_file():
+            continue
+        manifest = json.loads(manifest_path.read_text())
+        for name, digest in manifest["sha256"].items():
+            parts = Path(name).parts
+            if len(parts) < 4 or parts[:2] != ("site", "studio") or parts[2] not in ("studio-assets", "studio-fonts"):
+                continue
+            source = release / name
+            relative = Path(*parts[2:])
+            target = history / relative
+            if (not source.resolve().is_relative_to((release / "site/studio" / parts[2]).resolve())
+                    or not target.resolve().is_relative_to((history / parts[2]).resolve())
+                    or source.is_symlink() or target.is_symlink()):
+                raise RuntimeError("Unsafe static asset path")
+            if relative in seen:
+                if seen[relative] != digest:
+                    raise RuntimeError(f"Static asset name collision: {relative}")
+                continue
+            if hashlib.sha256(source.read_bytes()).hexdigest() != digest:
+                raise RuntimeError(f"Previous static asset changed: {relative}")
+            if target.exists():
+                if hashlib.sha256(target.read_bytes()).hexdigest() != digest:
+                    raise RuntimeError(f"Retained static asset changed: {relative}")
+            else:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                temporary = target.with_name(target.name + ".next")
+                shutil.copyfile(source, temporary)
+                temporary.chmod(0o644)
+                temporary.replace(target)
+                added += 1
+            seen[relative] = digest
+    return {"retained": len(seen), "added": added}
+
+
 def main():
     archive, version, expected_hash = sys.argv[1:4]
     if not re.fullmatch(r"[0-9]{14}-studio-v[1234567]", version):
@@ -98,6 +140,10 @@ def main():
             with sqlite3.connect(backup / "studio.sqlite3") as target_db:
                 source_db.backup(target_db)
         (backup / "studio.sqlite3").chmod(0o600)
+    # Lazy routes in an open tab still import the previous build's hashed files.
+    # Seed all verified releases once, then only add new filenames on later deploys.
+    retained = retain_static_assets(ROOT / "releases", ROOT / "static-history")
+    print(json.dumps({"static_history": retained}), flush=True)
     snippet = '''    # PinDou Studio preview (managed by studio_deploy.py)
     # VISION3: the public studio owns the homepage; generator paths remain below.
     location = / {
@@ -191,6 +237,12 @@ def main():
     }
     location ~ ^/(studio-assets|studio-fonts)/ {
         root /opt/pindou/studio/current/site/studio;
+        try_files $uri @studio_static_history;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        add_header X-Content-Type-Options nosniff;
+    }
+    location @studio_static_history {
+        root /opt/pindou/studio/static-history;
         try_files $uri =404;
         add_header Cache-Control "public, max-age=31536000, immutable";
         add_header X-Content-Type-Options nosniff;
@@ -201,7 +253,14 @@ def main():
         add_header Cache-Control "no-cache";
         add_header X-Content-Type-Options nosniff;
     }
-    location ~ ^/studio/(studio-assets|studio-fonts|studio-media|studio-brand|studio-journal)/ {
+    location ~ ^/studio/(studio-assets|studio-fonts)/ {
+        rewrite ^/studio/(.*)$ /$1 break;
+        root /opt/pindou/studio/current/site/studio;
+        try_files $uri @studio_static_history;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        add_header X-Content-Type-Options nosniff;
+    }
+    location ~ ^/studio/(studio-media|studio-brand|studio-journal)/ {
         root /opt/pindou/studio/current/site;
         try_files $uri =404;
         add_header Cache-Control "no-cache";

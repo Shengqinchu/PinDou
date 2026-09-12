@@ -1,13 +1,18 @@
-"""Offline tutorial fixture, using the existing Standard pattern algorithm."""
+"""Prepare the owner's approved Kitty example, without generating a paid artwork."""
 from pathlib import Path
-import json,sys
+import json,shutil
 root=Path(__file__).resolve().parents[2]
-sys.path.insert(0,str(root/'06_backend'))
-from pindou.pattern.builder import PatternBuilder
-from pindou.pattern.exporter import PatternExporter
-from pindou.providers.base import SizePreset
+fixture=Path(__file__).parent/'fixtures/generator-tutorial'
 out=root/'artifacts/generator-integration';out.mkdir(parents=True,exist_ok=True)
-sheet=PatternBuilder().build(SizePreset('52x52'),raw_image=(root/'01_research/tech/test_inputs/cartoon_synthetic.png').read_bytes(),mode='script')
-(out/'tutorial-pattern.json').write_text(json.dumps(sheet.to_frontend_dict(),ensure_ascii=False),encoding='utf-8')
-(out/'tutorial-pattern.png').write_bytes(PatternExporter().to_labeled_grid_png(sheet))
-print(json.dumps({'beads':sheet.bead_total,'colours':len(sheet.palette_used),'paid_requests':0}))
+data=json.loads((fixture/'kitty-pattern.json').read_text(encoding='utf-8'))
+palette={c['code']:c for c in data['palette_used']}
+grid=[[palette[code] if code else None for code in row] for row in data['grid']]
+counts={code:sum(cell==code for row in data['grid'] for cell in row) for code in palette}
+assert len(grid)==104 and all(len(row)==104 for row in grid)
+assert counts==data['color_counts'] and sum(counts.values())==6062
+pattern={'grid':grid,'palette_used':data['palette_used'],'color_counts':counts,
+         'bead_total':6062,'brand':'MARD','no_bead_mask':[[c is None for c in row] for row in grid],
+         'image_url':'/qa/pattern.png','metadata':{'labeled_image_url':'/qa/pattern.png'}}
+(out/'tutorial-pattern.json').write_text(json.dumps(pattern,ensure_ascii=False),encoding='utf-8')
+shutil.copyfile(fixture/'kitty-preview.png',out/'tutorial-pattern.png')
+print(json.dumps({'example':'Kitty','size':'104x104','beads':6062,'colours':len(palette),'paid_requests':0}))
