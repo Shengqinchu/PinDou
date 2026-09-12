@@ -2727,8 +2727,8 @@
       "Fully booked"
     ],
     "full_buffer": [
-      "满员时段前后 30 分钟不可预约。",
-      "The 30 minutes before and after a fully booked period are unavailable."
+      "满员时段前后 0.5 小时不可预约。",
+      "The 0.5 hours before and after a fully booked period are unavailable."
     ],
     "previous_dates_314fc5": [
       "上一组日期",
@@ -5955,8 +5955,8 @@
       "Time and payment"
     ],
     "time_is_measured_by_actual_making_time_8a7c82": [
-      "计时以实际拼豆时长为准，超出 15 分钟按半小时计。\n付款方式为现金，emt，或微信支付宝。",
-      "Time is measured by actual making time; more than 15 minutes counts as half an hour.\nPayment is accepted by cash, EMT, WeChat Pay or Alipay."
+      "计时以实际拼豆时长为准，超出 0.25 小时按 0.5 小时计。\n付款方式为现金，emt，或微信支付宝。",
+      "Time is measured by actual making time; more than 0.25 hours counts as 0.5 hours.\nPayment is accepted by cash, EMT, WeChat Pay or Alipay."
     ]
   },
   "pages-Home": {
@@ -7811,6 +7811,26 @@
     "wallet_redemption_use_required": [
       "请选择到店游玩或小店购物。",
       "Choose a studio visit or Little shop purchase."
+    ],
+    "actual_hours": [
+      "实际游玩时长（小时／人）",
+      "Actual time (hours per guest)"
+    ],
+    "time_hours": [
+      "时长（小时）",
+      "Time (hours)"
+    ],
+    "invalid_hours": [
+      "请填写有效的小时数，例如 0.5 或 1.5。",
+      "Enter valid hours, such as 0.5 or 1.5."
+    ],
+    "debit_hours_help": [
+      "填写正数，保存时会从余额中扣除。多人共用时，请填写合计消费小时数。",
+      "Enter a positive number to deduct. For shared time, enter the total hours used by all guests."
+    ],
+    "wallet_actual_hours_details_required": [
+      "请同时填写有效的游玩小时数和人数，例如 0.5 小时、1 人。",
+      "Enter valid hours and a guest count, such as 0.5 hours and 1 guest."
     ]
   },
   "wechat": {
@@ -8677,6 +8697,12 @@
     "copied": [
       "后台地址已复制",
       "Admin address copied"
+    ]
+  },
+  "workbench": {
+    "hours": [
+      "剩余 {count} 小时",
+      "{count} hours left"
     ]
   }
 }

@@ -5,6 +5,7 @@ import { PhArrowRight,PhArrowClockwise,PhWallet,PhCheck } from '@phosphor-icons/
 import { useDesk } from '../../admin';
 import { CommerceError } from '../../commerce';
 import { walletCopy as copy,duration,type WalletAccount,type WalletDetail,type WalletEntry,type WalletCategory } from '../../wallet';
+import { minutesFromHours } from '../../time-units';
 import { say,formatCopy,hamiltonDate } from '../../state';
 import { readSession,saveSession } from '../../reservations';
 import SlideOver from '../SlideOver.vue';
@@ -20,7 +21,7 @@ const members=ref<WalletAccount[]>([]),total=ref(0),page=ref(1),search=ref(''),b
 const selected=ref(''),open=ref(false),data=ref<WalletDetail>(),ledgerPage=ref(1),category=ref<WalletCategory>('all');
 const loading=ref(false),saving=ref(false),saveError=ref(''),saved=ref(false),showForm=ref(false);
 const redemptionUse=ref<'visit'|'shop'>('visit'),noPromotion=ref(false);
-const kind=ref('topup'),timeAmount=ref<number|''>(600),pointsAmount=ref<number|''>(0),redeemCad=ref<number|''>(1),bill=ref('');
+const kind=ref('topup'),timeHours=ref<number|string>(10),pointsAmount=ref<number|''>(0),redeemCad=ref<number|''>(1),bill=ref('');
 const note=ref(''),effective=ref(hamiltonDate()),reservation=ref(''),privateNote=ref(''),noteVersion=ref(1),reverseEntry=ref<WalletEntry>();
 const frozen=computed(()=>saving.value||!!pending.value);
 const editingBooking=ref(false),bookingDraft=ref(emptyContact()),bookingVersion=ref(0);
@@ -77,7 +78,8 @@ async function record(){
   let body:Record<string,unknown>={version:data.value.account.version,note:note.value.trim()};
   if(reverseEntry.value){path=`/manage/members/${encodeURIComponent(owner)}/entries/${reverseEntry.value.id}/reverse`;}
   else{
-    const m=Number(timeAmount.value||0),p=Number(pointsAmount.value||0);
+    const m=kind.value==='redeem'?0:minutesFromHours(timeHours.value),p=Number(pointsAmount.value||0);
+    if(m===null||Math.abs(m)>1000000||(kind.value!=='adjustment'&&m<0)){saveError.value=say(copy.invalid_hours);return;}
     body={...body,kind:kind.value,minutes_delta:kind.value==='redeem'?0:kind.value==='usage'?-m:m,
       points_delta:kind.value==='redeem'?-Number(redeemCad.value)*100:['gift','opening','adjustment'].includes(kind.value)?p:0,
       effective_date:effective.value,reservation_id:reservation.value.trim(),
@@ -92,7 +94,7 @@ async function saveNote(){
 }
 function beginEntry(){showForm.value=true;noPromotion.value=false;redemptionUse.value='visit';reverseEntry.value=undefined;saved.value=false;saveError.value='';note.value='';}
 function beginReverse(entry:WalletEntry){beginEntry();reverseEntry.value=entry;}
-watch(kind,()=>{noPromotion.value=false;pointsAmount.value=0;timeAmount.value=['usage','adjustment','gift'].includes(kind.value)?0:600;});
+watch(kind,()=>{noPromotion.value=false;pointsAmount.value=0;timeHours.value=['usage','adjustment','gift'].includes(kind.value)?0:10;});
 watch(search,()=>{clearTimeout(debounce);debounce=setTimeout(()=>{page.value=1;void load();},300);});
 watch([ledgerPage,category],()=>{if(open.value&&!saving.value)void loadDetail();});
 watch(()=>[props.active,route.query.member],()=>{
@@ -126,12 +128,12 @@ defineExpose({refresh:load});
           <template v-else>
             <label class="desk-field">{{say(copy.kind)}}<select v-model="kind" :disabled="frozen"><option v-for="key in kinds" :key="key" :value="key">{{label(key)}}</option></select></label>
             <div class="wallet-input-grid">
-              <label v-if="kind!=='redeem'" class="desk-field">{{say(copy.time_amount)}}<input v-model.number="timeAmount" type="number" :min="kind==='adjustment'?-1000000:0" max="1000000" step="1" required :disabled="frozen"/></label>
+              <label v-if="kind!=='redeem'" class="desk-field">{{say(copy.time_hours)}}<input v-model="timeHours" type="number" inputmode="decimal" :min="kind==='adjustment'?-1000000/60:0" :max="1000000/60" step="any" required :disabled="frozen"/></label>
               <label v-if="['opening','gift','adjustment'].includes(kind)" class="desk-field">{{say(copy.points_amount)}}<input v-model.number="pointsAmount" type="number" :min="kind==='adjustment'?-1000000:0" max="1000000" step="1" required :disabled="frozen"/></label>
               <template v-if="kind==='redeem'"><label class="desk-field">{{say(copy.redeem_cad)}}<input v-model.number="redeemCad" type="number" min="1" :max="data.account.redeemable_cad" step="1" required :disabled="frozen"/></label><label class="desk-field">{{say(copy.bill)}}<input v-model="bill" type="number" min="1" step="0.01" max="1000000" required :disabled="frozen"/></label></template>
             </div>
             <template v-if="kind==='redeem'"><label class="desk-field">{{say(copy.redemption_use)}}<select v-model="redemptionUse" :disabled="frozen"><option value="visit">{{say(copy.redeem_visit)}}</option><option value="shop">{{say(copy.redeem_shop)}}</option></select></label><label class="wallet-promotion-confirm"><input v-model="noPromotion" type="checkbox" required :disabled="frozen"/><span>{{say(copy.no_promotion)}}</span></label><p class="wallet-rule">{{say(copy.promotion_rule)}}</p></template>
-            <p v-if="kind==='usage'" class="wallet-rule">{{say(copy.debit_help)}}</p><p v-if="kind==='adjustment'" class="wallet-rule">{{say(copy.adjust_help)}}</p>
+            <p v-if="kind==='usage'" class="wallet-rule">{{say(copy.debit_hours_help)}}</p><p v-if="kind==='adjustment'" class="wallet-rule">{{say(copy.adjust_help)}}</p>
             <label class="desk-field">{{say(copy.date)}}<input v-model="effective" type="date" :max="hamiltonDate()" required :disabled="frozen"/></label>
             <label class="desk-field">{{say(copy.reservation)}}<input v-model.trim="reservation" maxlength="64" :disabled="frozen"/></label>
           </template>

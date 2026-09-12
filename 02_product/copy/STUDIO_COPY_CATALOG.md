@@ -902,7 +902,7 @@
 | low_seats | 座位数≤2 | Seats left ≤ 2 |
 | remaining_seats | 剩余 {v0} 个座位 | {v0} seats left |
 | full | 已满员 | Fully booked |
-| full_buffer | 满员时段前后 30 分钟不可预约。 | The 30 minutes before and after a fully booked period are unavailable. |
+| full_buffer | 满员时段前后 0.5 小时不可预约。 | The 0.5 hours before and after a fully booked period are unavailable. |
 | previous_dates_314fc5 | 上一组日期 | Previous dates |
 | the_next_two_weeks_59cce3 | 未来两周 | The next two weeks |
 | date_label | 日期 | Dates |
@@ -2091,7 +2091,7 @@
 | keeping_the_worktable_lovely_4b7731 | 让工作台保持整齐 | Keeping the worktable lovely |
 | place_beads_individually_rather_than_scattering_them_2535e2 | 采用正常逐颗拼豆的方式，不使用撒豆等非常规操作。撒落或混合的豆子需自行整理，或另付清洁费用。 | Place beads individually rather than scattering them. Please sort spilled or mixed beads yourself, or pay a cleaning fee. |
 | time_and_payment_a87618 | 计时与付款方式 | Time and payment |
-| time_is_measured_by_actual_making_time_8a7c82 | 计时以实际拼豆时长为准，超出 15 分钟按半小时计。<br>付款方式为现金，emt，或微信支付宝。 | Time is measured by actual making time; more than 15 minutes counts as half an hour.<br>Payment is accepted by cash, EMT, WeChat Pay or Alipay. |
+| time_is_measured_by_actual_making_time_8a7c82 | 计时以实际拼豆时长为准，超出 0.25 小时按 0.5 小时计。<br>付款方式为现金，emt，或微信支付宝。 | Time is measured by actual making time; more than 0.25 hours counts as 0.5 hours.<br>Payment is accepted by cash, EMT, WeChat Pay or Alipay. |
 
 ## pages-Home.json
 
@@ -2579,6 +2579,7 @@
 | unrecorded | 待店主记录 | Not recorded yet |
 | per_guest | {v0}／人 · {v1} 人 | {v0} per guest · {v1} guests |
 | actual_minutes | 实际游玩时长（分钟／人） | Actual time (minutes per guest) |
+| actual_hours | 实际游玩时长（小时／人） | Actual time (hours per guest) |
 | actual_guests | 实际游玩人数 | Guests who attended |
 | attendance_help | 填写实际游玩时间，完成到店记录后赠送 166 积分；不会自动扣钱包时长。 | Record the actual time. Completing attendance awards 166 points; wallet time is not deducted automatically. |
 | public_note | 给顾客的备注 | Note for the guest |
@@ -2601,6 +2602,10 @@
 | reverse | 撤销这笔 | Reverse entry |
 | reverse_help | 将以一笔相反的变动撤销原记账，保留两笔明细。 | An opposite entry reverses this change. Both entries remain in the history. |
 | time_amount | 时长（分钟） | Time (minutes) |
+| time_hours | 时长（小时） | Time (hours) |
+| invalid_hours | 请填写有效的小时数，例如 0.5 或 1.5。 | Enter valid hours, such as 0.5 or 1.5. |
+| debit_hours_help | 填写正数，保存时会从余额中扣除。多人共用时，请填写合计消费小时数。 | Enter a positive number to deduct. For shared time, enter the total hours used by all guests. |
+| wallet_actual_hours_details_required | 请同时填写有效的游玩小时数和人数，例如 0.5 小时、1 人。 | Enter valid hours and a guest count, such as 0.5 hours and 1 guest. |
 | points_amount | 积分数量 | Number of points |
 | redeem_cad | 抵扣金额（整数 CAD） | Amount to redeem (whole CAD) |
 | bill | 本次可抵扣消费金额（CAD） | Eligible bill amount (CAD) |
@@ -2729,6 +2734,7 @@
 | profile | 顾客资料 | Customer details |
 | member_search | 搜索顾客或联系方式 | Search customers or contact details |
 | minutes | 剩余 {count} 分钟 | {count} minutes left |
+| hours | 剩余 {count} 小时 | {count} hours left |
 | points | {count} 积分 | {count} points |
 | ledger | 账户明细 | Account history |
 | adjust | 调整账户 | Update account |

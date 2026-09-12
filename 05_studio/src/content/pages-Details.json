@@ -100,7 +100,7 @@
   ],
   "time_and_payment_a87618": ["计时与付款方式", "Time and payment"],
   "time_is_measured_by_actual_making_time_8a7c82": [
-    "计时以实际拼豆时长为准，超出 15 分钟按半小时计。\n付款方式为现金，emt，或微信支付宝。",
-    "Time is measured by actual making time; more than 15 minutes counts as half an hour.\nPayment is accepted by cash, EMT, WeChat Pay or Alipay."
+    "计时以实际拼豆时长为准，超出 0.25 小时按 0.5 小时计。\n付款方式为现金，emt，或微信支付宝。",
+    "Time is measured by actual making time; more than 0.25 hours counts as 0.5 hours.\nPayment is accepted by cash, EMT, WeChat Pay or Alipay."
   ]
 }

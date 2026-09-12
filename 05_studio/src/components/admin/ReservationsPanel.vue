@@ -27,6 +27,7 @@ import timetableWords from '../../content/reservation-timetable.json';
 import { formatCopy } from '../../state';
 const timetableCopy=contentModule('reservation-timetable',timetableWords);
 import { walletCopy,duration } from '../../wallet';
+import { hoursInput,minutesFromHours } from '../../time-units';
 import { useRoute, useRouter } from 'vue-router';
 import { messageCopy } from '../../messaging';
 type Entry = Reservation & { payload: ReservationPayload; staff_note: string;owner_id:string;deleted_at:string|null };
@@ -35,7 +36,7 @@ const at=ref(''),timetableRevision=ref(0);
 const { request } = useDesk();
 const router=useRouter(),route=useRoute();
 const deleted=ref(false),deleting=ref(false),deleteReason=ref(''),publicNote=ref('');
-const actualMinutes=ref<number|''>(''),actualGuests=ref<number|''>('');
+const actualHours=ref<number|string>(''),actualGuests=ref<number|''>('');
 const items = ref<Entry[]>([]),
   counts = ref<Record<string, number>>({}),
   total = ref(0),
@@ -102,7 +103,7 @@ function inspect(item: Entry) {
   entry.value = item;
   nextStatus.value = item.status;
   note.value = item.staff_note;
-  actualMinutes.value=item.actual_minutes??'';actualGuests.value=item.actual_guests??'';
+  actualHours.value=hoursInput(item.actual_minutes);actualGuests.value=item.actual_guests??'';
   publicNote.value=item.public_note||'';deleting.value=false;deleteReason.value='';
   saveError.value = "";
   open.value = true;
@@ -116,8 +117,9 @@ async function inspectBooking(id:string){
 onBeforeUnmount(()=>{inspectSequence++;});
 async function save() {
   if (!entry.value || saving.value) return;
-  if((actualMinutes.value==='')!==(actualGuests.value==='') || (actualMinutes.value!==''&&(!Number.isInteger(actualMinutes.value)||actualMinutes.value<1||actualMinutes.value>1440||!Number.isInteger(actualGuests.value)||Number(actualGuests.value)<1||Number(actualGuests.value)>99))){
-    saveError.value=say(walletCopy.wallet_actual_details_required);return;
+  const emptyHours=String(actualHours.value).trim()==='',actualMinutes=emptyHours?null:minutesFromHours(actualHours.value);
+  if(emptyHours!==(actualGuests.value==='') || (!emptyHours&&(actualMinutes===null||actualMinutes<1||actualMinutes>1440||!Number.isInteger(actualGuests.value)||Number(actualGuests.value)<1||Number(actualGuests.value)>99))){
+    saveError.value=say(walletCopy.wallet_actual_hours_details_required);return;
   }
   saving.value = true;
   saveError.value = "";
@@ -128,7 +130,7 @@ async function save() {
         status: nextStatus.value,
         staff_note: note.value,
         version: entry.value.version,
-        actual_minutes:actualMinutes.value===''?null:actualMinutes.value,
+        actual_minutes:actualMinutes,
         actual_guests:actualGuests.value===''?null:actualGuests.value,
         public_note:publicNote.value,
       }),
@@ -394,7 +396,7 @@ defineExpose({ refresh: load });
         <button v-if="!entry.deleted_at" class="desk-button secondary" @click="openMessages">{{say(messageCopy.new_conversation)}}<PhArrowRight/></button>
         <div v-if="!entry.deleted_at" class="reservation-attendance">
           <p class="fine-print">{{say(walletCopy.booked)}} · {{duration(entry.booked_minutes)}}</p>
-          <div class="wallet-input-grid"><label class="desk-field">{{say(walletCopy.actual_minutes)}}<input v-model.number="actualMinutes" type="number" min="1" max="1440" step="1" :disabled="saving"/></label><label class="desk-field">{{say(walletCopy.actual_guests)}}<input v-model.number="actualGuests" type="number" min="1" max="99" step="1" :disabled="saving"/></label></div>
+          <div class="wallet-input-grid"><label class="desk-field">{{say(walletCopy.actual_hours)}}<input v-model="actualHours" type="number" inputmode="decimal" min="0" max="24" step="any" :disabled="saving"/></label><label class="desk-field">{{say(walletCopy.actual_guests)}}<input v-model.number="actualGuests" type="number" min="1" max="99" step="1" :disabled="saving"/></label></div>
           <p class="wallet-rule">{{say(walletCopy.attendance_help)}}</p>
           <label class="desk-field">{{say(walletCopy.public_note)}}<textarea v-model="publicNote" rows="3" maxlength="600" :disabled="saving"/></label>
         </div>

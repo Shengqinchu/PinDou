@@ -42,6 +42,7 @@
   "profile": ["顾客资料", "Customer details"],
   "member_search": ["搜索顾客或联系方式", "Search customers or contact details"],
   "minutes": ["剩余 {count} 分钟", "{count} minutes left"],
+  "hours": ["剩余 {count} 小时", "{count} hours left"],
   "points": ["{count} 积分", "{count} points"],
   "ledger": ["账户明细", "Account history"],
   "adjust": ["调整账户", "Update account"],
