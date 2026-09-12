@@ -8750,5 +8750,275 @@
       "微信登录使用微信提供的登录凭证与身份标识，用于验证登录、关联账号和完成网站扫码授权。邮箱登录使用你填写的邮箱和密码。昵称、头像和选填的微信号由你主动填写或选择。店主可查看当前账号的顾客编号、昵称、头像、预约称呼及你提供的联系方式，用于核对预约和沟通；不会按同名或同一联系方式自动合并账号。打开首页不会自动取得微信手机号、微信号、昵称或头像。",
       "WeChat login uses credentials and identifiers supplied by WeChat to authenticate you, link your account and approve website sign-in. Email login uses the email address and password you enter. You choose your nickname and avatar and may provide a WeChat ID. The host can see your customer reference, nickname, avatar, booking name and provided contact details to match bookings and communicate. Accounts are not automatically merged by matching names or contact details. Opening the home page does not automatically give us your WeChat phone number, WeChat ID, nickname or avatar."
     ]
+  },
+  "shop": {
+    "title": [
+      "拼豆小店",
+      "The little shop"
+    ],
+    "home": [
+      "在家拼豆",
+      "Bead at home"
+    ],
+    "finished": [
+      "拼豆成品",
+      "Finished pieces"
+    ],
+    "services": [
+      "代拼/代烫服务",
+      "Beading & ironing"
+    ],
+    "beading": [
+      "代拼服务",
+      "Beading service"
+    ],
+    "ironing": [
+      "代烫服务",
+      "Ironing service"
+    ],
+    "cart": [
+      "购物车",
+      "Cart"
+    ],
+    "orders": [
+      "我的订单",
+      "My orders"
+    ],
+    "search": [
+      "搜索商品或色号",
+      "Search products or colour codes"
+    ],
+    "all": [
+      "全部",
+      "All"
+    ],
+    "categories": [
+      "商品分类",
+      "Categories"
+    ],
+    "empty": [
+      "商品整理中",
+      "Products are being prepared"
+    ],
+    "noMatch": [
+      "没有找到符合条件的商品",
+      "No matching products"
+    ],
+    "noPhoto": [
+      "图片待补充",
+      "Photo coming soon"
+    ],
+    "unpriced": [
+      "价格待定",
+      "Price to be confirmed"
+    ],
+    "addCart": [
+      "加入购物车",
+      "Add to cart"
+    ],
+    "savedCart": [
+      "已加入购物车",
+      "Added to cart"
+    ],
+    "cartLimit": [
+      "购物车最多保存20种商品，每种最多20件。",
+      "Your cart can hold 20 products, with up to 20 of each."
+    ],
+    "cartEmpty": [
+      "购物车还是空的",
+      "Your cart is empty"
+    ],
+    "browse": [
+      "继续逛逛",
+      "Keep browsing"
+    ],
+    "paused": [
+      "小店暂未开放在线下单，购物车会为你保留。",
+      "Online ordering is not open yet. Your cart will be saved."
+    ],
+    "remove": [
+      "移除",
+      "Remove"
+    ],
+    "quantity": [
+      "数量",
+      "Quantity"
+    ],
+    "subtotal": [
+      "已定价商品小计",
+      "Subtotal of priced items"
+    ],
+    "unavailable": [
+      "商品已下架",
+      "Product unavailable"
+    ],
+    "ordersEmpty": [
+      "暂无商品订单",
+      "No product orders yet"
+    ],
+    "ordersHelp": [
+      "这里显示此浏览器保存的商品订单。",
+      "Product orders saved in this browser appear here."
+    ],
+    "orderOpen": [
+      "查看订单",
+      "View order"
+    ],
+    "retry": [
+      "重新加载",
+      "Reload"
+    ],
+    "loading": [
+      "正在加载商品…",
+      "Loading products…"
+    ],
+    "adminTitle": [
+      "小店商品",
+      "Shop products"
+    ],
+    "adminHelp": [
+      "管理商品、系列和图片。售价以 CAD 填写；在线下单暂未开放。",
+      "Manage products, categories and photos. Enter prices in CAD; online ordering is not open yet."
+    ],
+    "addProduct": [
+      "增加商品",
+      "Add product"
+    ],
+    "editProduct": [
+      "编辑商品",
+      "Edit product"
+    ],
+    "addCategory": [
+      "增加分类/系列",
+      "Add category or series"
+    ],
+    "editCategory": [
+      "编辑分类/系列",
+      "Edit category or series"
+    ],
+    "nameZh": [
+      "中文名称",
+      "Chinese name"
+    ],
+    "nameEn": [
+      "英文名称",
+      "English name"
+    ],
+    "detailZh": [
+      "中文介绍",
+      "Chinese description"
+    ],
+    "detailEn": [
+      "英文介绍",
+      "English description"
+    ],
+    "collection": [
+      "小店栏目",
+      "Shop section"
+    ],
+    "category": [
+      "分类/系列",
+      "Category or series"
+    ],
+    "parent": [
+      "上级分类",
+      "Parent category"
+    ],
+    "topCategory": [
+      "一级分类",
+      "Top-level category"
+    ],
+    "price": [
+      "售价（CAD）",
+      "Price (CAD)"
+    ],
+    "stock": [
+      "本店库存",
+      "Studio stock"
+    ],
+    "code": [
+      "色号/商品编号",
+      "Colour code / SKU"
+    ],
+    "sort": [
+      "排序（越小越靠前）",
+      "Sort order (lowest first)"
+    ],
+    "photos": [
+      "商品图片",
+      "Product photos"
+    ],
+    "upload": [
+      "上传图片",
+      "Upload photos"
+    ],
+    "photoHelp": [
+      "最多12张；第一张作为封面。",
+      "Up to 12 photos; the first is the cover."
+    ],
+    "cover": [
+      "设为封面",
+      "Use as cover"
+    ],
+    "show": [
+      "在小店展示",
+      "Show in the shop"
+    ],
+    "visible": [
+      "已展示",
+      "Visible"
+    ],
+    "hidden": [
+      "已隐藏",
+      "Hidden"
+    ],
+    "save": [
+      "保存",
+      "Save"
+    ],
+    "saved": [
+      "已保存",
+      "Saved"
+    ],
+    "source": [
+      "来源记录",
+      "Source record"
+    ],
+    "sourcePrice": [
+      "来源价（RMB，仅供参考）",
+      "Source price (RMB, reference only)"
+    ],
+    "conflict": [
+      "这条记录已被更新。请先重新加载，再编辑保存。",
+      "This record has changed. Reload it before saving your edits."
+    ],
+    "invalidCategory": [
+      "请选择有效的二级分类。分类最多两级。",
+      "Choose a valid subcategory. Categories support two levels."
+    ],
+    "categoryUsed": [
+      "此分类已有商品，不能改为一级分类。",
+      "This category contains products and cannot become a top-level category."
+    ],
+    "invalidPrice": [
+      "请输入最多两位小数的正数售价，或留空。",
+      "Enter a positive price with up to two decimal places, or leave it blank."
+    ],
+    "pendingInfo": [
+      "尚未定价的商品可以展示，不能在线购买。",
+      "Unpriced products can be displayed but cannot be purchased online."
+    ],
+    "refresh": [
+      "刷新",
+      "Refresh"
+    ],
+    "count": [
+      "{v0} 个商品",
+      "{v0} products"
+    ],
+    "imageNumber": [
+      "图片 {v0}",
+      "Photo {v0}"
+    ]
   }
 }

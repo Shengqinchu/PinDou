@@ -56,6 +56,8 @@ import { walletCopy } from '../wallet';
 import { messageCopy } from '../messaging';
 const MessagesPanel=defineAsyncComponent(()=>import('./admin/CustomerMessages.vue'));
 const FinancePanel=defineAsyncComponent(()=>import('./admin/FinancePanel.vue'));
+const ShopCatalogPanel=defineAsyncComponent(()=>import('./admin/ShopCatalogPanel.vue'));
+import { shopWords } from '../shop';
 import businessDefaults from '../content/business.json';
 const businessCopy=contentModule('business',businessDefaults);
 const props = defineProps<{ token: string }>();
@@ -70,6 +72,7 @@ const reservationCalendar = ref<InstanceType<typeof ReservationsPanel>>();
 const memberPanel=ref<InstanceType<typeof MembersPanel>>();
 const messagePanel=ref<{refresh:()=>Promise<void>}>();
 const financePanel=ref<{refresh:()=>Promise<void>}>();
+const shopPanel=ref<{refresh:()=>Promise<void>}>();
 const mobileMedia = matchMedia("(max-width: 900px)");
 const isMobile = ref(mobileMedia.matches);
 const sidebar = ref<HTMLElement>();
@@ -142,6 +145,7 @@ const navigation = computed(() => [
     icon: PhCalendarDots,
   },
   {id:'finance',zh:businessCopy.title[0],en:businessCopy.title[1],icon:PhReceipt},
+  {id:'shop',zh:shopWords.adminTitle[0],en:shopWords.adminTitle[1],icon:PhPackage},
   /* V4: commerce navigation is retired; records and panels remain available in source.
   {
     id: "overview",
@@ -222,7 +226,8 @@ watch(view, async () => {
 });
 onMounted(desk.loadSetup);
 function refreshCurrent() {
-  if(view.value==='messages') void messagePanel.value?.refresh();
+  if(view.value==='shop') void shopPanel.value?.refresh();
+  else if(view.value==='messages') void messagePanel.value?.refresh();
   else if(view.value==='finance') void financePanel.value?.refresh();
   else if(view.value==='members') memberPanel.value?.refresh();
   else if (view.value === "reservations") reservationList.value?.refresh();
@@ -365,9 +370,10 @@ const readableDate = computed(() =>
         <KeepAlive><JournalEditor v-if="view === 'journal-editor'" :active="view === 'journal-editor'" /></KeepAlive>
         <KeepAlive><MessagesPanel v-if="view==='messages'" ref="messagePanel" :active="view==='messages'"/></KeepAlive>
         <KeepAlive><FinancePanel v-if="view==='finance'" ref="financePanel" :active="view==='finance'"/></KeepAlive>
+        <KeepAlive><ShopCatalogPanel v-if="view==='shop'" ref="shopPanel" :active="view==='shop'"/></KeepAlive>
         <p
           v-if="
-            !['reservations', 'reservation-calendar', 'legacy', 'content', 'journal-editor','members','messages','finance'].includes(view)
+            !['reservations', 'reservation-calendar', 'legacy', 'content', 'journal-editor','members','messages','finance','shop'].includes(view)
           "
           class="reservation-commerce-note"
         >

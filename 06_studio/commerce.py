@@ -86,7 +86,13 @@ class Product(Strict):
     en: str = Field(min_length=1, max_length=140)
     detailZh: str = Field(default="", max_length=500)
     detailEn: str = Field(default="", max_length=700)
-    image: str = Field(pattern=r"^(studio-(0[1-9]|1[0-5])|journal-(02|04|05|07|10|11|13|20))$")
+    image: str = Field(default="", max_length=350)
+    images: list[str] = Field(default_factory=list, max_length=12)
+    shop_collection: Literal["home", "finished", "services"] | None = None
+    shop_category_id: str | None = Field(default=None, pattern=r"^[a-z][a-z0-9_-]{0,39}$")
+    shop_visible: bool = False
+    code: str = Field(default="", max_length=50)
+    sort: int = Field(default=0, ge=0, le=100000, strict=True)
     price_cents: int | None = Field(default=None, ge=1, le=1000000, strict=True)
     stock: int = Field(default=0, ge=0, le=100000, strict=True)
     active: bool = False
@@ -94,6 +100,16 @@ class Product(Strict):
 
     @model_validator(mode="after")
     def published_price(self):
+        import content
+        for src in [self.image, *self.images]:
+            if src and not (re.fullmatch(r"studio-(0[1-9]|1[0-5])|journal-(02|04|05|07|10|11|13|20)", src) or content.image_path_ok(src)):
+                raise ValueError("Use a studio image upload")
+        if len(set(self.images)) != len(self.images) or any(not src for src in self.images):
+            raise ValueError("Duplicate or empty images")
+        if self.shop_collection and self.kind != "physical":
+            raise ValueError("Shop items must be physical products")
+        if self.shop_visible and not self.shop_collection:
+            raise ValueError("Choose a shop collection")
         if self.active and self.price_cents is None:
             raise ValueError("Published products need a price")
         if self.kind == "experience" and self.id not in {"hourly", "day", "pair"}:
@@ -637,8 +653,12 @@ def register(app, admin_actor):
                     fail("version_conflict")
                 if old["kind"] != payload.kind:
                     fail("invalid_product", 422)
+            elif payload.version != 1:
+                fail("version_conflict")
             if payload.kind == "physical" and payload.stock < stock_held(db, product_id):
                 fail("stock_below_holds")
+            import shop_catalog
+            shop_catalog.validate_product_category(db, payload)
             value = payload.model_dump()
             value["version"] = payload.version + 1
             db.execute("INSERT INTO commerce_products VALUES(?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload", (product_id, json.dumps(value, ensure_ascii=False)))

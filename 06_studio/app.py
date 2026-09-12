@@ -67,6 +67,8 @@ def initialize():
         """)
     import commerce
     commerce.initialize(database)
+    import shop_catalog
+    shop_catalog.initialize(database)
     import reservations
     reservations.initialize(database)
     import customer_auth
@@ -335,6 +337,8 @@ def update_inquiry(request_id: str, payload: StatusUpdate, actor: Annotated[str,
 
 import commerce
 commerce.register(app, admin_actor)
+import shop_catalog
+shop_catalog.register(app, admin_actor)
 import reservations
 import customer_auth
 customer_auth.register(app, database, ADMIN_ORIGIN)

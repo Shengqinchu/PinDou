@@ -1,5 +1,5 @@
 {
-  "source": "Owner 2026-09-12: fix and deploy Xiaohongshu import; STUDIO_COPY_CHANGES.md",
+  "source": "STUDIO_SHOP_20260912_PDF_AND_OWNER_REQUEST",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -73,6 +73,7 @@
     "rate-fields.json": "3470adfe9da8bf9b2f47d05a5e4c128c8325325f58b6075bfd2ecf9728938b79",
     "reservation-cancellation.json": "eba475db2f343f58e518d60c94774b4add2ea34186adddf9869c8c38bb302190",
     "reservation-timetable.json": "c98f1bf9df4ed58e4ff5643ab5e8a37b68c9b7dd00a22fd0fb5778c9a53bbf52",
+    "shop.json": "7826ae6898451e6b67d38499b01173097d44735b40e42c38523f4c126b6d1b3f",
     "state.json": "c4eeb599810219fc6102c20f5c7c3a265a0d592a3cefd9351d88734552a2650f",
     "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3",
     "telegram-notifications.json": "62f79e51391e39d86b83e0aa43dc81491b862b1d7e943234df6e0f34b1b98cf5",

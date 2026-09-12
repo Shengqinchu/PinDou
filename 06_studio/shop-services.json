@@ -1,0 +1,4 @@
+[
+ {"id":"service-beading","kind":"physical","category":"finished","zh":"代拼服务","en":"Beading service","shop_collection":"services","shop_visible":true,"sort":1},
+ {"id":"service-ironing","kind":"physical","category":"finished","zh":"代烫服务","en":"Ironing service","shop_collection":"services","shop_visible":true,"sort":2}
+]
