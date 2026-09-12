@@ -94,7 +94,7 @@ try{
  await pointTip().click();await expect(page.getByRole('tooltip')).toContainText('可抵扣 CAD 0');await page.keyboard.press('Escape');
  // Opening time is permitted after the registration reward, tested in pytest; add a top-up for decimal-hour UI regression.
  await dialog().getByRole('button',{name:'登记一笔',exact:true}).click();await dialog().getByRole('combobox',{name:'记账类型',exact:true}).selectOption('topup');
- await dialog().getByLabel('时长（分钟）',{exact:true}).fill('90');await dialog().getByLabel('记账说明（顾客可见）',{exact:true}).fill('QA time 1.5 hours');
+ await dialog().getByLabel('时长（小时）',{exact:true}).fill('1.5');await dialog().getByLabel('记账说明（顾客可见）',{exact:true}).fill('QA time 1.5 hours');
  await dialog().getByRole('button',{name:'保存并同步给顾客',exact:true}).click();await expect(dialog().locator('.wallet-saved')).toBeVisible();
  await page.getByRole('button',{name:'刷新记录',exact:true}).click();await expect(page.locator('.wallet-balance.time strong')).toHaveText('1.5 小时');
  record('Shop redemption requires explicit no-promotion confirmation, debits only 100, retains 66, and decimal hours remain correct');

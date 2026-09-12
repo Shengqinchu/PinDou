@@ -22,7 +22,7 @@ try{
  async function entry(kind,minutes,points,note){
   await host.getByRole('button',{name:'登记一笔',exact:true}).click();
   await dialog().getByRole('combobox',{name:'记账类型',exact:true}).selectOption(kind);
-  if(minutes!=null)await dialog().getByLabel('时长（分钟）',{exact:true}).fill(String(minutes));
+  if(minutes!=null)await dialog().getByLabel('时长（小时）',{exact:true}).fill(String(minutes/60));
   if(points!=null)await dialog().getByLabel('积分数量',{exact:true}).fill(String(points));
   await dialog().getByLabel('记账说明（顾客可见）',{exact:true}).fill(note);
  }
@@ -59,7 +59,7 @@ try{
  const seed=await (await host.request.post(base+'/studio-api/qa/attended-visit')).json();
  await host.goto(base+'/manage',{waitUntil:'networkidle'});
  await host.locator('.reservation-desk-row').filter({hasText:seed.id}).click();
- await dialog().getByLabel('实际游玩时长（分钟／人）',{exact:true}).fill('165');
+ await dialog().getByLabel('实际游玩时长（小时／人）',{exact:true}).fill('2.75');
  await dialog().getByLabel('实际游玩人数',{exact:true}).fill('2');
  await dialog().getByLabel('给顾客的备注',{exact:true}).fill('QA actual visit, customer visible');
  await dialog().locator('select').selectOption('completed');
