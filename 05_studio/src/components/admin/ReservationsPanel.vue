@@ -28,6 +28,8 @@ import { formatCopy } from '../../state';
 const timetableCopy=contentModule('reservation-timetable',timetableWords);
 import { walletCopy,duration } from '../../wallet';
 import { hoursInput,minutesFromHours } from '../../time-units';
+import CustomerIdentity from '../CustomerIdentity.vue';
+import type {WalletAccount} from '../../wallet';
 import { useRoute, useRouter } from 'vue-router';
 import { messageCopy } from '../../messaging';
 type Entry = Reservation & { payload: ReservationPayload; staff_note: string;owner_id:string;deleted_at:string|null };
@@ -37,6 +39,7 @@ const { request } = useDesk();
 const router=useRouter(),route=useRoute();
 const deleted=ref(false),deleting=ref(false),deleteReason=ref(''),publicNote=ref('');
 const actualHours=ref<number|string>(''),actualGuests=ref<number|''>('');
+const customer=ref<WalletAccount>();let customerSequence=0;
 const items = ref<Entry[]>([]),
   counts = ref<Record<string, number>>({}),
   total = ref(0),
@@ -100,6 +103,8 @@ async function load() {
   }
 }
 function inspect(item: Entry) {
+  customer.value=undefined;const identitySequence=++customerSequence;
+  if(item.owner_id)void request<{account:WalletAccount}>('/manage/members/'+encodeURIComponent(item.owner_id)).then(data=>{if(identitySequence===customerSequence)customer.value=data.account;}).catch(()=>{});
   entry.value = item;
   nextStatus.value = item.status;
   note.value = item.staff_note;
@@ -114,7 +119,7 @@ async function inspectBooking(id:string){
  try{const data=await request<{items:Entry[]}>('/manage/reservations?search='+encodeURIComponent(id));if(n===inspectSequence&&props.active){const found=data.items.find(item=>item.id===id);if(found)inspect(found);}}
  catch(e){if(n===inspectSequence)error.value=(e as Error).message;}
 }
-onBeforeUnmount(()=>{inspectSequence++;});
+onBeforeUnmount(()=>{inspectSequence++;customerSequence++;});
 async function save() {
   if (!entry.value || saving.value) return;
   const emptyHours=String(actualHours.value).trim()==='',actualMinutes=emptyHours?null:minutesFromHours(actualHours.value);
@@ -349,7 +354,7 @@ defineExpose({ refresh: load });
       :subtitle="entry?.id"
       :busy="saving"
       ><template v-if="entry"
-        ><dl class="reservation-desk-summary">
+        ><CustomerIdentity v-if="customer" :customer="customer"/><dl class="reservation-desk-summary">
           <div>
             <dt>{{ say(copyText.visit_f29981) }}</dt>
             <dd>

@@ -8,8 +8,8 @@
     "Service terms"
   ],
   "updated": [
-    "更新日期：2026 年 9 月 11 日",
-    "Updated: September 11, 2026"
+    "更新日期：2026 年 9 月 12 日",
+    "Updated: September 12, 2026"
   ],
   "privacy_intro": [
     "本说明适用于小狗拼豆铺（PinDou Puppy）的小程序及共用的账号、预约和图纸服务。我们按你使用的功能处理相应信息。你可以先浏览首页和店铺信息，再决定是否登录、预约或上传图片。",
@@ -20,8 +20,8 @@
     "Account and profile"
   ],
   "identity_body": [
-    "微信登录使用微信提供的登录凭证与身份标识，用于验证登录、关联账号和完成网站扫码授权。邮箱登录使用你填写的邮箱和密码。昵称、头像由你主动填写或选择，用于账号展示。打开首页不会自动取得微信手机号、昵称或头像。",
-    "WeChat login uses credentials and identifiers supplied by WeChat to authenticate you, link your account and approve website sign-in. Email login uses the email address and password you enter. Your chosen nickname and avatar identify your profile. Opening the home page does not automatically give us your WeChat phone number, nickname or avatar."
+    "微信登录使用微信提供的登录凭证与身份标识，用于验证登录、关联账号和完成网站扫码授权。邮箱登录使用你填写的邮箱和密码。昵称、头像和选填的微信号由你主动填写或选择。店主可查看当前账号的顾客编号、昵称、头像、预约称呼及你提供的联系方式，用于核对预约和沟通；不会按同名或同一联系方式自动合并账号。打开首页不会自动取得微信手机号、微信号、昵称或头像。",
+    "WeChat login uses credentials and identifiers supplied by WeChat to authenticate you, link your account and approve website sign-in. Email login uses the email address and password you enter. You choose your nickname and avatar and may provide a WeChat ID. The host can see your customer reference, nickname, avatar, booking name and provided contact details to match bookings and communicate. Accounts are not automatically merged by matching names or contact details. Opening the home page does not automatically give us your WeChat phone number, WeChat ID, nickname or avatar."
   ],
   "booking_title": [
     "预约与联系资料",

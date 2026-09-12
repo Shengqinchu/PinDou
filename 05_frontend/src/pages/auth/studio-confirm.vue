@@ -2,12 +2,14 @@
 import { computed, ref } from 'vue';
 import { onLoad, onUnload } from '@dcloudio/uni-app';
 import copy from '../../../../05_studio/src/content/miniapp.json';
+import profileCopy from '../../../../05_studio/src/content/profile.json';
+import {useUserStore} from '../../store/user';
 import StudioShell from '../../components/StudioShell.vue';
 import StudioBrand from '../../components/StudioBrand.vue';
 import StudioGlyph from '../../components/StudioGlyph.vue';
 import { useStudioNative } from '../../utils/studio-native';
 import { miniSession, studioCall, miniappPrefix, MiniappError } from '../../utils/miniapp-client';
-const { language, keyboardOpen, shellStyle, t, changeLanguage } = useStudioNative();
+const { language, keyboardOpen, shellStyle, t, say, changeLanguage } = useStudioNative();
 const busy = ref(false), loading = ref(true), errorCode = ref(''), status = ref(''), scene = ref(''), ticket = ref('');
 const details = ref<{mode:string;account:string;display_code:string}>();
 let alive = true;
@@ -40,6 +42,7 @@ async function confirm(approve: boolean) {
   } catch (e) { if (alive) fail(e); }
   finally { if (alive) busy.value = false; }
 }
+async function setupProfile(){if(busy.value)return;busy.value=true;errorCode.value='';try{const result=await studioCall<any>(miniappPrefix+'/native/sign-in',{},ticket.value);if(!alive)return;const user=useUserStore();user.token=result.token;user.userInfo=result.shared_user;uni.setStorageSync('pd_token',result.token);uni.setStorageSync('pd_user',JSON.stringify(result.shared_user));uni.redirectTo({url:'/pages/auth/studio-profile?onboard=1'});}catch(e){if(alive)fail(e);}finally{if(alive)busy.value=false;}}
 function home() { uni.reLaunch({url:'/pages/studio/home'}); }
 onLoad(options => { try { scene.value = decodeURIComponent(String(options?.scene || '')); } catch { scene.value = ''; } void load(); });
 onUnload(() => { alive = false; ticket.value = ''; });
@@ -61,7 +64,7 @@ onUnload(() => { alive = false; ticket.value = ''; });
       </template>
       <text v-if="errorCode" class="studio-native-error" role="alert">{{error}}</text>
     </view>
-    <view class="studio-native-actions">
+    <view class="studio-native-actions"><button v-if="status==='approved'" class="studio-native-secondary" :disabled="busy" @tap="setupProfile">{{say(profileCopy.setup_title)}}</button>
       <button :hover-start-time="0" v-if="done||terminal" class="studio-native-primary" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="home"><text class="studio-native-primary-label">{{t('home')}}</text><view class="studio-native-button-arrow"><StudioGlyph name="arrow" :size="18"/></view></button>
       <template v-else-if="details&&!loading">
         <button :hover-start-time="0" class="studio-native-primary" :disabled="busy" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="confirm(true)"><view v-if="busy" class="studio-native-progress"/><text class="studio-native-primary-label">{{t(busy?'working':details.mode==='link'?'link':'confirm')}}</text><view v-if="!busy" class="studio-native-button-arrow"><StudioGlyph name="arrow" :size="18"/></view></button>

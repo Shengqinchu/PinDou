@@ -6,6 +6,7 @@ import { useDesk } from '../../admin';
 import { CommerceError } from '../../commerce';
 import { walletCopy as copy,duration,type WalletAccount,type WalletDetail,type WalletEntry,type WalletCategory } from '../../wallet';
 import { minutesFromHours } from '../../time-units';
+import CustomerIdentity from '../CustomerIdentity.vue';
 import { say,formatCopy,hamiltonDate } from '../../state';
 import { readSession,saveSession } from '../../reservations';
 import SlideOver from '../SlideOver.vue';
@@ -111,13 +112,14 @@ defineExpose({refresh:load});
     <label class="desk-field member-search">{{say(copy.search)}}<input v-model.trim="search" type="search" maxlength="160"/></label>
     <p v-if="error" class="desk-error" role="alert">{{error}}</p>
     <p v-if="busy&&!members.length" role="status">{{say(copy.loading)}}</p><p v-else-if="!members.length" class="wallet-empty">{{say(copy.no_members)}}</p>
-    <div class="member-list"><button v-for="member in members" :key="member.owner_id" class="member-row" @click="inspect(member.owner_id)"><PhWallet :size="24" weight="light"/><span><strong>{{member.booking_profile?.name||member.name}}</strong><small>{{member.email||member.owner_id}}</small><small v-if="member.booking_profile?.contact">{{contactMethodLabel(member.booking_profile.contact_method)}} · {{member.booking_profile.contact}}</small></span><span class="member-list-note">{{member.staff_note}}</span><span class="member-list-balance">{{duration(member.minutes)}}<small>{{formatCopy(copy.point_count,{v0:member.points})}}</small></span><PhArrowRight :size="18"/></button></div>
+    <div class="member-list"><button v-for="member in members" :key="member.owner_id" class="member-row" @click="inspect(member.owner_id)"><CustomerIdentity :customer="member"/><span class="member-list-note">{{member.staff_note}}</span><span class="member-list-balance">{{duration(member.minutes)}}<small>{{formatCopy(copy.point_count,{v0:member.points})}}</small></span><PhArrowRight :size="18"/></button></div>
     <div v-if="total>30" class="wallet-pagination"><button :disabled="page===1||busy" @click="page--;load()">{{say(copy.previous)}}</button><span>{{formatCopy(copy.page,{v0:page,v1:total})}}</span><button :disabled="page*30>=total||busy" @click="page++;load()">{{say(copy.next)}}</button></div>
-    <SlideOver v-model="open" :title="data?.account.name||say(copy.members)" :subtitle="data?.account.email||selected" :busy="saving">
+    <SlideOver v-model="open" :title="data?.account.name||say(copy.members)" :subtitle="data?.account.customer_code||''" :busy="saving">
       <p v-if="loading&&!data" role="status">{{say(copy.loading)}}</p>
       <p v-if="saveError" class="desk-error" role="alert">{{saveError}} <button class="desk-link" :disabled="frozen" @click="loadDetail(true)">{{say(copy.refresh)}}</button></p>
       <p v-if="saved" class="wallet-saved" role="status"><PhCheck/>{{say(copy.saved)}}</p>
       <template v-if="data">
+        <CustomerIdentity :customer="data.account"/>
         <section class="booking-profile-section"><h3>{{say(bookingCopy.title)}}</h3><div v-if="!editingBooking" class="booking-profile-summary"><div v-if="data.booking_profile.complete"><strong>{{data.booking_profile.name}}</strong><p>{{contactMethodLabel(data.booking_profile.contact_method)}} · {{data.booking_profile.contact}}</p></div><p v-else>{{say(bookingCopy.empty)}}</p><button type="button" class="text-link" :disabled="frozen" @click="editBooking">{{say(bookingCopy.edit)}}</button></div><form v-else @submit.prevent="saveBooking"><BookingContactFields v-model="bookingDraft" class="profile-contact" :required="false" :disabled="frozen"/><div class="booking-profile-actions"><button type="button" class="desk-button secondary" :disabled="frozen" @click="editingBooking=false">{{say(bookingCopy.cancel)}}</button><button class="desk-button primary" :disabled="frozen">{{say(bookingCopy.save)}}</button></div></form></section>
         <WalletBalances :account="data.account"/><p class="wallet-rule">{{say(copy.rules)}}</p>
         <p v-if="saving" role="status">{{say(copy.saving)}}</p>

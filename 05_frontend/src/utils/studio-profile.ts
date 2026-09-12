@@ -15,8 +15,8 @@ function responseProfile(data:any,token:string,id:string){
 }
 export function saveNickname(token:string,id:string,nickname:string):Promise<SharedProfile>{
  assertProfileOwner(token,id);if(!validName(nickname))throw new ProfileError('name_invalid');
- return new Promise((resolve,reject)=>uni.request({url:'https://pindoupuppy.com/api/v1/user/profile',method:'PATCH',header:{Authorization:'Bearer '+token,'Content-Type':'application/json'},data:{nickname:normalizedName(nickname)},timeout:20000,
- success:r=>{if(r.statusCode!==200){reject(new ProfileError(r.statusCode===401?'account_login_required':r.statusCode===422?'name_rejected':'save_error',r.statusCode));return;}try{resolve(responseProfile(r.data,token,id));}catch(e){reject(e);}},fail:()=>reject(new ProfileError('save_error'))}));
+ return new Promise((resolve,reject)=>uni.request({url:'https://pindoupuppy.com/studio-api/auth/profile',method:'PUT',header:{Authorization:'Bearer '+token,'Content-Type':'application/json'},data:{nickname:normalizedName(nickname)},timeout:20000,
+ success:r=>{if(r.statusCode!==200){reject(new ProfileError(r.statusCode===401?'account_login_required':r.statusCode===422?'name_rejected':'save_error',r.statusCode));return;}try{resolve(responseProfile((r.data as any).shared_user,token,id));}catch(e){reject(e);}},fail:()=>reject(new ProfileError('save_error'))}));
 }
 export async function validateAvatar(path:string){
  let size=0,mimeType='';

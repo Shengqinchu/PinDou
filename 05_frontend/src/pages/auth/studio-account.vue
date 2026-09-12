@@ -13,12 +13,13 @@ import { MiniappError } from '../../utils/miniapp-client';
 import {peekStudioSnapshot,readStudioCached} from '../../utils/studio-cache';
 import { useUserStore } from '../../store/user';
 import profileCopy from '../../../../05_studio/src/content/profile.json';
+import {needsProfileSetup} from '../../../../05_studio/src/identity-model';
 import ownerCopy from '../../../../05_studio/src/content/owner-wechat.json';
 import workbenchCopy from '../../../../05_studio/src/content/workbench.json';
 import noticeCopy from '../../../../05_studio/src/content/customer-notifications.json';
 function messages(){uni.navigateTo({url:'/pages/studio/messages'});}
 function notices(){uni.navigateTo({url:'/pages/studio/notifications'});}
-type Profile = {nickname:string;email:string;avatar?:string;is_admin?:boolean};
+type Profile = {nickname:string;email:string;avatar?:string;is_admin?:boolean;customer_code?:string};
 type Wallet = {account:{minutes:number;points:number};booking_profile:{name:string;contact_method:string;contact:string;complete:boolean}};
 const user = useUserStore();
 const { language, keyboardOpen, shellStyle, say, t, changeLanguage, website } = useStudioNative();
@@ -53,7 +54,7 @@ async function refresh(force=false) {
   if (results[0].status === 'fulfilled') {
     const next = results[0].value.user;
     if (next.avatar !== profile.value?.avatar) avatarFailed.value = false;
-    profile.value = {nickname:next.nickname,email:next.email,avatar:next.avatar,is_admin:next.is_admin};
+    profile.value = {nickname:next.nickname,email:next.email,avatar:next.avatar,is_admin:next.is_admin,customer_code:next.customer_code};
   }
   if (results[1].status === 'fulfilled') {
     const next = results[1].value;
@@ -67,6 +68,7 @@ function patterns() { uni.navigateTo({url:'/pages/upload/upload'}); }
 function visit() { uni.navigateTo({url:'/pages/studio/visit'}); }
 function reservations() { uni.navigateTo({url:'/pages/studio/reservations'}); }
 function edit() { uni.navigateTo({url:'/pages/auth/studio-profile'}); }
+function setupProfile(){uni.navigateTo({url:'/pages/auth/studio-profile?onboard=1'});}
 function ownerAlerts(){uni.navigateTo({url:'/pages/studio/owner'});}
 function openWorkbench(){uni.navigateTo({url:'/pages/studio/manage'});}
 watch(()=>user.token,()=>{sequence++;profile.value=undefined;wallet.value=undefined;isOwner.value=false;busy.value=false;failed.value=false;});
@@ -82,7 +84,7 @@ onUnload(() => { ++sequence; });
         <view class="studio-native-profile-text"><text class="studio-native-name">{{name}}</text><text v-if="profile?.email&&profile.email!==name" class="studio-native-body">{{profile.email}}</text><text class="studio-native-label">{{say(profile?.is_admin?workbenchCopy.admin:accountCopy.signed_in)}}</text></view>
         <button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-link studio-profile-edit" @tap="edit">{{say(profileCopy.edit)}}</button>
       </view>
-      <button v-if="profile?.is_admin" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="openWorkbench"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(workbenchCopy.entry)}}</text><StudioGlyph name="arrow" :size="18"/></button>
+      <text v-if="profile?.customer_code" class="studio-native-label" selectable>{{say(profileCopy.customer_code)}} · {{profile.customer_code}}</text><view v-if="profile&&wallet&&needsProfileSetup(profile,wallet.booking_profile)" class="studio-native-section"><text class="studio-native-body">{{say(profileCopy.setup_help)}}</text><button class="studio-native-secondary" @tap="setupProfile">{{say(profileCopy.setup_title)}}</button></view><button v-if="profile?.is_admin" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="openWorkbench"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(workbenchCopy.entry)}}</text><StudioGlyph name="arrow" :size="18"/></button>
       <text v-if="failed" class="studio-native-error" role="alert">{{t('generic_error')}}</text>
       <view v-if="busy&&!wallet" class="studio-native-status"><view class="studio-native-progress"/><text class="studio-native-body">{{say(walletCopy.loading)}}</text></view>
       <view class="studio-native-balances">

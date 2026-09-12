@@ -6871,12 +6871,44 @@
       "About your WeChat link"
     ],
     "wechat_profile_help": [
-      "已绑定的微信可用于登录。当前登录方式未提供真实微信昵称和头像；网站昵称和头像可在“编辑资料”中设置。",
-      "Your linked WeChat can be used to sign in. This sign-in method has not provided your real WeChat name or avatar. Set your website profile in Edit profile."
+      "微信可用于登录。店主看到的是你主动保存的昵称、头像和联系方式；微信号不会自动读取。",
+      "WeChat can be used to sign in. The host sees the display name, avatar and contact details you save. Your WeChat ID is not read automatically."
     ],
     "mobile_link_help": [
       "请在电脑上登录此账号，再用手机微信扫码完成绑定。",
       "Sign in to this account on a computer, then scan the code with WeChat on your phone to link it."
+    ],
+    "setup_title": [
+      "完善顾客资料",
+      "Complete your customer profile"
+    ],
+    "setup_help": [
+      "请填写昵称、预约称呼及联系方式，方便店主认出你、核对预约。头像和微信号由你主动提供，可以稍后补充。",
+      "Add your display name, booking name and contact details so the host can recognise you and match your booking. You choose your avatar and provide your WeChat ID; these can be added later."
+    ],
+    "setup_later": [
+      "稍后填写",
+      "Later"
+    ],
+    "customer_code": [
+      "顾客编号",
+      "Customer reference"
+    ],
+    "wechat_id": [
+      "微信号（选填）",
+      "WeChat ID (optional)"
+    ],
+    "wechat_id_placeholder": [
+      "填写可添加好友的微信号",
+      "Your WeChat ID for adding contacts"
+    ],
+    "wechat_id_help": [
+      "由你填写，用于店主联系和核对预约；微信登录不会自动提供微信号。",
+      "Provided by you so the host can contact you and match your booking. WeChat sign-in does not supply your WeChat ID."
+    ],
+    "wechat_id_invalid": [
+      "请检查微信号，可使用字母、数字、下划线、短横线或点号。",
+      "Check your WeChat ID. Use letters, numbers, underscores, hyphens or dots."
     ]
   },
   "rate-fields": {
@@ -8703,6 +8735,16 @@
     "hours": [
       "剩余 {count} 小时",
       "{count} hours left"
+    ]
+  },
+  "miniapp-legal": {
+    "updated": [
+      "更新日期：2026 年 9 月 12 日",
+      "Updated: September 12, 2026"
+    ],
+    "identity_body": [
+      "微信登录使用微信提供的登录凭证与身份标识，用于验证登录、关联账号和完成网站扫码授权。邮箱登录使用你填写的邮箱和密码。昵称、头像和选填的微信号由你主动填写或选择。店主可查看当前账号的顾客编号、昵称、头像、预约称呼及你提供的联系方式，用于核对预约和沟通；不会按同名或同一联系方式自动合并账号。打开首页不会自动取得微信手机号、微信号、昵称或头像。",
+      "WeChat login uses credentials and identifiers supplied by WeChat to authenticate you, link your account and approve website sign-in. Email login uses the email address and password you enter. You choose your nickname and avatar and may provide a WeChat ID. The host can see your customer reference, nickname, avatar, booking name and provided contact details to match bookings and communicate. Accounts are not automatically merged by matching names or contact details. Opening the home page does not automatically give us your WeChat phone number, WeChat ID, nickname or avatar."
     ]
   }
 }

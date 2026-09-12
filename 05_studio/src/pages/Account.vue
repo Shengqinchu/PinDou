@@ -4,11 +4,16 @@ import AccountPanel from '../components/AccountPanel.vue';
 import { accountCopy as copy } from '../account';
 import { accountReturn } from '../wechat';
 import { say } from '../state';
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter } from 'vue-router';
 import { onMounted } from 'vue';
-import { refreshAccount } from '../account';
-const route=useRoute();
-function signedIn(){if(route.query.intent==='login')location.assign(accountReturn(route.query.return_to,'/upload'));}
+import { refreshAccount,accountUser } from '../account';
+import {defaultDisplayName} from '../identity-model';
+const route=useRoute(),router=useRouter();
+function signedIn(){if(route.query.intent==='login'){
+ const next=accountReturn(route.query.return_to,'/upload');
+ if(accountUser.value?.id.startsWith('wechat_authing_')&&defaultDisplayName(accountUser.value.nickname))void router.replace({path:'/account',query:{setup:'1',next}});
+ else location.assign(next);
+}}
 onMounted(async()=>{if(route.query.intent==='login'&&await refreshAccount().catch(()=>false))signedIn();});
 </script>
 <template><section class="container account-page"><LiftTitle :text="say(copy.account_center)"/><AccountPanel embedded @signed-in="signedIn" /></section></template>

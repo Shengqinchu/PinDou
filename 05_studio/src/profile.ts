@@ -1,6 +1,6 @@
 import { contentModule } from './content-store';
 import defaults from './content/profile.json';
-import { accountCopy,accountUser,applyAccountProfile } from './account';
+import { accountCopy,accountUser,applyAccountProfile,refreshAccount } from './account';
 import { customerToken } from './account-storage';
 import { say } from './state';
 export const profileCopy=contentModule('profile',defaults);
@@ -32,5 +32,6 @@ export async function saveProfilePart(token:string,id:string,part:{nickname:stri
   const profile=avatar?data?.user:data;
   if(!profile||profile.user_id!==id||(profile.email!=null&&typeof profile.email!=='string'))throw new Error(say(profileCopy.save_error));
   if(!applyAccountProfile(profile,token))throw new Error(say(accountCopy.account_login_required));
+  if(!await refreshAccount()||customerToken()!==token||accountUser.value?.id!==id)throw new Error(say(profileCopy.save_error));
   return profile;
 }

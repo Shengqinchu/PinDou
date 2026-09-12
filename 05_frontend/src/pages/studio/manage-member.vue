@@ -2,6 +2,7 @@
 import {computed,reactive,ref} from 'vue';
 import {onLoad,onShow,onUnload} from '@dcloudio/uni-app';
 import StudioAdminShell from '../../components/StudioAdminShell.vue';
+import StudioCustomerIdentity from '../../components/StudioCustomerIdentity.vue';
 import {useStudioNative} from '../../utils/studio-native';
 import {adminCall,adminError,confirmAdmin,requestKey,today} from '../../utils/studio-admin';
 import copy from '../../../../05_studio/src/content/workbench.json';
@@ -31,7 +32,7 @@ async function save(){if(!data.value||saving.value)return;let payload=attemptPay
 onLoad(q=>{ident=typeof q?.id==='string'?q.id:'';form.reservation_id=typeof q?.reservation==='string'?q.reservation:'';});onShow(()=>{if(!editing.value)void load();});onUnload(()=>{alive=false;});
 </script>
 <template><StudioAdminShell :title="data?.account.name||say(copy.profile)" back :language="language" :shell-style="shellStyle" :keyboard-open="keyboardOpen" :busy="busy" :error="error" @refresh="load()" @language="changeLanguage"><template v-if="data">
- <view class="admin-card admin-stack"><text class="admin-name">{{data.account.name}}</text><text class="admin-muted">{{data.booking_profile?.contact||data.account.email||'—'}}</text><view class="admin-pair"><view class="admin-stack"><text class="admin-label">{{say(wallet.remaining_time)}}</text><text>{{say(copy.hours).replace('{count}',hoursNumber(data.account.minutes))}}</text></view><view class="admin-stack"><text class="admin-label">{{say(wallet.remaining_points)}}</text><text>{{data.account.points}}</text></view></view></view>
+ <view class="admin-card admin-stack"><StudioCustomerIdentity :customer="data.account" :language="language"/><view class="admin-pair"><view class="admin-stack"><text class="admin-label">{{say(wallet.remaining_time)}}</text><text>{{say(copy.hours).replace('{count}',hoursNumber(data.account.minutes))}}</text></view><view class="admin-stack"><text class="admin-label">{{say(wallet.remaining_points)}}</text><text>{{data.account.points}}</text></view></view></view>
  <view class="admin-card admin-stack"><text class="admin-label">{{say(wallet.private_note)}}</text><textarea v-model="note" class="admin-textarea" maxlength="1500" :adjust-position="false"/><button class="admin-secondary" :disabled="saving" @tap="saveNote">{{say(wallet.save_note)}}</button></view>
  <button v-if="!editing" class="admin-primary" @tap="editing=true">{{say(wallet.transaction)}}</button>
  <view v-if="editing" class="admin-card"><view class="admin-field"><text class="admin-label">{{say(wallet.kind)}}</text><picker :disabled="!!attemptPayload" :range="labels" :value="kinds.indexOf(form.kind)" @change="form.kind=kinds[Number($event.detail.value)];form.hours='';form.points=''"><view class="admin-input">{{labels[kinds.indexOf(form.kind)]}}</view></picker></view>

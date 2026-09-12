@@ -1,5 +1,5 @@
 """Real Studio HTTP handlers with an isolated legacy-account service double."""
-import io,json,uuid
+import io,json,uuid,hashlib
 from datetime import datetime,timedelta
 from urllib.error import HTTPError,URLError
 import pytest
@@ -96,7 +96,8 @@ def test_account_profile_exposes_shared_avatar_but_no_provider_or_private_fields
         'nickname':'Shared name','avatar':'/static/thumbnails/avatar_test.png','phone':'private','is_admin':True,
         'password_hash':'private','wechat_openid':'private','paid_credits':188})
     assert client.get('/studio-api/auth/me').json()['user']=={
-        'id':'qa-owner','email':'qa@example.test','nickname':'Shared name','avatar':'/static/thumbnails/avatar_test.png','is_admin':False}
+        'id':'qa-owner','email':'qa@example.test','nickname':'Shared name','avatar':'/static/thumbnails/avatar_test.png','is_admin':False,
+        'customer_code':'PD-'+hashlib.sha256(b'qa-owner').hexdigest()[:10].upper()}
 
 
 def test_password_signup_uses_bridge_and_rewards_once(client,monkeypatch):

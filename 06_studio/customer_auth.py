@@ -46,7 +46,7 @@ def limit(request: Request, scope: str, maximum: int, seconds: int, identifier: 
         db.execute("INSERT INTO studio_auth_limits VALUES(?,?,?,1) ON CONFLICT(scope,actor,bucket) DO UPDATE SET count=count+1", (scope,actor,bucket))
 
 
-def upstream(path: str, request: Request, body=None, token: str = "") -> dict:
+def upstream(path: str, request: Request, body=None, token: str = "", method: str | None = None) -> dict:
     if path not in PATHS:
         raise HTTPException(503, "account_unavailable")
     headers = {"Content-Type": "application/json", "Accept": "application/json"}
@@ -54,7 +54,7 @@ def upstream(path: str, request: Request, body=None, token: str = "") -> dict:
     headers["X-Forwarded-For"] = request.client.host if request.client else "unknown"
     if token:
         headers["Authorization"] = "Bearer " + token
-    req = URLRequest(_origin + "/api/v1/user/" + path, headers=headers,
+    req = URLRequest(_origin + "/api/v1/user/" + path, headers=headers, method=method,
                      data=json.dumps(body).encode() if body is not None else None)
     try:
         with build_opener(NoRedirect()).open(req, timeout=15) as response:
@@ -81,6 +81,15 @@ def upstream(path: str, request: Request, body=None, token: str = "") -> dict:
         raise HTTPException(503,"account_unavailable") from None
 
 
+def display_name(ident: str, value) -> str:
+    nickname=str(value or '')[:80]
+    if nickname.strip() in ('', '拼豆用户', '微信用户', 'PinDou guest', 'WeChat user'):
+        import content
+        template=content.DEFAULTS.get('account',{}).get('default_name_with_suffix',['PinDou guest_{v0}'])[0]
+        return template.replace('{v0}',hashlib.sha256(ident.encode()).hexdigest()[:8].upper())
+    return nickname
+
+
 def public_user(data: dict) -> dict:
     ident = data.get("user_id")
     email = data.get("email") or ''
@@ -90,11 +99,7 @@ def public_user(data: dict) -> dict:
         or not (EMAIL.fullmatch(email) or (not email and re.fullmatch(r'wechat_authing_[a-f0-9]{64}',ident)))):
         raise HTTPException(401,"account_email_required")
     avatar=data.get("avatar")
-    nickname=str(data.get("nickname") or "")[:80]
-    if not nickname.strip():
-        import content
-        template=content.DEFAULTS.get('account',{}).get('default_name_with_suffix',['PinDou guest_{v0}'])[0]
-        nickname=template.replace('{v0}',hashlib.sha256(ident.encode()).hexdigest()[:8].upper())
+    nickname=display_name(ident,data.get('nickname'))
     import studio_staff
     return {"id":ident,"email":email,"nickname":nickname,
             "avatar":avatar if isinstance(avatar,str) and len(avatar)<=2048 else "", "is_admin":studio_staff.is_admin(ident)}
@@ -137,6 +142,11 @@ class PasswordRegistration(EmailInput):
     password: str = Field(min_length=6,max_length=128)
 
 
+class ProfileInput(BaseModel):
+    model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
+    nickname: str = Field(min_length=1, max_length=20)
+
+
 def signed_in(path, payload, request):
     limit(request,"login-ip",30,600)
     limit(request,"login-email",10,600,payload.email)
@@ -155,6 +165,17 @@ def signed_in(path, payload, request):
 def register(app, database, origin):
     global _database,_origin
     _database=database;_origin=origin.rstrip("/")
+
+    @app.put('/studio-api/auth/profile')
+    def update_profile(payload: ProfileInput, request: Request):
+        # WeChat supports PUT; the shared account's existing endpoint uses PATCH.
+        customer=require_customer(request,request.headers.get('authorization'))
+        updated=upstream('profile',request,payload.model_dump(),token=request.headers['authorization'][7:],method='PATCH')
+        public=public_user(updated)
+        if public['id']!=customer['id']:raise HTTPException(503,'account_unavailable')
+        import wallet
+        wallet.remember_customer(public)
+        return {'user':public,'shared_user':updated}
 
     @app.get("/studio-api/auth/options")
     def options():

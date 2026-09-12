@@ -8,7 +8,7 @@ profiles={}
 def reject_legacy_admin(req,**kwargs):
     raise HTTPError(req.full_url,401,'Local user is not an admin',{},io.BytesIO(b'{}'))
 
-def fake_upstream(path,request,body=None,token=""):
+def fake_upstream(path,request,body=None,token="",method=None):
     if path=="email/send-code":return {"cooldown_seconds":60}
     if path=="profile":
         if token not in ("qa-owner","qa-other") and not token.startswith("qa-email-"):
@@ -20,5 +20,6 @@ def fake_upstream(path,request,body=None,token=""):
         token="qa-email-"+hashlib.sha256(body['email'].encode()).hexdigest()[:12]
         email=body['email']
     user=profiles.get(token) or {"user_id":token,"email":email,"nickname":"Local QA"}
+    if path=='profile' and method=='PATCH':user={**user,**body}
     profiles[token]=user
     return user if path=="profile" else {"token":token,"user":user}

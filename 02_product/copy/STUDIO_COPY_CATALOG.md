@@ -1778,10 +1778,10 @@
 |---|---|---|
 | privacy_title | 隐私政策说明 | Privacy notice |
 | agreement_title | 用户服务协议 | Service terms |
-| updated | 更新日期：2026 年 9 月 11 日 | Updated: September 11, 2026 |
+| updated | 更新日期：2026 年 9 月 12 日 | Updated: September 12, 2026 |
 | privacy_intro | 本说明适用于小狗拼豆铺（PinDou Puppy）的小程序及共用的账号、预约和图纸服务。我们按你使用的功能处理相应信息。你可以先浏览首页和店铺信息，再决定是否登录、预约或上传图片。 | This notice covers the PinDou Puppy mini program and its shared account, booking and pattern services. We process information for the features you choose. You can browse the home page and studio information before deciding to sign in, book or upload an image. |
 | identity_title | 账号与个人资料 | Account and profile |
-| identity_body | 微信登录使用微信提供的登录凭证与身份标识，用于验证登录、关联账号和完成网站扫码授权。邮箱登录使用你填写的邮箱和密码。昵称、头像由你主动填写或选择，用于账号展示。打开首页不会自动取得微信手机号、昵称或头像。 | WeChat login uses credentials and identifiers supplied by WeChat to authenticate you, link your account and approve website sign-in. Email login uses the email address and password you enter. Your chosen nickname and avatar identify your profile. Opening the home page does not automatically give us your WeChat phone number, nickname or avatar. |
+| identity_body | 微信登录使用微信提供的登录凭证与身份标识，用于验证登录、关联账号和完成网站扫码授权。邮箱登录使用你填写的邮箱和密码。昵称、头像和选填的微信号由你主动填写或选择。店主可查看当前账号的顾客编号、昵称、头像、预约称呼及你提供的联系方式，用于核对预约和沟通；不会按同名或同一联系方式自动合并账号。打开首页不会自动取得微信手机号、微信号、昵称或头像。 | WeChat login uses credentials and identifiers supplied by WeChat to authenticate you, link your account and approve website sign-in. Email login uses the email address and password you enter. You choose your nickname and avatar and may provide a WeChat ID. The host can see your customer reference, nickname, avatar, booking name and provided contact details to match bookings and communicate. Accounts are not automatically merged by matching names or contact details. Opening the home page does not automatically give us your WeChat phone number, WeChat ID, nickname or avatar. |
 | booking_title | 预约与联系资料 | Bookings and contact details |
 | booking_body | 预约使用你选择的体验、人数、日期和时间，以及填写的称呼、联系方式和备注，供店主查看和确认安排。首次预约填写的称呼及联系方式会保存到当前账号，供再次预约复用，也可在个人资料中修改。店主会通过你提供的方式联系你。 你在注册或预约中留下的邮箱、手机会自动用于预约状态、到店提醒及相关沟通，可在“预约提醒”中关闭；微信提醒由你单独允许。站内对话和必要的手机消息记录用于店主查看、回复及核对沟通。 | Bookings use your chosen experience, party size, date and time, together with your name, contact details and notes, so the host can review and confirm arrangements. The name and contact details from your first booking are saved to your account for future bookings and can be edited in your profile. The host may contact you using these details. Email and phone details you provide at registration or booking are used for booking updates, visit reminders and related replies. You can disable these in notification settings; WeChat notices require separate approval. In-app conversations and necessary phone-message records allow the host to read, reply and review the conversation. |
 | images_title | 图片与图纸 | Images and patterns |
@@ -2347,6 +2347,14 @@
 | 键 | 中文 | English |
 |---|---|---|
 | edit | 编辑资料 | Edit profile |
+| setup_title | 完善顾客资料 | Complete your customer profile |
+| setup_help | 请填写昵称、预约称呼及联系方式，方便店主认出你、核对预约。头像和微信号由你主动提供，可以稍后补充。 | Add your display name, booking name and contact details so the host can recognise you and match your booking. You choose your avatar and provide your WeChat ID; these can be added later. |
+| setup_later | 稍后填写 | Later |
+| customer_code | 顾客编号 | Customer reference |
+| wechat_id | 微信号（选填） | WeChat ID (optional) |
+| wechat_id_placeholder | 填写可添加好友的微信号 | Your WeChat ID for adding contacts |
+| wechat_id_help | 由你填写，用于店主联系和核对预约；微信登录不会自动提供微信号。 | Provided by you so the host can contact you and match your booking. WeChat sign-in does not supply your WeChat ID. |
+| wechat_id_invalid | 请检查微信号，可使用字母、数字、下划线、短横线或点号。 | Check your WeChat ID. Use letters, numbers, underscores, hyphens or dots. |
 | nickname | 昵称 | Display name |
 | avatar | 头像 | Avatar |
 | upload | 更换头像 | Change avatar |
@@ -2369,7 +2377,7 @@
 | time_empty | 暂无时长记录 | No time entries yet |
 | points_empty | 暂无积分记录 | No points entries yet |
 | wechat_help | 微信绑定说明 | About your WeChat link |
-| wechat_profile_help | 已绑定的微信可用于登录。当前登录方式未提供真实微信昵称和头像；网站昵称和头像可在“编辑资料”中设置。 | Your linked WeChat can be used to sign in. This sign-in method has not provided your real WeChat name or avatar. Set your website profile in Edit profile. |
+| wechat_profile_help | 微信可用于登录。店主看到的是你主动保存的昵称、头像和联系方式；微信号不会自动读取。 | WeChat can be used to sign in. The host sees the display name, avatar and contact details you save. Your WeChat ID is not read automatically. |
 | mobile_link_help | 请在电脑上登录此账号，再用手机微信扫码完成绑定。 | Sign in to this account on a computer, then scan the code with WeChat on your phone to link it. |
 
 ## rate-fields.json

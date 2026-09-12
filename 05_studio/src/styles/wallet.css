@@ -43,7 +43,7 @@ html[data-motion="reduced"] :is(.member-row,.home-journal-card,.account-methods>
 @media(hover:hover) and (pointer:fine){.member-row:hover{background:#f1f6f9;}}
 @media(max-width:600px){.member-row{grid-template-columns:minmax(0,1fr) auto 18px;padding:18px 16px;gap:12px;}.member-row>svg:first-child{display:none;}.member-row strong{font-size:15px;}.wallet-form{padding:16px;}.wallet-entry-heading{flex-wrap:wrap;gap:4px 12px;}.wallet-input-grid{grid-template-columns:1fr;}.wallet-balance{padding:14px;}.wallet-balances{gap:8px;}.wallet-form-actions .desk-button{flex:1;}}
 
-.member-row{grid-template-columns:28px minmax(130px,1fr) minmax(120px,1.2fr) minmax(100px,.5fr) 20px;}
+.member-row{grid-template-columns:minmax(180px,1.5fr) minmax(120px,1.2fr) minmax(100px,.5fr) 20px;}
 .member-row .member-list-note{font-size:13px;line-height:1.65;white-space:pre-line;overflow-wrap:anywhere;color:var(--muted);}
 .wallet-promotion-confirm{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.6;}.wallet-promotion-confirm input{width:18px;height:18px;margin-top:2px;flex-shrink:0;}
 @media(max-width:700px){.member-row{grid-template-columns:minmax(0,1fr) auto 18px;gap:8px 12px;}.member-row>svg:first-child{display:none;}.member-row>span:first-of-type{grid-column:1;grid-row:1;}.member-row .member-list-note{grid-column:1/-1;grid-row:2;}.member-row .member-list-note:empty{display:none;}.member-list-balance{grid-column:2;grid-row:1;}.member-row>svg:last-child{grid-column:3;grid-row:1;}}

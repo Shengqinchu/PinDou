@@ -15,7 +15,7 @@ from zoneinfo import ZoneInfo
 from fastapi import Depends, Header, HTTPException
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from customer_auth import require_customer
+from customer_auth import require_customer, display_name
 import booking_profile
 
 _database = None
@@ -59,10 +59,27 @@ def initialize(database):
             db.execute("ALTER TABLE studio_wallet_ledger ADD COLUMN redemption_use TEXT NOT NULL DEFAULT ''")
         if 'no_promotion' not in columns:
             db.execute('ALTER TABLE studio_wallet_ledger ADD COLUMN no_promotion INTEGER')
+        member_columns={r[1] for r in db.execute('PRAGMA table_info(studio_members)')}
+        for name in ('avatar','customer_code'):
+            if name not in member_columns:db.execute(f"ALTER TABLE studio_members ADD COLUMN {name} TEXT NOT NULL DEFAULT ''")
+        db.execute("CREATE UNIQUE INDEX IF NOT EXISTS studio_customer_code ON studio_members(customer_code) WHERE customer_code!=''")
         # Existing stable user IDs only. Contact details are not identity proofs.
         db.execute("""INSERT OR IGNORE INTO studio_members(owner_id,name,created_at,updated_at)
           SELECT owner_id, coalesce(json_extract(payload,'$.name'),owner_id),min(created_at),max(updated_at)
           FROM studio_reservations WHERE owner_id!='' GROUP BY owner_id""")
+        for row in db.execute("SELECT owner_id FROM studio_members WHERE customer_code='' ").fetchall():
+            ensure_customer_code(db,row['owner_id'])
+
+
+def ensure_customer_code(db, owner_id):
+    digest=hashlib.sha256(owner_id.encode()).hexdigest().upper()
+    for length in range(10,65,2):
+        code='PD-'+digest[:length]
+        other=db.execute('SELECT owner_id FROM studio_members WHERE customer_code=?',(code,)).fetchone()
+        if not other or other['owner_id']==owner_id:
+            db.execute("UPDATE studio_members SET customer_code=? WHERE owner_id=? AND customer_code=''",(code,owner_id))
+            return code
+    raise RuntimeError('Customer reference collision')
 
 
 def remember_customer(customer):
@@ -70,13 +87,15 @@ def remember_customer(customer):
         return
     with _database() as db:
         db.execute("BEGIN IMMEDIATE")
-        existing = db.execute("SELECT name,email FROM studio_members WHERE owner_id=?", (customer['id'],)).fetchone()
+        existing = db.execute("SELECT name,email,avatar,customer_code FROM studio_members WHERE owner_id=?", (customer['id'],)).fetchone()
         name = customer.get('nickname') or (existing['name'] if existing else customer['email'])
+        avatar=customer.get('avatar') or ''
         if not existing:
-            db.execute("INSERT INTO studio_members(owner_id,name,email,created_at,updated_at) VALUES(?,?,?,?,?)",
-                       (customer['id'], name, customer['email'], now(), now()))
-        elif existing['email'] != customer['email'] or existing['name'] != name:
-            db.execute("UPDATE studio_members SET name=?,email=? WHERE owner_id=?", (name, customer['email'], customer['id']))
+            db.execute("INSERT INTO studio_members(owner_id,name,email,avatar,created_at,updated_at) VALUES(?,?,?,?,?,?)",
+                       (customer['id'], name, customer['email'], avatar, now(), now()))
+        elif existing['email'] != customer['email'] or existing['name'] != name or existing['avatar']!=avatar:
+            db.execute("UPDATE studio_members SET name=?,email=?,avatar=? WHERE owner_id=?", (name, customer['email'], avatar, customer['id']))
+        customer['customer_code']=existing['customer_code'] if existing and existing['customer_code'] else ensure_customer_code(db,customer['id'])
         reward_registration(db,customer['id'])
 
 
@@ -89,9 +108,22 @@ def member(db, owner_id):
 
 def public_member(row):
     return {k: row[k] for k in ('owner_id', 'name', 'email', 'minutes', 'points', 'version', 'updated_at')} | {
+        'name':display_name(row['owner_id'],row['name']),
+        'avatar':row.get('avatar',''),'customer_code':row.get('customer_code',''),
         'redeemable_cad': row['points'] // POINTS_PER_CAD, 'points_per_cad': POINTS_PER_CAD,
         'visit_reward': VISIT_REWARD, 'registration_reward': REGISTRATION_REWARD,
     }
+
+
+def staff_profile(db, row):
+    profile=booking_profile.read(db,row['owner_id']);contacts=[]
+    def add(kind,value):
+        if value and not any(c['kind']==kind and c['value']==value for c in contacts):contacts.append({'kind':kind,'value':value})
+    add(profile['contact_method'],profile['contact']);add('wechat',profile.get('wechat_id',''));add('email',row['email'])
+    if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='studio_customer_notification_preferences'").fetchone():
+        pref=db.execute('SELECT email,phone FROM studio_customer_notification_preferences WHERE owner_id=?',(row['owner_id'],)).fetchone()
+        if pref:add('email',pref['email']);add('phone',pref['phone'])
+    return {'booking_profile':profile,'contacts':contacts}
 
 
 def detail(db, owner_id, page=1, category='all', admin=False):
@@ -106,7 +138,7 @@ def detail(db, owner_id, page=1, category='all', admin=False):
                  'minutes_balance','points_balance','note','reservation_id','bill_cents','reverses_id','reversed_by','redemption_use','no_promotion')}
         if admin: entry['actor'] = row['actor']
         entries.append(entry)
-    return {'account': (account | public_member(account)) if admin else public_member(account),
+    return {'account': (account | public_member(account) | staff_profile(db,account)) if admin else public_member(account),
             'entries': entries, 'total': total, 'page': page, 'booking_profile':booking_profile.read(db,owner_id)}
 
 
@@ -228,12 +260,15 @@ def register(app, database, admin_actor):
     @app.get('/studio-api/manage/members')
     def members(search:str='',page:int=1,_actor=Depends(admin_actor)):
         if len(search)>160 or not 1<=page<=100000: raise HTTPException(422,'invalid_filter')
-        where=' WHERE instr(lower(name),lower(?))>0 OR instr(lower(email),lower(?))>0 OR instr(owner_id,?)>0 OR instr(lower(staff_note),lower(?))>0 OR owner_id IN (SELECT owner_id FROM studio_booking_profiles WHERE instr(lower(name),lower(?))>0 OR instr(lower(contact),lower(?))>0)'
-        params=(search,search,search,search,search,search)
+        where=' WHERE instr(lower(name),lower(?))>0 OR instr(lower(email),lower(?))>0 OR instr(owner_id,?)>0 OR instr(lower(staff_note),lower(?))>0 OR instr(lower(customer_code),lower(?))>0 OR owner_id IN (SELECT owner_id FROM studio_booking_profiles WHERE instr(lower(name),lower(?))>0 OR instr(lower(contact),lower(?))>0 OR instr(lower(wechat_id),lower(?))>0)'
+        params=(search,)*8
         with database() as db:
+            if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='studio_customer_notification_preferences'").fetchone():
+                where+=' OR owner_id IN (SELECT owner_id FROM studio_customer_notification_preferences WHERE instr(lower(email),lower(?))>0 OR instr(phone,?)>0)'
+                params+=(search,search)
             total=db.execute('SELECT count(*) FROM studio_members'+where,params).fetchone()[0]
             rows=db.execute('SELECT * FROM studio_members'+where+' ORDER BY updated_at DESC,owner_id LIMIT 30 OFFSET ?',(*params,(page-1)*30)).fetchall()
-            return {'items':[public_member(dict(r))|{'staff_note':r['staff_note'],'booking_profile':booking_profile.read(db,r['owner_id'])} for r in rows],'total':total,'page':page}
+            return {'items':[public_member(dict(r))|{'staff_note':r['staff_note'],**staff_profile(db,r)} for r in rows],'total':total,'page':page}
 
     @app.get('/studio-api/manage/members/{owner_id}')
     def get_member(owner_id:str,page:int=1,category:Literal['all','time','points']='all',_actor=Depends(admin_actor)):

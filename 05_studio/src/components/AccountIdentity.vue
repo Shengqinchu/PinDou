@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed,onBeforeUnmount,ref,watch } from 'vue';
+import { computed,onBeforeUnmount,onMounted,ref,watch } from 'vue';
 import { PhPencilSimple,PhUserCircle } from '@phosphor-icons/vue';
-import { RouterLink } from 'vue-router';
+import { RouterLink,useRoute,useRouter } from 'vue-router';
+import {defaultDisplayName,validWechatId} from '../identity-model';
+import {accountReturn} from '../wechat';
 import { accountCopy,accountUser,closeAccount } from '../account';
 import { customerToken } from '../account-storage';
 import { profileCopy as copy,normalizeNickname,imageError,saveProfilePart } from '../profile';
@@ -13,14 +15,16 @@ import InfoTip from './InfoTip.vue';
 import WechatSignIn from './WechatSignIn.vue';
 import BookingContactFields from './BookingContactFields.vue';
 import { bookingProfileCopy as bookingCopy,emptyContact,contactDetails,sameContact,validContact,loadBookingProfile,saveBookingProfile,type BookingProfile } from '../booking-profile';
-defineProps<{emailOnly?:boolean;linkToCenter?:boolean}>();
+const props=defineProps<{emailOnly?:boolean;linkToCenter?:boolean}>();
+const route=useRoute(),router=useRouter(),wechatId=ref('');
+const setupNeeded=computed(()=>!!accountUser.value?.id.startsWith('wechat_authing_')&&(defaultDisplayName(accountUser.value.nickname)||!accountUser.value.avatar));
 const editing=ref(false),busy=ref(false),nickname=ref(''),error=ref(''),file=ref<File>(),preview=ref(''),failed=ref(false);
 const input=ref<HTMLInputElement>(),owner=ref(''),token=ref(''),original=ref('');
 const booking=ref<BookingProfile>(),bookingDraft=ref(emptyContact()),bookingLoading=ref(false),bookingError=ref('');let bookingSequence=0;
 const bookingConflict=ref(false);
 const name=computed(()=>normalizeNickname(nickname.value));
 const valid=computed(()=>name.value===original.value||([...name.value].length>=1&&[...name.value].length<=20));
-const bookingChanged=computed(()=>!!booking.value&&!sameContact(bookingDraft.value,booking.value));
+const bookingChanged=computed(()=>!!booking.value&&(!sameContact(bookingDraft.value,booking.value)||wechatId.value!==(booking.value.wechat_id||'')));
 const changed=computed(()=>name.value!==original.value||!!file.value||bookingChanged.value);
 const avatar=computed(()=>preview.value||accountUser.value?.avatar||'');
 function releasePreview(){if(preview.value)URL.revokeObjectURL(preview.value);preview.value='';}
@@ -28,16 +32,16 @@ function openEditor(){
   if(!accountUser.value)return;
   owner.value=accountUser.value.id;token.value=customerToken();
   original.value=normalizeNickname(accountUser.value.nickname||'');nickname.value=original.value;
-  file.value=undefined;error.value='';releasePreview();editing.value=true;
+  file.value=undefined;error.value='';wechatId.value='';releasePreview();editing.value=true;
   booking.value=undefined;bookingConflict.value=false;bookingDraft.value=emptyContact();void loadBooking();
 }
 async function loadBooking(){
  const seq=++bookingSequence,id=owner.value;bookingLoading.value=true;bookingError.value='';
- try{const value=await loadBookingProfile(id,token.value);if(seq===bookingSequence&&editing.value){booking.value=value;bookingDraft.value=contactDetails(value);}}
+ try{const value=await loadBookingProfile(id,token.value);if(seq===bookingSequence&&editing.value){booking.value=value;bookingDraft.value=contactDetails(value);wechatId.value=value.wechat_id||'';}}
  catch(e){if(seq===bookingSequence)bookingError.value=(e as Error).message;}
  finally{if(seq===bookingSequence)bookingLoading.value=false;}
 }
-function closeEditor(){if(!busy.value){editing.value=false;file.value=undefined;releasePreview();}}
+function closeEditor(){if(!busy.value){editing.value=false;file.value=undefined;releasePreview();if(route.query.setup==='1'&&route.query.next)void router.replace(accountReturn(route.query.next,'/'));}}
 async function useLatestBooking(){await loadBooking();if(!bookingError.value){bookingConflict.value=false;error.value='';}}
 function choose(event:Event){
   const selected=(event.target as HTMLInputElement).files?.[0];(event.target as HTMLInputElement).value='';
@@ -48,6 +52,7 @@ function choose(event:Event){
 async function save(){
   if(busy.value||bookingLoading.value||!changed.value)return;
   if(!valid.value){error.value=say(copy.name_invalid);return;}
+  if(!validWechatId(wechatId.value)){error.value=say(copy.wechat_id_invalid);return;}
   if(bookingChanged.value&&!validContact(bookingDraft.value,true)){error.value=say(bookingCopy.incomplete);return;}
   busy.value=true;error.value='';let savedAny=false;
   try{
@@ -55,7 +60,7 @@ async function save(){
       await saveProfilePart(token.value,owner.value,{nickname:name.value});
       original.value=name.value;savedAny=true;
     }
-    if(bookingChanged.value){booking.value=await saveBookingProfile(owner.value,token.value,bookingDraft.value,booking.value!.version);bookingDraft.value=contactDetails(booking.value);savedAny=true;}
+    if(bookingChanged.value){booking.value=await saveBookingProfile(owner.value,token.value,bookingDraft.value,booking.value!.version,wechatId.value);bookingDraft.value=contactDetails(booking.value);savedAny=true;}
     if(file.value)await saveProfilePart(token.value,owner.value,file.value);
     busy.value=false;closeEditor();notify(copy.saved[0],copy.saved[1],'success');
   }catch(e){bookingConflict.value=e instanceof CommerceError&&e.code==='booking_profile_changed';error.value=(savedAny?say(bookingCopy.partial)+' ':'')+(e as Error).message;}
@@ -64,8 +69,12 @@ async function save(){
 watch(()=>accountUser.value?.id,()=>{bookingSequence++;editing.value=false;file.value=undefined;booking.value=undefined;bookingDraft.value=emptyContact();releasePreview();});
 watch(()=>accountUser.value?.avatar,()=>failed.value=false);
 onBeforeUnmount(releasePreview);
+onMounted(()=>{if(!props.emailOnly&&route.query.setup==='1')openEditor();});
+watch(()=>route.query.setup,value=>{if(value==='1'&&!props.emailOnly&&!editing.value)openEditor();});
 </script>
 <template>
+  <p v-if="setupNeeded&&!emailOnly" class="profile-setup-notice">{{say(copy.setup_help)}} <button class="text-link" @click="openEditor">{{say(copy.setup_title)}}</button></p>
+  <p v-if="accountUser?.customer_code&&!emailOnly" class="fine-print">{{say(copy.customer_code)}} · {{accountUser.customer_code}}</p>
   <div v-if="accountUser" class="account-identity">
     <component :is="linkToCenter?RouterLink:'span'" class="account-avatar-link" v-bind="linkToCenter?{to:'/account','aria-label':say(accountCopy.account_center)}:{}" @click="linkToCenter&&closeAccount()"><img v-if="accountUser.avatar&&!failed" class="account-portrait" :src="accountUser.avatar" alt="" referrerpolicy="no-referrer" @error="failed=true"/><PhUserCircle v-else class="account-portrait" :size="56" weight="light"/></component>
     <div class="account-identity-text"><component :is="linkToCenter?RouterLink:'span'" class="account-name-link" v-bind="linkToCenter?{to:'/account'}:{}" @click="linkToCenter&&closeAccount()"><strong>{{accountUser.nickname||accountUser.email||say(accountCopy.default_name)}}</strong></component><WechatSignIn v-if="!emailOnly" :key="accountUser.id" linking compact/><p v-else>{{accountUser.email}}</p></div>
@@ -81,6 +90,7 @@ onBeforeUnmount(releasePreview);
       </div>
       <label class="field"><span class="profile-field-label">{{say(copy.nickname)}}<InfoTip :label="say(copy.nickname_help)"><p>{{say(copy.nickname_help)}}</p></InfoTip></span><input v-model="nickname" autocomplete="nickname" :required="name!==original" :disabled="busy" :aria-invalid="nickname.length>0&&!valid||undefined"/></label>
       <div v-if="accountUser?.email" class="profile-email"><span>{{say(accountCopy.email)}}</span><p>{{accountUser?.email}}</p><InfoTip :label="say(copy.shared_help)"><p>{{say(copy.shared_help)}}</p></InfoTip></div>
+      <label class="field"><span>{{say(copy.wechat_id)}}</span><input v-model="wechatId" maxlength="80" :placeholder="say(copy.wechat_id_placeholder)" :disabled="busy"/><small>{{say(copy.wechat_id_help)}}</small></label>
       <section class="booking-profile-section"><h3>{{say(bookingCopy.title)}}</h3><p v-if="bookingLoading" role="status">{{say(bookingCopy.loading)}}</p><p v-else-if="bookingError" class="profile-contact-error" role="alert">{{bookingError}} <button type="button" class="text-link" @click="loadBooking">{{say(bookingCopy.retry)}}</button></p><BookingContactFields v-else class="profile-contact" v-model="bookingDraft" :required="false" :disabled="busy"/></section>
       <p v-if="error" class="form-error" role="alert">{{error}} <button v-if="bookingConflict" class="text-link" type="button" :disabled="busy||bookingLoading" @click="useLatestBooking">{{say(bookingCopy.use_latest)}}</button></p>
       <div class="profile-actions"><button type="button" class="button button-secondary" :disabled="busy" @click="closeEditor">{{say(copy.cancel)}}</button><button class="button button-primary" :disabled="busy||bookingLoading||!changed||!valid">{{say(busy?copy.saving:copy.save)}}</button></div>

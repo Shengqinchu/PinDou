@@ -3,7 +3,7 @@ import copy from '../../../05_studio/src/content/miniapp.json';
 const origin='https://pindoupuppy.com/studio-api';
 export const miniappPrefix='/auth/wechat/miniapp';
 export type MiniSession={ticket:string;linked:boolean;expires_in:number};
-export type SharedSession={token:string;user:{id:string;nickname:string;email:string};shared_user:any};
+export type SharedSession={token:string;user:{id:string;nickname:string;email:string;avatar?:string};shared_user:any};
 export class MiniappError extends Error {
   constructor(public code:string,public status=0){super((copy as Record<string,string[]>)[code]?.[0]||copy.generic_error[0]);}
 }

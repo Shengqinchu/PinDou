@@ -4,7 +4,7 @@ import defaults from "./content/account.json";
 import { commerceApi, CommerceError } from "./commerce";
 import { customerToken,storeCustomer,clearCustomer } from "./account-storage";
 export const accountCopy=contentModule("account",defaults);
-export type Customer={id:string;email:string;nickname:string;avatar?:string;is_admin?:boolean};
+export type Customer={id:string;email:string;nickname:string;avatar?:string;is_admin?:boolean;customer_code?:string};
 export type SignInResult={token:string;user:Customer;shared_user:Record<string,unknown>};
 export const accountUser=ref<Customer|null>(null);
 export const accountOpen=ref(false);
