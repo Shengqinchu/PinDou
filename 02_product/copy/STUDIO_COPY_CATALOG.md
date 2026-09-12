@@ -956,7 +956,7 @@
 | 键 | 中文 | English |
 |---|---|---|
 | title | 预约提醒 | Booking notifications |
-| help | 选择接收方式，仅用于预约状态、到店提醒和本次沟通。 | Choose how to receive booking updates, visit reminders and related replies. |
+| help | 注册或预约中填写的邮箱、手机会自动用于预约提醒和本次沟通，可随时关闭。 | The email and phone number you provide are used automatically for booking updates and related replies. You can turn either off. |
 | email | 邮箱提醒 | Email notifications |
 | sms | 手机消息提醒 | Phone notifications |
 | phone | 加拿大/美国手机号（+1） | Canada / US phone number (+1) |
@@ -1031,6 +1031,10 @@
 | message_thread_missing | 此会话不存在。 | This conversation was not found. |
 | message_invalid_cursor | 请刷新消息列表。 | Please refresh the message list. |
 | generic_error | 暂时未能完成，请稍后重试。 | Could not complete this. Please try again. |
+| prompt_title | 开启预约提醒 | Enable booking notifications |
+| prompt_body | 允许后，我们会通过微信发送预约成功、取消和到店前提醒，方便你及时查看预约状态。 | Allow WeChat notifications for booking confirmations, cancellations and reminders before your visit. |
+| prompt_allow | 允许提醒 | Allow |
+| prompt_later | 暂不开启 | Not now |
 
 ## data-commerce-labels.json
 
@@ -1779,7 +1783,7 @@
 | identity_title | 账号与个人资料 | Account and profile |
 | identity_body | 微信登录使用微信提供的登录凭证与身份标识，用于验证登录、关联账号和完成网站扫码授权。邮箱登录使用你填写的邮箱和密码。昵称、头像由你主动填写或选择，用于账号展示。打开首页不会自动取得微信手机号、昵称或头像。 | WeChat login uses credentials and identifiers supplied by WeChat to authenticate you, link your account and approve website sign-in. Email login uses the email address and password you enter. Your chosen nickname and avatar identify your profile. Opening the home page does not automatically give us your WeChat phone number, nickname or avatar. |
 | booking_title | 预约与联系资料 | Bookings and contact details |
-| booking_body | 预约使用你选择的体验、人数、日期和时间，以及填写的称呼、联系方式和备注，供店主查看和确认安排。首次预约填写的称呼及联系方式会保存到当前账号，供再次预约复用，也可在个人资料中修改。店主会通过你提供的方式联系你。 | Bookings use your chosen experience, party size, date and time, together with your name, contact details and notes, so the host can review and confirm arrangements. The name and contact details from your first booking are saved to your account for future bookings and can be edited in your profile. The host may contact you using these details. |
+| booking_body | 预约使用你选择的体验、人数、日期和时间，以及填写的称呼、联系方式和备注，供店主查看和确认安排。首次预约填写的称呼及联系方式会保存到当前账号，供再次预约复用，也可在个人资料中修改。店主会通过你提供的方式联系你。 你在注册或预约中留下的邮箱、手机会自动用于预约状态、到店提醒及相关沟通，可在“预约提醒”中关闭；微信提醒由你单独允许。站内对话和必要的手机消息记录用于店主查看、回复及核对沟通。 | Bookings use your chosen experience, party size, date and time, together with your name, contact details and notes, so the host can review and confirm arrangements. The name and contact details from your first booking are saved to your account for future bookings and can be edited in your profile. The host may contact you using these details. Email and phone details you provide at registration or booking are used for booking updates, visit reminders and related replies. You can disable these in notification settings; WeChat notices require separate approval. In-app conversations and necessary phone-message records allow the host to read, reply and review the conversation. |
 | images_title | 图片与图纸 | Images and patterns |
 | images_body | 选择头像或生成图纸时，我们处理你主动选择或拍摄的图片。图片及生成结果可能包含个人信息，请只使用你有权处理的内容。选择 AI 生成时，图片会通过图像处理服务传给相应 AI 服务提供方；直接转换用于拼豆量化。保存到相册只在你点击保存并允许权限后执行。 | We process the image you select or photograph for an avatar or pattern. Images and generated results may contain personal information; only use content you are entitled to process. For AI generation, the image is sent through the image-processing service to the relevant AI provider. Direct conversion uses it for bead-pattern quantization. Saving to your photo album requires your action and permission. |
 | permissions_title | 设备权限与本地存储 | Permissions and local storage |

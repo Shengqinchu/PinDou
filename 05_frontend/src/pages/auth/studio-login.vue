@@ -10,6 +10,7 @@ import { useStudioNative } from '../../utils/studio-native';
 import { miniSession, studioCall, miniappPrefix, MiniappError, type SharedSession } from '../../utils/miniapp-client';
 import { useUserStore } from '../../store/user';
 import { studioWords } from '../../utils/studio-content';
+import {askWechatNotifications,loadNotifications,saveNotifications} from '../../utils/customer-notifications';
 const user = useUserStore();
 const { language, keyboardOpen, shellStyle, say, t, changeLanguage, website } = useStudioNative();
 type Method = 'register' | 'password' | 'wechat';
@@ -45,11 +46,14 @@ function choose(value: Method) {
   uni.hideKeyboard(); method.value = value; errorCode.value = ''; reveal.value = false;
   if (value === 'wechat') void prepare();
 }
-function complete(result: SharedSession) {
+async function complete(result: SharedSession,requestWechat=false) {
   if (!alive) return;
   user.token = result.token; user.userInfo = result.shared_user;
   uni.setStorageSync('pd_token', result.token); uni.setStorageSync('pd_user', JSON.stringify(result.shared_user));
   password.value = ''; confirmation.value = '';
+  try{await loadNotifications(result.token);await saveNotifications(result.token);}catch{}
+  if(requestWechat)await askWechatNotifications(result.token,language.value);
+  if(!alive)return;
   const previous = getCurrentPages().slice(-2)[0]?.route || '';
   if (getCurrentPages().length > 1 && !/pages\/(auth|index|user)\//.test(previous)) uni.navigateBack({ delta: 1 });
   else uni.redirectTo({ url: '/pages/studio/home' });
@@ -66,7 +70,7 @@ async function signIn() {
       { email: email.value.trim().toLowerCase(), password: password.value });
     if (!alive) return;
     await studioCall(miniappPrefix + '/native/bind', {}, ticket.value, result.token);
-    complete(result);
+    await complete(result,method.value==='register');
   } catch (e) { if (alive) fail(e); }
   finally { if (alive) busy.value = false; }
 }
@@ -75,7 +79,7 @@ async function wechat() {
   busy.value = true; errorCode.value = '';
   try {
     if (!await prepare() || !alive) return;
-    complete(await studioCall<SharedSession>(miniappPrefix + (linked.value ? '/native/sign-in' : '/native/create'), {}, ticket.value));
+    await complete(await studioCall<SharedSession>(miniappPrefix + (linked.value ? '/native/sign-in' : '/native/create'), {}, ticket.value),true);
   } catch (e) { if (alive) fail(e); }
   finally { if (alive) busy.value = false; }
 }

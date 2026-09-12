@@ -33,6 +33,8 @@ def setup(tmp_path, monkeypatch):
         await asyncio.Event().wait()
     monkeypatch.setattr(alerts, 'worker', paused_worker)
     monkeypatch.setattr(owner_wechat, 'worker', paused_worker)
+    import customer_notifications
+    monkeypatch.setattr(customer_notifications,'worker',paused_worker)
     sent=[]
     def deliver(key,title,body):
         sent.append((key,title,body))

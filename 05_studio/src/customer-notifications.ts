@@ -12,7 +12,7 @@ export async function loadNotificationPreferences(){
  await pending;
 }
 export async function saveNotificationPreferences(){
- await loadNotificationPreferences();if(!notificationLoaded.value||snapshot===JSON.stringify(notificationDraft))return;
+ await loadNotificationPreferences();if(!notificationLoaded.value||(notificationDraft.version>0&&snapshot===JSON.stringify(notificationDraft)))return;
  const token=owner;const {email,phone,email_enabled,sms_enabled,version}=notificationDraft;
  const value=await commerceApi<NotificationPreferences>('/auth/notifications',{method:'PUT',body:JSON.stringify({email,phone,email_enabled,sms_enabled,version})});
  if(token===owner){Object.assign(notificationDraft,value);snapshot=JSON.stringify(notificationDraft);}

@@ -4,8 +4,8 @@
     "Booking notifications"
   ],
   "help": [
-    "选择接收方式，仅用于预约状态、到店提醒和本次沟通。",
-    "Choose how to receive booking updates, visit reminders and related replies."
+    "注册或预约中填写的邮箱、手机会自动用于预约提醒和本次沟通，可随时关闭。",
+    "The email and phone number you provide are used automatically for booking updates and related replies. You can turn either off."
   ],
   "email": [
     "邮箱提醒",
@@ -302,5 +302,21 @@
   "generic_error": [
     "暂时未能完成，请稍后重试。",
     "Could not complete this. Please try again."
+  ],
+  "prompt_title": [
+    "开启预约提醒",
+    "Enable booking notifications"
+  ],
+  "prompt_body": [
+    "允许后，我们会通过微信发送预约成功、取消和到店前提醒，方便你及时查看预约状态。",
+    "Allow WeChat notifications for booking confirmations, cancellations and reminders before your visit."
+  ],
+  "prompt_allow": [
+    "允许提醒",
+    "Allow"
+  ],
+  "prompt_later": [
+    "暂不开启",
+    "Not now"
   ]
 }

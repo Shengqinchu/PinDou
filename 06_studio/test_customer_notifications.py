@@ -82,9 +82,9 @@ def setup_wechat():
 def test_contact_preferences_opt_in_and_version(setup):
     client,_,_=setup
     first=client.get('/studio-api/auth/notifications').json()
-    assert not first['sms_enabled'] and not first['email_enabled']
+    assert not first['sms_enabled'] and first['email_enabled'] and first['email']=='qa-owner@example.test'
     # An old +86 contact does not block bookings when phone notices are off.
-    assert pref(client,phone='+8619558948263',email='invalid').status_code==200
+    assert pref(client,phone='+8619558948263',email='invalid',email_enabled=False).status_code==200
     assert pref(client,sms_enabled=True,phone='+8619558948263').status_code==422
     assert pref(client,email_enabled=True,email='bad').status_code==422
     saved=pref(client,sms_enabled=True,phone='(416) 555-0123').json()
@@ -166,7 +166,7 @@ def test_wechat_unknown_send_is_never_retried(setup,monkeypatch):
     monkeypatch.setattr(owner_wechat,'provider',unavailable)
     ident=create(client);status(client,ident,'confirmed');drain()
     now[0]+=120;drain()
-    assert len(count)==1 and next(r for r in jobs() if r['kind']=='confirmed')['state']=='unknown'
+    assert len(count)==1 and next(r for r in jobs() if r['kind']=='confirmed' and r['channel']=='wechat')['state']=='unknown'
 
 
 def test_email_claim_does_not_hold_db_and_is_not_double_sent(setup,monkeypatch):
@@ -242,3 +242,26 @@ def test_email_transport_identity_idempotency_and_html_escaping(monkeypatch):
     assert requests[0].get_header('User-agent')=='PinDouStudio/1.0'
     assert requests[0].get_header('Idempotency-key')==requests[1].get_header('Idempotency-key')=='booking-repeatable-test'
     body=json.loads(requests[0].data);assert '<script>' not in body['html'] and '&lt;img' in body['html']
+
+
+def test_provided_contacts_are_automatic_but_explicit_opt_out_is_kept(setup):
+    client,_,_=setup
+    with studio.database() as db:
+        db.execute("INSERT INTO studio_booking_profiles(owner_id,name,contact_method,contact,version,updated_at,source_reservation_id) VALUES('qa-owner','Local','phone','+14165550123',1,'2026-09-10','')")
+    initial=client.get('/studio-api/auth/notifications').json()
+    assert initial['email_enabled'] and initial['sms_enabled']
+    assert initial['email']=='qa-owner@example.test' and initial['phone']=='+14165550123'
+    pref(client,sms_enabled=False,email_enabled=False)
+    again=client.get('/studio-api/auth/notifications').json()
+    assert not again['sms_enabled'] and not again['email_enabled']
+    create(client)
+    assert not jobs()
+
+
+def test_first_booking_automatically_captures_registered_email_and_phone(setup):
+    client,_,_=setup
+    response=client.post('/studio-api/reservations',headers={'Idempotency-Key':str(uuid.uuid4())},json={
+      'booking':{'date':'2026-09-11','start':'14:00','end':'16:00','plan':'hourly','guests':1},
+      'name':'Local first booking','contact_method':'phone','contact':'+14165550123','consent':True})
+    assert response.status_code==201,response.text
+    assert {(r['channel'],r['recipient']) for r in jobs()}=={('email','qa-owner@example.test'),('sms','+14165550123')}

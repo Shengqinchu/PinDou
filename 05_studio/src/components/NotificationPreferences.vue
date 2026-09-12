@@ -6,7 +6,7 @@ import {notificationDraft as draft,notificationLoaded,loadNotificationPreference
 const props=withDefaults(defineProps<{compact?:boolean;method?:string;contact?:string}>(),{compact:false,method:'',contact:''});
 const busy=ref(false),error=ref(''),saved=ref(false);
 const explain=(e:unknown)=>say((copy as Record<string,string[]>)[(e as any)?.code]||copy.generic_error);
-function prefill(){if(props.method==='phone'&&!draft.phone)draft.phone=props.contact;if(props.method==='email'&&!draft.email)draft.email=props.contact;}
+function prefill(){if(props.method==='phone'&&!draft.phone&&/^(?:\+?1)?[2-9]\d{9}$/.test(props.contact.replace(/[\s().-]/g,''))){draft.phone=props.contact;draft.sms_enabled=true;}if(props.method==='email'&&!draft.email&&props.contact){draft.email=props.contact;draft.email_enabled=true;}}
 async function load(){try{await loadNotificationPreferences();prefill();}catch(e){error.value=explain(e);}}
 async function save(){busy.value=true;error.value='';saved.value=false;try{await saveNotificationPreferences();saved.value=true;}catch(e){error.value=explain(e);}finally{busy.value=false;}}
 watch([()=>props.method,()=>props.contact],prefill);onMounted(()=>void load());

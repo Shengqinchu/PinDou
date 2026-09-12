@@ -7,7 +7,7 @@ const props=withDefaults(defineProps<{language:string;compact?:boolean;method?:s
 const user=useUserStore(),busy=ref(false),error=ref('');const say=(value:string[])=>value[props.language==='en'?1:0];
 const explain=(e:any)=>say((copy as Record<string,string[]>)[e?.code]||copy.generic_error);
 function toggle(field:'email_enabled'|'sms_enabled',event:Event){draft[field]=Boolean((event as unknown as {detail:{value:boolean}}).detail.value);}
-function fill(){if(props.method==='email'&&!draft.email)draft.email=props.contact;if(props.method==='phone'&&!draft.phone)draft.phone=props.contact;}
+function fill(){if(props.method==='email'&&!draft.email&&props.contact){draft.email=props.contact;draft.email_enabled=true;}if(props.method==='phone'&&!draft.phone&&/^(?:\+?1)?[2-9]\d{9}$/.test(props.contact.replace(/[\s().-]/g,''))){draft.phone=props.contact;draft.sms_enabled=true;}}
 async function load(){try{await loadNotifications(user.token);fill();void warmWechat(user.token).catch(()=>{});}catch(e){error.value=explain(e);}}
 async function save(){busy.value=true;error.value='';try{await saveNotifications(user.token);uni.showToast({title:say(copy.saved),icon:'none'});}catch(e){error.value=explain(e);}finally{busy.value=false;}}
 async function subscribe(){busy.value=true;error.value='';try{const accepted=await subscribeWechat(user.token);uni.showToast({title:say(accepted?copy.wechat_ready:copy.wechat_declined),icon:'none'});}catch(e){error.value=explain(e);}finally{busy.value=false;}}

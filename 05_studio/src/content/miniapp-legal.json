@@ -28,8 +28,8 @@
     "Bookings and contact details"
   ],
   "booking_body": [
-    "预约使用你选择的体验、人数、日期和时间，以及填写的称呼、联系方式和备注，供店主查看和确认安排。首次预约填写的称呼及联系方式会保存到当前账号，供再次预约复用，也可在个人资料中修改。店主会通过你提供的方式联系你。",
-    "Bookings use your chosen experience, party size, date and time, together with your name, contact details and notes, so the host can review and confirm arrangements. The name and contact details from your first booking are saved to your account for future bookings and can be edited in your profile. The host may contact you using these details."
+    "预约使用你选择的体验、人数、日期和时间，以及填写的称呼、联系方式和备注，供店主查看和确认安排。首次预约填写的称呼及联系方式会保存到当前账号，供再次预约复用，也可在个人资料中修改。店主会通过你提供的方式联系你。 你在注册或预约中留下的邮箱、手机会自动用于预约状态、到店提醒及相关沟通，可在“预约提醒”中关闭；微信提醒由你单独允许。站内对话和必要的手机消息记录用于店主查看、回复及核对沟通。",
+    "Bookings use your chosen experience, party size, date and time, together with your name, contact details and notes, so the host can review and confirm arrangements. The name and contact details from your first booking are saved to your account for future bookings and can be edited in your profile. The host may contact you using these details. Email and phone details you provide at registration or booking are used for booking updates, visit reminders and related replies. You can disable these in notification settings; WeChat notices require separate approval. In-app conversations and necessary phone-message records allow the host to read, reply and review the conversation."
   ],
   "images_title": [
     "图片与图纸",

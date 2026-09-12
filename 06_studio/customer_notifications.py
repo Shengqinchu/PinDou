@@ -73,13 +73,21 @@ def initialize(database):
 
 
 def preferences(db,owner,customer=None):
+    profile=db.execute('SELECT contact_method,contact FROM studio_booking_profiles WHERE owner_id=?',(owner,)).fetchone()
+    member=db.execute('SELECT email FROM studio_members WHERE owner_id=?',(owner,)).fetchone()
+    email=(profile['contact'] if profile and profile['contact_method']=='email' else (customer or {}).get('email') or (member['email'] if member else '') or '')
+    if not re.fullmatch(r'[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+',email):email=''
+    number=''
+    if profile and profile['contact_method']=='phone':
+        try:number=sms_inbox.phone(profile['contact'])
+        except HTTPException:pass
     row=db.execute('SELECT * FROM studio_customer_notification_preferences WHERE owner_id=?',(owner,)).fetchone()
     if row:
-        value=dict(row);value.pop('owner_id');value['email_enabled']=bool(value['email_enabled']);value['sms_enabled']=bool(value['sms_enabled']);return value
-    profile=db.execute('SELECT contact_method,contact FROM studio_booking_profiles WHERE owner_id=?',(owner,)).fetchone()
-    return {'email':(profile['contact'] if profile and profile['contact_method']=='email' else (customer or {}).get('email','')),
-      'phone':profile['contact'] if profile and profile['contact_method']=='phone' else '',
-      'email_enabled':False,'sms_enabled':False,'version':0,'updated_at':0}
+        value=dict(row);value.pop('owner_id');value['email_enabled']=bool(value['email_enabled']);value['sms_enabled']=bool(value['sms_enabled'])
+        if not value['email'] and email:value.update(email=email,email_enabled=True)
+        if not value['phone'] and number:value.update(phone=number,sms_enabled=True)
+        return value
+    return {'email':email,'phone':number,'email_enabled':bool(email),'sms_enabled':bool(number),'version':0,'updated_at':0}
 
 
 def start_time(booking):

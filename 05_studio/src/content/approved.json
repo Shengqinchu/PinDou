@@ -1,5 +1,5 @@
 {
-  "source": "user-20260911-complete-customer-owner-notifications-and-calendar-screenshot48cb0a39",
+  "source": "user-20260911-auto-booking-contacts-and-wechat-permission-prompt",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -38,7 +38,7 @@
     "components-StudioCarousel.json": "3d95089ba11a06f03e6ecc8592208dcafa3be2fe1afbc6b592667c4ee30323a9",
     "components-StudioToast.json": "3901e64e5116ccf047f593172fa5945a6df55fff548cd84df0e293f72efa7f52",
     "contact-fields.json": "cc1879ad8ac262c92f74045c165b46ee15360923d53992667349bc0e1ac7a7fc",
-    "customer-notifications.json": "f7ef57cbeaef3f124b429f751d96df8b3299ff185491fda2463f3a2f754e2879",
+    "customer-notifications.json": "dc6ff98131cc7f406ce730f7d89d2534c27cbf0ca23cd38be5571f571215350c",
     "data-commerce-labels.json": "5155567d136dedbf4dc78ab99e7b35a7748a5b1284b6c8577cd87d1a6c80c1e5",
     "data-commerce-messages.json": "4d1e7581b869c6f6f806638350d1f145948f738f93d44a4e0a75aa8b0f8cb637",
     "data-components-admin-SchedulePanel-labels.json": "5800653cc2886f2313e67babd9486fb8190ccbe74cd2f47a8c57877517aec97a",
@@ -54,7 +54,7 @@
     "journal-collection.json": "b58215725c1eba05052d83ac53eda17ae46f4923ea4be4d1d1d8cc1b5a5e2bd8",
     "journal-posts.json": "0d729d67cc00df5499308c9093d76f9afb9f64d49314dffa7e414df57cca610b",
     "messaging.json": "0fb6e2c3a1ccdc4ead68e67f6530a44cc0bde9580ac4959cd05d88f58af76af7",
-    "miniapp-legal.json": "35d5a95cc967d717bd688aacaf393b0f02ff1812c31c30c17ea14e8b41822ac3",
+    "miniapp-legal.json": "dceb6933b26e348745178df678e6610fe96c86950590558a591b86e5727cab10",
     "miniapp.json": "19d48cada7e86fc2af6b32a3486be29d08d7d27fbb792a860b46be198554913a",
     "owner-notifications.json": "d1dfa473a578e36665c78cbc2cc3421309af5972bc3874a6f06e84a8c21f2e78",
     "owner-wechat.json": "2d4bce47dad11ef65aaa01ad2c730ebc85d8433b34ae48a2e4ada40c7a20e002",
