@@ -4,7 +4,7 @@ import { PhPlus, PhArrowClockwise, PhPencilSimple } from '@phosphor-icons/vue';
 import { useDesk } from '../../admin';
 import { say, tr, formatCopy } from '../../state';
 import { money, CommerceError } from '../../commerce';
-import { shopWords as w, shopImage, loadShop, type ShopCatalog, type ShopProduct, type ShopCategory } from '../../shop';
+import { shopWords as w, shopImage, loadShop, productTextLimits, productTextLength, type ShopCatalog, type ShopProduct, type ShopCategory } from '../../shop';
 import { uploadMedia } from '../../editor';
 import MediaUpload from './MediaUpload.vue';
 import SlideOver from '../SlideOver.vue';
@@ -19,6 +19,9 @@ const b=contentModule('shop-batch',batchDefaults);
 const selected=ref<string[]>([]),batchOpen=ref(false),batchProducts=ref<ShopProduct[]>([]),priceState=ref('all'),imageState=ref('all');
 const data=ref<ShopCatalog>(),busy=ref(false),error=ref(''),success=ref(''),search=ref(''),collection=ref('all'),category=ref('all');
 const categoryMode=ref(false),edit=ref<ShopProduct>(),categoryEdit=ref<ShopCategory>(),open=ref(false),categoryOpen=ref(false),price=ref('');
+const textTooLong=computed(()=>!!edit.value&&([edit.value.zh,edit.value.en].some(v=>productTextLength(v)>productTextLimits.name)||[edit.value.detailZh,edit.value.detailEn].some(v=>productTextLength(v)>productTextLimits.description)));
+const textLimitMessage=computed(()=>formatCopy(w.textTooLong,{v0:productTextLimits.name,v1:productTextLimits.description}));
+const textCount=(value:string,limit:number)=>formatCopy(w.textCount,{v0:productTextLength(value),v1:limit});
 const drafts=new Map<string,{product:ShopProduct;price:string}>();
 const clone=<T,>(v:T):T=>JSON.parse(JSON.stringify(v));
 const leaves=computed(()=>data.value?.categories.filter(c=>!data.value?.categories.some(child=>child.parent_id===c.id))||[]);
@@ -44,6 +47,7 @@ function create(){editProduct({id:'item-'+crypto.randomUUID().slice(0,12),kind:'
 function changeCollection(){if(edit.value)edit.value.shop_category_id=edit.value.shop_collection==='home'?(leaves.value[0]?.id||null):null;}
 async function save(){
  if(!edit.value||busy.value)return;
+ if(textTooLong.value){error.value=textLimitMessage.value;return;}
  if(price.value&&!/^\d{1,5}(\.\d{1,2})?$/.test(price.value)){error.value=say(w.invalidPrice);return;}
  const amount=price.value===''?null:Math.round(Number(price.value)*100);
  if(amount!==null&&(amount<1||amount>1000000)){error.value=say(w.invalidPrice);return;}
@@ -80,18 +84,19 @@ onMounted(refresh);onDeactivated(()=>{keepDraft();open.value=false;categoryOpen.
  <ShopBatchEditor v-model="batchOpen" :products="batchProducts" @saved="batchSaved"/>
  <SlideOver v-model="open" :title="say(w.editProduct)" :busy="busy">
   <form v-if="edit" id="shop-product-editor" class="shop-edit-form" @submit.prevent="save">
-   <div class="shop-edit-pair"><label>{{say(w.nameZh)}}<input v-model="edit.zh" maxlength="90" required/></label><label>{{say(w.nameEn)}}<input v-model="edit.en" maxlength="140" required/></label></div>
+   <div class="shop-edit-pair"><label>{{say(w.nameZh)}}<input v-model="edit.zh" :aria-label="say(w.nameZh)" required/><small class="shop-text-count" :class="{exceeded:productTextLength(edit.zh)>productTextLimits.name}">{{textCount(edit.zh,productTextLimits.name)}}</small></label><label>{{say(w.nameEn)}}<input v-model="edit.en" :aria-label="say(w.nameEn)" required/><small class="shop-text-count" :class="{exceeded:productTextLength(edit.en)>productTextLimits.name}">{{textCount(edit.en,productTextLimits.name)}}</small></label></div>
    <div class="shop-edit-pair"><label>{{say(w.collection)}}<select :aria-label="say(w.collection)" v-model="edit.shop_collection" @change="changeCollection"><option v-for="s in (['home','finished','services'] as const)" :key="s" :value="s">{{say(w[s])}}</option></select></label><label v-if="edit.shop_collection==='home'">{{say(w.category)}}<select :aria-label="say(w.category)" v-model="edit.shop_category_id" required><option v-for="c in leaves" :key="c.id" :value="c.id">{{tr(c.zh,c.en)}}</option></select></label></div>
    <div class="shop-edit-pair"><label>{{say(w.price)}}<input v-model="price" inputmode="decimal" :placeholder="say(w.unpriced)"/></label><label>{{say(w.stock)}}<input v-model.number="edit.stock" type="number" min="0" max="100000" step="1" required/></label></div>
    <p class="shop-notice">{{say(w.pendingInfo)}}</p>
    <div class="shop-edit-pair"><label>{{say(w.code)}}<input v-model="edit.code" maxlength="50"/></label><label>{{say(w.sort)}}<input v-model.number="edit.sort" type="number" min="0" max="100000" step="1" required/></label></div>
-   <label>{{say(w.detailZh)}}<textarea v-model="edit.detailZh" maxlength="500"/></label><label>{{say(w.detailEn)}}<textarea v-model="edit.detailEn" maxlength="700"/></label>
+   <label>{{say(w.detailZh)}}<textarea v-model="edit.detailZh" :aria-label="say(w.detailZh)" rows="8"/><small class="shop-text-count" :class="{exceeded:productTextLength(edit.detailZh)>productTextLimits.description}">{{textCount(edit.detailZh,productTextLimits.description)}}</small></label><label>{{say(w.detailEn)}}<textarea v-model="edit.detailEn" :aria-label="say(w.detailEn)" rows="8"/><small class="shop-text-count" :class="{exceeded:productTextLength(edit.detailEn)>productTextLimits.description}">{{textCount(edit.detailEn,productTextLimits.description)}}</small></label>
+   <p v-if="textTooLong" class="shop-error" role="alert">{{textLimitMessage}}</p>
    <label class="shop-check"><input v-model="edit.shop_visible" type="checkbox"/>{{say(w.show)}}</label>
    <div><h3>{{say(w.photos)}}</h3><p class="shop-notice">{{say(w.photoHelp)}}</p><div class="shop-edit-photos"><div v-for="(src,i) in edit.images" :key="src"><img :src="shopImage(src)" :alt="formatCopy(w.imageNumber,{v0:i+1})"/><button v-if="i>0" type="button" :disabled="busy" @click="cover(i)">{{say(w.cover)}}</button><button type="button" :disabled="busy" @click="edit.images.splice(i,1)">{{say(w.remove)}}</button></div></div><MediaUpload multiple original :busy="busy" :disabled="busy||edit.images.length>=12" :label="say(w.upload)" @select="upload"/></div>
    <details v-if="data?.sources?.[edit.id]"><summary>{{say(w.source)}}</summary><p>{{data.sources[edit.id].platform}} · {{data.sources[edit.id].title}}</p><p>{{say(w.sourcePrice)}} {{(data.sources[edit.id].source_min_fen/100).toFixed(2)}}</p></details>
    <p v-if="error" class="shop-error" role="alert">{{error}} <button type="button" :disabled="busy" @click="reloadProduct">{{say(w.retry)}}</button></p>
   </form>
-  <template #footer><button class="desk-button primary" form="shop-product-editor" type="submit" :disabled="busy">{{say(w.save)}}</button></template>
+  <template #footer><button class="desk-button primary" form="shop-product-editor" type="submit" :disabled="busy||textTooLong">{{say(w.save)}}</button></template>
  </SlideOver>
  <SlideOver v-model="categoryOpen" :title="say(w.editCategory)" :busy="busy"><form v-if="categoryEdit" id="shop-category-editor" class="shop-edit-form" @submit.prevent="saveCat">
   <label>{{say(w.nameZh)}}<input v-model="categoryEdit.zh" maxlength="60" required/></label><label>{{say(w.nameEn)}}<input v-model="categoryEdit.en" maxlength="100" required/></label><label>{{say(w.parent)}}<select v-model="categoryEdit.parent_id" :aria-label="say(w.parent)"><option :value="null">{{say(w.topCategory)}}</option><option v-for="c in roots" :key="c.id" :value="c.id">{{tr(c.zh,c.en)}}</option></select></label><label>{{say(w.sort)}}<input v-model.number="categoryEdit.sort" type="number" min="0" max="100000" required/></label><label class="shop-check"><input v-model="categoryEdit.visible" type="checkbox"/>{{say(w.show)}}</label><p v-if="error" class="shop-error" role="alert">{{error}} <button type="button" :disabled="busy" @click="reloadCat">{{say(w.retry)}}</button></p>

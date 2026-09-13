@@ -8912,6 +8912,18 @@
       "英文介绍",
       "English description"
     ],
+    "textCount": [
+      "{v0} / {v1} 字符",
+      "{v0} / {v1} characters"
+    ],
+    "textTooLong": [
+      "商品名称最多 {v0} 字符，介绍每种语言最多 {v1} 字符。请缩短后保存，当前内容会保留。",
+      "Product names allow up to {v0} characters, and each description up to {v1}. Shorten the text to save; your draft will be kept."
+    ],
+    "fullDescription": [
+      "查看完整介绍",
+      "Read full description"
+    ],
     "collection": [
       "小店栏目",
       "Shop section"

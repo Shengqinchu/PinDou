@@ -82,10 +82,10 @@ class Product(Strict):
     id: str = Field(pattern=r"^[a-z][a-z0-9_-]{0,39}$")
     kind: Literal["experience", "physical"]
     category: Literal["experience", "tools", "beads", "finished"]
-    zh: str = Field(min_length=1, max_length=90)
-    en: str = Field(min_length=1, max_length=140)
-    detailZh: str = Field(default="", max_length=500)
-    detailEn: str = Field(default="", max_length=700)
+    zh: str = Field(min_length=1, max_length=200)
+    en: str = Field(min_length=1, max_length=200)
+    detailZh: str = Field(default="", max_length=10000)
+    detailEn: str = Field(default="", max_length=10000)
     image: str = Field(default="", max_length=350)
     images: list[str] = Field(default_factory=list, max_length=12)
     shop_collection: Literal["home", "finished", "services"] | None = None

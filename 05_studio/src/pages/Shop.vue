@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { PhShoppingCart, PhReceipt, PhMagnifyingGlass, PhPlus, PhMinus, PhTrash, PhCaretDown, PhArrowRight } from '@phosphor-icons/vue';
 import LiftTitle from '../components/LiftTitle.vue';
 import SlideOver from '../components/SlideOver.vue';
 import { say, tr, formatCopy } from '../state';
 import { bag, bagCount, addToBag, removeLine, quantityChange, money } from '../commerce';
-import { shopWords as w, shopCatalog, loadShop, shopImage, savedShopOrders, type ShopProduct } from '../shop';
+import { shopWords as w, shopCatalog, loadShop, shopImage, savedShopOrders, productIntro, type ShopProduct } from '../shop';
 import { notify } from '../ui';
 import '../styles/shop.css';
 const route=useRoute(),router=useRouter();
@@ -15,6 +15,7 @@ const searches=reactive<Record<string,string>>({home:'',finished:'',services:''}
 const search=computed({get:()=>searches[section.value],set:value=>{searches[section.value]=value}});
 const root=ref('refills'),leaf=ref('refill-a'),error=ref(''),loading=ref(!shopCatalog.value);
 const selected=ref<ShopProduct>(),detailsOpen=ref(false),photo=ref(0);
+const selectedDescription=computed(()=>selected.value?tr(selected.value.detailZh,selected.value.detailEn):'');
 const cartOpen=computed({get:()=>route.query.view==='cart',set:v=>setView(v?'cart':'')});
 const ordersOpen=computed({get:()=>route.query.view==='orders',set:v=>setView(v?'orders':'')});
 const orders=ref<string[]>([]);
@@ -36,7 +37,10 @@ function add(p:ShopProduct){
 async function refresh(){loading.value=true;error.value='';try{await loadShop(true)}catch(e){error.value=(e as Error).message}finally{loading.value=false}}
 watch(shopCatalog,d=>{if(!d)return;if(!d.categories.some(c=>c.id===leaf.value)){const r=d.categories.find(c=>c.id===root.value&&!c.parent_id)||d.categories.find(c=>!c.parent_id);root.value=r?.id||'';leaf.value=d.categories.find(c=>c.parent_id===root.value)?.id||root.value;}},{immediate:true});
 watch(ordersOpen,v=>{if(v)orders.value=savedShopOrders()},{immediate:true});
-onMounted(async()=>{try{await loadShop()}catch(e){error.value=(e as Error).message}finally{loading.value=false}});
+async function syncCatalog(){try{await loadShop(true);if(selected.value){const id=selected.value.id;selected.value=shopCatalog.value?.products.find(p=>p.id===id);photo.value=Math.min(photo.value,Math.max(0,(selected.value?.images.length||0)-1));if(!selected.value)detailsOpen.value=false;}}catch(e){if(!shopCatalog.value)error.value=(e as Error).message;}}
+function focusRefresh(){if(!document.hidden)void syncCatalog();}
+onMounted(async()=>{window.addEventListener('focus',focusRefresh);document.addEventListener('visibilitychange',focusRefresh);try{await syncCatalog()}finally{loading.value=false}});
+onUnmounted(()=>{window.removeEventListener('focus',focusRefresh);document.removeEventListener('visibilitychange',focusRefresh)});
 </script>
 <template>
  <section class="shop-page container">
@@ -60,7 +64,7 @@ onMounted(async()=>{try{await loadShop()}catch(e){error.value=(e as Error).messa
        <img v-if="p.images.length" :src="shopImage(p.images[0])" :alt="tr(p.zh,p.en)" width="600" height="600" loading="lazy"/>
        <span v-else class="shop-placeholder" :class="{'shop-kit-placeholder':p.shop_category_id==='kits'}"><strong>{{p.code||tr(p.zh,p.en)}}</strong><small>{{say(w.noPhoto)}}</small></span><span v-if="p.images.length>1" class="shop-photo-count">{{p.images.length}}</span>
       </button>
-      <div class="shop-card-body"><button class="shop-name" @click="openProduct(p)">{{tr(p.zh,p.en)}}</button><p>{{tr(p.detailZh,p.detailEn)}}</p>
+      <div class="shop-card-body"><button class="shop-name" @click="openProduct(p)">{{tr(p.zh,p.en)}}</button><p class="shop-card-description">{{productIntro(tr(p.detailZh,p.detailEn)).text}}</p><button v-if="productIntro(tr(p.detailZh,p.detailEn)).shortened" class="shop-description-link" @click="openProduct(p)">{{say(w.fullDescription)}}<PhArrowRight :size="16"/></button>
        <div class="shop-card-bottom"><span v-if="p.price_cents!==null" class="shop-price">{{(p.price_cents/100).toFixed(2)}}<small>CAD</small></span><span v-else class="shop-unpriced">{{say(w.unpriced)}}</span><button class="shop-add" :aria-label="say(w.addCart)+' · '+tr(p.zh,p.en)" @click="section==='services'?openProduct(p):add(p)"><PhArrowRight v-if="section==='services'"/><PhPlus v-else/></button></div>
       </div>
      </article>
@@ -72,7 +76,7 @@ onMounted(async()=>{try{await loadShop()}catch(e){error.value=(e as Error).messa
  <SlideOver v-model="detailsOpen" :title="selected?tr(selected.zh,selected.en):''">
   <div v-if="selected" class="shop-detail"><img v-if="selected.images.length" class="shop-detail-image" :src="shopImage(selected.images[photo])" :alt="tr(selected.zh,selected.en)"/><div v-else class="shop-placeholder"><strong>{{selected.code||tr(selected.zh,selected.en)}}</strong><small>{{say(w.noPhoto)}}</small></div>
    <div v-if="selected.images.length>1" class="shop-thumbnails"><button v-for="(src,i) in selected.images" :key="src" :class="{active:photo===i}" :aria-label="formatCopy(w.imageNumber,{v0:i+1})" :aria-pressed="photo===i" @click="photo=i"><img :src="shopImage(src)" alt=""/></button></div>
-   <p class="shop-description">{{tr(selected.detailZh,selected.detailEn)}}</p><p>{{selected.price_cents===null?say(w.unpriced):money(selected.price_cents)}}</p>
+   <p class="shop-description">{{selectedDescription}}</p><p>{{selected.price_cents===null?say(w.unpriced):money(selected.price_cents)}}</p>
   </div>
   <template #footer><button v-if="selected" class="desk-button primary" @click="add(selected)"><PhPlus/>{{say(w.addCart)}}</button></template>
  </SlideOver>

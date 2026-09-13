@@ -151,7 +151,7 @@ async def tracked_http_error(request:Request,exc:StarletteHTTPException):
 @app.middleware("http")
 async def response_controls(request: Request, call_next):
     length = request.headers.get("content-length", "0")
-    limit = 12 * 1024 * 1024 if request.url.path == "/studio-api/manage/media" else 2 * 1024 * 1024 if request.url.path.startswith(("/studio-api/manage/content", "/studio-api/manage/journal")) else 256 * 1024 if request.url.path.startswith('/studio-api/message-bridge/') else 16000
+    limit = 12 * 1024 * 1024 if request.url.path == "/studio-api/manage/media" else 2 * 1024 * 1024 if request.url.path.startswith(("/studio-api/manage/content", "/studio-api/manage/journal")) else 256 * 1024 if request.url.path.startswith(('/studio-api/message-bridge/', '/studio-api/manage/products/')) else 16000
     if not length.isdigit() or int(length) > limit:
         from fastapi.responses import JSONResponse
         return JSONResponse({"detail": "Request too large"}, status_code=413)
