@@ -1,9 +1,5 @@
 [
   {"id":"kits","zh":"拼豆套装","en":"Bead kits","sort":10},
-  {"id":"kit-144-tools","parent_id":"kits","zh":"144色套装（含工具）","en":"144 colours with tools","sort":11},
-  {"id":"kit-144","parent_id":"kits","zh":"144色豆子","en":"144 colours","sort":12},
-  {"id":"kit-221-tools","parent_id":"kits","zh":"221色套装（含工具）","en":"221 colours with tools","sort":13},
-  {"id":"kit-221","parent_id":"kits","zh":"221色豆子","en":"221 colours","sort":14},
   {"id":"tools","zh":"拼豆工具","en":"Beading tools","sort":20},
   {"id":"tool-boards","parent_id":"tools","zh":"豆板","en":"Pegboards","sort":21},
   {"id":"tool-needles","parent_id":"tools","zh":"豆针","en":"Beading needles","sort":22},

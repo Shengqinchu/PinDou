@@ -54,7 +54,9 @@ def initialize(db_func):
         CREATE TABLE IF NOT EXISTS shop_categories(id TEXT PRIMARY KEY,payload TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS shop_import_sources(
           source_key TEXT PRIMARY KEY,product_id TEXT NOT NULL UNIQUE,payload TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS shop_catalog_migrations(id TEXT PRIMARY KEY);
         """)
+        db.execute('BEGIN IMMEDIATE')
         seed = json.loads(Path(__file__).with_name('shop-categories.json').read_text(encoding='utf8'))
         for data in seed:
             category = Category.model_validate(data)
@@ -62,6 +64,37 @@ def initialize(db_func):
         for data in json.loads(Path(__file__).with_name('shop-services.json').read_text(encoding='utf8')):
             product = commerce.Product.model_validate(data)
             db.execute('INSERT OR IGNORE INTO commerce_products VALUES(?,?)', (product.id, product.model_dump_json()))
+        migrate_kit_products(db)
+
+
+def migrate_kit_products(db):
+    """Retire the four kit subcategories once; preserve any existing owner products."""
+    migration = 'kit-categories-to-products-20260912'
+    if db.execute('SELECT 1 FROM shop_catalog_migrations WHERE id=?', (migration,)).fetchone():
+        return
+    seeds = json.loads(Path(__file__).with_name('shop-kits.json').read_text(encoding='utf8'))
+    old_categories = {r[0]:json.loads(r[1]) for r in db.execute('SELECT id,payload FROM shop_categories')}
+    products = commerce.products_for(db)
+    for seed in seeds:
+        old_category = old_categories.get(seed['id'])
+        existing = [p for p in products if p.get('shop_category_id') == seed['id']]
+        for old in existing:
+            value = dict(old, shop_category_id='kits', version=old['version']+1)
+            db.execute('UPDATE commerce_products SET payload=? WHERE id=?', (json.dumps(value,ensure_ascii=False),old['id']))
+            commerce.audit(db,old['id'],'shop_kit_category_migrated','owner-request',
+                           json.dumps({'before':old,'after':value},ensure_ascii=False))
+        if not existing and not any(p['id'] == seed['id'] for p in products):
+            # Category names and visibility may already have been edited by the owner.
+            value = dict(seed)
+            if old_category:
+                value.update(zh=old_category['zh'],en=old_category['en'],sort=old_category['sort'],shop_visible=old_category['visible'])
+            product = commerce.Product.model_validate(value)
+            db.execute('INSERT INTO commerce_products VALUES(?,?)', (product.id,product.model_dump_json()))
+            commerce.audit(db,product.id,'shop_kit_product_created','owner-request',product.model_dump_json())
+        if old_category:
+            db.execute('DELETE FROM shop_categories WHERE id=?', (seed['id'],))
+            commerce.audit(db,seed['id'],'shop_kit_category_retired','owner-request',json.dumps(old_category,ensure_ascii=False))
+    db.execute('INSERT INTO shop_catalog_migrations VALUES(?)', (migration,))
 
 
 def categories_for(db):
@@ -76,7 +109,7 @@ def validate_product_category(db, product):
             commerce.fail('shop_category_invalid', 422)
         return
     categories = categories_for(db)
-    if not any(c['id'] == product.shop_category_id and c['parent_id'] for c in categories):
+    if not any(c['id'] == product.shop_category_id for c in categories) or any(c['parent_id'] == product.shop_category_id for c in categories):
         commerce.fail('shop_category_invalid', 422)
 
 
@@ -162,6 +195,8 @@ def register(app, admin_actor):
                 parent = categories.get(payload.parent_id)
                 if not parent or parent['parent_id'] or parent['id'] == category_id or any(c['parent_id'] == category_id for c in categories.values()):
                     commerce.fail('shop_category_invalid', 422)
+                if any(p.get('shop_category_id') == parent['id'] for p in commerce.products_for(db)):
+                    commerce.fail('shop_category_in_use', 409)
             elif old and old['parent_id']:
                 if any(p.get('shop_category_id') == category_id for p in commerce.products_for(db)):
                     commerce.fail('shop_category_in_use', 409)

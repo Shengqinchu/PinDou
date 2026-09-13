@@ -1,0 +1,87 @@
+// All edits run only against the disposable local shop fixture.
+import { chromium, webkit } from '@playwright/test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+const base='http://127.0.0.1:4184';
+const out=new URL('../../artifacts/shop-kits-20260912/',import.meta.url);
+const results=[];
+for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
+ const browser=await engine.launch({headless:true});
+ try{
+  const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
+  await context.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','zh');sessionStorage.setItem('puppy-studio-admin','local-qa')});
+  const page=await context.newPage(),errors=[];let requests=0;
+  page.on('pageerror',e=>errors.push(e.message));
+  page.on('request',r=>{if(r.url().endsWith('/shop/catalog'))requests++});
+  await page.goto(base+'/shop?section=home');
+  await page.locator('.shop-card').first().waitFor();
+  assert.equal(await page.locator('.shop-card').count(),27);
+  const kits=page.locator('.shop-root').filter({hasText:'拼豆套装'});
+  await kits.click();
+  assert.equal(await page.locator('.shop-card').count(),4);
+  assert.equal(await page.locator('.shop-children').count(),0);
+  assert.equal(await kits.locator('svg').count(),0);
+  assert.deepEqual(await page.locator('.shop-name').allTextContents(),['144色套装（含工具）','144色豆子','221色套装（含工具）','221色豆子']);
+  await page.screenshot({path:fileURLToPath(new URL('kits-'+name+'-desktop.png',out))});
+  await page.locator('.shop-search input').fill('221');
+  assert.equal(await page.locator('.shop-card').count(),2);
+  await page.getByRole('button',{name:'代拼/代烫服务',exact:true}).click();
+  assert.equal(await page.locator('.shop-card').count(),2);
+  await page.getByRole('button',{name:'在家拼豆',exact:true}).click();
+  assert.equal(await page.locator('.shop-search input').inputValue(),'221');
+  assert.equal(await page.locator('.shop-card').count(),2);
+  await page.locator('.shop-root').filter({hasText:'拼豆工具'}).click();
+  assert.equal(await page.locator('.shop-children button').count(),9);
+  assert.equal(await page.locator('.shop-card').count(),0);
+  await page.locator('.shop-root').filter({hasText:'拼豆补充装'}).click();
+  assert.equal(await page.locator('.shop-children button').count(),9);
+  assert.equal(await page.locator('.shop-card').count(),27);
+  await kits.click();assert.equal(await page.locator('.shop-card').count(),4);
+  assert.equal(requests,1);
+  for(const width of [320,390,844,1440,2560]){
+   await page.setViewportSize({width,height:900});
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'overflow at '+width);
+   assert.equal(await page.locator('.shop-card').count(),4);
+   assert.ok(await page.locator('.shop-kit-placeholder').evaluateAll(elements=>elements.every(e=>e.scrollHeight<=e.clientHeight+1)), 'kit placeholder text must fit at '+width);
+  }
+  await page.setViewportSize({width:390,height:844});
+  await page.screenshot({path:fileURLToPath(new URL('kits-'+name+'-mobile.png',out))});
+  await page.locator('.shop-card-preview').first().click();
+  await page.locator('dialog[data-phase="open"] .shop-detail').waitFor();
+  await page.keyboard.press('Escape');
+  await page.setViewportSize({width:1440,height:1000});
+  await page.goto(base+'/manage?view=shop');await page.locator('.shop-admin-row').first().waitFor();
+  await page.locator('.shop-admin-tools').getByLabel('分类/系列',{exact:true}).selectOption('kits');
+  assert.equal(await page.locator('.shop-admin-row').count(),4);
+  await page.locator('.shop-admin-row').first().click();
+  const form=page.locator('#shop-product-editor');
+  assert.equal(await form.getByLabel('分类/系列',{exact:true}).inputValue(),'kits');
+  await form.getByLabel('售价（CAD）',{exact:true}).fill(name==='chromium'?'24.99':'25.99');
+  await form.locator('input[type=file]').setInputFiles(fileURLToPath(new URL('../../artifacts/taobao-refills-20260912/originals/A12.webp',import.meta.url)));
+  await page.waitForFunction(()=>document.querySelectorAll('.shop-edit-photos img').length===1);
+  await page.locator('button[form=shop-product-editor]').click();
+  await page.waitForFunction(()=>!document.querySelector('#shop-product-editor')?.closest('dialog')?.open);
+  assert.equal(await page.locator('.shop-admin-row').count(),4);
+  await page.locator('.shop-admin-row').first().click();
+  assert.equal(await form.getByLabel('售价（CAD）',{exact:true}).inputValue(),name==='chromium'?'24.99':'25.99');
+  assert.equal(await form.getByLabel('分类/系列',{exact:true}).inputValue(),'kits');
+  assert.equal(await form.locator('.shop-edit-photos img').count(),1);
+  await page.keyboard.press('Escape');
+  await page.locator('.shop-admin .shop-tabs').getByRole('button',{name:'商品分类',exact:true}).click();
+  const categoryLabels=await page.locator('.shop-admin-categories button').allTextContents();
+  assert.ok(categoryLabels.some(t=>t==='拼豆套装'));
+  assert.ok(!categoryLabels.some(t=>/144色|221色/.test(t)));
+  await page.goto(base+'/shop');await page.locator('.shop-card').first().waitFor();
+  await page.locator('.shop-root').filter({hasText:'拼豆套装'}).click();
+  await page.locator('.language-button').click();
+  assert.deepEqual(await page.locator('.shop-name').allTextContents(),['144 colours with tools','144 colours','221 colours with tools','221 colours']);
+  await page.setViewportSize({width:390,height:844});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  await page.screenshot({path:fileURLToPath(new URL('kits-'+name+'-english-mobile.png',out))});
+  assert.deepEqual(errors,[]);
+  results.push({engine:name,passed:true,kitProducts:4,catalogRequestsAcrossTabs:1,widths:[320,390,844,1440,2560],adminEdits:['price','image','category retained'],languages:['zh','en']});
+ }finally{await browser.close()}
+}
+await fs.writeFile(new URL('browser-verification.json',out),JSON.stringify(results,null,2));
+console.log(JSON.stringify(results));

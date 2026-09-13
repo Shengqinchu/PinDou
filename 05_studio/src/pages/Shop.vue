@@ -21,11 +21,11 @@ const orders=ref<string[]>([]);
 const roots=computed(()=>shopCatalog.value?.categories.filter(c=>!c.parent_id)||[]);
 const children=(id:string)=>shopCatalog.value?.categories.filter(c=>c.parent_id===id)||[];
 const products=computed(()=>shopCatalog.value?.products||[]);
-const visible=computed(()=>products.value.filter(p=>p.shop_collection===section.value&&(section.value!=='home'||(!leaf.value||p.shop_category_id===leaf.value))&&`${p.zh} ${p.en} ${p.code}`.toLowerCase().includes(search.value.trim().toLowerCase())));
+const visible=computed(()=>products.value.filter(p=>p.shop_collection===section.value&&(section.value!=='home'||p.shop_category_id===leaf.value)&&`${p.zh} ${p.en} ${p.code}`.toLowerCase().includes(search.value.trim().toLowerCase())));
 const items=computed(()=>bag.value.map(line=>({line,product:products.value.find(p=>p.id===line.product_id)})));
 const total=computed(()=>items.value.reduce((s,{line,product})=>s+(product?.price_cents||0)*line.quantity,0));
 function setView(view:string){void router.replace({query:{...route.query,view:view||undefined}})}
-function chooseRoot(id:string){root.value=id;leaf.value=children(id)[0]?.id||'';search.value='';}
+function chooseRoot(id:string){root.value=id;leaf.value=children(id)[0]?.id||id;search.value='';}
 function chooseSection(value:string){void router.replace({query:{...route.query,section:value}})}
 function openProduct(p:ShopProduct){selected.value=p;photo.value=0;detailsOpen.value=true;}
 function add(p:ShopProduct){
@@ -34,7 +34,7 @@ function add(p:ShopProduct){
  addToBag(p.id);
 }
 async function refresh(){loading.value=true;error.value='';try{await loadShop(true)}catch(e){error.value=(e as Error).message}finally{loading.value=false}}
-watch(shopCatalog,d=>{if(!d)return;if(!d.categories.some(c=>c.id===leaf.value)){const r=d.categories.find(c=>!c.parent_id);root.value=r?.id||'';leaf.value=d.categories.find(c=>c.parent_id===root.value)?.id||'';}},{immediate:true});
+watch(shopCatalog,d=>{if(!d)return;if(!d.categories.some(c=>c.id===leaf.value)){const r=d.categories.find(c=>c.id===root.value&&!c.parent_id)||d.categories.find(c=>!c.parent_id);root.value=r?.id||'';leaf.value=d.categories.find(c=>c.parent_id===root.value)?.id||root.value;}},{immediate:true});
 watch(ordersOpen,v=>{if(v)orders.value=savedShopOrders()},{immediate:true});
 onMounted(async()=>{try{await loadShop()}catch(e){error.value=(e as Error).message}finally{loading.value=false}});
 </script>
@@ -49,8 +49,8 @@ onMounted(async()=>{try{await loadShop()}catch(e){error.value=(e as Error).messa
   <p v-if="loading&&!shopCatalog" class="shop-state" role="status">{{say(w.loading)}}</p>
   <div v-else class="shop-layout" :class="{'shop-layout-flat':section!=='home'}">
    <nav v-if="section==='home'" class="shop-categories" :aria-label="say(w.categories)"><div v-for="c in roots" :key="c.id" class="shop-category-group">
-    <button class="shop-root" :class="{active:root===c.id}" :aria-expanded="root===c.id" @click="chooseRoot(c.id)">{{tr(c.zh,c.en)}}<PhCaretDown/></button>
-    <div v-if="root===c.id" class="shop-children"><button v-for="child in children(c.id)" :key="child.id" :class="{active:leaf===child.id}" :aria-pressed="leaf===child.id" @click="leaf=child.id;search=''">{{tr(child.zh,child.en)}}</button></div>
+    <button class="shop-root" :class="{active:root===c.id}" :aria-expanded="children(c.id).length?root===c.id:undefined" :aria-pressed="!children(c.id).length?root===c.id:undefined" @click="chooseRoot(c.id)">{{tr(c.zh,c.en)}}<PhCaretDown v-if="children(c.id).length"/></button>
+    <div v-if="root===c.id&&children(c.id).length" class="shop-children"><button v-for="child in children(c.id)" :key="child.id" :class="{active:leaf===child.id}" :aria-pressed="leaf===child.id" @click="leaf=child.id;search=''">{{tr(child.zh,child.en)}}</button></div>
    </div></nav>
    <main class="shop-results">
     <div class="shop-result-tools"><label class="shop-search"><PhMagnifyingGlass/><input v-model="search" type="search" :placeholder="say(w.search)" :aria-label="say(w.search)"/></label><span class="shop-result-count">{{formatCopy(w.count,{v0:visible.length})}}</span></div>
@@ -58,7 +58,7 @@ onMounted(async()=>{try{await loadShop()}catch(e){error.value=(e as Error).messa
      <article v-for="p in visible" :key="p.id" class="shop-card">
       <button class="shop-card-preview" :aria-label="tr(p.zh,p.en)" @click="openProduct(p)">
        <img v-if="p.images.length" :src="shopImage(p.images[0])" :alt="tr(p.zh,p.en)" width="600" height="600" loading="lazy"/>
-       <span v-else class="shop-placeholder"><strong>{{p.code||tr(p.zh,p.en)}}</strong><small>{{say(w.noPhoto)}}</small></span><span v-if="p.images.length>1" class="shop-photo-count">{{p.images.length}}</span>
+       <span v-else class="shop-placeholder" :class="{'shop-kit-placeholder':p.shop_category_id==='kits'}"><strong>{{p.code||tr(p.zh,p.en)}}</strong><small>{{say(w.noPhoto)}}</small></span><span v-if="p.images.length>1" class="shop-photo-count">{{p.images.length}}</span>
       </button>
       <div class="shop-card-body"><button class="shop-name" @click="openProduct(p)">{{tr(p.zh,p.en)}}</button><p>{{tr(p.detailZh,p.detailEn)}}</p>
        <div class="shop-card-bottom"><span v-if="p.price_cents!==null" class="shop-price">{{(p.price_cents/100).toFixed(2)}}<small>CAD</small></span><span v-else class="shop-unpriced">{{say(w.unpriced)}}</span><button class="shop-add" :aria-label="say(w.addCart)+' · '+tr(p.zh,p.en)" @click="section==='services'?openProduct(p):add(p)"><PhArrowRight v-if="section==='services'"/><PhPlus v-else/></button></div>

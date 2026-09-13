@@ -9,3 +9,4 @@
 @media(max-width:360px){.shop-layout{grid-template-columns:90px minmax(0,1fr);gap:8px}.shop-layout-flat{grid-template-columns:1fr}.shop-actions{gap:10px}.shop-add{width:30px;height:34px}.shop-unpriced{font-size:10px}}
 [data-motion="reduced"] .shop-card,[data-motion="reduced"] .shop-root svg{transition:none}
 .shop-tabs button.active{background:transparent;border-radius:0}
+.shop-kit-placeholder{padding:8px}.shop-kit-placeholder strong{font-size:clamp(13px,1.5vw,23px);line-height:1.35;overflow-wrap:anywhere}

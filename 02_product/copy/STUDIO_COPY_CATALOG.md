@@ -2551,8 +2551,8 @@
 | source | 来源记录 | Source record |
 | sourcePrice | 来源价（RMB，仅供参考） | Source price (RMB, reference only) |
 | conflict | 这条记录已被更新。请先重新加载，再编辑保存。 | This record has changed. Reload it before saving your edits. |
-| invalidCategory | 请选择有效的二级分类。分类最多两级。 | Choose a valid subcategory. Categories support two levels. |
-| categoryUsed | 此分类已有商品，不能改为一级分类。 | This category contains products and cannot become a top-level category. |
+| invalidCategory | 请选择有效的商品分类。分类最多两级。 | Choose a valid product category. Categories support two levels. |
+| categoryUsed | 此分类已有商品，请先调整商品分类，再修改分类层级。 | This category contains products. Reassign them before changing the category hierarchy. |
 | invalidPrice | 请输入最多两位小数的正数售价，或留空。 | Enter a positive price with up to two decimal places, or leave it blank. |
 | pendingInfo | 尚未定价的商品可以展示，不能在线购买。 | Unpriced products can be displayed but cannot be purchased online. |
 | refresh | 刷新 | Refresh |

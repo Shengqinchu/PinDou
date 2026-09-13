@@ -21,7 +21,7 @@ const data=ref<ShopCatalog>(),busy=ref(false),error=ref(''),success=ref(''),sear
 const categoryMode=ref(false),edit=ref<ShopProduct>(),categoryEdit=ref<ShopCategory>(),open=ref(false),categoryOpen=ref(false),price=ref('');
 const drafts=new Map<string,{product:ShopProduct;price:string}>();
 const clone=<T,>(v:T):T=>JSON.parse(JSON.stringify(v));
-const leaves=computed(()=>data.value?.categories.filter(c=>c.parent_id)||[]);
+const leaves=computed(()=>data.value?.categories.filter(c=>!data.value?.categories.some(child=>child.parent_id===c.id))||[]);
 const visible=computed(()=>data.value?.products.filter(p=>(collection.value==='all'||p.shop_collection===collection.value)&&(category.value==='all'||p.shop_category_id===category.value)&&(priceState.value==='all'||(priceState.value==='unpriced'?p.price_cents===null:p.price_cents!==null))&&(imageState.value==='all'||(imageState.value==='missing'?!p.images.length:!!p.images.length))&&`${p.zh} ${p.en} ${p.code}`.toLowerCase().includes(search.value.trim().toLowerCase()))||[]);
 const allSelected=computed(()=>!!visible.value.length&&visible.value.every(p=>selected.value.includes(p.id)));
 function selectFiltered(){const ids=new Set(visible.value.map(p=>p.id));selected.value=allSelected.value?selected.value.filter(id=>!ids.has(id)):[...new Set([...selected.value,...ids])];}
@@ -35,7 +35,7 @@ async function startBatch(){
  }catch(e){fail(e)}finally{busy.value=false;}
 }
 async function batchSaved(count:number){edit.value=undefined;await refresh();void loadShop(true).catch(()=>{});success.value=formatCopy(b.saved,{v0:count});selected.value=[];}
-const roots=computed(()=>data.value?.categories.filter(c=>!c.parent_id&&c.id!==categoryEdit.value?.id)||[]);
+const roots=computed(()=>data.value?.categories.filter(c=>!c.parent_id&&c.id!==categoryEdit.value?.id&&!data.value?.products.some(p=>p.shop_category_id===c.id))||[]);
 function fail(e:unknown){const x=e as CommerceError;error.value=say(x.code==='version_conflict'?w.conflict:x.code==='shop_category_invalid'?w.invalidCategory:x.code==='shop_category_in_use'?w.categoryUsed:[])||x.message;}
 async function refresh(){error.value='';try{data.value=await request<ShopCatalog>('/manage/shop')}catch(e){fail(e)}}
 function keepDraft(){if(edit.value)drafts.set(edit.value.id,{product:clone(edit.value),price:price.value})}
