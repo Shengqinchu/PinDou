@@ -12,7 +12,8 @@ METHODS = ('wechat', 'phone', 'email', 'other')
 
 
 def valid_contact(method, value):
-    if method not in METHODS or not 3 <= len(value) <= 180:
+    minimum = 1 if method == 'wechat' else 3
+    if method not in METHODS or not minimum <= len(value) <= 180:
         return False
     if method == 'phone':
         return bool(re.fullmatch(r'[+\d ()-]{7,30}', value)) and len(re.sub(r'\D', '', value)) >= 7

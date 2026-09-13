@@ -25,6 +25,7 @@
 @media(max-height:520px){.visit-flow-heading{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.vision-header.visit-header{padding-block:6px;min-height:54px}.visit-header .puppy-brandmark{width:130px}.visit-progress button{min-height:34px}.visit-flow-page{gap:5px;padding-top:6px}.visit-actions{padding-top:6px}.visit-time-selection{font-size:11px;min-height:18px;margin:2px 0}.visit-time-tools .visit-guest-trigger{min-height:44px}.is-compact .reservation-legend{margin-block:2px;font-size:10px}.is-compact .reservation-overtime-note{font-size:10px;margin-top:4px}}
 html.keyboard-open .visit-flow-heading,html.keyboard-open .visit-progress,html.keyboard-open .visit-review{display:none}
 html[data-motion=reduced] :is(.visit-step-enter-active,.visit-step-leave-active,.visit-progress i){transition:none;transform:none;opacity:1}
+.is-compact .reservation-minimum-note{order:4;flex-shrink:0;font-size:11px;line-height:1.55;margin:4px 0 0}
 
 /* Both rows share label, value and hint tracks, including translated text. */
 .visit-time-tools{justify-content:center;min-height:46px}
@@ -50,4 +51,17 @@ html[data-motion=reduced] :is(.visit-step-enter-active,.visit-step-leave-active,
  .visit-flow-page[data-step="3"] .visit-scroll{padding-block:4px}
  .visit-review{margin-bottom:5px;padding-bottom:5px;gap:14px}.visit-review small{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.visit-review>div{gap:0 8px}.visit-review strong{font-size:12px;line-height:1.4}.visit-review button{min-height:28px}
  .visit-returning-help{font-size:11px;line-height:1.5;margin-bottom:5px}.visit-contact{grid-template-columns:minmax(160px,.65fr) minmax(380px,1.35fr);align-items:start;gap:14px}.visit-contact-channel{padding:5px;gap:8px;grid-template-columns:minmax(200px,1fr) minmax(150px,1fr)}.visit-contact label:not(.contact-method-picker label){font-size:12px;gap:4px}.visit-contact .contact-method-picker legend{font-size:12px;margin-bottom:4px}.visit-contact input:not([type=radio]){min-height:44px;padding-block:9px}.visit-contact .contact-method-picker>div>label{font-size:11px;min-height:36px;padding-block:4px}.visit-notes{margin-top:4px;font-size:11px}.visit-notes>summary{min-height:28px;padding-block:5px}.visit-confirmation-note{font-size:11px;line-height:1.5;margin-top:4px}
+}
+
+/* Let the phone timetable grow beyond a single screen. Keep the action bar
+   reachable while the page and the full range of time slots can both scroll. */
+@media(max-width:700px){
+ .visit-flow-page[data-step="2"]{height:auto;min-height:calc(var(--visible-height) - var(--visit-header-height,80px))}
+ .visit-flow-page[data-step="2"] .visit-scroll{display:block;overflow:visible;flex:none}
+ .visit-flow-page[data-step="2"] .visit-fields{display:block}
+ .visit-flow-page[data-step="2"] .visit-stage{display:flex}
+ .visit-flow-page[data-step="2"] .reservation-calendar.is-compact{flex:none}
+ .visit-flow-page[data-step="2"] .reservation-grid-scroll{flex:none;height:max(520px,calc(2 * var(--visible-height) - 900px));min-height:520px;max-height:none;overscroll-behavior-y:auto;scroll-margin-block:12px 88px}
+ .visit-flow-page[data-step="2"] .visit-actions{position:sticky;bottom:0;z-index:5;box-shadow:0 -8px 12px #ffffffeb}
+ .is-compact .reservation-minimum-note{font-size:10px}
 }

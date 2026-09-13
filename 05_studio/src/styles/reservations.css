@@ -339,6 +339,10 @@
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
+.reservation-calendar {
+  --reservation-selection: #e8e3f4;
+  --reservation-selection-border: #898298;
+}
 .reservation-legend {
   display: flex;
   gap: 24px;
@@ -362,7 +366,8 @@
   background: var(--white);
 }
 .reservation-legend i.chosen {
-  background: var(--accent);
+  background: var(--reservation-selection);
+  border-color: var(--reservation-selection-border);
 }
 .reservation-legend i.closed {
   background: #dce3e6;
@@ -377,6 +382,12 @@
 }
 .reservation-hours {
   margin-top: 15px;
+}
+.reservation-minimum-note {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin: 4px 3px 0;
 }
 .reservation-grid-scroll {
   max-height: 560px;
@@ -450,11 +461,11 @@
     color 0.3s ease-in-out;
 }
 .reservation-grid td > button.chosen {
-  background: #e8e3f4;
+  background: var(--reservation-selection);
   color: #292a2b;
   box-shadow:
-    inset 2px 0 #898298,
-    inset -2px 0 #898298;
+    inset 2px 0 var(--reservation-selection-border),
+    inset -2px 0 var(--reservation-selection-border);
 }
 .reservation-grid td > button.start {
   background: #d8d0ea;

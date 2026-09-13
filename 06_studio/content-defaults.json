@@ -2781,6 +2781,10 @@
     "all_times_are_local_to_hamilton_the_8a3607": [
       "均为汉密尔顿当地时间，营业时间以当前时间表为准。",
       "All times are local to Hamilton. The timetable shows the current opening hours."
+    ],
+    "minimum_duration": [
+      "预约时长至少 2 小时",
+      "Minimum booking: 2 hours."
     ]
   },
   "components-SlideOver": {

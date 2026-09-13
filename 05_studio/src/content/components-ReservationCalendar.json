@@ -7,6 +7,7 @@
   ],
   "available_to_book_9bb918": ["可以预约", "Available to book"],
   "your_selection_0fc834": ["已选时段", "Your selection"],
+  "minimum_duration": ["预约时长至少 2 小时", "Minimum booking: 2 hours."],
   "unavailable_fb3489": ["不可预约", "Unavailable"],
   "low_seats": ["座位数≤2", "Seats left ≤ 2"],
   "remaining_seats": ["剩余 {v0} 个座位", "{v0} seats left"],

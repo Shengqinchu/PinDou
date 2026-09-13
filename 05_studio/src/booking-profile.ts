@@ -16,7 +16,7 @@ export const contactMethodLabel=(method:ContactDetails['contact_method'])=>say(v
 export function validContact(data:ContactDetails,allowEmpty=false){
  const name=data.name.trim(),contact=data.contact.trim();
  if(allowEmpty&&!name&&!contact)return true;
- if(!name||name.length>80||contact.length<3||contact.length>180)return false;
+ if(!name||name.length>80||contact.length<(data.contact_method==='wechat'?1:3)||contact.length>180)return false;
  if(data.contact_method==='email')return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact);
  if(data.contact_method==='phone')return /^[+\d ()-]{7,30}$/.test(contact)&&contact.replace(/\D/g,'').length>=7;
  return true;

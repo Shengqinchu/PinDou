@@ -133,7 +133,7 @@ class Submission(Strict):
     @model_validator(mode="after")
     def contact_valid(self):
         if not self.contact:return self
-        if len(self.contact)<3:raise ValueError("Invalid contact")
+        if len(self.contact)<(1 if self.contact_method=='wechat' else 3):raise ValueError("Invalid contact")
         if self.contact_method == "phone" and (not re.fullmatch(r"[+\d ()-]{7,30}", self.contact) or len(re.sub(r"\D", "", self.contact)) < 7):
             raise ValueError("Invalid phone")
         if self.contact_method == "email" and not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", self.contact):
@@ -296,7 +296,8 @@ def reservation_contact(db, payload, customer, current):
     # Resolve only this account's history. The request hash remains the original
     # blank input so a retry returns the original receipt after history changes.
     row=db.execute("""SELECT payload FROM studio_reservations WHERE owner_id=? AND deleted_at IS NULL
-      AND status IN ('completed','confirmed','pending') AND length(json_extract(payload,'$.contact'))>=3
+      AND status IN ('completed','confirmed','pending')
+      AND length(json_extract(payload,'$.contact'))>=CASE WHEN json_extract(payload,'$.contact_method')='wechat' THEN 1 ELSE 3 END
       ORDER BY (status='completed') DESC,created_at DESC,id DESC LIMIT 1""",(customer['id'],)).fetchone()
     history=json.loads(row['payload']) if row else {}
     values={'returning_customer':True}

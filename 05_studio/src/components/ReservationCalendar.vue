@@ -299,6 +299,7 @@ watch(
       </table>
     </div>
     <ReservationHoursNote/>
+    <p class="reservation-minimum-note">{{ say(copyText.minimum_duration) }}</p>
     <p v-if="message" class="form-error" role="alert">{{ message }}</p>
     <p v-if="!compact" class="reservation-hours">
       {{ say(copyText.all_times_are_local_to_hamilton_the_8a3607) }}
