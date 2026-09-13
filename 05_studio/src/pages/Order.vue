@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LiftTitle from '../components/LiftTitle.vue';
+import ManualShopOrder from '../components/ManualShopOrder.vue';
 import CopyContact from "../components/CopyContact.vue";
 import { contentModule } from "../content-store";
 const copyText = contentModule("pages-Order", copyTextDefault);
@@ -48,7 +49,7 @@ const payable = computed(
   () => order.value?.status === "pending" && seconds.value > 0,
 );
 const terminal = computed(() =>
-  ["paid", "paid_needs_review", "failed", "refunded"].includes(
+  ["paid", "paid_needs_review", "failed", "refunded", "manual_pending", "manual_confirmed", "manual_completed", "manual_cancelled"].includes(
     order.value?.status || "",
   ),
 );
@@ -115,7 +116,7 @@ async function tryAgain() {
 </script>
 <template>
   <section class="container order-page section-bottom">
-    <RouterLink to="/cart" class="text-link">{{
+    <RouterLink :to="order?.quote.mode==='manual'?'/shop?view=cart':'/cart'" class="text-link">{{
       say(copyText.back_to_your_bag_1d6e14)
     }}</RouterLink>
     <p v-if="error" class="form-error" role="alert">
@@ -124,7 +125,8 @@ async function tryAgain() {
         {{ say(copyText.try_again_c3273b) }}
       </button>
     </p>
-    <div v-if="order" class="order-layout">
+    <ManualShopOrder v-if="order?.quote.mode==='manual'" :order="order" @updated="order=$event"/>
+    <div v-else-if="order" class="order-layout">
       <div class="order-main">
         <div :class="['order-seal', { confirmed: order.status === 'paid' }]">
           <PhCheck v-if="order.status === 'paid'" :size="30" /><PhClock

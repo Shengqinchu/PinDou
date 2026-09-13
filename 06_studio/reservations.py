@@ -495,7 +495,7 @@ def register(app, database, admin_actor):
         where = " WHERE " + " AND ".join(clauses) if clauses else ""
         with database() as db:
             count = db.execute("SELECT count(*) FROM studio_reservations"+where, params).fetchone()[0]
-            rows = db.execute("SELECT * FROM studio_reservations"+where+" ORDER BY created_at DESC,id DESC LIMIT 30 OFFSET ?", (*params,(page-1)*30)).fetchall()
+            rows = db.execute("SELECT * FROM studio_reservations"+where+" ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'confirmed' THEN 1 WHEN 'completed' THEN 2 WHEN 'cancelled' THEN 3 ELSE 4 END,created_at DESC,id DESC LIMIT 30 OFFSET ?", (*params,(page-1)*30)).fetchall()
             counts = dict(db.execute("SELECT status,count(*) FROM studio_reservations WHERE deleted_at IS NULL GROUP BY status").fetchall())
             policy = read_policy(db)
         return {"items":[public_row(r) | {"payload":json.loads(r["payload"]),"staff_note":r["staff_note"],'owner_id':r['owner_id'],'deleted_at':r['deleted_at']} for r in rows], "total":count,"counts":counts,"policy":policy}

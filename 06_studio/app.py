@@ -69,6 +69,8 @@ def initialize():
     commerce.initialize(database)
     import shop_catalog
     shop_catalog.initialize(database)
+    import shop_orders
+    shop_orders.initialize(database)
     import reservations
     reservations.initialize(database)
     import customer_auth
@@ -339,6 +341,8 @@ import commerce
 commerce.register(app, admin_actor)
 import shop_catalog
 shop_catalog.register(app, admin_actor)
+import shop_orders
+shop_orders.register(app, admin_actor)
 import reservations
 import customer_auth
 customer_auth.register(app, database, ADMIN_ORIGIN)

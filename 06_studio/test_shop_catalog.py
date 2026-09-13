@@ -94,7 +94,8 @@ def test_kits_are_editable_products_directly_under_root(client):
     assert [p['id'] for p in kits]==['kit-144-tools','kit-144','kit-221-tools','kit-221']
     assert not any(c['parent_id']=='kits' for c in data['categories'])
     assert all(p['price_cents'] is None and not p['active'] for p in kits)
-    updated=client.put('/studio-api/manage/products/kit-144',json=kits[1]|{'price_cents':2499,'stock':4})
+    editable=next(p for p in client.get('/studio-api/manage/shop').json()['products'] if p['id']=='kit-144')
+    updated=client.put('/studio-api/manage/products/kit-144',json=editable|{'price_cents':2499,'stock':4})
     assert updated.status_code==200,updated.text
     assert updated.json()['shop_category_id']=='kits'
     batch=client.patch('/studio-api/manage/shop/products/batch',json={'items':[

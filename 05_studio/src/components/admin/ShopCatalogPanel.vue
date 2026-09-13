@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onDeactivated, ref } from 'vue';
+import { computed, onMounted, onDeactivated, ref, watch } from 'vue';
 import { PhPlus, PhArrowClockwise, PhPencilSimple } from '@phosphor-icons/vue';
 import { useDesk } from '../../admin';
 import { say, tr, formatCopy } from '../../state';
@@ -9,6 +9,10 @@ import { uploadMedia } from '../../editor';
 import MediaUpload from './MediaUpload.vue';
 import SlideOver from '../SlideOver.vue';
 import ShopBatchEditor from './ShopBatchEditor.vue';
+import ProductOptionsEditor from './ProductOptionsEditor.vue';
+import ShopOrdersPanel from './ShopOrdersPanel.vue';
+import { orderWords as o } from '../../shop-ordering';
+import '../../styles/shop-ordering.css';
 import { contentModule } from '../../content-store';
 import batchDefaults from '../../content/shop-batch.json';
 import '../../styles/shop.css';
@@ -18,6 +22,8 @@ const {request}=useDesk();
 const b=contentModule('shop-batch',batchDefaults);
 const selected=ref<string[]>([]),batchOpen=ref(false),batchProducts=ref<ShopProduct[]>([]),priceState=ref('all'),imageState=ref('all');
 const data=ref<ShopCatalog>(),busy=ref(false),error=ref(''),success=ref(''),search=ref(''),collection=ref('all'),category=ref('all');
+const ordersMode=ref(false);
+watch(ordersMode,async value=>{if(!value){busy.value=true;try{await refresh()}finally{busy.value=false}}});
 const categoryMode=ref(false),edit=ref<ShopProduct>(),categoryEdit=ref<ShopCategory>(),open=ref(false),categoryOpen=ref(false),price=ref('');
 const textTooLong=computed(()=>!!edit.value&&([edit.value.zh,edit.value.en].some(v=>productTextLength(v)>productTextLimits.name)||[edit.value.detailZh,edit.value.detailEn].some(v=>productTextLength(v)>productTextLimits.description)));
 const textLimitMessage=computed(()=>formatCopy(w.textTooLong,{v0:productTextLimits.name,v1:productTextLimits.description}));
@@ -51,6 +57,7 @@ async function save(){
  if(price.value&&!/^\d{1,5}(\.\d{1,2})?$/.test(price.value)){error.value=say(w.invalidPrice);return;}
  const amount=price.value===''?null:Math.round(Number(price.value)*100);
  if(amount!==null&&(amount<1||amount>1000000)){error.value=say(w.invalidPrice);return;}
+ if(edit.value.quantity_offer&&amount!==null&&edit.value.quantity_offer.price_cents>=amount*edit.value.quantity_offer.quantity){error.value=say(o.invalidOffer);return;}
  const current=clone(edit.value);current.price_cents=amount;current.image=current.images[0]||'';current.active=false;
  current.category=current.shop_collection==='home'?(data.value?.categories.find(c=>c.id===current.shop_category_id)?.parent_id==='tools'?'tools':'beads'):'finished';
  busy.value=true;error.value='';success.value='';
@@ -69,17 +76,18 @@ onMounted(refresh);onDeactivated(()=>{keepDraft();open.value=false;categoryOpen.
 </script>
 <template>
  <section class="shop-admin">
-  <header class="desk-page-heading"><div><h1>{{say(w.adminTitle)}}</h1><p>{{say(w.adminHelp)}}</p></div><div class="shop-actions"><button class="desk-button secondary" @click="refresh"><PhArrowClockwise/>{{say(w.refresh)}}</button><button class="desk-button primary" @click="categoryMode?editCat():create()"><PhPlus/>{{say(categoryMode?w.addCategory:w.addProduct)}}</button></div></header>
-  <nav class="shop-tabs"><button :class="{active:!categoryMode}" @click="categoryMode=false">{{say(w.adminTitle)}}</button><button :class="{active:categoryMode}" @click="categoryMode=true">{{say(w.categories)}}</button></nav>
+  <header class="desk-page-heading"><div><h1>{{say(w.adminTitle)}}</h1><p>{{say(w.adminHelp)}}</p></div><div v-if="!ordersMode" class="shop-actions"><button class="desk-button secondary" @click="refresh"><PhArrowClockwise/>{{say(w.refresh)}}</button><button class="desk-button primary" @click="categoryMode?editCat():create()"><PhPlus/>{{say(categoryMode?w.addCategory:w.addProduct)}}</button></div></header>
+  <nav class="shop-tabs"><button :class="{active:!categoryMode&&!ordersMode}" @click="categoryMode=false;ordersMode=false">{{say(w.adminTitle)}}</button><button :class="{active:categoryMode&&!ordersMode}" @click="categoryMode=true;ordersMode=false">{{say(w.categories)}}</button><button :class="{active:ordersMode}" @click="ordersMode=true">{{say(o.ordersTitle)}}</button></nav>
+  <ShopOrdersPanel v-if="ordersMode"/>
   <p v-if="error&&!open&&!categoryOpen" role="alert" class="shop-error">{{error}}</p><p v-if="success" role="status">{{success}}</p>
-  <template v-if="!categoryMode">
+  <template v-if="!categoryMode&&!ordersMode">
    <div class="shop-admin-tools"><select v-model="collection" :aria-label="say(w.collection)"><option value="all">{{say(w.all)}}</option><option v-for="s in (['home','finished','services'] as const)" :key="s" :value="s">{{say(w[s])}}</option></select><select v-model="category" :aria-label="say(w.category)"><option value="all">{{say(w.all)}}</option><option v-for="c in leaves" :key="c.id" :value="c.id">{{tr(c.zh,c.en)}}</option></select><input v-model="search" type="search" :placeholder="say(w.search)" :aria-label="say(w.search)"/></div>
    <div class="shop-admin-tools"><select v-model="priceState" :aria-label="say(b.priceState)"><option value="all">{{say(b.priceState)}} · {{say(w.all)}}</option><option value="unpriced">{{say(b.unpriced)}}</option><option value="priced">{{say(b.priced)}}</option></select><select v-model="imageState" :aria-label="say(b.imageState)"><option value="all">{{say(b.imageState)}} · {{say(w.all)}}</option><option value="missing">{{say(b.missing)}}</option><option value="has-image">{{say(b.hasImage)}}</option></select></div>
    <div class="shop-selection-bar"><label><input type="checkbox" :checked="allSelected" :disabled="busy" @change="selectFiltered"/>{{say(b.selectFiltered)}}</label><span>{{formatCopy(b.selected,{v0:selected.length})}} / {{formatCopy(w.count,{v0:visible.length})}}</span><button class="desk-button secondary" :disabled="busy||!selected.length" @click="selected=[]">{{say(b.clear)}}</button><button class="desk-button primary" :disabled="busy||!selected.length||selected.length>500" @click="startBatch">{{say(b.edit)}}</button></div>
-   <div class="shop-admin-list"><div v-for="p in visible" :key="p.id" class="shop-select-row"><input v-model="selected" type="checkbox" :value="p.id" :aria-label="formatCopy(b.select,{v0:tr(p.zh,p.en)})"/><button class="shop-admin-row" @click="editProduct(p)"><img v-if="p.images.length" :src="shopImage(p.images[0])" alt="" loading="lazy"/><span v-else class="shop-bag-thumb">{{p.code||'—'}}</span><span><strong>{{tr(p.zh,p.en)}}</strong><small>{{p.code}}</small></span><span>{{p.price_cents===null?say(w.unpriced):money(p.price_cents)}}</span><span>{{say(p.shop_visible?w.visible:w.hidden)}}<PhPencilSimple/></span></button></div></div>
+   <div class="shop-admin-list"><div v-for="p in visible" :key="p.id" class="shop-select-row"><input v-model="selected" type="checkbox" :value="p.id" :aria-label="formatCopy(b.select,{v0:tr(p.zh,p.en)})"/><button class="shop-admin-row" :disabled="busy" @click="editProduct(p)"><img v-if="p.images.length" :src="shopImage(p.images[0])" alt="" loading="lazy"/><span v-else class="shop-bag-thumb">{{p.code||'—'}}</span><span><strong>{{tr(p.zh,p.en)}}</strong><small>{{p.code}}</small></span><span>{{p.price_cents===null?say(w.unpriced):money(p.price_cents)}}</span><span>{{say(p.shop_visible?w.visible:w.hidden)}}<PhPencilSimple/></span></button></div></div>
    <p v-if="!visible.length" class="shop-state">{{say(w.noMatch)}}</p>
   </template>
-  <div v-else class="shop-admin-categories"><button v-for="c in data?.categories" :key="c.id" :class="{child:c.parent_id}" @click="editCat(c)">{{tr(c.zh,c.en)}}<small v-if="!c.visible"> · {{say(w.hidden)}}</small></button></div>
+  <div v-else-if="categoryMode&&!ordersMode" class="shop-admin-categories"><button v-for="c in data?.categories" :key="c.id" :class="{child:c.parent_id}" @click="editCat(c)">{{tr(c.zh,c.en)}}<small v-if="!c.visible"> · {{say(w.hidden)}}</small></button></div>
  </section>
  <ShopBatchEditor v-model="batchOpen" :products="batchProducts" @saved="batchSaved"/>
  <SlideOver v-model="open" :title="say(w.editProduct)" :busy="busy">
@@ -88,6 +96,7 @@ onMounted(refresh);onDeactivated(()=>{keepDraft();open.value=false;categoryOpen.
    <div class="shop-edit-pair"><label>{{say(w.collection)}}<select :aria-label="say(w.collection)" v-model="edit.shop_collection" @change="changeCollection"><option v-for="s in (['home','finished','services'] as const)" :key="s" :value="s">{{say(w[s])}}</option></select></label><label v-if="edit.shop_collection==='home'">{{say(w.category)}}<select :aria-label="say(w.category)" v-model="edit.shop_category_id" required><option v-for="c in leaves" :key="c.id" :value="c.id">{{tr(c.zh,c.en)}}</option></select></label></div>
    <div class="shop-edit-pair"><label>{{say(w.price)}}<input v-model="price" inputmode="decimal" :placeholder="say(w.unpriced)"/></label><label>{{say(w.stock)}}<input v-model.number="edit.stock" type="number" min="0" max="100000" step="1" required/></label></div>
    <p class="shop-notice">{{say(w.pendingInfo)}}</p>
+   <ProductOptionsEditor :product="edit" :busy="busy"/>
    <div class="shop-edit-pair"><label>{{say(w.code)}}<input v-model="edit.code" maxlength="50"/></label><label>{{say(w.sort)}}<input v-model.number="edit.sort" type="number" min="0" max="100000" step="1" required/></label></div>
    <label>{{say(w.detailZh)}}<textarea v-model="edit.detailZh" :aria-label="say(w.detailZh)" rows="8"/><small class="shop-text-count" :class="{exceeded:productTextLength(edit.detailZh)>productTextLimits.description}">{{textCount(edit.detailZh,productTextLimits.description)}}</small></label><label>{{say(w.detailEn)}}<textarea v-model="edit.detailEn" :aria-label="say(w.detailEn)" rows="8"/><small class="shop-text-count" :class="{exceeded:productTextLength(edit.detailEn)>productTextLimits.description}">{{textCount(edit.detailEn,productTextLimits.description)}}</small></label>
    <p v-if="textTooLong" class="shop-error" role="alert">{{textLimitMessage}}</p>

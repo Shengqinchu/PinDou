@@ -78,6 +78,17 @@ class Settings(Strict):
         return self
 
 
+class ProductOption(Strict):
+    id: str = Field(pattern=r"^[a-z0-9][a-z0-9_-]{0,39}$")
+    zh: str = Field(min_length=1, max_length=80)
+    en: str = Field(min_length=1, max_length=120)
+
+
+class QuantityOffer(Strict):
+    quantity: int = Field(ge=2, le=20, strict=True)
+    price_cents: int = Field(ge=1, le=1000000, strict=True)
+
+
 class Product(Strict):
     id: str = Field(pattern=r"^[a-z][a-z0-9_-]{0,39}$")
     kind: Literal["experience", "physical"]
@@ -95,12 +106,21 @@ class Product(Strict):
     sort: int = Field(default=0, ge=0, le=100000, strict=True)
     price_cents: int | None = Field(default=None, ge=1, le=1000000, strict=True)
     stock: int = Field(default=0, ge=0, le=100000, strict=True)
+    variants: list[ProductOption] = Field(default_factory=list, max_length=100)
+    choices: list[ProductOption] = Field(default_factory=list, max_length=20)
+    choiceZh: str = Field(default="制作方式", min_length=1, max_length=80)
+    choiceEn: str = Field(default="Finish", min_length=1, max_length=120)
+    quantity_offer: QuantityOffer | None = None
     active: bool = False
     version: int = Field(default=1, ge=1, strict=True)
 
     @model_validator(mode="after")
     def published_price(self):
         import content
+        if any(len({v.id for v in values}) != len(values) for values in (self.variants, self.choices)):
+            raise ValueError("Duplicate product options")
+        if self.quantity_offer and self.price_cents is not None and self.quantity_offer.price_cents >= self.price_cents * self.quantity_offer.quantity:
+            raise ValueError("Offer must cost less than buying the items individually")
         for src in [self.image, *self.images]:
             if src and not (re.fullmatch(r"studio-(0[1-9]|1[0-5])|journal-(02|04|05|07|10|11|13|20)", src) or content.image_path_ok(src)):
                 raise ValueError("Use a studio image upload")
@@ -284,7 +304,7 @@ def remaining_seats(db, settings, day, start, end, exclude="", extra=()):
 
 def stock_held(db, product_id, exclude=""):
     return db.execute("""SELECT coalesce(sum(s.quantity),0) FROM commerce_stock s JOIN commerce_orders o ON o.id=s.order_id
-        WHERE s.product_id=? AND o.id<>? AND o.status IN ('creating','pending','payment_uncertain') AND o.hold_until>?""", (product_id, exclude, time.time())).fetchone()[0]
+        WHERE s.product_id=? AND o.id<>? AND (o.status IN ('manual_pending','manual_confirmed') OR (o.status IN ('creating','pending','payment_uncertain') AND o.hold_until>?))""", (product_id, exclude, time.time())).fetchone()[0]
 
 
 PUBLIC_SALES_ENABLED = os.getenv("STUDIO_ONLINE_SALES", "0") == "1"
@@ -355,6 +375,8 @@ def quote_cart(db, cart: Cart):
 def order_view(row, admin=False):
     result = {key: row[key] for key in ("id", "created_at", "status", "expires_at", "hold_until", "paid_at", "fulfillment", "version")}
     result["quote"] = json.loads(row["quote"])
+    if result["quote"].get("mode") == "manual":
+        result["customer"] = json.loads(row["customer"])
     if row["status"] in PENDING and row["expires_at"] > time.time():
         result.update(payment_url=row["payment_url"], qr_url=row["qr_url"])
     if admin:
@@ -396,6 +418,8 @@ def settle(order_id, trade_id, source):
         row = db.execute("SELECT * FROM commerce_orders WHERE id=?", (order_id,)).fetchone()
         if not row:
             fail("order_not_found", 404)
+        if json.loads(row['quote']).get('mode') == 'manual':
+            fail('manual_order_has_no_gateway_payment')
         if row["trade_id"] and row["trade_id"] != trade_id:
             fail("payment_identity_mismatch")
         duplicate = db.execute("SELECT id FROM commerce_orders WHERE trade_id=? AND id<>?", (trade_id, order_id)).fetchone()

@@ -5,7 +5,11 @@ import { PhShoppingCart, PhReceipt, PhMagnifyingGlass, PhPlus, PhMinus, PhTrash,
 import LiftTitle from '../components/LiftTitle.vue';
 import SlideOver from '../components/SlideOver.vue';
 import { say, tr, formatCopy } from '../state';
-import { bag, bagCount, addToBag, removeLine, quantityChange, money } from '../commerce';
+import { bag, bagCount, addToBag, money } from '../commerce';
+import ShopCart from '../components/ShopCart.vue';
+import CopyContact from '../components/CopyContact.vue';
+import { orderWords as o, offerText, orderable } from '../shop-ordering';
+import '../styles/shop-ordering.css';
 import { shopWords as w, shopCatalog, loadShop, shopImage, savedShopOrders, productIntro, type ShopProduct } from '../shop';
 import { notify } from '../ui';
 import '../styles/shop.css';
@@ -15,6 +19,8 @@ const searches=reactive<Record<string,string>>({home:'',finished:'',services:''}
 const search=computed({get:()=>searches[section.value],set:value=>{searches[section.value]=value}});
 const root=ref('refills'),leaf=ref('refill-a'),error=ref(''),loading=ref(!shopCatalog.value);
 const selected=ref<ShopProduct>(),detailsOpen=ref(false),photo=ref(0);
+const variant=ref(''),choice=ref('');
+const readySelection=computed(()=>!!selected.value&&(!selected.value.variants?.length||selected.value.variants.some(v=>v.id===variant.value))&&(!selected.value.choices?.length||selected.value.choices.some(v=>v.id===choice.value)));
 const selectedDescription=computed(()=>selected.value?tr(selected.value.detailZh,selected.value.detailEn):'');
 const cartOpen=computed({get:()=>route.query.view==='cart',set:v=>setView(v?'cart':'')});
 const ordersOpen=computed({get:()=>route.query.view==='orders',set:v=>setView(v?'orders':'')});
@@ -23,16 +29,18 @@ const roots=computed(()=>shopCatalog.value?.categories.filter(c=>!c.parent_id)||
 const children=(id:string)=>shopCatalog.value?.categories.filter(c=>c.parent_id===id)||[];
 const products=computed(()=>shopCatalog.value?.products||[]);
 const visible=computed(()=>products.value.filter(p=>p.shop_collection===section.value&&(section.value!=='home'||p.shop_category_id===leaf.value)&&`${p.zh} ${p.en} ${p.code}`.toLowerCase().includes(search.value.trim().toLowerCase())));
-const items=computed(()=>bag.value.map(line=>({line,product:products.value.find(p=>p.id===line.product_id)})));
-const total=computed(()=>items.value.reduce((s,{line,product})=>s+(product?.price_cents||0)*line.quantity,0));
 function setView(view:string){void router.replace({query:{...route.query,view:view||undefined}})}
 function chooseRoot(id:string){root.value=id;leaf.value=children(id)[0]?.id||id;search.value='';}
 function chooseSection(value:string){void router.replace({query:{...route.query,section:value}})}
-function openProduct(p:ShopProduct){selected.value=p;photo.value=0;detailsOpen.value=true;}
-function add(p:ShopProduct){
- const line=bag.value.find(l=>l.product_id===p.id);
+function openProduct(p:ShopProduct){selected.value=p;photo.value=0;variant.value='';choice.value='';detailsOpen.value=true;}
+function add(p:ShopProduct,fromDetails=false){
+ if(!orderable(p))return;
+ if(!fromDetails&&(p.variants?.length||p.choices?.length)){openProduct(p);return;}
+ if(fromDetails&&!readySelection.value)return;
+ const selection={variant_id:fromDetails?variant.value:'',choice_id:fromDetails?choice.value:''};
+ const line=bag.value.find(l=>l.product_id===p.id&&(l.variant_id||'')===selection.variant_id&&(l.choice_id||'')===selection.choice_id);
  if((!line&&bag.value.length>=20)||(line&&line.quantity>=20)){notify(w.cartLimit[0],w.cartLimit[1],'error');return;}
- addToBag(p.id);
+ addToBag(p.id,undefined,selection);
 }
 async function refresh(){loading.value=true;error.value='';try{await loadShop(true)}catch(e){error.value=(e as Error).message}finally{loading.value=false}}
 watch(shopCatalog,d=>{if(!d)return;if(!d.categories.some(c=>c.id===leaf.value)){const r=d.categories.find(c=>c.id===root.value&&!c.parent_id)||d.categories.find(c=>!c.parent_id);root.value=r?.id||'';leaf.value=d.categories.find(c=>c.parent_id===root.value)?.id||root.value;}},{immediate:true});
@@ -65,7 +73,8 @@ onUnmounted(()=>{window.removeEventListener('focus',focusRefresh);document.remov
        <span v-else class="shop-placeholder" :class="{'shop-kit-placeholder':p.shop_category_id==='kits'}"><strong>{{p.code||tr(p.zh,p.en)}}</strong><small>{{say(w.noPhoto)}}</small></span><span v-if="p.images.length>1" class="shop-photo-count">{{p.images.length}}</span>
       </button>
       <div class="shop-card-body"><button class="shop-name" @click="openProduct(p)">{{tr(p.zh,p.en)}}</button><p class="shop-card-description">{{productIntro(tr(p.detailZh,p.detailEn)).text}}</p><button v-if="productIntro(tr(p.detailZh,p.detailEn)).shortened" class="shop-description-link" @click="openProduct(p)">{{say(w.fullDescription)}}<PhArrowRight :size="16"/></button>
-       <div class="shop-card-bottom"><span v-if="p.price_cents!==null" class="shop-price">{{(p.price_cents/100).toFixed(2)}}<small>CAD</small></span><span v-else class="shop-unpriced">{{say(w.unpriced)}}</span><button class="shop-add" :aria-label="say(w.addCart)+' · '+tr(p.zh,p.en)" @click="section==='services'?openProduct(p):add(p)"><PhArrowRight v-if="section==='services'"/><PhPlus v-else/></button></div>
+       <p v-if="p.quantity_offer" class="shop-offer">{{offerText(p)}}</p>
+       <div class="shop-card-bottom"><span v-if="p.price_cents!==null" class="shop-price">{{(p.price_cents/100).toFixed(2)}}<small>CAD</small></span><span v-else class="shop-unpriced">{{say(w.unpriced)}}</span><button class="shop-add" :disabled="section!=='services'&&!orderable(p)" :aria-label="say(p.variants?.length?o.choose:w.addCart)+' · '+tr(p.zh,p.en)" @click="section==='services'?openProduct(p):add(p)"><PhArrowRight v-if="section==='services'"/><PhPlus v-else/></button></div>
       </div>
      </article>
     </div>
@@ -77,16 +86,13 @@ onUnmounted(()=>{window.removeEventListener('focus',focusRefresh);document.remov
   <div v-if="selected" class="shop-detail"><img v-if="selected.images.length" class="shop-detail-image" :src="shopImage(selected.images[photo])" :alt="tr(selected.zh,selected.en)"/><div v-else class="shop-placeholder"><strong>{{selected.code||tr(selected.zh,selected.en)}}</strong><small>{{say(w.noPhoto)}}</small></div>
    <div v-if="selected.images.length>1" class="shop-thumbnails"><button v-for="(src,i) in selected.images" :key="src" :class="{active:photo===i}" :aria-label="formatCopy(w.imageNumber,{v0:i+1})" :aria-pressed="photo===i" @click="photo=i"><img :src="shopImage(src)" alt=""/></button></div>
    <p class="shop-description">{{selectedDescription}}</p><p>{{selected.price_cents===null?say(w.unpriced):money(selected.price_cents)}}</p>
+   <p v-if="selected.quantity_offer" class="shop-offer">{{offerText(selected)}}<small>{{say(o.offerHelp)}}</small></p>
+   <fieldset v-if="selected.variants?.length" class="shop-option-group"><legend>{{say(o.variants)}}</legend><div><button v-for="v in selected.variants" :key="v.id" :class="{active:variant===v.id}" :aria-pressed="variant===v.id" @click="variant=v.id">{{tr(v.zh,v.en)}}</button></div></fieldset>
+   <fieldset v-if="selected.choices?.length" class="shop-option-group"><legend>{{tr(selected.choiceZh||'',selected.choiceEn||'')}}</legend><div><button v-for="v in selected.choices" :key="v.id" :class="{active:choice===v.id}" :aria-pressed="choice===v.id" @click="choice=v.id">{{tr(v.zh,v.en)}}</button></div></fieldset>
+   <p v-if="selected.shop_collection==='services'">{{say(o.serviceContact)}} · {{say(o.wechat)}} <CopyContact value="xiaogoushuangji"/></p>
   </div>
-  <template #footer><button v-if="selected" class="desk-button primary" @click="add(selected)"><PhPlus/>{{say(w.addCart)}}</button></template>
+  <template #footer><button v-if="selected&&selected.shop_collection!=='services'" class="desk-button primary" :disabled="!orderable(selected)||!readySelection" @click="add(selected,true)"><PhPlus/>{{say(selected.price_cents===null?w.unpriced:!orderable(selected)?o.outOfStock:w.addCart)}}</button></template>
  </SlideOver>
- <SlideOver v-model="cartOpen" :title="say(w.cart)">
-  <p class="shop-notice">{{say(w.paused)}}</p><p v-if="!items.length" class="shop-state">{{say(w.cartEmpty)}}</p>
-  <div v-for="{line,product} in items" :key="line.key" class="shop-bag-row"><div class="shop-bag-thumb"><img v-if="product?.images.length" :src="shopImage(product.images[0])" alt=""/><span v-else>{{product?.code||'—'}}</span></div>
-   <div><strong>{{product?tr(product.zh,product.en):say(w.unavailable)}}</strong><p>{{product?.price_cents!=null?money(product.price_cents):say(w.unpriced)}}</p><div class="shop-quantity" :aria-label="say(w.quantity)"><button :disabled="line.quantity<=1" :aria-label="say(w.quantity)+' −'" @click="quantityChange(line.key,-1)"><PhMinus/></button><span>{{line.quantity}}</span><button :disabled="line.quantity>=20" :aria-label="say(w.quantity)+' +'" @click="quantityChange(line.key,1)"><PhPlus/></button></div></div>
-   <button class="shop-remove" :aria-label="say(w.remove)" @click="removeLine(line.key)"><PhTrash/></button>
-  </div>
-  <template #footer><div class="shop-cart-total"><span>{{say(w.subtotal)}}</span><strong>{{money(total)}}</strong></div><button class="desk-button primary" @click="setView('')">{{say(w.browse)}}<PhArrowRight/></button></template>
- </SlideOver>
+ <ShopCart v-model="cartOpen" :products="products" :enabled="!!shopCatalog?.manual_ordering_ready"/>
  <SlideOver v-model="ordersOpen" :title="say(w.orders)"><p class="shop-notice">{{say(w.ordersHelp)}}</p><p v-if="!orders.length" class="shop-state">{{say(w.ordersEmpty)}}</p><RouterLink v-for="id in orders" :key="id" class="shop-order-row" :to="'/order/'+id"><span>{{id}}</span>{{say(w.orderOpen)}}<PhArrowRight/></RouterLink></SlideOver>
 </template>

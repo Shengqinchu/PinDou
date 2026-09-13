@@ -20,6 +20,8 @@ import bookingProfileDefaults from './content/booking-profile.json';
 const bookingProfileMessages=contentModule('booking-profile',bookingProfileDefaults);
 import cancellationDefaults from './content/reservation-cancellation.json';
 import notificationMessages from './content/customer-notifications.json';
+import shopOrderingDefaults from './content/shop-ordering.json';
+const shopOrderingMessages=contentModule('shop-ordering',shopOrderingDefaults) as Record<string,string[]>;
 import miniappDefaults from './content/miniapp.json';
 const miniappMessages=contentModule('miniapp',miniappDefaults) as Record<string,string[]>;
 const cancellationMessages=contentModule('reservation-cancellation',cancellationDefaults) as Record<string,string[]>;
@@ -35,7 +37,11 @@ export type CartLine = {
   product_id: string;
   quantity: number;
   booking?: Booking | null;
+  variant_id?: string;
+  choice_id?: string;
 };
+export type ProductOption = {id:string;zh:string;en:string};
+export type QuantityOffer = {quantity:number;price_cents:number};
 export type Product = {
   id: string;
   kind: "experience" | "physical";
@@ -50,6 +56,11 @@ export type Product = {
   available_stock?: number;
   active: boolean;
   version: number;
+  variants?: ProductOption[];
+  choices?: ProductOption[];
+  choiceZh?: string;
+  choiceEn?: string;
+  quantity_offer?: QuantityOffer | null;
 };
 export type Hours = {
   day: number;
@@ -93,8 +104,15 @@ export type QuoteLine = Omit<CartLine, "key"> & {
   kind: string;
   unit_cents: number;
   total_cents: number;
+  variant_zh?: string;
+  variant_en?: string;
+  choice_zh?: string;
+  choice_en?: string;
+  discount_cents?: number;
 };
 export type Quote = {
+  mode?: 'manual';
+  discount_cents?: number;
   lines: QuoteLine[];
   subtotal_cents: number;
   tax_cents: number;
@@ -164,7 +182,7 @@ export async function commerceApi<T>(
   }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const words = (data.detail==='booking_profile_changed'?bookingProfileMessages.changed:undefined) || (notificationMessages as Record<string,string[]>)[data.detail] || cancellationMessages[data.detail] || messages[data.detail] || accountMessages[data.detail] || walletMessages[data.detail] || wechatMessages[data.detail] || miniappMessages[data.detail];
+    const words = shopOrderingMessages[data.detail] || (data.detail==='booking_profile_changed'?bookingProfileMessages.changed:undefined) || (notificationMessages as Record<string,string[]>)[data.detail] || cancellationMessages[data.detail] || messages[data.detail] || accountMessages[data.detail] || walletMessages[data.detail] || wechatMessages[data.detail] || miniappMessages[data.detail];
     if (words)
       throw new CommerceError(say(words), response.status, data.detail, response.headers.get('X-Request-ID') || undefined);
     if (response.status === 401 || response.status === 403)
@@ -237,11 +255,12 @@ export async function loadCatalog() {
   catalog.value = await commerceApi<Catalog>("/catalog");
   return catalog.value;
 }
-export function addToBag(product_id: string, booking?: Booking) {
+export function addToBag(product_id: string, booking?: Booking, selection?:{variant_id:string;choice_id:string}) {
   if (checkoutBusy.value) return;
   const line = bag.value.find(
     (v) =>
       v.product_id === product_id &&
+      (v.variant_id||'') === (selection?.variant_id||'') && (v.choice_id||'') === (selection?.choice_id||'') &&
       JSON.stringify(v.booking || null) === JSON.stringify(booking || null),
   );
   if (line && !booking) line.quantity = Math.min(20, line.quantity + 1);
@@ -251,6 +270,7 @@ export function addToBag(product_id: string, booking?: Booking) {
       product_id,
       quantity: 1,
       booking: booking || null,
+      ...(selection||{}),
     });
   notify(
     copyText.message_1186a6e2[0],

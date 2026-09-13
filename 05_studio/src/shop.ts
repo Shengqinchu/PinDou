@@ -13,7 +13,7 @@ export function productIntro(text:string){
 }
 export type ShopCategory={id:string;parent_id:string|null;zh:string;en:string;sort:number;visible:boolean;version:number};
 export type ShopProduct=Product & {images:string[];shop_collection:'home'|'finished'|'services';shop_category_id:string|null;shop_visible:boolean;code:string;sort:number};
-export type ShopCatalog={products:ShopProduct[];categories:ShopCategory[];checkout_ready:boolean;sources?:Record<string,{platform:string;title:string;source_min_fen:number;source_currency:string;captured_at:string}>};
+export type ShopCatalog={products:ShopProduct[];categories:ShopCategory[];checkout_ready:boolean;manual_ordering_ready?:boolean;sources?:Record<string,{platform:string;title:string;source_min_fen:number;source_currency:string;captured_at:string}>};
 export const shopCatalog=ref<ShopCatalog>();
 let pending:Promise<void>|undefined;
 export function loadShop(force=false):Promise<void>{

@@ -1,0 +1,239 @@
+[
+  {
+    "id": "gift-swinging-cats",
+    "kind": "physical",
+    "category": "finished",
+    "zh": "小猫摇摇乐/Kitty猫摇摇乐",
+    "en": "Swinging cats / Kitty cats",
+    "detailZh": "CAD 6 / 个。\n1–4 号对应第一张实拍图中的现货款式。选择“定制”可按后面两张款式图制作，请在订单备注中写明款式，或联系店主确认。\n可以做成冰箱贴或钥匙扣。",
+    "detailEn": "CAD 6 each.\nOptions 1–4 match the ready-made designs numbered in the first photo. Choose Custom for a design from the following two reference images; specify it in your order notes or confirm with the host.\nAvailable as a fridge magnet or keychain.",
+    "image": "/studio-media/finished-20260913/swinging-cats-stock.jpg",
+    "images": [
+      "/studio-media/finished-20260913/swinging-cats-stock.jpg",
+      "/studio-media/finished-20260913/swinging-cats-zh.jpg",
+      "/studio-media/finished-20260913/kitty-custom-designs.jpg",
+      "/studio-media/finished-20260913/swinging-cats-en.png"
+    ],
+    "shop_collection": "finished",
+    "shop_category_id": null,
+    "shop_visible": true,
+    "price_cents": 600,
+    "stock": 999,
+    "active": false,
+    "code": "",
+    "sort": 10,
+    "version": 1,
+    "variants": [
+      {
+        "id": "1",
+        "zh": "1",
+        "en": "1"
+      },
+      {
+        "id": "2",
+        "zh": "2",
+        "en": "2"
+      },
+      {
+        "id": "3",
+        "zh": "3",
+        "en": "3"
+      },
+      {
+        "id": "4",
+        "zh": "4",
+        "en": "4"
+      },
+      {
+        "id": "custom",
+        "zh": "定制",
+        "en": "Custom"
+      }
+    ],
+    "choices": [
+      {
+        "id": "magnet",
+        "zh": "冰箱贴",
+        "en": "Fridge magnet"
+      },
+      {
+        "id": "keychain",
+        "zh": "钥匙扣",
+        "en": "Keychain"
+      }
+    ],
+    "quantity_offer": null,
+    "choiceZh": "制作方式",
+    "choiceEn": "Finish"
+  },
+  {
+    "id": "gift-stardew-charms",
+    "kind": "physical",
+    "category": "finished",
+    "zh": "星露谷挂链",
+    "en": "Stardew Valley charms",
+    "detailZh": "CAD 8 / 个。\n5 个规格对应图片中的 1–5 号，请按编号选择。",
+    "detailEn": "CAD 8 each.\nChoose one of the five numbered designs shown in the photo.",
+    "image": "/studio-media/finished-20260913/stardew-charms.jpg",
+    "images": [
+      "/studio-media/finished-20260913/stardew-charms.jpg"
+    ],
+    "shop_collection": "finished",
+    "shop_category_id": null,
+    "shop_visible": true,
+    "price_cents": 800,
+    "stock": 999,
+    "active": false,
+    "code": "",
+    "sort": 20,
+    "version": 1,
+    "variants": [
+      {
+        "id": "1",
+        "zh": "1",
+        "en": "1"
+      },
+      {
+        "id": "2",
+        "zh": "2",
+        "en": "2"
+      },
+      {
+        "id": "3",
+        "zh": "3",
+        "en": "3"
+      },
+      {
+        "id": "4",
+        "zh": "4",
+        "en": "4"
+      },
+      {
+        "id": "5",
+        "zh": "5",
+        "en": "5"
+      }
+    ],
+    "choices": [],
+    "quantity_offer": null,
+    "choiceZh": "制作方式",
+    "choiceEn": "Finish"
+  },
+  {
+    "id": "gift-small",
+    "kind": "physical",
+    "category": "finished",
+    "zh": "小号拼豆礼品（持续更新）",
+    "en": "Small bead gifts (updated regularly)",
+    "detailZh": "CAD 3 / 个，CAD 5 / 2 个。\n1、2 号为发夹；3、4、7 号为徽章；5、6 号为挂件。\n同一商品可选不同编号凑两件优惠。",
+    "detailEn": "CAD 3 each, or CAD 5 for 2.\n1 and 2: hair clips. 3, 4 and 7: pins. 5 and 6: charms.\nMix numbered designs within this product for the two-item offer.",
+    "image": "/studio-media/finished-20260913/small-gifts.jpg",
+    "images": [
+      "/studio-media/finished-20260913/small-gifts.jpg"
+    ],
+    "shop_collection": "finished",
+    "shop_category_id": null,
+    "shop_visible": true,
+    "price_cents": 300,
+    "stock": 999,
+    "active": false,
+    "code": "",
+    "sort": 30,
+    "version": 1,
+    "variants": [
+      {
+        "id": "1",
+        "zh": "1 · 发夹",
+        "en": "1 · Hair clip"
+      },
+      {
+        "id": "2",
+        "zh": "2 · 发夹",
+        "en": "2 · Hair clip"
+      },
+      {
+        "id": "3",
+        "zh": "3 · 徽章",
+        "en": "3 · Pin"
+      },
+      {
+        "id": "4",
+        "zh": "4 · 徽章",
+        "en": "4 · Pin"
+      },
+      {
+        "id": "5",
+        "zh": "5 · 挂件",
+        "en": "5 · Charm"
+      },
+      {
+        "id": "6",
+        "zh": "6 · 挂件",
+        "en": "6 · Charm"
+      },
+      {
+        "id": "7",
+        "zh": "7 · 徽章",
+        "en": "7 · Pin"
+      }
+    ],
+    "choices": [],
+    "quantity_offer": {
+      "quantity": 2,
+      "price_cents": 500
+    },
+    "choiceZh": "制作方式",
+    "choiceEn": "Finish"
+  },
+  {
+    "id": "gift-medium",
+    "kind": "physical",
+    "category": "finished",
+    "zh": "中号拼豆礼品（持续更新）",
+    "en": "Medium bead gifts (updated regularly)",
+    "detailZh": "CAD 4 / 个，CAD 7 / 2 个。\n1、2、3 号为挂件；4 号为杯垫。\n同一商品可选不同编号凑两件优惠。",
+    "detailEn": "CAD 4 each, or CAD 7 for 2.\n1, 2 and 3: charms. 4: coaster.\nMix numbered designs within this product for the two-item offer.",
+    "image": "/studio-media/finished-20260913/medium-gifts.jpg",
+    "images": [
+      "/studio-media/finished-20260913/medium-gifts.jpg"
+    ],
+    "shop_collection": "finished",
+    "shop_category_id": null,
+    "shop_visible": true,
+    "price_cents": 400,
+    "stock": 999,
+    "active": false,
+    "code": "",
+    "sort": 40,
+    "version": 1,
+    "variants": [
+      {
+        "id": "1",
+        "zh": "1 · 挂件",
+        "en": "1 · Charm"
+      },
+      {
+        "id": "2",
+        "zh": "2 · 挂件",
+        "en": "2 · Charm"
+      },
+      {
+        "id": "3",
+        "zh": "3 · 挂件",
+        "en": "3 · Charm"
+      },
+      {
+        "id": "4",
+        "zh": "4 · 杯垫",
+        "en": "4 · Coaster"
+      }
+    ],
+    "choices": [],
+    "quantity_offer": {
+      "quantity": 2,
+      "price_cents": 700
+    },
+    "choiceZh": "制作方式",
+    "choiceEn": "Finish"
+  }
+]

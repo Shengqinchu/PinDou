@@ -122,7 +122,11 @@ def catalog_for(db, admin=False):
         ids = {c['id'] for c in categories}
         products = [p for p in products if p['shop_visible'] and (p['shop_collection'] != 'home' or p['shop_category_id'] in ids)]
     products.sort(key=lambda p: (p['sort'], p['id']))
-    return {'categories': categories, 'products': products, 'checkout_ready': commerce.commerce_ready(commerce.settings_for(db))}
+    import shop_orders
+    if not admin:
+        for product in products:
+            product['available_stock'] = max(0, product['stock'] - commerce.stock_held(db, product['id']))
+    return {'categories': categories, 'products': products, 'checkout_ready': commerce.commerce_ready(commerce.settings_for(db)), 'manual_ordering_ready': shop_orders.ordering_enabled(db)}
 
 
 def register(app, admin_actor):
