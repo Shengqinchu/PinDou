@@ -20,8 +20,16 @@
     "sha256": "2866dc05bbb194c48ab519178c9da0bb9accce0a999d2d0dfc06f893aded9cd1"
   },
   "README.md": {
-    "bytes": 2477,
-    "sha256": "0c4a5d0d1f9d46f04186190885cf0d6f1d864824c484d6db652b1fd4d1a33dee"
+    "bytes": 3234,
+    "sha256": "071165091827cba65e3ed0c99be68f36db17666af5b3e789aa6ac9dcc08d0c8a"
+  },
+  "website-qr-large-logo.png": {
+    "bytes": 517050,
+    "sha256": "82f1f302912df83ae0d0c348852d81bda5407c5ff6ad39dabe411943df91c3f7"
+  },
+  "website-qr-large-logo.svg": {
+    "bytes": 1348305,
+    "sha256": "1f21f31681372b8b5c64d6c8038e94f1388a140c7a1c7a5d4b65ce65a241574f"
   },
   "website-qr.png": {
     "bytes": 270689,
