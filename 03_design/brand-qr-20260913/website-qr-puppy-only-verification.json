@@ -1,0 +1,139 @@
+{
+  "url": "https://pindoupuppy.com",
+  "pixels": 2368,
+  "version": 3,
+  "ecc": "H",
+  "quiet_zone_modules": 4,
+  "first_matrix_identical": true,
+  "pixels_outside_first_center_identical": true,
+  "center_window_modules": {
+    "width": 7,
+    "height": 5,
+    "previous_width": 7,
+    "previous_height": 7
+  },
+  "checks": [
+    {
+      "size": 2368,
+      "condition": "normal",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 2368,
+      "condition": "rotated",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 2368,
+      "condition": "slight-blur",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 2368,
+      "condition": "slight-perspective",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 740,
+      "condition": "normal",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 740,
+      "condition": "rotated",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 740,
+      "condition": "slight-blur",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 740,
+      "condition": "slight-perspective",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 370,
+      "condition": "normal",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 370,
+      "condition": "rotated",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 370,
+      "condition": "slight-blur",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 370,
+      "condition": "slight-perspective",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 296,
+      "condition": "normal",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 296,
+      "condition": "rotated",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 296,
+      "condition": "slight-blur",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 296,
+      "condition": "slight-perspective",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 222,
+      "condition": "normal",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 222,
+      "condition": "rotated",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 185,
+      "condition": "normal",
+      "opencv": true,
+      "zxing": true
+    },
+    {
+      "size": 185,
+      "condition": "rotated",
+      "opencv": true,
+      "zxing": true
+    }
+  ],
+  "real_phone_tested": false,
+  "passed": true
+}
