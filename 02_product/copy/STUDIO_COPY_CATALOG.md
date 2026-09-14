@@ -2488,6 +2488,77 @@
 | skipped | 已有图片，按当前设置跳过 | Already has photos; skipped by current setting |
 | priceAndPhoto | 售价与图片可一起保存；有一条冲突时整批不会覆盖。 | Save prices and photos together. A conflict prevents the whole batch from overwriting newer edits. |
 
+## shop-ordering.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| notice | 未标注价格商品紧急筹备中，暂时不可下单。无需网站付款，下单后联系店主。 | Unpriced products are being prepared and cannot be ordered yet. No payment is required on the website; contact the host after placing your order. |
+| choose | 选择规格 | Choose an option |
+| variants | 商品规格 | Product variants |
+| addVariant | 增加规格 | Add a variant |
+| variantZh | 规格名称（中文） | Variant name (Chinese) |
+| variantEn | 规格名称（英文） | Variant name (English) |
+| priceFrom | 起 | and up |
+| variantPrice | 规格售价（CAD，可选） | Variant price (CAD, optional) |
+| variantPriceHelp | 留空沿用商品售价；填写后，该规格按独立售价计算，不参与多件优惠。 | Leave blank to use the product price. A variant with its own price is excluded from multi-buy offers. |
+| variantOfferNote | 独立定价的规格不参与多件优惠。 | Variants with their own prices are excluded from multi-buy offers. |
+| choices | 制作方式选项 | Finish options |
+| choiceLabelZh | 选项标题（中文） | Option heading (Chinese) |
+| choiceLabelEn | 选项标题（英文） | Option heading (English) |
+| addChoice | 增加制作方式 | Add a finish |
+| optionsHelp | 顾客下单时需选择一个规格；没有规格的商品可直接加入购物车。 | Customers select a variant before adding the product to their cart. Leave this empty for products without variants. |
+| offer | {v0} 件 {v1} | {v0} for {v1} |
+| offerEnabled | 设置多件优惠 | Add a multi-buy offer |
+| offerQuantity | 优惠件数 | Bundle quantity |
+| offerPrice | 这些商品合计售价（CAD） | Bundle price (CAD) |
+| offerHelp | 同一商品的不同规格可以凑单。按优惠组数计算，余下件数按单价计算。 | Mix variants of the same product. Complete bundles receive the offer price; remaining items use the regular price. |
+| invalidOffer | 优惠总价应低于按单价购买相同件数的总价。 | The bundle price must be lower than buying the same quantity individually. |
+| outOfStock | 暂时缺货 | Out of stock |
+| serviceContact | 请联系店主确认总价 | Contact the host for a quote |
+| review | 确认商品 | Review order |
+| submit | 提交订单 | Place order |
+| submitting | 正在提交… | Submitting… |
+| total | 商品合计 | Items total |
+| discount | 多件优惠 | Multi-buy savings |
+| contactOptional | 留下联系方式（可选） | Your contact details (optional) |
+| contactHint | 微信、电话或邮箱 | WeChat, phone or email |
+| name | 怎么称呼您（可选） | Your name (optional) |
+| notes | 订单备注 / 定制要求（可选） | Order notes / custom requests (optional) |
+| successTitle | 下单成功 | Order placed |
+| success | 您已成功下单，请联系店主安排付款与发货，谢谢合作！ | Your order has been placed. Please contact the host to arrange payment and delivery. Thank you! |
+| leaveContact | 或留下您的联系方式，店主会第一时间联系您。 | Or leave your contact details and the host will get in touch as soon as possible. |
+| message | 短信 | Text message |
+| wechat | 微信 | WeChat |
+| saveContact | 保存联系方式 | Save contact details |
+| contactSaved | 联系方式已保存 | Contact details saved |
+| emptyName | 未留称呼 | Name not provided |
+| emptyContact | 顾客将主动联系店主 | Customer will contact the host |
+| ordersTitle | 商品订单 | Shop orders |
+| ordersHelp | 查看商品规格、优惠和联系方式，联系顾客安排付款与发货。 | Review variants, offers and contact details, then arrange payment and delivery with the customer. |
+| searchOrders | 搜索订单、姓名或联系方式 | Search orders, names or contact details |
+| orderNumber | 订单编号 | Order number |
+| manual_pending | 待联系 | Awaiting contact |
+| manual_confirmed | 已确认 | Confirmed |
+| manual_completed | 已完成 | Completed |
+| manual_cancelled | 已取消 | Cancelled |
+| status | 订单状态 | Order status |
+| staffNote | 店内备注（顾客不可见） | Staff note (private) |
+| completeHelp | 完成订单会扣除库存；取消订单会释放预留库存。已完成或已取消的订单不能再更改状态。 | Completing an order deducts stock; cancelling releases reserved stock. Completed or cancelled orders cannot change status. |
+| previous | 上一页 | Previous |
+| next | 下一页 | Next |
+| reloadQuote | 重新核对价格 | Refresh prices |
+| ineligible | 购物车含未定价、下架、缺货或需联系报价的商品。请先移除这些商品。 | Your cart includes unpriced, unavailable, out-of-stock or quote-only items. Remove them to continue. |
+| missingVariant | 请为购物车中的商品选择有效规格。 | Please select a valid variant for each cart item. |
+| uncertain | 暂未收到提交结果。请点击“重试提交”，系统会核对同一笔订单。 | The submission result has not arrived. Retry to check the same order without creating a duplicate. |
+| retrySubmit | 重试提交 | Retry submission |
+| shop_choose_variant | 商品规格已更新，请重新选择。 | Product variants have changed. Please choose again. |
+| shop_unpriced_or_hidden | 商品未定价、已下架或需要联系报价，请重新确认购物车。 | An item is unpriced, unavailable or requires a quote. Please review your cart. |
+| shop_manual_closed | 小店暂未开放下单，请稍后再试。 | Ordering is currently closed. Please try again later. |
+| shop_order_finished | 订单已完成或已取消，不能再更改状态。 | This order is completed or cancelled and its status cannot be changed. |
+| stock_unavailable | 所选数量超过可用库存，请减少数量后重试。 | The selected quantity exceeds available stock. Reduce it and try again. |
+| version_conflict | 记录已更新，请刷新后再保存。 | This record has changed. Refresh it before saving. |
+| price_changed | 商品或价格已更新，请重新确认后提交。 | Products or prices have changed. Review them before placing your order. |
+
 ## shop.json
 
 | 键 | 中文 | English |
@@ -2523,7 +2594,7 @@
 | retry | 重新加载 | Reload |
 | loading | 正在加载商品… | Loading products… |
 | adminTitle | 小店商品 | Shop products |
-| adminHelp | 管理商品、系列和图片。售价以 CAD 填写；在线下单暂未开放。 | Manage products, categories and photos. Enter prices in CAD; online ordering is not open yet. |
+| adminHelp | 管理商品、规格、优惠和图片。售价以 CAD 填写；未定价商品暂不能下单。 | Manage products, variants, offers and photos. Enter prices in CAD; unpriced products cannot be ordered. |
 | addProduct | 增加商品 | Add product |
 | editProduct | 编辑商品 | Edit product |
 | addCategory | 增加分类/系列 | Add category or series |
@@ -2558,7 +2629,7 @@
 | invalidCategory | 请选择有效的商品分类。分类最多两级。 | Choose a valid product category. Categories support two levels. |
 | categoryUsed | 此分类已有商品，请先调整商品分类，再修改分类层级。 | This category contains products. Reassign them before changing the category hierarchy. |
 | invalidPrice | 请输入最多两位小数的正数售价，或留空。 | Enter a positive price with up to two decimal places, or leave it blank. |
-| pendingInfo | 尚未定价的商品可以展示，不能在线购买。 | Unpriced products can be displayed but cannot be purchased online. |
+| pendingInfo | 有价格且有库存的商品可下单，付款与发货联系店主安排。服务商品需联系确认总价。 | Priced, in-stock products can be ordered. Arrange payment and delivery with the host. Services require a quote. |
 | refresh | 刷新 | Refresh |
 | count | {v0} 个商品 | {v0} products |
 | imageNumber | 图片 {v0} | Photo {v0} |

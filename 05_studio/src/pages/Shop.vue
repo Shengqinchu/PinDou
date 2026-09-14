@@ -8,7 +8,7 @@ import { say, tr, formatCopy } from '../state';
 import { bag, bagCount, addToBag, money } from '../commerce';
 import ShopCart from '../components/ShopCart.vue';
 import CopyContact from '../components/CopyContact.vue';
-import { orderWords as o, offerText, orderable } from '../shop-ordering';
+import { orderWords as o, offerText, orderable, variantPrice, hasVariantPrices, priceRange, minimumPrice } from '../shop-ordering';
 import '../styles/shop-ordering.css';
 import { shopWords as w, shopCatalog, loadShop, shopImage, savedShopOrders, productIntro, type ShopProduct } from '../shop';
 import { notify } from '../ui';
@@ -74,7 +74,7 @@ onUnmounted(()=>{window.removeEventListener('focus',focusRefresh);document.remov
       </button>
       <div class="shop-card-body"><button class="shop-name" @click="openProduct(p)">{{tr(p.zh,p.en)}}</button><p class="shop-card-description">{{productIntro(tr(p.detailZh,p.detailEn)).text}}</p><button v-if="productIntro(tr(p.detailZh,p.detailEn)).shortened" class="shop-description-link" @click="openProduct(p)">{{say(w.fullDescription)}}<PhArrowRight :size="16"/></button>
        <p v-if="p.quantity_offer" class="shop-offer">{{offerText(p)}}</p>
-       <div class="shop-card-bottom"><span v-if="p.price_cents!==null" class="shop-price">{{(p.price_cents/100).toFixed(2)}}<small>CAD</small></span><span v-else class="shop-unpriced">{{say(w.unpriced)}}</span><button class="shop-add" :disabled="section!=='services'&&!orderable(p)" :aria-label="say(p.variants?.length?o.choose:w.addCart)+' · '+tr(p.zh,p.en)" @click="section==='services'?openProduct(p):add(p)"><PhArrowRight v-if="section==='services'"/><PhPlus v-else/></button></div>
+       <div class="shop-card-bottom"><span v-if="p.price_cents!==null" class="shop-price">{{(minimumPrice(p)/100).toFixed(2)}}<small>CAD</small><small v-if="hasVariantPrices(p)">{{say(o.priceFrom)}}</small></span><span v-else class="shop-unpriced">{{say(w.unpriced)}}</span><button class="shop-add" :disabled="section!=='services'&&!orderable(p)" :aria-label="say(p.variants?.length?o.choose:w.addCart)+' · '+tr(p.zh,p.en)" @click="section==='services'?openProduct(p):add(p)"><PhArrowRight v-if="section==='services'"/><PhPlus v-else/></button></div>
       </div>
      </article>
     </div>
@@ -85,9 +85,9 @@ onUnmounted(()=>{window.removeEventListener('focus',focusRefresh);document.remov
  <SlideOver v-model="detailsOpen" :title="selected?tr(selected.zh,selected.en):''">
   <div v-if="selected" class="shop-detail"><img v-if="selected.images.length" class="shop-detail-image" :src="shopImage(selected.images[photo])" :alt="tr(selected.zh,selected.en)"/><div v-else class="shop-placeholder"><strong>{{selected.code||tr(selected.zh,selected.en)}}</strong><small>{{say(w.noPhoto)}}</small></div>
    <div v-if="selected.images.length>1" class="shop-thumbnails"><button v-for="(src,i) in selected.images" :key="src" :class="{active:photo===i}" :aria-label="formatCopy(w.imageNumber,{v0:i+1})" :aria-pressed="photo===i" @click="photo=i"><img :src="shopImage(src)" alt=""/></button></div>
-   <p class="shop-description">{{selectedDescription}}</p><p>{{selected.price_cents===null?say(w.unpriced):money(selected.price_cents)}}</p>
-   <p v-if="selected.quantity_offer" class="shop-offer">{{offerText(selected)}}<small>{{say(o.offerHelp)}}</small></p>
-   <fieldset v-if="selected.variants?.length" class="shop-option-group"><legend>{{say(o.variants)}}</legend><div><button v-for="v in selected.variants" :key="v.id" :class="{active:variant===v.id}" :aria-pressed="variant===v.id" @click="variant=v.id">{{tr(v.zh,v.en)}}</button></div></fieldset>
+   <p class="shop-description">{{selectedDescription}}</p><p class="shop-detail-price">{{selected.price_cents===null?say(w.unpriced):variant?money(variantPrice(selected,variant)!):hasVariantPrices(selected)?priceRange(selected)+' CAD':money(selected.price_cents)}}</p>
+   <p v-if="selected.quantity_offer" class="shop-offer">{{offerText(selected)}}<small>{{say(o.offerHelp)}}</small><small v-if="hasVariantPrices(selected)">{{say(o.variantOfferNote)}}</small></p>
+   <fieldset v-if="selected.variants?.length" class="shop-option-group"><legend>{{say(o.variants)}}</legend><div><button v-for="v in selected.variants" :key="v.id" :class="{active:variant===v.id}" :aria-pressed="variant===v.id" @click="variant=v.id">{{tr(v.zh,v.en)}}<small v-if="hasVariantPrices(selected)&&variantPrice(selected,v.id)!==null">{{money(variantPrice(selected,v.id)!)}}</small></button></div></fieldset>
    <fieldset v-if="selected.choices?.length" class="shop-option-group"><legend>{{tr(selected.choiceZh||'',selected.choiceEn||'')}}</legend><div><button v-for="v in selected.choices" :key="v.id" :class="{active:choice===v.id}" :aria-pressed="choice===v.id" @click="choice=v.id">{{tr(v.zh,v.en)}}</button></div></fieldset>
    <p v-if="selected.shop_collection==='services'">{{say(o.serviceContact)}} · {{say(o.wechat)}} <CopyContact value="xiaogoushuangji"/></p>
   </div>

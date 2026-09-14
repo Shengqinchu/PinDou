@@ -5,7 +5,7 @@ import { PhMinus, PhPlus, PhTrash, PhArrowRight } from '@phosphor-icons/vue';
 import SlideOver from './SlideOver.vue';
 import { bag, checkoutBusy, commerceApi, CommerceError, money, quantityChange, removeLine, rememberOrder, type Order, type Quote } from '../commerce';
 import { shopWords as w, shopImage, type ShopProduct } from '../shop';
-import { orderWords as o, optionText, offerText, orderable, shopPayload } from '../shop-ordering';
+import { orderWords as o, optionText, offerText, orderable, shopPayload, variantPrice, hasVariantPrices } from '../shop-ordering';
 import { locale, say, tr } from '../state';
 
 const props=defineProps<{modelValue:boolean;products:ShopProduct[];enabled:boolean}>();
@@ -64,11 +64,11 @@ onBeforeUnmount(()=>{++sequence;clearTimeout(timer);checkoutBusy.value=false});
   <p v-if="!items.length&&!attempt" class="shop-state">{{say(w.cartEmpty)}}</p>
   <div v-for="{line,product:p} in items" :key="line.key" class="shop-bag-row">
    <div class="shop-bag-thumb"><img v-if="p?.images.length" :src="shopImage(p.images[0])" alt=""/><span v-else>{{p?.code||'—'}}</span></div>
-   <div class="shop-bag-info"><strong>{{p?tr(p.zh,p.en):say(w.unavailable)}}</strong><p>{{p?.price_cents!=null?money(p.price_cents):say(w.unpriced)}}</p>
-    <label v-if="p?.variants?.length" class="shop-cart-select">{{say(o.variants)}}<select v-model="line.variant_id" :disabled="locked"><option :value="undefined" disabled>{{say(o.choose)}}</option><option v-for="v in p.variants" :key="v.id" :value="v.id">{{tr(v.zh,v.en)}}</option></select></label>
+   <div class="shop-bag-info"><strong>{{p?tr(p.zh,p.en):say(w.unavailable)}}</strong><p>{{variantPrice(p,line.variant_id)!==null?money(variantPrice(p,line.variant_id)!):say(w.unpriced)}}</p>
+    <label v-if="p?.variants?.length" class="shop-cart-select">{{say(o.variants)}}<select v-model="line.variant_id" :disabled="locked"><option :value="undefined" disabled>{{say(o.choose)}}</option><option v-for="v in p.variants" :key="v.id" :value="v.id">{{tr(v.zh,v.en)}}{{hasVariantPrices(p)&&variantPrice(p,v.id)!==null?' · '+money(variantPrice(p,v.id)!):''}}</option></select></label>
     <label v-if="p?.choices?.length" class="shop-cart-select">{{tr(p.choiceZh||'',p.choiceEn||'')}}<select v-model="line.choice_id" :disabled="locked"><option :value="undefined" disabled>{{say(o.choose)}}</option><option v-for="v in p.choices" :key="v.id" :value="v.id">{{tr(v.zh,v.en)}}</option></select></label>
     <p v-if="!p?.variants?.length&&!p?.choices?.length&&optionText(p,line)">{{optionText(p,line)}}</p>
-    <small v-if="p?.quantity_offer" class="shop-offer">{{offerText(p)}}</small>
+    <small v-if="p?.quantity_offer" class="shop-offer">{{offerText(p)}}<small v-if="hasVariantPrices(p)">{{say(o.variantOfferNote)}}</small></small>
     <div class="shop-quantity" :aria-label="say(w.quantity)"><button :disabled="locked||line.quantity<=1" :aria-label="say(w.quantity)+' −'" @click="quantityChange(line.key,-1)"><PhMinus/></button><span>{{line.quantity}}</span><button :disabled="locked||line.quantity>=20" :aria-label="say(w.quantity)+' +'" @click="quantityChange(line.key,1)"><PhPlus/></button></div>
    </div><button class="shop-remove" :disabled="locked" :aria-label="say(w.remove)" @click="removeLine(line.key)"><PhTrash/></button>
   </div>

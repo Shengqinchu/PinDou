@@ -84,6 +84,11 @@ class ProductOption(Strict):
     en: str = Field(min_length=1, max_length=120)
 
 
+class ProductVariant(ProductOption):
+    # None inherits the product price. A set can carry its own full price.
+    price_cents: int | None = Field(default=None, ge=1, le=1000000, strict=True)
+
+
 class QuantityOffer(Strict):
     quantity: int = Field(ge=2, le=20, strict=True)
     price_cents: int = Field(ge=1, le=1000000, strict=True)
@@ -106,7 +111,7 @@ class Product(Strict):
     sort: int = Field(default=0, ge=0, le=100000, strict=True)
     price_cents: int | None = Field(default=None, ge=1, le=1000000, strict=True)
     stock: int = Field(default=0, ge=0, le=100000, strict=True)
-    variants: list[ProductOption] = Field(default_factory=list, max_length=100)
+    variants: list[ProductVariant] = Field(default_factory=list, max_length=100)
     choices: list[ProductOption] = Field(default_factory=list, max_length=20)
     choiceZh: str = Field(default="制作方式", min_length=1, max_length=80)
     choiceEn: str = Field(default="Finish", min_length=1, max_length=120)

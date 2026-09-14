@@ -41,6 +41,7 @@ export type CartLine = {
   choice_id?: string;
 };
 export type ProductOption = {id:string;zh:string;en:string};
+export type ProductVariant = ProductOption & {price_cents?:number|null};
 export type QuantityOffer = {quantity:number;price_cents:number};
 export type Product = {
   id: string;
@@ -56,7 +57,7 @@ export type Product = {
   available_stock?: number;
   active: boolean;
   version: number;
-  variants?: ProductOption[];
+  variants?: ProductVariant[];
   choices?: ProductOption[];
   choiceZh?: string;
   choiceEn?: string;

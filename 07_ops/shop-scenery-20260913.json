@@ -1,0 +1,119 @@
+[
+  {
+    "id": "scenery-sunset-apocalypse",
+    "kind": "physical",
+    "category": "finished",
+    "zh": "落日末世系列风景拼豆",
+    "en": "Sunset Apocalypse landscape bead art",
+    "detailZh": "每图 12 CAD，四图全套 45 CAD。\n规格：1、2、3、4、全套。\n图片编号：左上为 1，右上为 2，左下为 3，右下为 4。\n选择“全套”包含 1–4 号各一图。",
+    "detailEn": "12 CAD per piece; 45 CAD for the complete set of four.\nOptions: 1, 2, 3, 4 or Full set.\nPhoto numbering: 1 top left, 2 top right, 3 bottom left, 4 bottom right.\nThe full set includes one of each design, 1–4.",
+    "image": "/studio-media/scenery-20260913/sunset-front.jpg",
+    "images": [
+      "/studio-media/scenery-20260913/sunset-front.jpg",
+      "/studio-media/scenery-20260913/sunset-angle.jpg"
+    ],
+    "shop_collection": "finished",
+    "shop_category_id": null,
+    "shop_visible": true,
+    "price_cents": 1200,
+    "stock": 999,
+    "active": false,
+    "code": "",
+    "sort": 50,
+    "version": 1,
+    "variants": [
+      {
+        "id": "1",
+        "zh": "1",
+        "en": "1",
+        "price_cents": null
+      },
+      {
+        "id": "2",
+        "zh": "2",
+        "en": "2",
+        "price_cents": null
+      },
+      {
+        "id": "3",
+        "zh": "3",
+        "en": "3",
+        "price_cents": null
+      },
+      {
+        "id": "4",
+        "zh": "4",
+        "en": "4",
+        "price_cents": null
+      },
+      {
+        "id": "full-set",
+        "zh": "全套（四图）",
+        "en": "Full set (4 pieces)",
+        "price_cents": 4500
+      }
+    ],
+    "choices": [],
+    "quantity_offer": null,
+    "choiceZh": "制作方式",
+    "choiceEn": "Finish"
+  },
+  {
+    "id": "scenery-blue-coast",
+    "kind": "physical",
+    "category": "finished",
+    "zh": "蓝色海岸系列风景拼豆",
+    "en": "Blue Coast landscape bead art",
+    "detailZh": "每图 10 CAD，四图全套 38 CAD。\n规格：1、2、3、4、全套。\n图片编号：左上为 1，右上为 2，左下为 3，右下为 4。\n选择“全套”包含 1–4 号各一图。",
+    "detailEn": "10 CAD per piece; 38 CAD for the complete set of four.\nOptions: 1, 2, 3, 4 or Full set.\nPhoto numbering: 1 top left, 2 top right, 3 bottom left, 4 bottom right.\nThe full set includes one of each design, 1–4.",
+    "image": "/studio-media/scenery-20260913/blue-coast.jpg",
+    "images": [
+      "/studio-media/scenery-20260913/blue-coast.jpg"
+    ],
+    "shop_collection": "finished",
+    "shop_category_id": null,
+    "shop_visible": true,
+    "price_cents": 1000,
+    "stock": 999,
+    "active": false,
+    "code": "",
+    "sort": 60,
+    "version": 1,
+    "variants": [
+      {
+        "id": "1",
+        "zh": "1",
+        "en": "1",
+        "price_cents": null
+      },
+      {
+        "id": "2",
+        "zh": "2",
+        "en": "2",
+        "price_cents": null
+      },
+      {
+        "id": "3",
+        "zh": "3",
+        "en": "3",
+        "price_cents": null
+      },
+      {
+        "id": "4",
+        "zh": "4",
+        "en": "4",
+        "price_cents": null
+      },
+      {
+        "id": "full-set",
+        "zh": "全套（四图）",
+        "en": "Full set (4 pieces)",
+        "price_cents": 3800
+      }
+    ],
+    "choices": [],
+    "quantity_offer": null,
+    "choiceZh": "制作方式",
+    "choiceEn": "Finish"
+  }
+]

@@ -9467,6 +9467,22 @@
     "price_changed": [
       "商品或价格已更新，请重新确认后提交。",
       "Products or prices have changed. Review them before placing your order."
+    ],
+    "priceFrom": [
+      "起",
+      "and up"
+    ],
+    "variantPrice": [
+      "规格售价（CAD，可选）",
+      "Variant price (CAD, optional)"
+    ],
+    "variantPriceHelp": [
+      "留空沿用商品售价；填写后，该规格按独立售价计算，不参与多件优惠。",
+      "Leave blank to use the product price. A variant with its own price is excluded from multi-buy offers."
+    ],
+    "variantOfferNote": [
+      "独立定价的规格不参与多件优惠。",
+      "Variants with their own prices are excluded from multi-buy offers."
     ]
   }
 }

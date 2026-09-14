@@ -92,18 +92,23 @@ def quote_cart(db, cart):
             commerce.fail('shop_unpriced_or_hidden')
         variant = option_label(p.get('variants', []), item.variant_id)
         choice = option_label(p.get('choices', []), item.choice_id)
-        group = groups.setdefault(p['id'], {'product': p, 'quantity': 0, 'indexes': []})
+        override = variant.get('price_cents') if variant else None
+        unit_cents = p['price_cents'] if override is None else override
+        group = groups.setdefault(p['id'], {'product': p, 'quantity': 0, 'offer_quantity': 0, 'indexes': []})
         group['quantity'] += item.quantity
-        group['indexes'].append(len(lines))
+        # Independently priced sets do not count towards regular-item offers.
+        if override is None:
+            group['offer_quantity'] += item.quantity
+            group['indexes'].append(len(lines))
         if group['quantity'] > p['available_stock']:
             commerce.fail('stock_unavailable')
         lines.append({**item.model_dump(), 'kind': 'physical', 'zh': p['zh'], 'en': p['en'],
-                      'image': p['image'], 'unit_cents': p['price_cents'], 'total_cents': p['price_cents'] * item.quantity,
+                      'image': p['image'], 'unit_cents': unit_cents, 'total_cents': unit_cents * item.quantity,
                       'product_version': p['version'], 'variant_zh': variant['zh'] if variant else '',
                       'variant_en': variant['en'] if variant else '', 'choice_zh': choice['zh'] if choice else '',
                       'choice_en': choice['en'] if choice else '', 'discount_cents': 0})
     for group in groups.values():
-        p, quantity = group['product'], group['quantity']
+        p, quantity = group['product'], group['offer_quantity']
         offer = p.get('quantity_offer')
         if not offer:
             continue

@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import type { ProductVariant } from '../../commerce';
 import { type ShopProduct, shopWords as w } from '../../shop';
 import { orderWords as o } from '../../shop-ordering';
 import { say } from '../../state';
 const props=defineProps<{product:ShopProduct;busy:boolean}>();
 function add(kind:'variants'|'choices'){(props.product[kind]??=[]).push({id:'v-'+crypto.randomUUID().slice(0,8),zh:'',en:''})}
+function setVariantPrice(v:ProductVariant,event:Event){const input=event.target as HTMLInputElement;v.price_cents=input.value===''?null:Math.round(Number(input.value)*100)}
 function toggleOffer(event:Event){props.product.quantity_offer=(event.target as HTMLInputElement).checked?{quantity:2,price_cents:0}:null}
 const offerPrice=computed({get:()=>props.product.quantity_offer?.price_cents?props.product.quantity_offer.price_cents/100:'',set:v=>{if(props.product.quantity_offer)props.product.quantity_offer.price_cents=Math.round(Number(v)*100)}});
 </script>
 <template>
  <fieldset class="shop-editor-options" :disabled="busy"><legend>{{say(o.variants)}}</legend><p class="shop-notice">{{say(o.optionsHelp)}}</p>
-  <div v-for="(v,i) in product.variants||[]" :key="v.id" class="shop-option-editor-row"><label>{{say(o.variantZh)}}<input v-model="v.zh" maxlength="80" required/></label><label>{{say(o.variantEn)}}<input v-model="v.en" maxlength="120" required/></label><button type="button" class="desk-button secondary" @click="product.variants!.splice(i,1)">{{say(w.remove)}}</button></div>
+  <p class="shop-notice">{{say(o.variantPriceHelp)}}</p>
+  <div v-for="(v,i) in product.variants||[]" :key="v.id" class="shop-option-editor-row shop-variant-price-row"><label>{{say(o.variantZh)}}<input v-model="v.zh" maxlength="80" required/></label><label>{{say(o.variantEn)}}<input v-model="v.en" maxlength="120" required/></label><label>{{say(o.variantPrice)}}<input :value="v.price_cents==null?'':v.price_cents/100" type="number" inputmode="decimal" min="0.01" max="10000" step="0.01" @input="setVariantPrice(v,$event)"/></label><button type="button" class="desk-button secondary" @click="product.variants!.splice(i,1)">{{say(w.remove)}}</button></div>
   <button type="button" class="desk-button secondary" :disabled="(product.variants?.length||0)>=100" @click="add('variants')">{{say(o.addVariant)}}</button>
  </fieldset>
  <fieldset class="shop-editor-options" :disabled="busy"><legend>{{say(o.choices)}}</legend>
