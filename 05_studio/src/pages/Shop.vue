@@ -7,6 +7,8 @@ import SlideOver from '../components/SlideOver.vue';
 import { say, tr, formatCopy } from '../state';
 import { bag, bagCount, addToBag, money } from '../commerce';
 import ShopCart from '../components/ShopCart.vue';
+import ShopImage from '../components/ShopImage.vue';
+import { createImageWarmer, imageWidth } from '../shop-images';
 import CopyContact from '../components/CopyContact.vue';
 import { orderWords as o, offerText, orderable, variantPrice, hasVariantPrices, priceRange, minimumPrice } from '../shop-ordering';
 import '../styles/shop-ordering.css';
@@ -29,6 +31,20 @@ const roots=computed(()=>shopCatalog.value?.categories.filter(c=>!c.parent_id)||
 const children=(id:string)=>shopCatalog.value?.categories.filter(c=>c.parent_id===id)||[];
 const products=computed(()=>shopCatalog.value?.products||[]);
 const visible=computed(()=>products.value.filter(p=>p.shop_collection===section.value&&(section.value!=='home'||p.shop_category_id===leaf.value)&&`${p.zh} ${p.en} ${p.code}`.toLowerCase().includes(search.value.trim().toLowerCase())));
+let warmer:ReturnType<typeof createImageWarmer>|undefined;
+function warmCategory(id:string, collection=section.value, limit=8){
+ const width=document.querySelector('.shop-card-preview img')?.getBoundingClientRect().width||160;
+ warmer?.targets(products.value.filter(p=>p.shop_collection===collection&&(collection!=='home'||p.shop_category_id===id)).slice(0,limit).flatMap(p=>p.images.slice(0,1)).map(shopImage),imageWidth(width));
+}
+function warmNext(){
+ if(search.value||section.value!=='home'){warmer?.targets([],320);return;}
+ const siblings=children(root.value),index=siblings.findIndex(c=>c.id===leaf.value);
+ const next=siblings[index+1];
+ if(next)warmCategory(next.id,'home',4);else warmer?.targets([],320);
+}
+watch([leaf,section,search,products],warmNext,{flush:'post'});
+onMounted(()=>{warmer=createImageWarmer();warmNext();});
+onUnmounted(()=>warmer?.dispose());
 function setView(view:string){void router.replace({query:{...route.query,view:view||undefined}})}
 function chooseRoot(id:string){root.value=id;leaf.value=children(id)[0]?.id||id;search.value='';}
 function chooseSection(value:string){void router.replace({query:{...route.query,section:value}})}
@@ -62,14 +78,14 @@ onUnmounted(()=>{window.removeEventListener('focus',focusRefresh);document.remov
   <div v-else class="shop-layout" :class="{'shop-layout-flat':section!=='home'}">
    <nav v-if="section==='home'" class="shop-categories" :aria-label="say(w.categories)"><div v-for="c in roots" :key="c.id" class="shop-category-group">
     <button class="shop-root" :class="{active:root===c.id}" :aria-expanded="children(c.id).length?root===c.id:undefined" :aria-pressed="!children(c.id).length?root===c.id:undefined" @click="chooseRoot(c.id)">{{tr(c.zh,c.en)}}<PhCaretDown v-if="children(c.id).length"/></button>
-    <div v-if="root===c.id&&children(c.id).length" class="shop-children"><button v-for="child in children(c.id)" :key="child.id" :class="{active:leaf===child.id}" :aria-pressed="leaf===child.id" @click="leaf=child.id;search=''">{{tr(child.zh,child.en)}}</button></div>
+    <div v-if="root===c.id&&children(c.id).length" class="shop-children"><button v-for="child in children(c.id)" :key="child.id" :class="{active:leaf===child.id}" :aria-pressed="leaf===child.id" @pointerenter="event=>event.pointerType==='mouse'&&warmCategory(child.id)" @focus="warmCategory(child.id)" @click="leaf=child.id;search=''">{{tr(child.zh,child.en)}}</button></div>
    </div></nav>
    <main class="shop-results">
     <div class="shop-result-tools"><label class="shop-search"><PhMagnifyingGlass/><input v-model="search" type="search" :placeholder="say(w.search)" :aria-label="say(w.search)"/></label><span class="shop-result-count">{{formatCopy(w.count,{v0:visible.length})}}</span></div>
     <div class="shop-grid" :class="{'shop-service-grid':section==='services'}">
-     <article v-for="p in visible" :key="p.id" class="shop-card">
+     <article v-for="(p,index) in visible" :key="p.id" class="shop-card">
       <button class="shop-card-preview" :aria-label="tr(p.zh,p.en)" @click="openProduct(p)">
-       <img v-if="p.images.length" :src="shopImage(p.images[0])" :alt="tr(p.zh,p.en)" width="600" height="600" loading="lazy"/>
+       <ShopImage v-if="p.images.length" :src="shopImage(p.images[0])" :alt="tr(p.zh,p.en)" :priority="index<2"/>
        <span v-else class="shop-placeholder" :class="{'shop-kit-placeholder':p.shop_category_id==='kits'}"><strong>{{p.code||tr(p.zh,p.en)}}</strong><small>{{say(w.noPhoto)}}</small></span><span v-if="p.images.length>1" class="shop-photo-count">{{p.images.length}}</span>
       </button>
       <div class="shop-card-body"><button class="shop-name" @click="openProduct(p)">{{tr(p.zh,p.en)}}</button><p class="shop-card-description">{{productIntro(tr(p.detailZh,p.detailEn)).text}}</p><button v-if="productIntro(tr(p.detailZh,p.detailEn)).shortened" class="shop-description-link" @click="openProduct(p)">{{say(w.fullDescription)}}<PhArrowRight :size="16"/></button>

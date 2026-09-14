@@ -10,6 +10,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, ConfigDict, Field
 from PIL import Image, ImageOps, UnidentifiedImageError
 import xhs_import
+import image_previews
 
 Image.MAX_IMAGE_PIXELS=60_000_000
 DEFAULT_PATH=Path(__file__).with_name('content-defaults.json')
@@ -348,7 +349,12 @@ def register(app,database,admin_actor):
         if not re.fullmatch(r'[a-f0-9]{64}\.(?:jpg|png|webp)',name):raise HTTPException(404)
         path=MEDIA_DIR/name
         if not path.is_file():raise HTTPException(404)
-        return FileResponse(path,headers={'Cache-Control':'public, max-age=31536000, immutable','X-Content-Type-Options':'nosniff'})
+        return FileResponse(path,media_type=image_previews.MIME_TYPES[path.suffix],headers={'Cache-Control':image_previews.CACHE_CONTROL,'X-Content-Type-Options':'nosniff'})
+
+    @app.get('/studio-api/media/previews/v1/{width}/{name}')
+    def image_preview(width:int,name:str):
+        path=image_previews.preview(MEDIA_DIR,name,width)
+        return FileResponse(path,media_type='image/webp',headers={'Cache-Control':image_previews.CACHE_CONTROL,'X-Content-Type-Options':'nosniff'})
 
     @app.get('/studio-api/manage/journal')
     def journal_list(_actor=Depends(admin_actor)):

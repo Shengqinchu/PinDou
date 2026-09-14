@@ -19,7 +19,8 @@ import {
 } from "@phosphor-icons/vue";
 import { locale, socialUrl, tr, wechat, phone, phoneHref } from "./state";
 import { gsap } from "gsap";
-import { arrive } from "./motion";
+import { enterRoute } from "./route-entrance";
+import { onMotionPreferenceChange } from "./motion-preference";
 import StudioToast from "./components/StudioToast.vue";
 import SlideOver from "./components/SlideOver.vue";
 import ReleaseNotice from "./components/ReleaseNotice.vue";
@@ -42,7 +43,18 @@ const isToolEditor=computed(()=>!!route.meta.toolEditor);
 const isVisit=computed(()=>route.path==='/visit');
 const menu = ref(false);
 const main = ref<HTMLElement>();
-let arrival: gsap.core.Tween | undefined;
+let arrival: gsap.Context | undefined;
+let entranceRevision = 0;
+function clearEntrance() { entranceRevision++; arrival?.revert(); arrival = undefined; }
+async function entrance() {
+  clearEntrance();
+  const revision = entranceRevision;
+  await nextTick();
+  if (revision === entranceRevision && main.value) arrival = enterRoute(main.value, route.path);
+}
+const stopEntrancePreference = onMotionPreferenceChange(clearEntrance);
+onMounted(entrance);
+watch(() => route.path, entrance, { flush: 'post' });
 const navigation = computed(() => [
   { path: "/", label: say(copyText.home_76c92b) },
   { path: "/visit", label: say(copyText.come_create_2eee81) },
@@ -51,17 +63,13 @@ const navigation = computed(() => [
   { path: "/tools", label: say(copyText.pattern_maker_7db57b), document:false },
 ]);
 const menuNavigation=computed(()=>[...navigation.value.slice(0,4),{path:'/details',label:say(copyText.studio_details_7c4089),document:false},navigation.value[4]]);
-onBeforeUnmount(() => arrival?.kill());
+onBeforeUnmount(() => { clearEntrance(); stopEntrancePreference(); });
 watch(
   () => route.fullPath,
   async () => {
     menu.value = false;
     await nextTick();
     main.value?.focus({ preventScroll: true });
-    if (!isDesk.value && !isTool.value && !isVisit.value && route.path !== "/" && main.value?.firstElementChild) {
-      arrival?.progress(1).kill();
-      arrival = arrive(main.value.firstElementChild, { stationary: true });
-    }
   },
 );
 </script>

@@ -140,6 +140,12 @@ def main():
             with sqlite3.connect(backup / "studio.sqlite3") as target_db:
                 source_db.backup(target_db)
         (backup / "studio.sqlite3").chmod(0o600)
+    # Build finite public-shop previews before switching the site. Originals and
+    # catalogue rows remain untouched; repeated deployments reuse shared files.
+    preview_builder = release / "service/image_previews.py"
+    if studio_db.exists() and preview_builder.exists():
+        run("runuser", "-u", "pindou", "--", str(venv / "bin/python"), str(preview_builder),
+            "--db", str(studio_db), "--media-dir", str(shared / "media"))
     # Lazy routes in an open tab still import the previous build's hashed files.
     # Seed all verified releases once, then only add new filenames on later deploys.
     retained = retain_static_assets(ROOT / "releases", ROOT / "static-history")

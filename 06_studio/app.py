@@ -158,7 +158,7 @@ async def response_controls(request: Request, call_next):
         from fastapi.responses import JSONResponse
         return JSONResponse({"detail": "Request too large"}, status_code=413)
     response = await call_next(request)
-    if not request.url.path.startswith("/studio-api/media/"):
+    if not request.url.path.startswith("/studio-api/media/") or response.status_code >= 400:
         response.headers["Cache-Control"] = "no-store"
     response.headers["X-Content-Type-Options"] = "nosniff"
     return response
