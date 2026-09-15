@@ -1870,6 +1870,36 @@
 | account_check_details | 请检查填写的信息。 | Check the information entered. |
 | generic_error | 暂时未能完成，请稍后重试。 | Could not complete this action. Please try again. |
 
+## owner-delivery.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| title | 店主通知状态 | Owner alert status |
+| ready | 自动提醒通道可用 | Automatic alerts available |
+| warning | 部分提醒通道受限 | Some alert channels are limited |
+| critical | 通知需要处理 | Alerts need attention |
+| loading | 正在检查通知通道… | Checking alert channels… |
+| unavailable | 暂时无法核实通知状态，请刷新检查。 | Could not verify alert status. Refresh to check again. |
+| refresh | 刷新通知状态 | Refresh alert status |
+| continuous | 手机、方糖及 Telegram 通道不需要逐条手动授权；原生小程序提醒仅作补充。 | Phone, ServerChan and Telegram alerts do not require permission for each message. Native mini-program alerts are supplementary. |
+| no_route | 目前没有可用的持续提醒通道。请检查发送设备和渠道设置，并直接查看待确认预约。 | No continuous alert channel is currently ready. Check the sending device and channel settings, and review pending reservations directly. |
+| unacknowledged | {v0} 个待确认预约的通知尚未获得任何通道的发送回报，请及时查看。 | Alerts for {v0} pending reservations have no acknowledgement from any channel. Please review them. |
+| details | 查看各通道状态 | View channel status |
+| sms | 手机提醒 | Phone alerts |
+| serverchan | 方糖微信提醒 | ServerChan WeChat alerts |
+| telegram | Telegram | Telegram |
+| wechat | 原生小程序提醒（补充） | Native mini-program alerts (supplementary) |
+| online | 自动发送可用 | Ready to send automatically |
+| offline | 发送设备离线，未发任务保留等待恢复 | Sending device offline; unsent tasks retained until recovery |
+| disabled | 未开启 | Disabled |
+| not_configured | 配置尚未完成 | Setup incomplete |
+| limited | 发送额度已用完，等待恢复 | Request allowance used; waiting for reset |
+| blocked | 供应商暂时限制发送 | Sending temporarily limited by provider |
+| authorized | 有一次性接收授权 | One-time permission available |
+| authorization_needed | 一次性授权已用完，不影响其他通道 | One-time permission used; other channels are unaffected |
+| usage | 方糖最近 24 小时：{v0} / {v1} 次。修改本站额度不会开通供应商会员。 | ServerChan requests in the last 24 hours: {v0} / {v1}. Changing this site's limit does not purchase a provider subscription. |
+| receipt | 发送回报不等于已读。待确认预约持续保留，处理后停止发送旧提醒。 | A sending acknowledgement is not a read receipt. Pending reservations remain tracked; old alerts stop after the reservation is handled. |
+
 ## owner-notifications.json
 
 | 键 | 中文 | English |
@@ -1900,7 +1930,7 @@
 | log | 最近发送记录 | Recent activity |
 | refresh | 刷新记录 | Refresh activity |
 | empty | 还没有提醒记录。 | No alerts yet. |
-| accepted_help | 服务已接收表示 Server 酱已接受请求，请以微信实际收到为准。失败会自动重试，超过 24 小时的提醒不再发送。 | Accepted means ServerChan acknowledged the request. Check WeChat for delivery. Temporary failures are retried; alerts expire after 24 hours. |
+| accepted_help | 服务已接收表示 Server 酱已接受请求，请以微信实际收到为准。待确认预约的暂时失败会自动重试，不因超过 24 小时而放弃；预约处理后停止旧提醒。测试及取消提醒保留 24 小时有效期。 | Accepted means ServerChan acknowledged the request. Check WeChat for delivery. Temporary failures for pending reservations are retried beyond 24 hours; old alerts stop once the reservation is handled. Test and cancellation alerts expire after 24 hours. |
 | usage | 最近 24 小时已请求 {v0} / {v1} 次 | Requests in the last 24 hours: {v0} / {v1} |
 | created | 新预约 | New reservation |
 | cancelled | 顾客取消预约 | Customer cancellation |

@@ -192,7 +192,11 @@ def test_quota_is_durable_and_bounded(setup,monkeypatch):
     assert client.get('/studio-api/manage/owner-notifications').json()['used']==5
     now[0]+=86402
     alerts.process_one(studio.database)
-    assert len(sent)==5 and any(r['state']=='expired' for r in jobs())
+    assert len(sent)==6 and all(r['state']=='accepted' for r in jobs())
+    # A restart or the next worker tick cannot send the recovered sixth alert twice.
+    studio.initialize()
+    assert alerts.process_one(studio.database) is False
+    assert len(sent)==6
 
 
 def test_skip_stale_new_booking_and_test_does_not_create_reservation(setup):

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CopyContact from "../CopyContact.vue";
+import OwnerDeliveryStatus from './OwnerDeliveryStatus.vue';
 import OfferLabel from '../../visit/OfferLabel.vue';
 import { contentModule } from "../../content-store";
 const copyText = contentModule("components-admin-ReservationsPanel", copyTextDefault);
@@ -227,6 +228,7 @@ defineExpose({ refresh: load });
         }}
       </button>
     </header>
+    <OwnerDeliveryStatus :active="active" />
     <ReservationAvailability v-if="calendar" :active="active" />
     <div v-if="!calendar" class="reservation-desk-metrics">
       <button @click="status = 'pending'">

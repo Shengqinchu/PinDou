@@ -478,6 +478,9 @@ def register(app, database, admin_actor):
             db.execute("BEGIN IMMEDIATE")
             # Unstarted leases may be reclaimed. A started send is never replayed.
             db.execute("UPDATE studio_sms_jobs SET state='queued',claim_token='' WHERE bridge_id=? AND state='claimed' AND lease_until<?", (bridge["id"], stamp))
+            if bridge['role'] == 'owner_alert':
+                import owner_delivery
+                owner_delivery.keep_pending_sms(db, stamp)
             stale = db.execute("SELECT message_id FROM studio_sms_jobs WHERE bridge_id=? AND state='dispatching' AND lease_until<?", (bridge["id"], stamp)).fetchall()
             for row in stale:
                 if row["message_id"]:

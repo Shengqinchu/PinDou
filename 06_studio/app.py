@@ -362,6 +362,8 @@ import observability
 observability.install(app, database, admin_actor)
 import owner_notifications
 owner_notifications.register(app, database, admin_actor)
+import owner_delivery
+owner_delivery.register(app, database, admin_actor)
 import telegram_notifications
 telegram_notifications.register(app, database, admin_actor)
 import sms_inbox

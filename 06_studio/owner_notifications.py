@@ -225,6 +225,9 @@ def process_one(database, channel='serverchan'):
     current = time.time()
     with database() as db:
         db.execute('BEGIN IMMEDIATE')
+        if channel == 'serverchan':
+            import owner_delivery
+            owner_delivery.keep_pending_alerts(db, current)
         settings, key = channel_settings(db, channel)
         db.execute("UPDATE studio_owner_notifications SET state='expired',error='expired',updated_at=? WHERE channel=? AND state IN ('queued','retry','sending') AND expires_at<=? AND lease_until<=?", (current, channel, current, current))
         if not settings['enabled'] or not key or settings['blocked_until'] > current:
@@ -238,7 +241,8 @@ def process_one(database, channel='serverchan'):
         if obsolete(db, job) or job['target'] != settings.get('target',''):
             db.execute("UPDATE studio_owner_notifications SET state='skipped',error='superseded',updated_at=?,lease_until=0 WHERE id=?", (current, job['id']))
             return True
-        if job['attempts'] >= MAX_ATTEMPTS:
+        persistent = job['kind'] == 'created'
+        if job['attempts'] >= MAX_ATTEMPTS and not persistent:
             db.execute("UPDATE studio_owner_notifications SET state='failed',error='retry_exhausted',updated_at=?,lease_until=0 WHERE id=?", (current, job['id']))
             return True
         # Rolling windows also cover restarts and avoid assuming a provider timezone.
@@ -266,7 +270,7 @@ def process_one(database, channel='serverchan'):
         outcome = {'ok': False, 'error': 'worker_error', 'retry': True}
     finished = time.time()
     attempt = job['attempts']+1
-    state = 'accepted' if outcome['ok'] else ('retry' if outcome.get('retry') and attempt < MAX_ATTEMPTS else 'failed')
+    state = 'accepted' if outcome['ok'] else ('retry' if outcome.get('retry') and (persistent or attempt < MAX_ATTEMPTS) else 'failed')
     delay = outcome.get('delay', RETRY_SECONDS[min(attempt-1, len(RETRY_SECONDS)-1)])
     with database() as db:
         db.execute('BEGIN IMMEDIATE')
@@ -360,7 +364,8 @@ def register(app, database, admin_actor):
                 raise HTTPException(404, 'notification_not_found')
             if row['state'] in ('queued', 'retry', 'sending'):
                 return public_job(row)
-            if row['state'] != 'failed' or row['expires_at'] <= time.time() or row['attempts'] >= MAX_ATTEMPTS:
+            persistent = row['kind'] == 'created' and not obsolete(db, row)
+            if row['state'] != 'failed' or (not persistent and (row['expires_at'] <= time.time() or row['attempts'] >= MAX_ATTEMPTS)):
                 raise HTTPException(409, 'notification_not_retryable')
             db.execute("UPDATE studio_owner_notifications SET state='queued',next_attempt=?,updated_at=? WHERE id=?", (time.time(), time.time(), ident))
             return public_job(db.execute('SELECT * FROM studio_owner_notifications WHERE id=?', (ident,)).fetchone())

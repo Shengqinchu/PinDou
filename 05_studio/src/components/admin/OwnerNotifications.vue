@@ -52,7 +52,7 @@ watch(open,value=>{if(!value)sendkey.value='';});
    <p v-if="saved" class="form-help">{{formatCopy(copy.usage,{v0:saved.used,v1:saved.daily_limit})}}</p>
    <p class="form-help">{{say(copy.accepted_help)}}</p>
    <p v-if="saved&&!saved.items.length">{{say(copy.empty)}}</p>
-   <ol class="owner-notification-log"><li v-for="item in saved?.items" :key="item.id"><div><strong>{{say(copy[item.kind==='test'?'test_kind':item.kind])}}</strong><span :data-state="item.state">{{say(copy[item.state])}}</span></div><time>{{date(item.created_at)}}</time><p v-if="item.reservation_id">{{item.reservation_id}}</p><p v-if="item.error">{{say(copy[item.error]||copy.generic_error)}}</p><button v-if="item.state==='failed'&&item.attempts<8" type="button" class="desk-link" :disabled="busy||!saved?.enabled||dirty" @click="retry(item.id)">{{say(copy.retry_action)}}</button></li></ol>
+    <ol class="owner-notification-log"><li v-for="item in saved?.items" :key="item.id"><div><strong>{{say(copy[item.kind==='test'?'test_kind':item.kind])}}</strong><span :data-state="item.state">{{say(copy[item.state])}}</span></div><time>{{date(item.created_at)}}</time><p v-if="item.reservation_id">{{item.reservation_id}}</p><p v-if="item.error">{{say(copy[item.error]||copy.generic_error)}}</p><button v-if="item.state==='failed'&&(item.kind==='created'||item.attempts<8)" type="button" class="desk-link" :disabled="busy||!saved?.enabled||dirty" @click="retry(item.id)">{{say(copy.retry_action)}}</button></li></ol>
   </div>
  </SlideOver>
 </template>

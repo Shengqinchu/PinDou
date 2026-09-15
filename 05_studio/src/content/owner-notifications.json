@@ -25,7 +25,7 @@
   "log": ["最近发送记录", "Recent activity"],
   "refresh": ["刷新记录", "Refresh activity"],
   "empty": ["还没有提醒记录。", "No alerts yet."],
-  "accepted_help": ["服务已接收表示 Server 酱已接受请求，请以微信实际收到为准。失败会自动重试，超过 24 小时的提醒不再发送。", "Accepted means ServerChan acknowledged the request. Check WeChat for delivery. Temporary failures are retried; alerts expire after 24 hours."],
+  "accepted_help": ["服务已接收表示 Server 酱已接受请求，请以微信实际收到为准。待确认预约的暂时失败会自动重试，不因超过 24 小时而放弃；预约处理后停止旧提醒。测试及取消提醒保留 24 小时有效期。", "Accepted means ServerChan acknowledged the request. Check WeChat for delivery. Temporary failures for pending reservations are retried beyond 24 hours; old alerts stop once the reservation is handled. Test and cancellation alerts expire after 24 hours."],
   "usage": ["最近 24 小时已请求 {v0} / {v1} 次", "Requests in the last 24 hours: {v0} / {v1}"],
   "created": ["新预约", "New reservation"],
   "cancelled": ["顾客取消预约", "Customer cancellation"],
