@@ -1,6 +1,6 @@
 import { computed, reactive, ref, shallowRef,watch } from 'vue';
 import { onShow, onHide, onUnload } from '@dcloudio/uni-app';
-import {saveNotifications,subscribeWechat} from './customer-notifications';
+import {saveNotifications,subscribeWechat,warmWechat,wechatPermissionReady,resetWechatChoices,skipWechatChoices,saveBookingWechatChoices} from './customer-notifications';
 import { useUserStore } from '../store/user';
 import { MiniappError, studioCall } from './miniapp-client';
 import {peekStudioSnapshot,readStudioCached,invalidateStudioSnapshots,rememberStudioSnapshot} from './studio-cache';
@@ -12,12 +12,37 @@ export function useStudioVisit(language:{value:string}){
   const notes=ref(''),step=ref(0),calendar=ref<Calendar|null>(null),loading=ref(false),sending=ref(false),errorCode=ref(''),calendarError=ref(false);
   const context=ref<ContactContext>(),contactLoading=ref(false),contactError=ref(false),editing=ref(false),profileConflict=ref(false),attempt=ref<Attempt|null>(null);
   const confirmation=shallowRef<Payload|null>(null);
+  const notificationLoading=ref(false),notificationNote=ref(''),confirming=ref(false);
   let alive=true,visible=true,calendarSeq=0,contactSeq=0,owner='',ownerToken='',timer:ReturnType<typeof setInterval>|undefined,restoring=false,resolveConfirmation:((value:boolean)=>void)|undefined;
   function settleConfirmation(value:boolean){const resolve=resolveConfirmation;resolveConfirmation=undefined;confirmation.value=null;resolve?.(value);}
   function dismissSubmission(){settleConfirmation(false);}
-  let confirming=false;
-  async function confirmSubmission(){if(confirming)return;confirming=true;try{await subscribeWechat(user.token);}catch{}finally{confirming=false;settleConfirmation(true);}}
-  function review(body:Payload){return new Promise<boolean>(resolve=>{if(!alive||!visible){resolve(false);return;}resolveConfirmation=resolve;confirmation.value=body;});}
+  async function prepareNotification(){
+    // #ifdef MP-WEIXIN
+    const token=user.token;notificationLoading.value=true;notificationNote.value='';
+    try{await warmWechat(token,true);if(alive&&token===user.token)notificationNote.value=wechatPermissionReady(token)?'':'wechat_unavailable';}
+    catch{if(alive&&token===user.token)notificationNote.value='wechat_unavailable';}
+    finally{if(alive&&token===user.token)notificationLoading.value=false;}
+    // #endif
+  }
+  async function confirmSubmission(){
+    if(confirming.value||notificationLoading.value||!confirmation.value)return;
+    const current=confirmation.value,token=user.token;
+    // #ifdef MP-WEIXIN
+    if(!wechatPermissionReady(token)){
+      await prepareNotification();
+      if(alive&&token===user.token&&current===confirmation.value&&wechatPermissionReady(token))notificationNote.value='wechat_confirm_again';
+      return;
+    }
+    // #endif
+    confirming.value=true;
+    try{await subscribeWechat(token);}catch{}
+    finally{confirming.value=false;if(alive&&token===user.token&&current===confirmation.value)settleConfirmation(true);}
+  }
+  function confirmWithoutWechat(){if(confirming.value||!confirmation.value)return;skipWechatChoices(user.token);settleConfirmation(true);}
+  async function review(body:Payload){
+    const token=user.token;resetWechatChoices(token);await prepareNotification();
+    return new Promise<boolean>(resolve=>{if(!alive||!visible||token!==user.token){resolve(false);return;}resolveConfirmation=resolve;confirmation.value=body;});
+  }
   const locked=computed(()=>sending.value||!!attempt.value);
   const selected=computed(()=>!loading.value&&!calendarError.value&&validBooking(calendar.value,booking));
   const savedContact=computed(()=>context.value?.profile.complete&&!editing.value);
@@ -117,6 +142,7 @@ export function useStudioVisit(language:{value:string}){
       await saveNotifications(token);
       const result=await studioCall<Receipt>('/reservations',request.body,'',token,'POST',{'Idempotency-Key':request.key});
       if(token!==user.token)return;
+      saveBookingWechatChoices(token,result.id);
       invalidateStudioSnapshots(token);rememberStudioSnapshot('/reservations/'+result.id,token,result);
       uni.removeStorageSync(attemptKey(request.owner));uni.removeStorageSync(draftKey(request.owner));
       if(alive){restoring=true;attempt.value=null;clearTime();notes.value='';step.value=0;restoring=false;uni.redirectTo({url:'/pages/studio/reservation?id='+encodeURIComponent(result.id)});}
@@ -142,6 +168,6 @@ export function useStudioVisit(language:{value:string}){
     if(!locked.value){await loadContact();if(alive)await loadCalendar();}
     if(alive)timer=setInterval(()=>{if(!locked.value&&!loading.value)void loadCalendar();},60000);
   }
-  onShow(()=>{visible=true;void resume();});onHide(()=>{visible=false;clearInterval(timer);dismissSubmission();});onUnload(()=>{alive=false;visible=false;dismissSubmission();calendarSeq++;contactSeq++;clearInterval(timer);});
-  return {booking,contact,notes,step,calendar,loading,sending,errorCode,calendarError,context,contactLoading,contactError,editing,profileConflict,attempt,confirmation,confirmSubmission,dismissSubmission,locked,selected,savedContact,choosePlan,chooseGuests,select,navigate,loadCalendar,loadContact,useSaved,submit};
+  onShow(()=>{visible=true;void resume();});onHide(()=>{visible=false;clearInterval(timer);if(!confirming.value)dismissSubmission();});onUnload(()=>{alive=false;visible=false;dismissSubmission();calendarSeq++;contactSeq++;clearInterval(timer);});
+  return {booking,contact,notes,step,calendar,loading,sending,errorCode,calendarError,context,contactLoading,contactError,editing,profileConflict,attempt,confirmation,confirmSubmission,confirmWithoutWechat,dismissSubmission,notificationLoading,notificationNote,confirming,locked,selected,savedContact,choosePlan,chooseGuests,select,navigate,loadCalendar,loadContact,useSaved,submit};
 }

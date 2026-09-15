@@ -4,6 +4,8 @@ import {onLoad,onShow,onHide,onUnload} from '@dcloudio/uni-app';
 import StudioShell from '../../components/StudioShell.vue';
 import StudioGlyph from '../../components/StudioGlyph.vue';
 import StudioCancel from '../../components/StudioCancel.vue';
+import StudioWechatOutcome from '../../components/StudioWechatOutcome.vue';
+import {bookingWechatChoices} from '../../utils/customer-notifications';
 import notices from '../../../../05_studio/src/content/customer-notifications.json';
 import {useUserStore} from '../../store/user';
 import {useStudioNative} from '../../utils/studio-native';
@@ -13,6 +15,7 @@ import {studioWords,bookingError,refreshStudioContent,studioProfile,fillWords} f
 import type {Receipt} from '../../utils/studio-booking';
 const user=useUserStore(),{language,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();
 const id=ref(''),result=ref<Receipt>(),loading=ref(false),errorCode=ref('');let sequence=0,timer:ReturnType<typeof setInterval>|undefined,alive=true;
+const wechatChoices=computed(()=>bookingWechatChoices(user.token,id.value));
 const words=(module:Parameters<typeof studioWords>[0],key:string)=>say(studioWords(module,key));
 const title=computed(()=>!result.value?'':words('receipt',({pending:'the_host_will_confirm_it_ae62ce',confirmed:'your_visit_is_confirmed_94453d',completed:'thank_you_for_coming_285672',cancelled:'this_reservation_was_cancelled_54b1d2'} as const)[result.value.status]));
 const titleEnding=computed(()=>result.value?.status==='confirmed'?words('receipt','see_you_at_the_studio_add3a5'):result.value?.status==='completed'?words('receipt','lets_make_again_soon_12f0b9'):'');
@@ -48,6 +51,9 @@ onHide(()=>clearInterval(timer));onUnload(()=>{alive=false;sequence++;clearInter
     <view class="studio-receipt-heading"><text class="studio-native-title">{{title}}<text v-if="titleEnding" class="studio-home-title-line">{{titleEnding}}</text></text><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-eye" :disabled="loading" :aria-label="words('receipt','refresh_reservation_30af18')" @tap="refresh(true)"><view v-if="loading" class="studio-native-progress"/><StudioGlyph v-else name="refresh" :size="20"/></button></view>
     <text v-if="result.status==='pending'" class="studio-native-body">{{words('receipt','the_host_will_review_your_plans_as_fec716')}}</text>
     <text v-if="result.status==='pending'" class="studio-booking-urgent">{{words('receipt','if_your_visit_starts_in_less_than_4b8a93')}}</text>
+    <!-- #ifdef MP-WEIXIN -->
+    <StudioWechatOutcome v-if="wechatChoices" :language="language" :choices="wechatChoices"/>
+    <!-- #endif -->
     <view class="studio-native-definition"><view class="studio-native-definition-row"><text class="studio-native-label">{{words('booking','name')}}</text><text>{{result.name}}</text></view><view class="studio-native-definition-row"><text class="studio-native-label">{{words('receipt','visit_time_9fc550')}}</text><text>{{result.booking.date}} · {{result.booking.start}}–{{result.booking.end}}</text><text class="studio-native-label">{{words('receipt','hamilton_local_time_496f95')}}</text></view><view class="studio-native-definition-row"><text class="studio-native-label">{{words('receipt','guests_c77186')}}</text><text>{{fillWords(studioWords('flow','guest_count'),language,{v0:result.booking.guests})}}</text></view><view class="studio-native-definition-row"><text class="studio-native-label">{{words('receipt','experience_cc25a0')}}</text><text>{{words('visit',result.booking.plan==='day'?'a_day_of_making_01d6e2':'by_the_hour_5300b2')}} · {{duration(result.booked_minutes)}}</text></view><view class="studio-native-definition-row"><text class="studio-native-label">{{words('wallet','actual')}}</text><text>{{result.actual_minutes===null?words('wallet','unrecorded'):fillWords(studioWords('wallet','per_guest'),language,{v0:duration(result.actual_minutes),v1:result.actual_guests||result.booking.guests})}}</text></view><text v-if="result.public_note" class="studio-native-body">{{result.public_note}}</text></view>
     <view class="studio-receipt-actions"><StudioCancel id="booking-cancel" :reservation="result" :language="language" @changed="changed"/><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-link" @tap="details"><StudioGlyph name="pin" :size="18"/>{{words('home','studio_details_7c4089')}}</button></view>
    </template>

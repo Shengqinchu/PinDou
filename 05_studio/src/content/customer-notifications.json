@@ -44,13 +44,25 @@
     "Subscribe to confirmation, cancellation and pre-visit notices. Each approval allows one notice per type."
   ],
   "wechat_ready": [
-    "微信提醒已允许",
-    "WeChat notifications allowed"
+    "本次预约成功提醒已允许",
+    "This confirmation alert is allowed"
   ],
   "wechat_declined": [
-    "未开启微信提醒，仍可在我的预约中查看状态。",
-    "WeChat notifications were not enabled. You can still check My bookings."
+    "未开启预约成功微信提醒，仍可在我的预约中查看状态。",
+    "WeChat confirmation alerts were not enabled. You can still check My bookings."
   ],
+  "wechat_preparing": ["正在准备本次微信提醒…", "Preparing WeChat alerts for this booking…"],
+  "wechat_booking_request": ["确认后，可选择接收本次预约的微信提醒。", "After confirming, you can choose WeChat alerts for this booking."],
+  "wechat_confirm_again": ["提醒已重新准备好，请再点一次确认提交。", "Alerts are ready again. Tap Confirm to submit."],
+  "wechat_tap_again": ["提醒已准备好，请再次点击接收微信预约提醒。", "Alerts are ready. Tap Receive WeChat booking notifications again."],
+  "wechat_submit_without": ["仅提交预约，不接收本次微信提醒", "Submit without WeChat alerts"],
+  "wechat_result_title": ["本次操作的微信提醒", "WeChat alerts from this action"],
+  "wechat_kind_confirmed": ["预约成功通知", "Booking confirmation"],
+  "wechat_kind_cancelled": ["预约取消通知", "Booking cancellation"],
+  "wechat_kind_reminder": ["到店前提醒", "Pre-visit reminder"],
+  "wechat_choice_allowed": ["已允许一条", "One alert allowed"],
+  "wechat_choice_declined": ["本次未开启", "Not enabled this time"],
+  "wechat_choice_unavailable": ["本次未能确认开启", "Not confirmed as enabled"],
   "wechat_unavailable": [
     "微信提醒暂不可用，其他接收方式不受影响。",
     "WeChat notifications are temporarily unavailable. Other channels are unaffected."

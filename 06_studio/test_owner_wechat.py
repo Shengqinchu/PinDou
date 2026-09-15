@@ -173,6 +173,24 @@ def test_inflating_local_counter_cannot_override_wechat_rejection(wechat, monkey
         assert db.execute('SELECT grants FROM studio_owner_wechat_bindings').fetchone()[0] == 0
 
 
+def test_real_nonce_records_can_accumulate_past_100_without_prefilling(wechat):
+    client, _ = wechat
+    configure(client); headers, _ = bind(client)
+    with studio.database() as db:
+        assert db.execute('SELECT grants FROM studio_owner_wechat_bindings').fetchone()[0] == 0
+        db.execute('UPDATE studio_owner_wechat_bindings SET grants=100')
+    state = client.get('/studio-api/owner-wechat/status', headers=headers).json()
+    payload = {'nonce': state['nonce'], 'result': 'accept'}
+    assert client.post('/studio-api/owner-wechat/subscribe', headers=headers, json=payload).status_code == 200
+    assert client.post('/studio-api/owner-wechat/subscribe', headers=headers, json=payload).status_code == 200
+    with studio.database() as db:
+        assert db.execute('SELECT grants FROM studio_owner_wechat_bindings').fetchone()[0] == 101
+        db.execute('UPDATE studio_owner_wechat_bindings SET grants=9999')
+    allow(client, headers); allow(client, headers)
+    with studio.database() as db:
+        assert db.execute('SELECT grants FROM studio_owner_wechat_bindings').fetchone()[0] == 10000
+
+
 def test_timeout_does_not_replay_or_invent_success(wechat, monkeypatch):
     client, _ = wechat
     configure(client); headers, _ = bind(client); allow(client, headers); create(client)

@@ -87,6 +87,27 @@ function page() {
   await test('unchecked alert saves the booking without subscription', async () => {const p = page(); await p.result.save(); p.result.confirmSave(false); await new Promise(r => setImmediate(r)); assert.equal(p.calls.filter(c => c[2] === 'PATCH').length, 1); assert.equal(p.requests.length, 0);});
   await test('combined confirmation starts request in tap stack and saves once', async () => {const p = page(); await p.result.save(); p.result.confirmSave(true); assert.equal(p.requests.length, 1); p.result.confirmSave(true); await new Promise(r => setImmediate(r)); assert.equal(p.requests.length, 1); assert.equal(p.calls.filter(c => c[2] === 'PATCH').length, 1); assert.equal(p.calls[0][1].version, 1);});
   await test('attendance validation still prevents invalid completion', async () => {const p = page(); p.result.draft.status = 'completed'; await vue.nextTick(); await p.result.save(); assert(!p.result.savePrompt.value); assert.equal(p.calls.length, 0); assert.equal(p.requests.length, 0); assert(p.result.error.value);});
+  await test('owner refresh reuses unexpired login proof and renews on expiry', async () => {
+    let clock=Date.now(),logins=0,statuses=0;
+    class MiniappError extends Error {}
+    const file=fs.readFileSync(path.join(root,'05_frontend/src/pages/studio/owner.vue'),'utf8');
+    const source=compiler.compileScript(compiler.parse(file).descriptor,{id:'owner-refresh-qa'}).content;
+    const api=compile(source,{'vue':vue,'@dcloudio/uni-app':{onLoad(){},onShow(){},onUnload(){}},'../../components/StudioShell.vue':{},'../../components/StudioGlyph.vue':{},'../../utils/studio-native':{useStudioNative:()=>({say:words=>words[0]})},'../../utils/miniapp-client':{MiniappError,miniSession:async()=>{logins++;return {ticket:'proof-'+logins,expires_in:600};},studioCall:async p=>p==='/owner-wechat/status'?{bound:true,admin:true,enabled:true,template_id:'test-template',nonce:'test-'+(++statuses)}:{items:[]}}},{Date:{now:()=>clock}}).default.setup({}, {expose(){}});
+    for(let i=0;i<12;i++)await api.refresh();
+    assert.equal(logins,1);assert.equal(statuses,12);
+    clock+=571000;await api.refresh();assert.equal(logins,2);
+  });
+  await test('owner idle prompt renews before permission and requires a fresh tap', async () => {
+    let clock=Date.now(),logins=0,statuses=0,recorded=0;const requests=[];
+    class MiniappError extends Error {}
+    const file=fs.readFileSync(path.join(root,'05_frontend/src/pages/studio/owner.vue'),'utf8').replace(/\/\/ #ifndef MP-WEIXIN[\s\S]*?\/\/ #endif/g,'');
+    const source=compiler.compileScript(compiler.parse(file).descriptor,{id:'owner-prompt-qa'}).content;
+    const api=compile(source,{'vue':vue,'@dcloudio/uni-app':{onLoad(){},onShow(){},onUnload(){}},'../../components/StudioShell.vue':{},'../../components/StudioGlyph.vue':{},'../../utils/studio-native':{useStudioNative:()=>({say:words=>words[0]})},'../../utils/miniapp-client':{MiniappError,miniSession:async()=>{logins++;return {ticket:'proof-'+logins,expires_in:600};},studioCall:async p=>{if(p==='/owner-wechat/status')return {bound:true,enabled:true,template_id:'template',nonce:'nonce-'+(++statuses)};if(p==='/owner-wechat/subscribe')recorded++;return {items:[]};}}},{Date:{now:()=>clock},uni:{requestSubscribeMessage:options=>requests.push(options)}}).default.setup({}, {expose(){}});
+    await api.refresh();clock+=241000;api.subscribe();assert.equal(requests.length,0);
+    await new Promise(resolve=>setImmediate(resolve));assert.equal(statuses,2);assert.equal(logins,1);
+    api.subscribe();api.subscribe();assert.equal(requests.length,1);await requests[0].success({template:'accept'});
+    assert.equal(recorded,1);await new Promise(resolve=>setImmediate(resolve));assert.equal(statuses,3);
+  });
   const output = path.join(root, 'artifacts/original-notifications-20260915/native-subscription-checks.json');
   fs.writeFileSync(output, JSON.stringify({passed: tested.length, tests: tested, realPermissionSheet: false, realMessages: false}, null, 2));
   console.log(JSON.stringify({passed: tested.length, realPermissionSheet: false, realMessages: false}));

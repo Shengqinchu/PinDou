@@ -23,6 +23,9 @@ import miniapp_login as miniapp
 
 LOG = logging.getLogger(__name__)
 TEMPLATE_KEYS = ("thing1", "time2", "time3", "thing4", "thing5")
+# This caps our record of individual accepted subscriptions, not WeChat's
+# upstream permission. Raising it never pre-fills or grants any send rights.
+MAX_OWNER_GRANTS = 10_000
 COPY_PATH = Path(__file__).with_name("owner-wechat-copy.json")
 if not COPY_PATH.exists():
     COPY_PATH = Path(__file__).resolve().parents[1] / "05_studio/src/content/owner-wechat.json"
@@ -336,7 +339,7 @@ def register(app, database, admin_actor):
                 return {"ok": True}
             db.execute("UPDATE studio_owner_wechat_subscriptions SET result=? WHERE nonce_hash=?", (payload.result, key_hash(payload.nonce)))
             if payload.result == "accept":
-                db.execute("UPDATE studio_owner_wechat_bindings SET grants=MIN(grants+1,100),error='' WHERE id=?", (binding["id"],))
+                db.execute("UPDATE studio_owner_wechat_bindings SET grants=MIN(grants+1,?),error='' WHERE id=?", (MAX_OWNER_GRANTS, binding["id"]))
                 db.execute("UPDATE studio_owner_wechat_jobs SET state='queued' WHERE binding_id=? AND state='waiting_subscription' AND expires_at>?", (binding["id"], time.time()))
             else:
                 db.execute("UPDATE studio_owner_wechat_bindings SET grants=0,error='owner_wechat_subscription_required' WHERE id=?", (binding["id"],))

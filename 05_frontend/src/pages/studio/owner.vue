@@ -12,18 +12,18 @@ type Booking={id:string;status:string;name:string;booking:{date:string;start:str
 const {language,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();
 const state=ref<OwnerState>(),candidate=ref<{label:string;expires_at:number}>(),items=ref<Booking[]>([]);
 const busy=ref(false),subscribing=ref(false),error=ref(''),note=ref('');
-let ticket='',scene='',reference='',alive=true,sequence=0;
+let ticket='',ticketUntil=0,promptUntil=0,scene='',reference='',alive=true,sequence=0;
 const words=(key:string)=>say((copy as Record<string,string[]>)[key]||copy.generic_error);
 function failed(e:unknown){error.value=words(e instanceof MiniappError?e.code:'generic_error');}
-async function refresh(){
+async function refresh(loadBookings=true){
   if(busy.value||subscribing.value||!alive)return;busy.value=true;error.value='';const current=++sequence;
   try{
-    const proof=await miniSession();if(!alive||current!==sequence)return;ticket=proof.ticket;
-    const value=await studioCall<OwnerState>('/owner-wechat/status',{},ticket,'','GET');
-    if(!alive||current!==sequence)return;state.value=value;
+    if(!ticket||Date.now()>=ticketUntil){const started=Date.now(),proof=await miniSession();if(!alive||current!==sequence)return;ticket=proof.ticket;ticketUntil=started+Math.max(0,proof.expires_in-30)*1000;}
+    const preparedAt=Date.now(),value=await studioCall<OwnerState>('/owner-wechat/status',{},ticket,'','GET');
+    if(!alive||current!==sequence)return;state.value=value;promptUntil=Math.min(ticketUntil,preparedAt+240000);
     if(scene)candidate.value=await studioCall('/owner-wechat/binding',{scene},ticket,'','GET');
-    if(value.bound){const result=await studioCall<{items:Booking[]}>('/owner-wechat/reservations',reference?{reference}:{},ticket,'','GET');if(alive&&current===sequence)items.value=result.items;}
-  }catch(e){if(alive&&current===sequence)failed(e);}finally{if(current===sequence)busy.value=false;}
+    if(value.bound&&loadBookings){const result=await studioCall<{items:Booking[]}>('/owner-wechat/reservations',reference?{reference}:{},ticket,'','GET');if(alive&&current===sequence)items.value=result.items;}
+  }catch(e){if(alive&&current===sequence){if(e instanceof MiniappError&&e.status===401){ticket='';ticketUntil=0;state.value=undefined;}failed(e);}}finally{if(current===sequence)busy.value=false;}
 }
 async function confirmBinding(){
   if(busy.value||!scene)return;busy.value=true;error.value='';
@@ -33,15 +33,16 @@ async function confirmBinding(){
 }
 function subscribe(){
   const current=state.value;
-  if(subscribing.value||!current?.bound||!current.enabled||!current.template_id||!current.nonce)return;
+  if(busy.value||subscribing.value||!current?.bound||!current.enabled||!current.template_id||!current.nonce)return;
+  if(Date.now()>=promptUntil){note.value=words('owner_wechat_prompt_expired');void refresh(false);return;}
   const template=current.template_id,nonce=current.nonce,proof=ticket;subscribing.value=true;note.value='';error.value='';
   // This call must remain directly inside the user's tap handler. Do not put
   // an awaited network request before the WeChat permission sheet.
   // #ifdef MP-WEIXIN
   uni.requestSubscribeMessage({tmplIds:[template],success:async(result)=>{
     const choice=(result as unknown as Record<string,string>)[template];
-    try{if(!['accept','reject','ban'].includes(choice))throw new Error();await studioCall('/owner-wechat/subscribe',{nonce,result:choice},proof);note.value=words(choice==='accept'?'subscription_saved':'subscription_denied');}
-    catch(e){failed(e);}finally{subscribing.value=false;void refresh();}
+    try{if(!['accept','reject','ban'].includes(choice))throw new Error();const record=()=>studioCall('/owner-wechat/subscribe',{nonce,result:choice},proof);try{await record();}catch{await record();}note.value=words(choice==='accept'?'subscription_saved':'subscription_denied');}
+    catch(e){failed(e);}finally{subscribing.value=false;void refresh(false);}
   },fail:()=>{subscribing.value=false;error.value=words('subscription_denied');}});
   // #endif
   // #ifndef MP-WEIXIN
@@ -60,7 +61,7 @@ onShow(()=>void refresh());onUnload(()=>{alive=false;++sequence;});
       <text v-if="error" class="studio-native-error" role="alert">{{error}}</text><text v-if="note" class="studio-native-body" role="status">{{note}}</text>
       <button v-if="state?.admin" class="studio-native-primary" hover-class="studio-native-pressed" @tap="openWorkbench">{{say(workbenchCopy.entry)}}</button>
       <view v-if="candidate" class="owner-permission"><text class="studio-native-subtitle">{{candidate.label}}</text><text class="studio-native-body">{{words('binding_explanation')}}</text><button class="studio-native-primary" :disabled="busy" hover-class="studio-native-pressed" @tap="confirmBinding">{{words('confirm_binding')}}</button></view>
-      <view v-else-if="state?.bound" class="owner-permission"><text class="studio-native-body">{{state.binding?.label}} · {{words('bound')}}</text><button class="studio-native-primary" :disabled="subscribing||!state.enabled||!state.template_id" hover-class="studio-native-pressed" @tap="subscribe">{{words('subscribe')}}</button><text class="studio-native-label">{{words('subscription_note')}}</text><text v-if="!state.template_id" class="studio-native-label">{{words('owner_wechat_template_required')}}</text></view>
+      <view v-else-if="state?.bound" class="owner-permission"><text class="studio-native-body">{{state.binding?.label}} · {{words('bound')}}</text><button class="studio-native-primary" :disabled="busy||subscribing||!state.enabled||!state.template_id" hover-class="studio-native-pressed" @tap="subscribe">{{words('subscribe')}}</button><text class="studio-native-label">{{words('subscription_note')}}</text><text v-if="!state.template_id" class="studio-native-label">{{words('owner_wechat_template_required')}}</text></view>
       <text v-else-if="state" class="studio-native-body">{{words('unbound')}}</text>
       <template v-if="state?.bound"><view class="studio-native-section-head"><text class="studio-native-subtitle">{{words('pending')}}</text><button class="studio-native-link" @tap="openDesk">{{words('open_desk')}}</button></view><text class="studio-native-label">{{words('timezone')}}</text><scroll-view scroll-y class="owner-bookings"><text v-if="!items.length" class="studio-native-body">{{words('empty')}}</text><view v-for="booking in items" :key="booking.id" class="owner-booking"><text class="studio-native-subtitle">{{booking.name}}</text><text class="studio-native-body">{{booking.booking.date}} · {{booking.booking.start}}–{{booking.booking.end}}</text><text class="studio-native-label">{{words('guests').replace('{count}',String(booking.booking.guests))}}</text></view></scroll-view></template>
     </view>
