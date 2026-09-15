@@ -2001,6 +2001,10 @@
 | subscribe | 接收新预约提醒 | Receive booking alerts |
 | subscription_note | 每次允许可接收一条新预约提醒，用完后请再次允许。 | Each permission allows one booking alert. Allow again when it is used. |
 | subscription_saved | 本次提醒已允许 | This alert is allowed |
+| save_with_alert | 同时接收下一条新预约提醒 | Also receive the next booking alert |
+| confirm_with_alert | 保存并接收提醒 | Save and receive an alert |
+| save_alert_note | 每次允许可接收一条提醒。不允许提醒也能保存预约。 | Each permission allows one alert. You can save without allowing alerts. |
+| save_alert_unavailable | 本次提醒未能开启，可到店主预约提醒页重试。 | Could not enable this alert. Try again on the owner booking alerts page. |
 | subscription_denied | 本次未允许微信提醒。 | WeChat alerts were not allowed this time. |
 | authorization_available | 有可用的提醒授权 | Alert permission available |
 | authorization_needed | 需要在小程序内允许提醒 | Allow alerts in the mini-program |

@@ -160,6 +160,19 @@ def test_provider_subscription_rejection_is_authoritative(wechat, monkeypatch):
     assert not wx.process_one(studio.database)
 
 
+def test_inflating_local_counter_cannot_override_wechat_rejection(wechat, monkeypatch):
+    client, _ = wechat
+    configure(client); headers, _ = bind(client); allow(client, headers)
+    with studio.database() as db:
+        db.execute('UPDATE studio_owner_wechat_bindings SET grants=999999')
+    create(client)
+    monkeypatch.setattr(wx, 'provider', lambda *a, **kw: {'errcode':43101})
+    assert wx.process_one(studio.database)
+    assert jobs()[0]['state'] != 'accepted'
+    with studio.database() as db:
+        assert db.execute('SELECT grants FROM studio_owner_wechat_bindings').fetchone()[0] == 0
+
+
 def test_timeout_does_not_replay_or_invent_success(wechat, monkeypatch):
     client, _ = wechat
     configure(client); headers, _ = bind(client); allow(client, headers); create(client)
