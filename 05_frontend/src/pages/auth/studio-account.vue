@@ -24,7 +24,7 @@ type Wallet = {account:{minutes:number;points:number};booking_profile:{name:stri
 const user = useUserStore();
 const { language, keyboardOpen, shellStyle, say, t, changeLanguage, website } = useStudioNative();
 const profile = ref<Profile>(), wallet = ref<Wallet>(), busy = ref(false), failed = ref(false), avatarFailed = ref(false);
-const isOwner=ref(false);
+const isOwner=ref(false),pageReset=ref(0);
 let sequence = 0;
 const name = computed(() => profile.value?.nickname || profile.value?.email || user.userInfo?.nickname || user.userInfo?.email || '—');
 const hours = computed(() => wallet.value ? say(walletCopy.whole_hours).replace('{v0}',String(Math.round(wallet.value.account.minutes / 60 * 100) / 100)) : '—');
@@ -72,11 +72,11 @@ function setupProfile(){uni.navigateTo({url:'/pages/auth/studio-profile?onboard=
 function ownerAlerts(){uni.navigateTo({url:'/pages/studio/owner'});}
 function openWorkbench(){uni.navigateTo({url:'/pages/studio/manage'});}
 watch(()=>user.token,()=>{sequence++;profile.value=undefined;wallet.value=undefined;isOwner.value=false;busy.value=false;failed.value=false;});
-onShow(() => void refresh());
+onShow(() => { pageReset.value++; void refresh(); });
 onUnload(() => { ++sequence; });
 </script>
 <template>
-  <StudioShell id="studio-shell" fitted :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" nav="account" @language="changeLanguage">
+  <StudioShell id="studio-shell" fitted :reset-key="pageReset" :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" nav="account" @language="changeLanguage">
     <view class="studio-native-main studio-account">
       <view class="studio-native-section-head"><text class="studio-native-title">{{say(accountCopy.account)}}</text><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-eye" :disabled="busy" :aria-label="say(walletCopy.refresh)" hover-class="studio-native-pressed" @tap="refresh(true)"><view v-if="busy" class="studio-native-progress"/><StudioGlyph v-else name="refresh" :size="21"/></button></view>
       <view class="studio-native-profile">
