@@ -53,6 +53,12 @@ def initialize(database):
         BEGIN SELECT RAISE(ABORT, 'wallet ledger is append-only'); END;
         CREATE TRIGGER IF NOT EXISTS studio_ledger_immutable_delete BEFORE DELETE ON studio_wallet_ledger
         BEGIN SELECT RAISE(ABORT, 'wallet ledger is append-only'); END;
+        CREATE TRIGGER IF NOT EXISTS wallet_self_booking_rewards
+          BEFORE INSERT ON studio_wallet_ledger
+          WHEN NEW.kind='visit_reward' AND NOT EXISTS (
+            SELECT 1 FROM studio_reservations r WHERE r.id=NEW.reservation_id
+              AND r.owner_id=NEW.owner_id AND r.creation_source IN ('customer_self','legacy_customer'))
+          BEGIN SELECT RAISE(ABORT, 'visit reward requires a self booking'); END;
         """)
         columns={row[1] for row in db.execute('PRAGMA table_info(studio_wallet_ledger)')}
         if 'redemption_use' not in columns:

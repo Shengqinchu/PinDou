@@ -69,9 +69,18 @@ def initialize(database):
         if 'creation_source' not in columns:
             # Before this migration the only creation route was customer submit.
             # Mark those rows once; future unspecified writers fail closed.
-            db.execute("ALTER TABLE studio_reservations ADD COLUMN creation_source TEXT NOT NULL DEFAULT 'unknown' CHECK(creation_source IN ('unknown','legacy_customer','customer_self','admin_booking','admin_backfill'))")
-            db.execute("ALTER TABLE studio_reservations ADD COLUMN created_by TEXT NOT NULL DEFAULT ''")
-            db.execute("UPDATE studio_reservations SET creation_source='legacy_customer',created_by='legacy:customer'")
+            # SQLite DDL otherwise commits independently before the first DML;
+            # interruption between these columns must leave the old schema intact.
+            db.execute('SAVEPOINT reservation_origin_upgrade')
+            try:
+                db.execute("ALTER TABLE studio_reservations ADD COLUMN creation_source TEXT NOT NULL DEFAULT 'unknown' CHECK(creation_source IN ('unknown','legacy_customer','customer_self','admin_booking','admin_backfill'))")
+                db.execute("ALTER TABLE studio_reservations ADD COLUMN created_by TEXT NOT NULL DEFAULT ''")
+                db.execute("UPDATE studio_reservations SET creation_source='legacy_customer',created_by='legacy:customer'")
+            except Exception:
+                db.execute('ROLLBACK TO reservation_origin_upgrade')
+                db.execute('RELEASE reservation_origin_upgrade')
+                raise
+            db.execute('RELEASE reservation_origin_upgrade')
         db.executescript("""
         CREATE TRIGGER IF NOT EXISTS reservation_origin_immutable
           BEFORE UPDATE OF creation_source,created_by ON studio_reservations

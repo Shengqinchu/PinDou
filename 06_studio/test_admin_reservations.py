@@ -4,6 +4,7 @@ import base64
 import sqlite3
 import uuid
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from datetime import datetime
 
 import pytest
@@ -275,6 +276,7 @@ def test_legacy_migration_is_once_only_and_unknown_writers_fail_closed(client, m
     with studio.database() as db:
         # Reconstruct the schema immediately before this feature migration.
         db.execute('DROP TRIGGER reservation_origin_immutable')
+        db.execute('DROP TRIGGER IF EXISTS wallet_self_booking_rewards')
         db.execute('ALTER TABLE studio_reservations DROP COLUMN creation_source')
         db.execute('ALTER TABLE studio_reservations DROP COLUMN created_by')
     reservations.initialize(studio.database)
@@ -293,3 +295,55 @@ def test_legacy_migration_is_once_only_and_unknown_writers_fail_closed(client, m
           (json.dumps(body('2026-09-06')),str(uuid.uuid4())))
         wallet.reward_visit(db,db.execute("SELECT * FROM studio_reservations WHERE id='UNKNOWN'").fetchone(),'test')
     assert entries('UNKNOWN') == (0, 0)
+
+
+def test_schema_migration_is_atomic_when_interrupted_between_columns(client):
+    prepare(client)
+    row = submit(client).json()
+    with studio.database() as db:
+        db.execute('DROP TRIGGER reservation_origin_immutable')
+        db.execute('DROP TRIGGER IF EXISTS wallet_self_booking_rewards')
+        db.execute('ALTER TABLE studio_reservations DROP COLUMN creation_source')
+        db.execute('ALTER TABLE studio_reservations DROP COLUMN created_by')
+
+    class InterruptedConnection:
+        def __init__(self, db): self.db = db
+        def executescript(self, sql): return self.db.executescript(sql)
+        def execute(self, sql, *args):
+            if 'ADD COLUMN created_by' in sql:
+                raise RuntimeError('Interrupted schema upgrade')
+            return self.db.execute(sql, *args)
+
+    @contextmanager
+    def interrupted_database():
+        with studio.database() as db:
+            yield InterruptedConnection(db)
+
+    with pytest.raises(RuntimeError, match='Interrupted schema upgrade'):
+        reservations.initialize(interrupted_database)
+    with studio.database() as db:
+        columns = {r[1] for r in db.execute('PRAGMA table_info(studio_reservations)')}
+        assert not {'creation_source', 'created_by'} & columns
+    reservations.initialize(studio.database)
+    with studio.database() as db:
+        original = db.execute('SELECT * FROM studio_reservations WHERE id=?', (row['id'],)).fetchone()
+        assert original['creation_source'] == 'legacy_customer'
+        assert json.loads(original['payload'])['booking'] == row['booking']
+
+
+def test_legacy_reward_writer_cannot_mint_admin_points(client):
+    prepare(client)
+    row = create(client, payload('backfill')).json()
+    with studio.database() as db:
+        before = dict(db.execute("SELECT * FROM studio_members WHERE owner_id='qa-owner'").fetchone())
+    # Simulate a rollback writer that calls the ledger without the new Python guard.
+    with pytest.raises(sqlite3.IntegrityError, match='visit reward requires a self booking'):
+        with studio.database() as db:
+            db.execute('BEGIN IMMEDIATE')
+            wallet.append(db, 'qa-owner', kind='visit_reward', minutes=0, points=166,
+                          note='', actor='old-release', key='visit-reward:'+row['id'],
+                          digest=wallet.fingerprint({'visit':row['id'],'points':166}),
+                          effective_date=row['booking']['date'], reservation_id=row['id'])
+    with studio.database() as db:
+        assert dict(db.execute("SELECT * FROM studio_members WHERE owner_id='qa-owner'").fetchone()) == before
+    assert entries(row['id']) == (0, 1)
