@@ -8,7 +8,7 @@ import StudioGlyph from '../../components/StudioGlyph.vue';
 import StudioLegalLinks from '../../components/StudioLegalLinks.vue';
 import { useStudioNative } from '../../utils/studio-native';
 import { miniSession, studioCall, miniappPrefix, MiniappError, type SharedSession } from '../../utils/miniapp-client';
-import { useUserStore } from '../../store/user';
+import { useUserStore } from '../../store/studio-user';
 import { studioWords } from '../../utils/studio-content';
 import {askWechatNotifications,loadNotifications,saveNotifications} from '../../utils/customer-notifications';
 const user = useUserStore();

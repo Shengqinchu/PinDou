@@ -3,7 +3,7 @@ import {computed,ref} from 'vue';
 import {onLoad} from '@dcloudio/uni-app';
 import StudioShell from '../../components/StudioShell.vue';
 import StudioGlyph from '../../components/StudioGlyph.vue';
-import copy from '../../../../05_studio/src/content/miniapp-legal.json';
+import copy from '../../../../05_studio/src/content/studio-miniapp-legal.json';
 import {useStudioNative} from '../../utils/studio-native';
 import {studioProfile} from '../../utils/studio-content';
 const {language,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();

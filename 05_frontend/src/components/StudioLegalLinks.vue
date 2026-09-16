@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import copy from '../../../05_studio/src/content/miniapp-legal.json';
+import copy from '../../../05_studio/src/content/studio-miniapp-legal.json';
 defineProps<{language:string}>();
 function open(type:'privacy'|'agreement'){uni.navigateTo({url:'/pages/consent/consent?type='+type});}
 </script>

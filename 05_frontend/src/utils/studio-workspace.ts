@@ -1,6 +1,6 @@
 import {ref,shallowRef,watch,onBeforeUnmount} from 'vue';
 import {onLoad,onShow,onHide} from '@dcloudio/uni-app';
-import {useUserStore} from '../store/user';
+import {useUserStore} from '../store/studio-user';
 import {useStudioNative,provideStudioNative} from './studio-native';
 import {registerWorkspace,takeWorkspace,workspaceCommand,workspaceRoutes,workspaceUrl,type WorkspaceCommand,type WorkspaceKind} from './studio-workspace-router';
 export function useWorkspace(kind:WorkspaceKind){

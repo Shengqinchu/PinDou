@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount,ref,watch } from 'vue';
-import { useUserStore } from '../store/user';
+import { useUserStore } from '../store/studio-user';
 import { MiniappError,studioRead,studioCall } from '../utils/miniapp-client';
 import { studioWords,bookingError,studioProfile,fillWords } from '../utils/studio-content';
 import {invalidateStudioSnapshots,rememberStudioSnapshot} from '../utils/studio-cache';

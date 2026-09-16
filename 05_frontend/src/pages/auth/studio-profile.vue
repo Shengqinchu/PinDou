@@ -3,7 +3,7 @@ import {computed,reactive,ref,watch} from 'vue';
 import {onLoad,onShow,onUnload} from '@dcloudio/uni-app';
 import StudioShell from '../../components/StudioShell.vue';
 import StudioGlyph from '../../components/StudioGlyph.vue';
-import {useUserStore} from '../../store/user';
+import {useUserStore} from '../../store/studio-user';
 import {useStudioNative} from '../../utils/studio-native';
 import {studioRead,studioCall,MiniappError} from '../../utils/miniapp-client';
 import {studioWords,bookingError} from '../../utils/studio-content';

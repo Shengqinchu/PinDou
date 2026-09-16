@@ -7,7 +7,7 @@ import StudioCancel from '../../components/StudioCancel.vue';
 import StudioWechatOutcome from '../../components/StudioWechatOutcome.vue';
 import {bookingWechatChoices} from '../../utils/customer-notifications';
 import notices from '../../../../05_studio/src/content/customer-notifications.json';
-import {useUserStore} from '../../store/user';
+import {useUserStore} from '../../store/studio-user';
 import {useStudioNative} from '../../utils/studio-native';
 import {MiniappError} from '../../utils/miniapp-client';
 import {peekStudioSnapshot,readStudioCached} from '../../utils/studio-cache';

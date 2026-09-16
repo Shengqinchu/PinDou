@@ -13,7 +13,7 @@ import { useStudioNative } from '../../utils/studio-native';
 import { MiniappError } from '../../utils/miniapp-client';
 import {navigateStudio} from '../../utils/studio-navigation';
 import {peekStudioSnapshot,readStudioCached} from '../../utils/studio-cache';
-import { useUserStore } from '../../store/user';
+import { useUserStore } from '../../store/studio-user';
 import profileCopy from '../../../../05_studio/src/content/profile.json';
 import ownerCopy from '../../../../05_studio/src/content/owner-wechat.json';
 import workbenchCopy from '../../../../05_studio/src/content/workbench.json';
@@ -57,7 +57,6 @@ async function refresh(force=false) {
   await Promise.allSettled([core,owner]);
 }
 function logout() { ++sequence; user.logout(); profile.value = undefined; wallet.value = undefined; uni.reLaunch({url:'/pages/auth/studio-login'}); }
-function patterns() { uni.navigateTo({url:'/pages/upload/upload'}); }
 function visit() { uni.navigateTo({url:'/pages/studio/visit'}); }
 function reservations() { navigateStudio('/pages/studio/reservations'); }
 function edit() { uni.navigateTo({url:'/pages/auth/studio-profile'}); }
@@ -93,7 +92,7 @@ onUnload(() => { ++sequence; });
           <text v-else class="studio-native-body">{{say(bookingCopy.empty)}}</text>
         </view>
       </view>
-      <view class="studio-native-menu"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(visitCopy.come_make_something_f834ec)}}</text><StudioGlyph name="arrow" :size="18"/></button><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="patterns"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(accountCopy.pattern_tool)}}</text><StudioGlyph name="arrow" :size="18"/></button></view>
+      <view class="studio-native-menu"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(visitCopy.come_make_something_f834ec)}}</text><StudioGlyph name="arrow" :size="18"/></button></view>
       <button v-if="isOwner" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="ownerAlerts"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(ownerCopy.page_title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
 
       <button class="studio-native-menu-row" @tap="notices"><StudioGlyph name="info"/><text class="studio-native-menu-label">{{say(noticeCopy.title)}}</text><StudioGlyph name="arrow" :size="18"/></button>

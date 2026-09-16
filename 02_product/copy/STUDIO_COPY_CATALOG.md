@@ -1902,7 +1902,7 @@
 | home | 回到小程序首页 | Mini program home |
 | retry | 重新尝试 | Try again |
 | native_title | 欢迎来到小狗拼豆铺 | Welcome to PinDou Puppy |
-| native_intro | 已有网站账号，登录后可继续使用原有图纸、积分和时长。 | Use your website account to keep your patterns, points and studio time together. |
+| native_intro | 已有网站账号，登录后可查看预约、积分和时长。 | Sign in with your website account to view bookings, points and studio time. |
 | email | 邮箱地址 | Email address |
 | password | 密码 | Password |
 | password_login | 登录并绑定当前微信 | Sign in and connect this WeChat |
@@ -2735,6 +2735,43 @@
 | please_check_the_date_time_and_contact_baa037 | 请检查日期、时间和联系信息，再试一次。 | Please check the date, time and contact details, then try again. |
 | please_sign_in_with_an_administrator_account_801902 | 登录已过期或账号无管理权限，请重新登录。 | Please sign in with an administrator account. |
 | we_could_not_complete_that_request_please_967586 | 暂时未能提交，请重试或通过微信联系店主。 | We could not complete that request. Please try again or contact us on WeChat. |
+
+## studio-miniapp-legal.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| privacy_title | 隐私政策说明 | Privacy notice |
+| agreement_title | 用户服务协议 | Service terms |
+| updated | 更新日期：2026 年 9 月 16 日 | Updated: September 16, 2026 |
+| privacy_intro | 本说明适用于小狗拼豆铺（PinDou Puppy）小程序的店铺信息、账号、预约及店主工作台服务。我们按你使用的功能处理相应信息。你可以先浏览首页和店铺信息，再决定是否登录、预约或设置头像。 | This notice covers studio information, accounts, bookings and the host workspace in the PinDou Puppy mini program. We process information for the features you choose. You can browse the home page and studio information before deciding to sign in, book or set an avatar. |
+| identity_title | 账号与个人资料 | Account and profile |
+| identity_body | 微信登录使用微信提供的登录凭证与身份标识，用于验证登录、关联账号和完成网站扫码授权。邮箱登录使用你填写的邮箱和密码。昵称、头像和选填的微信号由你主动填写或选择。店主可查看当前账号的顾客编号、昵称、头像、预约称呼及你提供的联系方式，用于核对预约和沟通；不会按同名或同一联系方式自动合并账号。打开首页不会自动取得微信手机号、微信号、昵称或头像。 | WeChat login uses credentials and identifiers supplied by WeChat to authenticate you, link your account and approve website sign-in. Email login uses the email address and password you enter. You choose your nickname and avatar and may provide a WeChat ID. The host can see your customer reference, nickname, avatar, booking name and provided contact details to match bookings and communicate. Accounts are not automatically merged by matching names or contact details. Opening the home page does not automatically give us your WeChat phone number, WeChat ID, nickname or avatar. |
+| booking_title | 预约与联系资料 | Bookings and contact details |
+| booking_body | 预约使用你选择的体验、人数、日期和时间，以及填写的称呼、联系方式和备注，供店主查看和确认安排。首次预约填写的称呼及联系方式会保存到当前账号，供再次预约复用，也可在个人资料中修改。你在注册或预约中留下的邮箱、手机会用于预约状态、到店提醒及相关沟通，可在“预约提醒”中关闭；微信提醒由你单独允许。必要的预约通知及沟通记录用于店主核对安排。 | Bookings use your chosen experience, party size, date and time, together with your name, contact details and notes, so the host can review and confirm arrangements. The name and contact details from your first booking are saved to your account for future bookings and can be edited in your profile. Email and phone details you provide at registration or booking are used for booking updates, visit reminders and related communication. You can disable these in notification settings; WeChat notices require separate approval. Necessary booking-notification and communication records help the host reconcile arrangements. |
+| images_title | 头像与店铺图片 | Avatars and studio images |
+| images_body | 设置头像时，我们处理你主动选择或拍摄的图片，用于展示个人资料和帮助店主核对顾客。请只使用你有权使用的图片。店铺指引和拼豆流程图片用于说明线下体验，可点击查看。设置头像不是浏览店铺信息或提交预约的前提。 | When you set an avatar, we process the image you choose or photograph to display your profile and help the host identify you. Only use images you are entitled to use. Studio directions and beadmaking photographs describe the in-person experience and can be opened for viewing. Setting an avatar is not required to browse studio information or submit a booking. |
+| permissions_title | 设备权限与本地存储 | Permissions and local storage |
+| permissions_body | 相册、相机和头像选择权限按你设置头像时的操作申请，你可以拒绝或在微信设置中管理权限。本机保存登录状态、语言及预约草稿，便于继续操作；账号和预约的短时数据缓存按当前登录隔离。复制店铺信息和拨打店主电话由你主动触发，不用于读取通讯录或获取定位。 | Photo library, camera and avatar-selection permissions are requested when you choose how to set an avatar. You may decline or manage them in WeChat settings. Login state, language and booking drafts are stored locally so you can continue later. Temporary account and booking caches are isolated by login. Copying studio information and calling the host are actions you initiate; they do not read your contacts or location. |
+| providers_title | 服务支持与信息传输 | Service providers and transfers |
+| providers_body | 微信提供小程序运行和身份验证，服务器及网络服务支持账号、预约、头像和店主工作台。相关基础设施可能位于中国境外。服务器记录必要的请求时间、接口状态等运行信息，用于维护安全和排查故障。微信平台登记的个人信息处理事项可通过下方入口查看。 | WeChat provides the runtime and authentication. Server and network services support accounts, bookings, avatars and the host workspace. Supporting infrastructure may be outside China. Servers record necessary operational information such as request times and response status for security and troubleshooting. You can view the disclosures registered with WeChat using the button below. |
+| storage_title | 保存与删除 | Retention and deletion |
+| storage_body | 账号、预约及相关账务记录用于提供服务、处理安排和核对历史记录。你选择的头像保存在账号服务中，可以在个人资料中更换。退出登录不会删除服务器资料。如需删除账号、预约资料或查询保存情况，请联系店主。处理前需要验证账号归属，并说明哪些记录仍因必要的服务或法律要求需要保留。 | Account, booking and related ledger records support service delivery, arrangements and historical reconciliation. Your selected avatar is stored in the account service and can be replaced in your profile. Signing out does not delete server-side information. Contact the host to request account or booking-data deletion or ask about retention. We need to verify ownership and explain any records that must remain for necessary service or legal requirements. |
+| choices_title | 你的选择 | Your choices |
+| choices_body | 你可以查看和修改个人资料、管理预约和提醒偏好，或停止使用需要相关信息的功能。如需查询、更正、删除信息或撤回后续处理的同意，请联系店主。阅读本说明不会替你同意授权；微信权限选择和头像设置由你主动操作。 | You can view and edit your profile, manage bookings and notification preferences, or stop using features that need the information. Contact the host to request access, correction, deletion or withdrawal of consent for future processing. Reading this notice does not grant consent. WeChat permission choices and avatar selection are actions you initiate. |
+| terms_intro | 小狗拼豆铺小程序提供店铺信息、到店体验预约、账号及提醒管理，店主可通过工作台处理预约、顾客和经营记录。请根据实际需要使用相应功能。 | The PinDou Puppy mini program provides studio information, visit bookings, accounts and notification settings. The host workspace manages bookings, customers and business records. Use the features you need. |
+| service_title | 到店预约 | Studio bookings |
+| service_body | 提交预约表示向店主提出到访申请，需要店主确认后才安排完成。请核对人数、体验、联系方式及汉密尔顿当地日期和时间。实际接待以店主确认的安排为准。展示价格用于了解体验，预约提交本身不会收取线上费用。 | Submitting a booking sends a visit request to the host; the arrangement is complete after confirmation. Check the party size, experience, contact details and Hamilton local date and time. The confirmed arrangement governs your visit. Displayed prices describe the experience; submitting a booking does not charge an online payment. |
+| cancellation_title | 更改与取消 | Changes and cancellations |
+| cancellation_body | 可取消的预约可在“我的预约”或预约详情中自行取消，每账号每自然月最多自行取消 3 次，按汉密尔顿当地时间计算。操作前会显示当前剩余次数。达到上限或需要其他调整时，请联系店主。 | Eligible bookings can be cancelled in My bookings or the booking details. Each account can make up to three self-service cancellations per calendar month, measured in Hamilton local time. The remaining allowance is shown before cancellation. Contact the host after reaching the limit or for other changes. |
+| materials_title | 头像与手作参考图片 | Avatars and craft reference images |
+| materials_body | 请仅使用你有权使用的头像，并取得涉及的他人肖像或作品授权。店铺图片用于说明位置、工具和线下手作流程，实际作品的细节、色彩和材料可能有所差异，制作前可与店主核对。 | Only use an avatar you are entitled to use, including permission for other people’s likenesses or work. Studio images explain the location, tools and in-person craft process. Actual pieces may differ in detail, colour or materials; you can check with the host before making them. |
+| security_title | 账号与服务使用 | Accounts and service use |
+| security_body | 请妥善保管登录凭据，并提供便于店主联系的资料。账号异常或提交失败时，可联系店主协助处理。网络、系统维护或第三方故障可能暂时影响服务。不要反复创建同一预约来判断是否提交成功，可先查看“我的预约”。 | Keep your login credentials secure and provide contact details the host can use. Contact the host about account problems or unsuccessful submissions. Network, maintenance or third-party problems may temporarily affect availability. Check My bookings before creating the same booking again to determine whether it was received. |
+| support_title | 联系店主 | Contact the host |
+| support_body | 关于预约、账号、作品或个人信息的问题，可通过以下方式联系店主。涉及账号资料的操作需要核实归属。 | Contact the host below about bookings, accounts, works or personal information. Requests involving account information require ownership verification. |
+| wechat_contract | 查看微信隐私保护指引 | View WeChat privacy disclosures |
+| contract_unavailable | 暂时无法打开微信隐私保护指引，请稍后重试或联系店主。 | The WeChat privacy disclosures could not be opened. Please try again later or contact the host. |
+| back | 返回 | Back |
 
 ## studio-profile.json
 

@@ -5,7 +5,7 @@ import {onViewShow as onShow,onViewHide as onHide,onViewUnload as onUnload} from
 import StudioShell from '../../components/StudioShell.vue';
 import StudioGlyph from '../../components/StudioGlyph.vue';
 import StudioCancel from '../../components/StudioCancel.vue';
-import {useUserStore} from '../../store/user';
+import {useUserStore} from '../../store/studio-user';
 import {useStudioNative} from '../../utils/studio-native';
 import {MiniappError} from '../../utils/miniapp-client';
 import {peekStudioSnapshot,readStudioCached} from '../../utils/studio-cache';

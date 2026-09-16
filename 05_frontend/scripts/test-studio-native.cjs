@@ -6,7 +6,7 @@ for(const modern of [true,false]){
  const vue={ref:value=>({value}),computed:fn=>({get value(){return fn();}}),inject:()=>inherited,provide:(_key,value)=>{inherited=value},watch:()=>{},onUnmounted:fn=>hooks.unmount.push(fn)};
  const uni={getStorageSync:()=>language,setStorageSync:(_key,value)=>language=value,getSystemInfoSync:()=>{calls.system++;return {...info}},setNavigationBarTitle:()=>calls.title++,onKeyboardHeightChange:fn=>{calls.listen++;keyboard=fn},offKeyboardHeightChange:()=>calls.unlisten++};
  if(modern)uni.getWindowInfo=()=>{calls.window++;return {...info}};
- const modules={'vue':vue,'@dcloudio/uni-app':{onShow:fn=>hooks.show.push(fn),onHide:fn=>hooks.hide.push(fn),onResize:fn=>hooks.resize.push(fn)},'../../../05_studio/src/content/miniapp.json':{brand:['店铺','Studio']},'../store/user':{useUserStore:()=>({token:'fixture'})},'./studio-cache':{setStudioCacheOwner:()=>{}},'./studio-navigation':{studioPageShown:()=>{}}};
+ const modules={'vue':vue,'@dcloudio/uni-app':{onShow:fn=>hooks.show.push(fn),onHide:fn=>hooks.hide.push(fn),onResize:fn=>hooks.resize.push(fn)},'../../../05_studio/src/content/miniapp.json':{brand:['店铺','Studio']},'../store/studio-user':{useUserStore:()=>({token:'fixture'})},'./studio-cache':{setStudioCacheOwner:()=>{}},'./studio-navigation':{studioPageShown:()=>{}}};
  const ex={};vm.runInNewContext(code,{exports:ex,require:id=>modules[id],uni,getCurrentPages:()=>[{route:'pages/studio/home'}],setTimeout,clearTimeout});
  const root=ex.useStudioNative();hooks.show.forEach(f=>f());ex.provideStudioNative(root);
  for(let i=0;i<7;i++)assert.equal(ex.useStudioNative(),root,'All retained views use one native window context');

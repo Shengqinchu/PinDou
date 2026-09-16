@@ -1,7 +1,7 @@
 import {computed,inject,onUnmounted,provide,ref,watch,type Ref,type ComputedRef,type InjectionKey} from 'vue';
 import {onResize,onShow,onHide} from '@dcloudio/uni-app';
 import miniappCopy from '../../../05_studio/src/content/miniapp.json';
-import {useUserStore} from '../store/user';
+import {useUserStore} from '../store/studio-user';
 import {setStudioCacheOwner} from './studio-cache';
 import {studioPageShown} from './studio-navigation';
 export type NativeLanguage='zh'|'en';

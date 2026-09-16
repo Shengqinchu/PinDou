@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { onLoad, onUnload } from '@dcloudio/uni-app';
 import copy from '../../../../05_studio/src/content/miniapp.json';
 import profileCopy from '../../../../05_studio/src/content/profile.json';
-import {useUserStore} from '../../store/user';
+import {useUserStore} from '../../store/studio-user';
 import StudioShell from '../../components/StudioShell.vue';
 import StudioBrand from '../../components/StudioBrand.vue';
 import StudioGlyph from '../../components/StudioGlyph.vue';

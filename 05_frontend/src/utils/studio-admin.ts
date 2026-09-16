@@ -1,5 +1,5 @@
 import {miniSession,studioCall,MiniappError} from './miniapp-client';
-import {useUserStore} from '../store/user';
+import {useUserStore} from '../store/studio-user';
 import workbench from '../../../05_studio/src/content/workbench.json';
 import business from '../../../05_studio/src/content/business.json';
 import wallet from '../../../05_studio/src/content/wallet.json';

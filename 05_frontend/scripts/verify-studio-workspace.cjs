@@ -1,7 +1,7 @@
 // Disposable browser fixture only. No request is sent to a production API.
 const {createRequire}=require('node:module'),fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {chromium,webkit,expect}=createRequire(path.resolve(__dirname,'../../05_studio/package.json'))('@playwright/test');
-const root=path.resolve(__dirname,'../..'),out=path.join(root,'artifacts/miniapp-smooth-20260915');fs.mkdirSync(out,{recursive:true});
+const root=path.resolve(__dirname,'../..'),out=path.resolve(process.env.STUDIO_TEST_OUT||path.join(root,'artifacts/miniapp-smooth-20260915'));fs.mkdirSync(out,{recursive:true});
 const build=path.resolve(process.env.STUDIO_QA_BUILD||path.join(root,'05_frontend/dist/build/h5'));
 const server=http.createServer((req,res)=>{const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);const file=path.resolve(build,pathname.replace(/^\/h5\/?/,'')||'index.html');if(!file.startsWith(build+path.sep)&&file!==path.join(build,'index.html')){res.writeHead(403).end();return;}try{res.setHeader('Content-Type',({'.js':'application/javascript','.css':'text/css','.html':'text/html','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg'}[path.extname(file)]||'application/octet-stream'));res.end(fs.readFileSync(file));}catch{res.writeHead(404).end();}});
 const checks=[];

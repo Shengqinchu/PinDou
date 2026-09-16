@@ -1,4 +1,4 @@
-import {useUserStore} from '../store/user';
+import {useUserStore} from '../store/studio-user';
 import {invalidateStudioSnapshots} from './studio-cache';
 export type SharedProfile={user_id:string;nickname:string;avatar:string;email?:string;[key:string]:any};
 export class ProfileError extends Error{constructor(public code:string,public status=0){super(code);}}

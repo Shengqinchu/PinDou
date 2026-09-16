@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed,nextTick,ref,watch} from 'vue';
 import {onLoad,onShow,onHide,onUnload} from '@dcloudio/uni-app';
-import {useUserStore} from '../../store/user';
+import {useUserStore} from '../../store/studio-user';
 import {useStudioNative} from '../../utils/studio-native';
 import {studioCall} from '../../utils/miniapp-client';
 import {adminCall} from '../../utils/studio-admin';

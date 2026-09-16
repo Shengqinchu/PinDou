@@ -1,4 +1,4 @@
-import {useUserStore} from '../store/user';
+import {useUserStore} from '../store/studio-user';
 
 type Snapshot={state:any;loadedAt:number;revision:number};
 const views=new Map<string,Snapshot>(),revisions=new Map<string,number>();

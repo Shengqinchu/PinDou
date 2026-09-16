@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {onMounted,ref,watch} from 'vue';
-import {useUserStore} from '../store/user';
+import {useUserStore} from '../store/studio-user';
 import {notificationDraft as draft,notificationsReady,loadNotifications,saveNotifications,warmWechat,subscribeWechat,wechatPermissionReady,wechatSubscribing,wechatChoices} from '../utils/customer-notifications';
 import StudioWechatOutcome from './StudioWechatOutcome.vue';
 import copy from '../../../05_studio/src/content/customer-notifications.json';

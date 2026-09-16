@@ -5,7 +5,7 @@ import StudioGlyph from '../../components/StudioGlyph.vue';
 import StudioCalendar from '../../components/StudioCalendar.vue';
 import StudioSubmitConfirm from '../../components/StudioSubmitConfirm.vue';
 import StudioNotificationChoices from '../../components/StudioNotificationChoices.vue';
-import { useUserStore } from '../../store/user';
+import { useUserStore } from '../../store/studio-user';
 import { useStudioNative } from '../../utils/studio-native';
 import { useStudioVisit } from '../../utils/use-studio-visit';
 import { studioWords,studioRate,bookingError,fillWords } from '../../utils/studio-content';

@@ -1,7 +1,7 @@
 import { computed, reactive, ref, shallowRef,watch } from 'vue';
 import { onShow, onHide, onUnload } from '@dcloudio/uni-app';
 import {saveNotifications,subscribeWechat,warmWechat,wechatPermissionReady,resetWechatChoices,skipWechatChoices,saveBookingWechatChoices} from './customer-notifications';
-import { useUserStore } from '../store/user';
+import { useUserStore } from '../store/studio-user';
 import { MiniappError, studioCall } from './miniapp-client';
 import {peekStudioSnapshot,readStudioCached,invalidateStudioSnapshots,rememberStudioSnapshot} from './studio-cache';
 import { refreshStudioContent } from './studio-content';

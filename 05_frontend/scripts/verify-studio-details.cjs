@@ -1,7 +1,7 @@
 // Uses published public text/photos with isolated customer API fixtures. No business writes.
 const {createRequire}=require('node:module'),fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {chromium,webkit,expect}=createRequire(path.resolve(__dirname,'../../05_studio/package.json'))('@playwright/test');
-const root=path.resolve(__dirname,'../..'),build=path.join(root,'05_frontend/dist/build/h5'),out=path.join(root,'artifacts/miniapp-details-20260915');fs.mkdirSync(out,{recursive:true});
+const root=path.resolve(__dirname,'../..'),build=path.join(root,'05_frontend/dist/build/h5'),out=path.resolve(process.env.STUDIO_TEST_OUT||path.join(root,'artifacts/miniapp-details-20260915'));fs.mkdirSync(out,{recursive:true});
 const json=file=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));
 const published=json('artifacts/miniapp-details-20260915/published-details.json').modules;
 const defaults=json('05_studio/src/content/pages-Details.json'),processDefaults=json('05_studio/src/content/components-BeadingProcess.json'),media=json('05_studio/src/media-assets.json');
@@ -60,7 +60,7 @@ async function run(browser,engine,lang,width,height){
   const logo=await page.locator('.studio-native-top').boundingBox();assert(logo&&logo.y>=0,'Detail navigation keeps the shared header in view');
   await page.screenshot({path:path.join(out,`details-process-${engine}-${lang}-${width}.png`)});
   await page.goto(base+'#/pages/auth/studio-account');await page.locator('.studio-native-name').filter({hasText:'Fixture Customer'}).waitFor();await page.waitForTimeout(220);
-  const account=await page.locator('.studio-account').innerText();assert(!account.includes('PD-HIDDEN'));assert(!/完善顾客资料|Complete your customer profile|我的消息|My messages/.test(account));
+  const account=await page.locator('.studio-account').innerText();assert(!account.includes('PD-HIDDEN'));assert(!/完善顾客资料|Complete your customer profile|我的消息|My messages|拼豆图纸生成器|Pattern generator/.test(account));
   await expect(page.locator('.studio-profile-edit')).toBeVisible();await expect(page.locator('.studio-native-balance-value').filter({hasText:'166'})).toBeVisible();
   await page.screenshot({path:path.join(out,`account-clean-${engine}-${lang}-${width}.png`)});
   await page.goto(base+'#/pages/studio/messages');await page.locator('.studio-account').waitFor();assert.equal(calls.filter(c=>c.path==='/studio-api/auth/messages').length,0,'Retired customer chat must not fetch or poll');

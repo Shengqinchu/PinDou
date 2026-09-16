@@ -17,7 +17,7 @@
  "home":["回到小程序首页","Mini program home"],
  "retry":["重新尝试","Try again"],
  "native_title":["欢迎来到小狗拼豆铺","Welcome to PinDou Puppy"],
- "native_intro":["已有网站账号，登录后可继续使用原有图纸、积分和时长。","Use your website account to keep your patterns, points and studio time together."],
+ "native_intro":["已有网站账号，登录后可查看预约、积分和时长。","Sign in with your website account to view bookings, points and studio time."],
  "email":["邮箱地址","Email address"],
  "password":["密码","Password"],
  "password_login":["登录并绑定当前微信","Sign in and connect this WeChat"],
