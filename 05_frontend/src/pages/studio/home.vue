@@ -14,9 +14,3 @@ const activeTab=computed(()=>tab.value as 'home'|'bookings'|'account');
   <StudioWorkspacePane v-if="visited.bookings" :key="scope+':bookings'" :active="visible&&tab==='bookings'" :query="query"><CustomerBookings/></StudioWorkspacePane>
   <StudioWorkspacePane v-if="visited.account" :key="scope+':account'" :active="visible&&tab==='account'" :query="query"><CustomerAccount/></StudioWorkspacePane>
 </StudioShell></template>
-<style>
-/* #ifdef H5 */
-/* The app body already excludes the browser-rendered navigation bar. */
-uni-page-body:has(.studio-native-workspace-content){min-height:0}
-/* #endif */
-</style>

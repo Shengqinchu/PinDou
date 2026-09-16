@@ -11,7 +11,6 @@ import { miniSession, studioCall, miniappPrefix, MiniappError, type SharedSessio
 import { useUserStore } from '../../store/user';
 import { studioWords } from '../../utils/studio-content';
 import {askWechatNotifications,loadNotifications,saveNotifications} from '../../utils/customer-notifications';
-import {needsProfileSetup} from '../../../../05_studio/src/identity-model';
 const user = useUserStore();
 const { language, keyboardOpen, shellStyle, say, t, changeLanguage, website } = useStudioNative();
 type Method = 'register' | 'password' | 'wechat';
@@ -55,12 +54,6 @@ async function complete(result: SharedSession,requestWechat=false) {
   try{await loadNotifications(result.token);await saveNotifications(result.token);}catch{}
   if(requestWechat)await askWechatNotifications(result.token,language.value);
   if(!alive||user.token!==result.token)return;
-  if(requestWechat){
-    try{const booking=await studioCall<{complete:boolean}>('/auth/booking-profile',{},'',result.token,'GET');
-      if(!alive||user.token!==result.token)return;
-      if(needsProfileSetup(result.user,booking)){uni.redirectTo({url:'/pages/auth/studio-profile?onboard=1'});return;}
-    }catch{if(alive&&user.token===result.token)uni.redirectTo({url:'/pages/auth/studio-profile?onboard=1'});return;}
-  }
   const previous = getCurrentPages().slice(-2)[0]?.route || '';
   if (getCurrentPages().length > 1 && !/pages\/(auth|index|user)\//.test(previous)) uni.navigateBack({ delta: 1 });
   else uni.redirectTo({ url: '/pages/studio/home' });

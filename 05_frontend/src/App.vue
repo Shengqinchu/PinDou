@@ -98,6 +98,8 @@ view, scroll-view, text, image, button, input, textarea {
 }
 
 /* #ifdef H5 */
+/* Fitted Studio views already subtract the H5 navigation bar from their height. */
+uni-page-body:has(.studio-native--fitted) { min-height: 0; }
 *,
 *::before,
 *::after {

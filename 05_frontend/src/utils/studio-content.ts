@@ -18,9 +18,12 @@ import rates from '../../../05_studio/src/content/experience-rates.json';
 import studio from '../../../05_studio/src/content/studio-profile.json';
 import profile from '../../../05_studio/src/content/profile.json';
 import notifications from '../../../05_studio/src/content/customer-notifications.json';
+import process from '../../../05_studio/src/content/components-BeadingProcess.json';
+import contacts from '../../../05_studio/src/content/contact-fields.json';
+import media from '../../../05_studio/src/media-assets.json';
 
-const defaults={home,visit,flow,calendar,receipt,cancellation,booking,account,wallet,app,details,errors,generic,miniapp,profile};
-const names:Record<keyof typeof defaults,string>={home:'pages-Home',visit:'pages-Visit',flow:'visit-flow',calendar:'components-ReservationCalendar',receipt:'pages-ReservationReceipt',cancellation:'reservation-cancellation',booking:'booking-profile',account:'account',wallet:'wallet',app:'App',details:'pages-Details',errors:'data-commerce-messages',generic:'commerce',miniapp:'miniapp',profile:'profile'};
+const defaults={home,visit,flow,calendar,receipt,cancellation,booking,account,wallet,app,details,errors,generic,miniapp,profile,process,contacts};
+const names:Record<keyof typeof defaults,string>={home:'pages-Home',visit:'pages-Visit',flow:'visit-flow',calendar:'components-ReservationCalendar',receipt:'pages-ReservationReceipt',cancellation:'reservation-cancellation',booking:'booking-profile',account:'account',wallet:'wallet',app:'App',details:'pages-Details',errors:'data-commerce-messages',generic:'commerce',miniapp:'miniapp',profile:'profile',process:'components-BeadingProcess',contacts:'contact-fields'};
 const published=shallowRef<Record<string,Record<string,unknown>>>({});
 let pending:Promise<void>|undefined,updated=0;
 export function refreshStudioContent(){
@@ -43,6 +46,15 @@ export function studioPhoto(){
   return value?.startsWith('/')&&!value.startsWith('//')?'https://pindoupuppy.com'+value:'/static/studio/hero.webp';
 }
 export const studioProfile=studio;
+export type StudioMedia={src:string;width:number;height:number};
+export function studioMedia(name:keyof typeof media):StudioMedia{
+  const fallback=media[name],override=published.value.media?.[name] as Partial<StudioMedia>|undefined;
+  const source=override?.src;
+  const valid=typeof source==='string'&&((source.startsWith('/')&&!source.startsWith('//'))||source.startsWith('https://pindoupuppy.com/'));
+  const src=valid?source!:fallback.src;
+  const dimension=(value:unknown,original:number)=>typeof value==='number'&&Number.isFinite(value)&&value>0?value:original;
+  return {src:src.startsWith('/')?'https://pindoupuppy.com'+src:src,width:dimension(valid?override?.width:undefined,fallback.width),height:dimension(valid?override?.height:undefined,fallback.height)};
+}
 export function bookingError(code:string):string[]{
   if(code in notifications)return (notifications as Record<string,string[]>)[code];
   if(code==='booking_profile_changed')return booking.changed;

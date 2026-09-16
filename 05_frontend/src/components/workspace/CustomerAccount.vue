@@ -15,11 +15,9 @@ import {navigateStudio} from '../../utils/studio-navigation';
 import {peekStudioSnapshot,readStudioCached} from '../../utils/studio-cache';
 import { useUserStore } from '../../store/user';
 import profileCopy from '../../../../05_studio/src/content/profile.json';
-import {needsProfileSetup} from '../../../../05_studio/src/identity-model';
 import ownerCopy from '../../../../05_studio/src/content/owner-wechat.json';
 import workbenchCopy from '../../../../05_studio/src/content/workbench.json';
 import noticeCopy from '../../../../05_studio/src/content/customer-notifications.json';
-function messages(){uni.navigateTo({url:'/pages/studio/messages'});}
 function notices(){uni.navigateTo({url:'/pages/studio/notifications'});}
 type Profile = {nickname:string;email:string;avatar?:string;is_admin?:boolean;customer_code?:string};
 type Wallet = {account:{minutes:number;points:number};booking_profile:{name:string;contact_method:string;contact:string;complete:boolean}};
@@ -63,7 +61,6 @@ function patterns() { uni.navigateTo({url:'/pages/upload/upload'}); }
 function visit() { uni.navigateTo({url:'/pages/studio/visit'}); }
 function reservations() { navigateStudio('/pages/studio/reservations'); }
 function edit() { uni.navigateTo({url:'/pages/auth/studio-profile'}); }
-function setupProfile(){uni.navigateTo({url:'/pages/auth/studio-profile?onboard=1'});}
 function ownerAlerts(){uni.navigateTo({url:'/pages/studio/owner'});}
 function openWorkbench(){uni.navigateTo({url:'/pages/studio/manage'});}
 watch(()=>user.token,()=>{sequence++;profile.value=undefined;wallet.value=undefined;isOwner.value=false;busy.value=false;failed.value=false;});
@@ -79,7 +76,7 @@ onUnload(() => { ++sequence; });
         <view class="studio-native-profile-text"><text class="studio-native-name">{{name}}</text><text v-if="profile?.email&&profile.email!==name" class="studio-native-body">{{profile.email}}</text><text class="studio-native-label">{{say(profile?.is_admin?workbenchCopy.admin:accountCopy.signed_in)}}</text></view>
         <button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-link studio-profile-edit" @tap="edit">{{say(profileCopy.edit)}}</button>
       </view>
-      <text v-if="profile?.customer_code" class="studio-native-label" selectable>{{say(profileCopy.customer_code)}} · {{profile.customer_code}}</text><view v-if="profile&&wallet&&needsProfileSetup(profile,wallet.booking_profile)" class="studio-native-section"><text class="studio-native-body">{{say(profileCopy.setup_help)}}</text><button class="studio-native-secondary" @tap="setupProfile">{{say(profileCopy.setup_title)}}</button></view><button v-if="profile?.is_admin" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="openWorkbench"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(workbenchCopy.entry)}}</text><StudioGlyph name="arrow" :size="18"/></button>
+      <button v-if="profile?.is_admin" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="openWorkbench"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(workbenchCopy.entry)}}</text><StudioGlyph name="arrow" :size="18"/></button>
       <text v-if="failed" class="studio-native-error" role="alert">{{t('generic_error')}}</text>
       <view v-if="busy&&!wallet" class="studio-native-status"><view class="studio-native-progress"/><text class="studio-native-body">{{say(walletCopy.loading)}}</text></view>
       <view class="studio-native-balances">
@@ -99,7 +96,7 @@ onUnload(() => { ++sequence; });
       <view class="studio-native-menu"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(visitCopy.come_make_something_f834ec)}}</text><StudioGlyph name="arrow" :size="18"/></button><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="patterns"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(accountCopy.pattern_tool)}}</text><StudioGlyph name="arrow" :size="18"/></button></view>
       <button v-if="isOwner" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="ownerAlerts"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(ownerCopy.page_title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
 
-      <button class="studio-native-menu-row" @tap="messages"><StudioGlyph name="wechat"/><text class="studio-native-menu-label">{{say(noticeCopy.messages)}}</text><StudioGlyph name="arrow" :size="18"/></button><button class="studio-native-menu-row" @tap="notices"><StudioGlyph name="info"/><text class="studio-native-menu-label">{{say(noticeCopy.title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
+      <button class="studio-native-menu-row" @tap="notices"><StudioGlyph name="info"/><text class="studio-native-menu-label">{{say(noticeCopy.title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
       <view class="studio-account-end"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-link" hover-class="studio-native-pressed" @tap="logout">{{say(accountCopy.sign_out)}}</button><StudioLegalLinks :language="language"/></view>
     </view>
   </StudioShell>

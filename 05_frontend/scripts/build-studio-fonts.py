@@ -21,7 +21,8 @@ for module, keys in {
     'miniapp-legal': ['privacy_title','agreement_title'],
     'pages-Home': ['a_little_time_all_yours_9e9d60','make_something_lovely_04db64'],
     'visit-flow': ['experience','time','contact','review'],
-    'pages-Details': ['a_little_guide_to_the_studio_1b38da','studio_address_171634','parking_8188de','seats_and_tools_4b0a0a'],
+    'pages-Details': ['a_little_guide_to_the_studio_1b38da','studio_address_171634','parking_8188de','seats_and_tools_4b0a0a','a_place_to_park_fcb8e3','made_comfortable_made_yours_0c8904','a_few_little_notes_7bbea4'],
+    'components-BeadingProcess': ['title','patternTitle','toolsTitle','makingTitle','ironingTitle','finishingTitle'],
     'reservation-cancellation': ['title','contact'],
     'pages-ReservationReceipt': ['the_host_will_confirm_it_ae62ce','your_visit_is_confirmed_94453d','thank_you_for_coming_285672','this_reservation_was_cancelled_54b1d2','see_you_at_the_studio_add3a5','lets_make_again_soon_12f0b9'],
 }.items():
