@@ -10,6 +10,12 @@
 .studio-submit-actions{display:flex;gap:10px;flex-shrink:0}.studio-native .studio-submit-actions>button{flex:1;min-width:0;min-height:46px;padding:10px 12px;font-size:14px}
 .studio-submit-panel .studio-native-definition{gap:8px}.studio-submit-panel>.studio-native-body{font-size:12px;line-height:1.6}
 .studio-cancel-remaining{font-variant-numeric:tabular-nums}
+/* Functional screens give immediate feedback; the home keeps its brand entry. */
+.studio-native-title,.studio-native-section-head>.studio-native-subtitle{animation-duration:.16s}
+.studio-native-balances,.studio-visit-plans,.studio-visit-review,.studio-profile-avatar-row{animation-duration:.16s}
+.studio-native button{transition-duration:.12s}
+.studio-native-heading{animation-duration:.22s}
+.studio-home .studio-native-heading{animation-duration:.55s}
 @keyframes studio-title-enter{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 @keyframes studio-card-enter{from{opacity:.65;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes studio-overlay-enter{from{opacity:0}to{opacity:1}}

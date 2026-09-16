@@ -5,6 +5,9 @@
 .studio-native--fitted .studio-native-language{min-height:40px;padding:6px 10px;font-size:12px}
 .studio-native-scroll{flex:1;height:0;min-height:0;width:calc(100% + var(--studio-gutter)*2);margin-inline:calc(0px - var(--studio-gutter));box-sizing:border-box}
 .studio-native-scroll-inner{padding:10px var(--studio-gutter) 14px;box-sizing:border-box;min-width:0}
+/* Tab panes share one persistent header and dock; only their middle area changes. */
+.studio-native-workspace-content{flex:1;min-height:0;overflow:hidden;width:calc(100% + var(--studio-gutter)*2);margin-inline:calc(0px - var(--studio-gutter))}
+.studio-native--fitted.studio-native--embedded{height:100%;max-height:100%;min-height:0;padding:0 var(--studio-gutter)}
 .studio-native--fitted .studio-native-main{padding:0;gap:14px;min-height:0}
 .studio-native--fitted .studio-native-title{font-size:24px;line-height:1.35}.studio-native--fitted.studio-native--en .studio-native-title{font-size:25px}
 .studio-native--fitted .studio-native-subtitle{font-size:19px;line-height:1.4}.studio-native--fitted .studio-native-body{font-size:13px;line-height:1.65}.studio-native--fitted .studio-native-label{font-size:12px;line-height:1.5}

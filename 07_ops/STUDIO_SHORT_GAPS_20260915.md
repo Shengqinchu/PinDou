@@ -19,4 +19,12 @@
 
 证据：`artifacts/miniapp-smooth-20260915/booking-tests.xml`、`gap-ui-results.json`、`short-gap-*.png`、`live-forecast.json`。性能改造与这条服务端规则分别验证，小程序正式发布状态另记。
 
-正式部署尚未执行，部署及即时备份对照结果完成后追加。
+## 正式部署与验收
+
+2026-09-15 加东晚间已上线 **20260916020639-studio-v7**，网页 build `2026-09-16T02:00:28.106Z`。压缩包 SHA256 `c493a1e290c1fb8274c62062e95bed8242a3248a47165f50720ad85da8d02708`；415 个部署文件逐项校验通过。与前一版本相比，服务目录只改变 `reservations.py`。
+
+切换前备份：`/opt/pindou/studio/backups/20260916020639-studio-v7`。30 张受保护表与即时备份逐值一致，包括 26 条预约、62 条预约事件、36 条钱包流水、10 条经营记录；没有为验证而创建真实预约。原生成器 PID 914 保持。
+
+普通公网浏览器已核对正式 build 和日历 200。2026-09-18 的 17:30–18:00、21:00–22:00 已返回 `available:false, reason:short_gap`。线上小程序沿用服务端可约状态，无需等性能版审核才生效。
+
+部署证据：`gap-release.json`、`gap-deploy-result.txt`、`gap-production-verification.json`、`gap-public-verification.json`，均位于上述证据目录。预约数量是本次验收快照，不应作为未来生产状态。

@@ -4,6 +4,7 @@ import { useUserStore } from '../store/user';
 import { MiniappError,studioRead,studioCall } from '../utils/miniapp-client';
 import { studioWords,bookingError,studioProfile,fillWords } from '../utils/studio-content';
 import {invalidateStudioSnapshots,rememberStudioSnapshot} from '../utils/studio-cache';
+import {onViewHide} from '../utils/studio-view-lifecycle';
 import type { Receipt,CancelPolicy } from '../utils/studio-booking';
 defineOptions({options:{styleIsolation:'shared'}});
 const props=defineProps<{reservation:Receipt;language:string}>();
@@ -30,6 +31,7 @@ async function cancel(){
 function phone(){uni.makePhoneCall({phoneNumber:studioProfile.phone.replace(/\s/g,'')});}
 watch(()=>user.token,()=>{sequence++;open.value=false;policy.value=undefined;busy.value=false;loading.value=false;});
 onBeforeUnmount(()=>sequence++);
+onViewHide(()=>{if(!busy.value){sequence++;open.value=false;policy.value=undefined;loading.value=false;}});
 </script>
 <template>
  <button :hover-stay-time="180" :hover-start-time="0" v-if="reservation.can_cancel" class="studio-cancel-link" hover-class="studio-native-pressed" @tap="begin">{{words('action')}}</button>

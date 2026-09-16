@@ -28,6 +28,7 @@
       "minified": true
     },
     "usingComponents": true,
+    "lazyCodeLoading": "requiredComponents",
     "permission": {}
   },
   "vueVersion": "3"

@@ -6,6 +6,7 @@ import wallet from '../../../05_studio/src/content/wallet.json';
 import commerce from '../../../05_studio/src/content/commerce.json';
 import messaging from '../../../05_studio/src/content/messaging.json';
 import {clearAdminViews,invalidateAdminViews} from './studio-admin-cache';
+import {navigateStudio} from './studio-navigation';
 let ticket='',until=0,inFlight:ReturnType<typeof miniSession>|null=null;
 async function proof(){
  if(ticket&&Date.now()<until)return ticket;
@@ -41,7 +42,7 @@ export function today(){const d=new Date();return new Intl.DateTimeFormat('en-CA
 export function requestKey(){
  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.floor(Math.random()*16);return(c==='x'?r:(r&3)|8).toString(16);});
 }
-export function goAdmin(page='',query=''){uni.navigateTo({url:'/pages/studio/manage'+page+(query?'?'+query:'')});}
+export function goAdmin(page='',query=''){navigateStudio('/pages/studio/manage'+page+(query?'?'+query:''));}
 export function confirmAdmin(title:string,content:string,confirmText:string,cancelText:string):Promise<boolean>{
  return new Promise(resolve=>uni.showModal({title,content,confirmText,cancelText,success:r=>resolve(r.confirm),fail:()=>resolve(false)}));
 }

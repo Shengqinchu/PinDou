@@ -2,7 +2,7 @@
 import StudioGlyph from './StudioGlyph.vue';
 import {studioWords} from '../utils/studio-content';
 import {navigateStudio} from '../utils/studio-navigation';
-defineOptions({options:{styleIsolation:'shared'}});
+defineOptions({options:{styleIsolation:'shared',virtualHost:true}});
 const props=defineProps<{active:'home'|'bookings'|'account';language:string}>();
 const items=[{id:'home',path:'/pages/studio/home',icon:'home',module:'app',key:'home_76c92b'},{id:'bookings',path:'/pages/studio/reservations',icon:'calendar',module:'account',key:'my_reservations'},{id:'account',path:'/pages/auth/studio-account',icon:'user',module:'account',key:'account'}] as const;
 function go(item:typeof items[number]){
