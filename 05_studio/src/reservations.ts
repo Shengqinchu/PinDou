@@ -53,6 +53,7 @@ export type ReservationPayload = {
   website: string;
 };
 export type Reservation = {
+  creation_source?: 'customer_self' | 'legacy_customer' | 'admin_booking' | 'admin_backfill' | 'unknown';
   can_cancel: boolean;
   offer?: ReservationOffer | null;
   id: string;

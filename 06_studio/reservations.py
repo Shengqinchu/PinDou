@@ -66,6 +66,22 @@ def initialize(database):
             'public_note':"TEXT NOT NULL DEFAULT ''", 'deleted_at':'TEXT',
         }.items():
             if name not in columns: db.execute(f'ALTER TABLE studio_reservations ADD COLUMN {name} {definition}')
+        if 'creation_source' not in columns:
+            # Before this migration the only creation route was customer submit.
+            # Mark those rows once; future unspecified writers fail closed.
+            db.execute("ALTER TABLE studio_reservations ADD COLUMN creation_source TEXT NOT NULL DEFAULT 'unknown' CHECK(creation_source IN ('unknown','legacy_customer','customer_self','admin_booking','admin_backfill'))")
+            db.execute("ALTER TABLE studio_reservations ADD COLUMN created_by TEXT NOT NULL DEFAULT ''")
+            db.execute("UPDATE studio_reservations SET creation_source='legacy_customer',created_by='legacy:customer'")
+        db.executescript("""
+        CREATE TRIGGER IF NOT EXISTS reservation_origin_immutable
+          BEFORE UPDATE OF creation_source,created_by ON studio_reservations
+          WHEN NEW.creation_source!=OLD.creation_source OR NEW.created_by!=OLD.created_by
+          BEGIN SELECT RAISE(ABORT,'reservation origin is immutable'); END;
+        CREATE TRIGGER IF NOT EXISTS reservation_history_update BEFORE UPDATE ON reservation_events
+          BEGIN SELECT RAISE(ABORT,'reservation history is append-only'); END;
+        CREATE TRIGGER IF NOT EXISTS reservation_history_delete BEFORE DELETE ON reservation_events
+          BEGIN SELECT RAISE(ABORT,'reservation history is append-only'); END;
+        """)
 
 def clock(value):
     return f"{value // 60:02d}:{value % 60:02d}"
@@ -223,6 +239,7 @@ def public_row(row):
     data = json.loads(row["payload"])
     booking=data['booking']
     return {key: row[key] for key in ("id", "status", "created_at", "updated_at", "version", "actual_minutes", "actual_guests", "public_note")} | {
+        "creation_source": row['creation_source'],
         "booking": booking, "name": data["name"],
         "booked_minutes": minute(booking['end'])-minute(booking['start']),
         "offer": data.get('offer_snapshot'),
@@ -258,6 +275,43 @@ class ReservationUpdate(Strict):
 class ReservationDeletion(Strict):
     version: int = Field(ge=1,strict=True)
     reason: str = Field(min_length=1,max_length=600)
+
+class AdminReservation(Strict):
+    kind: Literal['booking', 'backfill']
+    booking: Visit
+    status: Literal['pending', 'confirmed', 'completed']
+    actual_minutes: int | None = Field(default=None, ge=1, le=1440, strict=True)
+    actual_guests: int | None = Field(default=None, ge=1, le=99, strict=True)
+    public_note: str = Field(default='', max_length=600)
+    staff_note: str = Field(default='', max_length=1500)
+    reason: str = Field(min_length=1, max_length=600)
+    locale: Literal['zh', 'en'] = 'zh'
+
+    @model_validator(mode='after')
+    def record_kind(self):
+        if self.kind == 'backfill':
+            if self.status != 'completed' or self.actual_minutes is None or self.actual_guests is None:
+                raise ValueError('Completed attendance details are required')
+        elif self.status == 'completed' or self.actual_minutes is not None or self.actual_guests is not None:
+            raise ValueError('Use backfill for completed attendance')
+        return self
+
+
+def validate_backfill(booking, current):
+    # Historical facts must not be rejected by today's edited opening hours or
+    # capacity. Keep the same clock precision and positive, within-day interval.
+    start, end = minute(booking.start), minute(booking.end)
+    ended = datetime.combine(booking.date, datetime.min.time(), tzinfo=ZONE) + timedelta(minutes=end)
+    if end <= start or ended > current:
+        raise HTTPException(422, 'reservation_backfill_not_finished')
+
+
+def audit_creation(db, row, actor, reason=''):
+    snapshot = {key: row[key] for key in ('creation_source', 'created_by', 'owner_id', 'status',
+                'actual_minutes', 'actual_guests', 'public_note', 'staff_note')}
+    snapshot.update(payload=json.loads(row['payload']), reason=reason)
+    db.execute('INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)',
+               (row['id'], actor, row['created_at'], 'created', json.dumps(snapshot, ensure_ascii=False)))
 
 class DayHours(Strict):
     weekday: int = Field(ge=0, le=6, strict=True)
@@ -429,7 +483,7 @@ def register(app, database, admin_actor):
             existing = db.execute("SELECT * FROM studio_reservations WHERE idempotency_key=?", (idempotency_key,)).fetchone()
             if existing:
                 wrong_owner = existing["owner_id"] != customer["id"] if existing["owner_id"] else existing["visitor_hash"] != actor
-                if wrong_owner or existing["payload_hash"] != digest:
+                if wrong_owner or existing['creation_source'] not in ('customer_self','legacy_customer') or existing["payload_hash"] != digest:
                     raise HTTPException(409, "reservation_request_changed")
                 return public_row(existing)
             contact=reservation_contact(db,payload,customer,current)
@@ -448,12 +502,59 @@ def register(app, database, admin_actor):
             ref = "VIS-" + uuid.uuid4().hex[:16].upper()
             timestamp = current.isoformat()
             stored = json.dumps(json.loads(encoded) | contact | ({'offer_snapshot': offer} if offer else {}), ensure_ascii=False, separators=(',', ':')) if offer or contact else encoded
-            db.execute("INSERT INTO studio_reservations(id,created_at,updated_at,payload,visitor_hash,idempotency_key,payload_hash,owner_id) VALUES(?,?,?,?,?,?,?,?)", (ref,timestamp,timestamp,stored,actor,idempotency_key,digest,customer["id"]))
+            db.execute("INSERT INTO studio_reservations(id,created_at,updated_at,payload,visitor_hash,idempotency_key,payload_hash,owner_id,creation_source,created_by) VALUES(?,?,?,?,?,?,?,?,'customer_self',?)", (ref,timestamp,timestamp,stored,actor,idempotency_key,digest,customer["id"],'customer:'+customer['id']))
             import booking_profile
             booking_profile.capture(db,customer['id'],json.loads(stored),payload.contact_profile_version,ref)
             row = db.execute("SELECT * FROM studio_reservations WHERE id=?", (ref,)).fetchone()
+            audit_creation(db, row, 'customer:'+customer['id'])
             import owner_notifications
             owner_notifications.enqueue_reservation(db, 'created', row)
+            return public_row(row)
+
+    @app.post('/studio-api/manage/members/{owner_id}/reservations', status_code=201)
+    def create_for_member(owner_id: str, payload: AdminReservation, idempotency_key: Annotated[str, Header()], actor=Depends(admin_actor)):
+        from wallet import validate_key, fingerprint, member
+        import booking_profile
+        validate_key(idempotency_key)
+        source = 'admin_booking' if payload.kind == 'booking' else 'admin_backfill'
+        digest = fingerprint(payload.model_dump() | {'owner_id': owner_id, 'actor': actor, 'source': source})
+        current = now_local()
+        with database() as db:
+            db.execute('BEGIN IMMEDIATE')
+            existing = db.execute('SELECT * FROM studio_reservations WHERE idempotency_key=?', (idempotency_key,)).fetchone()
+            if existing:
+                if existing['owner_id'] != owner_id or existing['creation_source'] != source or existing['payload_hash'] != digest:
+                    raise HTTPException(409, 'reservation_request_changed')
+                return public_row(existing)
+            account = member(db, owner_id)
+            if payload.kind == 'booking':
+                policy = read_policy(db)
+                validate_interval(payload.booking, current, policy)
+                if not has_capacity(db, payload.booking, policy):
+                    raise HTTPException(409, 'reservation_interval_unavailable')
+            else:
+                validate_backfill(payload.booking, current)
+            profile = booking_profile.read(db, owner_id)
+            stored = {'booking': payload.booking.model_dump(mode='json'),
+                      'name': profile['name'] or account['name'],
+                      'contact_method': profile['contact_method'] if profile['contact'] else 'email' if account['email'] else 'other',
+                      'contact': profile['contact'] or account['email'], 'notes': '', 'locale': payload.locale}
+            reference = 'VIS-' + uuid.uuid4().hex[:16].upper()
+            stamp = current.isoformat()
+            db.execute('''INSERT INTO studio_reservations
+              (id,created_at,updated_at,status,payload,visitor_hash,idempotency_key,payload_hash,owner_id,
+               creation_source,created_by,actual_minutes,actual_guests,public_note,staff_note)
+              VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+              (reference, stamp, stamp, payload.status, json.dumps(stored, ensure_ascii=False), '', idempotency_key,
+               digest, owner_id, source, actor, payload.actual_minutes, payload.actual_guests, payload.public_note, payload.staff_note))
+            row = db.execute('SELECT * FROM studio_reservations WHERE id=?', (reference,)).fetchone()
+            audit_creation(db, row, actor, payload.reason)
+            if payload.kind == 'backfill':
+                from studio_finance import from_completed
+                from_completed(db, row, actor)
+            elif payload.status == 'confirmed':
+                import customer_notifications
+                customer_notifications.on_reservation(db, 'confirmed', row)
             return public_row(row)
 
     @app.get("/studio-api/reservations/{reference}")
@@ -480,11 +581,12 @@ def register(app, database, admin_actor):
         return {"items":[public_row(row) for row in rows],'total':total,'page':page}
 
     @app.get("/studio-api/manage/reservations")
-    def listing(_actor=Depends(admin_actor), status: str="all", day: date | None=None, search: str="", page: int=1, deleted:bool=False, at:str=""):
+    def listing(_actor=Depends(admin_actor), status: str="all", day: date | None=None, search: str="", page: int=1, deleted:bool=False, at:str="", owner_id:str=''):
         if status not in STATES | {"all"} or not 1 <= page <= 10000 or len(search) > 120:
             raise HTTPException(422, "invalid_filter")
         clauses, params = ['deleted_at IS NOT NULL' if deleted else 'deleted_at IS NULL'], []
         if status != "all": clauses.append("status=?"); params.append(status)
+        if owner_id: clauses.append('owner_id=?'); params.append(owner_id)
         if day: clauses.append("json_extract(payload,'$.booking.date')=?"); params.append(str(day))
         if at:
             if not day or deleted or not re.fullmatch(r'\d{2}:\d{2}',at): raise HTTPException(422,'invalid_filter')
@@ -498,7 +600,17 @@ def register(app, database, admin_actor):
             rows = db.execute("SELECT * FROM studio_reservations"+where+" ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'confirmed' THEN 1 WHEN 'completed' THEN 2 WHEN 'cancelled' THEN 3 ELSE 4 END,created_at DESC,id DESC LIMIT 30 OFFSET ?", (*params,(page-1)*30)).fetchall()
             counts = dict(db.execute("SELECT status,count(*) FROM studio_reservations WHERE deleted_at IS NULL GROUP BY status").fetchall())
             policy = read_policy(db)
-        return {"items":[public_row(r) | {"payload":json.loads(r["payload"]),"staff_note":r["staff_note"],'owner_id':r['owner_id'],'deleted_at':r['deleted_at']} for r in rows], "total":count,"counts":counts,"policy":policy}
+        return {"items":[public_row(r) | {"payload":json.loads(r["payload"]),"staff_note":r["staff_note"],'owner_id':r['owner_id'],'deleted_at':r['deleted_at'],'created_by':r['created_by']} for r in rows], "total":count,"counts":counts,"policy":policy}
+
+    @app.get('/studio-api/manage/reservations/{reference}/events')
+    def reservation_history(reference:str, page:int=1, _actor=Depends(admin_actor)):
+        if not 1 <= page <= 10000: raise HTTPException(422, 'invalid_filter')
+        with database() as db:
+            if not db.execute('SELECT 1 FROM studio_reservations WHERE id=?', (reference,)).fetchone():
+                raise HTTPException(404, 'reservation_not_found')
+            total = db.execute('SELECT count(*) FROM reservation_events WHERE reservation_id=?', (reference,)).fetchone()[0]
+            rows = db.execute('SELECT * FROM reservation_events WHERE reservation_id=? ORDER BY id DESC LIMIT 30 OFFSET ?', (reference, (page-1)*30)).fetchall()
+        return {'items': [dict(row) for row in rows], 'total': total, 'page': page}
 
     @app.get('/studio-api/manage/reservation-timetable')
     def timetable(_actor=Depends(admin_actor),start:date|None=None):
@@ -560,6 +672,9 @@ def register(app, database, admin_actor):
                 raise HTTPException(409,'wallet_completed_record_locked')
             if payload.status=='completed' and (not actual or not guests):
                 raise HTTPException(422,'wallet_actual_hours_details_required')
+            if payload.status=='completed' and row['creation_source'] in ('admin_booking','admin_backfill'):
+                if json.loads(row['payload'])['booking']['date'] > str(current.date()):
+                    raise HTTPException(422, 'wallet_visit_not_arrived')
             db.execute("UPDATE studio_reservations SET status=?,staff_note=?,actual_minutes=?,actual_guests=?,public_note=?,version=version+1,updated_at=? WHERE id=?", (payload.status,payload.staff_note,actual,guests,public_note,current.isoformat(),reference))
             if payload.status=='completed':
                 from wallet import reward_visit

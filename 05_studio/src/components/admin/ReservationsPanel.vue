@@ -30,10 +30,12 @@ const timetableCopy=contentModule('reservation-timetable',timetableWords);
 import { walletCopy,duration } from '../../wallet';
 import { hoursInput,minutesFromHours } from '../../time-units';
 import CustomerIdentity from '../CustomerIdentity.vue';
+import { adminVisitCopy, visitSourceLabel } from '../../admin-visits';
+import ReservationHistory from './ReservationHistory.vue';
 import type {WalletAccount} from '../../wallet';
 import { useRoute, useRouter } from 'vue-router';
 import { messageCopy } from '../../messaging';
-type Entry = Reservation & { payload: ReservationPayload; staff_note: string;owner_id:string;deleted_at:string|null };
+type Entry = Reservation & { payload: ReservationPayload; staff_note: string;owner_id:string;deleted_at:string|null;created_by?:string };
 const props = defineProps<{ active: boolean; calendar?: boolean }>();
 const at=ref(''),timetableRevision=ref(0);
 const { request } = useDesk();
@@ -356,7 +358,9 @@ defineExpose({ refresh: load });
       :subtitle="entry?.id"
       :busy="saving"
       ><template v-if="entry"
-        ><CustomerIdentity v-if="customer" :customer="customer"/><dl class="reservation-desk-summary">
+        ><CustomerIdentity v-if="customer" :customer="customer"/>
+        <p class="fine-print">{{say(adminVisitCopy.source)}} · {{visitSourceLabel(entry.creation_source)}}<br />{{say(adminVisitCopy.created_by)}} · {{entry.created_by||'—'}}</p>
+        <dl class="reservation-desk-summary">
           <div>
             <dt>{{ say(copyText.visit_f29981) }}</dt>
             <dd>
@@ -423,7 +427,7 @@ defineExpose({ refresh: load });
           </select></label>
         <template v-if="nextStatus==='completed'&&!entry.deleted_at">
           <div class="wallet-input-grid"><label class="desk-field">{{say(walletCopy.actual_hours)}}<input v-model="actualHours" type="number" inputmode="decimal" min="0" max="24" step="any" :disabled="saving"/></label><label class="desk-field">{{say(walletCopy.actual_guests)}}<input v-model.number="actualGuests" type="number" min="1" max="99" step="1" :disabled="saving"/></label></div>
-          <p class="wallet-rule">{{say(walletCopy.attendance_help)}}</p>
+          <p class="wallet-rule">{{say(entry.creation_source==='customer_self'||entry.creation_source==='legacy_customer'?walletCopy.attendance_help:adminVisitCopy.no_reward)}}</p>
         </template>
         <label class="desk-field"
           >{{ say(copyText.staff_note_private_53d294)
@@ -435,6 +439,7 @@ defineExpose({ refresh: load });
           />
         </label>
         <div class="reservation-delete">
+          <ReservationHistory :key="entry.id+':'+entry.version" :reference="entry.id"/>
           <button class="desk-button secondary" :disabled="saving" @click="deleting=!deleting">{{say(entry.deleted_at?walletCopy.restore:walletCopy.delete)}}</button>
           <form v-if="deleting" @submit.prevent="removeOrRestore"><p class="wallet-rule">{{say(walletCopy.delete_help)}}</p><label class="desk-field">{{say(walletCopy.deletion_reason)}}<textarea v-model="deleteReason" rows="2" minlength="1" maxlength="600" required :disabled="saving"/></label><button class="desk-button secondary" :disabled="saving||!deleteReason.trim()">{{say(entry.deleted_at?walletCopy.restore:walletCopy.confirm_delete)}}</button></form>
         </div>

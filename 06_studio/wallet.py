@@ -176,6 +176,11 @@ def reward_registration(db,owner_id):
 
 def reward_visit(db, row, actor):
     """Called inside the reservation transaction. Not backfilled on deployment."""
+    # Read authoritative persisted provenance, never a form/payload flag. The
+    # guard lives at the ledger boundary so later completion paths cannot bypass it.
+    origin = db.execute('SELECT creation_source FROM studio_reservations WHERE id=?', (row['id'],)).fetchone()
+    if not origin or origin['creation_source'] not in ('customer_self', 'legacy_customer'):
+        return
     if not row['owner_id'] or row['actual_minutes'] is None or row['actual_minutes'] <= 0:
         return
     key = 'visit-reward:'+row['id']

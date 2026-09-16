@@ -1,4 +1,5 @@
 {
+  "admin-visits": ["代建预约与游玩补录", "Host reservations and past visits"],
   "visit-flow": ["三步预约流程", "Guided visit booking"],
   "components-MotionSettings": ["页面动效设置", "Page motion settings"],
   "account": [

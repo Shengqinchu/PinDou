@@ -7,6 +7,7 @@ import { CommerceError } from '../../commerce';
 import { walletCopy as copy,duration,type WalletAccount,type WalletDetail,type WalletEntry,type WalletCategory } from '../../wallet';
 import { minutesFromHours } from '../../time-units';
 import CustomerIdentity from '../CustomerIdentity.vue';
+import MemberVisits from './MemberVisits.vue';
 import { say,formatCopy,hamiltonDate } from '../../state';
 import { readSession,saveSession } from '../../reservations';
 import SlideOver from '../SlideOver.vue';
@@ -21,10 +22,11 @@ const pending=ref<Pending|null>(readSession<Pending>('studio-wallet-pending-v1')
 const members=ref<WalletAccount[]>([]),total=ref(0),page=ref(1),search=ref(''),busy=ref(false),error=ref('');
 const selected=ref(''),open=ref(false),data=ref<WalletDetail>(),ledgerPage=ref(1),category=ref<WalletCategory>('all');
 const loading=ref(false),saving=ref(false),saveError=ref(''),saved=ref(false),showForm=ref(false);
+const visitSaving=ref(false);
 const redemptionUse=ref<'visit'|'shop'>('visit'),noPromotion=ref(false);
 const kind=ref('topup'),timeHours=ref<number|string>(10),pointsAmount=ref<number|''>(0),redeemCad=ref<number|''>(1),bill=ref('');
 const note=ref(''),effective=ref(hamiltonDate()),reservation=ref(''),privateNote=ref(''),noteVersion=ref(1),reverseEntry=ref<WalletEntry>();
-const frozen=computed(()=>saving.value||!!pending.value);
+const frozen=computed(()=>saving.value||visitSaving.value||!!pending.value);
 const editingBooking=ref(false),bookingDraft=ref(emptyContact()),bookingVersion=ref(0);
 function editBooking(){if(!data.value)return;bookingDraft.value=contactDetails(data.value.booking_profile);bookingVersion.value=data.value.booking_profile.version;editingBooking.value=true;}
 async function saveBooking(){
@@ -49,7 +51,7 @@ async function loadDetail(resetNote=false){
   catch(e){if(seq===detailSequence)saveError.value=(e as Error).message;}finally{if(seq===detailSequence)loading.value=false;}
 }
 async function inspect(owner:string){
-  if(saving.value)return;
+  if(saving.value||visitSaving.value)return;
   if(pending.value)owner=pending.value.owner;
   selected.value=owner;data.value=undefined;ledgerPage.value=1;category.value='all';saved.value=false;saveError.value='';
   editingBooking.value=false;
@@ -114,12 +116,13 @@ defineExpose({refresh:load});
     <p v-if="busy&&!members.length" role="status">{{say(copy.loading)}}</p><p v-else-if="!members.length" class="wallet-empty">{{say(copy.no_members)}}</p>
     <div class="member-list"><button v-for="member in members" :key="member.owner_id" class="member-row" @click="inspect(member.owner_id)"><CustomerIdentity :customer="member"/><span class="member-list-note">{{member.staff_note}}</span><span class="member-list-balance">{{duration(member.minutes)}}<small>{{formatCopy(copy.point_count,{v0:member.points})}}</small></span><PhArrowRight :size="18"/></button></div>
     <div v-if="total>30" class="wallet-pagination"><button :disabled="page===1||busy" @click="page--;load()">{{say(copy.previous)}}</button><span>{{formatCopy(copy.page,{v0:page,v1:total})}}</span><button :disabled="page*30>=total||busy" @click="page++;load()">{{say(copy.next)}}</button></div>
-    <SlideOver v-model="open" :title="data?.account.name||say(copy.members)" :subtitle="data?.account.customer_code||''" :busy="saving">
+    <SlideOver v-model="open" :title="data?.account.name||say(copy.members)" :subtitle="data?.account.customer_code||''" :busy="saving||visitSaving">
       <p v-if="loading&&!data" role="status">{{say(copy.loading)}}</p>
       <p v-if="saveError" class="desk-error" role="alert">{{saveError}} <button class="desk-link" :disabled="frozen" @click="loadDetail(true)">{{say(copy.refresh)}}</button></p>
       <p v-if="saved" class="wallet-saved" role="status"><PhCheck/>{{say(copy.saved)}}</p>
       <template v-if="data">
         <CustomerIdentity :customer="data.account"/>
+        <MemberVisits :key="data.account.owner_id" :account="data.account" :disabled="saving||!!pending" @busy="visitSaving=$event" @recorded="loadDetail();load()"/>
         <section class="booking-profile-section"><h3>{{say(bookingCopy.title)}}</h3><div v-if="!editingBooking" class="booking-profile-summary"><div v-if="data.booking_profile.complete"><strong>{{data.booking_profile.name}}</strong><p>{{contactMethodLabel(data.booking_profile.contact_method)}} · {{data.booking_profile.contact}}</p></div><p v-else>{{say(bookingCopy.empty)}}</p><button type="button" class="text-link" :disabled="frozen" @click="editBooking">{{say(bookingCopy.edit)}}</button></div><form v-else @submit.prevent="saveBooking"><BookingContactFields v-model="bookingDraft" class="profile-contact" :required="false" :disabled="frozen"/><div class="booking-profile-actions"><button type="button" class="desk-button secondary" :disabled="frozen" @click="editingBooking=false">{{say(bookingCopy.cancel)}}</button><button class="desk-button primary" :disabled="frozen">{{say(bookingCopy.save)}}</button></div></form></section>
         <WalletBalances :account="data.account"/><p class="wallet-rule">{{say(copy.rules)}}</p>
         <p v-if="saving" role="status">{{say(copy.saving)}}</p>
@@ -147,7 +150,7 @@ defineExpose({refresh:load});
         <WalletLedger :entries="data.entries" admin :busy="frozen" @reverse="beginReverse"/>
         <div v-if="data.total>30" class="wallet-pagination"><button :disabled="ledgerPage===1||loading" @click="ledgerPage--">{{say(copy.previous)}}</button><span>{{formatCopy(copy.page,{v0:ledgerPage,v1:data.total})}}</span><button :disabled="ledgerPage*30>=data.total||loading" @click="ledgerPage++">{{say(copy.next)}}</button></div>
       </template>
-      <template #footer><button class="desk-button secondary" :disabled="saving" @click="open=false">{{say(copy.close)}}</button></template>
+      <template #footer><button class="desk-button secondary" :disabled="saving||visitSaving" @click="open=false">{{say(copy.close)}}</button></template>
     </SlideOver>
   </section>
 </template>

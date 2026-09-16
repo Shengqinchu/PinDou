@@ -1,6 +1,7 @@
 """Build small, self-hosted Chinese UI fonts from the licensed Google Fonts sources."""
 import hashlib
 import json
+import argparse
 from pathlib import Path
 
 from fontTools import subset
@@ -13,11 +14,22 @@ output.mkdir(parents=True, exist_ok=True)
 licenses = web / "public/font-licenses"
 licenses.mkdir(parents=True, exist_ok=True)
 
-text = "".join(p.read_text(encoding="utf8") for p in (web / "src").rglob("*") if p.suffix in {".vue", ".ts", ".json"})
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--extend-copy', action='append', default=[], help='Extend existing subsets with a named content module, preserving all current glyphs')
+options_cli = parser.parse_args()
+if options_cli.extend_copy:
+    modules = [(web / 'src/content' / (name + '.json')) for name in options_cli.extend_copy]
+    text = ''.join(p.read_text(encoding='utf8') for p in modules)
+else:
+    text = "".join(p.read_text(encoding="utf8") for p in (web / "src").rglob("*") if p.suffix in {".vue", ".ts", ".json"})
 # Include all static UI CJK characters, punctuation and common numerals used in dates.
 characters = {ord(c) for c in text if ord(c) > 127}
 characters.update(range(0x3000, 0x3040))
 characters.update(range(0xFF00, 0xFFEF))
+if options_cli.extend_copy:
+    for name in ('pindou-serif-sc.woff2', 'pindou-sans-sc.woff2'):
+        with TTFont(output / name) as existing:
+            characters.update(existing.getBestCmap())
 manifest = {"characters": len(characters), "fonts": []}
 for upstream, family, filename, expected in [
     ("NotoSerifSC", "PinDou Serif SC", "pindou-serif-sc.woff2", "050080d9255a86808f2945bffac582b31ef32bc36411ce29563b4961670c66f9"),
