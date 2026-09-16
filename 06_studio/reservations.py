@@ -202,6 +202,35 @@ def capacity_grid(confirmed, day, policy):
         slot["low_capacity"] = not slot["buffered"] and slot["remaining_seats"] is not None and 0 < slot["remaining_seats"] <= 2
     return slots
 
+def availability_grid(confirmed, blocks, day, policy, guests=1, *, current=None, include_buffer=True):
+    """Close free runs shorter than two hours after all existing restrictions.
+
+    Exactly two hours remains bookable. Gap closure adds no new capacity
+    padding and never changes an existing reservation.
+    """
+    slots = capacity_grid(confirmed, day, policy)
+    opening = hours(day, policy)
+    day_blocks = [(minute(b['start']), minute(b['end'])) for b in blocks if b['date'] == str(day)]
+    for at, state in slots.items():
+        closed = not opening['enabled'] or at < minute(opening['open']) or at + 30 > minute(opening['close'])
+        blocked = any(start < at + 30 and end > at for start, end in day_blocks)
+        past = current is not None and datetime.combine(day, datetime.min.time(), tzinfo=ZONE) + timedelta(minutes=at) <= current
+        busy = state['capacity_full'] or (state['remaining_seats'] is not None and state['remaining_seats'] < guests) or guests > policy['max_guests_per_group']
+        reason = 'closed' if closed or blocked else 'past' if past else 'capacity' if busy else 'buffer' if include_buffer and state['buffered'] else None
+        state.update(closed=closed, blocked=blocked, available=reason is None, reason=reason, gap_blocked=False,
+                     low_capacity=state['low_capacity'] and not closed and not blocked and not past)
+    run = []
+    for at in range(0, 1470, 30):
+        if at in slots and slots[at]['available']:
+            run.append(at)
+            continue
+        if 0 < len(run) * 30 < 120:
+            for free_at in run:
+                slots[free_at].update(available=False, reason='short_gap', gap_blocked=True, low_capacity=False)
+        run = []
+    return slots
+
+
 def capacity_available(confirmed, day, start, end, guests, policy, *, include_buffer=True):
     slots = capacity_grid(confirmed, day, policy)
     return all(not slots[at]["capacity_full"]
@@ -210,10 +239,10 @@ def capacity_available(confirmed, day, start, end, guests, policy, *, include_bu
                for at in range(start, end, 30))
 
 def has_capacity(db, booking, policy, exclude="", *, include_buffer=True):
-    if db.execute('SELECT 1 FROM reservation_blocks WHERE date=? AND start<? AND end>? LIMIT 1', (str(booking.date),booking.end,booking.start)).fetchone():
-        return False
+    blocks = [dict(r) for r in db.execute('SELECT date,start,end FROM reservation_blocks WHERE date=?', (str(booking.date),))]
     confirmed = [json.loads(r[0])["booking"] for r in db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed' AND id!=? AND json_extract(payload,'$.booking.date')=?", (exclude, str(booking.date)))]
-    return capacity_available(confirmed, booking.date, minute(booking.start), minute(booking.end), booking.guests, policy, include_buffer=include_buffer)
+    slots = availability_grid(confirmed, blocks, booking.date, policy, booking.guests, include_buffer=include_buffer)
+    return all(slots[at]['available'] for at in range(minute(booking.start), minute(booking.end), 30))
 
 def available_offer(db, current):
     from pathlib import Path
@@ -462,15 +491,10 @@ def register(app, database, admin_actor):
             day = current.date() + timedelta(days=n)
             slots = []
             opening = hours(day, settings)
-            capacity = capacity_grid(confirmed, day, settings)
+            capacity = availability_grid(confirmed, blocks, day, settings, guests, current=current)
             for start in range(grid_start, grid_end, 30):
-                past = datetime.combine(day, datetime.min.time(), tzinfo=ZONE) + timedelta(minutes=start) <= current
                 state = capacity[start]
-                busy = state["capacity_full"] or state["remaining_seats"] is not None and state["remaining_seats"] < guests
-                closed = not opening["enabled"] or start < minute(opening["open"]) or start >= minute(opening["close"]) or any(b['date']==str(day) and minute(b['start'])<start+30 and minute(b['end'])>start for b in blocks)
-                reason = "closed" if closed else "past" if past else "capacity" if busy or guests > settings["max_guests_per_group"] else "buffer" if state["buffered"] else None
-                slots.append({**state, "start": clock(start), "end": clock(start + 30), "available": reason is None, "reason": reason,
-                              "low_capacity": state["low_capacity"] and not closed and not past})
+                slots.append({**state, "start": clock(start), "end": clock(start + 30)})
             days.append({"date": str(day), "open": opening["open"], "close": opening["close"], "closed": not opening["enabled"], "slots": slots})
         return {"today": str(current.date()), "timezone": "America/Toronto", "minimum_minutes": 120, "capacity_buffer_minutes": 30, "max_guests_per_group": settings["max_guests_per_group"], "weekly_hours": settings["weekly_hours"], "policy_version": settings["version"], "days": days, "offers": [offer] if offer and settings['max_guests_per_group'] >= 2 else []}
 
@@ -639,12 +663,10 @@ def register(app, database, admin_actor):
         for index in range(14):
             day=first+timedelta(days=index);opening=hours(day,policy);slots=[]
             present=[(s,b) for s,b in booked if b['date']==str(day)]
-            capacity=capacity_grid([b for s,b in present if s=='confirmed'],day,policy)
+            capacity=availability_grid([b for s,b in present if s=='confirmed'],blocks,day,policy)
             for at in range(0,1440,30):
                 begin,end=clock(at),clock(at+30)
-                slot={**capacity[at],'start':begin,'end':end,'closed':not opening['enabled'] or begin<opening['open'] or end>opening['close'],
-                      'blocked':any(b['date']==str(day) and b['start']<end and b['end']>begin for b in blocks)}
-                slot['low_capacity']=slot['low_capacity'] and not slot['closed'] and not slot['blocked']
+                slot={**capacity[at],'start':begin,'end':end}
                 for state in ('pending','confirmed','completed'):
                     overlaps=[b for s,b in present if s==state and b['start']<end and b['end']>begin]
                     slot[state]=sum(b['guests'] for b in overlaps);slot[state+'_groups']=len(overlaps)
