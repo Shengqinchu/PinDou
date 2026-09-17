@@ -1,6 +1,9 @@
 {
   "enca_9cd218": ["zh-CN", "en-CA"],
   "day_selection_help": ["点击到店时间，安排至当天闭店。", "Choose your arrival time for a visit until that day's closing time."],
+  "day_full": ["当天某一时段预约已满，不建议进行全天拼豆体验喔！", "One or more time slots that day are fully booked. An all-day beadmaking visit is not recommended."],
+  "day_unavailable": ["所选时间至闭店之间有不可预约时段，请选择其他日期或按小时体验。", "Some time slots between your arrival and closing are unavailable. Choose another date or an hourly visit."],
+  "interval_unavailable": ["所选时间内有不可预约时段，请重新选择。", "Your chosen visit includes unavailable time slots. Please select another time."],
   "choose_an_earlier_or_another_available_time_f98d07": [
     "这里无法安排至少两小时，请选择更早或其他可用时段。",
     "Choose an earlier or another available time for a visit of at least two hours."

@@ -37,9 +37,10 @@ const emit = defineEmits<{
 const offset = ref(0),
   pageSize = ref(7),
   focusIndex = ref(-1),
-  choosingEnd = ref(false),
-  message = ref("");
+  choosingEnd = ref(false);
+const message = ref<keyof typeof copyTextDefault | "">("");
 const table = ref<HTMLElement>();
+const messageElement = ref<HTMLElement>();
 const days = computed(() =>
   props.calendar.days.slice(offset.value, offset.value + pageSize.value),
 );
@@ -104,9 +105,17 @@ function choose(di: number, ri: number) {
     choosingEnd.value = false;
   } else choosingEnd.value = true;
   if (!validSelection(props.calendar, booking)) {
-    message.value = say(
-      copyText.choose_an_earlier_or_another_available_time_f98d07,
-    );
+    const startAt = minutes(booking.start), endAt = minutes(booking.end);
+    const covered = day.slots.filter(slot => minutes(slot.start) >= startAt && minutes(slot.start) < endAt);
+    message.value = endAt - startAt < 120 || endAt > minutes(day.close)
+      ? "choose_an_earlier_or_another_available_time_f98d07"
+      : booking.plan === "day"
+        ? covered.some(slot => slot.capacity_full) ? "day_full" : "day_unavailable"
+        : "interval_unavailable";
+    choosingEnd.value = false;
+    // A rejected new choice must not leave a previous date ready to submit.
+    emit("select", { date: day.date, start: "", end: "" });
+    void nextTick(() => messageElement.value?.scrollIntoView({ block: "nearest" }));
     return;
   }
   message.value = "";
@@ -170,7 +179,7 @@ watch(() => [props.calendar, props.disabled, columns.value], resetFocus, {
   immediate: true,
 });
 watch(
-  () => props.booking.plan,
+  () => [props.booking.plan, props.booking.guests],
   () => {
     choosingEnd.value = false;
     message.value = "";
@@ -300,7 +309,7 @@ watch(
     </div>
     <ReservationHoursNote/>
     <p class="reservation-minimum-note">{{ say(copyText.minimum_duration) }}</p>
-    <p v-if="message" class="form-error" role="alert">{{ message }}</p>
+    <p v-if="message" ref="messageElement" class="form-error" role="alert">{{ say(copyText[message]) }}</p>
     <p v-if="!compact" class="reservation-hours">
       {{ say(copyText.all_times_are_local_to_hamilton_the_8a3607) }}
     </p>
