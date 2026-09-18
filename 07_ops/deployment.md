@@ -1,301 +1,78 @@
-# PinDou 生产部署运维文档
+# PinDou 当前生产部署与运维
 
-> **当前生产环境（2026-06-08 复核）**：上海移动云 ECS + Nginx + systemd `pindou.service` + SQLite + 本地存储。  
-> **公网入口**：Cloudflare Tunnel `pindou-staging` 暴露移动云源站，源站不直接公开业务端口。  
-> **历史方案**：下方微信云托管 / MySQL / COS 内容是 ADR-012 曾规划的路径，当前不是线上事实；实际发版按 `07_ops/deployment_legacy.md` 的 release + `current` symlink 方式执行。
+更新：2026-09-18。生产已完整迁移至 **36.139.201.94**（移动云华东-上海1，8核 / 16GB / 80GB / 8Mbps），到期 **2027-09-18**。网站、小程序后端、店主后台及原图纸服务均使用新机。详见 [服务器资产与密钥位置](SERVER_ASSETS.md) 和 [迁移验收](PINDOU_FULL_MIGRATION_ACCEPTANCE_20260918.md)。
 
----
+## 连接与目标确认
 
-## 0. 当前 Web 域名
+本机 `.env`（不进入 Git）中的部署入口：
 
-- 正式入口：`https://pindoupuppy.com/`
-- 同源 API：`https://pindoupuppy.com/api/v1`
-- 管理后台：`https://pindoupuppy.com/Ios235169`
-- 健康检查：`https://pindoupuppy.com/health`
-- 对外验收、用户链接、截图和文档统一使用主域。旧 staging 子域仅保留为临时兼容/回滚入口，不再作为正式入口。
-- Cloudflare 当前路由（2026-06-05 已切）：`pindoupuppy.com` 和 `staging.pindoupuppy.com` 均 CNAME 到同一条 Cloudflare Tunnel（`pindou-staging`），Tunnel ingress 覆盖 `pindoupuppy.com` / `www.pindoupuppy.com` / 旧 staging 子域，源站为 `https://localhost`（`noTLSVerify=true`）。
-- 旧 Worker routes `pindoupuppy.com/*`、`www.pindoupuppy.com/*`（脚本 `pindoupuppy-origin-proxy`）曾强制跳 `/h5/`，已删除；不要重新启用。若再次看到 `/` 跳到 `/h5/` 或 `/health` 为边缘 404，优先检查是否误恢复了这些 Worker routes 或把主域 DNS 指回腾讯云托管后端。
+```dotenv
+PINDOU_PROD_SSH_HOST=36.139.201.94
+PINDOU_PROD_SSH_USER=pindou
+PINDOU_PROD_SSH_KEY_PATH=C:/Users/123/.ssh/pindou_mobilecloud_20260918_ed25519
+```
 
----
+常规运维使用 `ssh pindou-prod`，原有需要 root 权限的部署脚本使用 `ssh pindou-prod-root` 对应的同一新机和新 key。两个别名位于本机 `C:/Users/123/.ssh/config`。登录前先核对 `ssh -G pindou-prod` 中的 hostname、user、identityfile，登录后核对主机名 `19558948263` 和资产表中的主机指纹。
 
-## 1. 架构
+新电脑先安全取得已授权私钥、配置 key 路径，并核对服务器指纹；不可从 GitHub 获取私钥。原 `pindou_prod_ed25519` 是旧机 key，不再作为默认部署凭据。
 
-### 1.0 当前生产架构（实际）
+## 当前运行结构
 
 ```text
-[Browser / Mobile Web]
-    |
-    | https://pindoupuppy.com
-    v
-[Cloudflare Tunnel: pindou-staging]
-    |
-    v
-[上海移动云 ECS]
-    |
-    +-- Nginx :443
-    |     +-- /api/* -> 127.0.0.1:8000
-    |     +-- /static/* -> FastAPI static/local storage
-    |     +-- /* -> /opt/pindou/current/05_web/dist
-    |
-    +-- systemd pindou.service
-          WorkingDirectory=/opt/pindou/current/06_backend
-          EnvironmentFile=/opt/pindou/shared/.env
-          SQLite=/opt/pindou/shared/var/pindou.db
+网站 / 微信小程序
+  -> Cloudflare 远程管理 Tunnel (pindou-staging)
+  -> 新机 Nginx (https://localhost)
+      -> pindou-studio.service / 127.0.0.1:8011
+      -> pindou.service        / 127.0.0.1:8000
+      -> 已发布的静态文件、图片和历史资源
 ```
 
-### 1.1 历史云托管架构（非当前生产）
+| 服务 | current / 工作目录 | 环境与数据 |
+|---|---|---|
+| 原图纸与账号 `pindou.service` | `/opt/pindou/current/06_backend` | `/opt/pindou/shared/.env`；`shared/var/pindou.db`；`shared/data` |
+| 店铺 `pindou-studio.service` | `/opt/pindou/studio/current/service` | `/opt/pindou/studio/shared/.env`；`shared/studio.sqlite3`；`shared/media` |
+| Nginx / cloudflared | 当前生效的 systemd 配置 | 正式远端 Tunnel ingress 为准；旧本地 YAML 不代表线上入口 |
 
-```text
-[微信小程序]
-    |
-    | wx.cloud.callContainer
-    v
-[微信云托管 FastAPI Docker]
-    |
-    | SQLAlchemy / Alembic
-    v
-[云托管 MySQL]
-    |
-    | StorageBackend
-    v
-[腾讯云 COS]
-    |
-    | payment/create + webhook
-    v
-[虎皮椒]
-```
+- 对外主域 `https://pindoupuppy.com`，同时保留 `www.pindoupuppy.com`、`staging.pindoupuppy.com`。Cloudflare 回源 `https://localhost`，`noTLSVerify=true`。域名和二维码不变。
+- `pindou` 与 `pindou-studio` 是两套运行环境：Python 3.11.0rc1 / 3.10.12。生成器 venv/启动脚本依赖旧 release 路径，不能清理历史目录后再期待 current 正常启动。
+- 当前数据是 **两个 SQLite 库 + 本地文件**。微信云托管 / MySQL / COS 是历史规划，不能因旧文档自动切换。
+- 跨库身份使用生成器 `users.openid`；保留预约来源、账本、通知结果和幂等状态。
+- 新机出站 IPv4 优先规则位于 `/etc/gai.conf`。它解决了不可达 IPv6 导致邮件/图纸连接等待的问题；不要只照抄一个 precedence 条目而丢掉其余默认优先级。
 
-### 1.2 关键差异
+## 只读检查
 
-| 项目 | 传统部署 | 云托管部署 |
-| --- | --- | --- |
-| 小程序访问 | `https://api.pindou.cn/api/v1` | `wx.cloud.callContainer` |
-| 域名 / ICP | 需要自有域名备案 | MVP 期使用微信云托管默认域名 |
-| 运行方式 | systemd + Uvicorn + Nginx | Docker 容器 |
-| 数据库 | SQLite / 未来 PG | 云托管 MySQL |
-| 文件存储 | 本地 `var/` | 腾讯云 COS |
-| webhook | 自有域名 | 云托管 HTTPS 域名 |
-
----
-
-## 2. 后端容器
-
-后端目录：`06_backend/`
-
-### 2.1 本地构建
+在已连接的新机执行，避免输出完整环境文件或带 token 的进程参数：
 
 ```bash
-cd 06_backend
-docker build -t pindou-backend .
-docker run --rm -p 8000:8000 --env-file .env pindou-backend
-curl http://localhost:8000/health
+hostname
+systemctl is-active pindou.service pindou-studio.service nginx.service cloudflared.service
+systemctl is-enabled pindou.service pindou-studio.service nginx.service cloudflared.service
+readlink -f /opt/pindou/current
+readlink -f /opt/pindou/studio/current
+df -h /
+curl --fail --silent http://127.0.0.1:8000/health
 ```
 
-预期返回：
+公网用主域检查首页、店铺、预约接口及 `/health`；出现异常时区分进程就绪、源站路由与 Cloudflare 缓存。发布后以日志中的本次请求标记确认流量确实到达新机。
 
-```json
-{"status":"ok"}
-```
+## 后续发布
 
-### 2.2 Dockerfile
+1. 按本次任务明确的产品范围准备提交，保留其他工作区改动。迁移不能被用作发布本地未验收功能的理由。
+2. 确认 `.env` 和本次连接目标为新机，读取实际 current 版本，再准备可回退的 release、文件清单与一致性数据备份。
+3. Studio 现有工具为 `studio_pack.py`、`studio_upload.py`、`studio_release_audit.py`、`studio_deploy.py`。上传工具只传包，不等于部署；后两项会涉及正式数据/服务，先读脚本再执行。上传/审计脚本当前以 root 读取 `.env` 中的新 host / key。
+4. 使用 release + current 符号链接流程。需要停写或改 schema 时，同时考虑两个库、通知 workers 和 Mac 短信桥，不让它们跨不一致的快照继续写入。
+5. 校验发布文件、受保护表、余额/流水、身份关联和服务就绪，再做受影响的公网功能检查。只报告实际验证过的层级。
 
-当前容器入口为：
+私钥、密码、应用环境文件及完整客户备份保持在授权的本机/服务器目录。模板 `.env.example` 只提供非秘密字段。
 
-```bash
-uvicorn pindou.main:app --host 0.0.0.0 --port 8000
-```
+## 备份与旧机
 
-云托管部署时只需要暴露容器端口 `8000`。
+本次完整迁移备份在新机 `/root/pindou-migration-20260918` 及本机 `D:/Users/123/Documents/PinDouBackups/20260918`，校验索引为 `MIGRATION_BACKUP_INDEX.json`。整根归档、最终数据库/文件和系统增量已验证恢复；**没有在本次迁移中新建持续定时备份**，不能把迁移快照当作今天之后的最新数据。
 
----
+旧机 `36.137.177.135` 的业务应用与正式 Tunnel 已停止并禁用，仅保留回退资料。其用户提供到期时间为上海时间 2026-09-25 22:41:52。新机开始写入后，回退必须冻结新机并反向同步全部最新状态，详见 [验收中的回退流程](PINDOU_FULL_MIGRATION_ACCEPTANCE_20260918.md#回退与交接)。同一时刻只运行一个正式 Tunnel 和一组通知消费者。
 
-## 3. 环境变量
+## 历史参考
 
-生产环境变量在微信云托管控制台配置，严禁写入 git。
-
-### 3.1 必填
-
-| 变量 | 说明 |
-| --- | --- |
-| `APP_ENV=production` | 生产模式 |
-| `DATABASE_URL` | 云托管 MySQL 连接串，格式见 `.env.example` |
-| `STORAGE_BACKEND=cos` | 生产使用 COS |
-| `COS_SECRET_ID` / `COS_SECRET_KEY` | COS 密钥 |
-| `COS_BUCKET` / `COS_REGION` | COS bucket 与地域 |
-| `JWT_SECRET` | JWT 签名密钥 |
-| `WECHAT_MP_APPID` / `WECHAT_MP_APPSECRET` | 小程序登录 |
-| `XIAOCHI_GPT_API_KEY` | AI 反代调用 |
-| `RESEND_API_KEY` | 邮箱验证码发送 |
-| `HUPIJIAO_APP_ID` / `HUPIJIAO_APP_SECRET` / `HUPIJIAO_WEBHOOK_SECRET` | 虎皮椒 |
-| `HUPIJIAO_CALLBACK_URL` | 云托管 HTTPS URL + `/api/v1/webhook/hupijiao` |
-
-### 3.2 推荐
-
-| 变量 | 推荐值 |
-| --- | --- |
-| `APP_CORS_ALLOW_ORIGINS` | 生产只填 `https://pindoupuppy.com` 等 HTTPS 白名单，禁止 `*`/localhost |
-| `COS_PUBLIC_BASE_URL` | 如开 CDN 或自定义访问域则填写 |
-| `MAX_REQUEST_BODY_BYTES` | 默认 `12582912`，请求体硬上限 |
-| `XIAOCHI_GPT_PROMPT_VARIANT` | 默认 `prompt_a_current`；Prompt B 灰度用 `prompt_b_grid_symmetry_20260606` |
-| `ENABLE_REVERSE_PROXY_HEALTH_MONITOR` | `true` |
-| `ENABLE_EXPIRED_ORIGINAL_DELETE_TASK` | `true` |
-
-生产启动会执行安全配置自检：`JWT_SECRET` 缺失/过短、CORS 使用通配或本地域名、生产支付/AI/邮件密钥缺失、虎皮椒回调不是 HTTPS 或指向内网地址，都会直接拒绝启动，避免带开发默认值上线。
-
----
-
-## 4. 数据库
-
-### 4.1 MySQL 初始化
-
-1. 微信云托管控制台创建 MySQL。
-2. 创建数据库 `pindou`，字符集建议 `utf8mb4`。
-3. 配置 `DATABASE_URL=mysql+pymysql://user:password@host:3306/pindou?charset=utf8mb4`。
-4. 容器启动后执行 Alembic：
-
-```bash
-cd 06_backend
-alembic upgrade head
-```
-
-### 4.2 SQLite 迁移到 MySQL
-
-如本地已有 SQLite 数据：
-
-```bash
-cd 06_backend
-python scripts/sqlite_to_mysql.py \
-  --sqlite sqlite:///./var/pindou.db \
-  --mysql "mysql+pymysql://user:password@host:3306/pindou?charset=utf8mb4" \
-  --dry-run
-
-python scripts/sqlite_to_mysql.py \
-  --sqlite sqlite:///./var/pindou.db \
-  --mysql "mysql+pymysql://user:password@host:3306/pindou?charset=utf8mb4"
-```
-
-先跑 `--dry-run` 看行数，再执行真实迁移。
-
----
-
-## 5. COS 存储
-
-### 5.1 创建 bucket
-
-1. 腾讯云 COS 创建 bucket，地域建议与云托管一致（上海）。
-2. 配置最小权限密钥，只允许当前 bucket 的对象读写删除。
-3. 环境变量设置：
-
-```env
-STORAGE_BACKEND=cos
-COS_SECRET_ID=...
-COS_SECRET_KEY=...
-COS_BUCKET=...
-COS_REGION=ap-shanghai
-COS_PUBLIC_BASE_URL=
-```
-
-### 5.2 路径约定
-
-| 类型 | key 前缀 |
-| --- | --- |
-| 用户原图 | `uploads/` |
-| AI preview | `previews/` |
-| 图纸 PNG / JSON | `patterns/` |
-| 缩略图 | `thumbnails/` |
-
-ADR-009 仍然生效：用户原图 30 天后删除，PatternSheet 和成品图保留。
-
----
-
-## 6. 前端云托管配置
-
-前端目录：`05_frontend/`
-
-### 6.1 环境变量
-
-```env
-VITE_USE_WX_CLOUD=true
-VITE_WX_CLOUD_ENV=<微信云托管环境 ID>
-VITE_WX_CLOUD_SERVICE=pindou-backend
-VITE_WX_CLOUD_API_PREFIX=/api/v1
-```
-
-本地联调老 HTTP 路径时可临时设置：
-
-```env
-VITE_USE_WX_CLOUD=false
-VITE_PINDOU_DEV_API=http://192.168.2.40:8000/api/v1
-```
-
-### 6.2 图片上传
-
-云托管路径不再使用 `uni.uploadFile`。前端读取本地图片为 base64，通过 JSON 发送：
-
-- AI preview：`POST /api/v1/preview/generate`
-- 脚本图纸：`POST /api/v1/pattern/build`
-
-后端负责 base64 解码、格式校验和存储抽象落盘 / 上传 COS。
-
----
-
-## 7. 虎皮椒 webhook
-
-部署成功后，从微信云托管控制台复制默认 HTTPS URL，并在虎皮椒后台设置：
-
-```text
-https://<云托管默认域名>/api/v1/webhook/hupijiao
-```
-
-同步更新生产环境变量：
-
-```env
-HUPIJIAO_CALLBACK_URL=https://<云托管默认域名>/api/v1/webhook/hupijiao
-```
-
-开发期可继续用：
-
-```bash
-cd 06_backend
-python scripts/mock_hupijiao_webhook.py <order_no> --amount 28.00
-```
-
----
-
-## 8. 部署步骤（用户执行）
-
-1. 微信公众平台开通“微信云托管”。
-2. 创建环境，推荐上海地域，记录 env ID。
-3. 创建云托管服务，服务名建议 `pindou-backend`。
-4. 创建 MySQL，并配置 `DATABASE_URL`。
-5. 创建 COS bucket，并配置 `STORAGE_BACKEND=cos` 与 COS 密钥。
-6. 在云托管服务环境变量页录入 `.env.example` 中的生产变量。
-7. 关联 GitHub repo 或上传 Docker 镜像。
-8. 部署后访问 `/health`，确认返回 `{"status":"ok"}`。
-9. 执行 `alembic upgrade head` 初始化 MySQL 表。
-10. 如已有 SQLite 数据，执行 `scripts/sqlite_to_mysql.py` 迁移。
-11. 修改虎皮椒后台 webhook URL。
-12. 前端配置 `VITE_WX_CLOUD_ENV` 后重新编译小程序，真机测试登录、上传、生成、支付和作品集。
-
----
-
-## 9. 监控与回退
-
-### 9.1 云托管监控
-
-- 容器启动失败 / 重启次数
-- API 错误率和 P95 延迟
-- MySQL 连接数与慢查询
-- COS 读写失败率
-- 虎皮椒 webhook 验签失败率
-- 反代健康检查失败次数（ADR-007）
-
-### 9.2 回退条件
-
-见 ADR-012：
-
-1. 云托管月成本连续 2 个月超过 200 元且高于传统部署。
-2. 云托管限流、冷启动或不可用影响生成链路。
-3. 用户量超过 5 万，需要重新核算资源和架构。
-
-触发后恢复 `deployment_legacy.md` 的传统服务器路径，或拆分为小程序云托管 + 独立后端混合部署。
+- [原服务器部署记录](deployment_legacy.md)：旧机配置、旧到期日和阶段性实施记录。
+- [微信云托管方案与迁移前文档快照](deployment_cloudrun_reference.md)：历史路径，不是当前生产步骤。
+- [完整迁移手册](PINDOU_FULL_MIGRATION_RUNBOOK_20260918.md)、[执行记录](PINDOU_FULL_MIGRATION_EXECUTION_20260918.md)。
