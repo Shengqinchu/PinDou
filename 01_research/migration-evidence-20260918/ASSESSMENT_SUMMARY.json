@@ -1,0 +1,1751 @@
+{
+  "audit_date_local": "2026-09-18",
+  "mode": "read_only_assessment",
+  "migration_executed": false,
+  "full_backup_created": false,
+  "target_purchased": false,
+  "source": {
+    "address": "36.137.177.135",
+    "hostname": "ecs-37487420",
+    "architecture": "x86_64",
+    "logical_cpu_count": 8
+  },
+  "expiry": {
+    "asia_shanghai": "2026-09-25T22:41:52+08:00",
+    "america_toronto": "2026-09-25T10:41:52-04:00",
+    "utc": "2026-09-25T14:41:52+00:00",
+    "basis": "user notice corroborated by 07_ops/deployment_legacy.md:28",
+    "current_billing_console_verified": false
+  },
+  "observed_at": {
+    "source-inventory.json": "2026-09-18T04:41:28.794114+00:00",
+    "source-detail.json": "2026-09-18T04:44:29.202957+00:00",
+    "source-business.json": "2026-09-18T04:50:09.285001+00:00",
+    "source-followup.json": "2026-09-18T04:58:07.231369+00:00",
+    "source-schema.json": "2026-09-18T05:06:46.306218+00:00",
+    "public-readonly.json": "2026-09-18T04:50:50.409303+00:00"
+  },
+  "current_releases": {
+    "/opt/pindou/current": "/opt/pindou/releases/20260910015453-studio-v7",
+    "/opt/pindou/studio/current": "/opt/pindou/studio/releases/20260917020325-studio-v7"
+  },
+  "manifest_validation": {
+    "/opt/pindou/studio/current/manifest.json": {
+      "files": 415,
+      "mismatches": [],
+      "version": "20260917020325-studio-v7"
+    }
+  },
+  "databases": {
+    "generator": {
+      "path": "/opt/pindou/shared/var/pindou.db",
+      "tables": 17,
+      "journal_mode": "delete",
+      "integrity": [
+        [
+          "ok"
+        ]
+      ],
+      "foreign_key_violations": 0,
+      "table_definitions_sha256": "d1d4fb69e5b9cb7bedf1887e6853b32bc65461b465208b3a180f3f6da8ab59cc",
+      "schema_objects": {
+        "types": {
+          "index": 67,
+          "table": 17
+        },
+        "all_schema_sha256": "c06a7fbc950f798c65bd414a70521615bb1ea0ea0d4e339798f98668c3f96f52",
+        "objects": [
+          {
+            "type": "index",
+            "name": "ix_admin_audit_logs_action",
+            "table": "admin_audit_logs",
+            "sql_sha256": "a92f0764720a3938901aa4d761300bbead2fa92ea59c6b571a1b0ad306befcb0"
+          },
+          {
+            "type": "index",
+            "name": "ix_admin_audit_logs_created_at",
+            "table": "admin_audit_logs",
+            "sql_sha256": "26ad0a335dddd4e1dab7ac356fb059c003e407f09fca1e39c4afac01fe2894ca"
+          },
+          {
+            "type": "index",
+            "name": "ix_admin_audit_logs_resource",
+            "table": "admin_audit_logs",
+            "sql_sha256": "fe825ed813dbfbf613ceb4090de8b58e978480706dcff0228fda65399f38bc61"
+          },
+          {
+            "type": "index",
+            "name": "ix_artworks_created_at",
+            "table": "artworks",
+            "sql_sha256": "f99cc609c3990e5a08f6a53bfbdcbc3b401486dc82696fde55122425c7ac70fe"
+          },
+          {
+            "type": "index",
+            "name": "ix_artworks_owner_created",
+            "table": "artworks",
+            "sql_sha256": "d21895b6027de8101c1d07dc740256a22b8d85a38b5abb1bd095863ab4dd9884"
+          },
+          {
+            "type": "index",
+            "name": "ix_artworks_owner_id",
+            "table": "artworks",
+            "sql_sha256": "45060514b0310e927d24e3a3adb1836d20da99ce6408d1639b9ba446dd990d1f"
+          },
+          {
+            "type": "index",
+            "name": "ix_artworks_owner_type",
+            "table": "artworks",
+            "sql_sha256": "b755924e42164fdc8eebac6899fa1645c3e21925fd34b20c2d4653b9d762f2c9"
+          },
+          {
+            "type": "index",
+            "name": "ix_artworks_user_id",
+            "table": "artworks",
+            "sql_sha256": "f7fb205e35191363be53c663b49906bd21a98c19fec7d5fc8b8b8d1ec2e81038"
+          },
+          {
+            "type": "index",
+            "name": "ix_cdks_batch_id",
+            "table": "cdks",
+            "sql_sha256": "a07925abc0e23bdc6137e4b628104fa13e60d1c74ba1b7af92c610c5742fba7f"
+          },
+          {
+            "type": "index",
+            "name": "ix_cdks_redeemed_owner_id",
+            "table": "cdks",
+            "sql_sha256": "d12c3d51f76e0a72efb5ec71ed6b3944bb9bb73ee645bf6d043ee6d4e9061528"
+          },
+          {
+            "type": "index",
+            "name": "ix_cdks_redeemed_owner_type",
+            "table": "cdks",
+            "sql_sha256": "5d67c42823062ffd76cef2785200d08ea5125ce0846238952a08b4bbf517f7c2"
+          },
+          {
+            "type": "index",
+            "name": "ix_cdks_status",
+            "table": "cdks",
+            "sql_sha256": "b98c9dbd3016a5d5f481085ec6651539cdc52779d4eceef4c3a590cf882b190e"
+          },
+          {
+            "type": "index",
+            "name": "ix_consent_logs_user_id",
+            "table": "consent_logs",
+            "sql_sha256": "31e2593c4a418dbf97652430365cd3744564b52b4894dc2a6b6d30b09dbee275"
+          },
+          {
+            "type": "index",
+            "name": "ix_credit_grants_expires_at",
+            "table": "credit_grants",
+            "sql_sha256": "35055b6a088e4b8c351978e9ff7f9adb20c44af315a0845444ace978fbd46031"
+          },
+          {
+            "type": "index",
+            "name": "ix_credit_grants_owner_active",
+            "table": "credit_grants",
+            "sql_sha256": "663d4114c759d5460582a4cce575528029f0c266beb34383b7ce7219b8673f4f"
+          },
+          {
+            "type": "index",
+            "name": "ix_credit_grants_owner_id",
+            "table": "credit_grants",
+            "sql_sha256": "84a3c1b49c2c4af5ad5362c93d7e3964ab5a3e28846644392e8402121094d64b"
+          },
+          {
+            "type": "index",
+            "name": "ix_credit_grants_owner_type",
+            "table": "credit_grants",
+            "sql_sha256": "0eda879e6f01bebc8213b7bff23ec22ce308396dd0f77f16c683250fcd63865d"
+          },
+          {
+            "type": "index",
+            "name": "ix_credit_grants_source_id",
+            "table": "credit_grants",
+            "sql_sha256": "c8f047ef041e0897d2ec76d36e48201890e633e7d1e38ba543d953757963717a"
+          },
+          {
+            "type": "index",
+            "name": "ix_credit_grants_source_type",
+            "table": "credit_grants",
+            "sql_sha256": "2042d4259f68facc08ef16f45c30b0f6a82f1f20fe58fde39b6c75fef7e1f906"
+          },
+          {
+            "type": "index",
+            "name": "ix_credit_transactions_created_at",
+            "table": "credit_transactions",
+            "sql_sha256": "4004b26d93a4245ce00e787e0b0011dc55853387e38ce92fab4e2a3e301f87b0"
+          },
+          {
+            "type": "index",
+            "name": "ix_credit_transactions_owner_id",
+            "table": "credit_transactions",
+            "sql_sha256": "b82951fa81500652cbb7fe81f28083d206c2a0653e64978f52e1c1a7ced1426b"
+          },
+          {
+            "type": "index",
+            "name": "ix_credit_transactions_owner_type",
+            "table": "credit_transactions",
+            "sql_sha256": "b0b25d1715d21689f1c0b0b331ebd4a21e27955f2ceca94d4bf799c9c1054d27"
+          },
+          {
+            "type": "index",
+            "name": "ix_credit_transactions_source_id",
+            "table": "credit_transactions",
+            "sql_sha256": "d27fb033851e4c84a7350c1ac7ec10784ee229f51f836514873a83a35ccffe7c"
+          },
+          {
+            "type": "index",
+            "name": "ix_credit_transactions_source_type",
+            "table": "credit_transactions",
+            "sql_sha256": "18b6008e6cb8d56d18770b0be86b7874eed473a538e810be7be2c9ec6d07e2fe"
+          },
+          {
+            "type": "index",
+            "name": "ix_daily_quotas_date",
+            "table": "daily_quotas",
+            "sql_sha256": "d47fe09b430a26f067bfaf95a8a808fdcef9bdbc7e30a54ef5a38726d340d83b"
+          },
+          {
+            "type": "index",
+            "name": "ix_daily_quotas_user_id",
+            "table": "daily_quotas",
+            "sql_sha256": "15ff91608f24d225a7a0bb76e58817ebb7732c99a70d658fa4a61af549e0c84a"
+          },
+          {
+            "type": "index",
+            "name": "ix_device_claims_claimed_by_user",
+            "table": "device_claims",
+            "sql_sha256": "885b84cc76222915f15beee91965cd489898e9a918524f9159d896180f032ee5"
+          },
+          {
+            "type": "index",
+            "name": "ix_email_codes_email",
+            "table": "email_codes",
+            "sql_sha256": "7763288ecba73e4ae53d566bb991f1ead671de7674a8a382fa4035e2a888ba13"
+          },
+          {
+            "type": "index",
+            "name": "ix_entitlement_grants_source_id",
+            "table": "entitlement_grants",
+            "sql_sha256": "299deadb1dbe209396babde57a8777e6c8ec1ea3eed1b426e337cf9a3648d463"
+          },
+          {
+            "type": "index",
+            "name": "ix_entitlement_grants_source_type",
+            "table": "entitlement_grants",
+            "sql_sha256": "e6a8ed87b77b34b7bf5069658f325ed1c7c59d7ce36f43f9a22750c9eed8b12d"
+          },
+          {
+            "type": "index",
+            "name": "ix_entitlement_grants_user_id",
+            "table": "entitlement_grants",
+            "sql_sha256": "b45b94188117d99feaffb7a63244b33a0089b07e0bbff42936bcc0db0ad8eecc"
+          },
+          {
+            "type": "index",
+            "name": "ix_generation_jobs_created_at",
+            "table": "generation_jobs",
+            "sql_sha256": "ad78bf5f17d05889816b8e70d8e6588195dcb8578e4d7d2720568012987ea3b8"
+          },
+          {
+            "type": "index",
+            "name": "ix_generation_jobs_owner_created",
+            "table": "generation_jobs",
+            "sql_sha256": "6302fc9158606331bbd8d4769068c10d76ac0f6fe81762eb97b2b9e30ca287a2"
+          },
+          {
+            "type": "index",
+            "name": "ix_generation_jobs_owner_id",
+            "table": "generation_jobs",
+            "sql_sha256": "d605d33163ecbd3eeb0520606265d6bcb19683dea725015f0074685090ec4137"
+          },
+          {
+            "type": "index",
+            "name": "ix_generation_jobs_owner_type",
+            "table": "generation_jobs",
+            "sql_sha256": "ee0846b02a0fdc2626dc933c2b53daf6ee5407a4def7d2e8cfeb9d078b7b9ba3"
+          },
+          {
+            "type": "index",
+            "name": "ix_generation_jobs_status",
+            "table": "generation_jobs",
+            "sql_sha256": "c97e14a9442ba29bf5e555bbd66af2e514128e75248575041a884faef230b028"
+          },
+          {
+            "type": "index",
+            "name": "ix_generation_jobs_user_id",
+            "table": "generation_jobs",
+            "sql_sha256": "d37e0773ee43756e48dd3a96c6d4d6e17d09509bfa2b05575b9d82b6ff372f3c"
+          },
+          {
+            "type": "index",
+            "name": "ix_membership_grants_expires_at",
+            "table": "membership_grants",
+            "sql_sha256": "0af552da443852d633c20a6f1aae7c2ff4eb4639ba9fa3fcfd50124d7524e6f1"
+          },
+          {
+            "type": "index",
+            "name": "ix_membership_grants_owner_active",
+            "table": "membership_grants",
+            "sql_sha256": "b4b7974e1b6e27ddedee816ae3febac779e973e9fe61e878cc701650d215c2dc"
+          },
+          {
+            "type": "index",
+            "name": "ix_membership_grants_owner_id",
+            "table": "membership_grants",
+            "sql_sha256": "55a6fc3a394c1c9cf1c96e26c5e190279f6717b854968f551d9f7bdd0bf6fcc7"
+          },
+          {
+            "type": "index",
+            "name": "ix_membership_grants_owner_type",
+            "table": "membership_grants",
+            "sql_sha256": "1bef03baae06a6416b43eaf8559e3804ff75a93c97eaa8a3c21a0045bc5b1ba9"
+          },
+          {
+            "type": "index",
+            "name": "ix_membership_grants_source_id",
+            "table": "membership_grants",
+            "sql_sha256": "42928e6e8be37f0bfe30300ad7ba6fd5b1e39098c802c076eb85dab2a264af10"
+          },
+          {
+            "type": "index",
+            "name": "ix_membership_grants_source_type",
+            "table": "membership_grants",
+            "sql_sha256": "20bc75298aad341f0ea74cc4d5e46ea2272ead62a5aec5e63b471e249b3ba2d2"
+          },
+          {
+            "type": "index",
+            "name": "ix_orders_order_no",
+            "table": "orders",
+            "sql_sha256": "f86b789be0cfbcdae5752ba6a2b7bdff87dba9a7f06d0b5dc96fa81d0074b8c4"
+          },
+          {
+            "type": "index",
+            "name": "ix_orders_status",
+            "table": "orders",
+            "sql_sha256": "07b2cc5a5ba6d3999b4f2d64380da7a39539cdf1baf79ec0d62d2927f65c6eae"
+          },
+          {
+            "type": "index",
+            "name": "ix_orders_user_id",
+            "table": "orders",
+            "sql_sha256": "547545932e19b9c748e58af17ecc9b2451fa9a02db58c4f376b7a08911bae677"
+          },
+          {
+            "type": "index",
+            "name": "ix_rate_limit_buckets_identity",
+            "table": "rate_limit_buckets",
+            "sql_sha256": "c42dba6935379b3df162f5c1953d22f0ac17edfa818b8a6466f3780ff6fc8638"
+          },
+          {
+            "type": "index",
+            "name": "ix_rate_limit_buckets_scope",
+            "table": "rate_limit_buckets",
+            "sql_sha256": "c8dd5ee2158987f8861932eedd017c38db1bfdea2c33206c275541fded22fd10"
+          },
+          {
+            "type": "index",
+            "name": "ix_rate_limit_buckets_window_start",
+            "table": "rate_limit_buckets",
+            "sql_sha256": "68d3994c8bdc25f789b009beb869ca2fa64a9f5b765c2f42ce679173eb21a115"
+          },
+          {
+            "type": "index",
+            "name": "ix_users_email",
+            "table": "users",
+            "sql_sha256": "d53afdaba99dbf8e0ff8320bc26b33ff6598a49ab1ccfe2f65ce2f3ce53e5700"
+          },
+          {
+            "type": "index",
+            "name": "ix_users_openid",
+            "table": "users",
+            "sql_sha256": "33f5c092257bce9434a8d9865e0aadfb35a9c0bc31adc3dd481105ac0921ebf9"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_alembic_version_1",
+            "table": "alembic_version",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_artworks_1",
+            "table": "artworks",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_cdks_1",
+            "table": "cdks",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_credit_grants_1",
+            "table": "credit_grants",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_credit_transactions_1",
+            "table": "credit_transactions",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_daily_quotas_1",
+            "table": "daily_quotas",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_device_claims_1",
+            "table": "device_claims",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_device_claims_2",
+            "table": "device_claims",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_entitlement_grants_1",
+            "table": "entitlement_grants",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_generation_jobs_1",
+            "table": "generation_jobs",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_membership_grants_1",
+            "table": "membership_grants",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_orders_1",
+            "table": "orders",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_orders_2",
+            "table": "orders",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_rate_limit_buckets_1",
+            "table": "rate_limit_buckets",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_session_nonces_1",
+            "table": "studio_session_nonces",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_users_1",
+            "table": "users",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "table",
+            "name": "admin_audit_logs",
+            "table": "admin_audit_logs",
+            "sql_sha256": "683f94201bfcf601ced1479f61b87b0800cc9b0a0b54a195ef6c396cbb7175b4"
+          },
+          {
+            "type": "table",
+            "name": "alembic_version",
+            "table": "alembic_version",
+            "sql_sha256": "2178ac174921dbea44557d477730d868fc34f8605138a794f77fa6b1e0fbdbee"
+          },
+          {
+            "type": "table",
+            "name": "artworks",
+            "table": "artworks",
+            "sql_sha256": "ebd0ac90a504f1053d5b5c656383644221efd283b12af0aedb38a6272fa6c735"
+          },
+          {
+            "type": "table",
+            "name": "cdks",
+            "table": "cdks",
+            "sql_sha256": "be2253b5c188d8964af33b6dd4c8d5b0bb4bda22e4d99ea45276e384a954b9b9"
+          },
+          {
+            "type": "table",
+            "name": "consent_logs",
+            "table": "consent_logs",
+            "sql_sha256": "a4d5eac2096823d17190fddd185341e3e006b53bc32ac258fb4d587c644709cf"
+          },
+          {
+            "type": "table",
+            "name": "credit_grants",
+            "table": "credit_grants",
+            "sql_sha256": "7177e2dcc0b2f23cfd0b2beae7742d805b956fbad91ffaee51130d3cb6eef96e"
+          },
+          {
+            "type": "table",
+            "name": "credit_transactions",
+            "table": "credit_transactions",
+            "sql_sha256": "c681916bed83490dc92d98c523f36d115c60097b5debf61cc6f841cc134f435c"
+          },
+          {
+            "type": "table",
+            "name": "daily_quotas",
+            "table": "daily_quotas",
+            "sql_sha256": "b42ea6494921020cbbe0724a363c666b304c3c54320a6b598b7a8cc491c08387"
+          },
+          {
+            "type": "table",
+            "name": "device_claims",
+            "table": "device_claims",
+            "sql_sha256": "32f9415430b951c18f88cf18c405f2d524e09c5568c21c8f9668d53fe36ce8b7"
+          },
+          {
+            "type": "table",
+            "name": "email_codes",
+            "table": "email_codes",
+            "sql_sha256": "1ca33e34f63597dab3aae4b36eab13ece9ff8cee47fb287add8b0104410565c4"
+          },
+          {
+            "type": "table",
+            "name": "entitlement_grants",
+            "table": "entitlement_grants",
+            "sql_sha256": "cfc69e43359a85f208f4d95c8ad79351b1b96d8db6e84e9b6bab458592efcb55"
+          },
+          {
+            "type": "table",
+            "name": "generation_jobs",
+            "table": "generation_jobs",
+            "sql_sha256": "b0cb098597b61a9752a6be9b1638509e2d6c35e8b124a3061f281798ceb93e04"
+          },
+          {
+            "type": "table",
+            "name": "membership_grants",
+            "table": "membership_grants",
+            "sql_sha256": "b424338b2961871107d70c42d316355f1b262df560f8f49bbc012615a0b69249"
+          },
+          {
+            "type": "table",
+            "name": "orders",
+            "table": "orders",
+            "sql_sha256": "24ab9df691c04da6f21282700e7cf2f6d4e8e9761e856a2e1d5879b0e8bc2fe1"
+          },
+          {
+            "type": "table",
+            "name": "rate_limit_buckets",
+            "table": "rate_limit_buckets",
+            "sql_sha256": "3fb47ed7d043e028895acd0f7ecf1216d4c50f7bc4b723bf6d7f77c9177e6e19"
+          },
+          {
+            "type": "table",
+            "name": "studio_session_nonces",
+            "table": "studio_session_nonces",
+            "sql_sha256": "7b3bd7e7efd0dcf814af8bdb98ec1bca766759894513afa89ac04b7303f26caa"
+          },
+          {
+            "type": "table",
+            "name": "users",
+            "table": "users",
+            "sql_sha256": "b554ee1c2ecd19e85eff93bd61de8c042b8fb7300ab968021fdb47f3db9d0900"
+          }
+        ]
+      }
+    },
+    "studio": {
+      "path": "/opt/pindou/studio/shared/studio.sqlite3",
+      "tables": 67,
+      "journal_mode": "wal",
+      "integrity": [
+        [
+          "ok"
+        ]
+      ],
+      "foreign_key_violations": 0,
+      "table_definitions_sha256": "1785f951bf4edd79d1cbac611684ff799f1af20508c89834a8ad29a8696b4f51",
+      "schema_objects": {
+        "types": {
+          "index": 90,
+          "table": 67,
+          "trigger": 8
+        },
+        "all_schema_sha256": "5b2098cfb9bab4f0f7422f5b404f4c9b1bfe2a0e2b520b79486fef9e0da07d27",
+        "objects": [
+          {
+            "type": "index",
+            "name": "blocks_day",
+            "table": "reservation_blocks",
+            "sql_sha256": "121f9df41326c4838a02c2b3d60b364a6f2604398ad627626d51b50c02008401"
+          },
+          {
+            "type": "index",
+            "name": "cancellation_owner_month",
+            "table": "reservation_customer_cancellations",
+            "sql_sha256": "e28aa7ab0108cb8f6c9247977501241d168e36252e80766f421f8e2ef43b33aa"
+          },
+          {
+            "type": "index",
+            "name": "commerce_seat_date",
+            "table": "commerce_seats",
+            "sql_sha256": "91e7fa147fc02fbe6d827faf536e04dc535d27bc1f9fa99c54366dbf660d9888"
+          },
+          {
+            "type": "index",
+            "name": "commerce_stock_product",
+            "table": "commerce_stock",
+            "sql_sha256": "729dfadefacb2030e96418883ccaa2a8d0a32ec59c4543e06b2625c430f0f26e"
+          },
+          {
+            "type": "index",
+            "name": "diagnostics_created",
+            "table": "studio_diagnostics",
+            "sql_sha256": "f3e6624117be517c34035f3c3f957d563d89ca0b613fd3a189f63cc43ba8e1e3"
+          },
+          {
+            "type": "index",
+            "name": "owner_channel_due",
+            "table": "studio_owner_notifications",
+            "sql_sha256": "b7f08b52b4d5ca16802aa3abf0a91b7e981b3ea23efb6f7b81ed3fda96b86afd"
+          },
+          {
+            "type": "index",
+            "name": "owner_notification_attempt_time",
+            "table": "studio_owner_notification_attempts",
+            "sql_sha256": "847a24949b99f02a4b291ae9b04d38dc61b33f12104a0cc43a36e86eed097a9c"
+          },
+          {
+            "type": "index",
+            "name": "owner_notifications_due",
+            "table": "studio_owner_notifications",
+            "sql_sha256": "617540373a91239a4b287f316564d7ba168f1715706aa9c32190f44eff989a20"
+          },
+          {
+            "type": "index",
+            "name": "requests_status",
+            "table": "studio_requests",
+            "sql_sha256": "1827bed9ae726d76c7f8aa345c02a83725666cdbe860273667b128f727c0228b"
+          },
+          {
+            "type": "index",
+            "name": "reservation_owner",
+            "table": "studio_reservations",
+            "sql_sha256": "3acf157b32b5a8d1147084f9fdfa5575ec8fe5ebb6b95f20fe18d7ab3d9650a1"
+          },
+          {
+            "type": "index",
+            "name": "reservation_status_date",
+            "table": "studio_reservations",
+            "sql_sha256": "15d246638d441f01b3b137a5a61d47ff2015e1857459cbca7553409fcd16d2e7"
+          },
+          {
+            "type": "index",
+            "name": "sms_bridge_token",
+            "table": "studio_sms_bridges",
+            "sql_sha256": "2d1bdd2e4e72f186717707dd5ba32c3a56b01f800e5af4f9bff0ab1f12c07275"
+          },
+          {
+            "type": "index",
+            "name": "sms_jobs_due",
+            "table": "studio_sms_jobs",
+            "sql_sha256": "1d1a5ece28e35d8cc266408bdb529cdcb6ca27908620cc131fd591623a9e201e"
+          },
+          {
+            "type": "index",
+            "name": "sms_thread_messages",
+            "table": "studio_sms_messages",
+            "sql_sha256": "9f053d3f0c5c394acd71c7c3965acfcaf436a46078c69b23c21dfff5a9894300"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_commerce_limits_1",
+            "table": "commerce_limits",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_commerce_orders_1",
+            "table": "commerce_orders",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_commerce_orders_2",
+            "table": "commerce_orders",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_commerce_orders_3",
+            "table": "commerce_orders",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_commerce_products_1",
+            "table": "commerce_products",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_reservation_blocks_1",
+            "table": "reservation_blocks",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_reservation_customer_cancellations_1",
+            "table": "reservation_customer_cancellations",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_shop_catalog_migrations_1",
+            "table": "shop_catalog_migrations",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_shop_categories_1",
+            "table": "shop_categories",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_shop_import_sources_1",
+            "table": "shop_import_sources",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_shop_import_sources_2",
+            "table": "shop_import_sources",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_auth_identities_1",
+            "table": "studio_auth_identities",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_auth_identities_2",
+            "table": "studio_auth_identities",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_auth_limits_1",
+            "table": "studio_auth_limits",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_booking_notification_choices_1",
+            "table": "studio_booking_notification_choices",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_booking_profiles_1",
+            "table": "studio_booking_profiles",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_content_1",
+            "table": "studio_content",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_conversation_messages_1",
+            "table": "studio_conversation_messages",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_conversation_messages_2",
+            "table": "studio_conversation_messages",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_conversations_1",
+            "table": "studio_conversations",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_conversations_2",
+            "table": "studio_conversations",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_customer_notification_jobs_1",
+            "table": "studio_customer_notification_jobs",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_customer_notification_jobs_2",
+            "table": "studio_customer_notification_jobs",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_customer_notification_preferences_1",
+            "table": "studio_customer_notification_preferences",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_customer_notification_templates_1",
+            "table": "studio_customer_notification_templates",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_customer_wechat_grants_1",
+            "table": "studio_customer_wechat_grants",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_customer_wechat_nonces_1",
+            "table": "studio_customer_wechat_nonces",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_diagnostic_limits_1",
+            "table": "studio_diagnostic_limits",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_finance_categories_1",
+            "table": "studio_finance_categories",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_finance_entries_1",
+            "table": "studio_finance_entries",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_finance_entries_2",
+            "table": "studio_finance_entries",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_finance_entries_3",
+            "table": "studio_finance_entries",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_finance_fx_1",
+            "table": "studio_finance_fx",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_import_jobs_1",
+            "table": "studio_import_jobs",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_import_limits_1",
+            "table": "studio_import_limits",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_journal_1",
+            "table": "studio_journal",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_members_1",
+            "table": "studio_members",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_migrations_1",
+            "table": "studio_migrations",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_miniapp_flows_1",
+            "table": "studio_miniapp_flows",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_miniapp_flows_2",
+            "table": "studio_miniapp_flows",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_miniapp_identities_1",
+            "table": "studio_miniapp_identities",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_miniapp_identities_2",
+            "table": "studio_miniapp_identities",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_miniapp_tickets_1",
+            "table": "studio_miniapp_tickets",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_oauth_flows_1",
+            "table": "studio_oauth_flows",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_owner_notifications_1",
+            "table": "studio_owner_notifications",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_owner_notifications_2",
+            "table": "studio_owner_notifications",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_owner_wechat_bind_tokens_1",
+            "table": "studio_owner_wechat_bind_tokens",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_owner_wechat_bindings_1",
+            "table": "studio_owner_wechat_bindings",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_owner_wechat_bindings_2",
+            "table": "studio_owner_wechat_bindings",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_owner_wechat_jobs_1",
+            "table": "studio_owner_wechat_jobs",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_owner_wechat_jobs_2",
+            "table": "studio_owner_wechat_jobs",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_owner_wechat_subscriptions_1",
+            "table": "studio_owner_wechat_subscriptions",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_requests_1",
+            "table": "studio_requests",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_requests_2",
+            "table": "studio_requests",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_reservations_1",
+            "table": "studio_reservations",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_reservations_2",
+            "table": "studio_reservations",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_sms_bridges_1",
+            "table": "studio_sms_bridges",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_sms_bridges_2",
+            "table": "studio_sms_bridges",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_sms_jobs_1",
+            "table": "studio_sms_jobs",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_sms_jobs_2",
+            "table": "studio_sms_jobs",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_sms_jobs_3",
+            "table": "studio_sms_jobs",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_sms_messages_1",
+            "table": "studio_sms_messages",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_sms_messages_2",
+            "table": "studio_sms_messages",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_sms_thread_reservations_1",
+            "table": "studio_sms_thread_reservations",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_sms_threads_1",
+            "table": "studio_sms_threads",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_sms_threads_2",
+            "table": "studio_sms_threads",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_staff_accounts_1",
+            "table": "studio_staff_accounts",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_telegram_bindings_1",
+            "table": "studio_telegram_bindings",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_wallet_ledger_1",
+            "table": "studio_wallet_ledger",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_studio_wallet_ledger_2",
+            "table": "studio_wallet_ledger",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_submission_limits_1",
+            "table": "submission_limits",
+            "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "type": "index",
+            "name": "studio_conversation_sequence",
+            "table": "studio_conversation_messages",
+            "sql_sha256": "3d3e38ed1fab658fa7b5eebd752da275289309a1e25bf9c2d5edfe37478128f3"
+          },
+          {
+            "type": "index",
+            "name": "studio_customer_code",
+            "table": "studio_members",
+            "sql_sha256": "3b3a2f18cb537f17a70721c12a043f89ead3b28956c10a948dd1a782524dff1e"
+          },
+          {
+            "type": "index",
+            "name": "studio_customer_notification_due",
+            "table": "studio_customer_notification_jobs",
+            "sql_sha256": "81606176622e0dbe56a3830f1198f68168e7f3629ff0ffbdf8792ebcb4f814cc"
+          },
+          {
+            "type": "index",
+            "name": "studio_finance_date",
+            "table": "studio_finance_entries",
+            "sql_sha256": "03bd4ccc9a5b5739b4d944682380588b2da4f648ff593da5b236f2c94668ca3d"
+          },
+          {
+            "type": "index",
+            "name": "studio_ledger_owner",
+            "table": "studio_wallet_ledger",
+            "sql_sha256": "80f6e28a4a753e0af36e64ff8af1a1b81b9e8d32d3937f655abc1e88aabc405f"
+          },
+          {
+            "type": "table",
+            "name": "commerce_events",
+            "table": "commerce_events",
+            "sql_sha256": "ec0c85e198b62847330fd19fca88a70a30667df68f0c318dbd960ddf6f54c312"
+          },
+          {
+            "type": "table",
+            "name": "commerce_limits",
+            "table": "commerce_limits",
+            "sql_sha256": "a4a0a3c80cbdaa7d6489baab16ba334f7be292c67647491e2037e8ff4dad0af3"
+          },
+          {
+            "type": "table",
+            "name": "commerce_orders",
+            "table": "commerce_orders",
+            "sql_sha256": "c22ec0d1160b06a26a26991309ec514dc18b13c2fde0edb49da4b49dbfdbffee"
+          },
+          {
+            "type": "table",
+            "name": "commerce_products",
+            "table": "commerce_products",
+            "sql_sha256": "286120e1b7f470a9202190f5cf4716a65d91fdb42dc012d6ad27feea028f079e"
+          },
+          {
+            "type": "table",
+            "name": "commerce_seats",
+            "table": "commerce_seats",
+            "sql_sha256": "83ab5e35f67092ae8f86941f21c1b7a6734e5e052fedc23c376f5153bb89da87"
+          },
+          {
+            "type": "table",
+            "name": "commerce_settings",
+            "table": "commerce_settings",
+            "sql_sha256": "11e726e13e2b90a47859e645be35a1f158e9aed53d0a9ae4d3fe6e637fc49055"
+          },
+          {
+            "type": "table",
+            "name": "commerce_stock",
+            "table": "commerce_stock",
+            "sql_sha256": "3e43f58cb125eaeecf1f159bf39149f41f14becfb64498fcdd9842331e60c4d1"
+          },
+          {
+            "type": "table",
+            "name": "reservation_blocks",
+            "table": "reservation_blocks",
+            "sql_sha256": "f6ebfc3baaeea5871776b6d79817d8474bcb8a19a9ea45cba682190b3670a5c4"
+          },
+          {
+            "type": "table",
+            "name": "reservation_customer_cancellations",
+            "table": "reservation_customer_cancellations",
+            "sql_sha256": "4557adf9b97e5e1e22190ffa70e5a9ae7d20d470d6c1aaa7171a90e442d4d62b"
+          },
+          {
+            "type": "table",
+            "name": "reservation_events",
+            "table": "reservation_events",
+            "sql_sha256": "12ec6443cbe934c0ecd4f68437c39567f7d52ec7a6adc0bf6d05da264c6fd564"
+          },
+          {
+            "type": "table",
+            "name": "reservation_policy",
+            "table": "reservation_policy",
+            "sql_sha256": "43c4a00fd9ebac5b49b60cc2727466adf65b905eb2ffbde6e67a2f91bc20dbe3"
+          },
+          {
+            "type": "table",
+            "name": "shop_catalog_migrations",
+            "table": "shop_catalog_migrations",
+            "sql_sha256": "b3ffb9dd8a944c8e8c9e31f0eaf6697e5e41d2633eedf1a577aa73fe3ca12976"
+          },
+          {
+            "type": "table",
+            "name": "shop_categories",
+            "table": "shop_categories",
+            "sql_sha256": "8f9fc8110ab70e15c46b6cfd476f5691b25c1997f2e560412ffa9e67fc7b93c4"
+          },
+          {
+            "type": "table",
+            "name": "shop_import_sources",
+            "table": "shop_import_sources",
+            "sql_sha256": "026db3134cad306caed4cd9a7407a9243df041053633e15dcbe7e0b830c9dab9"
+          },
+          {
+            "type": "table",
+            "name": "shop_order_settings",
+            "table": "shop_order_settings",
+            "sql_sha256": "aed4460c75780dd133f1eeed378af71b7890681db0e908b34ec4eb45d79ee54b"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql_sha256": "4cb1eaf14467f226196148cb5688569660cb290d414bae4c1c450b149b62befd"
+          },
+          {
+            "type": "table",
+            "name": "studio_audit",
+            "table": "studio_audit",
+            "sql_sha256": "87b15f14e893b1ffc0765b35cd078bc68bfbd3dbe37098907330b40945ea3177"
+          },
+          {
+            "type": "table",
+            "name": "studio_auth_identities",
+            "table": "studio_auth_identities",
+            "sql_sha256": "1e61766d4b779d482d43547178e29b49cc87f61a200349d708f25c30a31e012f"
+          },
+          {
+            "type": "table",
+            "name": "studio_auth_limits",
+            "table": "studio_auth_limits",
+            "sql_sha256": "ec870e8854691cb033c19b838a699655fd4e23bb686fe4a959a737cbad8b7cd3"
+          },
+          {
+            "type": "table",
+            "name": "studio_booking_notification_choices",
+            "table": "studio_booking_notification_choices",
+            "sql_sha256": "7ae8423bd87a11ba808b191dc0fb8ed2b8665bc3357c851d6806d2ec4349f6d6"
+          },
+          {
+            "type": "table",
+            "name": "studio_booking_profiles",
+            "table": "studio_booking_profiles",
+            "sql_sha256": "b51d6121c04c2267848d6134fad49fb0bf0fbcf1ff4cf44c94cb7bd39e730380"
+          },
+          {
+            "type": "table",
+            "name": "studio_content",
+            "table": "studio_content",
+            "sql_sha256": "2841b29f6a6e218dc423935b2fe9d4c65e6b190a3f985292c3af27cf93ad2354"
+          },
+          {
+            "type": "table",
+            "name": "studio_content_history",
+            "table": "studio_content_history",
+            "sql_sha256": "b0dc1e93d4503a6618fe529ce6c481803382642bb6b4d792d208ac792a959577"
+          },
+          {
+            "type": "table",
+            "name": "studio_conversation_messages",
+            "table": "studio_conversation_messages",
+            "sql_sha256": "8e0933979c7226049a24207167ebc9a048daf9a05dc266f2e7f95886c0c2cf42"
+          },
+          {
+            "type": "table",
+            "name": "studio_conversations",
+            "table": "studio_conversations",
+            "sql_sha256": "6347ff4516a78ed371cee12c4111e3117170d63ad28a3b94c1967e8a61b9401e"
+          },
+          {
+            "type": "table",
+            "name": "studio_customer_notification_jobs",
+            "table": "studio_customer_notification_jobs",
+            "sql_sha256": "fbe1ab1cb26e7e8a7795236705f0b803e6e757236897324f1fe4e980d5447d31"
+          },
+          {
+            "type": "table",
+            "name": "studio_customer_notification_preferences",
+            "table": "studio_customer_notification_preferences",
+            "sql_sha256": "94fe124555e0de0d64283c7e7588d8ab463e59ba45e0cd37d2540b604fd5dfb6"
+          },
+          {
+            "type": "table",
+            "name": "studio_customer_notification_templates",
+            "table": "studio_customer_notification_templates",
+            "sql_sha256": "df8a3f1c5fb8555c031edf5384e03207606887b216a161e166178370699b041b"
+          },
+          {
+            "type": "table",
+            "name": "studio_customer_wechat_grants",
+            "table": "studio_customer_wechat_grants",
+            "sql_sha256": "761272afcac0f4c19bc845054b8550d963f3a8a1919ce56c4ab709d5f613db9b"
+          },
+          {
+            "type": "table",
+            "name": "studio_customer_wechat_nonces",
+            "table": "studio_customer_wechat_nonces",
+            "sql_sha256": "d24a3d406a273c4544b6c3b3cb5782433e93fb74cb14b5d389c768a4bd5da662"
+          },
+          {
+            "type": "table",
+            "name": "studio_diagnostic_limits",
+            "table": "studio_diagnostic_limits",
+            "sql_sha256": "2fcec30f67fc80c480415a05eb72c17d14cf789ddb35cecfbfbfdac26e773672"
+          },
+          {
+            "type": "table",
+            "name": "studio_diagnostics",
+            "table": "studio_diagnostics",
+            "sql_sha256": "664ae3b5ddaf2ee61ca44e504f56662d68dad37983d2ff27fddd76c344fbfdcf"
+          },
+          {
+            "type": "table",
+            "name": "studio_finance_categories",
+            "table": "studio_finance_categories",
+            "sql_sha256": "640b1b33a6999bc9fe50c84ba855a1b971ac80af83cfc4f7c8eec8d41237915c"
+          },
+          {
+            "type": "table",
+            "name": "studio_finance_entries",
+            "table": "studio_finance_entries",
+            "sql_sha256": "feca3f1de1b3d0d52be6be4369a430839d233a59841e421644b7fb56cd0a1fd4"
+          },
+          {
+            "type": "table",
+            "name": "studio_finance_events",
+            "table": "studio_finance_events",
+            "sql_sha256": "841f218f87cb1efd6226192481b139f1f9595545c8994bee65584c958892aaf2"
+          },
+          {
+            "type": "table",
+            "name": "studio_finance_fx",
+            "table": "studio_finance_fx",
+            "sql_sha256": "d87367e81b40f54a6c6df295d6d9e48afa2b878335e26ce83ece81379e373f3d"
+          },
+          {
+            "type": "table",
+            "name": "studio_import_jobs",
+            "table": "studio_import_jobs",
+            "sql_sha256": "ddaf01698d3417e5f9cc4134f94e8eb13c3ff4de38dd76619beb7ad9fde75ef9"
+          },
+          {
+            "type": "table",
+            "name": "studio_import_limits",
+            "table": "studio_import_limits",
+            "sql_sha256": "ed0453526fd077c97b7c44c311b175b08d81a8e73b4d018fc8b3e8bdeeab06bb"
+          },
+          {
+            "type": "table",
+            "name": "studio_journal",
+            "table": "studio_journal",
+            "sql_sha256": "314cd95bc11edc34c590fd8318f9c3d683e197eef49457324fade539b101f5bc"
+          },
+          {
+            "type": "table",
+            "name": "studio_members",
+            "table": "studio_members",
+            "sql_sha256": "7aabf2932b2c361699aadaa852c3717a73f8656b393d4626d9bf017e77c95a5b"
+          },
+          {
+            "type": "table",
+            "name": "studio_migrations",
+            "table": "studio_migrations",
+            "sql_sha256": "45b4907f27755c5c9c13a82cbc83f60f8b39e4f0b4d2a71b16fd1c113e07cd93"
+          },
+          {
+            "type": "table",
+            "name": "studio_miniapp_flows",
+            "table": "studio_miniapp_flows",
+            "sql_sha256": "2948b4eea6625e9bcef9f1448037190b195fa2d550a3e2af30943d2a0ac84cac"
+          },
+          {
+            "type": "table",
+            "name": "studio_miniapp_identities",
+            "table": "studio_miniapp_identities",
+            "sql_sha256": "c8211e6e66ecbb613e2df5559bf3d228a28c36631cbd77a7bff2defe81cdbd88"
+          },
+          {
+            "type": "table",
+            "name": "studio_miniapp_tickets",
+            "table": "studio_miniapp_tickets",
+            "sql_sha256": "a55566929d5bed0f094bd60108e9edc3fc4093f90b293a6023c7c54a4e26220d"
+          },
+          {
+            "type": "table",
+            "name": "studio_oauth_flows",
+            "table": "studio_oauth_flows",
+            "sql_sha256": "4fefe71cc7e70f9f26fbe0bd0092599ac89f69b0f7bf3b7144fd411a4966094d"
+          },
+          {
+            "type": "table",
+            "name": "studio_owner_notification_attempts",
+            "table": "studio_owner_notification_attempts",
+            "sql_sha256": "177552f082b621748913e2ea687b8b7cfd68a798c302662ddc3877172eec07ad"
+          },
+          {
+            "type": "table",
+            "name": "studio_owner_notification_settings",
+            "table": "studio_owner_notification_settings",
+            "sql_sha256": "561217a695ec89bc62be1534076d142e30fafc29d93de34d2d7bb232e11de116"
+          },
+          {
+            "type": "table",
+            "name": "studio_owner_notifications",
+            "table": "studio_owner_notifications",
+            "sql_sha256": "8699f89b5e6ec480cb32f7a4a63184f6bec8ddc20e1b10f32d40abe4ecb10e54"
+          },
+          {
+            "type": "table",
+            "name": "studio_owner_wechat_bind_tokens",
+            "table": "studio_owner_wechat_bind_tokens",
+            "sql_sha256": "377ae116ddcbd5438198c2c606234aa015068fcf9043f67a7c8d4eac268da4c6"
+          },
+          {
+            "type": "table",
+            "name": "studio_owner_wechat_bindings",
+            "table": "studio_owner_wechat_bindings",
+            "sql_sha256": "b51a3c6bed7740a2533d9f7a048044c38b568a0a7f529dd61136693f1802eb31"
+          },
+          {
+            "type": "table",
+            "name": "studio_owner_wechat_jobs",
+            "table": "studio_owner_wechat_jobs",
+            "sql_sha256": "5bc8d437a513d4152b92ad81bf16bca8c170fbc7d1f67815e081b9fa110d9112"
+          },
+          {
+            "type": "table",
+            "name": "studio_owner_wechat_settings",
+            "table": "studio_owner_wechat_settings",
+            "sql_sha256": "877846ba3870e0ef8cc47429341ac039fdea4ac1f6ad2ba9b4d27049c395ec8b"
+          },
+          {
+            "type": "table",
+            "name": "studio_owner_wechat_subscriptions",
+            "table": "studio_owner_wechat_subscriptions",
+            "sql_sha256": "a0489f93402b7b9aa6f75a145f722a2416ca0cb19bf4a398543e7f9b0382e8d8"
+          },
+          {
+            "type": "table",
+            "name": "studio_requests",
+            "table": "studio_requests",
+            "sql_sha256": "316a1c8fdc079ae68358a106315c43304da996ae6ff15041ef1b9f3a1587810a"
+          },
+          {
+            "type": "table",
+            "name": "studio_reservations",
+            "table": "studio_reservations",
+            "sql_sha256": "8a2a003a7134084ae35e42571772ac76335eb34fd959d904d1c16d9c0236c73c"
+          },
+          {
+            "type": "table",
+            "name": "studio_sms_bridges",
+            "table": "studio_sms_bridges",
+            "sql_sha256": "0471bb8e10c5ef1cbb9c664ad5127810d44f53251e9343ece2810fcff56cd05a"
+          },
+          {
+            "type": "table",
+            "name": "studio_sms_jobs",
+            "table": "studio_sms_jobs",
+            "sql_sha256": "ce8764c8802b2772135d1362380f35916a91dfda6f0c53b5bdd3cc937d3220e5"
+          },
+          {
+            "type": "table",
+            "name": "studio_sms_messages",
+            "table": "studio_sms_messages",
+            "sql_sha256": "6fea0100c4550649ac6a3b8462298559a4895bee793aa1fd4ff89223f4aa6ac3"
+          },
+          {
+            "type": "table",
+            "name": "studio_sms_settings",
+            "table": "studio_sms_settings",
+            "sql_sha256": "9c21700b6e38c3f5db989111b0feedd16657fd6043c68931c4245df1235de699"
+          },
+          {
+            "type": "table",
+            "name": "studio_sms_thread_reservations",
+            "table": "studio_sms_thread_reservations",
+            "sql_sha256": "a9f48e240cf9f012e30bd2084d4226d5bd856e58adc65dacfd8510e614ce27e4"
+          },
+          {
+            "type": "table",
+            "name": "studio_sms_threads",
+            "table": "studio_sms_threads",
+            "sql_sha256": "9d2bae5334b21c7de758fc6735fba58b5ceab26eef26c4daa1506d80c5ed9ea4"
+          },
+          {
+            "type": "table",
+            "name": "studio_staff_accounts",
+            "table": "studio_staff_accounts",
+            "sql_sha256": "1a3f22b731245772c25bae6e888bf86fab54c5360a72efa44a0f7e7e19783ec0"
+          },
+          {
+            "type": "table",
+            "name": "studio_staff_events",
+            "table": "studio_staff_events",
+            "sql_sha256": "4593b4700e64fac51a51d1478f221c33360c273cc5c73ebc89a3337a2a4e3a4c"
+          },
+          {
+            "type": "table",
+            "name": "studio_telegram_bindings",
+            "table": "studio_telegram_bindings",
+            "sql_sha256": "f4e44a4a6078b0a508c850a7d0ca233825cf49375c62b5be89c7fbb6be5c7123"
+          },
+          {
+            "type": "table",
+            "name": "studio_telegram_settings",
+            "table": "studio_telegram_settings",
+            "sql_sha256": "7afee8c913384cad1728ecb86f1bbb9705b118900d8274d966e36f8a414c9aee"
+          },
+          {
+            "type": "table",
+            "name": "studio_wallet_ledger",
+            "table": "studio_wallet_ledger",
+            "sql_sha256": "5b085dcf99726a451c9c6dad9c48fbba211f2f111634952aa7890e07266e13f1"
+          },
+          {
+            "type": "table",
+            "name": "submission_limits",
+            "table": "submission_limits",
+            "sql_sha256": "2e69efdf06b520215c99fcc022ebe9e0eebe459f73b2e12958a73e2668a57305"
+          },
+          {
+            "type": "trigger",
+            "name": "reservation_history_delete",
+            "table": "reservation_events",
+            "sql_sha256": "6ae7717a8cd3dfc9d4006faa228ae479e54eca87de082ae041c53858b19b0b2d"
+          },
+          {
+            "type": "trigger",
+            "name": "reservation_history_update",
+            "table": "reservation_events",
+            "sql_sha256": "5fae7411ec791716e8ce1223d165a52ba25526499444f6bc470bf2774f53b6b9"
+          },
+          {
+            "type": "trigger",
+            "name": "reservation_origin_immutable",
+            "table": "studio_reservations",
+            "sql_sha256": "45656c9907e1312a0667d49af011fc7d4d24ae8003ce9598b6140208b2f9948c"
+          },
+          {
+            "type": "trigger",
+            "name": "studio_finance_history_delete",
+            "table": "studio_finance_events",
+            "sql_sha256": "7414026d394c878a56d66df3f709e9d8996c2132b016f20247025104beee92e7"
+          },
+          {
+            "type": "trigger",
+            "name": "studio_finance_history_update",
+            "table": "studio_finance_events",
+            "sql_sha256": "d6a797e4fb1d5ff9af120e2b09f7c7be3b5137aca8618ea021895a20d7fded19"
+          },
+          {
+            "type": "trigger",
+            "name": "studio_ledger_immutable_delete",
+            "table": "studio_wallet_ledger",
+            "sql_sha256": "df944205bf0d2a64736b5d091d3ba99272ac31d6b5238043f4df9512677b23eb"
+          },
+          {
+            "type": "trigger",
+            "name": "studio_ledger_immutable_update",
+            "table": "studio_wallet_ledger",
+            "sql_sha256": "2b62acdbb43b4b1a5b19bc36670edc9d3dbd1810d0dc617d4231caea3d52d4e0"
+          },
+          {
+            "type": "trigger",
+            "name": "wallet_self_booking_rewards",
+            "table": "studio_wallet_ledger",
+            "sql_sha256": "8d4c2efee1303767fa102b03173c24e231981868bea83d499400d7d695b1aec8"
+          }
+        ]
+      }
+    }
+  },
+  "database_snapshot_limit": "each database has its own read transaction; not a joint production write freeze",
+  "table_hash_method": "sort SHA256 digest bytes of each compact UTF8 JSON row; concatenate digest bytes; SHA256 result; bytes represented as binary_hex object",
+  "storage": {
+    "/opt/pindou": {
+      "regular_paths": 661646,
+      "duplicate_hardlink_paths": 137969,
+      "unique_logical_bytes": 19343058374,
+      "unique_allocated_bytes": 20580438016
+    },
+    "/var/log": {
+      "regular_paths": 271,
+      "duplicate_hardlink_paths": 0,
+      "unique_logical_bytes": 5917947379,
+      "unique_allocated_bytes": 5918425088
+    },
+    "/root": {
+      "regular_paths": 55,
+      "duplicate_hardlink_paths": 0,
+      "unique_logical_bytes": 18438527,
+      "unique_allocated_bytes": 18567168
+    },
+    "/home": {
+      "regular_paths": 459,
+      "duplicate_hardlink_paths": 0,
+      "unique_logical_bytes": 196090372,
+      "unique_allocated_bytes": 197156864
+    },
+    "/tmp": {
+      "regular_paths": 92,
+      "duplicate_hardlink_paths": 0,
+      "unique_logical_bytes": 182648917,
+      "unique_allocated_bytes": 182804480
+    }
+  },
+  "release_counts": {
+    "/opt/pindou/releases": 46,
+    "/opt/pindou/studio/releases": 74
+  },
+  "runtime": {
+    "/usr/bin/python3.11": {
+      "rc": 0,
+      "stdout": "Python 3.11.0rc1",
+      "stderr": ""
+    },
+    "/opt/pindou/current/06_backend/.venv/bin/python": {
+      "rc": 0,
+      "stdout": "Python 3.11.0rc1",
+      "stderr": ""
+    },
+    "/opt/pindou/studio/venv/bin/python": {
+      "rc": 0,
+      "stdout": "Python 3.10.12",
+      "stderr": ""
+    }
+  },
+  "local_wheels": [
+    {
+      "name": "certifi-2026.7.22-py3-none-any.whl",
+      "bytes": 136983,
+      "sha256": "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775"
+    },
+    {
+      "name": "curl_cffi-0.14.0-cp39-abi3-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl",
+      "bytes": 8654624,
+      "sha256": "060fe2c99c41d3cb7f894de318ddf4b0301b08dca70453d769bd4e74b36b8483"
+    }
+  ],
+  "file_reference_checks": {
+    "studio": {
+      "unique_local_references": 369,
+      "existing": 369,
+      "missing": [],
+      "scope": "published and draft content/journal/product payload references; historical free-text metadata not covered"
+    },
+    "generator": {
+      "original_expected": 2,
+      "original_exists": 2,
+      "deleted_originals": 58,
+      "previews_expected": 85,
+      "previews_exists": 85,
+      "missing_originals": 0,
+      "missing_previews": 0,
+      "json_documents": 85,
+      "json_valid": 85,
+      "path_kinds": {
+        "relative:uploads": 60,
+        "absolute:static": 60,
+        "absolute:brand": 25
+      }
+    }
+  },
+  "relations": {
+    "members": 21,
+    "join_contract": "Studio owner_id and miniapp user_id equal generator users.openid, not its numeric id",
+    "members_missing_generator_user": 0,
+    "miniapp_identities_missing_generator_user": 0,
+    "authing_identities": 4
+  },
+  "wallet": {
+    "points": 4814,
+    "minutes": 3840,
+    "negative_members": 0,
+    "latest_ledger_mismatch": 0,
+    "duplicate_idempotency": 0
+  },
+  "notification_states": {
+    "studio_owner_notifications": [
+      {
+        "state": "accepted",
+        "count": 17
+      },
+      {
+        "state": "skipped",
+        "count": 3
+      }
+    ],
+    "studio_owner_wechat_jobs": [
+      {
+        "state": "accepted",
+        "count": 6
+      },
+      {
+        "state": "skipped",
+        "count": 4
+      }
+    ],
+    "studio_customer_notification_jobs": [
+      {
+        "state": "accepted",
+        "count": 12
+      },
+      {
+        "state": "queued",
+        "count": 1
+      },
+      {
+        "state": "sent",
+        "count": 7
+      },
+      {
+        "state": "skipped",
+        "count": 1
+      }
+    ],
+    "studio_sms_jobs": [
+      {
+        "state": "delivered",
+        "count": 3
+      },
+      {
+        "state": "sent",
+        "count": 17
+      },
+      {
+        "state": "unknown",
+        "count": 1
+      }
+    ]
+  },
+  "tunnel": {
+    "remote_managed": true,
+    "current_ingress_export_obtained": false,
+    "available_journal_matches": 0
+  },
+  "critical_gaps": [
+    "current cloud billing/security group/snapshot evidence",
+    "current Cloudflare ingress export",
+    "target availability/quote/network validation",
+    "complete independently stored backup and restore",
+    "isolated full restore and final freeze rehearsal"
+  ],
+  "secrets_exported": false,
+  "customer_rows_exported": false
+}

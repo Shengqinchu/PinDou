@@ -1,0 +1,81 @@
+{
+  "created_at": "2026-09-18T05:07:39.371225+00:00",
+  "files": [
+    {
+      "path": "artifacts/migration-research-20260918/collect_source.py",
+      "bytes": 1397,
+      "sha256": "db586d8dcf866d3457c5e74cd9cafbc79150ede2b6b4f851d6ac59b7a74dde07"
+    },
+    {
+      "path": "artifacts/migration-research-20260918/public-readonly.json",
+      "bytes": 2412,
+      "sha256": "4dbcb108c84a06ae4d81bb1642dd092b327e81a0a34fff70cb131fc5b44e21fb"
+    },
+    {
+      "path": "artifacts/migration-research-20260918/remote_business.py",
+      "bytes": 9093,
+      "sha256": "6e61d882b98acf1ebed894a85753e64811a3cae7425deee62568ba6631c3a61b"
+    },
+    {
+      "path": "artifacts/migration-research-20260918/remote_detail.py",
+      "bytes": 7295,
+      "sha256": "59a60b5e772d857638065f371a6624df6688c8df2583cba67313f86250417dba"
+    },
+    {
+      "path": "artifacts/migration-research-20260918/remote_followup.py",
+      "bytes": 2707,
+      "sha256": "1d57aa7af4119a55a9b797c96f72e0d8c33ccecce46e2f3ce9b5ca18a8440fe6"
+    },
+    {
+      "path": "artifacts/migration-research-20260918/remote_inventory.py",
+      "bytes": 7048,
+      "sha256": "96542c28c778d13472f2a081b80522e973a09e41ee7dd96274e242f7c3baeb0a"
+    },
+    {
+      "path": "artifacts/migration-research-20260918/remote_schema.py",
+      "bytes": 876,
+      "sha256": "19580f1b3487ba2ff806d0aa3cf49099424ed004a7791d952c7747b953c0b2dd"
+    },
+    {
+      "path": "artifacts/migration-research-20260918/source-business.json",
+      "bytes": 8706,
+      "sha256": "80faf67e36d19225d19064f79a4bf0429267ee564bcda117ab91e73aab6f0259"
+    },
+    {
+      "path": "artifacts/migration-research-20260918/source-detail.json",
+      "bytes": 440460,
+      "sha256": "78547796ee97437725991888fbb9b2168b64c90801c91eead1a272411a258d84"
+    },
+    {
+      "path": "artifacts/migration-research-20260918/source-followup.json",
+      "bytes": 1736,
+      "sha256": "f4facf1fceef1d0f990a33359e4b1d350df632a9f84fad32b43b38bac9b3daed"
+    },
+    {
+      "path": "artifacts/migration-research-20260918/source-inventory.json",
+      "bytes": 131734,
+      "sha256": "be9062812695527b129ff8da02bc09b52bf021f32e35796c8103b9456ad99813"
+    },
+    {
+      "path": "artifacts/migration-research-20260918/source-schema.json",
+      "bytes": 59574,
+      "sha256": "33dcb16f7587da80ca6515a1db72ac6358654453a5dc27d504b93de3a57314ee"
+    },
+    {
+      "path": "artifacts/migration-research-20260918/turnitin-chat-excerpts.json",
+      "bytes": 62926,
+      "sha256": "73aa39f29f038bee5372508e4cbcaf541678d769d48fbc78cf78d98a22642a31"
+    },
+    {
+      "path": "01_research/migration-evidence-20260918/ASSESSMENT_SUMMARY.json",
+      "bytes": 69339,
+      "sha256": "99a16a4c69994430a1e4109791beb1954a48e9d496a213e037a0d47608f2e8c8"
+    },
+    {
+      "path": "01_research/migration-evidence-20260918/DB_BASELINE_20260918.csv",
+      "bytes": 10984,
+      "sha256": "bdab09936795db6de31cda63c15aee9f85f04a661a238f3f7fceb40972ef2644"
+    }
+  ],
+  "note": "Local read-only evidence; paths under artifacts are local ignored evidence. This index is not a production file manifest or a full backup."
+}

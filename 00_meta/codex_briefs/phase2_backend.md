@@ -38,11 +38,11 @@
 
 ### 任务 0：SSH 进服务器查硬件 + 填 deployment.md（最先做）
 
-**SSH 凭证**：从本地 `.env` 读 `PINDOU_PROD_SSH_*`（密码已在 .env，不要写到 commit）
+**SSH 凭证**：从本地 `.env` 读 `PINDOU_PROD_SSH_*`。2026-09-18 起目标为 `36.139.201.94`，使用新 Ed25519 key；详见 `07_ops/SERVER_ASSETS.md`，密码及私钥不写到 commit。
 
 **要查的信息**：
 ```bash
-ssh -o StrictHostKeyChecking=no root@$PINDOU_PROD_SSH_HOST
+ssh pindou-prod
 # 上去后执行：
 df -h                          # 硬盘
 lsblk                          # 块设备

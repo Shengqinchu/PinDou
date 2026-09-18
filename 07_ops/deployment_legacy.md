@@ -1,5 +1,7 @@
 # PinDou 部署运维文档
 
+> **历史文档（旧机）**：本文件保留 2026 年 5 月起的实施记录。2026-09-18 已迁至 `36.139.201.94`，到期 **2027-09-18**；当前配置和操作入口以 [服务器资产](SERVER_ASSETS.md) / [部署说明](deployment.md) 为准。以下旧带宽、SSH 策略、环境和到期时间不是新机配置，不应直接照抄执行。
+
 > **目标环境**：生产（上海 8C16G 20Mbps）
 > **撰写**：Claude Code 2026-05-24（初版骨架）
 > **状态**：🟢 Codex Phase 2 任务 0 已完成硬件盘点；旧服务/旧数据已清理，SSH key / 部署用户 / fail2ban / UFW 已落地
@@ -19,9 +21,9 @@
 | 内存 | 15 GiB RAM，2.0 GiB swap |
 | 硬盘 | 80G system disk；`/dev/sda1` mounted on `/`，79G total / 6.9G used / 69G available / 10% used（2026-05-25 清理旧服务后） |
 | `/var` 分区 | 与根分区同盘；清理后 `/var` 约 525M。用户图片落本地盘仍需关注容量上限 |
-| 公网 IP | 见 `.env` `PINDOU_PROD_SSH_HOST` |
-| SSH 用户 | 见 `.env` `PINDOU_PROD_SSH_USER`（当前已切到 `pindou`） |
-| SSH 凭证 | 见 `.env` `PINDOU_PROD_SSH_KEY_PATH`；密码登录已禁用，旧 `PINDOU_PROD_SSH_PASS` 已从本地 `.env` 移除 |
+| 旧机公网 IP | `36.137.177.135`；本机 `.env` 已改为新机，不能用于复现本表旧机信息 |
+| 旧机 SSH 用户 | `pindou` / root 应急 |
+| 旧机 SSH 凭证 | `C:/Users/123/.ssh/pindou_prod_ed25519`；下方禁用密码是旧机历史记录 |
 | 网络接口 | `eth0` private network + `docker0`；公网 IP 不入文档 |
 | 已监听端口 | 公网仅 `22`；本地 `127.0.0.1:31088` 为云探针 |
 | 已清理端口 | `80` / `3001` / `8092` / `111` / cloudflared UDP 均已停止；UFW 仍预放行 `22/80/443` 供后续 PinDou 部署 |
