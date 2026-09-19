@@ -30,6 +30,7 @@
 
 - 发布包 SHA-256：`241152b5f115f001963aca949a3fb0d0615772e9922f8fc91a6acfced4261cb6`；416 个清单文件逐一核验通过。
 - 切换前即时备份：`/opt/pindou/studio/backups/20260919002842-studio-v7/`。双库快照、恢复演练和发布日志：`/root/pindou-admin-controls-20260919002842-studio-v7-verified/`。
+- 离机副本：`D:/Users/123/Documents/PinDouBackups/admin-controls-20260918/`，`BACKUP_INDEX.json` 记录双库快照、切换前 Studio 库及演练/发布证据共 7 个文件，逐一与服务器 SHA-256 一致。
 - 与即时备份比对：23 个顾客账户、46 条账本流水、27 条预约、249 件商品、2 个历史订单及身份、预约资料、商品来源、通知队列等全部原样保留。66 张既有表中，64 张逐值一致；`studio_content` 仅增加 `admin-controls`，两条 `studio_sms_bridges` 仅 `last_seen` 正常心跳更新时间变化。两张新归档表均为空，未操作真实顾客或商品。
 - Studio、生成器、Nginx、cloudflared 全部 active；生成器 PID `67327` 保持，未重启生成器或 Tunnel。发布后日志无新增应用异常。
 - 公网 Chromium 桌面及 WebKit 手机尺寸均取得新 build；小店和后台登录页面 200、健康/目录接口 200、未登录的新后台读取接口 401。5 个管理员 JS/CSS 资源哈希与发布清单一致，包含本轮新控件。源站两个新增归档写接口的无凭据请求均为 401。
