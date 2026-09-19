@@ -71,7 +71,7 @@ def test_opening_topup_gift_usage_redemption_and_remainder(client):
 
 
 @pytest.mark.parametrize('changes',[
-    {'kind':'redeem','minutes_delta':0,'points_delta':-88,'bill_cents':1000},
+    {'kind':'redeem','minutes_delta':0,'points_delta':-88.5,'bill_cents':1000},
     {'kind':'redeem','minutes_delta':0,'points_delta':-200,'bill_cents':199},
     {'kind':'redeem','minutes_delta':0,'points_delta':-100},
     {'minutes_delta':1.5}, {'points_delta':True}, {'note':''},

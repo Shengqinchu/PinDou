@@ -1,11 +1,12 @@
 {
-  "source": "STUDIO_DAY_CONFLICT_20260916",
+  "source": "owner-admin-controls-20260918",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
   },
   "hashes": {
     "account.json": "4d8eb4133dc5798fabea70a6a95bb9736a213b2991b18ff231c6d5440440ddf8",
+    "admin-controls.json": "f7a93bc3a8f5766c3015cdbf6cafa2b0e5d465aecba2162a833296ee54cfa56e",
     "admin-visits.json": "c27d3fb861fea54c5c49f875058b28fd0a2bffc7a9cb0a8fafc729f1556620ac",
     "admin.json": "f867ea87d71f2508a1e9dde9ed9dadad4069582cd74159ff89549273a47c1d6e",
     "App.json": "11615c68d94a5488985886162ee225322755d3668aeb0685651bf41c137ac2a0",

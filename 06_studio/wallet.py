@@ -134,6 +134,9 @@ def staff_profile(db, row):
 
 def detail(db, owner_id, page=1, category='all', admin=False):
     account = member(db, owner_id)
+    if admin:
+        import admin_archives
+        account['deleted_at'] = admin_archives.archived(db, 'member', owner_id)
     clause = {'all':'', 'time':' AND minutes_delta!=0', 'points':' AND points_delta!=0'}[category]
     total = db.execute('SELECT count(*) FROM studio_wallet_ledger WHERE owner_id=?'+clause, (owner_id,)).fetchone()[0]
     rows = db.execute("""SELECT l.*, (SELECT id FROM studio_wallet_ledger r WHERE r.reverses_id=l.id) reversed_by
@@ -211,25 +214,26 @@ class Transaction(Strict):
     version: int = Field(ge=1, strict=True)
     kind: Literal['opening','topup','gift','usage','redeem','adjustment']
     minutes_delta: int = Field(default=0, ge=-1000000, le=1000000, strict=True)
-    points_delta: int = Field(default=0, ge=-1000000, le=1000000, strict=True)
+    points_delta: int = Field(default=0, ge=-100000000, le=1000000, strict=True)
     note: str = Field(min_length=1, max_length=600)
     effective_date: date
     reservation_id: str = Field(default='', max_length=64)
-    bill_cents: int | None = Field(default=None, ge=100, le=100000000, strict=True)
+    bill_cents: int | None = Field(default=None, ge=1, le=100000000, strict=True)
     redemption_use: Literal['visit','shop'] | None = None
     no_promotion: bool | None = Field(default=None,strict=True)
 
     @model_validator(mode='after')
     def amounts(self):
         m,p = self.minutes_delta,self.points_delta
+        if self.kind!='redeem' and p < -1000000: raise ValueError('Adjustment exceeds transaction limit')
         if m==0 and p==0: raise ValueError('No balance change')
         if self.effective_date > datetime.now(ZONE).date(): raise ValueError('Use a past or current date')
         if self.kind in ('opening','gift') and (m<0 or p<0): raise ValueError('Credits must be positive')
         if self.kind=='topup' and (m<=0 or p!=0): raise ValueError('Top-up requires time only')
         if self.kind=='usage' and (m>=0 or p!=0): raise ValueError('Usage requires a time debit')
         if self.kind=='redeem':
-            if m or p>=0 or p%POINTS_PER_CAD or self.bill_cents is None or -p>self.bill_cents:
-                raise ValueError('Redeem whole CAD within the verified bill amount')
+            if m or p>=0 or self.bill_cents is None or -p>self.bill_cents:
+                raise ValueError('Redeem integer points within the verified bill amount')
         elif self.bill_cents is not None or self.redemption_use is not None or self.no_promotion is not None:
             raise ValueError('Redemption details are for redemption only')
         return self
@@ -269,7 +273,7 @@ def register(app, database, admin_actor):
             return detail(db,customer['id'],page,category)
 
     @app.get('/studio-api/manage/members')
-    def members(search:str='',page:int=1,_actor=Depends(admin_actor)):
+    def members(search:str='',page:int=1,deleted:bool=False,_actor=Depends(admin_actor)):
         if len(search)>160 or not 1<=page<=100000: raise HTTPException(422,'invalid_filter')
         where=' WHERE instr(lower(name),lower(?))>0 OR instr(lower(email),lower(?))>0 OR instr(owner_id,?)>0 OR instr(lower(staff_note),lower(?))>0 OR instr(lower(customer_code),lower(?))>0 OR owner_id IN (SELECT owner_id FROM studio_booking_profiles WHERE instr(lower(name),lower(?))>0 OR instr(lower(contact),lower(?))>0 OR instr(lower(wechat_id),lower(?))>0)'
         params=(search,)*8
@@ -277,6 +281,7 @@ def register(app, database, admin_actor):
             if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='studio_customer_notification_preferences'").fetchone():
                 where+=' OR owner_id IN (SELECT owner_id FROM studio_customer_notification_preferences WHERE instr(lower(email),lower(?))>0 OR instr(phone,?)>0)'
                 params+=(search,search)
+            where=' WHERE ('+where.removeprefix(' WHERE ')+') AND '+('' if deleted else 'NOT ')+"EXISTS (SELECT 1 FROM studio_archives a WHERE a.kind='member' AND a.entity_id=studio_members.owner_id)"
             total=db.execute('SELECT count(*) FROM studio_members'+where,params).fetchone()[0]
             rows=db.execute('SELECT * FROM studio_members'+where+' ORDER BY updated_at DESC,owner_id LIMIT 30 OFFSET ?',(*params,(page-1)*30)).fetchall()
             return {'items':[public_member(dict(r))|{'staff_note':r['staff_note'],**staff_profile(db,r)} for r in rows],'total':total,'page':page}

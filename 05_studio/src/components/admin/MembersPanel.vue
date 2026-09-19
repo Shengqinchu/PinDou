@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { computed,onBeforeUnmount,ref,watch } from 'vue';
+import { computed,nextTick,onBeforeUnmount,ref,watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { PhArrowRight,PhArrowClockwise,PhWallet,PhCheck } from '@phosphor-icons/vue';
 import { useDesk } from '../../admin';
 import { CommerceError } from '../../commerce';
-import { walletCopy as copy,duration,type WalletAccount,type WalletDetail,type WalletEntry,type WalletCategory } from '../../wallet';
+import { walletCopy as copy,duration,centsFromCad,type WalletAccount,type WalletDetail,type WalletEntry,type WalletCategory } from '../../wallet';
 import { minutesFromHours } from '../../time-units';
 import CustomerIdentity from '../CustomerIdentity.vue';
 import MemberVisits from './MemberVisits.vue';
+import ArchiveDialog from './ArchiveDialog.vue';
+import controlsDefaults from '../../content/admin-controls.json';
+import { contentModule } from '../../content-store';
+const controls=contentModule('admin-controls',controlsDefaults);
 import { say,formatCopy,hamiltonDate } from '../../state';
 import { readSession,saveSession } from '../../reservations';
 import SlideOver from '../SlideOver.vue';
@@ -22,9 +26,16 @@ const pending=ref<Pending|null>(readSession<Pending>('studio-wallet-pending-v1')
 const members=ref<WalletAccount[]>([]),total=ref(0),page=ref(1),search=ref(''),busy=ref(false),error=ref('');
 const selected=ref(''),open=ref(false),data=ref<WalletDetail>(),ledgerPage=ref(1),category=ref<WalletCategory>('all');
 const loading=ref(false),saving=ref(false),saveError=ref(''),saved=ref(false),showForm=ref(false);
-const visitSaving=ref(false);
+const visitSaving=ref(false),deleted=ref(false),archiveOpen=ref(false);
+const archiveTarget=ref<WalletAccount>();
+const entryForm=ref<HTMLFormElement>(),feedback=ref<HTMLElement>();
+const redeemPoints=computed(()=>centsFromCad(redeemCad.value));
+function archiveMember(){if(frozen.value||!data.value)return;archiveTarget.value={...data.value.account};open.value=false;archiveOpen.value=true;}
+async function memberArchived(){await load();data.value=undefined;selected.value='';}
+function useAllPoints(){if(data.value)redeemCad.value=(data.value.account.points/100).toFixed(2);}
+async function reveal(element:HTMLElement|undefined){await nextTick();element?.scrollIntoView({block:'start',behavior:'instant'});element?.focus({preventScroll:true});}
 const redemptionUse=ref<'visit'|'shop'>('visit'),noPromotion=ref(false);
-const kind=ref('topup'),timeHours=ref<number|string>(10),pointsAmount=ref<number|''>(0),redeemCad=ref<number|''>(1),bill=ref('');
+const kind=ref('topup'),timeHours=ref<number|string>(10),pointsAmount=ref<number|''>(0),redeemCad=ref<number|string>('1.00'),bill=ref('');
 const note=ref(''),effective=ref(hamiltonDate()),reservation=ref(''),privateNote=ref(''),noteVersion=ref(1),reverseEntry=ref<WalletEntry>();
 const frozen=computed(()=>saving.value||visitSaving.value||!!pending.value);
 const editingBooking=ref(false),bookingDraft=ref(emptyContact()),bookingVersion=ref(0);
@@ -41,7 +52,7 @@ const kinds=['opening','topup','gift','usage','redeem','adjustment'];
 const label=(value:string)=>say((copy as Record<string,string[]>)[value]);
 async function load(){
   const seq=++listSequence;busy.value=true;error.value='';
-  try{const result=await request<{items:WalletAccount[];total:number}>(`/manage/members?${new URLSearchParams({search:search.value,page:String(page.value)})}`);if(seq===listSequence){members.value=result.items;total.value=result.total;}}
+  try{const result=await request<{items:WalletAccount[];total:number}>(`/manage/members?${new URLSearchParams({search:search.value,page:String(page.value),deleted:String(deleted.value)})}`);if(seq===listSequence){members.value=result.items;total.value=result.total;}}
   catch(e){if(seq===listSequence)error.value=(e as Error).message;}finally{if(seq===listSequence)busy.value=false;}
 }
 async function loadDetail(resetNote=false){
@@ -65,7 +76,7 @@ async function sendPending(){
   try{
     const result=await request<WalletDetail>(action.path,{method:'POST',headers:{'Idempotency-Key':action.key},body:JSON.stringify(action.body)});
     setPending(null);data.value=result;ledgerPage.value=1;category.value='all';privateNote.value=result.account.staff_note||'';noteVersion.value=result.account.version;
-    showForm.value=false;reverseEntry.value=undefined;note.value='';saved.value=true;await load();
+    showForm.value=false;reverseEntry.value=undefined;note.value='';saved.value=true;await load();await nextTick();void reveal(feedback.value);
   }catch(e){
     saveError.value=(e as Error).message;
     // A definite rejected request can be edited. An uncertain result retains its
@@ -81,12 +92,14 @@ async function record(){
   let body:Record<string,unknown>={version:data.value.account.version,note:note.value.trim()};
   if(reverseEntry.value){path=`/manage/members/${encodeURIComponent(owner)}/entries/${reverseEntry.value.id}/reverse`;}
   else{
+    const redeemed=centsFromCad(redeemCad.value),billCents=centsFromCad(bill.value);
+    if(kind.value==='redeem'&&(redeemed===null||redeemed<1||redeemed>data.value.account.points||billCents===null||redeemed>billCents)){saveError.value=say(controls.invalidRedemption);return;}
     const m=kind.value==='redeem'?0:minutesFromHours(timeHours.value),p=Number(pointsAmount.value||0);
     if(m===null||Math.abs(m)>1000000||(kind.value!=='adjustment'&&m<0)){saveError.value=say(copy.invalid_hours);return;}
     body={...body,kind:kind.value,minutes_delta:kind.value==='redeem'?0:kind.value==='usage'?-m:m,
-      points_delta:kind.value==='redeem'?-Number(redeemCad.value)*100:['gift','opening','adjustment'].includes(kind.value)?p:0,
+      points_delta:kind.value==='redeem'?-(redeemed||0):['gift','opening','adjustment'].includes(kind.value)?p:0,
       effective_date:effective.value,reservation_id:reservation.value.trim(),
-      ...(kind.value==='redeem'?{bill_cents:Math.round(Number(bill.value)*100),redemption_use:redemptionUse.value,no_promotion:noPromotion.value}:{})};
+      ...(kind.value==='redeem'?{bill_cents:billCents,redemption_use:redemptionUse.value,no_promotion:noPromotion.value}:{})};
   }
   setPending({owner,key:crypto.randomUUID(),path,body});await sendPending();
 }
@@ -96,8 +109,9 @@ async function saveNote(){
   catch(e){saveError.value=(e as Error).message;}finally{saving.value=false;}
 }
 function beginEntry(){showForm.value=true;noPromotion.value=false;redemptionUse.value='visit';reverseEntry.value=undefined;saved.value=false;saveError.value='';note.value='';}
-function beginReverse(entry:WalletEntry){beginEntry();reverseEntry.value=entry;}
+async function beginReverse(entry:WalletEntry){if(frozen.value)return;beginEntry();reverseEntry.value=entry;await nextTick();void reveal(entryForm.value);}
 watch(kind,()=>{noPromotion.value=false;pointsAmount.value=0;timeHours.value=['usage','adjustment','gift'].includes(kind.value)?0:10;});
+watch(deleted,()=>{page.value=1;void load();});
 watch(search,()=>{clearTimeout(debounce);debounce=setTimeout(()=>{page.value=1;void load();},300);});
 watch([ledgerPage,category],()=>{if(open.value&&!saving.value)void loadDetail();});
 watch(()=>[props.active,route.query.member],()=>{
@@ -111,6 +125,7 @@ defineExpose({refresh:load});
   <section class="member-desk">
     <header class="desk-page-heading"><div><h1>{{say(copy.members)}}</h1><p>{{say(copy.members_intro)}}</p></div><button class="desk-button secondary" :disabled="busy" @click="load"><PhArrowClockwise :class="{spinning:busy}"/>{{say(copy.refresh)}}</button></header>
     <p class="member-intro">{{say(copy.register_first)}}</p>
+    <nav class="admin-archive-tabs"><button type="button" :aria-pressed="!deleted" @click="deleted=false">{{say(controls.currentMembers)}}</button><button type="button" :aria-pressed="deleted" @click="deleted=true">{{say(controls.deletedMembers)}}</button></nav>
     <label class="desk-field member-search">{{say(copy.search)}}<input v-model.trim="search" type="search" maxlength="160"/></label>
     <p v-if="error" class="desk-error" role="alert">{{error}}</p>
     <p v-if="busy&&!members.length" role="status">{{say(copy.loading)}}</p><p v-else-if="!members.length" class="wallet-empty">{{say(copy.no_members)}}</p>
@@ -119,30 +134,31 @@ defineExpose({refresh:load});
     <SlideOver v-model="open" :title="data?.account.name||say(copy.members)" :subtitle="data?.account.customer_code||''" :busy="saving||visitSaving">
       <p v-if="loading&&!data" role="status">{{say(copy.loading)}}</p>
       <p v-if="saveError" class="desk-error" role="alert">{{saveError}} <button class="desk-link" :disabled="frozen" @click="loadDetail(true)">{{say(copy.refresh)}}</button></p>
-      <p v-if="saved" class="wallet-saved" role="status"><PhCheck/>{{say(copy.saved)}}</p>
+      <p v-if="saved" ref="feedback" tabindex="-1" class="wallet-saved" role="status"><PhCheck/>{{say(copy.saved)}}</p>
       <template v-if="data">
-        <CustomerIdentity :customer="data.account"/>
+        <CustomerIdentity :customer="data.account"/><p v-if="data.account.deleted_at" class="admin-archive-notice">{{say(controls.memberDeleted)}}</p>
         <MemberVisits :key="data.account.owner_id" :account="data.account" :disabled="saving||!!pending" @busy="visitSaving=$event" @recorded="loadDetail();load()"/>
         <section class="booking-profile-section"><h3>{{say(bookingCopy.title)}}</h3><div v-if="!editingBooking" class="booking-profile-summary"><div v-if="data.booking_profile.complete"><strong>{{data.booking_profile.name}}</strong><p>{{contactMethodLabel(data.booking_profile.contact_method)}} · {{data.booking_profile.contact}}</p></div><p v-else>{{say(bookingCopy.empty)}}</p><button type="button" class="text-link" :disabled="frozen" @click="editBooking">{{say(bookingCopy.edit)}}</button></div><form v-else @submit.prevent="saveBooking"><BookingContactFields v-model="bookingDraft" class="profile-contact" :required="false" :disabled="frozen"/><div class="booking-profile-actions"><button type="button" class="desk-button secondary" :disabled="frozen" @click="editingBooking=false">{{say(bookingCopy.cancel)}}</button><button class="desk-button primary" :disabled="frozen">{{say(bookingCopy.save)}}</button></div></form></section>
-        <WalletBalances :account="data.account"/><p class="wallet-rule">{{say(copy.rules)}}</p>
+        <WalletBalances :account="data.account" admin/><p class="wallet-rule">{{say(controls.adminPointsRule)}}</p>
         <p v-if="saving" role="status">{{say(copy.saving)}}</p>
         <div v-if="pending&&!saving" class="wallet-uncertain" role="alert"><p>{{say(copy.uncertain)}}</p><p>{{pending.body.note}}</p><button class="desk-button primary" :disabled="saving" @click="sendPending">{{say(copy.retry)}}</button></div>
         <button v-if="!showForm&&!pending" class="desk-button primary wallet-new" @click="beginEntry">{{say(copy.transaction)}}<PhArrowRight/></button>
-        <form v-if="showForm&&!pending" class="wallet-form" @submit.prevent="record">
+        <form v-if="showForm&&!pending" ref="entryForm" tabindex="-1" class="wallet-form" @submit.prevent="record">
           <template v-if="reverseEntry"><h3>{{say(copy.reverse)}} · #{{reverseEntry.id}}</h3><p class="wallet-rule">{{say(copy.reverse_help)}}</p><WalletLedger :entries="[reverseEntry]"/></template>
           <template v-else>
             <label class="desk-field">{{say(copy.kind)}}<select v-model="kind" :disabled="frozen"><option v-for="key in kinds" :key="key" :value="key">{{label(key)}}</option></select></label>
             <div class="wallet-input-grid">
               <label v-if="kind!=='redeem'" class="desk-field">{{say(copy.time_hours)}}<input v-model="timeHours" type="number" inputmode="decimal" :min="kind==='adjustment'?-1000000/60:0" :max="1000000/60" step="any" required :disabled="frozen"/></label>
               <label v-if="['opening','gift','adjustment'].includes(kind)" class="desk-field">{{say(copy.points_amount)}}<input v-model.number="pointsAmount" type="number" :min="kind==='adjustment'?-1000000:0" max="1000000" step="1" required :disabled="frozen"/></label>
-              <template v-if="kind==='redeem'"><label class="desk-field">{{say(copy.redeem_cad)}}<input v-model.number="redeemCad" type="number" min="1" :max="data.account.redeemable_cad" step="1" required :disabled="frozen"/></label><label class="desk-field">{{say(copy.bill)}}<input v-model="bill" type="number" min="1" step="0.01" max="1000000" required :disabled="frozen"/></label></template>
+              <template v-if="kind==='redeem'"><label class="desk-field">{{say(controls.redeemCad)}}<input v-model="redeemCad" type="number" inputmode="decimal" min="0.01" :max="data.account.points/100" step="0.01" required :disabled="frozen"/></label><label class="desk-field">{{say(copy.bill)}}<input v-model="bill" type="number" min="0.01" step="0.01" max="1000000" required :disabled="frozen"/></label></template>
             </div>
-            <template v-if="kind==='redeem'"><label class="desk-field">{{say(copy.redemption_use)}}<select v-model="redemptionUse" :disabled="frozen"><option value="visit">{{say(copy.redeem_visit)}}</option><option value="shop">{{say(copy.redeem_shop)}}</option></select></label><label class="wallet-promotion-confirm"><input v-model="noPromotion" type="checkbox" required :disabled="frozen"/><span>{{say(copy.no_promotion)}}</span></label><p class="wallet-rule">{{say(copy.promotion_rule)}}</p></template>
+            <template v-if="kind==='redeem'"><button type="button" class="desk-button secondary wallet-redeem-all" :disabled="frozen||!data.account.points" @click="useAllPoints">{{say(controls.useAll)}}</button><p v-if="redeemPoints!==null&&redeemPoints>0&&redeemPoints<=data.account.points" class="wallet-rule">{{formatCopy(controls.redeemPreview,{v0:redeemPoints,v1:data.account.points-redeemPoints})}}</p><label class="desk-field">{{say(copy.redemption_use)}}<select v-model="redemptionUse" :disabled="frozen"><option value="visit">{{say(copy.redeem_visit)}}</option><option value="shop">{{say(copy.redeem_shop)}}</option></select></label><label class="wallet-promotion-confirm"><input v-model="noPromotion" type="checkbox" required :disabled="frozen"/><span>{{say(copy.no_promotion)}}</span></label><p class="wallet-rule">{{say(copy.promotion_rule)}}</p></template>
             <p v-if="kind==='usage'" class="wallet-rule">{{say(copy.debit_hours_help)}}</p><p v-if="kind==='adjustment'" class="wallet-rule">{{say(copy.adjust_help)}}</p>
             <label class="desk-field">{{say(copy.date)}}<input v-model="effective" type="date" :max="hamiltonDate()" required :disabled="frozen"/></label>
             <label class="desk-field">{{say(copy.reservation)}}<input v-model.trim="reservation" maxlength="64" :disabled="frozen"/></label>
           </template>
           <label class="desk-field">{{say(copy.reason)}}<textarea v-model="note" rows="3" minlength="1" maxlength="600" required :disabled="frozen"/></label>
+          <p v-if="saveError" class="desk-error" role="alert">{{saveError}}</p>
           <div class="wallet-form-actions"><button type="button" class="desk-button secondary" :disabled="frozen" @click="showForm=false">{{say(copy.cancel)}}</button><button class="desk-button primary" :disabled="frozen">{{saving?say(copy.saving):say(copy.save)}}<PhCheck/></button></div>
         </form>
         <details class="member-private-note" open><summary>{{say(copy.private_note)}}</summary><form @submit.prevent="saveNote"><label class="desk-field">{{say(copy.private_note)}}<textarea v-model="privateNote" rows="3" maxlength="1500" :disabled="frozen"/></label><button class="desk-button secondary" :disabled="frozen">{{say(copy.save_note)}}</button></form></details>
@@ -150,7 +166,8 @@ defineExpose({refresh:load});
         <WalletLedger :entries="data.entries" admin :busy="frozen" @reverse="beginReverse"/>
         <div v-if="data.total>30" class="wallet-pagination"><button :disabled="ledgerPage===1||loading" @click="ledgerPage--">{{say(copy.previous)}}</button><span>{{formatCopy(copy.page,{v0:ledgerPage,v1:data.total})}}</span><button :disabled="ledgerPage*30>=data.total||loading" @click="ledgerPage++">{{say(copy.next)}}</button></div>
       </template>
-      <template #footer><button class="desk-button secondary" :disabled="saving||visitSaving" @click="open=false">{{say(copy.close)}}</button></template>
+      <template #footer><button v-if="data" type="button" class="desk-button" :class="data.account.deleted_at?'secondary':'admin-delete-button'" :disabled="frozen" @click="archiveMember">{{say(data.account.deleted_at?controls.restoreMember:controls.deleteMember)}}</button><button class="desk-button secondary" :disabled="saving||visitSaving" @click="open=false">{{say(copy.close)}}</button></template>
     </SlideOver>
+    <ArchiveDialog v-if="archiveTarget" v-model="archiveOpen" :title="say(archiveTarget.deleted_at?controls.restoreMember:controls.deleteMember)" :description="say(archiveTarget.deleted_at?controls.memberRestoreHelp:controls.memberDeleteHelp)" :items="[archiveTarget.name,archiveTarget.customer_code||'']" :restore="!!archiveTarget.deleted_at" :path="'/manage/members/'+encodeURIComponent(archiveTarget.owner_id)+'/archive'" :body="{version:archiveTarget.version,action:archiveTarget.deleted_at?'restore':'delete'}" @saved="memberArchived" @reload="load"/>
   </section>
 </template>

@@ -259,6 +259,8 @@ def initialize(db_func):
           PRIMARY KEY(client,bucket)
         );
         """)
+        import admin_archives
+        admin_archives.initialize(db)
         settings = Settings(weekly=[Hours(day=i) for i in range(7)])
         db.execute("INSERT OR IGNORE INTO commerce_settings VALUES(1,?)", (settings.model_dump_json(),))
         seeds = [
@@ -284,8 +286,9 @@ def settings_for(db):
     return json.loads(db.execute("SELECT payload FROM commerce_settings WHERE id=1").fetchone()[0])
 
 
-def products_for(db):
-    return [json.loads(row[0]) for row in db.execute("SELECT payload FROM commerce_products ORDER BY rowid")]
+def products_for(db, include_archived=False):
+    where = '' if include_archived else " WHERE NOT EXISTS (SELECT 1 FROM studio_archives a WHERE a.kind='product' AND a.entity_id=p.id)"
+    return [json.loads(row[0]) for row in db.execute("SELECT payload FROM commerce_products p" + where + " ORDER BY p.rowid")]
 
 
 def opening(settings, day):
@@ -435,7 +438,8 @@ def settle(order_id, trade_id, source):
         settings = settings_for(db)
         seats = db.execute("SELECT * FROM commerce_seats WHERE order_id=?", (order_id,)).fetchall()
         stocks = db.execute("SELECT * FROM commerce_stock WHERE order_id=?", (order_id,)).fetchall()
-        catalog = {p["id"]: p for p in products_for(db)}
+        # Previously placed orders still settle against their retained inventory.
+        catalog = {p["id"]: p for p in products_for(db, include_archived=True)}
         extra, can_fulfill = [], True
         for seat in seats:
             if remaining_seats(db, settings, seat["date"], seat["start"], seat["end"], order_id, extra) < seat["guests"]:
@@ -676,6 +680,9 @@ def register(app, admin_actor):
         with database() as db:
             db.execute("BEGIN IMMEDIATE")
             row = db.execute("SELECT payload FROM commerce_products WHERE id=?", (product_id,)).fetchone()
+            import admin_archives
+            if admin_archives.archived(db, 'product', product_id):
+                fail('product_unavailable', 409)
             if row:
                 old = json.loads(row[0])
                 if old["version"] != payload.version:

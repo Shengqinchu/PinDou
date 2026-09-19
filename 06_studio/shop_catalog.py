@@ -113,9 +113,11 @@ def validate_product_category(db, product):
         commerce.fail('shop_category_invalid', 422)
 
 
-def catalog_for(db, admin=False):
+def catalog_for(db, admin=False, deleted=False):
     categories = categories_for(db)
-    products = [commerce.Product.model_validate(p).model_dump() for p in commerce.products_for(db) if p.get('shop_collection')]
+    import admin_archives
+    products = [commerce.Product.model_validate(p).model_dump() for p in commerce.products_for(db, include_archived=admin and deleted)
+                if p.get('shop_collection') and (not admin or bool(admin_archives.archived(db, 'product', p['id'])) == deleted)]
     if not admin:
         roots = {c['id'] for c in categories if not c['parent_id'] and c['visible']}
         categories = [c for c in categories if c['visible'] and (not c['parent_id'] or c['parent_id'] in roots)]
@@ -130,6 +132,8 @@ def catalog_for(db, admin=False):
 
 
 def register(app, admin_actor):
+    import admin_archives
+    admin_archives.register(app, lambda: database(), admin_actor)
     @app.patch('/studio-api/manage/shop/products/batch')
     def update_products(payload: ProductBatch, actor=Depends(admin_actor)):
         batch_id = uuid.uuid4().hex
@@ -141,6 +145,8 @@ def register(app, admin_actor):
                 row = db.execute('SELECT payload FROM commerce_products WHERE id=?', (patch.id,)).fetchone()
                 if not row:
                     commerce.fail('product_unavailable', 404)
+                if admin_archives.archived(db, 'product', patch.id):
+                    commerce.fail('product_unavailable', 409)
                 old = json.loads(row[0])
                 if not old.get('shop_collection'):
                     commerce.fail('invalid_product', 422)
@@ -178,9 +184,9 @@ def register(app, admin_actor):
             return catalog_for(db)
 
     @app.get('/studio-api/manage/shop')
-    def owner_catalog(_actor=Depends(admin_actor)):
+    def owner_catalog(deleted: bool = False, _actor=Depends(admin_actor)):
         with database() as db:
-            result = catalog_for(db, True)
+            result = catalog_for(db, True, deleted)
             # Supplier prices never appear in customer-facing catalog responses.
             result['sources'] = {r['product_id']: json.loads(r['payload']) for r in db.execute('SELECT product_id,payload FROM shop_import_sources')}
             return result

@@ -22,6 +22,7 @@ files['service/telegram_notifications.py'] = root / '06_studio/telegram_notifica
 files['service/telegram-notification-copy.json'] = root / '05_studio/src/content/telegram-notifications.json'
 files['service/miniapp_login.py'] = root / '06_studio/miniapp_login.py'
 files['service/shop_catalog.py'] = root / '06_studio/shop_catalog.py'
+files['service/admin_archives.py'] = root / '06_studio/admin_archives.py'
 files['service/image_previews.py'] = root / '06_studio/image_previews.py'
 files['service/owner_delivery.py'] = root / '06_studio/owner_delivery.py'
 files['service/shop_orders.py'] = root / '06_studio/shop_orders.py'
