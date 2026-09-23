@@ -42,7 +42,21 @@ class Checkout(Cart, Contact):
     quote_id: str = Field(pattern=r'^[a-f0-9]{64}$')
     access_key: str = Field(pattern=r'^[a-f0-9]{64}$')
     locale: Literal['zh', 'en'] = 'zh'
+    delivery_method: Literal['pickup', 'courier']
+    address: str = Field(default='', max_length=500)
     website: str = Field(default='', max_length=0)
+
+    @model_validator(mode='after')
+    def required_delivery_details(self):
+        if not self.name.strip() or not self.contact.strip() or not self.notes.strip():
+            raise ValueError('Name, contact and order notes are required')
+        if self.delivery_method == 'courier' and not self.address.strip():
+            raise ValueError('Courier address is required')
+        self.name = self.name.strip()
+        self.contact = self.contact.strip()
+        self.notes = self.notes.strip()
+        self.address = self.address.strip() if self.delivery_method == 'courier' else ''
+        return self
 
 
 class ContactUpdate(Contact):
@@ -173,7 +187,8 @@ def register(app, admin_actor):
             ident = 'PS' + uuid.uuid4().hex[:24].upper()
             now = time.time()
             customer = {'name': payload.name, 'contact': payload.contact, 'contact_method': 'other',
-                        'notes': payload.notes, 'locale': payload.locale}
+                        'notes': payload.notes, 'locale': payload.locale,
+                        'delivery_method': payload.delivery_method, 'address': payload.address}
             db.execute("""INSERT INTO commerce_orders(id,created_at,updated_at,status,access_hash,idempotency_key,payload_hash,customer,quote,expires_at,hold_until,fulfillment)
                        VALUES(?,?,?,'manual_pending',?,?,?,?,?,0,0,'awaiting_contact')""",
                        (ident, now, now, commerce.digest(payload.access_key), idempotency_key, hashed,

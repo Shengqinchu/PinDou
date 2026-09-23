@@ -56,7 +56,9 @@ function add(p:ShopProduct,fromDetails=false){
  const selection={variant_id:fromDetails?variant.value:'',choice_id:fromDetails?choice.value:''};
  const line=bag.value.find(l=>l.product_id===p.id&&(l.variant_id||'')===selection.variant_id&&(l.choice_id||'')===selection.choice_id);
  if((!line&&bag.value.length>=20)||(line&&line.quantity>=20)){notify(w.cartLimit[0],w.cartLimit[1],'error');return;}
- addToBag(p.id,undefined,selection);
+ addToBag(p.id,undefined,selection,true);
+ if(fromDetails)detailsOpen.value=false;
+ notify(o.addedToCart[0],o.addedToCart[1],'success','shop-cart');
 }
 async function refresh(){loading.value=true;error.value='';try{await loadShop(true)}catch(e){error.value=(e as Error).message}finally{loading.value=false}}
 watch(shopCatalog,d=>{if(!d)return;if(!d.categories.some(c=>c.id===leaf.value)){const r=d.categories.find(c=>c.id===root.value&&!c.parent_id)||d.categories.find(c=>!c.parent_id);root.value=r?.id||'';leaf.value=d.categories.find(c=>c.parent_id===root.value)?.id||root.value;}},{immediate:true});

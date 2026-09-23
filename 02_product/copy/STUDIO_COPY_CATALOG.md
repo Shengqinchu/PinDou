@@ -2650,12 +2650,25 @@
 | submitting | 正在提交… | Submitting… |
 | total | 商品合计 | Items total |
 | discount | 多件优惠 | Multi-buy savings |
-| contactOptional | 留下联系方式（可选） | Your contact details (optional) |
+| contactOptional | 联系方式 | Contact details |
 | contactHint | 微信、电话或邮箱 | WeChat, phone or email |
-| name | 怎么称呼您（可选） | Your name (optional) |
-| notes | 订单备注 / 定制要求（可选） | Order notes / custom requests (optional) |
+| name | 姓名 | Name |
+| notes | 订单备注 / 定制要求 | Order notes / custom requests |
 | successTitle | 下单成功 | Order placed |
-| success | 您已成功下单，请联系店主安排付款与发货，谢谢合作！ | Your order has been placed. Please contact the host to arrange payment and delivery. Thank you! |
+| success | 您已成功提交订单，请等待店主主动联系您，谢谢合作！ | Your order has been submitted. Please wait for the host to contact you. Thank you! |
+| addedToCart | 加入成功！ | Added to bag! |
+| backToCart | 返回购物车 | Back to bag |
+| deliveryTitle | 请填写收货信息 | Delivery details |
+| deliveryMethod | 收货方式 | Delivery method |
+| pickup | 自提 | Pickup |
+| courier | 快递 | Courier |
+| pickupAddress | 自提地址（小店地址） | Pickup address (studio) |
+| courierFee | 快递费用以实际运费为准。 | Courier delivery is charged at the actual shipping cost. |
+| shippingAddress | 收货地址 | Delivery address |
+| notesHint | 如无特殊要求，请填写“无” | Enter “None” if you have no special requests |
+| requiredDetails | 请填写所有收货信息后再提交订单。 | Please complete all delivery details before submitting. |
+| paymentNotice | 网站暂不收取款项。提交订单后店主将会联系您，届时可使用 e-Transfer 或现金付款。请在提交订单后注意查收消息。 | The website does not collect payment. The host will contact you after your order is submitted; you can then pay by e-Transfer or cash. Please watch for their message. |
+| confirmSubmit | 确认提交订单 | Confirm order |
 | leaveContact | 或留下您的联系方式，店主会第一时间联系您。 | Or leave your contact details and the host will get in touch as soon as possible. |
 | message | 短信 | Text message |
 | wechat | 微信 | WeChat |

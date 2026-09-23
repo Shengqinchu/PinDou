@@ -8,14 +8,14 @@ export const notice = ref<{
   zh: string;
   en: string;
   kind: "success" | "error";
-  action?: "cart";
+  action?: "cart" | "shop-cart";
 }>();
 let noticeTimer: ReturnType<typeof setTimeout>;
 export function notify(
   zh: string,
   en: string,
   kind: "success" | "error" = "success",
-  action?: "cart",
+  action?: "cart" | "shop-cart",
 ) {
   clearTimeout(noticeTimer);
   notice.value = { id: Date.now(), zh, en, kind, action };

@@ -116,7 +116,7 @@ async function tryAgain() {
 </script>
 <template>
   <section class="container order-page section-bottom">
-    <RouterLink :to="order?.quote.mode==='manual'?'/shop?view=cart':'/cart'" class="text-link">{{
+    <RouterLink v-if="order?.quote.mode!=='manual'" to="/cart" class="text-link">{{
       say(copyText.back_to_your_bag_1d6e14)
     }}</RouterLink>
     <p v-if="error" class="form-error" role="alert">
@@ -125,7 +125,7 @@ async function tryAgain() {
         {{ say(copyText.try_again_c3273b) }}
       </button>
     </p>
-    <ManualShopOrder v-if="order?.quote.mode==='manual'" :order="order" @updated="order=$event"/>
+    <ManualShopOrder v-if="order?.quote.mode==='manual'" :order="order"/>
     <div v-else-if="order" class="order-layout">
       <div class="order-main">
         <div :class="['order-seal', { confirmed: order.status === 'paid' }]">

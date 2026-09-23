@@ -46,7 +46,9 @@ def payload(client,items=None):
     items=items or [item()]
     result=quote(client,items)
     assert result.status_code==200,result.text
-    return {'items':items,'quote_id':result.json()['quote_id'],'access_key':secrets.token_hex(32)}
+    return {'items':items,'quote_id':result.json()['quote_id'],'access_key':secrets.token_hex(32),
+            'name':'Test customer','contact':'test@example.com','notes':'No custom request',
+            'delivery_method':'pickup','address':''}
 
 
 def place(client,body,key=None):
@@ -85,10 +87,11 @@ def test_custom_finish_required_and_snapshotted(client):
     assert q.json()['total_cents']==600
 
 
-def test_order_without_contact_idempotency_and_no_payment(client):
+def test_pickup_order_idempotency_and_no_payment(client):
     body=payload(client,[item('1'),item('2')]);key=str(uuid.uuid4())
     first=place(client,body,key);assert first.status_code==201,first.text
     order=first.json();assert order['status']=='manual_pending' and order['paid_at'] is None
+    assert order['customer']['delivery_method']=='pickup' and order['customer']['address']==''
     assert order['quote']['total_cents']==500 and 'payment_url' not in order
     assert place(client,body,key).json()['id']==order['id']
     assert place(client,{**body,'name':'Changed'},key).status_code==409
@@ -100,6 +103,21 @@ def test_order_without_contact_idempotency_and_no_payment(client):
         assert db.execute('SELECT count(*) FROM commerce_orders').fetchone()[0]==1
         assert db.execute('SELECT count(*) FROM studio_wallet_ledger').fetchone()[0]==0
         assert db.execute('SELECT count(*) FROM studio_reservations').fetchone()[0]==0
+
+
+def test_delivery_details_required_before_order_and_courier_address_private(client):
+    body=payload(client)
+    for changes in ({'name':' '},{'contact':' '},{'notes':' '},{'delivery_method':'courier'},
+                    {'delivery_method':'postal','address':'Hamilton'}):
+        assert place(client,body|changes).status_code==422
+    with studio.database() as db:
+        assert db.execute('SELECT count(*) FROM commerce_orders').fetchone()[0]==0
+        assert db.execute('SELECT count(*) FROM commerce_stock').fetchone()[0]==0
+    courier=place(client,body|{'delivery_method':'courier','address':'  1 Main St, Hamilton  '}).json()
+    assert courier['customer']['delivery_method']=='courier'
+    assert courier['customer']['address']=='1 Main St, Hamilton'
+    assert client.get('/studio-api/orders/'+courier['id']).status_code==404
+    assert client.get('/studio-api/manage/shop/orders').json()['items'][0]['customer']['address']=='1 Main St, Hamilton'
 
 
 def test_contact_privacy_version_and_admin_visibility(client):

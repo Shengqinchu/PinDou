@@ -1,6 +1,6 @@
 # 小狗拼豆铺服务器资产
 
-更新：2026-09-18。**默认生产服务器为 `36.139.201.94`**；以后排查、备份和部署均使用此机。全项目共享总账为 `C:/Users/123/Desktop/apisell/服务器资产清单.md`，本文件是 PinDou 的运维入口。
+更新：2026-09-23。**默认生产服务器为 `36.139.201.94`**；以后排查、备份和部署均使用此机。全项目共享总账为 `C:/Users/123/Desktop/apisell/服务器资产清单.md`，本文件是 PinDou 的运维入口。
 
 ## 当前生产服务器
 
@@ -19,7 +19,7 @@
 | 到期时间 | **2027-09-18**；用户截图显示 `2027-09-18 21:23:25`。精确时分秒和控制台时区未重新登录账单确认，日历以用户确认的日期为准 |
 | 正式域名 | `pindoupuppy.com`；兼容 `www.pindoupuppy.com`、`staging.pindoupuppy.com` |
 | 生产切换 | 2026-09-18 16:20:35 UTC / 12:20:35 America/Toronto 公网验收完成 |
-| 正式服务 | `pindou.service`、`pindou-studio.service`、`nginx.service`、`cloudflared.service`；2026-09-19 00:32 UTC 发布复核均 active |
+| 正式服务 | `pindou.service`、`pindou-studio.service`、`nginx.service`、`cloudflared.service`；2026-09-23 店铺发布复核均 active |
 
 ## 登录与密钥
 
@@ -42,7 +42,7 @@
 | 对象 | 位置 |
 |---|---|
 | 生成器 current | `/opt/pindou/current` → `releases/20260910015453-studio-v7`（迁移验收时） |
-| Studio current | `/opt/pindou/studio/current` → `releases/20260919002842-studio-v7`（2026-09-18 加东 20:32 后台功能发布） |
+| Studio current | `/opt/pindou/studio/current` → `releases/20260923232440-studio-v7`（2026-09-23 加东 19:24 店铺下单流程发布） |
 | 生成器数据库 / 环境 | `/opt/pindou/shared/var/pindou.db` / `/opt/pindou/shared/.env` |
 | Studio 数据库 / 环境 | `/opt/pindou/studio/shared/studio.sqlite3` / `/opt/pindou/studio/shared/.env` |
 | 图片与资料 | 两个 `shared` 目录、`/opt/pindou/shared/data`、Studio `shared/media`、全部历史 release / static-history 保留 |
@@ -64,6 +64,7 @@
 
 - [当前部署说明](deployment.md)
 - [最新后台功能发布核验](STUDIO_ADMIN_CONTROLS_20260918.md)
+- [最新店铺发布核验](STUDIO_SHOP_CHECKOUT_20260923.md)
 - [迁移验收与备份校验](PINDOU_FULL_MIGRATION_ACCEPTANCE_20260918.md)
 - [迁移执行记录](PINDOU_FULL_MIGRATION_EXECUTION_20260918.md)
 - [迁移与回退手册](PINDOU_FULL_MIGRATION_RUNBOOK_20260918.md)

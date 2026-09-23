@@ -1,0 +1,65 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import { chromium, webkit } from 'playwright';
+
+const base=process.env.PINDOU_STUDIO_QA_URL||'http://127.0.0.1:4188';
+const output=new URL('../../artifacts/shop-checkout-20260923/',import.meta.url);
+await fs.mkdir(output,{recursive:true});
+const product={id:'qa-a1',kind:'physical',category:'beads',zh:'A1',en:'A1',detailZh:'A1 拼豆补充装',detailEn:'A1 refill beads',image:'/qa-img/1.png',images:['/qa-img/1.png','/qa-img/2.png','/qa-img/3.png'],price_cents:200,stock:999,available_stock:999,active:true,version:1,shop_collection:'home',shop_category_id:'refill-a',shop_visible:true,code:'A1',sort:1,variants:[],choices:[]};
+const quote={mode:'manual',currency:'CAD',lines:[{product_id:product.id,quantity:1,zh:product.zh,en:product.en,image:'',kind:'physical',unit_cents:200,total_cents:200}],subtotal_cents:200,total_cents:200,discount_cents:0,tax_cents:0,quote_id:'a'.repeat(64)};
+const order={id:'PS'+'A'.repeat(24),status:'manual_pending',created_at:Date.now()/1000,expires_at:0,hold_until:0,paid_at:null,fulfillment:'awaiting_contact',version:1,quote,customer:{name:'Test',contact_method:'other',contact:'test@example.com',notes:'无',delivery_method:'courier',address:'1 Main St, Hamilton'}};
+for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
+ const browser=await engine.launch({headless:true});
+ try{
+  const context=await browser.newContext({viewport:{width:390,height:844},locale:'zh-CN'});
+  await context.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','zh')});
+  const page=await context.newPage();page.setDefaultTimeout(12000);
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));let placed=0;
+  await page.route('**/studio-api/shop/catalog',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({products:[product],categories:[{id:'refills',parent_id:null,zh:'拼豆补充装',en:'Refills',sort:1,visible:true,version:1},{id:'refill-a',parent_id:'refills',zh:'A系列',en:'A series',sort:2,visible:true,version:1}],checkout_ready:false,manual_ordering_ready:true})}));
+  await page.route('**/qa-img/*.png',route=>route.fulfill({status:200,contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==','base64')}));
+  await page.route('**/studio-api/shop/cart/quote',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(quote)}));
+  await page.route('**/studio-api/shop/orders',route=>{placed++;return route.fulfill({status:201,contentType:'application/json',body:JSON.stringify(order)})});
+  await page.route('**/studio-api/orders/'+order.id,route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(order)}));
+  await page.goto(base+'/shop');
+  await page.locator('.shop-card-preview').click();
+  await page.waitForTimeout(450);
+  const thumbs=await page.locator('.shop-thumbnails').boundingBox(),description=await page.locator('.shop-detail>.shop-description').boundingBox();
+  await page.screenshot({path:new URL(name+'-detail.png',output).pathname.replace(/^\/([A-Za-z]:)/,'$1')});
+  assert(thumbs&&description&&description.y>=thumbs.y+thumbs.height,'Product description must follow thumbnail strip');
+  await page.locator('.studio-drawer[open] .drawer-bottom button').click();
+  await page.waitForFunction(()=>!document.querySelector('.studio-drawer')?.open);
+  await page.getByText('加入成功！',{exact:true}).waitFor();
+  await page.locator('.shop-cart-notice .notice-action').click();
+  await page.locator('.studio-drawer[open]').waitFor();
+  assert.equal(await page.getByText('怎么称呼您（可选）').count(),0);
+  assert.equal(await page.locator('.studio-drawer input:not([type=hidden])').count(),0);
+  await page.getByRole('button',{name:'提交订单'}).click();
+  await page.waitForURL('**/shop/checkout');
+  await page.getByRole('heading',{name:'请填写收货信息'}).waitFor();
+  assert.equal(placed,0);
+  await page.getByText('8 Hughson St N, Hamilton, ON L8R 0B1').waitFor();
+  await page.getByRole('button',{name:'确认提交订单'}).click();
+  assert.equal(placed,0);
+  await page.getByLabel('姓名').fill('Test');
+  await page.getByLabel('联系方式').fill('test@example.com');
+  await page.getByLabel('订单备注 / 定制要求').fill('无');
+  await page.getByLabel('快递').check();
+  await page.getByText('快递费用以实际运费为准。').waitFor();
+  await page.getByLabel('收货地址').fill('1 Main St, Hamilton');
+  assert.equal(placed,0);
+  await page.setViewportSize({width:320,height:844});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  await page.setViewportSize({width:390,height:844});
+  await page.screenshot({path:new URL(name+'-checkout.png',output).pathname.replace(/^\/([A-Za-z]:)/,'$1')});
+  await page.getByRole('button',{name:'确认提交订单'}).click();
+  await page.waitForURL('**/order/'+order.id);
+  await page.getByRole('heading',{name:'下单成功'}).waitFor();
+  assert.equal(placed,1);
+  assert.equal(await page.getByText('您已成功提交订单，请等待店主主动联系您，谢谢合作！').count(),1);
+  assert.equal(await page.locator('.shop-manual-receipt').getByRole('button',{name:'复制'}).count(),0);
+  assert.equal(await page.locator('.shop-manual-receipt').getByText('短信').count(),0);
+  assert.deepEqual(errors,[]);
+  await page.screenshot({path:new URL(name+'-success.png',output).pathname.replace(/^\/([A-Za-z]:)/,'$1')});
+  console.log(name+': cart -> delivery -> one final order -> minimal success OK');
+ }finally{await browser.close()}
+}

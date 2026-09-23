@@ -22,7 +22,7 @@ const route = useRoute();
       ><div
         v-if="notice"
         :key="notice.id"
-        :class="['studio-notice', notice.kind]"
+        :class="['studio-notice', notice.kind, {'shop-cart-notice':notice.action==='shop-cart'}]"
       >
         <span class="notice-seal"
           ><PhCheck
@@ -37,6 +37,7 @@ const route = useRoute();
           @click="dismissNotice"
           >{{ say(copyText.view_bag_6caa85) }}<PhArrowRight
         /></RouterLink>
+        <RouterLink v-if="notice.action==='shop-cart'" to="/shop?view=cart" class="notice-action" @click="dismissNotice">{{say(copyText.view_bag_6caa85)}}<PhArrowRight/></RouterLink>
         <button
           class="icon-button"
           :aria-label="say(copyText.dismiss_notification_a43888)"

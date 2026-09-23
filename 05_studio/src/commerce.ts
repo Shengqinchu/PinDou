@@ -143,6 +143,8 @@ export type Order = {
     contact_method: string;
     contact: string;
     notes: string;
+    delivery_method?: 'pickup' | 'courier';
+    address?: string;
   };
 };
 
@@ -257,7 +259,7 @@ export async function loadCatalog() {
   catalog.value = await commerceApi<Catalog>("/catalog");
   return catalog.value;
 }
-export function addToBag(product_id: string, booking?: Booking, selection?:{variant_id:string;choice_id:string}) {
+export function addToBag(product_id: string, booking?: Booking, selection?:{variant_id:string;choice_id:string}, silent=false) {
   if (checkoutBusy.value) return;
   const line = bag.value.find(
     (v) =>
@@ -274,12 +276,7 @@ export function addToBag(product_id: string, booking?: Booking, selection?:{vari
       booking: booking || null,
       ...(selection||{}),
     });
-  notify(
-    copyText.message_1186a6e2[0],
-    copyText.message_1186a6e2[1],
-    "success",
-    "cart",
-  );
+  if(!silent)notify(copyText.message_1186a6e2[0],copyText.message_1186a6e2[1],"success","cart");
 }
 export function removeLine(key: string) {
   if (!checkoutBusy.value) bag.value = bag.value.filter((v) => v.key !== key);

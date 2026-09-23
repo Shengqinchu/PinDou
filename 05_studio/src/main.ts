@@ -66,6 +66,7 @@ const router = createRouter({
     },
     { path: "/details", component: routeLoaders.details },
     { path: "/shop", component: routeLoaders.shop },
+    { path: "/shop/checkout", component: () => import('./pages/ShopCheckout.vue') },
     { path: "/cart", redirect: {path:"/shop",query:{view:"cart"}} },
     { path: "/order/:id", component: () => import("./pages/Order.vue") },
     { path: "/journal", component: routeLoaders.journal },

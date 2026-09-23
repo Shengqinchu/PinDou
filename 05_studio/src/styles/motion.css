@@ -117,6 +117,8 @@
   font-size: 13px;
   pointer-events: auto;
 }
+.shop-cart-notice{padding:10px 11px 10px 12px;gap:9px;border:1px solid #e3ece7;box-shadow:0 10px 26px #2734211c}
+.shop-cart-notice .notice-seal{width:27px;height:27px}
 .notice-seal {
   width: 32px;
   height: 32px;
