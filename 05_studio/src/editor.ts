@@ -6,6 +6,7 @@ import uploadWords from "./content/data-commerce-messages.json";
 import editorWords from "./content/components-admin-ContentEditor.json";
 import { CommerceError } from "./commerce";
 import { say } from "./state";
+import { optimizeProductImage, sendImageChunks } from "./image-upload";
 export type EditorData = Record<string, string[] | MediaAsset>;
 export type EditorDocument = { name:string; version:number; published_version:number; data:EditorData; published:EditorData };
 export type EditorRequest = <T>(path:string,init?:RequestInit)=>Promise<T>;
@@ -102,8 +103,9 @@ export function useContentEditor(request:EditorRequest,words:Words) {
   return {items,name,doc,search,busy,error,success,dirty,revisions,uploadKey,uploadStatus,globalQuery,matches,searching,failure,load,choose,initialize,save,upload,history,restore,exportDraft};
 }
 
-export async function uploadMedia(request:EditorRequest,file:File,original=false):Promise<MediaAsset> {
+export async function uploadMedia(request:EditorRequest,file:File,original=false,optimize=false):Promise<MediaAsset> {
   if(file.size>12*1024*1024)throw new CommerceError(say(uploadWords.image_too_large),413,'image_too_large');
+  if(optimize)file=await optimizeProductImage(file);
   async function send<T>(path:string,init:RequestInit,attempts=1):Promise<T>{
     let failure:unknown;
     for(let attempt=0;attempt<attempts;attempt++){
@@ -118,13 +120,8 @@ export async function uploadMedia(request:EditorRequest,file:File,original=false
     if((failure as Error)?.name==='AbortError')throw new CommerceError(say(editorWords.uploadTimeout),0,'upload_timeout');
     throw failure;
   }
-  // The production tunnel times out on a slow, single large request. Small,
-  // idempotent chunks retain the original bytes and allow safe retries.
+  // The production tunnel times out on a slow, single large request. Four
+  // concurrent idempotent chunks avoid serial round trips and retain retries.
   if(file.size<=512*1024)return send<MediaAsset>('/manage/media'+(original?'?original=true':''),{method:'POST',headers:{'Content-Type':file.type||'application/octet-stream'},body:file});
-  const id=crypto.randomUUID().replaceAll('-',''),size=256*1024;
-  const chunks=Math.ceil(file.size/size);
-  for(let index=0;index<chunks;index++){
-    await send(`/manage/media/chunks/${id}/${index}`,{method:'PUT',headers:{'Content-Type':'application/octet-stream'},body:file.slice(index*size,(index+1)*size)},3);
-  }
-  return send<MediaAsset>(`/manage/media/chunks/${id}/complete?size=${file.size}&chunks=${chunks}&original=${original}`,{method:'POST'},3);
+  return sendImageChunks<MediaAsset>(file,crypto.randomUUID().replaceAll('-',''),original,send);
 }

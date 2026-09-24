@@ -35,7 +35,7 @@ async function archived(){
 }
 watch(deleted,()=>{selected.value=[];void refresh();});
 const selected=ref<string[]>([]),batchOpen=ref(false),batchProducts=ref<ShopProduct[]>([]),priceState=ref('all'),imageState=ref('all');
-const data=ref<ShopCatalog>(),busy=ref(false),error=ref(''),success=ref(''),search=ref(''),collection=ref('all'),category=ref('all');
+const data=ref<ShopCatalog>(),busy=ref(false),error=ref(''),success=ref(''),search=ref(''),collection=ref('all'),category=ref('all'),optimizePhotos=ref(true);
 const categoryMode=ref(false),edit=ref<ShopProduct>(),categoryEdit=ref<ShopCategory>(),open=ref(false),categoryOpen=ref(false),price=ref('');
 const textTooLong=computed(()=>!!edit.value&&([edit.value.zh,edit.value.en].some(v=>productTextLength(v)>productTextLimits.name)||[edit.value.detailZh,edit.value.detailEn].some(v=>productTextLength(v)>productTextLimits.description)));
 const textLimitMessage=computed(()=>formatCopy(w.textTooLong,{v0:productTextLimits.name,v1:productTextLimits.description}));
@@ -78,7 +78,7 @@ async function save(){
 async function reloadProduct(){if(!edit.value||busy.value)return;const id=edit.value.id;await refresh();const p=data.value?.products.find(p=>p.id===id);if(p){drafts.delete(id);edit.value=undefined;editProduct(p)}}
 async function upload(files:File[]){
  if(!edit.value||busy.value)return;const target=edit.value;busy.value=true;error.value='';
- try{for(const file of files.slice(0,12-target.images.length)){const asset=await uploadMedia(request,file,true);if(!target.images.includes(asset.src))target.images.push(asset.src)}}catch(e){fail(e)}finally{busy.value=false;}
+ try{for(const file of files.slice(0,12-target.images.length)){const asset=await uploadMedia(request,file,true,optimizePhotos.value);if(!target.images.includes(asset.src))target.images.push(asset.src)}}catch(e){fail(e)}finally{busy.value=false;}
 }
 function cover(index:number){if(!edit.value||busy.value)return;edit.value.images.unshift(...edit.value.images.splice(index,1));}
 function editCat(c?:ShopCategory){if(busy.value)return;categoryEdit.value=clone(c||{id:'category-'+crypto.randomUUID().slice(0,12),parent_id:null,zh:'',en:'',visible:true,version:1,sort:50});error.value='';success.value='';categoryOpen.value=true;}
@@ -114,7 +114,7 @@ onMounted(refresh);onDeactivated(()=>{keepDraft();open.value=false;categoryOpen.
    <label>{{say(w.detailZh)}}<textarea v-model="edit.detailZh" :aria-label="say(w.detailZh)" rows="8"/><small class="shop-text-count" :class="{exceeded:productTextLength(edit.detailZh)>productTextLimits.description}">{{textCount(edit.detailZh,productTextLimits.description)}}</small></label><label>{{say(w.detailEn)}}<textarea v-model="edit.detailEn" :aria-label="say(w.detailEn)" rows="8"/><small class="shop-text-count" :class="{exceeded:productTextLength(edit.detailEn)>productTextLimits.description}">{{textCount(edit.detailEn,productTextLimits.description)}}</small></label>
    <p v-if="textTooLong" class="shop-error" role="alert">{{textLimitMessage}}</p>
    <label class="shop-check"><input v-model="edit.shop_visible" type="checkbox"/>{{say(w.show)}}</label>
-   <div><h3>{{say(w.photos)}}</h3><p class="shop-notice">{{say(w.photoHelp)}}</p><div class="shop-edit-photos"><div v-for="(src,i) in edit.images" :key="src"><img :src="shopImage(src)" :alt="formatCopy(w.imageNumber,{v0:i+1})"/><button v-if="i>0" type="button" :disabled="busy" @click="cover(i)">{{say(w.cover)}}</button><button type="button" :disabled="busy" @click="edit.images.splice(i,1)">{{say(w.remove)}}</button></div></div><MediaUpload multiple original :busy="busy" :disabled="busy||edit.images.length>=12" :label="say(w.upload)" @select="upload"/></div>
+   <div><h3>{{say(w.photos)}}</h3><p class="shop-notice">{{say(w.photoHelp)}}</p><div class="shop-edit-photos"><div v-for="(src,i) in edit.images" :key="src"><img :src="shopImage(src)" :alt="formatCopy(w.imageNumber,{v0:i+1})"/><button v-if="i>0" type="button" :disabled="busy" @click="cover(i)">{{say(w.cover)}}</button><button type="button" :disabled="busy" @click="edit.images.splice(i,1)">{{say(w.remove)}}</button></div></div><label class="shop-check"><input v-model="optimizePhotos" type="checkbox" :disabled="busy"/>{{say(w.optimizePhotos)}}</label><MediaUpload multiple original :busy="busy" :disabled="busy||edit.images.length>=12" :label="say(w.upload)" :help="optimizePhotos?say(w.optimizePhotosHelp):undefined" @select="upload"/></div>
    <details v-if="data?.sources?.[edit.id]"><summary>{{say(w.source)}}</summary><p>{{data.sources[edit.id].platform}} · {{data.sources[edit.id].title}}</p><p>{{say(w.sourcePrice)}} {{(data.sources[edit.id].source_min_fen/100).toFixed(2)}}</p></details>
    <p v-if="error" class="shop-error" role="alert">{{error}} <button type="button" :disabled="busy" @click="reloadProduct">{{say(w.retry)}}</button></p>
   </form>

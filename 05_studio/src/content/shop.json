@@ -52,6 +52,8 @@
   "sort":["排序（越小越靠前）","Sort order (lowest first)"],
   "photos":["商品图片","Product photos"],
   "upload":["上传图片","Upload photos"],
+  "optimizePhotos":["优化大图上传","Optimize large photo uploads"],
+  "optimizePhotosHelp":["JPG、PNG 或 WebP，最大 12 MB。大于 512 KB 的 JPG/PNG 仅在高质量 WebP 至少缩小 30% 时转换；细小文字可能略变软。取消勾选可保留原文件。","JPG, PNG or WebP, up to 12 MB. JPG/PNG over 512 KB is converted to high-quality WebP only when at least 30% smaller; fine text may soften slightly. Uncheck to preserve the original file."],
   "photoHelp":["最多12张；第一张作为封面。","Up to 12 photos; the first is the cover."],
   "cover":["设为封面","Use as cover"],
   "show":["在小店展示","Show in the shop"],
