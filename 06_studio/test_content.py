@@ -1,5 +1,5 @@
 """Durable authoring, public/private separation, and availability race regressions."""
-import io,json,hashlib
+import io,json,hashlib,os,uuid
 import pytest
 from PIL import Image
 from fastapi import HTTPException
@@ -39,6 +39,33 @@ def test_upload_image_and_media_publication(client):
     assert result.status_code==200
     doc['data']['hero-illustration']['src']='https://untrusted.example/image.jpg'
     assert client.put('/studio-api/manage/content/media',json={'version':result.json()['version'],'data':doc['data']}).status_code==422
+
+
+def test_large_original_upload_is_chunked_and_completion_is_idempotent(client):
+    image=Image.frombytes('RGB',(700,400),os.urandom(700*400*3))
+    buffer=io.BytesIO();image.save(buffer,format='PNG');original=buffer.getvalue()
+    assert len(original)>512*1024
+    upload_id=uuid.uuid4().hex
+    chunk_size=content.MEDIA_CHUNK_SIZE
+    chunks=[original[index:index+chunk_size] for index in range(0,len(original),chunk_size)]
+    base=f'/studio-api/manage/media/chunks/{upload_id}'
+    assert client.put(f'{base}/0',content=chunks[0],headers={'Authorization':''}).status_code==401
+    admin()
+    assert client.post(f'{base}/complete?size={len(original)}&chunks={len(chunks)}&original=true').status_code==409
+    for index,part in enumerate(chunks):
+        path=f'{base}/{index}'
+        assert client.put(path,content=part).status_code==200
+        assert client.put(path,content=part).status_code==200
+    assert client.put(f'{base}/0',content=b'wrong').status_code==409
+    assert client.put(f'{base}/{len(chunks)}',content=b'x'*(chunk_size+1)).status_code==413
+    assert client.post(f'{base}/complete?size={len(original)-1}&chunks={len(chunks)}&original=true').status_code==422
+    complete=f'{base}/complete?size={len(original)}&chunks={len(chunks)}&original=true'
+    result=client.post(complete)
+    assert result.status_code==200
+    assert client.post(complete).json()==result.json()
+    assert client.get(result.json()['src']).content==original
+    assert result.json()['sha256']==hashlib.sha256(original).hexdigest()
+    assert not any((content.MEDIA_DIR/'.uploads'/upload_id/f'{i:03d}').exists() for i in range(len(chunks)))
 
 def test_journal_complete_english_publish_and_sort(client):
     admin();posts=client.get('/studio-api/journal').json()['posts'];assert len(posts)==8

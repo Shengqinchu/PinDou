@@ -3,6 +3,7 @@
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { type MediaAsset, refreshContent } from "./content-store";
 import uploadWords from "./content/data-commerce-messages.json";
+import editorWords from "./content/components-admin-ContentEditor.json";
 import { CommerceError } from "./commerce";
 import { say } from "./state";
 export type EditorData = Record<string, string[] | MediaAsset>;
@@ -102,10 +103,28 @@ export function useContentEditor(request:EditorRequest,words:Words) {
 }
 
 export async function uploadMedia(request:EditorRequest,file:File,original=false):Promise<MediaAsset> {
-  // A finite timeout avoids an indefinitely disabled editor after a dropped upload.
-  // Retry is safe because media is stored by its content hash.
   if(file.size>12*1024*1024)throw new CommerceError(say(uploadWords.image_too_large),413,'image_too_large');
-  const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),60000);
-  try{return await request<MediaAsset>('/manage/media'+(original?'?original=true':''),{method:'POST',headers:{'Content-Type':file.type||'application/octet-stream'},body:file,signal:abort.signal});}
-  finally{clearTimeout(timer);}
+  async function send<T>(path:string,init:RequestInit,attempts=1):Promise<T>{
+    let failure:unknown;
+    for(let attempt=0;attempt<attempts;attempt++){
+      const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),45000);
+      try{return await request<T>(path,{...init,signal:abort.signal});}
+      catch(error){
+        failure=error;
+        const issue=error as CommerceError;
+        if(attempt===attempts-1||!(issue.name==='AbortError'||issue.status===0||issue.status>=500))break;
+      }finally{clearTimeout(timer);}
+    }
+    if((failure as Error)?.name==='AbortError')throw new CommerceError(say(editorWords.uploadTimeout),0,'upload_timeout');
+    throw failure;
+  }
+  // The production tunnel times out on a slow, single large request. Small,
+  // idempotent chunks retain the original bytes and allow safe retries.
+  if(file.size<=512*1024)return send<MediaAsset>('/manage/media'+(original?'?original=true':''),{method:'POST',headers:{'Content-Type':file.type||'application/octet-stream'},body:file});
+  const id=crypto.randomUUID().replaceAll('-',''),size=256*1024;
+  const chunks=Math.ceil(file.size/size);
+  for(let index=0;index<chunks;index++){
+    await send(`/manage/media/chunks/${id}/${index}`,{method:'PUT',headers:{'Content-Type':'application/octet-stream'},body:file.slice(index*size,(index+1)*size)},3);
+  }
+  return send<MediaAsset>(`/manage/media/chunks/${id}/complete?size=${file.size}&chunks=${chunks}&original=${original}`,{method:'POST'},3);
 }

@@ -1,6 +1,6 @@
 """Owner-edited bilingual content and original journal media, separate from releases."""
 from __future__ import annotations
-import hashlib, io, json, os, re, time, uuid
+import hashlib, io, json, os, re, shutil, time, uuid
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -18,6 +18,8 @@ JOURNAL_PATH=Path(__file__).with_name('journal-defaults.json')
 SITE_PATH=Path(__file__).resolve().parent.parent/'site/studio/index.html'
 DEFAULTS={}
 MEDIA_DIR=Path('var/media')
+MEDIA_CHUNK_SIZE=256*1024
+MEDIA_MAX_BYTES=12*1024*1024
 CUTOFF='2026-06-24'
 
 def initialize(database, db_path):
@@ -188,7 +190,7 @@ def document_row(db,name):
             'data':DEFAULTS[name]|json.loads(row['draft'])}
 
 def store_image(data,original=False):
-    if len(data)>12*1024*1024: raise HTTPException(413,'image_too_large')
+    if len(data)>MEDIA_MAX_BYTES: raise HTTPException(413,'image_too_large')
     try:
         im=Image.open(io.BytesIO(data)); im.verify()
         im=Image.open(io.BytesIO(data))
@@ -217,6 +219,61 @@ def store_image(data,original=False):
     if not path.exists():
         temporary=MEDIA_DIR/(uuid.uuid4().hex+'.tmp');temporary.write_bytes(data);os.replace(temporary,path)
     return {'src':'/studio-api/media/'+name,'width':width,'height':height,'sha256':digest}
+
+def media_upload_directory(upload_id):
+    if not re.fullmatch(r'[a-f0-9]{32}',upload_id):raise HTTPException(422,'image_upload_invalid')
+    return MEDIA_DIR/'.uploads'/upload_id
+
+def prune_media_uploads():
+    root=MEDIA_DIR/'.uploads'
+    if not root.exists():return
+    cutoff=time.time()-24*60*60
+    for path in root.iterdir():
+        if path.is_dir() and path.stat().st_mtime<cutoff:shutil.rmtree(path)
+
+def store_media_chunk(upload_id,index,data):
+    if not 0<=index<MEDIA_MAX_BYTES//MEDIA_CHUNK_SIZE:raise HTTPException(422,'image_upload_invalid')
+    if not 0<len(data)<=MEDIA_CHUNK_SIZE:raise HTTPException(413,'image_too_large')
+    prune_media_uploads()
+    directory=media_upload_directory(upload_id)
+    directory.mkdir(parents=True,exist_ok=True)
+    if (directory/'result.json').exists():raise HTTPException(409,'image_upload_completed')
+    target=directory/f'{index:03d}'
+    if target.exists():
+        if target.read_bytes()!=data:raise HTTPException(409,'image_upload_conflict')
+        return {'received':index}
+    temporary=directory/(uuid.uuid4().hex+'.tmp')
+    try:
+        temporary.write_bytes(data)
+        os.replace(temporary,target)
+    finally:
+        temporary.unlink(missing_ok=True)
+    return {'received':index}
+
+def complete_media_chunks(upload_id,size,chunks,original):
+    directory=media_upload_directory(upload_id)
+    if not 0<size<=MEDIA_MAX_BYTES or chunks!=(size+MEDIA_CHUNK_SIZE-1)//MEDIA_CHUNK_SIZE:
+        raise HTTPException(422,'image_upload_invalid')
+    receipt=directory/'result.json'
+    if receipt.exists():return json.loads(receipt.read_text(encoding='utf-8'))
+    if not directory.is_dir():raise HTTPException(409,'image_upload_incomplete')
+    parts=[]
+    for index in range(chunks):
+        path=directory/f'{index:03d}'
+        if not path.is_file():raise HTTPException(409,'image_upload_incomplete')
+        part=path.read_bytes()
+        expected=min(MEDIA_CHUNK_SIZE,size-index*MEDIA_CHUNK_SIZE)
+        if len(part)!=expected:raise HTTPException(422,'image_upload_invalid')
+        parts.append(part)
+    result=store_image(b''.join(parts),original)
+    temporary=directory/(uuid.uuid4().hex+'.tmp')
+    try:
+        temporary.write_text(json.dumps(result),encoding='utf-8')
+        os.replace(temporary,receipt)
+    finally:
+        temporary.unlink(missing_ok=True)
+    for index in range(chunks):(directory/f'{index:03d}').unlink(missing_ok=True)
+    return result
 
 def history(db,name,version,actor,action,data):
     db.execute('INSERT INTO studio_content_history(name,version,actor,action,payload,created_at) VALUES(?,?,?,?,?,?)',(name,version,actor,action,json.dumps(data,ensure_ascii=False),int(time.time())))
@@ -343,6 +400,20 @@ def register(app,database,admin_actor):
         from starlette.concurrency import run_in_threadpool
         # Image decoding and WebP compression must not block the event loop.
         return await run_in_threadpool(store_image,bytes(buffer),original)
+
+    @app.put('/studio-api/manage/media/chunks/{upload_id}/{index}')
+    async def upload_chunk(upload_id:str,index:int,request:Request,_actor=Depends(admin_actor)):
+        buffer=bytearray()
+        async for chunk in request.stream():
+            buffer.extend(chunk)
+            if len(buffer)>MEDIA_CHUNK_SIZE:raise HTTPException(413,'image_too_large')
+        from starlette.concurrency import run_in_threadpool
+        return await run_in_threadpool(store_media_chunk,upload_id,index,bytes(buffer))
+
+    @app.post('/studio-api/manage/media/chunks/{upload_id}/complete')
+    async def finish_upload(upload_id:str,size:int,chunks:int,original:bool=False,_actor=Depends(admin_actor)):
+        from starlette.concurrency import run_in_threadpool
+        return await run_in_threadpool(complete_media_chunks,upload_id,size,chunks,original)
 
     @app.get('/studio-api/media/{name}')
     def image(name:str):

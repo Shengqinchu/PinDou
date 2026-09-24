@@ -1,7 +1,8 @@
-"""Package a reviewed Studio frontend build on top of the verified live release.
+"""Package reviewed Studio frontend and named service files on the live release.
 
-All service files and previous hashed assets are reused byte-for-byte from the
-base manifest. This avoids shipping unrelated local backend changes.
+Other service files and previous hashed assets are reused byte-for-byte from
+the base manifest. Name changed service files explicitly to avoid shipping
+unrelated local backend changes.
 """
 from __future__ import annotations
 
@@ -34,12 +35,23 @@ for path in dist.rglob("*"):
 if len(site) < 100:
     raise SystemExit("Frontend build looks incomplete")
 
+service = {}
+for filename in sys.argv[2:]:
+    if not re.fullmatch(r"[a-z][a-z0-9_]*\.py", filename):
+        raise SystemExit(f"Invalid service filename: {filename}")
+    name = "service/" + filename
+    path = root / "06_studio" / filename
+    if name not in base_hashes or not path.is_file() or path.is_symlink():
+        raise SystemExit(f"Service file missing from live manifest or local tree: {name}")
+    service[name] = path
+
 hashes = dict(base_hashes)
-hashes.update({name: hashlib.sha256(path.read_bytes()).hexdigest() for name, path in site.items()})
-changed = {name: path for name, path in site.items() if hashes[name] != base_hashes.get(name)}
+approved = site | service
+hashes.update({name: hashlib.sha256(path.read_bytes()).hexdigest() for name, path in approved.items()})
+changed = {name: path for name, path in approved.items() if hashes[name] != base_hashes.get(name)}
 reused = sorted(set(hashes) - set(changed))
-if not changed or any(not name.startswith("site/studio/") for name in changed):
-    raise SystemExit("Expected only changed frontend files")
+if not changed or any(not name.startswith("site/studio/") and name not in service for name in changed):
+    raise SystemExit("Expected only changed frontend or named service files")
 
 version = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S") + "-studio-v7"
 manifest = {"version": version, "sha256": hashes, "base_version": base["version"], "reuse": reused}
@@ -54,6 +66,8 @@ with tarfile.open(archive, "w:gz") as tar:
     info.size = len(data)
     tar.addfile(info, io.BytesIO(data))
 meta = {"version": version, "archive": str(archive), "sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
-        "files": len(hashes), "changed_frontend": len(changed), "reused": len(reused), "base_version": base["version"]}
+        "files": len(hashes), "changed_frontend": len([name for name in changed if name.startswith('site/studio/')]),
+        "changed_service": sorted(name for name in changed if name.startswith('service/')),
+        "reused": len(reused), "base_version": base["version"]}
 (out / "latest.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
 print(json.dumps(meta, indent=2))
