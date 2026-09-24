@@ -1,5 +1,5 @@
 {
-  "source": "店主2026-09-23订单与账户六图及全部完成",
+  "source": "店主2026-09-23英文预约提醒短信邮件模板",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -40,7 +40,7 @@
     "components-StudioCarousel.json": "3d95089ba11a06f03e6ecc8592208dcafa3be2fe1afbc6b592667c4ee30323a9",
     "components-StudioToast.json": "3901e64e5116ccf047f593172fa5945a6df55fff548cd84df0e293f72efa7f52",
     "contact-fields.json": "50809e2fe7f9998b3812378ce8da1ba47f5dffa1be3a43939f97f918ea42a9f9",
-    "customer-notifications.json": "ee199369aeb20a4aa20e68cc1924c64a4acb5c699a53ba8554c4949c56c56cb5",
+    "customer-notifications.json": "23d0cb27104fa2aa01da71dbbd0ec68d633e0442442ca0b5af0a48cce1b6fe0f",
     "data-commerce-labels.json": "5155567d136dedbf4dc78ab99e7b35a7748a5b1284b6c8577cd87d1a6c80c1e5",
     "data-commerce-messages.json": "d2cceeaeb48b7998ed4e2a9b2a7a759bf894123dcb328bc65604845fee0e837f",
     "data-components-admin-SchedulePanel-labels.json": "5800653cc2886f2313e67babd9486fb8190ccbe74cd2f47a8c57877517aec97a",

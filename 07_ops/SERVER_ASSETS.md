@@ -42,7 +42,7 @@
 | 对象 | 位置 |
 |---|---|
 | 生成器 current | `/opt/pindou/current` → `releases/20260910015453-studio-v7`（迁移验收时） |
-| Studio current | `/opt/pindou/studio/current` → `releases/20260924014155-studio-v7`（2026-09-23 加东夜间订单与账户六图修正发布；[验收](STUDIO_ORDER_ACCOUNT_UI_RELEASE_20260923.md)） |
+| Studio current | `/opt/pindou/studio/current` → `releases/20260924023755-studio-v7`（2026-09-23 加东夜间顾客英文提醒发布；[验收](STUDIO_NOTIFICATION_ENGLISH_RELEASE_20260923.md)） |
 | 生成器数据库 / 环境 | `/opt/pindou/shared/var/pindou.db` / `/opt/pindou/shared/.env` |
 | Studio 数据库 / 环境 | `/opt/pindou/studio/shared/studio.sqlite3` / `/opt/pindou/studio/shared/.env` |
 | 图片与资料 | 两个 `shared` 目录、`/opt/pindou/shared/data`、Studio `shared/media`、全部历史 release / static-history 保留 |

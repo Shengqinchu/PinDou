@@ -241,7 +241,15 @@
   ],
   "confirmed_body": [
     "{name}，店主已确认你的预约。\n{date} {start}–{end} · {guests} 人\n汉密尔顿当地时间\n地址：{address}\n查看预约或联系店主：{url}",
-    "Hi {name}, the host has confirmed your booking.\n{date} {start}–{end} · {guests} guest(s)\nHamilton local time\nAddress: {address}\nView your booking or message the host: {url}"
+    "{name}, PinDou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nPinDou Puppy looks forward to welcoming you!"
+  ],
+  "confirmed_sms_body": [
+    "{name}, PinDou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nIf your plans change or you need to contact the host, reply to this message.\nPinDou Puppy looks forward to welcoming you!",
+    "{name}, PinDou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nIf your plans change or you need to contact the host, reply to this message.\nPinDou Puppy looks forward to welcoming you!"
+  ],
+  "confirmed_email_body": [
+    "{name}, PinDou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nIf your plans change or you need to contact the host, email staywithcsq@outlook.com.\nPinDou Puppy looks forward to welcoming you!",
+    "{name}, PinDou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nIf your plans change or you need to contact the host, email staywithcsq@outlook.com.\nPinDou Puppy looks forward to welcoming you!"
   ],
   "cancelled_body": [
     "{name}，你在 {date} {start}–{end} 的预约已取消。\n如需重新预约或联系店主：{url}",

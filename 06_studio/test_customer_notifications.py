@@ -1,5 +1,5 @@
 """Booking lifecycle, subscription identity and retry tests; no external deliveries."""
-import asyncio,json,uuid
+import asyncio,json,re,uuid
 from datetime import datetime
 from types import SimpleNamespace
 from concurrent.futures import ThreadPoolExecutor
@@ -47,10 +47,10 @@ def pref(client,**changes):
     return client.put('/studio-api/auth/notifications',json=data|changes)
 
 
-def create(client,key=None):
+def create(client,key=None,locale='en'):
     result=client.post('/studio-api/reservations',headers={'Idempotency-Key':key or str(uuid.uuid4())},json={
       'booking':{'date':'2026-09-11','start':'14:00','end':'16:00','plan':'hourly','guests':2},
-      'name':'Local <Guest>','contact_method':'wechat','contact':'local-test','consent':True,'locale':'en'})
+      'name':'Local <Guest>','contact_method':'wechat','contact':'local-test','consent':True,'locale':locale})
     assert result.status_code==201,result.text
     return result.json()['id']
 
@@ -98,7 +98,7 @@ def test_contact_preferences_opt_in_and_version(setup):
 def test_pending_confirmation_reminder_cancel_are_distinct_and_idempotent(setup):
     client,now,calls=setup
     assert pref(client,email_enabled=True,email='local@example.test').status_code==200
-    key=str(uuid.uuid4());ident=create(client,key);assert create(client,key)==ident
+    key=str(uuid.uuid4());ident=create(client,key,locale='zh');assert create(client,key,locale='zh')==ident
     assert [r['kind'] for r in jobs()]==['pending']
     drain();assert calls[0][1]['title']=='Booking request received'
     assert 'confirmed' not in calls[0][1]['title'].lower()
@@ -112,6 +112,58 @@ def test_pending_confirmation_reminder_cancel_are_distinct_and_idempotent(setup)
     assert next(r for r in jobs() if r['kind']=='reminder')['state']=='skipped'
     messages=client.get('/studio-api/auth/messages').json()['items']
     assert len(messages)==3 and all(r['sender_role']=='system' for r in messages)
+
+
+def test_chinese_booking_sends_channel_specific_english_confirmation(setup):
+    client,_,calls=setup
+    pref(client,email_enabled=True,email='local@example.test',sms_enabled=True,phone='+14165550123')
+    bridge()
+    ident=create(client,locale='zh');drain()
+    status(client,ident,'confirmed');drain()
+    email=next(payload for job,payload in calls if job['kind']=='confirmed')
+    sms_notice=next(row for row in jobs() if row['kind']=='confirmed' and row['channel']=='sms')
+    with studio.database() as db:
+        sms_body=db.execute('SELECT content FROM studio_sms_jobs WHERE request_key=?',
+          ('customer-notice:'+sms_notice['id'],)).fetchone()[0]
+    assert email['locale']=='en' and sms_body.startswith('Booking confirmed\n')
+    for body in (email['body'],sms_body):
+        assert 'Local <Guest>, PinDou Puppy has confirmed your booking.' in body
+        assert '2026-09-11 14:00-16:00 · 2 guests' in body
+        assert 'Hamilton local time' in body
+        assert 'Address: 8 Hughson St N, Hamilton, ON L8R 0B1' in body
+        assert 'View booking: https://pindoupuppy.com/reservation/'+ident in body
+        assert 'Studio details: https://pindoupuppy.com/details' in body
+        assert body.endswith('PinDou Puppy looks forward to welcoming you!')
+        assert not re.search(r'[\u3400-\u9fff]',body)
+    assert 'reply to this message' in sms_body and 'staywithcsq@outlook.com' not in sms_body
+    assert 'email staywithcsq@outlook.com' in email['body'] and 'reply to this message' not in email['body']
+
+
+def test_legacy_queued_reminders_are_rewritten_before_handoff(setup):
+    client,now,calls=setup
+    pref(client,email_enabled=True,email='local@example.test',sms_enabled=True,phone='+14165550123')
+    bridge()
+    ident=create(client,locale='zh');drain();status(client,ident,'confirmed');drain()
+    reminders=[row for row in jobs() if row['kind']=='reminder']
+    assert len(reminders)==2 and all(row['state']=='queued' and row['attempts']==0 for row in reminders)
+    with studio.database() as db:
+        for row in reminders:
+            payload=json.loads(row['payload'])
+            payload.update(title='到店提醒',body='预约即将开始',locale='zh')
+            db.execute('UPDATE studio_customer_notification_jobs SET payload=? WHERE id=?',
+              (json.dumps(payload,ensure_ascii=False),row['id']))
+    calls.clear();now[0]=reminders[0]['due_at']+1;drain()
+    email=next(payload for job,payload in calls if job['kind']=='reminder')
+    with studio.database() as db:
+        sms_notice=next(row for row in reminders if row['channel']=='sms')
+        sms_body=db.execute('SELECT content FROM studio_sms_jobs WHERE request_key=?',
+          ('customer-notice:'+sms_notice['id'],)).fetchone()[0]
+        stored=[json.loads(db.execute('SELECT payload FROM studio_customer_notification_jobs WHERE id=?',
+          (row['id'],)).fetchone()[0]) for row in reminders]
+    assert email['locale']=='en' and email['title']=='Your visit is coming up'
+    assert sms_body.startswith('Your visit is coming up\n')
+    assert all(payload['locale']=='en' for payload in stored)
+    assert not re.search(r'[\u3400-\u9fff]',email['body']+sms_body)
 
 
 def test_queued_email_is_stopped_after_opt_out(setup):
@@ -150,9 +202,11 @@ def test_wechat_grants_bound_to_account_and_one_time_nonce(setup,monkeypatch):
     assert client.post('/studio-api/auth/notifications/wechat/subscribe',json=data).status_code==200
     with studio.database() as db:assert [r[0] for r in db.execute('SELECT grants FROM studio_customer_wechat_grants')]==[1,1,1]
     sent=[];monkeypatch.setattr(owner_wechat,'provider',lambda path,payload:sent.append(payload) or {'errcode':0})
-    ident=create(client);status(client,ident,'confirmed');drain()
+    ident=create(client,locale='zh');status(client,ident,'confirmed');drain()
     assert len(sent)==1 and sent[0]['page']=='pages/studio/reservation?id='+ident
     assert sent[0]['miniprogram_state']=='trial'
+    assert sent[0]['lang']=='en_US'
+    assert not re.search(r'[\u3400-\u9fff]',json.dumps(sent[0]['data'],ensure_ascii=False))
     with studio.database() as db:assert db.execute("SELECT grants FROM studio_customer_wechat_grants WHERE kind='confirmed'").fetchone()[0]==0
     drain();assert len(sent)==1
 
@@ -237,11 +291,16 @@ def test_email_transport_identity_idempotency_and_html_escaping(monkeypatch):
         return io.BytesIO(b'{"id":"local-provider-id"}')
     monkeypatch.setattr(notices,'urlopen',transport)
     job={'id':'repeatable-test','recipient':'local@example.test'}
-    payload={'title':'<script>test</script>','body':'<img src=x>','url':'https://pindoupuppy.com/messages','locale':'en'}
+    payload={'title':'<script>test</script>',
+      'body':'<img src=x>\nView booking: https://pindoupuppy.com/reservation/VIS-TEST\nStudio details: https://pindoupuppy.com/details',
+      'url':'https://pindoupuppy.com/messages','locale':'en'}
     for _ in range(2):assert notices.send_email(job,payload)==('accepted','','local-provider-id')
     assert requests[0].get_header('User-agent')=='PinDouStudio/1.0'
     assert requests[0].get_header('Idempotency-key')==requests[1].get_header('Idempotency-key')=='booking-repeatable-test'
     body=json.loads(requests[0].data);assert '<script>' not in body['html'] and '&lt;img' in body['html']
+    assert body['text'].startswith('<script>test</script>\n')
+    assert body['html'].count('<a href=')==2
+    assert 'account?notifications=1' not in body['html']
 
 
 def test_provided_contacts_are_automatic_but_explicit_opt_out_is_kept(setup):

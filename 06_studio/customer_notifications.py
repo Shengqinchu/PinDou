@@ -27,7 +27,9 @@ if not COPY.exists():COPY=Path(__file__).resolve().parents[1]/'05_studio/src/con
 PROFILE=Path(__file__).with_name('studio-profile.json')
 if not PROFILE.exists():PROFILE=Path(__file__).resolve().parents[1]/'05_studio/src/content/studio-profile.json'
 KINDS=('confirmed','cancelled','reminder')
+BOOKING_KINDS=('pending',)+KINDS
 ZONE=ZoneInfo('America/Toronto')
+DELIVERY_LOCALE='en'
 
 
 def words(key,locale='zh'):
@@ -94,12 +96,27 @@ def start_time(booking):
     return datetime.fromisoformat(booking['date']+'T'+booking['start']).replace(tzinfo=ZONE).timestamp()
 
 
-def render(row,kind,locale):
-    value=json.loads(row['payload']);booking=value['booking'];url='https://pindoupuppy.com/reservation/'+row['id']
-    fields={'name':value.get('name',''),'date':booking['date'],'start':booking['start'],'end':booking['end'],
-      'guests':booking['guests'],'address':json.loads(PROFILE.read_text(encoding='utf-8'))['address'],'url':url}
-    return {'title':words(kind+'_title',locale),'body':words(kind+'_body',locale).format(**fields),'url':url,'locale':locale,
-      'booking':booking,'name':fields['name'],'kind':kind}
+def delivery_payload(job,payload):
+    """Render unsent notices from the current English copy, including legacy queued jobs."""
+    if job.get('attempts',0)>0 and job.get('state') not in ('waiting_config','waiting_subscription'):
+        return payload  # Preserve provider idempotency for deliveries that may have reached a provider.
+    kind=job['kind'];url=payload['url']
+    if kind in BOOKING_KINDS:
+        booking=payload['booking'];url='https://pindoupuppy.com/reservation/'+job['reservation_id']
+        fields={'name':payload.get('name',''),'date':booking['date'],'start':booking['start'],'end':booking['end'],
+          'guests':booking['guests'],'guest_label':'guest' if booking['guests']==1 else 'guests',
+          'address':json.loads(PROFILE.read_text(encoding='utf-8'))['address'],'url':url}
+        body_key=kind+'_'+job['channel']+'_body' if kind=='confirmed' and job['channel'] in ('sms','email') else kind+'_body'
+    else:
+        fields={'url':url};body_key=kind+'_body'
+    return payload|{'title':words(kind+'_title',DELIVERY_LOCALE),
+      'body':words(body_key,DELIVERY_LOCALE).format(**fields),'url':url,'locale':DELIVERY_LOCALE,'kind':kind}
+
+
+def render(row,kind):
+    value=json.loads(row['payload']);url='https://pindoupuppy.com/reservation/'+row['id']
+    payload={'url':url,'booking':value['booking'],'name':value.get('name',''),'kind':kind}
+    return delivery_payload({'kind':kind,'channel':'site','reservation_id':row['id']},payload)
 
 
 def enqueue(db,row,kind,due=None):
@@ -110,7 +127,7 @@ def enqueue(db,row,kind,due=None):
     if kind=='reminder':expires=begins
     due=stamp if due is None else due
     if expires<=due:return
-    event=kind+':'+row['id']+':'+str(row['version']);payload=render(row,kind,choices['locale'])
+    event=kind+':'+row['id']+':'+str(row['version']);payload=render(row,kind)
     if kind!='reminder':studio_messages.system_message(db,row['owner_id'],payload['name'],payload['title']+'\n'+payload['body'],event,row['id'])
     destinations=[]
     if choices['email_enabled'] and choices['email']:destinations.append(('email',choices['email']))
@@ -119,10 +136,11 @@ def enqueue(db,row,kind,due=None):
         identity=db.execute('SELECT 1 FROM studio_miniapp_identities WHERE user_id=? AND app_id=?',(row['owner_id'],mini.config().app_id)).fetchone()
         if identity:destinations.append(('wechat',''))
     for channel,recipient in destinations:
+        channel_payload=delivery_payload({'kind':kind,'channel':channel,'reservation_id':row['id']},payload)
         db.execute('''INSERT OR IGNORE INTO studio_customer_notification_jobs
           (id,event_key,reservation_id,owner_id,kind,channel,recipient,payload,state,due_at,expires_at,next_attempt,created_at,updated_at)
           VALUES(?,?,?,?,?,?,?,?,'queued',?,?,?,?,?)''',
-          (uuid.uuid4().hex,event,row['id'],row['owner_id'],kind,channel,recipient,json.dumps(payload,ensure_ascii=False),due,expires,due,stamp,stamp))
+          (uuid.uuid4().hex,event,row['id'],row['owner_id'],kind,channel,recipient,json.dumps(channel_payload,ensure_ascii=False),due,expires,due,stamp,stamp))
 
 
 def on_reservation(db,kind,row):
@@ -174,12 +192,9 @@ def on_message(db,thread,message):
     stamp=time.time();role=message['sender_role'];owner=thread['owner_id']
     if role not in ('staff','customer'):return
     kind='reply' if role=='staff' else 'customer_message'
-    locale='zh'
-    recent=db.execute('SELECT locale FROM studio_booking_notification_choices WHERE owner_id=? ORDER BY rowid DESC LIMIT 1',(owner,)).fetchone()
-    if recent and recent['locale']=='en':locale='en'
     url='https://pindoupuppy.com/messages' if role=='staff' else 'https://pindoupuppy.com/manage?view=messages'
-    payload={'title':words(kind+'_title',locale),'body':words(kind+'_body',locale).format(url=url),
-      'url':url,'locale':locale,'thread_id':thread['id'],'seq':message['seq'],'name':thread['name']}
+    payload=delivery_payload({'kind':kind,'channel':'sms','reservation_id':''},
+      {'url':url,'thread_id':thread['id'],'seq':message['seq'],'name':thread['name']})
     destinations=[]
     if role=='staff':
         pref=preferences(db,owner)
@@ -204,9 +219,13 @@ def email_credentials():
 def send_email(job,payload):
     key,sender=email_credentials()
     if not key or not sender:return ('waiting_config','email_unconfigured','')
-    title=html.escape(payload['title']);body=html.escape(payload['body']).replace('\n','<br>');url=html.escape(payload['url'],quote=True)
-    markup=f'<div style="max-width:560px;margin:auto;padding:24px;font:16px/1.7 Arial,sans-serif;color:#26343d"><h2>{title}</h2><p>{body}</p><p><a href="{url}">{html.escape(words("view_booking",payload["locale"]))}</a></p><p><a href="https://pindoupuppy.com/account?notifications=1">{html.escape(words("notification_settings",payload["locale"]))}</a></p></div>'
-    data={'from':sender,'to':[job['recipient']],'subject':words('place',payload['locale'])+' · '+payload['title'],'text':payload['body'],'html':markup}
+    title=html.escape(payload['title'])
+    parts=re.split(r'(https://pindoupuppy\.com/[A-Za-z0-9/_?&=%#.\-]+)',payload['body'])
+    body=''.join('<a href="'+html.escape(part,quote=True)+'">'+html.escape(part)+'</a>'
+      if part.startswith('https://pindoupuppy.com/') else html.escape(part) for part in parts).replace('\n','<br>')
+    markup=f'<div style="max-width:560px;margin:auto;padding:24px;font:16px/1.7 Arial,sans-serif;color:#26343d"><h2>{title}</h2><p>{body}</p></div>'
+    data={'from':sender,'to':[job['recipient']],'subject':words('place',DELIVERY_LOCALE)+' · '+payload['title'],
+      'text':payload['title']+'\n'+payload['body'],'html':markup}
     request=URLRequest('https://api.resend.com/emails',data=json.dumps(data).encode(),headers={'Authorization':'Bearer '+key,'Content-Type':'application/json','User-Agent':'PinDouStudio/1.0','Idempotency-Key':'booking-'+job['id']})
     try:
         with urlopen(request,timeout=12) as response:result=json.loads(response.read(64000))
@@ -217,14 +236,14 @@ def send_email(job,payload):
 
 
 def wechat_message(job,payload,template,grant):
-    fields=json.loads(template['fields']);booking=payload['booking'];locale=payload['locale']
+    fields=json.loads(template['fields']);booking=payload['booking'];locale=DELIVERY_LOCALE
     text=lambda value:re.sub(r'[\x00-\x1f\x7f]',' ',str(value))[:20]
     values={'place':text(words('place',locale)),'start':booking['date']+' '+booking['start'],
       'end':booking['date']+' '+booking['end'],'service':text(words('day' if booking['plan']=='day' else 'hourly',locale)),
       'note':text(words('card_'+job['kind'],locale).format(guests=booking['guests']))}
     return {'touser':grant['openid'],'template_id':template['template_id'],
       'page':'pages/studio/reservation?id='+job['reservation_id'],'miniprogram_state':{'release':'formal','trial':'trial','develop':'developer'}[mini.config().environment],
-      'lang':'en_US' if locale=='en' else 'zh_CN','data':{key:{'value':values[value]} for key,value in fields.items()}}
+      'lang':'en_US','data':{key:{'value':values[value]} for key,value in fields.items()}}
 
 
 def process_one(database):
@@ -240,6 +259,11 @@ def process_one(database):
         if not valid_job(db,job):
             db.execute("UPDATE studio_customer_notification_jobs SET state='skipped',error='superseded',updated_at=? WHERE id=?",(now,job['id']));return True
         payload=json.loads(job['payload'])
+        current=delivery_payload(job,payload)
+        if current!=payload:
+            payload=current
+            db.execute('UPDATE studio_customer_notification_jobs SET payload=?,updated_at=? WHERE id=?',
+              (json.dumps(payload,ensure_ascii=False),now,job['id']))
         if job['channel'] in ('sms','owner_sms'):
             bridge=db.execute("SELECT * FROM studio_sms_bridges WHERE role=? AND enabled=1 AND send_enabled=1",('owner_alert' if job['channel']=='owner_sms' else 'customer',)).fetchone()
             if not bridge:
