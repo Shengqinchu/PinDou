@@ -32,6 +32,12 @@ ZONE=ZoneInfo('America/Toronto')
 DELIVERY_LOCALE='en'
 
 
+def english_display_name(value):
+    """Keep an English notice English when a booking name uses another script."""
+    name=' '.join(str(value or '').split())[:80]
+    return name if name and name.isascii() and name.isprintable() else 'Hello'
+
+
 def words(key,locale='zh'):
     return json.loads(COPY.read_text(encoding='utf-8'))[key][locale=='en']
 
@@ -103,7 +109,11 @@ def delivery_payload(job,payload):
     kind=job['kind'];url=payload['url']
     if kind in BOOKING_KINDS:
         booking=payload['booking'];url='https://pindoupuppy.com/reservation/'+job['reservation_id']
-        fields={'name':payload.get('name',''),'date':booking['date'],'start':booking['start'],'end':booking['end'],
+        channel=job['channel']
+        contact_key={'sms':'contact_by_sms','email':'contact_by_email'}.get(channel,'contact_on_booking_page')
+        fields={'name':payload.get('name',''),'display_name':english_display_name(payload.get('name')),
+          'contact_instruction':words(contact_key,DELIVERY_LOCALE),
+          'date':booking['date'],'start':booking['start'],'end':booking['end'],
           'guests':booking['guests'],'guest_label':'guest' if booking['guests']==1 else 'guests',
           'address':json.loads(PROFILE.read_text(encoding='utf-8'))['address'],'url':url}
         body_key=kind+'_'+job['channel']+'_body' if kind=='confirmed' and job['channel'] in ('sms','email') else kind+'_body'
@@ -240,7 +250,8 @@ def wechat_message(job,payload,template,grant):
     text=lambda value:re.sub(r'[\x00-\x1f\x7f]',' ',str(value))[:20]
     values={'place':text(words('place',locale)),'start':booking['date']+' '+booking['start'],
       'end':booking['date']+' '+booking['end'],'service':text(words('day' if booking['plan']=='day' else 'hourly',locale)),
-      'note':text(words('card_'+job['kind'],locale).format(guests=booking['guests']))}
+      'note':text(words('card_'+job['kind'],locale).format(
+        guests=booking['guests'],guest_label='guest' if booking['guests']==1 else 'guests'))}
     return {'touser':grant['openid'],'template_id':template['template_id'],
       'page':'pages/studio/reservation?id='+job['reservation_id'],'miniprogram_state':{'release':'formal','trial':'trial','develop':'developer'}[mini.config().environment],
       'lang':'en_US','data':{key:{'value':values[value]} for key,value in fields.items()}}

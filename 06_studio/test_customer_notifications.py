@@ -47,10 +47,10 @@ def pref(client,**changes):
     return client.put('/studio-api/auth/notifications',json=data|changes)
 
 
-def create(client,key=None,locale='en'):
+def create(client,key=None,locale='en',name='Local <Guest>',guests=2):
     result=client.post('/studio-api/reservations',headers={'Idempotency-Key':key or str(uuid.uuid4())},json={
-      'booking':{'date':'2026-09-11','start':'14:00','end':'16:00','plan':'hourly','guests':2},
-      'name':'Local <Guest>','contact_method':'wechat','contact':'local-test','consent':True,'locale':locale})
+      'booking':{'date':'2026-09-11','start':'14:00','end':'16:00','plan':'hourly','guests':guests},
+      'name':name,'contact_method':'wechat','contact':'local-test','consent':True,'locale':locale})
     assert result.status_code==201,result.text
     return result.json()['id']
 
@@ -139,6 +139,51 @@ def test_chinese_booking_sends_channel_specific_english_confirmation(setup):
     assert 'email staywithcsq@outlook.com' in email['body'] and 'reply to this message' not in email['body']
 
 
+def test_pending_email_and_sms_match_full_english_template_with_chinese_name(setup):
+    client,_,calls=setup
+    pref(client,email_enabled=True,email='local@example.test',sms_enabled=True,phone='+14165550123')
+    bridge()
+    ident=create(client,locale='zh',name='代记录',guests=1)
+    drain()
+    email=next(payload for job,payload in calls if job['kind']=='pending')
+    sms_notice=next(row for row in jobs() if row['kind']=='pending' and row['channel']=='sms')
+    with studio.database() as db:
+        sms_body=db.execute('SELECT content FROM studio_sms_jobs WHERE request_key=?',
+          ('customer-notice:'+sms_notice['id'],)).fetchone()[0]
+    assert email['title']=='Booking request received' and email['locale']=='en'
+    assert sms_body.startswith('Booking request received\n')
+    for body in (email['body'],sms_body):
+        assert 'Hello, PinDou Puppy has received your booking request.' in body
+        assert 'It is waiting for the host to confirm.' in body
+        assert '2026-09-11 14:00-16:00 · 1 guest' in body
+        assert 'Hamilton local time' in body
+        assert 'Address: 8 Hughson St N, Hamilton, ON L8R 0B1' in body
+        assert 'View booking: https://pindoupuppy.com/reservation/'+ident in body
+        assert 'Studio details: https://pindoupuppy.com/details' in body
+        assert 'We will notify you when the host confirms your booking.' in body
+        assert not re.search(r'[\u3400-\u9fff]',body)
+        assert 'guest(s)' not in body
+    assert 'reply to this message' in sms_body and 'staywithcsq@outlook.com' not in sms_body
+    assert 'email staywithcsq@outlook.com' in email['body'] and 'reply to this message' not in email['body']
+
+
+def test_all_booking_statuses_keep_chinese_names_out_of_english_delivery():
+    source={'url':'https://pindoupuppy.com/reservation/VIS-TEST','name':'代记录',
+      'booking':{'date':'2026-09-26','start':'10:00','end':'22:00','guests':1,'plan':'day'}}
+    for kind in notices.BOOKING_KINDS:
+        for channel in ('email','sms'):
+            payload=notices.delivery_payload(
+              {'kind':kind,'channel':channel,'reservation_id':'VIS-TEST'},source)
+            body=payload['body']
+            assert not re.search(r'[\u3400-\u9fff]',payload['title']+body)
+            assert '2026-09-26 10:00-22:00 · 1 guest' in body
+            assert 'Address: 8 Hughson St N, Hamilton, ON L8R 0B1' in body
+            assert body.count('https://pindoupuppy.com/reservation/VIS-TEST')==1
+            assert body.count('https://pindoupuppy.com/details')==1
+            if channel=='email':assert 'email staywithcsq@outlook.com' in body
+            else:assert 'reply to this message' in body
+
+
 def test_legacy_queued_reminders_are_rewritten_before_handoff(setup):
     client,now,calls=setup
     pref(client,email_enabled=True,email='local@example.test',sms_enabled=True,phone='+14165550123')
@@ -206,6 +251,7 @@ def test_wechat_grants_bound_to_account_and_one_time_nonce(setup,monkeypatch):
     assert len(sent)==1 and sent[0]['page']=='pages/studio/reservation?id='+ident
     assert sent[0]['miniprogram_state']=='trial'
     assert sent[0]['lang']=='en_US'
+    assert sent[0]['data']['thing5']['value']=='2 guests, see you'
     assert not re.search(r'[\u3400-\u9fff]',json.dumps(sent[0]['data'],ensure_ascii=False))
     with studio.database() as db:assert db.execute("SELECT grants FROM studio_customer_wechat_grants WHERE kind='confirmed'").fetchone()[0]==0
     drain();assert len(sent)==1

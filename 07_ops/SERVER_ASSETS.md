@@ -1,6 +1,6 @@
 # 小狗拼豆铺服务器资产
 
-更新：2026-09-23。**默认生产服务器为 `36.139.201.94`**；以后排查、备份和部署均使用此机。全项目共享总账为 `C:/Users/123/Desktop/apisell/服务器资产清单.md`，本文件是 PinDou 的运维入口。
+更新：2026-09-24。**默认生产服务器为 `36.139.201.94`**；以后排查、备份和部署均使用此机。全项目共享总账为 `C:/Users/123/Desktop/apisell/服务器资产清单.md`，本文件是 PinDou 的运维入口。
 
 ## 当前生产服务器
 
@@ -42,7 +42,7 @@
 | 对象 | 位置 |
 |---|---|
 | 生成器 current | `/opt/pindou/current` → `releases/20260910015453-studio-v7`（迁移验收时） |
-| Studio current | `/opt/pindou/studio/current` → `releases/20260924023755-studio-v7`（2026-09-23 加东夜间顾客英文提醒发布；[验收](STUDIO_NOTIFICATION_ENGLISH_RELEASE_20260923.md)） |
+| Studio current | `/opt/pindou/studio/current` → `releases/20260924152310-studio-v7`（2026-09-24 顾客英文提醒遗漏修正；[验收](STUDIO_NOTIFICATION_ENGLISH_CORRECTION_20260924.md)） |
 | 生成器数据库 / 环境 | `/opt/pindou/shared/var/pindou.db` / `/opt/pindou/shared/.env` |
 | Studio 数据库 / 环境 | `/opt/pindou/studio/shared/studio.sqlite3` / `/opt/pindou/studio/shared/.env` |
 | 图片与资料 | 两个 `shared` 目录、`/opt/pindou/shared/data`、Studio `shared/media`、全部历史 release / static-history 保留 |
