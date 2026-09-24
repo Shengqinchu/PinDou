@@ -187,7 +187,7 @@ def main():
         add_header Cache-Control "no-store" always;
     }
     location = /index.html { return 302 /; }
-    location ~ ^/(account|auth/wechat)$ {
+    location ~ ^/(account|messages|auth/wechat)$ {
         rewrite ^ /studio-api/site break;
         proxy_pass http://127.0.0.1:8011;
         proxy_set_header Host $host;

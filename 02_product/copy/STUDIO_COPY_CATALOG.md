@@ -2794,6 +2794,8 @@
 | refresh | 刷新 | Refresh |
 | count | {v0} 个商品 | {v0} products |
 | imageNumber | 图片 {v0} | Photo {v0} |
+| previousImage | 上一张图片 | Previous photo |
+| nextImage | 下一张图片 | Next photo |
 
 ## state.json
 

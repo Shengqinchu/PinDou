@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { PhShoppingCart, PhReceipt, PhMagnifyingGlass, PhPlus, PhMinus, PhTrash, PhCaretDown, PhArrowRight } from '@phosphor-icons/vue';
+import { PhShoppingCart, PhReceipt, PhMagnifyingGlass, PhPlus, PhMinus, PhTrash, PhCaretDown, PhCaretLeft, PhCaretRight, PhArrowRight } from '@phosphor-icons/vue';
 import LiftTitle from '../components/LiftTitle.vue';
 import SlideOver from '../components/SlideOver.vue';
 import { say, tr, formatCopy } from '../state';
@@ -49,6 +49,7 @@ function setView(view:string){void router.replace({query:{...route.query,view:vi
 function chooseRoot(id:string){root.value=id;leaf.value=children(id)[0]?.id||id;search.value='';}
 function chooseSection(value:string){void router.replace({query:{...route.query,section:value}})}
 function openProduct(p:ShopProduct){selected.value=p;photo.value=0;variant.value='';choice.value='';detailsOpen.value=true;}
+function changePhoto(step:number){const count=selected.value?.images.length||0;if(count>1)photo.value=(photo.value+step+count)%count;}
 function add(p:ShopProduct,fromDetails=false){
  if(!orderable(p))return;
  if(!fromDetails&&(p.variants?.length||p.choices?.length)){openProduct(p);return;}
@@ -100,7 +101,7 @@ onUnmounted(()=>{window.removeEventListener('focus',focusRefresh);document.remov
   </div>
  </section>
  <SlideOver v-model="detailsOpen" :title="selected?tr(selected.zh,selected.en):''">
-  <div v-if="selected" class="shop-detail"><img v-if="selected.images.length" class="shop-detail-image" :src="shopImage(selected.images[photo])" :alt="tr(selected.zh,selected.en)"/><div v-else class="shop-placeholder"><strong>{{selected.code||tr(selected.zh,selected.en)}}</strong><small>{{say(w.noPhoto)}}</small></div>
+  <div v-if="selected" class="shop-detail"><div v-if="selected.images.length" class="shop-detail-gallery"><img class="shop-detail-image" :src="shopImage(selected.images[photo])" :alt="tr(selected.zh,selected.en)"/><template v-if="selected.images.length>1"><button type="button" class="shop-image-nav previous" :aria-label="say(w.previousImage)" @click="changePhoto(-1)"><span><PhCaretLeft aria-hidden="true"/></span></button><button type="button" class="shop-image-nav next" :aria-label="say(w.nextImage)" @click="changePhoto(1)"><span><PhCaretRight aria-hidden="true"/></span></button></template></div><div v-else class="shop-placeholder"><strong>{{selected.code||tr(selected.zh,selected.en)}}</strong><small>{{say(w.noPhoto)}}</small></div>
    <div v-if="selected.images.length>1" class="shop-thumbnails"><button v-for="(src,i) in selected.images" :key="src" :class="{active:photo===i}" :aria-label="formatCopy(w.imageNumber,{v0:i+1})" :aria-pressed="photo===i" @click="photo=i"><img :src="shopImage(src)" alt=""/></button></div>
    <p class="shop-description">{{selectedDescription}}</p><p class="shop-detail-price">{{selected.price_cents===null?say(w.unpriced):variant?money(variantPrice(selected,variant)!):hasVariantPrices(selected)?priceRange(selected)+' CAD':money(selected.price_cents)}}</p>
    <p v-if="selected.quantity_offer" class="shop-offer">{{offerText(selected)}}<small>{{say(o.offerHelp)}}</small><small v-if="hasVariantPrices(selected)">{{say(o.variantOfferNote)}}</small></p>

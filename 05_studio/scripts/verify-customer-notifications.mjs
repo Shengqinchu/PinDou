@@ -11,9 +11,9 @@ try{
   const context=await browser.newContext({viewport,reducedMotion:'reduce'});await routeLocal(context);
   await context.addInitScript(()=>{localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('puppy-studio-locale','zh');sessionStorage.setItem('puppy-studio-admin','local-qa');});
   const customer=await context.newPage(),staff=await context.newPage(),errors=[];for(const p of [customer,staff])p.on('pageerror',e=>errors.push(e.message));
-  await customer.goto('http://127.0.0.1:5184/messages');await expect(customer.locator('.site-chat-composer textarea')).toBeVisible();
+  await customer.goto('http://127.0.0.1:5184/messages');await expect(customer.getByRole('heading',{name:'我的消息'})).toBeVisible();await expect(customer.locator('.site-chat-composer')).toHaveCount(0);
   const question=`Local web question ${viewport.width} ${stamp}`;
-  await customer.locator('.site-chat-composer textarea').fill(question);await customer.locator('.site-chat-composer button').click();
+  const seeded=await context.request.post('http://127.0.0.1:8011/studio-api/auth/messages',{headers:owner,data:{content:question,request_id:crypto.randomUUID(),reservation_id:''}});assert.equal(seeded.status(),201);
   await expect(customer.locator('.site-conversation-body')).toContainText(question);
   await staff.goto('http://127.0.0.1:5184/manage?view=messages');await staff.getByRole('button',{name:'站内消息',exact:true}).click();
   await staff.locator('.staff-site-inbox aside button').filter({hasText:question}).click();
@@ -33,7 +33,7 @@ try{
   await customer.locator('.notification-preferences input[type=email]').fill('local-ui@example.test');
   await customer.locator('.notification-preferences').getByRole('button',{name:'保存提醒设置',exact:true}).click();
   await expect(customer.locator('.notification-preferences')).toContainText('提醒设置已保存');
-  assert.deepEqual(errors,[]);results.push({surface:'web',viewport,customerToHost:true,hostToCustomerLive:true,preferences:true,history:true,noOverflow:true});await context.close();
+  assert.deepEqual(errors,[]);results.push({surface:'web',viewport,customerReadOnly:true,hostToCustomerLive:true,preferences:true,history:true,noOverflow:true});await context.close();
  }
  for(const viewport of [{width:390,height:844},{width:320,height:568},{width:844,height:390}]){
   const context=await browser.newContext({viewport,reducedMotion:'reduce'});await routeLocal(context);

@@ -1,5 +1,5 @@
 {
-  "source": "店主2026-09-24全部英文通知及微信字段长度修正",
+  "source": "店主2026-09-24两张标注截图要求商品图片左右点击切换与可点缩略图",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -78,7 +78,7 @@
     "reservation-timetable.json": "c98f1bf9df4ed58e4ff5643ab5e8a37b68c9b7dd00a22fd0fb5778c9a53bbf52",
     "shop-batch.json": "5d39372127568a985effa51781542b63fcb8bb8ed11e5e9629bbc954e0cad4a5",
     "shop-ordering.json": "b9d32ca916fa8923895283188e098ed3965f9c91d7d3b9925f216de134859f27",
-    "shop.json": "fb79337d6400de7b7d7887b21aaa77ea268f374ca532eff164126c2ba96a0e79",
+    "shop.json": "2c6ababc61f605509fe3a1c1e609368db5f3b918d566e8815c580db3c14e339c",
     "state.json": "c4eeb599810219fc6102c20f5c7c3a265a0d592a3cefd9351d88734552a2650f",
     "studio-miniapp-legal.json": "791203c9f40d60e70691f295eee68d0c73171e513cc7f3a3ee45776809fae619",
     "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3",
