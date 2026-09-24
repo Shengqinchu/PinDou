@@ -17,7 +17,7 @@ import {
   PhUserCircle,
   PhGlobe,
 } from "@phosphor-icons/vue";
-import { locale, socialUrl, tr, wechat, phone, phoneHref } from "./state";
+import { locale, socialUrl, tr, wechat, phone, phoneHref, email } from "./state";
 import { gsap } from "gsap";
 import { enterRoute } from "./route-entrance";
 import { onMotionPreferenceChange } from "./motion-preference";
@@ -199,6 +199,7 @@ watch(
           ><span class="contact-icon-slot"><BrandIcon name="canada" /></span
           ><span>{{ phone }}</span></a
         >
+        <a class="contact-channel" :href="'mailto:'+email"><span>{{ email }}</span></a>
       </div>
       <div class="vision-footer-links vision-footer-tools">
         <span>{{ say(copyText.the_toolbox_df33f0) }}</span>

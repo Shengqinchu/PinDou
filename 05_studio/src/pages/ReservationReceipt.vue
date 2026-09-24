@@ -23,7 +23,7 @@ import {
 import { commerceApi,CommerceError } from "../commerce";
 import { accountCopy,ensureCustomer,accountUser } from "../account";
 const needsSignIn=ref(false);
-import { prettyDate, tr, wechat, phone, phoneHref } from "../state";
+import { prettyDate, tr, wechat, phone, phoneHref, email } from "../state";
 import type { Reservation } from "../reservations";
 const route = useRoute(),
   result = ref<Reservation>(),
@@ -156,7 +156,7 @@ onBeforeUnmount(() => {
     <p class="fine-print">
       {{ say(copyText.for_changes_contact_the_host_on_wechat_2921d8)
       }}<CopyContact :value="wechat" /> · {{ say(copyText.phone_0614da)
-      }}<a :href="phoneHref">{{ phone }}</a> · {{say(copyText.email)}}<a href="mailto:staywithcsq@outlook.com">staywithcsq@outlook.com</a>
+      }}<a :href="phoneHref">{{ phone }}</a> · {{say(copyText.email)}}<a :href="'mailto:'+email">{{email}}</a>
     </p>
   </section>
 </template>

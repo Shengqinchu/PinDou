@@ -42,6 +42,7 @@ try{
  await expect(page.locator('.shop-manual-order-row')).toHaveCount(0);
  await page.goto(base+'/account');
  await expect(page.locator('.account-identity')).toContainText('QA guest');
+ await expect(page.getByRole('link',{name:'staywithcsq@outlook.com'})).toBeVisible();
  await page.getByRole('button',{name:'我的订单'}).click();
  await expect(page.locator('.shop-order-history-card')).toContainText('A1 × 2');
  await page.locator('.account-edit').click();
@@ -50,6 +51,8 @@ try{
  await expect(page.locator('.profile-form .profile-contact')).toBeHidden();
  await page.locator('.profile-form .booking-profile-section summary').click();
  await expect(page.locator('.profile-form .profile-contact')).toBeVisible();
+ await expect(page.locator('.profile-form .booking-profile-toggle')).toBeVisible();
+ await expect(page.locator('.profile-form').getByLabel('称呼')).toBeVisible();
  await page.getByLabel('收货地址（选填）').fill('75 John St N, Hamilton');
  await page.locator('.profile-actions button').last().click();
  assert.equal(savedAddress,'75 John St N, Hamilton');

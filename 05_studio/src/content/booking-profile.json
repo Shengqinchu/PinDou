@@ -1,6 +1,7 @@
 {
   "title": ["个人资料", "Personal details"],
   "name": ["预约称呼", "Booking name"],
+  "profile_name": ["称呼", "Name"],
   "contact": ["预约联系方式", "Booking contact"],
   "delivery_address": ["收货地址（选填）", "Delivery address (optional)"],
   "empty": ["尚未填写预约资料", "No booking details saved yet"],

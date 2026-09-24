@@ -11,13 +11,16 @@
 
 ## 发布和数据核验
 
-- 生产目标 `36.139.201.94`；发布前 current 为 `20260923232440-studio-v7`，发布后为 `20260924004402-studio-v7`。归档 SHA-256 `28490298282cd569bfba1daf7bb2c2137a55bbb0b49554fc4c1f988098539767`，417 个清单文件核验通过。
+- 生产目标 `36.139.201.94`；首版从 `20260923232440-studio-v7` 发布为 `20260924004402-studio-v7`。首版归档 SHA-256 `28490298282cd569bfba1daf7bb2c2137a55bbb0b49554fc4c1f988098539767`，417 个清单文件核验通过。
 - 发布脚本在 `/opt/pindou/studio/backups/20260924004402-studio-v7/` 自动备份部署前 Studio SQLite 和 Nginx/unit 状态；代码回退可以切换上一 release，不能把旧数据库快照覆盖发布后新增的预约、订单或余额。
 - 发布前后 Studio 受保护顾客/钱包表、生成器数据、商品/订单/库存/订单事件/预约资料的业务列逐表摘要一致；两库服务 active，Studio SQLite `integrity_check=ok`。新 `owner_id`、`delivery_address` 列均存在。相关文案模块在发布前无线上自定义覆盖。
 - 公网 `/version.json` 构建号 `2026-09-24T00:37:27.709Z`，健康接口 `ok`，商品目录响应正常；Chromium 只读验证购物车新提示和未登录者无法读取账号或后台订单。未向生产创建测试订单、修改真实状态或发送顾客消息。
+- 截图细节补充版现为 current：`20260924005450-studio-v7`，归档 SHA-256 `f415ed7a723ffbfbb0e0acd5b315cb52622ab064053368f29eec8584bc983101`，417 个文件逐项校验，回退资料 `/opt/pindou/studio/backups/20260924005450-studio-v7/`。个人资料折叠区新增圆形箭头及“称呼”标签；`staywithcsq@outlook.com` 放在预约收据和全站页脚，使用统一文案源。
+- 补充版公网构建号 `2026-09-24T00:51:50.069Z`；健康接口、购物车提示、联系邮箱及私有订单接口拒绝未登录请求的浏览器只读核验通过。Studio 与生成器服务 active，417 个发布文件有效。补充版发布前后的两库受保护数据、商品、4 条订单、库存、事件和预约资料摘要逐项相同，SQLite `integrity_check=ok`；本轮没有操作真实订单。
 
 ## 测试界限
 
 - `test_shop_orders.py` 与 `test_booking_profile.py` 共 31 项通过；`npm run build` 包含文案、类型和前端构建，通过。本地 Chromium/WebKit 完成结账流程夹具；管理员状态更新/删除、账号订单与收货地址保存夹具通过。这些夹具拦截接口写入，不能代替真实管理员或顾客登录验收。
+- 补充版再次通过上述 31 项后端测试、前端构建、Chromium/WebKit 下单夹具和管理员/账号夹具；线上只读检查未创建测试订单。
 - 后端全量 535 项中 534 项通过，唯一失败 `test_default_profile_names.py::test_custom_names_are_not_rewritten` 为既有测试与既有默认昵称规范互相矛盾：同一文件要求“拼豆用户”添加稳定后缀，同时要求它保持原样；本次未修改该文件或 `customer_auth.py`。
 - 本机私有证据在忽略 Git 的 `artifacts/studio-release/`；包含发布前后不含顾客明文的审计指纹、归档和上传校验。私钥、生产环境文件与完整数据库不进入 GitHub。

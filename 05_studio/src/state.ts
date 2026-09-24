@@ -57,6 +57,7 @@ export const mapsUrl = computed(() => "https://www.google.com/maps/search/?api=1
 export const wechat = computed(() => say(contacts.wechat));
 export const phone = computed(() => say(contacts.phone));
 export const phoneHref = computed(() => say(contacts.phone_href));
+export const email = computed(() => say(contacts.email));
 
 export const products = contentProducts;
 

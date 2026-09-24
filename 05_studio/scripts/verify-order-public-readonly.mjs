@@ -19,6 +19,7 @@ try{
  await page.goto(base+'/shop?view=cart');
  await expect(page.locator('.studio-drawer[open] .shop-notice').first()).toContainText('下单后店主会主动联系您');
  await expect(page.getByRole('heading',{name:'拼豆小店'})).toBeVisible();
+ await expect(page.getByRole('link',{name:'staywithcsq@outlook.com'})).toBeVisible();
  assert.deepEqual(errors,[]);
  console.log(JSON.stringify({publicBuild:version.build,health:health.status,cartNotice:true,privateOrdersProtected:true}));
 }finally{await browser.close()}

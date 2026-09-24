@@ -354,6 +354,10 @@
       "预约称呼",
       "Booking name"
     ],
+    "profile_name": [
+      "称呼",
+      "Name"
+    ],
     "contact": [
       "预约联系方式",
       "Booking contact"
@@ -2837,6 +2841,10 @@
     "phone": [
       "+1 4373624360",
       "+1 4373624360"
+    ],
+    "email": [
+      "staywithcsq@outlook.com",
+      "staywithcsq@outlook.com"
     ],
     "phone_href": [
       "tel:+14373624360",

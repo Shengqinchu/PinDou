@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed,onBeforeUnmount,onMounted,ref,watch } from 'vue';
-import { PhPencilSimple,PhUserCircle } from '@phosphor-icons/vue';
+import { PhCaretDown,PhPencilSimple,PhUserCircle } from '@phosphor-icons/vue';
 import { RouterLink,useRoute,useRouter } from 'vue-router';
 import {defaultDisplayName} from '../identity-model';
 import {accountReturn} from '../wechat';
@@ -89,7 +89,7 @@ watch(()=>route.query.setup,value=>{if(value==='1'&&!props.emailOnly&&!editing.v
       </div>
       <label class="field"><span class="profile-field-label">{{say(copy.nickname)}}<InfoTip :label="say(copy.nickname_help)"><p>{{say(copy.nickname_help)}}</p></InfoTip></span><input v-model="nickname" autocomplete="nickname" :required="name!==original" :disabled="busy" :aria-invalid="nickname.length>0&&!valid||undefined"/></label>
       <WechatSignIn :key="'editor-'+accountUser?.id" linking/>
-      <details class="booking-profile-section"><summary>{{say(bookingCopy.title)}}</summary><p v-if="bookingLoading" role="status">{{say(bookingCopy.loading)}}</p><p v-else-if="bookingError" class="profile-contact-error" role="alert">{{bookingError}} <button type="button" class="text-link" @click="loadBooking">{{say(bookingCopy.retry)}}</button></p><template v-else><BookingContactFields class="profile-contact" v-model="bookingDraft" :required="false" :disabled="busy"/><label class="field">{{say(bookingCopy.delivery_address)}}<input v-model="address" autocomplete="street-address" maxlength="500" :disabled="busy"/></label></template></details>
+      <details class="booking-profile-section"><summary>{{say(bookingCopy.title)}}<span class="booking-profile-toggle"><PhCaretDown :size="16"/></span></summary><p v-if="bookingLoading" role="status">{{say(bookingCopy.loading)}}</p><p v-else-if="bookingError" class="profile-contact-error" role="alert">{{bookingError}} <button type="button" class="text-link" @click="loadBooking">{{say(bookingCopy.retry)}}</button></p><template v-else><BookingContactFields class="profile-contact" v-model="bookingDraft" :name-label="say(bookingCopy.profile_name)" :required="false" :disabled="busy"/><label class="field">{{say(bookingCopy.delivery_address)}}<input v-model="address" autocomplete="street-address" maxlength="500" :disabled="busy"/></label></template></details>
       <p v-if="error" class="form-error" role="alert">{{error}} <button v-if="bookingConflict" class="text-link" type="button" :disabled="busy||bookingLoading" @click="useLatestBooking">{{say(bookingCopy.use_latest)}}</button></p>
       <div class="profile-actions"><button type="button" class="button button-secondary" :disabled="busy" @click="closeEditor">{{say(copy.cancel)}}</button><button class="button button-primary" :disabled="busy||bookingLoading||!changed||!valid">{{say(busy?copy.saving:copy.save)}}</button></div>
     </form>

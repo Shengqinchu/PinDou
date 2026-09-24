@@ -354,3 +354,4 @@
 - `shop.json`：我的订单从本机浏览器订单改为账号订单与旧订单关联的说明。
 - `account.json`：新增“我的订单”页签；`booking-profile.json`：标题改为“个人资料”，新增可选收货地址。
 - `pages-ReservationReceipt.json`：新增店主邮箱标签。经营地址、售价与原有联系号码不变。
+- 补充核对截图第 5、7 张：资料折叠区新增“称呼”标签；`contact-fields.json` 增加店主邮箱 `staywithcsq@outlook.com`，用于预约收据与全站页脚，便于在其他页面找到同一联系方式。
