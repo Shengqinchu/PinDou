@@ -1,10 +1,11 @@
 import { contentModule } from './content-store';
 import defaults from './content/shop-ordering.json';
 import { type CartLine, type Product, money } from './commerce';
-import { formatCopy, tr } from './state';
+import { formatCopy, say, tr } from './state';
 
 export const orderWords=contentModule('shop-ordering',defaults);
-export const manualStates=['manual_pending','manual_confirmed','manual_completed','manual_cancelled'] as const;
+export const manualStates=['manual_pending','manual_preparing','manual_ready','manual_completed','manual_cancelled'] as const;
+export const manualStatus=(status:string,delivery?:string)=>say(status==='manual_ready'&&delivery==='courier'?orderWords.manual_shipped:orderWords[status as keyof typeof defaults]||[status,status]);
 export const optionText=(p:Product|undefined,line:CartLine)=>{
  const variant=p?.variants?.find(x=>x.id===line.variant_id),choice=p?.choices?.find(x=>x.id===line.choice_id);
  return [variant?tr(variant.zh,variant.en):'',choice?tr(choice.zh,choice.en):''].filter(Boolean).join(' · ');

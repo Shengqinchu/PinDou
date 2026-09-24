@@ -169,7 +169,7 @@ export async function commerceApi<T>(
 ): Promise<T> {
   let response: Response;
   try {
-    const token=(path.startsWith("/auth/")||path.startsWith("/reservations"))?customerToken():"";
+    const token=(path.startsWith("/auth/")||path.startsWith("/reservations")||path==='/shop/orders')?customerToken():"";
     response = await fetch(`/studio-api${path}`, {
       ...init,
       headers: { "Content-Type": "application/json", ...(token?{Authorization:"Bearer "+token}:{}), ...init.headers },

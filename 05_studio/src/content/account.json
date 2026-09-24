@@ -123,6 +123,7 @@
     "我的预约",
     "My bookings"
   ],
+  "my_orders": ["我的订单", "My orders"],
   "no_reservations": [
     "还没有账号预约记录，选一个喜欢的时间来拼豆吧。",
     "No bookings on your account yet. Choose a time to come and create."

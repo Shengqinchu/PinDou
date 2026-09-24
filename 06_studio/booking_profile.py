@@ -29,6 +29,7 @@ class Details(BaseModel):
     contact: str = Field(default='', max_length=180)
     # Optional secondary contact. An older client omitting it must not erase it.
     wechat_id: str | None = Field(default=None, max_length=80)
+    delivery_address: str | None = Field(default=None, max_length=500)
 
     @model_validator(mode='after')
     def contact_valid(self):
@@ -48,7 +49,7 @@ class Update(Details):
 
 def read(db, owner_id):
     row = db.execute('SELECT * FROM studio_booking_profiles WHERE owner_id=?', (owner_id,)).fetchone()
-    value = dict(row) if row else dict(owner_id=owner_id, name='', contact_method='wechat', contact='', wechat_id='', version=0, updated_at='', source_reservation_id='')
+    value = dict(row) if row else dict(owner_id=owner_id, name='', contact_method='wechat', contact='', wechat_id='', delivery_address='', version=0, updated_at='', source_reservation_id='')
     return value | {'complete': bool(value['name'] and valid_contact(value['contact_method'], value['contact']))}
 
 
@@ -56,16 +57,17 @@ def save(db, owner_id, details, version, *, source='', actor=''):
     current = read(db, owner_id)
     values = {key: details[key] for key in ('name', 'contact_method', 'contact')}
     values['wechat_id']=details.get('wechat_id') if details.get('wechat_id') is not None else current.get('wechat_id','')
+    values['delivery_address']=details.get('delivery_address') if details.get('delivery_address') is not None else current.get('delivery_address','')
     if current['version'] and all(current[key] == value for key, value in values.items()):
         return current
     if current['version'] != version:
         raise HTTPException(409, 'booking_profile_changed')
     stamp = datetime.now(timezone.utc).isoformat()
-    db.execute('''INSERT INTO studio_booking_profiles(owner_id,name,contact_method,contact,wechat_id,version,updated_at,source_reservation_id)
-      VALUES(?,?,?,?,?,1,?,?) ON CONFLICT(owner_id) DO UPDATE SET name=excluded.name,
+    db.execute('''INSERT INTO studio_booking_profiles(owner_id,name,contact_method,contact,wechat_id,delivery_address,version,updated_at,source_reservation_id)
+      VALUES(?,?,?,?,?,?,1,?,?) ON CONFLICT(owner_id) DO UPDATE SET name=excluded.name,
       contact_method=excluded.contact_method,contact=excluded.contact,version=studio_booking_profiles.version+1,
-      wechat_id=excluded.wechat_id,updated_at=excluded.updated_at,source_reservation_id=excluded.source_reservation_id''',
-      (owner_id, values['name'], values['contact_method'], values['contact'], values['wechat_id'],stamp, source))
+      wechat_id=excluded.wechat_id,delivery_address=excluded.delivery_address,updated_at=excluded.updated_at,source_reservation_id=excluded.source_reservation_id''',
+      (owner_id, values['name'], values['contact_method'], values['contact'], values['wechat_id'],values['delivery_address'],stamp, source))
     if actor:
         db.execute('INSERT INTO studio_audit(request_id,changed_at,actor,previous_status,new_status,staff_note) VALUES(?,?,?,?,?,?)',
                    (owner_id, stamp, actor, 'booking_profile', 'booking_profile', ''))
@@ -92,6 +94,8 @@ def initialize(database):
         );''')
         if 'wechat_id' not in {r[1] for r in db.execute('PRAGMA table_info(studio_booking_profiles)')}:
             db.execute("ALTER TABLE studio_booking_profiles ADD COLUMN wechat_id TEXT NOT NULL DEFAULT ''")
+        if 'delivery_address' not in {r[1] for r in db.execute('PRAGMA table_info(studio_booking_profiles)')}:
+            db.execute("ALTER TABLE studio_booking_profiles ADD COLUMN delivery_address TEXT NOT NULL DEFAULT ''")
         db.execute('BEGIN IMMEDIATE')
         rows = db.execute('''SELECT r.owner_id,r.id,r.payload FROM studio_reservations r
           WHERE r.owner_id!='' AND r.deleted_at IS NULL

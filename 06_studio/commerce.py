@@ -241,7 +241,7 @@ def initialize(db_func):
           qr_url TEXT NOT NULL DEFAULT '', provider_id TEXT NOT NULL DEFAULT '',
           trade_id TEXT UNIQUE, paid_at REAL, last_check REAL NOT NULL DEFAULT 0,
           fulfillment TEXT NOT NULL DEFAULT 'awaiting_payment', staff_note TEXT NOT NULL DEFAULT '',
-          version INTEGER NOT NULL DEFAULT 1
+          version INTEGER NOT NULL DEFAULT 1, owner_id TEXT NOT NULL DEFAULT ''
         );
         CREATE TABLE IF NOT EXISTS commerce_seats (
           order_id TEXT NOT NULL, date TEXT NOT NULL, start INTEGER NOT NULL,
@@ -259,6 +259,9 @@ def initialize(db_func):
           PRIMARY KEY(client,bucket)
         );
         """)
+        if 'owner_id' not in {r[1] for r in db.execute('PRAGMA table_info(commerce_orders)')}:
+            db.execute("ALTER TABLE commerce_orders ADD COLUMN owner_id TEXT NOT NULL DEFAULT ''")
+        db.execute('CREATE INDEX IF NOT EXISTS commerce_orders_owner ON commerce_orders(owner_id,created_at DESC)')
         import admin_archives
         admin_archives.initialize(db)
         settings = Settings(weekly=[Hours(day=i) for i in range(7)])
@@ -312,7 +315,7 @@ def remaining_seats(db, settings, day, start, end, exclude="", extra=()):
 
 def stock_held(db, product_id, exclude=""):
     return db.execute("""SELECT coalesce(sum(s.quantity),0) FROM commerce_stock s JOIN commerce_orders o ON o.id=s.order_id
-        WHERE s.product_id=? AND o.id<>? AND (o.status IN ('manual_pending','manual_confirmed') OR (o.status IN ('creating','pending','payment_uncertain') AND o.hold_until>?))""", (product_id, exclude, time.time())).fetchone()[0]
+        WHERE s.product_id=? AND o.id<>? AND (o.status IN ('manual_pending','manual_confirmed','manual_preparing','manual_ready') OR (o.status IN ('creating','pending','payment_uncertain') AND o.hold_until>?))""", (product_id, exclude, time.time())).fetchone()[0]
 
 
 PUBLIC_SALES_ENABLED = os.getenv("STUDIO_ONLINE_SALES", "0") == "1"
@@ -602,6 +605,8 @@ def register(app, admin_actor):
     def read_order(order_id: str, x_order_key: Annotated[str | None, Header()] = None):
         with database() as db:
             row = db.execute("SELECT * FROM commerce_orders WHERE id=?", (order_id,)).fetchone()
+            if row and row['status'] == 'manual_deleted':
+                fail('order_not_found', 404)
             authorize(row, x_order_key)
         if row["created_at"] > time.time() - 600:
             reconcile(order_id)

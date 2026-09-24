@@ -6,13 +6,14 @@ import time
 import uuid
 from typing import Annotated, Literal
 
-from fastapi import Depends, Header, Request
+from fastapi import Depends, Header, HTTPException, Request
 from pydantic import Field, model_validator
 
 import commerce
+from customer_auth import require_customer as _customer
 
 database = None
-STATES = {'manual_pending', 'manual_confirmed', 'manual_completed', 'manual_cancelled'}
+STATES = {'manual_pending', 'manual_confirmed', 'manual_preparing', 'manual_ready', 'manual_completed', 'manual_cancelled'}
 
 
 class Item(commerce.Strict):
@@ -64,8 +65,24 @@ class ContactUpdate(Contact):
 
 
 class Update(commerce.Strict):
-    status: Literal['manual_pending', 'manual_confirmed', 'manual_completed', 'manual_cancelled']
+    status: Literal['manual_pending', 'manual_confirmed', 'manual_preparing', 'manual_ready', 'manual_completed', 'manual_cancelled']
     staff_note: str = Field(default='', max_length=1500)
+    version: int = Field(ge=1, strict=True)
+
+
+class Claim(commerce.Strict):
+    access_key: str = Field(pattern=r'^[a-f0-9]{64}$')
+
+
+class ClaimItem(Claim):
+    id: str = Field(pattern=r'^PS[A-F0-9]{24}$')
+
+
+class Claims(commerce.Strict):
+    items: list[ClaimItem] = Field(max_length=100)
+
+
+class Delete(commerce.Strict):
     version: int = Field(ge=1, strict=True)
 
 
@@ -160,7 +177,16 @@ def register(app, admin_actor):
             return quote_cart(db, payload)
 
     @app.post('/studio-api/shop/orders', status_code=201)
-    def place(payload: Checkout, request: Request, idempotency_key: Annotated[str, Header()]):
+    def place(payload: Checkout, request: Request, idempotency_key: Annotated[str, Header()], authorization: Annotated[str | None, Header()] = None):
+        import customer_auth
+        # Checkout is public. A stale optional sign-in must not prevent a guest
+        # order; its local access key can claim the order after signing in.
+        owner_id = ''
+        if authorization:
+            try:
+                owner_id = customer_auth.require_customer(request, authorization)['id']
+            except HTTPException:
+                pass
         try:
             uuid.UUID(idempotency_key)
         except ValueError:
@@ -189,10 +215,10 @@ def register(app, admin_actor):
             customer = {'name': payload.name, 'contact': payload.contact, 'contact_method': 'other',
                         'notes': payload.notes, 'locale': payload.locale,
                         'delivery_method': payload.delivery_method, 'address': payload.address}
-            db.execute("""INSERT INTO commerce_orders(id,created_at,updated_at,status,access_hash,idempotency_key,payload_hash,customer,quote,expires_at,hold_until,fulfillment)
-                       VALUES(?,?,?,'manual_pending',?,?,?,?,?,0,0,'awaiting_contact')""",
+            db.execute("""INSERT INTO commerce_orders(id,created_at,updated_at,status,access_hash,idempotency_key,payload_hash,customer,quote,expires_at,hold_until,fulfillment,owner_id)
+                       VALUES(?,?,?,'manual_pending',?,?,?,?,?,0,0,'awaiting_contact',?)""",
                        (ident, now, now, commerce.digest(payload.access_key), idempotency_key, hashed,
-                        json.dumps(customer, ensure_ascii=False), json.dumps(quoted, ensure_ascii=False)))
+                        json.dumps(customer, ensure_ascii=False), json.dumps(quoted, ensure_ascii=False), owner_id))
             for item in payload.items:
                 db.execute('INSERT INTO commerce_stock VALUES(?,?,?)', (ident, item.product_id, item.quantity))
             commerce.audit(db, ident, 'manual_order_submitted')
@@ -219,7 +245,7 @@ def register(app, admin_actor):
     def listing(_actor=Depends(admin_actor), status: str = 'all', search: str = '', page: int = 1):
         if status not in STATES | {'all'} or not 1 <= page <= 10000 or len(search) > 120:
             commerce.fail('invalid_page', 422)
-        clauses = ["status IN ('manual_pending','manual_confirmed','manual_completed','manual_cancelled')"]
+        clauses = ["status IN ('manual_pending','manual_confirmed','manual_preparing','manual_ready','manual_completed','manual_cancelled')"]
         params = []
         if status != 'all':
             clauses.append('status=?'); params.append(status)
@@ -229,7 +255,7 @@ def register(app, admin_actor):
         where = ' WHERE ' + ' AND '.join(clauses)
         with database() as db:
             total = db.execute('SELECT count(*) FROM commerce_orders' + where, params).fetchone()[0]
-            rows = db.execute('SELECT * FROM commerce_orders' + where + " ORDER BY CASE status WHEN 'manual_pending' THEN 0 WHEN 'manual_confirmed' THEN 1 WHEN 'manual_completed' THEN 2 ELSE 3 END,created_at DESC,id DESC LIMIT 30 OFFSET ?", (*params, (page - 1) * 30)).fetchall()
+            rows = db.execute('SELECT * FROM commerce_orders' + where + " ORDER BY CASE status WHEN 'manual_pending' THEN 0 WHEN 'manual_confirmed' THEN 1 WHEN 'manual_preparing' THEN 1 WHEN 'manual_ready' THEN 2 WHEN 'manual_completed' THEN 3 ELSE 4 END,created_at DESC,id DESC LIMIT 30 OFFSET ?", (*params, (page - 1) * 30)).fetchall()
             return {'items': [commerce.order_view(r, True) for r in rows], 'total': total}
 
     @app.patch('/studio-api/manage/shop/orders/{ident}')
@@ -254,8 +280,70 @@ def register(app, admin_actor):
                         commerce.fail('stock_unavailable')
                     p.update(stock=p['stock']-stock['quantity'], version=p['version']+1)
                     db.execute('UPDATE commerce_products SET payload=? WHERE id=?', (json.dumps(p, ensure_ascii=False), p['id']))
-            fulfillment = {'manual_pending':'awaiting_contact', 'manual_confirmed':'confirmed', 'manual_completed':'completed', 'manual_cancelled':'cancelled'}[payload.status]
+            fulfillment = {'manual_pending':'awaiting_contact', 'manual_confirmed':'preparing', 'manual_preparing':'preparing', 'manual_ready':'ready', 'manual_completed':'completed', 'manual_cancelled':'cancelled'}[payload.status]
             db.execute('UPDATE commerce_orders SET status=?,fulfillment=?,staff_note=?,updated_at=?,version=version+1 WHERE id=?',
                        (payload.status, fulfillment, payload.staff_note, time.time(), ident))
             commerce.audit(db, ident, 'manual_order_updated', actor, json.dumps({'before':row['status'], 'after':payload.status}, ensure_ascii=False))
             return commerce.order_view(db.execute('SELECT * FROM commerce_orders WHERE id=?', (ident,)).fetchone(), True)
+
+    @app.get('/studio-api/auth/shop/orders')
+    def own_orders(page: int = 1, customer=Depends(_customer)):
+        if not 1 <= page <= 10000:
+            commerce.fail('invalid_page', 422)
+        with database() as db:
+            where = "owner_id=? AND status IN ('manual_pending','manual_confirmed','manual_preparing','manual_ready','manual_completed','manual_cancelled')"
+            total = db.execute('SELECT count(*) FROM commerce_orders WHERE '+where, (customer['id'],)).fetchone()[0]
+            rows = db.execute('SELECT * FROM commerce_orders WHERE '+where+' ORDER BY created_at DESC,id DESC LIMIT 30 OFFSET ?', (customer['id'],(page-1)*30)).fetchall()
+            return {'items':[commerce.order_view(row) for row in rows], 'total':total}
+
+    @app.get('/studio-api/auth/shop/orders/{ident}')
+    def own_order(ident: str, customer=Depends(_customer)):
+        with database() as db:
+            row = db.execute("SELECT * FROM commerce_orders WHERE id=? AND owner_id=? AND status IN ('manual_pending','manual_confirmed','manual_preparing','manual_ready','manual_completed','manual_cancelled')", (ident, customer['id'])).fetchone()
+            if not row:
+                commerce.fail('order_not_found', 404)
+            return commerce.order_view(row)
+
+    @app.post('/studio-api/auth/shop/orders/{ident}/claim')
+    def claim_order(ident: str, payload: Claim, customer=Depends(_customer)):
+        with database() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row = db.execute('SELECT * FROM commerce_orders WHERE id=? AND status IN ('+','.join('?' for _ in STATES)+')', (ident,*sorted(STATES))).fetchone()
+            commerce.authorize(row, payload.access_key)
+            if row['owner_id'] and row['owner_id'] != customer['id']:
+                commerce.fail('order_not_found', 404)
+            if not row['owner_id']:
+                db.execute('UPDATE commerce_orders SET owner_id=? WHERE id=?', (customer['id'],ident))
+                commerce.audit(db, ident, 'manual_order_claimed', customer['id'])
+            return commerce.order_view(db.execute('SELECT * FROM commerce_orders WHERE id=?', (ident,)).fetchone())
+
+    @app.post('/studio-api/auth/shop/orders/claim')
+    def claim_orders(payload: Claims, customer=Depends(_customer)):
+        claimed = 0
+        with database() as db:
+            db.execute('BEGIN IMMEDIATE')
+            for item in payload.items:
+                row = db.execute('SELECT * FROM commerce_orders WHERE id=?', (item.id,)).fetchone()
+                if not row or row['status'] not in STATES or row['owner_id']:
+                    continue
+                try:
+                    commerce.authorize(row, item.access_key)
+                except HTTPException:
+                    continue
+                db.execute('UPDATE commerce_orders SET owner_id=? WHERE id=?', (customer['id'],item.id))
+                commerce.audit(db, item.id, 'manual_order_claimed', customer['id'])
+                claimed += 1
+        return {'claimed':claimed}
+
+    @app.delete('/studio-api/manage/shop/orders/{ident}')
+    def delete_order(ident: str, payload: Delete, actor=Depends(admin_actor)):
+        with database() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row = db.execute('SELECT * FROM commerce_orders WHERE id=?', (ident,)).fetchone()
+            if not row or row['status'] not in STATES:
+                commerce.fail('order_not_found', 404)
+            if row['version'] != payload.version:
+                commerce.fail('version_conflict')
+            db.execute("UPDATE commerce_orders SET status='manual_deleted',updated_at=?,version=version+1 WHERE id=?", (time.time(),ident))
+            commerce.audit(db, ident, 'manual_order_deleted', actor, json.dumps({'before':row['status']},ensure_ascii=False))
+            return {'id':ident,'deleted':True}

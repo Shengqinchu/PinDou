@@ -91,6 +91,15 @@ def test_validation_and_clear_preserves_explicit_empty_profile(client):
     assert own(client)['version']==2 and own(client)['name']==''
 
 
+def test_delivery_address_survives_older_profile_updates(client):
+    first=client.put('/studio-api/auth/booking-profile',json=details()|{'delivery_address':'8 Hughson St N, Hamilton'})
+    assert first.status_code==200 and first.json()['delivery_address']=='8 Hughson St N, Hamilton'
+    old_client=client.put('/studio-api/auth/booking-profile',json=details(contact='new-contact',version=1))
+    assert old_client.status_code==200 and old_client.json()['delivery_address']=='8 Hughson St N, Hamilton'
+    assert client.put('/studio-api/auth/booking-profile',json=details(version=2)|{'delivery_address':'x'*501}).status_code==422
+    assert own(client)['delivery_address']=='8 Hughson St N, Hamilton'
+
+
 def test_backfill_uses_latest_explicit_owned_booking_without_rewriting_it(client):
     one=submit(client,body()|{'name':'Earlier','contact':'earlier-contact'}).json()
     two=submit(client,body()|{'name':'Later','contact':'later-contact'}).json()

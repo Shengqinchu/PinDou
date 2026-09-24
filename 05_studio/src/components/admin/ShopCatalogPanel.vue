@@ -12,7 +12,6 @@ import ShopBatchEditor from './ShopBatchEditor.vue';
 import ArchiveDialog from './ArchiveDialog.vue';
 import controlsDefaults from '../../content/admin-controls.json';
 import ProductOptionsEditor from './ProductOptionsEditor.vue';
-import ShopOrdersPanel from './ShopOrdersPanel.vue';
 import { orderWords as o } from '../../shop-ordering';
 import '../../styles/shop-ordering.css';
 import { contentModule } from '../../content-store';
@@ -37,8 +36,6 @@ async function archived(){
 watch(deleted,()=>{selected.value=[];void refresh();});
 const selected=ref<string[]>([]),batchOpen=ref(false),batchProducts=ref<ShopProduct[]>([]),priceState=ref('all'),imageState=ref('all');
 const data=ref<ShopCatalog>(),busy=ref(false),error=ref(''),success=ref(''),search=ref(''),collection=ref('all'),category=ref('all');
-const ordersMode=ref(false);
-watch(ordersMode,async value=>{if(!value){busy.value=true;try{await refresh()}finally{busy.value=false}}});
 const categoryMode=ref(false),edit=ref<ShopProduct>(),categoryEdit=ref<ShopCategory>(),open=ref(false),categoryOpen=ref(false),price=ref('');
 const textTooLong=computed(()=>!!edit.value&&([edit.value.zh,edit.value.en].some(v=>productTextLength(v)>productTextLimits.name)||[edit.value.detailZh,edit.value.detailEn].some(v=>productTextLength(v)>productTextLimits.description)));
 const textLimitMessage=computed(()=>formatCopy(w.textTooLong,{v0:productTextLimits.name,v1:productTextLimits.description}));
@@ -91,11 +88,10 @@ onMounted(refresh);onDeactivated(()=>{keepDraft();open.value=false;categoryOpen.
 </script>
 <template>
  <section class="shop-admin">
-  <header class="desk-page-heading"><div><h1>{{say(w.adminTitle)}}</h1><p>{{say(w.adminHelp)}}</p></div><div v-if="!ordersMode" class="shop-actions"><button class="desk-button secondary" @click="refresh"><PhArrowClockwise/>{{say(w.refresh)}}</button><button v-if="!deleted||categoryMode" class="desk-button primary" @click="categoryMode?editCat():create()"><PhPlus/>{{say(categoryMode?w.addCategory:w.addProduct)}}</button></div></header>
-  <nav class="shop-tabs"><button :class="{active:!categoryMode&&!ordersMode}" @click="categoryMode=false;ordersMode=false">{{say(w.adminTitle)}}</button><button :class="{active:categoryMode&&!ordersMode}" @click="categoryMode=true;ordersMode=false">{{say(w.categories)}}</button><button :class="{active:ordersMode}" @click="ordersMode=true">{{say(o.ordersTitle)}}</button></nav>
-  <ShopOrdersPanel v-if="ordersMode"/>
+  <header class="desk-page-heading"><div><h1>{{say(w.adminTitle)}}</h1><p>{{say(w.adminHelp)}}</p></div><div class="shop-actions"><button class="desk-button secondary" @click="refresh"><PhArrowClockwise/>{{say(w.refresh)}}</button><button v-if="!deleted||categoryMode" class="desk-button primary" @click="categoryMode?editCat():create()"><PhPlus/>{{say(categoryMode?w.addCategory:w.addProduct)}}</button></div></header>
+  <nav class="shop-tabs"><button :class="{active:!categoryMode}" @click="categoryMode=false">{{say(w.adminTitle)}}</button><button :class="{active:categoryMode}" @click="categoryMode=true">{{say(w.categories)}}</button></nav>
   <p v-if="error&&!open&&!categoryOpen" role="alert" class="shop-error">{{error}}</p><p v-if="success" role="status">{{success}}</p>
-  <template v-if="!categoryMode&&!ordersMode">
+  <template v-if="!categoryMode">
    <nav class="admin-archive-tabs"><button type="button" :aria-pressed="!deleted" @click="deleted=false">{{say(controls.currentProducts)}}</button><button type="button" :aria-pressed="deleted" @click="deleted=true">{{say(controls.deletedProducts)}}</button></nav>
    <div class="shop-admin-tools"><select v-model="collection" :aria-label="say(w.collection)"><option value="all">{{say(w.all)}}</option><option v-for="s in (['home','finished','services'] as const)" :key="s" :value="s">{{say(w[s])}}</option></select><select v-model="category" :aria-label="say(w.category)"><option value="all">{{say(w.all)}}</option><option v-for="c in leaves" :key="c.id" :value="c.id">{{tr(c.zh,c.en)}}</option></select><input v-model="search" type="search" :placeholder="say(w.search)" :aria-label="say(w.search)"/></div>
    <div class="shop-admin-tools"><select v-model="priceState" :aria-label="say(b.priceState)"><option value="all">{{say(b.priceState)}} · {{say(w.all)}}</option><option value="unpriced">{{say(b.unpriced)}}</option><option value="priced">{{say(b.priced)}}</option></select><select v-model="imageState" :aria-label="say(b.imageState)"><option value="all">{{say(b.imageState)}} · {{say(w.all)}}</option><option value="missing">{{say(b.missing)}}</option><option value="has-image">{{say(b.hasImage)}}</option></select></div>
@@ -103,7 +99,7 @@ onMounted(refresh);onDeactivated(()=>{keepDraft();open.value=false;categoryOpen.
    <div class="shop-admin-list"><div v-for="p in visible" :key="p.id" class="shop-select-row"><input v-model="selected" type="checkbox" :value="p.id" :aria-label="formatCopy(b.select,{v0:tr(p.zh,p.en)})"/><button class="shop-admin-row" :disabled="busy" @click="editProduct(p)"><img v-if="p.images.length" :src="shopImage(p.images[0])" alt="" loading="lazy"/><span v-else class="shop-bag-thumb">{{p.code||'—'}}</span><span><strong>{{tr(p.zh,p.en)}}</strong><small>{{p.code}}</small></span><span>{{p.price_cents===null?say(w.unpriced):money(p.price_cents)}}</span><span>{{say(deleted?controls.restoreProduct:p.shop_visible?w.visible:w.hidden)}}<PhPencilSimple/></span></button></div></div>
    <p v-if="!visible.length" class="shop-state">{{say(w.noMatch)}}</p>
   </template>
-  <div v-else-if="categoryMode&&!ordersMode" class="shop-admin-categories"><button v-for="c in data?.categories" :key="c.id" :class="{child:c.parent_id}" @click="editCat(c)">{{tr(c.zh,c.en)}}<small v-if="!c.visible"> · {{say(w.hidden)}}</small></button></div>
+  <div v-else class="shop-admin-categories"><button v-for="c in data?.categories" :key="c.id" :class="{child:c.parent_id}" @click="editCat(c)">{{tr(c.zh,c.en)}}<small v-if="!c.visible"> · {{say(w.hidden)}}</small></button></div>
  </section>
  <ArchiveDialog v-model="archiveOpen" :title="formatCopy(archiveRestore?controls.restoreProductsTitle:controls.deleteProductsTitle,{v0:archiveTargets.length})" :description="say(archiveRestore?controls.productRestoreHelp:controls.productDeleteHelp)" :items="archiveTargets.map(p=>tr(p.zh,p.en))" :restore="archiveRestore" path="/manage/shop/products/archive" :body="{action:archiveRestore?'restore':'delete',items:archiveTargets.map(p=>({id:p.id,version:p.version}))}" @saved="archived" @reload="refresh"/>
  <ShopBatchEditor v-model="batchOpen" :products="batchProducts" @saved="batchSaved"/>

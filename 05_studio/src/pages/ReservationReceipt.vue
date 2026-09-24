@@ -9,7 +9,7 @@ import { contentModule } from "../content-store";
 const copyText = contentModule("pages-ReservationReceipt", copyTextDefault);
 
 import copyTextDefault from "../content/pages-ReservationReceipt.json";
-import { say,formatCopy } from "../state";
+import { say } from "../state";
 import { walletCopy,duration } from '../wallet';
 
 import { onBeforeUnmount, onMounted, ref,watch } from "vue";
@@ -133,7 +133,6 @@ onBeforeUnmount(() => {
           </dd>
         </div>
         <div><dt>{{say(walletCopy.booked)}}</dt><dd>{{duration(result.booked_minutes)}}</dd></div>
-        <div><dt>{{say(walletCopy.actual)}}</dt><dd>{{result.actual_minutes==null?say(walletCopy.unrecorded):formatCopy(walletCopy.per_guest,{v0:duration(result.actual_minutes),v1:result.actual_guests||result.booking.guests})}}</dd></div>
         <div v-if="result.public_note"><dt>{{say(walletCopy.public_note)}}</dt><dd>{{result.public_note}}</dd></div>
       </dl>
       <p class="reservation-details-link">
@@ -153,12 +152,11 @@ onBeforeUnmount(() => {
       <PhArrowClockwise :class="{ spinning: busy }" />{{
         say(copyText.refresh_reservation_30af18)
       }}
-    </button><CancelReservation v-if="result" :reservation="result"/></div>
-    <div v-if="result" class="reservation-receipt-actions"><RouterLink class="button button-primary" :to="{path:'/messages',query:{reservation:result.id}}">{{say(notices.contact_host)}}</RouterLink><RouterLink class="text-link" to="/account?notifications=1">{{say(notices.notification_settings)}}</RouterLink></div>
+    </button><CancelReservation v-if="result" :reservation="result"/><RouterLink v-if="result" class="button button-primary" :to="{path:'/messages',query:{reservation:result.id}}">{{say(notices.contact_host)}}</RouterLink></div>
     <p class="fine-print">
       {{ say(copyText.for_changes_contact_the_host_on_wechat_2921d8)
       }}<CopyContact :value="wechat" /> · {{ say(copyText.phone_0614da)
-      }}<a :href="phoneHref">{{ phone }}</a>
+      }}<a :href="phoneHref">{{ phone }}</a> · {{say(copyText.email)}}<a href="mailto:staywithcsq@outlook.com">staywithcsq@outlook.com</a>
     </p>
   </section>
 </template>

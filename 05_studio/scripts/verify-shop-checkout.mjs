@@ -55,11 +55,19 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
   await page.waitForURL('**/order/'+order.id);
   await page.getByRole('heading',{name:'下单成功'}).waitFor();
   assert.equal(placed,1);
-  assert.equal(await page.getByText('您已成功提交订单，请等待店主主动联系您，谢谢合作！').count(),1);
+  assert.equal(await page.getByText('您已成功提交订单，店主将会联系您，请注意查收信息，谢谢合作！').count(),1);
   assert.equal(await page.locator('.shop-manual-receipt').getByRole('button',{name:'复制'}).count(),0);
   assert.equal(await page.locator('.shop-manual-receipt').getByText('短信').count(),0);
   assert.deepEqual(errors,[]);
   await page.screenshot({path:new URL(name+'-success.png',output).pathname.replace(/^\/([A-Za-z]:)/,'$1')});
+  await page.goto(base+'/shop?view=orders');
+  await page.locator('.shop-order-history-card').waitFor();
+  assert.match(await page.locator('.shop-order-history-card').innerText(),/A1 × 1/);
+  assert.match(await page.locator('.shop-order-history-card').innerText(),/2\.00/);
+  await page.getByRole('link',{name:'查看订单'}).click();
+  await page.waitForURL('**/order/'+order.id+'?details=1');
+  await page.getByText('下单时间').waitFor();
+  await page.getByText('A1 × 1').waitFor();
   console.log(name+': cart -> delivery -> one final order -> minimal success OK');
  }finally{await browser.close()}
 }

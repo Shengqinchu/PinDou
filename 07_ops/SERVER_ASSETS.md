@@ -42,7 +42,7 @@
 | 对象 | 位置 |
 |---|---|
 | 生成器 current | `/opt/pindou/current` → `releases/20260910015453-studio-v7`（迁移验收时） |
-| Studio current | `/opt/pindou/studio/current` → `releases/20260923232440-studio-v7`（2026-09-23 加东 19:24 店铺下单流程发布） |
+| Studio current | `/opt/pindou/studio/current` → `releases/20260924004402-studio-v7`（2026-09-23 加东 20:44 订单、账号和预约页面发布） |
 | 生成器数据库 / 环境 | `/opt/pindou/shared/var/pindou.db` / `/opt/pindou/shared/.env` |
 | Studio 数据库 / 环境 | `/opt/pindou/studio/shared/studio.sqlite3` / `/opt/pindou/studio/shared/.env` |
 | 图片与资料 | 两个 `shared` 目录、`/opt/pindou/shared/data`、Studio `shared/media`、全部历史 release / static-history 保留 |
@@ -65,6 +65,7 @@
 - [当前部署说明](deployment.md)
 - [最新后台功能发布核验](STUDIO_ADMIN_CONTROLS_20260918.md)
 - [最新店铺发布核验](STUDIO_SHOP_CHECKOUT_20260923.md)
+- [最新订单与账号发布核验](STUDIO_ORDERS_ACCOUNT_20260923.md)
 - [迁移验收与备份校验](PINDOU_FULL_MIGRATION_ACCEPTANCE_20260918.md)
 - [迁移执行记录](PINDOU_FULL_MIGRATION_EXECUTION_20260918.md)
 - [迁移与回退手册](PINDOU_FULL_MIGRATION_RUNBOOK_20260918.md)

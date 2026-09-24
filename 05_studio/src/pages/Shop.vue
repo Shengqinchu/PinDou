@@ -7,12 +7,13 @@ import SlideOver from '../components/SlideOver.vue';
 import { say, tr, formatCopy } from '../state';
 import { bag, bagCount, addToBag, money } from '../commerce';
 import ShopCart from '../components/ShopCart.vue';
+import ShopOrderHistory from '../components/ShopOrderHistory.vue';
 import ShopImage from '../components/ShopImage.vue';
 import { createImageWarmer, imageWidth } from '../shop-images';
 import CopyContact from '../components/CopyContact.vue';
 import { orderWords as o, offerText, orderable, variantPrice, hasVariantPrices, priceRange, minimumPrice } from '../shop-ordering';
 import '../styles/shop-ordering.css';
-import { shopWords as w, shopCatalog, loadShop, shopImage, savedShopOrders, productIntro, type ShopProduct } from '../shop';
+import { shopWords as w, shopCatalog, loadShop, shopImage, productIntro, type ShopProduct } from '../shop';
 import { notify } from '../ui';
 import '../styles/shop.css';
 const route=useRoute(),router=useRouter();
@@ -26,7 +27,6 @@ const readySelection=computed(()=>!!selected.value&&(!selected.value.variants?.l
 const selectedDescription=computed(()=>selected.value?tr(selected.value.detailZh,selected.value.detailEn):'');
 const cartOpen=computed({get:()=>route.query.view==='cart',set:v=>setView(v?'cart':'')});
 const ordersOpen=computed({get:()=>route.query.view==='orders',set:v=>setView(v?'orders':'')});
-const orders=ref<string[]>([]);
 const roots=computed(()=>shopCatalog.value?.categories.filter(c=>!c.parent_id)||[]);
 const children=(id:string)=>shopCatalog.value?.categories.filter(c=>c.parent_id===id)||[];
 const products=computed(()=>shopCatalog.value?.products||[]);
@@ -62,7 +62,6 @@ function add(p:ShopProduct,fromDetails=false){
 }
 async function refresh(){loading.value=true;error.value='';try{await loadShop(true)}catch(e){error.value=(e as Error).message}finally{loading.value=false}}
 watch(shopCatalog,d=>{if(!d)return;if(!d.categories.some(c=>c.id===leaf.value)){const r=d.categories.find(c=>c.id===root.value&&!c.parent_id)||d.categories.find(c=>!c.parent_id);root.value=r?.id||'';leaf.value=d.categories.find(c=>c.parent_id===root.value)?.id||root.value;}},{immediate:true});
-watch(ordersOpen,v=>{if(v)orders.value=savedShopOrders()},{immediate:true});
 async function syncCatalog(){try{await loadShop(true);if(selected.value){const id=selected.value.id;selected.value=shopCatalog.value?.products.find(p=>p.id===id);photo.value=Math.min(photo.value,Math.max(0,(selected.value?.images.length||0)-1));if(!selected.value)detailsOpen.value=false;}}catch(e){if(!shopCatalog.value)error.value=(e as Error).message;}}
 function focusRefresh(){if(!document.hidden)void syncCatalog();}
 onMounted(async()=>{window.addEventListener('focus',focusRefresh);document.addEventListener('visibilitychange',focusRefresh);try{await syncCatalog()}finally{loading.value=false}});
@@ -112,5 +111,5 @@ onUnmounted(()=>{window.removeEventListener('focus',focusRefresh);document.remov
   <template #footer><button v-if="selected&&selected.shop_collection!=='services'" class="desk-button primary" :disabled="!orderable(selected)||!readySelection" @click="add(selected,true)"><PhPlus/>{{say(selected.price_cents===null?w.unpriced:!orderable(selected)?o.outOfStock:w.addCart)}}</button></template>
  </SlideOver>
  <ShopCart v-model="cartOpen" :products="products" :enabled="!!shopCatalog?.manual_ordering_ready"/>
- <SlideOver v-model="ordersOpen" :title="say(w.orders)"><p class="shop-notice">{{say(w.ordersHelp)}}</p><p v-if="!orders.length" class="shop-state">{{say(w.ordersEmpty)}}</p><RouterLink v-for="id in orders" :key="id" class="shop-order-row" :to="'/order/'+id"><span>{{id}}</span>{{say(w.orderOpen)}}<PhArrowRight/></RouterLink></SlideOver>
+ <SlideOver v-model="ordersOpen" :title="say(w.orders)"><p class="shop-notice">{{say(w.ordersHelp)}}</p><ShopOrderHistory v-if="ordersOpen" clickable/></SlideOver>
 </template>

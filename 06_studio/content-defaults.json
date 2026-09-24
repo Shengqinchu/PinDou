@@ -124,6 +124,10 @@
       "我的预约",
       "My bookings"
     ],
+    "my_orders": [
+      "我的订单",
+      "My orders"
+    ],
     "no_reservations": [
       "还没有账号预约记录，选一个喜欢的时间来拼豆吧。",
       "No bookings on your account yet. Choose a time to come and create."
@@ -343,8 +347,8 @@
   },
   "booking-profile": {
     "title": [
-      "预约资料",
-      "Booking details"
+      "个人资料",
+      "Personal details"
     ],
     "name": [
       "预约称呼",
@@ -353,6 +357,10 @@
     "contact": [
       "预约联系方式",
       "Booking contact"
+    ],
+    "delivery_address": [
+      "收货地址（选填）",
+      "Delivery address (optional)"
     ],
     "empty": [
       "尚未填写预约资料",
@@ -6563,6 +6571,10 @@
     "phone_0614da": [
       "手机号：",
       "Phone: "
+    ],
+    "email": [
+      "邮箱：",
+      "Email: "
     ]
   },
   "pages-Shop": {
@@ -8865,8 +8877,8 @@
       "No product orders yet"
     ],
     "ordersHelp": [
-      "这里显示此浏览器保存的商品订单。",
-      "Product orders saved in this browser appear here."
+      "登录后可查看账号下的商品订单；本浏览器保存的旧订单也会关联到账号。",
+      "Sign in to see orders across devices. Older orders saved in this browser can be linked to your account."
     ],
     "orderOpen": [
       "查看订单",
@@ -9225,8 +9237,8 @@
   },
   "shop-ordering": {
     "notice": [
-      "未标注价格商品紧急筹备中，暂时不可下单。无需网站付款，下单后联系店主。",
-      "Unpriced products are being prepared and cannot be ordered yet. No payment is required on the website; contact the host after placing your order."
+      "未标注价格商品紧急筹备中，暂时不可下单。无需网站付款，下单后店主会主动联系您。",
+      "Unpriced products are being prepared and cannot be ordered yet. No payment is required on the website; the host will contact you after you order."
     ],
     "choose": [
       "选择规格",
@@ -9357,8 +9369,8 @@
       "Order placed"
     ],
     "success": [
-      "您已成功提交订单，请等待店主主动联系您，谢谢合作！",
-      "Your order has been submitted. Please wait for the host to contact you. Thank you!"
+      "您已成功提交订单，店主将会联系您，请注意查收信息，谢谢合作！",
+      "Your order has been submitted. The host will contact you; please watch for their message. Thank you!"
     ],
     "addedToCart": [
       "加入成功！",
@@ -9457,12 +9469,24 @@
       "Order number"
     ],
     "manual_pending": [
-      "待联系",
-      "Awaiting contact"
+      "已下单",
+      "Placed"
     ],
     "manual_confirmed": [
-      "已确认",
-      "Confirmed"
+      "备货中",
+      "Preparing"
+    ],
+    "manual_preparing": [
+      "备货中",
+      "Preparing"
+    ],
+    "manual_ready": [
+      "可取货",
+      "Ready for pickup"
+    ],
+    "manual_shipped": [
+      "待收货",
+      "Awaiting delivery"
     ],
     "manual_completed": [
       "已完成",
@@ -9481,8 +9505,24 @@
       "Staff note (private)"
     ],
     "completeHelp": [
-      "完成订单会扣除库存；取消订单会释放预留库存。已完成或已取消的订单不能再更改状态。",
-      "Completing an order deducts stock; cancelling releases reserved stock. Completed or cancelled orders cannot change status."
+      "完成订单会扣除库存；取消或删除订单会释放预留库存。历史订单保留查账。",
+      "Completing an order deducts stock; cancelling or deleting releases reserved stock. Order history is retained for audit."
+    ],
+    "deleteOrder": [
+      "删除订单",
+      "Delete order"
+    ],
+    "cancelAction": [
+      "取消",
+      "Cancel"
+    ],
+    "deleteConfirm": [
+      "删除后订单将从正常列表移除，历史记录仍保留用于查账。确定删除吗？",
+      "The order will be removed from normal lists; its history stays for audit. Delete it?"
+    ],
+    "placedAt": [
+      "下单时间",
+      "Placed at"
     ],
     "previous": [
       "上一页",

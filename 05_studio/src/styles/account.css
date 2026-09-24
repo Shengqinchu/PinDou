@@ -26,6 +26,9 @@
 .account-bookings small { display: block; margin-top: 6px; color: var(--muted); }
 .account-bookings svg { flex-shrink: 0; }
 .account-signout { justify-self: start; min-height: 44px; }
+.account-content > .text-link,.account-content > details summary,.account-content > .account-signout{text-decoration:none;text-underline-offset:0}
+.account-content > .text-link:hover,.account-content > .account-signout:hover{text-decoration:none}
+.booking-profile-section[open]{display:grid}.booking-profile-section summary{cursor:pointer;min-height:44px;display:list-item;font-size:17px;font-weight:550;list-style-position:inside}
 .reservation-account-note { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .container.account-page { max-width: 680px; padding-block: clamp(24px,4vh,48px); min-height: 65vh; }
 .account-page h1 { font-size: clamp(30px,4vw,46px); margin: 0 0 32px; }

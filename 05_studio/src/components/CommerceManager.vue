@@ -33,7 +33,6 @@ import {
   PhX,
   PhCaretRight,
   PhArrowClockwise,
-  PhChatCircle,
 } from "@phosphor-icons/vue";
 import { gsap } from "gsap";
 import { arrive } from "../motion";
@@ -53,11 +52,11 @@ import ReservationNotifications from "./admin/ReservationNotifications.vue";
 import ReservationsPanel from "./admin/ReservationsPanel.vue";
 import MembersPanel from './admin/MembersPanel.vue';
 import { walletCopy } from '../wallet';
-import { messageCopy } from '../messaging';
-const MessagesPanel=defineAsyncComponent(()=>import('./admin/CustomerMessages.vue'));
 const FinancePanel=defineAsyncComponent(()=>import('./admin/FinancePanel.vue'));
 const ShopCatalogPanel=defineAsyncComponent(()=>import('./admin/ShopCatalogPanel.vue'));
+const ShopOrdersPanel=defineAsyncComponent(()=>import('./admin/ShopOrdersPanel.vue'));
 import { shopWords } from '../shop';
+import { orderWords } from '../shop-ordering';
 import businessDefaults from '../content/business.json';
 const businessCopy=contentModule('business',businessDefaults);
 const props = defineProps<{ token: string }>();
@@ -70,9 +69,9 @@ const mobileMenu = ref(false);
 const reservationList = ref<InstanceType<typeof ReservationsPanel>>();
 const reservationCalendar = ref<InstanceType<typeof ReservationsPanel>>();
 const memberPanel=ref<InstanceType<typeof MembersPanel>>();
-const messagePanel=ref<{refresh:()=>Promise<void>}>();
 const financePanel=ref<{refresh:()=>Promise<void>}>();
 const shopPanel=ref<{refresh:()=>Promise<void>}>();
+const shopOrdersPanel=ref<{refresh:()=>Promise<void>}>();
 const mobileMedia = matchMedia("(max-width: 900px)");
 const isMobile = ref(mobileMedia.matches);
 const sidebar = ref<HTMLElement>();
@@ -131,7 +130,6 @@ const navigation = computed(() => [
   {id:"content",zh:copyText.editor_content[0],en:copyText.editor_content[1],icon:PhSquaresFour},
   {id:"journal-editor",zh:copyText.editor_journal[0],en:copyText.editor_journal[1],icon:PhArchive},
   {id:'members',zh:walletCopy.members[0],en:walletCopy.members[1],icon:PhWallet},
-  {id:'messages',zh:messageCopy.title[0],en:messageCopy.title[1],icon:PhChatCircle},
   {
     id: "reservations",
     zh: copyText.nav_c557d2fc[0],
@@ -146,6 +144,7 @@ const navigation = computed(() => [
   },
   {id:'finance',zh:businessCopy.title[0],en:businessCopy.title[1],icon:PhReceipt},
   {id:'shop',zh:shopWords.adminTitle[0],en:shopWords.adminTitle[1],icon:PhPackage},
+  {id:'shop-orders',zh:orderWords.ordersTitle[0],en:orderWords.ordersTitle[1],icon:PhReceipt},
   /* V4: commerce navigation is retired; records and panels remain available in source.
   {
     id: "overview",
@@ -227,7 +226,7 @@ watch(view, async () => {
 onMounted(desk.loadSetup);
 function refreshCurrent() {
   if(view.value==='shop') void shopPanel.value?.refresh();
-  else if(view.value==='messages') void messagePanel.value?.refresh();
+  else if(view.value==='shop-orders') void shopOrdersPanel.value?.refresh();
   else if(view.value==='finance') void financePanel.value?.refresh();
   else if(view.value==='members') memberPanel.value?.refresh();
   else if (view.value === "reservations") reservationList.value?.refresh();
@@ -368,12 +367,12 @@ const readableDate = computed(() =>
         <ReservationNotifications />
         <KeepAlive><ContentEditor v-if="view === 'content'" :active="view === 'content'" /></KeepAlive>
         <KeepAlive><JournalEditor v-if="view === 'journal-editor'" :active="view === 'journal-editor'" /></KeepAlive>
-        <KeepAlive><MessagesPanel v-if="view==='messages'" ref="messagePanel" :active="view==='messages'"/></KeepAlive>
         <KeepAlive><FinancePanel v-if="view==='finance'" ref="financePanel" :active="view==='finance'"/></KeepAlive>
         <KeepAlive><ShopCatalogPanel v-if="view==='shop'" ref="shopPanel" :active="view==='shop'"/></KeepAlive>
+        <KeepAlive><ShopOrdersPanel v-if="view==='shop-orders'" ref="shopOrdersPanel"/></KeepAlive>
         <p
           v-if="
-            !['reservations', 'reservation-calendar', 'legacy', 'content', 'journal-editor','members','messages','finance','shop'].includes(view)
+            !['reservations', 'reservation-calendar', 'legacy', 'content', 'journal-editor','members','finance','shop','shop-orders'].includes(view)
           "
           class="reservation-commerce-note"
         >

@@ -8,7 +8,7 @@ const copyText = contentModule("pages-Order", copyTextDefault);
 import copyTextDefault from "../content/pages-Order.json";
 import { say } from "../state";
 
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   PhArrowRight,
@@ -36,8 +36,8 @@ const busy = ref(false);
 const now = ref(Date.now() / 1000);
 const qrError = ref(false);
 const mobile = ref(handheldCashier || matchMedia("(max-width: 767px)").matches);
-const id = String(route.params.id);
-const access = orderKey(id);
+const id = computed(() => String(route.params.id));
+const access = computed(() => orderKey(id.value));
 const seconds = computed(() =>
   Math.max(0, Math.ceil((order.value?.expires_at || 0) - now.value)),
 );
@@ -49,7 +49,7 @@ const payable = computed(
   () => order.value?.status === "pending" && seconds.value > 0,
 );
 const terminal = computed(() =>
-  ["paid", "paid_needs_review", "failed", "refunded", "manual_pending", "manual_confirmed", "manual_completed", "manual_cancelled"].includes(
+  ["paid", "paid_needs_review", "failed", "refunded", "manual_completed", "manual_cancelled"].includes(
     order.value?.status || "",
   ),
 );
@@ -59,30 +59,31 @@ const hasVisit = computed(() =>
 let timer: ReturnType<typeof setInterval>;
 let polling: ReturnType<typeof setTimeout>;
 let alive = true;
+let sequence = 0;
+let pollGeneration = 0;
 async function load() {
   if (busy.value || !alive) return;
-  if (!access) {
-    error.value = say(copyText.please_use_the_browser_in_which_you_972d7e);
-    return;
-  }
   busy.value = true;
+  const current = id.value;
+  const requestSequence = ++sequence;
   try {
-    const data = await commerceApi<Order>(`/orders/${id}`, {
-      headers: { "X-Order-Key": access },
-    });
-    if (alive) {
+    const data = access.value ? await commerceApi<Order>(`/orders/${current}`, {
+      headers: { "X-Order-Key": access.value },
+    }) : current.startsWith('PS') ? await commerceApi<Order>(`/auth/shop/orders/${current}`) : (()=>{throw new Error(say(copyText.please_use_the_browser_in_which_you_972d7e))})();
+    if (alive && requestSequence === sequence && id.value === current) {
       order.value = data;
       error.value = "";
     }
   } catch (e) {
-    if (alive) error.value = (e as Error).message;
+    if (alive && requestSequence === sequence) error.value = (e as Error).message;
   } finally {
-    busy.value = false;
+    if (requestSequence === sequence) busy.value = false;
   }
 }
 async function poll() {
+  const generation = pollGeneration;
   await load();
-  if (alive && !terminal.value) polling = setTimeout(poll, 8000);
+  if (alive && generation === pollGeneration && !terminal.value) polling = setTimeout(poll, 8000);
 }
 function resume() {
   now.value = Date.now() / 1000;
@@ -94,8 +95,19 @@ onMounted(() => {
   poll();
   timer = setInterval(() => (now.value = Date.now() / 1000), 1000);
 });
+watch(id, () => {
+  sequence++;
+  pollGeneration++;
+  clearTimeout(polling);
+  order.value = undefined;
+  error.value = "";
+  busy.value = false;
+  void poll();
+});
 onBeforeUnmount(() => {
   alive = false;
+  sequence++;
+  pollGeneration++;
   window.removeEventListener("pageshow", resume);
   document.removeEventListener("visibilitychange", resume);
   clearInterval(timer);
@@ -125,7 +137,7 @@ async function tryAgain() {
         {{ say(copyText.try_again_c3273b) }}
       </button>
     </p>
-    <ManualShopOrder v-if="order?.quote.mode==='manual'" :order="order"/>
+    <ManualShopOrder v-if="order?.quote.mode==='manual'" :order="order" :detailed="route.query.details==='1'"/>
     <div v-else-if="order" class="order-layout">
       <div class="order-main">
         <div :class="['order-seal', { confirmed: order.status === 'paid' }]">

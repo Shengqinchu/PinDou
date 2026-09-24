@@ -132,6 +132,62 @@ def test_contact_privacy_version_and_admin_visibility(client):
     assert owner['customer']['notes']=='Custom note'
 
 
+def test_owned_orders_claim_across_devices_and_private_boundaries(client, monkeypatch):
+    import customer_auth
+    monkeypatch.setattr(customer_auth, 'upstream', lambda path, request, token=None, **kwargs: {
+        'user_id': 'qa-'+str(token), 'email': str(token)+'@example.test', 'nickname':str(token)})
+    own={'Authorization':'Bearer first'}
+    other={'Authorization':'Bearer second'}
+    body=payload(client)
+    ordered=client.post('/studio-api/shop/orders',json=body,headers={'Idempotency-Key':str(uuid.uuid4()),**own})
+    assert ordered.status_code==201, ordered.text
+    ident=ordered.json()['id']
+    assert [row['id'] for row in client.get('/studio-api/auth/shop/orders',headers=own).json()['items']]==[ident]
+    assert client.get('/studio-api/auth/shop/orders/'+ident,headers=other).status_code==404
+    assert client.post('/studio-api/auth/shop/orders/'+ident+'/claim',json={'access_key':body['access_key']},headers=other).status_code==404
+    assert client.get('/studio-api/auth/shop/orders',headers=other).json()['items']==[]
+    guest_body=payload(client)
+    guest=place(client,guest_body).json()['id']
+    assert client.get('/studio-api/auth/shop/orders/'+guest,headers=own).status_code==404
+    assert client.post('/studio-api/auth/shop/orders/claim',json={'items':[{'id':guest,'access_key':'0'*64}]},headers=own).json()['claimed']==0
+    assert client.post('/studio-api/auth/shop/orders/claim',json={'items':[{'id':guest,'access_key':guest_body['access_key']}]},headers=own).json()['claimed']==1
+    assert client.get('/studio-api/auth/shop/orders/'+guest,headers=own).status_code==200
+    assert client.get('/studio-api/auth/shop/orders/'+guest,headers=other).status_code==404
+
+
+def test_stale_optional_login_does_not_block_guest_checkout(client, monkeypatch):
+    import customer_auth
+    def expired(*_args, **_kwargs):
+        raise HTTPException(401, 'expired')
+    monkeypatch.setattr(customer_auth, 'require_customer', expired)
+    body=payload(client)
+    response=client.post('/studio-api/shop/orders',json=body,headers={'Idempotency-Key':str(uuid.uuid4()),'Authorization':'Bearer expired'})
+    assert response.status_code==201, response.text
+    with studio.database() as db:
+        assert db.execute('SELECT owner_id FROM commerce_orders WHERE id=?',(response.json()['id'],)).fetchone()[0]==''
+
+
+def test_order_progress_and_soft_delete_release_stock_with_audit(client):
+    product_row=product(client);product_row['stock']=1
+    assert client.put('/studio-api/manage/products/'+product_row['id'],json=product_row).status_code==200
+    body=payload(client);order=place(client,body).json()
+    preparing=update_order(client,order,'manual_preparing').json()
+    assert preparing['fulfillment']=='preparing'
+    assert quote(client,[item()]).status_code==409
+    ready=update_order(client,preparing,'manual_ready').json()
+    assert ready['fulfillment']=='ready'
+    assert client.request('DELETE','/studio-api/manage/shop/orders/'+ready['id'],json={'version':ready['version']-1}).status_code==409
+    deleted=client.request('DELETE','/studio-api/manage/shop/orders/'+ready['id'],json={'version':ready['version']})
+    assert deleted.status_code==200 and deleted.json()['deleted']
+    assert client.get('/studio-api/manage/shop/orders').json()['items']==[]
+    assert client.get('/studio-api/orders/'+ready['id'],headers={'X-Order-Key':body['access_key']}).status_code==404
+    assert quote(client,[item()]).status_code==200
+    assert product(client)['stock']==1
+    with studio.database() as db:
+        assert db.execute('SELECT status FROM commerce_orders WHERE id=?',(ready['id'],)).fetchone()[0]=='manual_deleted'
+        assert db.execute("SELECT count(*) FROM commerce_events WHERE order_id=? AND event='manual_order_deleted'",(ready['id'],)).fetchone()[0]==1
+
+
 def test_stock_hold_completion_once_and_cancel_release(client):
     p=product(client);p['stock']=4
     assert client.put('/studio-api/manage/products/'+p['id'],json=p).status_code==200

@@ -7,6 +7,8 @@ import { shopPayload, orderWords as o } from '../shop-ordering';
 import { shopWords as w } from '../shop';
 import { locale, say } from '../state';
 import profile from '../content/studio-profile.json';
+import { accountUser } from '../account';
+import { loadBookingProfile } from '../booking-profile';
 import '../styles/shop-ordering.css';
 
 type Attempt={key:string;payload:Record<string,unknown>};
@@ -44,7 +46,9 @@ async function submit(){
   else error.value=say(o.uncertain);
  }finally{clearTimeout(timeout);sending.value=false;}
 }
-onMounted(()=>{if(!attempt.value)void refreshQuote()});
+async function prefill(){const id=accountUser.value?.id;if(!id)return;try{const saved=await loadBookingProfile(id);if(accountUser.value?.id!==id)return;if(!name.value)name.value=saved.name;if(!contact.value)contact.value=saved.contact;if(!address.value)address.value=saved.delivery_address||'';}catch{/* Checkout remains available with manual entry. */}}
+watch(()=>accountUser.value?.id,()=>void prefill());
+onMounted(()=>{if(!attempt.value)void refreshQuote();void prefill()});
 onBeforeUnmount(()=>{++sequence;checkoutBusy.value=false});
 </script>
 <template>

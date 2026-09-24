@@ -25,7 +25,7 @@
   "subtotal":["已定价商品小计","Subtotal of priced items"],
   "unavailable":["商品已下架","Product unavailable"],
   "ordersEmpty":["暂无商品订单","No product orders yet"],
-  "ordersHelp":["这里显示此浏览器保存的商品订单。","Product orders saved in this browser appear here."],
+  "ordersHelp":["登录后可查看账号下的商品订单；本浏览器保存的旧订单也会关联到账号。","Sign in to see orders across devices. Older orders saved in this browser can be linked to your account."],
   "orderOpen":["查看订单","View order"],
   "retry":["重新加载","Reload"],
   "loading":["正在加载商品…","Loading products…"],

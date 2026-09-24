@@ -8,7 +8,7 @@ import visitDefaults from './content/pages-Visit.json';
 const visitCopy=contentModule('pages-Visit',visitDefaults);
 export const bookingProfileCopy=contentModule('booking-profile',defaults);
 export type ContactDetails={name:string;contact_method:'wechat'|'phone'|'email'|'other';contact:string};
-export type BookingProfile=ContactDetails&{owner_id:string;version:number;complete:boolean;updated_at:string;source_reservation_id:string;wechat_id?:string};
+export type BookingProfile=ContactDetails&{owner_id:string;version:number;complete:boolean;updated_at:string;source_reservation_id:string;wechat_id?:string;delivery_address?:string};
 export const emptyContact=():ContactDetails=>({name:'',contact_method:'wechat',contact:''});
 export const contactDetails=(data:ContactDetails):ContactDetails=>({name:data.name,contact_method:data.contact_method,contact:data.contact});
 export const sameContact=(a:ContactDetails,b:ContactDetails)=>a.name===b.name&&a.contact_method===b.contact_method&&a.contact===b.contact;
@@ -26,9 +26,9 @@ export async function loadBookingProfile(id:string,token=customerToken()){
  if(result.owner_id!==id||accountUser.value?.id!==id||customerToken()!==token)throw new Error(say(accountCopy.account_login_required));
  return result;
 }
-export async function saveBookingProfile(id:string,token:string,details:ContactDetails,version:number,wechatId?:string){
+export async function saveBookingProfile(id:string,token:string,details:ContactDetails,version:number,wechatId?:string,deliveryAddress?:string){
  if(accountUser.value?.id!==id||customerToken()!==token)throw new Error(say(accountCopy.account_login_required));
- const result=await commerceApi<BookingProfile>('/auth/booking-profile',{method:'PUT',headers:{Authorization:'Bearer '+token},body:JSON.stringify({...contactDetails(details),version,...(wechatId===undefined?{}:{wechat_id:wechatId.trim()})})});
+ const result=await commerceApi<BookingProfile>('/auth/booking-profile',{method:'PUT',headers:{Authorization:'Bearer '+token},body:JSON.stringify({...contactDetails(details),version,...(wechatId===undefined?{}:{wechat_id:wechatId.trim()}),...(deliveryAddress===undefined?{}:{delivery_address:deliveryAddress.trim()})})});
  if(result.owner_id!==id||accountUser.value?.id!==id||customerToken()!==token)throw new Error(say(accountCopy.account_login_required));
  window.dispatchEvent(new Event('studio-booking-profile-change'));
  return result;
