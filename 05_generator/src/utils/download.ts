@@ -55,7 +55,7 @@ async function tryNativeShare(
   const file = new File([blob], filename, { type: blob.type || 'image/png' });
   const shareData: ShareDataWithFiles = {
     files: [file],
-    title: options.shareTitle || 'PinDou 拼豆图纸',
+    title: options.shareTitle || 'Pindou Puppy 拼豆图纸',
     text: options.shareText
   };
   if (nav.canShare && !nav.canShare({ files: shareData.files })) {

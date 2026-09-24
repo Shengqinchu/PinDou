@@ -67,7 +67,7 @@ const progressHeadline = computed(() => {
   return generation.generationMode === 'ai' ? 'Q 版豆图正在制作' : '图纸正在快速生成';
 });
 const progressSub = computed(() => {
-  const fileName = generation.sourceFile?.name || 'PinDou 拼豆图纸';
+  const fileName = generation.sourceFile?.name || 'Pindou Puppy 拼豆图纸';
   const style = generation.generationMode === 'ai' ? ` · ${gt(styleLabel.value)}` : '';
   return `${fileName} · ${gt(modeLabel.value)}${style} · ${gt(`${selectedSizeLabel.value} 格`)}`;
 });

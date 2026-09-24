@@ -127,13 +127,13 @@ def test_chinese_booking_sends_channel_specific_english_confirmation(setup):
           ('customer-notice:'+sms_notice['id'],)).fetchone()[0]
     assert email['locale']=='en' and sms_body.startswith('Booking confirmed\n')
     for body in (email['body'],sms_body):
-        assert 'Local <Guest>, PinDou Puppy has confirmed your booking.' in body
+        assert 'Local <Guest>, Pindou Puppy has confirmed your booking.' in body
         assert '2026-09-11 14:00-16:00 · 2 guests' in body
         assert 'Hamilton local time' in body
         assert 'Address: 8 Hughson St N, Hamilton, ON L8R 0B1' in body
         assert 'View booking: https://pindoupuppy.com/reservation/'+ident in body
         assert 'Studio details: https://pindoupuppy.com/details' in body
-        assert body.endswith('PinDou Puppy looks forward to welcoming you!')
+        assert body.endswith('Pindou Puppy looks forward to welcoming you!')
         assert not re.search(r'[\u3400-\u9fff]',body)
     assert 'reply to this message' in sms_body and 'staywithcsq@outlook.com' not in sms_body
     assert 'email staywithcsq@outlook.com' in email['body'] and 'reply to this message' not in email['body']
@@ -153,7 +153,7 @@ def test_pending_email_and_sms_match_full_english_template_with_chinese_name(set
     assert email['title']=='Booking request received' and email['locale']=='en'
     assert sms_body.startswith('Booking request received\n')
     for body in (email['body'],sms_body):
-        assert 'Hello, PinDou Puppy has received your booking request.' in body
+        assert 'Hello, Pindou Puppy has received your booking request.' in body
         assert 'It is waiting for the host to confirm.' in body
         assert '2026-09-11 14:00-16:00 · 1 guest' in body
         assert 'Hamilton local time' in body

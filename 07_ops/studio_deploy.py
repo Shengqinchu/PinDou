@@ -300,7 +300,7 @@ def main():
     else:
         new_nginx = re.sub(r"    # PinDou Studio preview \(managed by studio_deploy.py\).*?    # End PinDou Studio preview\n\n", lambda _: snippet, old_nginx, count=1, flags=re.S)
     unit = '''[Unit]
-Description=PinDou Puppy Studio inquiries
+Description=Pindou Puppy Studio inquiries
 After=network-online.target pindou.service
 Wants=network-online.target
 

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { gt } from '../i18n';
 
 import { emailPasswordLogin, getProfile, registerWebAccount, sendEmailCode, updateProfile, uploadAvatar, verifyEmailCode } from '../api';
 import type { EmailCodeResponse, RegisterResponse } from '../api';
@@ -20,7 +21,7 @@ export const useAuthStore = defineStore('auth', {
   }),
   getters: {
     isLoggedIn: (state) => Boolean(state.token),
-    displayName: (state) => state.user?.nickname || state.user?.email || 'PinDou 用户'
+    displayName: (state) => state.user?.nickname || state.user?.email || gt('Pindou Puppy 用户')
   },
   actions: {
     syncFromStorage() {

@@ -26,7 +26,7 @@
     ],
     "title": [
       "欢迎来到小狗拼豆铺",
-      "Welcome to PinDou Puppy"
+      "Welcome to Pindou Puppy"
     ],
     "reservation_title": [
       "登录后，继续这次预约",
@@ -222,11 +222,11 @@
     ],
     "default_name_with_suffix": [
       "拼豆用户_{v0}",
-      "PinDou member_{v0}"
+      "Pindou Puppy member_{v0}"
     ],
     "default_name": [
       "拼豆用户",
-      "PinDou member"
+      "Pindou Puppy member"
     ]
   },
   "admin": {
@@ -266,11 +266,11 @@
     ],
     "a_little_creative_space_in_hamilton_book_5cf34e": [
       "汉密尔顿的小小手作空间，欢迎来到小狗拼豆铺！",
-      "A little creative space in Hamilton. Welcome to Pindo Puppy!"
+      "A little creative space in Hamilton. Welcome to Pindou Puppy!"
     ],
     "pindo_puppy_home_69051e": [
       "小狗拼豆铺首页",
-      "Pindo Puppy home"
+      "Pindou Puppy home"
     ],
     "main_navigation_b48c67": [
       "主要导航",
@@ -1390,7 +1390,7 @@
     ],
     "pindou_puppy_studio_desk_c23194": [
       "小狗拼豆铺 · 店主工作台",
-      "PINDOU PUPPY · STUDIO DESK"
+      "Pindou Puppy · STUDIO DESK"
     ],
     "today_at_puppy_fa2258": [
       "店里的今天",
@@ -2356,7 +2356,7 @@
   "components-BrandMark": {
     "pindo_puppy_08aa61": [
       "小狗拼豆铺",
-      "Hamilton PindouPuppy"
+      "Hamilton Pindou Puppy"
     ],
     "artwork_wechat": [
       "xiaogoushuangji",
@@ -2392,7 +2392,7 @@
     ],
     "pindo_puppy_08aa61": [
       "小狗拼豆铺",
-      "Pindo Puppy"
+      "Pindou Puppy"
     ],
     "your_studio_in_good_hands_272ef4": [
       "小狗拼豆铺 · 店主工作台",
@@ -3873,8 +3873,8 @@
       "Your allowance is charged only when generation succeeds."
     ],
     "740e700712": [
-      "PinDou 用户",
-      "PinDou user"
+      "Pindou Puppy 用户",
+      "Pindou Puppy user"
     ],
     "39633dce90": [
       "AI 模式",
@@ -3941,8 +3941,8 @@
       "Pattern generation failed. Please try again."
     ],
     "e192025a0c": [
-      "PinDou 拼豆图纸",
-      "PinDou bead pattern"
+      "Pindou Puppy 拼豆图纸",
+      "Pindou Puppy bead pattern"
     ],
     "778fc8f994": [
       "全部",
@@ -4461,8 +4461,8 @@
       "Choose a well-lit photo with a clear subject. Cartoons on a white background and front-facing portraits often work well."
     ],
     "c5b10498cb": [
-      "PinDou 上传页截图",
-      "PinDou upload screen"
+      "Pindou Puppy 上传页截图",
+      "Pindou Puppy upload screen"
     ],
     "6ada99c2f4": [
       "选模式和尺寸",
@@ -4473,8 +4473,8 @@
       "Use standard mode for an existing cartoon. For people, pets or objects, AI can stylize the photo before conversion."
     ],
     "2be4c95a22": [
-      "PinDou 模式和目标格数选择截图",
-      "PinDou mode and grid size settings"
+      "Pindou Puppy 模式和目标格数选择截图",
+      "Pindou Puppy mode and grid size settings"
     ],
     "4363468b43": [
       "等待生成",
@@ -4485,8 +4485,8 @@
       "Follow the stages as your pattern is made. AI takes a little longer; standard mode is usually quicker."
     ],
     "2b98d411a3": [
-      "PinDou 生成中页面截图",
-      "PinDou generation progress screen"
+      "Pindou Puppy 生成中页面截图",
+      "Pindou Puppy generation progress screen"
     ],
     "881ade0b64": [
       "检查图纸",
@@ -4497,8 +4497,8 @@
       "Review the grid, bead count and colour list. Open the editor to adjust colours where needed."
     ],
     "7231b0e6e7": [
-      "PinDou 结果页截图",
-      "PinDou result screen"
+      "Pindou Puppy 结果页截图",
+      "Pindou Puppy result screen"
     ],
     "20da7ffe6d": [
       "编辑和下载",
@@ -4509,8 +4509,8 @@
       "Paint individual cells or replace a colour throughout the pattern, then save and download a PNG. On a phone, share it or touch and hold to save."
     ],
     "ff6d0fec13": [
-      "PinDou 图纸编辑器截图",
-      "PinDou pattern editor screen"
+      "Pindou Puppy 图纸编辑器截图",
+      "Pindou Puppy pattern editor screen"
     ],
     "0f1d2bf234": [
       "秒出",
@@ -4557,16 +4557,16 @@
       "AI costs 128 credits per pattern. Successful generations are charged; failed ones are not."
     ],
     "7c9ac84743": [
-      "PinDou 充值中心截图",
-      "PinDou credits and passes screen"
+      "Pindou Puppy 充值中心截图",
+      "Pindou Puppy credits and passes screen"
     ],
     "faeef25e4c": [
       "时间卡解锁普通模式不限次，并随卡赠送积分；AI 仍按积分扣。",
       "Passes include unlimited standard generation and bonus credits. AI still uses credits."
     ],
     "7d1ae34af0": [
-      "PinDou 时间卡会员截图",
-      "PinDou pass options"
+      "Pindou Puppy 时间卡会员截图",
+      "Pindou Puppy pass options"
     ],
     "300b507fd3": [
       "CDK 兑换",
@@ -4577,8 +4577,8 @@
       "Redeem a code directly. Guests can add a CDK to their current device wallet too."
     ],
     "de5e95d9ab": [
-      "PinDou CDK 兑换截图",
-      "PinDou CDK redemption screen"
+      "Pindou Puppy CDK 兑换截图",
+      "Pindou Puppy CDK redemption screen"
     ],
     "4358ab83e8": [
       "额度不足",
@@ -4589,8 +4589,8 @@
       "When your allowance runs out, redeem a CDK, sign up for a welcome allowance, or purchase more."
     ],
     "092d0f0ee4": [
-      "PinDou 额度不足三选一引导截图",
-      "PinDou allowance options"
+      "Pindou Puppy 额度不足三选一引导截图",
+      "Pindou Puppy allowance options"
     ],
     "0de9c5503e": [
       "新手教程",
@@ -4613,8 +4613,8 @@
       "Read the tips"
     ],
     "01f16d30a0": [
-      "PinDou 结果页预览",
-      "PinDou result preview"
+      "Pindou Puppy 结果页预览",
+      "Pindou Puppy result preview"
     ],
     "fd233dfd58": [
       "教程小节",
@@ -4645,12 +4645,12 @@
       "Start with your source image and choose the mode that suits it."
     ],
     "5c5bcb0931": [
-      "PinDou 模式和尺寸选择",
-      "PinDou mode and size settings"
+      "Pindou Puppy 模式和尺寸选择",
+      "Pindou Puppy mode and size settings"
     ],
     "807918f91b": [
-      "PinDou 生成进度",
-      "PinDou generation progress"
+      "Pindou Puppy 生成进度",
+      "Pindou Puppy generation progress"
     ],
     "d7cefc27ac": [
       "积分 / 会员 / CDK 怎么用",
@@ -4705,7 +4705,7 @@
       "Make your own bead pattern"
     ],
     "2d08f109af": [
-      "先上传一张你喜欢的照片，PinDou 会帮你整理成可编辑、可下载、可保存的图纸。",
+      "先上传一张你喜欢的照片，Pindou Puppy 会帮你整理成可编辑、可下载、可保存的图纸。",
       "Choose a photo you like and turn it into a pattern you can edit, download and keep."
     ],
     "dc83fe2ffb": [
@@ -5214,7 +5214,7 @@
   "miniapp": {
     "brand": [
       "小狗拼豆铺",
-      "PinDou Puppy"
+      "Pindou Puppy"
     ],
     "check_code": [
       "校验码 {v0}",
@@ -5222,7 +5222,7 @@
     ],
     "confirm_title": [
       "登录小狗拼豆铺",
-      "Sign in to PinDou Puppy"
+      "Sign in to Pindou Puppy"
     ],
     "link_title": [
       "绑定你的微信",
@@ -5282,7 +5282,7 @@
     ],
     "native_title": [
       "欢迎来到小狗拼豆铺",
-      "Welcome to PinDou Puppy"
+      "Welcome to Pindou Puppy"
     ],
     "native_intro": [
       "已有网站账号，登录后可继续使用原有图纸、积分和时长。",
@@ -5620,15 +5620,15 @@
     ],
     "message_created": [
       "小狗拼豆铺 · 新预约待确认",
-      "PinDou Puppy · New reservation request"
+      "Pindou Puppy · New reservation request"
     ],
     "message_cancelled": [
       "小狗拼豆铺 · 顾客取消预约",
-      "PinDou Puppy · Customer cancelled a reservation"
+      "Pindou Puppy · Customer cancelled a reservation"
     ],
     "message_test": [
       "小狗拼豆铺 · 微信提醒测试",
-      "PinDou Puppy · WeChat alert test"
+      "Pindou Puppy · WeChat alert test"
     ],
     "message_test_body": [
       "这是一条店主提醒测试。看到这条消息，表示微信接收渠道已连通。没有创建或更改任何顾客预约。",
@@ -6006,11 +6006,11 @@
     ],
     "welcome_to_pindo_puppychoose_an_afternoon_and_247303": [
       "欢迎光临小狗拼豆铺。\n也许是某一个下午，选一张自己喜欢的图，\n坐在阳光下，把一颗颗豆子，变成独属于你的快乐。",
-      "Welcome to Pindo Puppy.\nChoose an afternoon and a pattern you love.\nSit in the sunshine, turning tiny beads into happiness of your own."
+      "Welcome to Pindou Puppy.\nChoose an afternoon and a pattern you love.\nSit in the sunshine, turning tiny beads into happiness of your own."
     ],
     "sunlit_worktables_and_a_wall_of_bead_46e326": [
       "小狗拼豆铺的白色工作台、拼豆作品墙与自然光",
-      "Sunlit worktables and a wall of bead art at Pindo Puppy"
+      "Sunlit worktables and a wall of bead art at Pindou Puppy"
     ],
     "come_create_2eee81": [
       "来拼豆吧",
@@ -6058,7 +6058,7 @@
     ],
     "slow_down_at_pindo_puppy_and_enjoy_8b796a": [
       "在小狗拼豆铺慢下来吧，感受手工的快乐。",
-      "Slow down at Pindo Puppy and enjoy the simple pleasure of making by hand."
+      "Slow down at Pindou Puppy and enjoy the simple pleasure of making by hand."
     ],
     "studio_details_7c4089": [
       "拼豆铺详细信息",
@@ -6132,7 +6132,7 @@
     ],
     "new_pieces_on_the_wall_new_colours_0e0a4b": [
       "墙上的新作品、桌上的新颜色，以及每一个认真拼豆的下午。这里的照片，都是小狗拼豆铺的真实日常。",
-      "New pieces on the wall, new colours on the table, and afternoons well spent. Real photographs from everyday life at Pindo Puppy."
+      "New pieces on the wall, new colours on the table, and afternoons well spent. Real photographs from everyday life at Pindou Puppy."
     ],
     "more_stories_on_xiaohongshu_d10ec3": [
       "去小红书看更多日常",
@@ -6224,7 +6224,7 @@
     ],
     "pindo_puppy_08aa61": [
       "小狗拼豆铺",
-      "Pindo Puppy"
+      "Pindou Puppy"
     ],
     "a_little_creative_studio_72779b": [
       "小狗拼豆铺",
@@ -6232,7 +6232,7 @@
     ],
     "pindo_puppy_studio_98f0bc": [
       "小狗拼豆铺工作室",
-      "Pindo Puppy studio"
+      "Pindou Puppy studio"
     ],
     "every_little_plan_deserves_a_little_care_12f43a": [
       "每一份期待，值得好好照顾。",
@@ -6272,7 +6272,7 @@
     ],
     "use_your_existing_pindou_administrator_account_ac1b0a": [
       "使用现有拼豆后台的管理员账号。",
-      "Use your existing PinDou administrator account."
+      "Use your existing Pindou Puppy administrator account."
     ],
     "back_to_the_website_19fd8b": [
       "返回网站",
@@ -7120,7 +7120,7 @@
   "state": {
     "pindo_puppy_a_little_creative_studio_in_d8b24c": [
       "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
-      "Pindo Puppy · A little creative studio in Hamilton"
+      "Pindou Puppy · A little creative studio in Hamilton"
     ],
     "too_many_requests_please_try_again_later_7d3a95": [
       "提交次数较多，请稍后再试，或通过微信联系店主。",
@@ -7250,7 +7250,7 @@
     ],
     "telegram_in_use": [
       "这个机器人已连接其他接收服务，请使用专用于小狗拼豆铺的机器人。",
-      "This bot is connected to another update service. Use a dedicated PinDou Puppy bot."
+      "This bot is connected to another update service. Use a dedicated Pindou Puppy bot."
     ],
     "telegram_blocked": [
       "机器人无法向接收人发消息，请在 Telegram 中解除屏蔽并重新绑定。",
@@ -7270,7 +7270,7 @@
     ],
     "message_test": [
       "🐶 小狗拼豆铺 · Telegram 提醒测试",
-      "🐶 PinDou Puppy · Telegram alert test"
+      "🐶 Pindou Puppy · Telegram alert test"
     ],
     "message_test_body": [
       "店主预约提醒已连接。新预约和顾客取消预约会发到这个对话。你可以置顶此对话，并在 Telegram 中开启通知。\n\n这是一条测试消息，没有创建或修改任何顾客预约。",
@@ -8502,7 +8502,7 @@
     ],
     "owner_sms": [
       "小狗拼豆铺：有新的预约申请。{name}，{guests}人，{date} {start}-{end}（汉密尔顿时间）。请处理：https://pindoupuppy.com/manage?view=reservations",
-      "PinDou Puppy: new booking request. {name}, {guests} guests, {date} {start}-{end} (Hamilton). Review: https://pindoupuppy.com/manage?view=reservations"
+      "Pindou Puppy: new booking request. {name}, {guests} guests, {date} {start}-{end} (Hamilton). Review: https://pindoupuppy.com/manage?view=reservations"
     ],
     "today": [
       "今天",
@@ -8564,7 +8564,7 @@
     ],
     "studio": [
       "小狗拼豆铺",
-      "PinDou Puppy"
+      "Pindou Puppy"
     ],
     "customer": [
       "顾客",

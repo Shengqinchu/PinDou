@@ -209,7 +209,7 @@
   ],
   "owner_sms": [
     "小狗拼豆铺：有新的预约申请。{name}，{guests}人，{date} {start}-{end}（汉密尔顿时间）。请处理：https://pindoupuppy.com/manage?view=reservations",
-    "PinDou Puppy: new booking request. {name}, {guests} guests, {date} {start}-{end} (Hamilton). Review: https://pindoupuppy.com/manage?view=reservations"
+    "Pindou Puppy: new booking request. {name}, {guests} guests, {date} {start}-{end} (Hamilton). Review: https://pindoupuppy.com/manage?view=reservations"
   ],
   "today": [
     "今天",

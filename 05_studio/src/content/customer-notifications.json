@@ -217,7 +217,7 @@
   ],
   "place": [
     "小狗拼豆铺",
-    "PinDou Puppy"
+    "Pindou Puppy"
   ],
   "pending_title": [
     "预约申请已收到",
@@ -237,27 +237,27 @@
   ],
   "pending_body": [
     "{name}，你的预约申请已收到，正在等待店主确认。\n{date} {start}–{end} · {guests} 人\n汉密尔顿当地时间\n查看预约或联系店主：{url}",
-    "{display_name}, PinDou Puppy has received your booking request. It is waiting for the host to confirm.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\n{contact_instruction}\nWe will notify you when the host confirms your booking."
+    "{display_name}, Pindou Puppy has received your booking request. It is waiting for the host to confirm.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\n{contact_instruction}\nWe will notify you when the host confirms your booking."
   ],
   "confirmed_body": [
     "{name}，店主已确认你的预约。\n{date} {start}–{end} · {guests} 人\n汉密尔顿当地时间\n地址：{address}\n查看预约或联系店主：{url}",
-    "{display_name}, PinDou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\n{contact_instruction}\nPinDou Puppy looks forward to welcoming you!"
+    "{display_name}, Pindou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\n{contact_instruction}\nPindou Puppy looks forward to welcoming you!"
   ],
   "confirmed_sms_body": [
-    "{display_name}, PinDou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nIf your plans change or you need to contact the host, reply to this message.\nPinDou Puppy looks forward to welcoming you!",
-    "{display_name}, PinDou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nIf your plans change or you need to contact the host, reply to this message.\nPinDou Puppy looks forward to welcoming you!"
+    "{display_name}, Pindou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nIf your plans change or you need to contact the host, reply to this message.\nPindou Puppy looks forward to welcoming you!",
+    "{display_name}, Pindou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nIf your plans change or you need to contact the host, reply to this message.\nPindou Puppy looks forward to welcoming you!"
   ],
   "confirmed_email_body": [
-    "{display_name}, PinDou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nIf your plans change or you need to contact the host, email staywithcsq@outlook.com.\nPinDou Puppy looks forward to welcoming you!",
-    "{display_name}, PinDou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nIf your plans change or you need to contact the host, email staywithcsq@outlook.com.\nPinDou Puppy looks forward to welcoming you!"
+    "{display_name}, Pindou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nIf your plans change or you need to contact the host, email staywithcsq@outlook.com.\nPindou Puppy looks forward to welcoming you!",
+    "{display_name}, Pindou Puppy has confirmed your booking.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\nIf your plans change or you need to contact the host, email staywithcsq@outlook.com.\nPindou Puppy looks forward to welcoming you!"
   ],
   "cancelled_body": [
     "{name}，你在 {date} {start}–{end} 的预约已取消。\n如需重新预约或联系店主：{url}",
-    "{display_name}, your booking with PinDou Puppy has been cancelled.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\n{contact_instruction}\nWe hope to welcome you another time."
+    "{display_name}, your booking with Pindou Puppy has been cancelled.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\n{contact_instruction}\nWe hope to welcome you another time."
   ],
   "reminder_body": [
     "{name}，你在小狗拼豆铺的预约即将开始。\n{date} {start}–{end} · {guests} 人\n汉密尔顿当地时间\n地址：{address}\n查看预约或联系店主：{url}",
-    "{display_name}, your visit to PinDou Puppy is coming up.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\n{contact_instruction}\nPinDou Puppy looks forward to welcoming you!"
+    "{display_name}, your visit to Pindou Puppy is coming up.\n{date} {start}-{end} · {guests} {guest_label}\nHamilton local time\nAddress: {address}\nView booking: {url}\nStudio details: https://pindoupuppy.com/details\n{contact_instruction}\nPindou Puppy looks forward to welcoming you!"
   ],
   "contact_by_sms": [
     "If your plans change or you need to contact the host, reply to this message.",

@@ -18,31 +18,31 @@ const flowSteps = computed(()=>[
     title: '上传照片',
     text: '选一张主体清楚、光线干净的照片。白底卡通和正脸照片最容易出清爽图纸。',
     image: uploadImage.value,
-    alt: 'PinDou 上传页截图'
+    alt: 'Pindou Puppy 上传页截图'
   },
   {
     title: '选模式和尺寸',
     text: '卡通原图用普通模式秒出；真人、宠物、实物照片建议 AI 模式，先转 Q 版再量化。',
     image: optionsImage.value,
-    alt: 'PinDou 模式和目标格数选择截图'
+    alt: 'Pindou Puppy 模式和目标格数选择截图'
   },
   {
     title: '等待生成',
     text: '生成中会显示阶段进度。AI 模式稍慢一点，普通模式通常更快。',
     image: loadingImage.value,
-    alt: 'PinDou 生成中页面截图'
+    alt: 'Pindou Puppy 生成中页面截图'
   },
   {
     title: '检查图纸',
     text: '看图纸、豆数、色号清单和占比。觉得某块颜色不对，就进入编辑器微调。',
     image: resultImage.value,
-    alt: 'PinDou 结果页截图'
+    alt: 'Pindou Puppy 结果页截图'
   },
   {
     title: '编辑和下载',
     text: '点格改色、全局替换色号，保存后下载 PNG。手机端可分享或长按保存。',
     image: editorImage.value,
-    alt: 'PinDou 图纸编辑器截图'
+    alt: 'Pindou Puppy 图纸编辑器截图'
   }
 ]);
 
@@ -66,25 +66,25 @@ const walletItems = computed(()=>[
     title: 'AI 积分',
     text: 'AI 模式统一 128 积分/张。生成成功才扣，失败不扣。',
     image: pricingImage.value,
-    alt: 'PinDou 充值中心截图'
+    alt: 'Pindou Puppy 充值中心截图'
   },
   {
     title: '时间卡会员',
     text: '时间卡解锁普通模式不限次，并随卡赠送积分；AI 仍按积分扣。',
     image: pricingImage.value,
-    alt: 'PinDou 时间卡会员截图'
+    alt: 'Pindou Puppy 时间卡会员截图'
   },
   {
     title: 'CDK 兑换',
     text: '有兑换码时可以直接兑换。游客也能把 CDK 兑到当前设备钱包。',
     image: cdkImage.value,
-    alt: 'PinDou CDK 兑换截图'
+    alt: 'Pindou Puppy CDK 兑换截图'
   },
   {
     title: '额度不足',
     text: '额度不够时会给你三条路：兑换 CDK、注册领礼、充值。',
     image: quotaImage.value,
-    alt: 'PinDou 额度不足三选一引导截图'
+    alt: 'Pindou Puppy 额度不足三选一引导截图'
   }
 ]);
 </script>
@@ -106,7 +106,7 @@ const walletItems = computed(()=>[
         </div>
       </div>
       <div class="tutorial-hero__media">
-        <img :src="resultImage" :alt='gt("PinDou 结果页预览")' />
+        <img :src="resultImage" :alt='gt("Pindou Puppy 结果页预览")' />
       </div>
     </header>
 
@@ -157,8 +157,8 @@ const walletItems = computed(()=>[
       </div>
 
       <div class="tutorial-screenshot-pair">
-        <img :src="optionsImage" :alt='gt("PinDou 模式和尺寸选择")' loading="lazy" />
-        <img :src="loadingImage" :alt='gt("PinDou 生成进度")' loading="lazy" />
+        <img :src="optionsImage" :alt='gt("Pindou Puppy 模式和尺寸选择")' loading="lazy" />
+        <img :src="loadingImage" :alt='gt("Pindou Puppy 生成进度")' loading="lazy" />
       </div>
     </section>
 
@@ -210,7 +210,7 @@ const walletItems = computed(()=>[
     <section class="tutorial-cta">
       <span class="tutorial-kicker">Ready</span>
       <LiftTitle as="h2" :text="gt('现在做一张自己的拼豆图纸')"/>
-      <p>{{ gt("先上传一张你喜欢的照片，PinDou 会帮你整理成可编辑、可下载、可保存的图纸。") }}</p>
+      <p>{{ gt("先上传一张你喜欢的照片，Pindou Puppy 会帮你整理成可编辑、可下载、可保存的图纸。") }}</p>
       <RouterLink class="pd-btn pd-btn--primary" to="/tools">{{ gt("现在去上传") }}</RouterLink>
     </section>
   </section>

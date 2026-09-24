@@ -26,11 +26,11 @@
  "telegram_not_configured":["请先保存有效的 Bot Token。","Save a valid bot token first."],
  "telegram_not_bound":["请先绑定接收人并开启提醒。","Connect a recipient and enable alerts first."],
  "telegram_binding_expired":["绑定链接已过期，请重新生成。","Pairing link expired. Generate a new one."],
- "telegram_in_use":["这个机器人已连接其他接收服务，请使用专用于小狗拼豆铺的机器人。","This bot is connected to another update service. Use a dedicated PinDou Puppy bot."],
+ "telegram_in_use":["这个机器人已连接其他接收服务，请使用专用于小狗拼豆铺的机器人。","This bot is connected to another update service. Use a dedicated Pindou Puppy bot."],
  "telegram_blocked":["机器人无法向接收人发消息，请在 Telegram 中解除屏蔽并重新绑定。","The bot cannot message the recipient. Unblock it in Telegram and reconnect."],
  "telegram_rate_limit":["Telegram 暂时限制发送，系统会按要求重试。","Telegram limited requests temporarily. The system will retry after the required delay."],
  "telegram_network_error":["暂时无法连接 Telegram，稍后重试。","Temporarily unable to reach Telegram. Retry shortly."],
  "telegram_rejected":["Telegram 未接受请求，请检查机器人与接收人设置。","Telegram rejected the request. Check the bot and recipient settings."],
- "message_test":["🐶 小狗拼豆铺 · Telegram 提醒测试","🐶 PinDou Puppy · Telegram alert test"],
+ "message_test":["🐶 小狗拼豆铺 · Telegram 提醒测试","🐶 Pindou Puppy · Telegram alert test"],
  "message_test_body":["店主预约提醒已连接。新预约和顾客取消预约会发到这个对话。你可以置顶此对话，并在 Telegram 中开启通知。\n\n这是一条测试消息，没有创建或修改任何顾客预约。","Owner reservation alerts are connected. New reservations and customer cancellations will appear in this chat. You can pin it and enable Telegram notifications.\n\nThis is a test message. No customer reservation was created or changed."]
 }

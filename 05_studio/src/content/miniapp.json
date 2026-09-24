@@ -1,7 +1,7 @@
 {
- "brand":["小狗拼豆铺","PinDou Puppy"],
+ "brand":["小狗拼豆铺","Pindou Puppy"],
  "check_code":["校验码 {v0}","Verification number {v0}"],
- "confirm_title":["登录小狗拼豆铺","Sign in to PinDou Puppy"],
+ "confirm_title":["登录小狗拼豆铺","Sign in to Pindou Puppy"],
  "link_title":["绑定你的微信","Connect your WeChat"],
  "site":["正在访问 pindoupuppy.com","Visiting pindoupuppy.com"],
  "confirm_help":["请确认电脑上的校验码与这里一致，再继续。","Check that the number on your computer matches before continuing."],
@@ -16,7 +16,7 @@
  "cancelled":["已取消本次登录","This sign-in was cancelled"],
  "home":["回到小程序首页","Mini program home"],
  "retry":["重新尝试","Try again"],
- "native_title":["欢迎来到小狗拼豆铺","Welcome to PinDou Puppy"],
+ "native_title":["欢迎来到小狗拼豆铺","Welcome to Pindou Puppy"],
  "native_intro":["已有网站账号，登录后可查看预约、积分和时长。","Sign in with your website account to view bookings, points and studio time."],
  "email":["邮箱地址","Email address"],
  "password":["密码","Password"],

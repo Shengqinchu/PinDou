@@ -42,7 +42,7 @@
 | 对象 | 位置 |
 |---|---|
 | 生成器 current | `/opt/pindou/current` → `releases/20260910015453-studio-v7`（迁移验收时） |
-| Studio current | `/opt/pindou/studio/current` → `releases/20260924171336-studio-v7`（2026-09-24 商品图片上传提速；[验收](STUDIO_IMAGE_UPLOAD_SPEED_20260924.md)） |
+| Studio current | `/opt/pindou/studio/current` → `releases/20260924180611-studio-v7`（2026-09-24 英文品牌名统一；[验收](STUDIO_BRAND_NAME_RELEASE_20260924.md)） |
 | 生成器数据库 / 环境 | `/opt/pindou/shared/var/pindou.db` / `/opt/pindou/shared/.env` |
 | Studio 数据库 / 环境 | `/opt/pindou/studio/shared/studio.sqlite3` / `/opt/pindou/studio/shared/.env` |
 | 图片与资料 | 两个 `shared` 目录、`/opt/pindou/shared/data`、Studio `shared/media`、全部历史 release / static-history 保留 |

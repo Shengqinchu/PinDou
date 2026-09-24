@@ -35,12 +35,22 @@ for path in dist.rglob("*"):
 if len(site) < 100:
     raise SystemExit("Frontend build looks incomplete")
 
+copy_sources = {
+    "customer-notification-copy.json": "customer-notifications.json",
+    "messaging-copy.json": "messaging.json",
+    "owner-notification-copy.json": "owner-notifications.json",
+    "owner-wechat-copy.json": "owner-wechat.json",
+    "telegram-notification-copy.json": "telegram-notifications.json",
+}
 service = {}
 for filename in sys.argv[2:]:
-    if not re.fullmatch(r"[a-z][a-z0-9_]*\.py", filename):
+    if filename in copy_sources:
+        path = root / "05_studio/src/content" / copy_sources[filename]
+    elif filename == "content-defaults.json" or re.fullmatch(r"[a-z][a-z0-9_]*\.py", filename):
+        path = root / "06_studio" / filename
+    else:
         raise SystemExit(f"Invalid service filename: {filename}")
     name = "service/" + filename
-    path = root / "06_studio" / filename
     if name not in base_hashes or not path.is_file() or path.is_symlink():
         raise SystemExit(f"Service file missing from live manifest or local tree: {name}")
     service[name] = path

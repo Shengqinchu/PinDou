@@ -139,7 +139,7 @@ async def lifespan(_app):
         await customer_notifier
 
 
-app = FastAPI(title="PinDou Puppy Studio", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
+app = FastAPI(title="Pindou Puppy Studio", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
 
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.exception_handlers import http_exception_handler

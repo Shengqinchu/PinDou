@@ -3,7 +3,7 @@
   "wechat_only": ["请在微信小程序中允许提醒。", "Allow alerts in the WeChat mini-program."],
   "title": ["店主微信提醒", "Owner WeChat alerts"],
   "page_title": ["店主预约提醒", "Owner booking alerts"],
-  "studio": ["小狗拼豆铺", "PinDou Puppy"],
+  "studio": ["小狗拼豆铺", "Pindou Puppy"],
   "customer": ["顾客", "Customer"],
   "card_note": ["{guests}人 · 汉密尔顿时间", "{guests} guests · Hamilton time"],
   "setup_template": ["配置新预约通知", "Set up booking notifications"],

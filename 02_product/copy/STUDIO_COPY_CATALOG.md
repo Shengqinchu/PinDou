@@ -12,7 +12,7 @@
 | account | 我的账号 | My account |
 | account_center | 账号中心 | Account centre |
 | pattern_tool | 拼豆图纸生成器 | Pattern maker |
-| title | 欢迎来到小狗拼豆铺 | Welcome to PinDou Puppy |
+| title | 欢迎来到小狗拼豆铺 | Welcome to Pindou Puppy |
 | reservation_title | 登录后，继续这次预约 | Sign in to finish your booking |
 | draft_saved | 选好的时段和填写的内容都已保留。 | Your chosen time and form details are saved. |
 | code_method | 邮箱验证码 | Email code |
@@ -61,8 +61,8 @@
 | recovery_sent | 若该邮箱已注册，将收到找回账号验证码，5 分钟内有效。 | If this email is registered, a recovery code will arrive. It is valid for 5 minutes. |
 | recovery_done | 密码已重设，请使用新密码登录。 | Your password has been reset. Sign in with your new password. |
 | account_code_login_disabled | 邮箱验证码仅用于找回账号，请使用微信或密码登录。 | Email codes are for account recovery only. Sign in with WeChat or your password. |
-| default_name_with_suffix | 拼豆用户_{v0} | PinDou member_{v0} |
-| default_name | 拼豆用户 | PinDou member |
+| default_name_with_suffix | 拼豆用户_{v0} | Pindou Puppy member_{v0} |
+| default_name | 拼豆用户 | Pindou Puppy member |
 
 ## admin-controls.json
 
@@ -165,8 +165,8 @@
 | little_shop_c97261 | 拼豆小店 | Little shop |
 | studio_journal_7b860e | 小狗日记 | Studio journal |
 | skip_to_content_1760ff | 跳到主要内容 | Skip to content |
-| a_little_creative_space_in_hamilton_book_5cf34e | 汉密尔顿的小小手作空间，欢迎来到小狗拼豆铺！ | A little creative space in Hamilton. Welcome to Pindo Puppy! |
-| pindo_puppy_home_69051e | 小狗拼豆铺首页 | Pindo Puppy home |
+| a_little_creative_space_in_hamilton_book_5cf34e | 汉密尔顿的小小手作空间，欢迎来到小狗拼豆铺！ | A little creative space in Hamilton. Welcome to Pindou Puppy! |
+| pindo_puppy_home_69051e | 小狗拼豆铺首页 | Pindou Puppy home |
 | main_navigation_b48c67 | 主要导航 | Main navigation |
 | switch_to_chinese_6c04c2 | Switch to English | 切换为中文 |
 | label_dd0e77 | English | 中文 |
@@ -574,7 +574,7 @@
 | weekly_hours_and_capacity_e99e57 | 每周排班和接待人数 | Weekly hours and capacity |
 | confirm_prices_and_tax_0c4728 | 确认售价与税费 | Confirm prices and tax |
 | show_the_final_amount_customers_pay_45b703 | 让客人看到最终实付金额 | Show the final amount customers pay |
-| pindou_puppy_studio_desk_c23194 | 小狗拼豆铺 · 店主工作台 | PINDOU PUPPY · STUDIO DESK |
+| pindou_puppy_studio_desk_c23194 | 小狗拼豆铺 · 店主工作台 | Pindou Puppy · STUDIO DESK |
 | today_at_puppy_fa2258 | 店里的今天 | Today, at puppy. |
 | todays_visits_new_orders_and_the_things_8c7be3 | 先看今天的安排，再处理新的订单。 | Today’s visits, new orders and the things that need you. |
 | todays_schedule_51eea7 | 查看今日排班 | Today’s schedule |
@@ -847,7 +847,7 @@
 
 | 键 | 中文 | English |
 |---|---|---|
-| pindo_puppy_08aa61 | 小狗拼豆铺 | Hamilton PindouPuppy |
+| pindo_puppy_08aa61 | 小狗拼豆铺 | Hamilton Pindou Puppy |
 | artwork_wechat | xiaogoushuangji | xiaogoushuangji |
 
 ## components-BrandMotif.json
@@ -865,7 +865,7 @@
 |---|---|---|
 | enca_9cd218 | zh-CN | en-CA |
 | studio_desk_navigation_28a348 | 店主工作台导航 | Studio desk navigation |
-| pindo_puppy_08aa61 | 小狗拼豆铺 | Pindo Puppy |
+| pindo_puppy_08aa61 | 小狗拼豆铺 | Pindou Puppy |
 | your_studio_in_good_hands_272ef4 | 小狗拼豆铺 · 店主工作台 | YOUR STUDIO, IN GOOD HANDS |
 | close_desk_navigation_f2d087 | 关闭后台导航 | Close desk navigation |
 | your_workspace_2c12d8 | 我的工作室 | YOUR WORKSPACE |
@@ -1107,17 +1107,17 @@
 | all | 全部 | All |
 | unread | 未读 | Unread |
 | search | 搜索顾客 | Search customers |
-| place | 小狗拼豆铺 | PinDou Puppy |
+| place | 小狗拼豆铺 | Pindou Puppy |
 | pending_title | 预约申请已收到 | Booking request received |
 | confirmed_title | 预约成功 | Booking confirmed |
 | cancelled_title | 预约已取消 | Booking cancelled |
 | reminder_title | 到店提醒 | Your visit is coming up |
-| pending_body | {name}，你的预约申请已收到，正在等待店主确认。<br>{date} {start}–{end} · {guests} 人<br>汉密尔顿当地时间<br>查看预约或联系店主：{url} | {display_name}, PinDou Puppy has received your booking request. It is waiting for the host to confirm.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>{contact_instruction}<br>We will notify you when the host confirms your booking. |
-| confirmed_body | {name}，店主已确认你的预约。<br>{date} {start}–{end} · {guests} 人<br>汉密尔顿当地时间<br>地址：{address}<br>查看预约或联系店主：{url} | {display_name}, PinDou Puppy has confirmed your booking.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>{contact_instruction}<br>PinDou Puppy looks forward to welcoming you! |
-| confirmed_sms_body | {display_name}, PinDou Puppy has confirmed your booking.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>If your plans change or you need to contact the host, reply to this message.<br>PinDou Puppy looks forward to welcoming you! | {display_name}, PinDou Puppy has confirmed your booking.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>If your plans change or you need to contact the host, reply to this message.<br>PinDou Puppy looks forward to welcoming you! |
-| confirmed_email_body | {display_name}, PinDou Puppy has confirmed your booking.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>If your plans change or you need to contact the host, email staywithcsq@outlook.com.<br>PinDou Puppy looks forward to welcoming you! | {display_name}, PinDou Puppy has confirmed your booking.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>If your plans change or you need to contact the host, email staywithcsq@outlook.com.<br>PinDou Puppy looks forward to welcoming you! |
-| cancelled_body | {name}，你在 {date} {start}–{end} 的预约已取消。<br>如需重新预约或联系店主：{url} | {display_name}, your booking with PinDou Puppy has been cancelled.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>{contact_instruction}<br>We hope to welcome you another time. |
-| reminder_body | {name}，你在小狗拼豆铺的预约即将开始。<br>{date} {start}–{end} · {guests} 人<br>汉密尔顿当地时间<br>地址：{address}<br>查看预约或联系店主：{url} | {display_name}, your visit to PinDou Puppy is coming up.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>{contact_instruction}<br>PinDou Puppy looks forward to welcoming you! |
+| pending_body | {name}，你的预约申请已收到，正在等待店主确认。<br>{date} {start}–{end} · {guests} 人<br>汉密尔顿当地时间<br>查看预约或联系店主：{url} | {display_name}, Pindou Puppy has received your booking request. It is waiting for the host to confirm.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>{contact_instruction}<br>We will notify you when the host confirms your booking. |
+| confirmed_body | {name}，店主已确认你的预约。<br>{date} {start}–{end} · {guests} 人<br>汉密尔顿当地时间<br>地址：{address}<br>查看预约或联系店主：{url} | {display_name}, Pindou Puppy has confirmed your booking.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>{contact_instruction}<br>Pindou Puppy looks forward to welcoming you! |
+| confirmed_sms_body | {display_name}, Pindou Puppy has confirmed your booking.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>If your plans change or you need to contact the host, reply to this message.<br>Pindou Puppy looks forward to welcoming you! | {display_name}, Pindou Puppy has confirmed your booking.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>If your plans change or you need to contact the host, reply to this message.<br>Pindou Puppy looks forward to welcoming you! |
+| confirmed_email_body | {display_name}, Pindou Puppy has confirmed your booking.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>If your plans change or you need to contact the host, email staywithcsq@outlook.com.<br>Pindou Puppy looks forward to welcoming you! | {display_name}, Pindou Puppy has confirmed your booking.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>If your plans change or you need to contact the host, email staywithcsq@outlook.com.<br>Pindou Puppy looks forward to welcoming you! |
+| cancelled_body | {name}，你在 {date} {start}–{end} 的预约已取消。<br>如需重新预约或联系店主：{url} | {display_name}, your booking with Pindou Puppy has been cancelled.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>{contact_instruction}<br>We hope to welcome you another time. |
+| reminder_body | {name}，你在小狗拼豆铺的预约即将开始。<br>{date} {start}–{end} · {guests} 人<br>汉密尔顿当地时间<br>地址：{address}<br>查看预约或联系店主：{url} | {display_name}, your visit to Pindou Puppy is coming up.<br>{date} {start}-{end} · {guests} {guest_label}<br>Hamilton local time<br>Address: {address}<br>View booking: {url}<br>Studio details: https://pindoupuppy.com/details<br>{contact_instruction}<br>Pindou Puppy looks forward to welcoming you! |
 | contact_by_sms | If your plans change or you need to contact the host, reply to this message. | If your plans change or you need to contact the host, reply to this message. |
 | contact_by_email | If your plans change or you need to contact the host, email staywithcsq@outlook.com. | If your plans change or you need to contact the host, email staywithcsq@outlook.com. |
 | contact_on_booking_page | If your plans change or you need to contact the host, use your booking page. | If your plans change or you need to contact the host, use your booking page. |
@@ -1464,7 +1464,7 @@
 | cb104b5c8d | 3 次普通 + 188 积分 | 3 standard uses + 188 credits |
 | 71b5cdecbe | 登录后购买，权益绑账号 | Sign in to keep purchases on your account |
 | 0b943c7afc | 生成成功才会扣额度，失败不会扣。 | Your allowance is charged only when generation succeeds. |
-| 740e700712 | PinDou 用户 | PinDou user |
+| 740e700712 | Pindou Puppy 用户 | Pindou Puppy user |
 | 39633dce90 | AI 模式 | AI mode |
 | 1838450b3b | Q版后转图纸 | Stylize, then make a pattern |
 | e8a4554eb3 | 普通模式 | Standard mode |
@@ -1481,7 +1481,7 @@
 | b6c2ca4985 | AI 生成仍在处理中，请稍后到作品集查看，或重新提交一次。 | AI is still processing. Check your works shortly before submitting another task. |
 | cfcbc98815 | AI 生成时间较长，请稍后重试；也可以切换普通模式先生成。 | AI is taking longer than expected. Try again later, or try standard mode. |
 | 2a14b6d51e | 图纸生成失败，请重新试一次。 | Pattern generation failed. Please try again. |
-| e192025a0c | PinDou 拼豆图纸 | PinDou bead pattern |
+| e192025a0c | Pindou Puppy 拼豆图纸 | Pindou Puppy bead pattern |
 | 778fc8f994 | 全部 | All |
 | fcb979ef0b | 处理中 | Processing |
 | 2eaa0e3743 | 存相册 | Save image |
@@ -1611,19 +1611,19 @@
 | 8b330eeea4 | 确认重新生成 | Confirm new generation |
 | 6566a95018 | 上传照片 | Upload a photo |
 | 7f18931ff3 | 选一张主体清楚、光线干净的照片。白底卡通和正脸照片最容易出清爽图纸。 | Choose a well-lit photo with a clear subject. Cartoons on a white background and front-facing portraits often work well. |
-| c5b10498cb | PinDou 上传页截图 | PinDou upload screen |
+| c5b10498cb | Pindou Puppy 上传页截图 | Pindou Puppy upload screen |
 | 6ada99c2f4 | 选模式和尺寸 | Choose mode and size |
 | 28f7bcf29e | 卡通原图用普通模式秒出；真人、宠物、实物照片建议 AI 模式，先转 Q 版再量化。 | Use standard mode for an existing cartoon. For people, pets or objects, AI can stylize the photo before conversion. |
-| 2be4c95a22 | PinDou 模式和目标格数选择截图 | PinDou mode and grid size settings |
+| 2be4c95a22 | Pindou Puppy 模式和目标格数选择截图 | Pindou Puppy mode and grid size settings |
 | 4363468b43 | 等待生成 | Wait for generation |
 | 1e3614a55b | 生成中会显示阶段进度。AI 模式稍慢一点，普通模式通常更快。 | Follow the stages as your pattern is made. AI takes a little longer; standard mode is usually quicker. |
-| 2b98d411a3 | PinDou 生成中页面截图 | PinDou generation progress screen |
+| 2b98d411a3 | Pindou Puppy 生成中页面截图 | Pindou Puppy generation progress screen |
 | 881ade0b64 | 检查图纸 | Check the pattern |
 | 0f0c71271c | 看图纸、豆数、色号清单和占比。觉得某块颜色不对，就进入编辑器微调。 | Review the grid, bead count and colour list. Open the editor to adjust colours where needed. |
-| 7231b0e6e7 | PinDou 结果页截图 | PinDou result screen |
+| 7231b0e6e7 | Pindou Puppy 结果页截图 | Pindou Puppy result screen |
 | 20da7ffe6d | 编辑和下载 | Edit and download |
 | 7fcce50449 | 点格改色、全局替换色号，保存后下载 PNG。手机端可分享或长按保存。 | Paint individual cells or replace a colour throughout the pattern, then save and download a PNG. On a phone, share it or touch and hold to save. |
-| ff6d0fec13 | PinDou 图纸编辑器截图 | PinDou pattern editor screen |
+| ff6d0fec13 | Pindou Puppy 图纸编辑器截图 | Pindou Puppy pattern editor screen |
 | 0f1d2bf234 | 秒出 | Quick |
 | c8400530cc | 适合本来就是卡通、线稿、图标的图片 | For existing cartoons, line art and icons |
 | 0bbd9424e6 | 直接量化原图，保留原始构图 | Converts the source image while keeping its composition |
@@ -1635,21 +1635,21 @@
 | 9a1e3cc46c | 统一 128 积分/张，成功才扣 | 128 credits per pattern, charged on success |
 | 0444adb18f | 真实照片、实物、杂色背景，优先用它。 | A good starting point for photos, objects and busy backgrounds. |
 | 2f8c2b38a6 | AI 模式统一 128 积分/张。生成成功才扣，失败不扣。 | AI costs 128 credits per pattern. Successful generations are charged; failed ones are not. |
-| 7c9ac84743 | PinDou 充值中心截图 | PinDou credits and passes screen |
+| 7c9ac84743 | Pindou Puppy 充值中心截图 | Pindou Puppy credits and passes screen |
 | faeef25e4c | 时间卡解锁普通模式不限次，并随卡赠送积分；AI 仍按积分扣。 | Passes include unlimited standard generation and bonus credits. AI still uses credits. |
-| 7d1ae34af0 | PinDou 时间卡会员截图 | PinDou pass options |
+| 7d1ae34af0 | Pindou Puppy 时间卡会员截图 | Pindou Puppy pass options |
 | 300b507fd3 | CDK 兑换 | CDK redemption |
 | 30e7fed91e | 有兑换码时可以直接兑换。游客也能把 CDK 兑到当前设备钱包。 | Redeem a code directly. Guests can add a CDK to their current device wallet too. |
-| de5e95d9ab | PinDou CDK 兑换截图 | PinDou CDK redemption screen |
+| de5e95d9ab | Pindou Puppy CDK 兑换截图 | Pindou Puppy CDK redemption screen |
 | 4358ab83e8 | 额度不足 | Insufficient allowance |
 | f737c9cbfd | 额度不够时会给你三条路：兑换 CDK、注册领礼、充值。 | When your allowance runs out, redeem a CDK, sign up for a welcome allowance, or purchase more. |
-| 092d0f0ee4 | PinDou 额度不足三选一引导截图 | PinDou allowance options |
+| 092d0f0ee4 | Pindou Puppy 额度不足三选一引导截图 | Pindou Puppy allowance options |
 | 0de9c5503e | 新手教程 | Getting started |
 | 69082b2815 | 从照片到拼豆图纸，一页看懂 | From a photo to a bead pattern |
 | eb82fbd80a | 照着这条流程走：上传照片、选择模式、生成图纸、编辑配色、下载保存。第一次用也不会乱。 | Upload, choose a mode, generate, edit colours and download. Follow the steps for your first pattern. |
 | bb98dda057 | 现在去上传 | Upload a photo |
 | ac7bdd7534 | 先看避坑 | Read the tips |
-| 01f16d30a0 | PinDou 结果页预览 | PinDou result preview |
+| 01f16d30a0 | Pindou Puppy 结果页预览 | Pindou Puppy result preview |
 | fd233dfd58 | 教程小节 | Tutorial sections |
 | 2eaed05412 | 普通 vs AI | Standard vs AI |
 | a14c799d9d | 积分会员 | Credits and passes |
@@ -1657,8 +1657,8 @@
 | 26efcd088b | 上传、选择、生成、编辑、下载，五步就能拿到可照着摆的图纸。 | Upload, choose, generate, edit and download: five steps to a pattern you can bead from. |
 | e32b9acfeb | 普通 vs AI 怎么选 | Choosing standard or AI |
 | d30bff5e4b | 不需要纠结参数。看原图类型，选对模式就行。 | Start with your source image and choose the mode that suits it. |
-| 5c5bcb0931 | PinDou 模式和尺寸选择 | PinDou mode and size settings |
-| 807918f91b | PinDou 生成进度 | PinDou generation progress |
+| 5c5bcb0931 | Pindou Puppy 模式和尺寸选择 | Pindou Puppy mode and size settings |
+| 807918f91b | Pindou Puppy 生成进度 | Pindou Puppy generation progress |
 | d7cefc27ac | 积分 / 会员 / CDK 怎么用 | Using credits, passes and CDKs |
 | 3dbec82003 | 一句话：AI 用积分，普通看时间卡或普通额度，CDK 可直接兑换到账户或设备。 | AI uses credits. Standard mode uses a pass or available uses. CDKs can be redeemed to an account or device. |
 | dceac6b0b5 | 避坑 / FAQ | Tips and FAQ |
@@ -1672,7 +1672,7 @@
 | 44a5fb1a71 | 下载后怎么保存？ | How do I save the download? |
 | 557afec843 | 电脑会下载 PNG；手机端优先用分享面板保存，浏览器不支持时可打开高清图后长按保存。 | On a computer, download the PNG. On a phone, use the share panel; if unavailable, open the full-size image and touch and hold to save. |
 | 95844461a8 | 现在做一张自己的拼豆图纸 | Make your own bead pattern |
-| 2d08f109af | 先上传一张你喜欢的照片，PinDou 会帮你整理成可编辑、可下载、可保存的图纸。 | Choose a photo you like and turn it into a pattern you can edit, download and keep. |
+| 2d08f109af | 先上传一张你喜欢的照片，Pindou Puppy 会帮你整理成可编辑、可下载、可保存的图纸。 | Choose a photo you like and turn it into a pattern you can edit, download and keep. |
 | dc83fe2ffb | AI 模式：先把照片变成 Q 版再转图纸，更精细，真人、实物照片强烈推荐（有 AI 参与，稍慢一点）。普通模式：直接量化原图，秒出，适合本来就是卡通的图。 | AI mode stylizes your photo before conversion, helping with portraits and objects. It takes a little longer. Standard mode converts the original directly and works well for existing cartoons. |
 | a3cfbc080f | 格子越多，细节越清楚、越还原；格子越少越好拼，但细节会糊。建议从 52 格起步。格数越高，生成时间也越久哦。 | Larger grids preserve more detail. Smaller grids are easier to bead but lose detail. Start with 52 cells; larger grids also take longer to generate. |
 | 430058dec5 | {v0} 积分/张 | {v0} credits/pattern |
@@ -1868,7 +1868,7 @@
 | sms_content_invalid | 请输入有效的消息内容。 | Enter a valid message. |
 | sms_send_rate_limit | 发送较频繁，请稍候。 | Messages are being sent too quickly. Please wait. |
 | send_uncertain | 提交结果待核对，内容已保留；请先刷新查看，不要重复发送。 | Submission needs checking. Your draft is kept; refresh before sending again. |
-| owner_sms | 小狗拼豆铺：有新的预约申请。{name}，{guests}人，{date} {start}-{end}（汉密尔顿时间）。请处理：https://pindoupuppy.com/manage?view=reservations | PinDou Puppy: new booking request. {name}, {guests} guests, {date} {start}-{end} (Hamilton). Review: https://pindoupuppy.com/manage?view=reservations |
+| owner_sms | 小狗拼豆铺：有新的预约申请。{name}，{guests}人，{date} {start}-{end}（汉密尔顿时间）。请处理：https://pindoupuppy.com/manage?view=reservations | Pindou Puppy: new booking request. {name}, {guests} guests, {date} {start}-{end} (Hamilton). Review: https://pindoupuppy.com/manage?view=reservations |
 | today | 今天 | Today |
 | yesterday | 昨天 | Yesterday |
 | loading | 加载中 | Loading |
@@ -1887,7 +1887,7 @@
 | privacy_title | 隐私政策说明 | Privacy notice |
 | agreement_title | 用户服务协议 | Service terms |
 | updated | 更新日期：2026 年 9 月 12 日 | Updated: September 12, 2026 |
-| privacy_intro | 本说明适用于小狗拼豆铺（PinDou Puppy）的小程序及共用的账号、预约和图纸服务。我们按你使用的功能处理相应信息。你可以先浏览首页和店铺信息，再决定是否登录、预约或上传图片。 | This notice covers the PinDou Puppy mini program and its shared account, booking and pattern services. We process information for the features you choose. You can browse the home page and studio information before deciding to sign in, book or upload an image. |
+| privacy_intro | 本说明适用于小狗拼豆铺（Pindou Puppy）的小程序及共用的账号、预约和图纸服务。我们按你使用的功能处理相应信息。你可以先浏览首页和店铺信息，再决定是否登录、预约或上传图片。 | This notice covers the Pindou Puppy mini program and its shared account, booking and pattern services. We process information for the features you choose. You can browse the home page and studio information before deciding to sign in, book or upload an image. |
 | identity_title | 账号与个人资料 | Account and profile |
 | identity_body | 微信登录使用微信提供的登录凭证与身份标识，用于验证登录、关联账号和完成网站扫码授权。邮箱登录使用你填写的邮箱和密码。昵称、头像和选填的微信号由你主动填写或选择。店主可查看当前账号的顾客编号、昵称、头像、预约称呼及你提供的联系方式，用于核对预约和沟通；不会按同名或同一联系方式自动合并账号。打开首页不会自动取得微信手机号、微信号、昵称或头像。 | WeChat login uses credentials and identifiers supplied by WeChat to authenticate you, link your account and approve website sign-in. Email login uses the email address and password you enter. You choose your nickname and avatar and may provide a WeChat ID. The host can see your customer reference, nickname, avatar, booking name and provided contact details to match bookings and communicate. Accounts are not automatically merged by matching names or contact details. Opening the home page does not automatically give us your WeChat phone number, WeChat ID, nickname or avatar. |
 | booking_title | 预约与联系资料 | Bookings and contact details |
@@ -1902,7 +1902,7 @@
 | storage_body | 账号、预约及相关账务记录用于提供服务、处理安排和核对历史记录。图片与图纸按你使用的功能保存在服务中；已保存的作品可在作品集中删除。退出登录不会删除服务器资料。如需删除账号、预约资料或查询保存情况，请联系店主。处理前需要验证账号归属，并说明哪些记录仍因必要的服务或法律要求需要保留。 | Account, booking and related ledger records support service delivery, arrangements and historical reconciliation. Images and patterns are retained by the features you use; saved works can be deleted from your collection. Signing out does not delete server-side information. Contact the host to request account or booking-data deletion or ask about retention. We need to verify ownership and explain any records that must remain for necessary service or legal requirements. |
 | choices_title | 你的选择 | Your choices |
 | choices_body | 你可以查看和修改个人资料、管理预约、删除作品，或停止使用需要相关信息的功能。如需查询、更正、删除信息或撤回后续处理的同意，请联系店主。阅读本说明不会替你同意授权；微信权限选择和图片上传前的确认分别生效。 | You can view and edit your profile, manage bookings, delete works or stop using features that need the information. Contact the host to request access, correction, deletion or withdrawal of consent for future processing. Reading this notice does not grant consent. WeChat permission choices and the confirmation before image upload are separate actions. |
-| terms_intro | 小狗拼豆铺提供到店拼豆体验预约、账号管理与拼豆图纸工具。使用相应功能前，请阅读以下说明及隐私政策。 | PinDou Puppy provides studio-experience bookings, account management and bead-pattern tools. Please read these terms and the privacy notice before using the relevant features. |
+| terms_intro | 小狗拼豆铺提供到店拼豆体验预约、账号管理与拼豆图纸工具。使用相应功能前，请阅读以下说明及隐私政策。 | Pindou Puppy provides studio-experience bookings, account management and bead-pattern tools. Please read these terms and the privacy notice before using the relevant features. |
 | service_title | 到店预约 | Studio bookings |
 | service_body | 提交预约表示向店主提出到访申请，需要店主确认后才安排完成。请核对人数、体验、联系方式及汉密尔顿当地日期和时间。实际接待以店主确认的安排为准。展示价格用于了解体验，预约提交本身不会收取线上费用。 | Submitting a booking sends a visit request to the host; the arrangement is complete after confirmation. Check the party size, experience, contact details and Hamilton local date and time. The confirmed arrangement governs your visit. Displayed prices describe the experience; submitting a booking does not charge an online payment. |
 | cancellation_title | 更改与取消 | Changes and cancellations |
@@ -1932,9 +1932,9 @@
 
 | 键 | 中文 | English |
 |---|---|---|
-| brand | 小狗拼豆铺 | PinDou Puppy |
+| brand | 小狗拼豆铺 | Pindou Puppy |
 | check_code | 校验码 {v0} | Verification number {v0} |
-| confirm_title | 登录小狗拼豆铺 | Sign in to PinDou Puppy |
+| confirm_title | 登录小狗拼豆铺 | Sign in to Pindou Puppy |
 | link_title | 绑定你的微信 | Connect your WeChat |
 | site | 正在访问 pindoupuppy.com | Visiting pindoupuppy.com |
 | confirm_help | 请确认电脑上的校验码与这里一致，再继续。 | Check that the number on your computer matches before continuing. |
@@ -1949,7 +1949,7 @@
 | cancelled | 已取消本次登录 | This sign-in was cancelled |
 | home | 回到小程序首页 | Mini program home |
 | retry | 重新尝试 | Try again |
-| native_title | 欢迎来到小狗拼豆铺 | Welcome to PinDou Puppy |
+| native_title | 欢迎来到小狗拼豆铺 | Welcome to Pindou Puppy |
 | native_intro | 已有网站账号，登录后可查看预约、积分和时长。 | Sign in with your website account to view bookings, points and studio time. |
 | email | 邮箱地址 | Email address |
 | password | 密码 | Password |
@@ -2068,9 +2068,9 @@
 | version_conflict | 设置已在其他窗口更新，请刷新后再保存。 | Settings changed in another window. Refresh before saving. |
 | generic_error | 操作暂未完成，请重试。 | Could not complete the action. Please try again. |
 | loading | 正在读取提醒设置… | Loading alert settings… |
-| message_created | 小狗拼豆铺 · 新预约待确认 | PinDou Puppy · New reservation request |
-| message_cancelled | 小狗拼豆铺 · 顾客取消预约 | PinDou Puppy · Customer cancelled a reservation |
-| message_test | 小狗拼豆铺 · 微信提醒测试 | PinDou Puppy · WeChat alert test |
+| message_created | 小狗拼豆铺 · 新预约待确认 | Pindou Puppy · New reservation request |
+| message_cancelled | 小狗拼豆铺 · 顾客取消预约 | Pindou Puppy · Customer cancelled a reservation |
+| message_test | 小狗拼豆铺 · 微信提醒测试 | Pindou Puppy · WeChat alert test |
 | message_test_body | 这是一条店主提醒测试。看到这条消息，表示微信接收渠道已连通。没有创建或更改任何顾客预约。 | This is a test of your owner alerts. Receiving it confirms the WeChat channel is working. No customer reservation was created or changed. |
 | message_name | 称呼 | Name |
 | message_time | 到店时间 | Visit time |
@@ -2088,7 +2088,7 @@
 | wechat_only | 请在微信小程序中允许提醒。 | Allow alerts in the WeChat mini-program. |
 | title | 店主微信提醒 | Owner WeChat alerts |
 | page_title | 店主预约提醒 | Owner booking alerts |
-| studio | 小狗拼豆铺 | PinDou Puppy |
+| studio | 小狗拼豆铺 | Pindou Puppy |
 | customer | 顾客 | Customer |
 | card_note | {guests}人 · 汉密尔顿时间 | {guests} guests · Hamilton time |
 | setup_template | 配置新预约通知 | Set up booking notifications |
@@ -2242,8 +2242,8 @@
 | hamilton_ontario_canada_fbf034 | 加拿大 · 安大略省 · 汉密尔顿 | Hamilton, Ontario, Canada |
 | a_little_time_all_yours_9e9d60 | 属于你的 | A little time. All yours. |
 | make_something_lovely_04db64 | 全新拼豆手作体验 | Make something lovely. |
-| welcome_to_pindo_puppychoose_an_afternoon_and_247303 | 欢迎光临小狗拼豆铺。<br>也许是某一个下午，选一张自己喜欢的图，<br>坐在阳光下，把一颗颗豆子，变成独属于你的快乐。 | Welcome to Pindo Puppy.<br>Choose an afternoon and a pattern you love.<br>Sit in the sunshine, turning tiny beads into happiness of your own. |
-| sunlit_worktables_and_a_wall_of_bead_46e326 | 小狗拼豆铺的白色工作台、拼豆作品墙与自然光 | Sunlit worktables and a wall of bead art at Pindo Puppy |
+| welcome_to_pindo_puppychoose_an_afternoon_and_247303 | 欢迎光临小狗拼豆铺。<br>也许是某一个下午，选一张自己喜欢的图，<br>坐在阳光下，把一颗颗豆子，变成独属于你的快乐。 | Welcome to Pindou Puppy.<br>Choose an afternoon and a pattern you love.<br>Sit in the sunshine, turning tiny beads into happiness of your own. |
+| sunlit_worktables_and_a_wall_of_bead_46e326 | 小狗拼豆铺的白色工作台、拼豆作品墙与自然光 | Sunlit worktables and a wall of bead art at Pindou Puppy |
 | come_create_2eee81 | 来拼豆吧 | Come create |
 | little_shop_c97261 | 拼豆小店 | Little shop |
 | time_for_yourself_9e1db5 | 一人放空 | Time for yourself |
@@ -2255,7 +2255,7 @@
 | we_turned_a_room_in_our_home_3b9cec | 这是一个家庭工作坊，我们把家里的一个房间，慢慢变成了拼豆小屋。 | We turned a room in our home into a little workshop for making things with beads. |
 | come_for_a_beadmaking_experience_pick_up_061846 | 你可以来体验拼豆，也可以购置自己的拼豆工具；你可以买下拼豆作品，也可以定制独一无二的图案。 | Come for a bead-making experience, pick up tools for home, choose a handmade piece, or talk to us about a pattern made just for you. |
 | come_alone_for_a_quiet_moment_or_6cec34 | 一个人来，安安静静地拼；或者约上朋友，边聊边做。 | Come alone for a quiet moment, or bring a friend and catch up while you create. |
-| slow_down_at_pindo_puppy_and_enjoy_8b796a | 在小狗拼豆铺慢下来吧，感受手工的快乐。 | Slow down at Pindo Puppy and enjoy the simple pleasure of making by hand. |
+| slow_down_at_pindo_puppy_and_enjoy_8b796a | 在小狗拼豆铺慢下来吧，感受手工的快乐。 | Slow down at Pindou Puppy and enjoy the simple pleasure of making by hand. |
 | studio_details_7c4089 | 拼豆铺详细信息 | Studio details |
 | happiness_takes_many_shapes_c5b449 | 快乐，有很多种形状。 | Happiness takes many shapes. |
 | browse_the_studio_journal_39842d | 翻翻小狗日记 | Browse the studio journal |
@@ -2278,7 +2278,7 @@
 |---|---|---|
 | life_in_our_1d9155 | 铺子里 | Stories from |
 | little_studio_902113 | 发生过的事 | the studio |
-| new_pieces_on_the_wall_new_colours_0e0a4b | 墙上的新作品、桌上的新颜色，以及每一个认真拼豆的下午。这里的照片，都是小狗拼豆铺的真实日常。 | New pieces on the wall, new colours on the table, and afternoons well spent. Real photographs from everyday life at Pindo Puppy. |
+| new_pieces_on_the_wall_new_colours_0e0a4b | 墙上的新作品、桌上的新颜色，以及每一个认真拼豆的下午。这里的照片，都是小狗拼豆铺的真实日常。 | New pieces on the wall, new colours on the table, and afternoons well spent. Real photographs from everyday life at Pindou Puppy. |
 | more_stories_on_xiaohongshu_d10ec3 | 去小红书看更多日常 | More stories on Xiaohongshu |
 | beadmaking_stories_by_xiaogou_shuangji_efb72f | 小狗双吉的拼豆日记 | Bead-making stories by Xiaogou Shuangji |
 | xiaogou_shuangji_xiaohongshu_380bde | 小狗双吉 · 小红书 | Xiaogou Shuangji · Xiaohongshu |
@@ -2310,9 +2310,9 @@
 | could_not_sign_in_4e21bb | 暂时无法登录。 | Could not sign in. |
 | could_not_load_requests_bd1427 | 加载失败。 | Could not load requests. |
 | could_not_save_this_request_may_have_c04e66 | 未能保存。记录可能已在另一处更新，请刷新核对后重试。 | Could not save. This request may have changed elsewhere. Refresh and check before retrying. |
-| pindo_puppy_08aa61 | 小狗拼豆铺 | Pindo Puppy |
+| pindo_puppy_08aa61 | 小狗拼豆铺 | Pindou Puppy |
 | a_little_creative_studio_72779b | 小狗拼豆铺 | A LITTLE CREATIVE STUDIO |
-| pindo_puppy_studio_98f0bc | 小狗拼豆铺工作室 | Pindo Puppy studio |
+| pindo_puppy_studio_98f0bc | 小狗拼豆铺工作室 | Pindou Puppy studio |
 | every_little_plan_deserves_a_little_care_12f43a | 每一份期待，值得好好照顾。 | Every little plan deserves a little care. |
 | hamilton_ontario_1f281c | 汉密尔顿 · 安大略省 | Hamilton, Ontario |
 | welcome_back_to_your_studio_5785ce | 欢迎回到小狗拼豆铺 | WELCOME BACK TO YOUR STUDIO |
@@ -2322,7 +2322,7 @@
 | password_db2477 | 密码 | Password |
 | signing_in_f2f0b2 | 正在登录… | Signing in… |
 | open_studio_desk_d62008 | 进入工作台 | Open studio desk |
-| use_your_existing_pindou_administrator_account_ac1b0a | 使用现有拼豆后台的管理员账号。 | Use your existing PinDou administrator account. |
+| use_your_existing_pindou_administrator_account_ac1b0a | 使用现有拼豆后台的管理员账号。 | Use your existing Pindou Puppy administrator account. |
 | back_to_the_website_19fd8b | 返回网站 | Back to the website |
 | request_status_f5815f | 请求状态 | Request status |
 | all_requests_26d41f | 全部 | All requests |
@@ -2803,7 +2803,7 @@
 
 | 键 | 中文 | English |
 |---|---|---|
-| pindo_puppy_a_little_creative_studio_in_d8b24c | 小狗拼豆铺 · 汉密尔顿拼豆手作体验 | Pindo Puppy · A little creative studio in Hamilton |
+| pindo_puppy_a_little_creative_studio_in_d8b24c | 小狗拼豆铺 · 汉密尔顿拼豆手作体验 | Pindou Puppy · A little creative studio in Hamilton |
 | too_many_requests_please_try_again_later_7d3a95 | 提交次数较多，请稍后再试，或通过微信联系店主。 | Too many requests. Please try again later or contact us on WeChat. |
 | please_check_the_date_time_and_contact_baa037 | 请检查日期、时间和联系信息，再试一次。 | Please check the date, time and contact details, then try again. |
 | please_sign_in_with_an_administrator_account_801902 | 登录已过期或账号无管理权限，请重新登录。 | Please sign in with an administrator account. |
@@ -2816,7 +2816,7 @@
 | privacy_title | 隐私政策说明 | Privacy notice |
 | agreement_title | 用户服务协议 | Service terms |
 | updated | 更新日期：2026 年 9 月 16 日 | Updated: September 16, 2026 |
-| privacy_intro | 本说明适用于小狗拼豆铺（PinDou Puppy）小程序的店铺信息、账号、预约及店主工作台服务。我们按你使用的功能处理相应信息。你可以先浏览首页和店铺信息，再决定是否登录、预约或设置头像。 | This notice covers studio information, accounts, bookings and the host workspace in the PinDou Puppy mini program. We process information for the features you choose. You can browse the home page and studio information before deciding to sign in, book or set an avatar. |
+| privacy_intro | 本说明适用于小狗拼豆铺（Pindou Puppy）小程序的店铺信息、账号、预约及店主工作台服务。我们按你使用的功能处理相应信息。你可以先浏览首页和店铺信息，再决定是否登录、预约或设置头像。 | This notice covers studio information, accounts, bookings and the host workspace in the Pindou Puppy mini program. We process information for the features you choose. You can browse the home page and studio information before deciding to sign in, book or set an avatar. |
 | identity_title | 账号与个人资料 | Account and profile |
 | identity_body | 微信登录使用微信提供的登录凭证与身份标识，用于验证登录、关联账号和完成网站扫码授权。邮箱登录使用你填写的邮箱和密码。昵称、头像和选填的微信号由你主动填写或选择。店主可查看当前账号的顾客编号、昵称、头像、预约称呼及你提供的联系方式，用于核对预约和沟通；不会按同名或同一联系方式自动合并账号。打开首页不会自动取得微信手机号、微信号、昵称或头像。 | WeChat login uses credentials and identifiers supplied by WeChat to authenticate you, link your account and approve website sign-in. Email login uses the email address and password you enter. You choose your nickname and avatar and may provide a WeChat ID. The host can see your customer reference, nickname, avatar, booking name and provided contact details to match bookings and communicate. Accounts are not automatically merged by matching names or contact details. Opening the home page does not automatically give us your WeChat phone number, WeChat ID, nickname or avatar. |
 | booking_title | 预约与联系资料 | Bookings and contact details |
@@ -2831,7 +2831,7 @@
 | storage_body | 账号、预约及相关账务记录用于提供服务、处理安排和核对历史记录。你选择的头像保存在账号服务中，可以在个人资料中更换。退出登录不会删除服务器资料。如需删除账号、预约资料或查询保存情况，请联系店主。处理前需要验证账号归属，并说明哪些记录仍因必要的服务或法律要求需要保留。 | Account, booking and related ledger records support service delivery, arrangements and historical reconciliation. Your selected avatar is stored in the account service and can be replaced in your profile. Signing out does not delete server-side information. Contact the host to request account or booking-data deletion or ask about retention. We need to verify ownership and explain any records that must remain for necessary service or legal requirements. |
 | choices_title | 你的选择 | Your choices |
 | choices_body | 你可以查看和修改个人资料、管理预约和提醒偏好，或停止使用需要相关信息的功能。如需查询、更正、删除信息或撤回后续处理的同意，请联系店主。阅读本说明不会替你同意授权；微信权限选择和头像设置由你主动操作。 | You can view and edit your profile, manage bookings and notification preferences, or stop using features that need the information. Contact the host to request access, correction, deletion or withdrawal of consent for future processing. Reading this notice does not grant consent. WeChat permission choices and avatar selection are actions you initiate. |
-| terms_intro | 小狗拼豆铺小程序提供店铺信息、到店体验预约、账号及提醒管理，店主可通过工作台处理预约、顾客和经营记录。请根据实际需要使用相应功能。 | The PinDou Puppy mini program provides studio information, visit bookings, accounts and notification settings. The host workspace manages bookings, customers and business records. Use the features you need. |
+| terms_intro | 小狗拼豆铺小程序提供店铺信息、到店体验预约、账号及提醒管理，店主可通过工作台处理预约、顾客和经营记录。请根据实际需要使用相应功能。 | The Pindou Puppy mini program provides studio information, visit bookings, accounts and notification settings. The host workspace manages bookings, customers and business records. Use the features you need. |
 | service_title | 到店预约 | Studio bookings |
 | service_body | 提交预约表示向店主提出到访申请，需要店主确认后才安排完成。请核对人数、体验、联系方式及汉密尔顿当地日期和时间。实际接待以店主确认的安排为准。展示价格用于了解体验，预约提交本身不会收取线上费用。 | Submitting a booking sends a visit request to the host; the arrangement is complete after confirmation. Check the party size, experience, contact details and Hamilton local date and time. The confirmed arrangement governs your visit. Displayed prices describe the experience; submitting a booking does not charge an online payment. |
 | cancellation_title | 更改与取消 | Changes and cancellations |
@@ -2889,12 +2889,12 @@
 | telegram_not_configured | 请先保存有效的 Bot Token。 | Save a valid bot token first. |
 | telegram_not_bound | 请先绑定接收人并开启提醒。 | Connect a recipient and enable alerts first. |
 | telegram_binding_expired | 绑定链接已过期，请重新生成。 | Pairing link expired. Generate a new one. |
-| telegram_in_use | 这个机器人已连接其他接收服务，请使用专用于小狗拼豆铺的机器人。 | This bot is connected to another update service. Use a dedicated PinDou Puppy bot. |
+| telegram_in_use | 这个机器人已连接其他接收服务，请使用专用于小狗拼豆铺的机器人。 | This bot is connected to another update service. Use a dedicated Pindou Puppy bot. |
 | telegram_blocked | 机器人无法向接收人发消息，请在 Telegram 中解除屏蔽并重新绑定。 | The bot cannot message the recipient. Unblock it in Telegram and reconnect. |
 | telegram_rate_limit | Telegram 暂时限制发送，系统会按要求重试。 | Telegram limited requests temporarily. The system will retry after the required delay. |
 | telegram_network_error | 暂时无法连接 Telegram，稍后重试。 | Temporarily unable to reach Telegram. Retry shortly. |
 | telegram_rejected | Telegram 未接受请求，请检查机器人与接收人设置。 | Telegram rejected the request. Check the bot and recipient settings. |
-| message_test | 🐶 小狗拼豆铺 · Telegram 提醒测试 | 🐶 PinDou Puppy · Telegram alert test |
+| message_test | 🐶 小狗拼豆铺 · Telegram 提醒测试 | 🐶 Pindou Puppy · Telegram alert test |
 | message_test_body | 店主预约提醒已连接。新预约和顾客取消预约会发到这个对话。你可以置顶此对话，并在 Telegram 中开启通知。<br><br>这是一条测试消息，没有创建或修改任何顾客预约。 | Owner reservation alerts are connected. New reservations and customer cancellations will appear in this chat. You can pin it and enable Telegram notifications.<br><br>This is a test message. No customer reservation was created or changed. |
 
 ## visit-flow.json

@@ -384,8 +384,8 @@
     "Your allowance is charged only when generation succeeds."
   ],
   "740e700712": [
-    "PinDou 用户",
-    "PinDou user"
+    "Pindou Puppy 用户",
+    "Pindou Puppy user"
   ],
   "39633dce90": [
     "AI 模式",
@@ -452,8 +452,8 @@
     "Pattern generation failed. Please try again."
   ],
   "e192025a0c": [
-    "PinDou 拼豆图纸",
-    "PinDou bead pattern"
+    "Pindou Puppy 拼豆图纸",
+    "Pindou Puppy bead pattern"
   ],
   "778fc8f994": [
     "全部",
@@ -972,8 +972,8 @@
     "Choose a well-lit photo with a clear subject. Cartoons on a white background and front-facing portraits often work well."
   ],
   "c5b10498cb": [
-    "PinDou 上传页截图",
-    "PinDou upload screen"
+    "Pindou Puppy 上传页截图",
+    "Pindou Puppy upload screen"
   ],
   "6ada99c2f4": [
     "选模式和尺寸",
@@ -984,8 +984,8 @@
     "Use standard mode for an existing cartoon. For people, pets or objects, AI can stylize the photo before conversion."
   ],
   "2be4c95a22": [
-    "PinDou 模式和目标格数选择截图",
-    "PinDou mode and grid size settings"
+    "Pindou Puppy 模式和目标格数选择截图",
+    "Pindou Puppy mode and grid size settings"
   ],
   "4363468b43": [
     "等待生成",
@@ -996,8 +996,8 @@
     "Follow the stages as your pattern is made. AI takes a little longer; standard mode is usually quicker."
   ],
   "2b98d411a3": [
-    "PinDou 生成中页面截图",
-    "PinDou generation progress screen"
+    "Pindou Puppy 生成中页面截图",
+    "Pindou Puppy generation progress screen"
   ],
   "881ade0b64": [
     "检查图纸",
@@ -1008,8 +1008,8 @@
     "Review the grid, bead count and colour list. Open the editor to adjust colours where needed."
   ],
   "7231b0e6e7": [
-    "PinDou 结果页截图",
-    "PinDou result screen"
+    "Pindou Puppy 结果页截图",
+    "Pindou Puppy result screen"
   ],
   "20da7ffe6d": [
     "编辑和下载",
@@ -1020,8 +1020,8 @@
     "Paint individual cells or replace a colour throughout the pattern, then save and download a PNG. On a phone, share it or touch and hold to save."
   ],
   "ff6d0fec13": [
-    "PinDou 图纸编辑器截图",
-    "PinDou pattern editor screen"
+    "Pindou Puppy 图纸编辑器截图",
+    "Pindou Puppy pattern editor screen"
   ],
   "0f1d2bf234": [
     "秒出",
@@ -1068,16 +1068,16 @@
     "AI costs 128 credits per pattern. Successful generations are charged; failed ones are not."
   ],
   "7c9ac84743": [
-    "PinDou 充值中心截图",
-    "PinDou credits and passes screen"
+    "Pindou Puppy 充值中心截图",
+    "Pindou Puppy credits and passes screen"
   ],
   "faeef25e4c": [
     "时间卡解锁普通模式不限次，并随卡赠送积分；AI 仍按积分扣。",
     "Passes include unlimited standard generation and bonus credits. AI still uses credits."
   ],
   "7d1ae34af0": [
-    "PinDou 时间卡会员截图",
-    "PinDou pass options"
+    "Pindou Puppy 时间卡会员截图",
+    "Pindou Puppy pass options"
   ],
   "300b507fd3": [
     "CDK 兑换",
@@ -1088,8 +1088,8 @@
     "Redeem a code directly. Guests can add a CDK to their current device wallet too."
   ],
   "de5e95d9ab": [
-    "PinDou CDK 兑换截图",
-    "PinDou CDK redemption screen"
+    "Pindou Puppy CDK 兑换截图",
+    "Pindou Puppy CDK redemption screen"
   ],
   "4358ab83e8": [
     "额度不足",
@@ -1100,8 +1100,8 @@
     "When your allowance runs out, redeem a CDK, sign up for a welcome allowance, or purchase more."
   ],
   "092d0f0ee4": [
-    "PinDou 额度不足三选一引导截图",
-    "PinDou allowance options"
+    "Pindou Puppy 额度不足三选一引导截图",
+    "Pindou Puppy allowance options"
   ],
   "0de9c5503e": [
     "新手教程",
@@ -1124,8 +1124,8 @@
     "Read the tips"
   ],
   "01f16d30a0": [
-    "PinDou 结果页预览",
-    "PinDou result preview"
+    "Pindou Puppy 结果页预览",
+    "Pindou Puppy result preview"
   ],
   "fd233dfd58": [
     "教程小节",
@@ -1156,12 +1156,12 @@
     "Start with your source image and choose the mode that suits it."
   ],
   "5c5bcb0931": [
-    "PinDou 模式和尺寸选择",
-    "PinDou mode and size settings"
+    "Pindou Puppy 模式和尺寸选择",
+    "Pindou Puppy mode and size settings"
   ],
   "807918f91b": [
-    "PinDou 生成进度",
-    "PinDou generation progress"
+    "Pindou Puppy 生成进度",
+    "Pindou Puppy generation progress"
   ],
   "d7cefc27ac": [
     "积分 / 会员 / CDK 怎么用",
@@ -1216,7 +1216,7 @@
     "Make your own bead pattern"
   ],
   "2d08f109af": [
-    "先上传一张你喜欢的照片，PinDou 会帮你整理成可编辑、可下载、可保存的图纸。",
+    "先上传一张你喜欢的照片，Pindou Puppy 会帮你整理成可编辑、可下载、可保存的图纸。",
     "Choose a photo you like and turn it into a pattern you can edit, download and keep."
   ],
   "dc83fe2ffb": [

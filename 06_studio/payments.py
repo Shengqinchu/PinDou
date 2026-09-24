@@ -81,7 +81,7 @@ class Gateway:
         result = self.request("/payment/do.html", {
             "version": "1.1", "trade_order_id": order_id,
             "total_fee": f"{cny_fen // 100}.{cny_fen % 100:02d}",
-            "title": "PinDou Puppy Studio", "plugins": "pindou-studio",
+            "title": "Pindou Puppy Studio", "plugins": "pindou-studio",
             "notify_url": self.origin + "/studio-api/payments/hupijiao/notify",
             "return_url": self.origin + "/studio/order/" + order_id,
         })

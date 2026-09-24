@@ -568,7 +568,7 @@ async function downloadCurrentPattern(): Promise<void> {
     const fetchStartedAt = performance.now();
     const result = await downloadImage(url, downloadFileName.value, {
       preferNativeShare,
-      shareTitle: gt('PinDou 拼豆图纸'),
+      shareTitle: gt('Pindou Puppy 拼豆图纸'),
       shareText: gt('保存到相册或分享这张拼豆图纸。')
     });
     console.info(`[PinDou] 下载 fetch 段 ${Math.round(performance.now() - fetchStartedAt)}ms`);
