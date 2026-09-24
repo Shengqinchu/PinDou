@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import LiftTitle from '../components/LiftTitle.vue';
 import CancelReservation from '../components/CancelReservation.vue';
-import notices from '../content/customer-notifications.json';
 import { reservationRevision } from '../cancellation';
 import CopyContact from "../components/CopyContact.vue";
 import OfferLabel from '../visit/OfferLabel.vue';
@@ -152,8 +151,8 @@ onBeforeUnmount(() => {
       <PhArrowClockwise :class="{ spinning: busy }" />{{
         say(copyText.refresh_reservation_30af18)
       }}
-    </button><CancelReservation v-if="result" :reservation="result"/><RouterLink v-if="result" class="button button-primary" :to="{path:'/messages',query:{reservation:result.id}}">{{say(notices.contact_host)}}</RouterLink></div>
-    <p class="fine-print">
+     </button><CancelReservation v-if="result" :reservation="result"/></div>
+     <p class="fine-print reservation-receipt-contacts">
       {{ say(copyText.for_changes_contact_the_host_on_wechat_2921d8)
       }}<CopyContact :value="wechat" /> · {{ say(copyText.phone_0614da)
       }}<a :href="phoneHref">{{ phone }}</a> · {{say(copyText.email)}}<a :href="'mailto:'+email">{{email}}</a>

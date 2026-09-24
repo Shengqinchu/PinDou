@@ -1,5 +1,6 @@
 .reservation-cancel-link{color:#875652;font-size:13px;min-height:44px;}
 .reservation-receipt-actions{display:flex;align-items:center;gap:12px 28px;flex-wrap:wrap;}
+.reservation-receipt-contacts{margin-top:12px;line-height:1.8;overflow-wrap:anywhere}
 .wallet-bookings .reservation-cancel-link{margin:0 0 12px;}
 .modal-shell.cancellation-dialog{position:fixed;inset:var(--visible-top,0px) 0 auto;width:100%;height:var(--visible-height,100dvh);max-width:none;max-height:none;padding:18px;margin:0;border:0;background:transparent;overflow:hidden;}
 .cancellation-dialog[open]{display:grid;place-items:center;}

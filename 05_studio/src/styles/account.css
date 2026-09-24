@@ -25,10 +25,12 @@
 .account-bookings a > span:first-child { flex: 1; }
 .account-bookings small { display: block; margin-top: 6px; color: var(--muted); }
 .account-bookings svg { flex-shrink: 0; }
-.account-signout { justify-self: start; min-height: 44px; }
-.account-content > .text-link,.account-content > details summary,.account-content > .account-signout{text-decoration:none;text-underline-offset:0}
-.account-content > .text-link:hover,.account-content > .account-signout:hover{text-decoration:none}
+.account-action{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:48px;padding:10px 4px;border:0;border-radius:8px;background:transparent;color:var(--ink);font:inherit;font-size:15px;text-align:left;text-decoration:none;cursor:pointer}
+.account-action:hover{background:#f2f8fb;text-decoration:none}.account-action:focus-visible{outline:2px solid #66849a;outline-offset:2px}
+.account-action>svg{flex-shrink:0}.account-notifications{min-width:0}.account-notifications summary{list-style:none}.account-notifications summary::-webkit-details-marker{display:none}.account-notifications[open] summary>svg{transform:rotate(180deg)}
+.account-signout{justify-self:stretch}
 .booking-profile-section[open]{display:grid}.booking-profile-section summary{cursor:pointer;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:17px;font-weight:550;list-style:none}.booking-profile-section summary::-webkit-details-marker{display:none}.booking-profile-toggle{display:grid;place-items:center;width:32px;height:32px;flex:none;border:1px solid var(--line);border-radius:50%}.booking-profile-section[open] .booking-profile-toggle{transform:rotate(180deg)}
+.booking-profile-help{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.7}
 .reservation-account-note { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .container.account-page { max-width: 680px; padding-block: clamp(24px,4vh,48px); min-height: 65vh; }
 .account-page h1 { font-size: clamp(30px,4vw,46px); margin: 0 0 32px; }

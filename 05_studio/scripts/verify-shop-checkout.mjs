@@ -14,7 +14,7 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
   const context=await browser.newContext({viewport:{width:390,height:844},locale:'zh-CN'});
   await context.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','zh')});
   const page=await context.newPage();page.setDefaultTimeout(12000);
-  const errors=[];page.on('pageerror',e=>errors.push(e.message));let placed=0;
+  const errors=[];page.on('pageerror',e=>errors.push(e.stack||e.message));let placed=0;
   await page.route('**/studio-api/shop/catalog',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({products:[product],categories:[{id:'refills',parent_id:null,zh:'拼豆补充装',en:'Refills',sort:1,visible:true,version:1},{id:'refill-a',parent_id:'refills',zh:'A系列',en:'A series',sort:2,visible:true,version:1}],checkout_ready:false,manual_ordering_ready:true})}));
   await page.route('**/qa-img/*.png',route=>route.fulfill({status:200,contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==','base64')}));
   await page.route('**/studio-api/shop/cart/quote',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(quote)}));
@@ -36,6 +36,12 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
   await page.getByRole('button',{name:'提交订单'}).click();
   await page.waitForURL('**/shop/checkout');
   await page.getByRole('heading',{name:'请填写收货信息'}).waitFor();
+  const payment=page.locator('.shop-delivery-notice');
+  assert.equal((await payment.textContent()).split('\n').length,3);
+  assert.equal(await payment.evaluate(node=>getComputedStyle(node).whiteSpace),'pre-line');
+  await page.locator('.vision-header-actions .language-button').click();
+  assert.equal((await payment.textContent()).split('\n').length,3);
+  await page.locator('.vision-header-actions .language-button').click();
   assert.equal(placed,0);
   await page.getByText('8 Hughson St N, Hamilton, ON L8R 0B1').waitFor();
   await page.getByRole('button',{name:'确认提交订单'}).click();
@@ -58,7 +64,7 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
   assert.equal(await page.getByText('您已成功提交订单，店主将会联系您，请注意查收信息，谢谢合作！').count(),1);
   assert.equal(await page.locator('.shop-manual-receipt').getByRole('button',{name:'复制'}).count(),0);
   assert.equal(await page.locator('.shop-manual-receipt').getByText('短信').count(),0);
-  assert.deepEqual(errors,[]);
+  assert.deepEqual(errors.filter(error=>!error.includes('static.cloudflareinsights.com/beacon.min.js')),[]);
   await page.screenshot({path:new URL(name+'-success.png',output).pathname.replace(/^\/([A-Za-z]:)/,'$1')});
   await page.goto(base+'/shop?view=orders');
   await page.locator('.shop-order-history-card').waitFor();

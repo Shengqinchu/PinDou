@@ -7,6 +7,8 @@ import { orderWords as o, manualStates, manualStatus } from '../../shop-ordering
 import { say, tr } from '../../state';
 import SlideOver from '../SlideOver.vue';
 import CopyContact from '../CopyContact.vue';
+import '../../styles/shop.css';
+import '../../styles/shop-ordering.css';
 const {request}=useDesk();
 const items=ref<Order[]>([]),total=ref(0),page=ref(1),search=ref(''),status=ref('all'),busy=ref(false),error=ref(''),open=ref(false),selected=ref<Order>(),newStatus=ref('manual_pending'),staffNote=ref(''),confirmDelete=ref(false);
 let seq=0,timer:ReturnType<typeof setTimeout>;

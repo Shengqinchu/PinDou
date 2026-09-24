@@ -350,6 +350,10 @@
       "个人资料",
       "Personal details"
     ],
+    "helper": [
+      "填写信息可用于预约到店或商品收货。",
+      "These details can be used for studio reservations or order delivery."
+    ],
     "name": [
       "预约称呼",
       "Booking name"
@@ -363,8 +367,8 @@
       "Booking contact"
     ],
     "delivery_address": [
-      "收货地址（选填）",
-      "Delivery address (optional)"
+      "收货地址",
+      "Delivery address"
     ],
     "empty": [
       "尚未填写预约资料",
@@ -9425,8 +9429,8 @@
       "Please complete all delivery details before submitting."
     ],
     "paymentNotice": [
-      "网站暂不收取款项。提交订单后店主将会联系您，届时可使用 e-Transfer 或现金付款。请在提交订单后注意查收消息。",
-      "The website does not collect payment. The host will contact you after your order is submitted; you can then pay by e-Transfer or cash. Please watch for their message."
+      "网站暂不收取款项。\n提交订单后店主将会联系您，届时可使用 e-Transfer 或现金付款。\n请在提交订单后注意查收消息。",
+      "The website does not collect payment.\nThe host will contact you after your order is submitted; you can then pay by e-Transfer or cash.\nPlease watch for their message."
     ],
     "confirmSubmit": [
       "确认提交订单",

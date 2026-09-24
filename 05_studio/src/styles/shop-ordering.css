@@ -20,11 +20,13 @@
 .shop-pickup-address{display:flex;align-items:flex-start;gap:11px;margin:0;padding:16px;border:1px solid #dce8ee;border-radius:14px;background:#f7fbfd;font-size:14px}
 .shop-pickup-address span,.shop-pickup-address strong{display:block}
 .shop-pickup-address strong{font-weight:550;margin-top:4px;overflow-wrap:anywhere}
-.shop-delivery-notice{line-height:1.8;margin:0;padding:18px;border-radius:14px;background:#f2f8fb;color:#445c69;font-size:14px}
+.shop-delivery-notice{line-height:1.8;margin:0;padding:18px;border-radius:14px;background:#f2f8fb;color:#445c69;font-size:14px;white-space:pre-line;overflow-wrap:anywhere}
 .shop-delivery-action{display:flex;justify-content:space-between;align-items:center;gap:18px;border-top:1px solid #e2e9ed;padding-top:20px}
 .shop-delivery-action p{margin:0}.shop-delivery-action strong{margin-left:8px}.shop-delivery-action button{min-height:48px}
 .shop-manual-receipt{display:block;max-width:720px;margin:clamp(36px,6vw,86px) auto 0;padding:clamp(24px,4vw,44px);border:1px solid #e4ecef;border-radius:22px;background:#fff}
 .shop-manual-receipt h1{margin:0 0 20px}.shop-manual-receipt .shop-order-reference{margin:28px 0 0}
 .shop-order-delete-confirm{margin:18px 0;padding:16px;border:1px solid #e5cfc7;border-radius:14px;background:#fff8f5;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.shop-order-delete-confirm p{flex:1 1 100%;margin:0;line-height:1.7}
 .shop-order-history-tools{display:flex;justify-content:flex-end}.shop-order-history-card{border-bottom:1px solid var(--line);padding:18px 0;overflow-wrap:anywhere}.shop-order-history-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline}.shop-order-history-head strong{font-weight:550}.shop-order-history-products{font-size:14px;line-height:1.7;margin:12px 0}.shop-order-history-meta{font-size:12px;line-height:1.8;color:var(--muted);margin:0}.shop-order-history-open{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-top:8px;font-size:13px}
+.shop-orders-admin .shop-manual-order-row{font:inherit;cursor:pointer;min-width:0}.shop-orders-admin .shop-manual-order-row>span{min-width:0;overflow-wrap:anywhere}.shop-orders-admin .shop-manual-order-row>strong{white-space:nowrap}.shop-orders-admin .shop-manual-order-row>span:last-child{text-align:right}
+@media(max-width:700px){.shop-orders-admin .shop-manual-order-row{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px}.shop-orders-admin .shop-manual-order-row>span:first-child{grid-column:1/-1}.shop-orders-admin .shop-manual-order-row>span:last-child{grid-column:2;text-align:right}}
 @media(max-width:700px){.shop-delivery-action{align-items:stretch;flex-direction:column}.shop-delivery-action button{justify-content:center}.shop-manual-receipt{margin-top:28px}}

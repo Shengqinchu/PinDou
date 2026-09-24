@@ -1,9 +1,10 @@
 {
   "title": ["个人资料", "Personal details"],
+  "helper": ["填写信息可用于预约到店或商品收货。", "These details can be used for studio reservations or order delivery."],
   "name": ["预约称呼", "Booking name"],
   "profile_name": ["称呼", "Name"],
   "contact": ["预约联系方式", "Booking contact"],
-  "delivery_address": ["收货地址（选填）", "Delivery address (optional)"],
+  "delivery_address": ["收货地址", "Delivery address"],
   "empty": ["尚未填写预约资料", "No booking details saved yet"],
   "loading": ["正在读取预约资料…", "Loading booking details…"],
   "load_error": ["预约资料暂时无法读取，请重试。", "Your booking details could not be loaded. Please retry."],

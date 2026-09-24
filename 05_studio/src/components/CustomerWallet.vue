@@ -14,6 +14,7 @@ import ShopOrderHistory from './ShopOrderHistory.vue';
 import { profileCopy } from '../profile';
 const tab=ref<'wallet'|'bookings'|'orders'>('wallet'), category=ref<WalletCategory>('time'), page=ref(1), bookingPage=ref(1);
 const data=ref<WalletDetail>(), bookings=ref<Reservation[]>([]), bookingTotal=ref(0), busy=ref(false), error=ref('');
+const orderHistory=ref<{refresh:()=>Promise<void>;busy:boolean}|null>(null);
 let sequence=0,timer:ReturnType<typeof setInterval>|undefined;
 async function refresh(){
   const id=accountUser.value?.id;if(!id)return;
@@ -26,6 +27,7 @@ async function refresh(){
   finally{if(seq===sequence)busy.value=false;}
 }
 function visibleRefresh(){if(document.visibilityState==='visible'&&!busy.value)void refresh();}
+function refreshActive(){if(tab.value==='orders')void orderHistory.value?.refresh();else void refresh();}
 watch(category,()=>{page.value=1;void refresh();});
 watch([page,bookingPage],()=>void refresh());
 watch(reservationRevision,()=>void refresh());
@@ -34,7 +36,7 @@ onBeforeUnmount(()=>{sequence++;clearInterval(timer);window.removeEventListener(
 </script>
 <template>
   <div class="customer-wallet">
-    <div class="wallet-toolbar"><div class="wallet-overview-tabs" role="group" :aria-label="say(accountCopy.account)"><button :aria-pressed="tab==='wallet'" @click="tab='wallet'">{{say(copy.account)}}</button><button :aria-pressed="tab==='bookings'" @click="tab='bookings'">{{say(accountCopy.my_reservations)}}</button><button :aria-pressed="tab==='orders'" @click="tab='orders'">{{say(accountCopy.my_orders)}}</button></div><button v-if="tab!=='orders'" class="icon-button" :aria-label="say(copy.refresh)" :disabled="busy" @click="refresh"><PhArrowClockwise :size="19" :class="{spinning:busy}"/></button></div>
+    <div class="wallet-toolbar"><div class="wallet-overview-tabs" role="group" :aria-label="say(accountCopy.account)"><button :aria-pressed="tab==='wallet'" @click="tab='wallet'">{{say(copy.account)}}</button><button :aria-pressed="tab==='bookings'" @click="tab='bookings'">{{say(accountCopy.my_reservations)}}</button><button :aria-pressed="tab==='orders'" @click="tab='orders'">{{say(accountCopy.my_orders)}}</button></div><button class="icon-button" :aria-label="say(copy.refresh)" :disabled="tab==='orders'?orderHistory?.busy:busy" @click="refreshActive"><PhArrowClockwise :size="19" :class="{spinning:tab==='orders'?orderHistory?.busy:busy}"/></button></div>
     <p v-if="error" class="form-error" role="alert">{{error}}</p><p v-if="busy&&!data" role="status">{{say(copy.loading)}}</p>
     <template v-if="data&&tab==='wallet'">
       <WalletBalances :account="data.account" customer/>
@@ -47,6 +49,6 @@ onBeforeUnmount(()=>{sequence++;clearInterval(timer);window.removeEventListener(
       <ul class="account-bookings wallet-bookings"><li v-for="booking in bookings" :key="booking.id"><RouterLink :to="'/reservation/'+booking.id" @click="closeAccount"><span><strong>{{prettyDate(booking.booking.date)}}</strong><small>{{booking.booking.start}}–{{booking.booking.end}} · {{reservationStatus(booking.status)}}</small><small v-if="booking.offer"><OfferLabel :offer="booking.offer"/></small><small>{{say(copy.booked)}} · {{duration(booking.booked_minutes)}}</small><small>{{say(copy.actual)}} · {{booking.actual_minutes==null?say(copy.unrecorded):formatCopy(copy.per_guest,{v0:duration(booking.actual_minutes),v1:booking.actual_guests||booking.booking.guests})}}</small><p v-if="booking.public_note">{{booking.public_note}}</p></span><PhArrowRight :size="18"/></RouterLink></li></ul>
       <div v-if="bookingTotal>30" class="wallet-pagination"><button :disabled="bookingPage===1||busy" @click="bookingPage--">{{say(copy.previous)}}</button><span>{{formatCopy(copy.page,{v0:bookingPage,v1:bookingTotal})}}</span><button :disabled="bookingPage*30>=bookingTotal||busy" @click="bookingPage++">{{say(copy.next)}}</button></div>
     </template>
-    <ShopOrderHistory v-if="tab==='orders'"/>
+    <ShopOrderHistory v-if="tab==='orders'" ref="orderHistory" :show-refresh="false"/>
   </div>
 </template>

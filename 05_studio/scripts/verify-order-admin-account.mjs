@@ -8,7 +8,7 @@ let current={...order},deleted=false,address='8 Hughson St N, Hamilton',savedAdd
 try{
  const context=await browser.newContext({viewport:{width:1280,height:900},locale:'zh-CN'});
  await context.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','zh');localStorage.setItem('pd_web_token','fixture-token');sessionStorage.setItem('puppy-studio-admin','fixture-admin')});
- const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
+ const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.stack||error.message));
  await page.route('**/studio-api/**',async route=>{
   const url=new URL(route.request().url()),path=url.pathname,method=route.request().method();let response={};let status=200;
   if(path==='/studio-api/manage/requests')response={items:[],total:0};
@@ -53,9 +53,9 @@ try{
  await expect(page.locator('.profile-form .profile-contact')).toBeVisible();
  await expect(page.locator('.profile-form .booking-profile-toggle')).toBeVisible();
  await expect(page.locator('.profile-form').getByLabel('称呼')).toBeVisible();
- await page.getByLabel('收货地址（选填）').fill('75 John St N, Hamilton');
+ await page.getByLabel('收货地址').fill('75 John St N, Hamilton');
  await page.locator('.profile-actions button').last().click();
  assert.equal(savedAddress,'75 John St N, Hamilton');
- assert.deepEqual(errors,[]);
+ assert.deepEqual(errors.filter(error=>!error.includes('static.cloudflareinsights.com/beacon.min.js')),[]);
  console.log('admin order status/delete and account orders/address OK');
 }finally{await browser.close()}

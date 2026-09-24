@@ -37,6 +37,7 @@
 | signed_in | 已登录 | Signed in |
 | sign_out | 退出登录 | Sign out |
 | my_reservations | 我的预约 | My bookings |
+| my_orders | 我的订单 | My orders |
 | no_reservations | 还没有账号预约记录，选一个喜欢的时间来拼豆吧。 | No bookings on your account yet. Choose a time to come and create. |
 | loading | 正在读取预约… | Loading bookings… |
 | retry | 重新加载 | Try again |
@@ -189,9 +190,12 @@
 
 | 键 | 中文 | English |
 |---|---|---|
-| title | 预约资料 | Booking details |
+| title | 个人资料 | Personal details |
+| helper | 填写信息可用于预约到店或商品收货。 | These details can be used for studio reservations or order delivery. |
 | name | 预约称呼 | Booking name |
+| profile_name | 称呼 | Name |
 | contact | 预约联系方式 | Booking contact |
+| delivery_address | 收货地址 | Delivery address |
 | empty | 尚未填写预约资料 | No booking details saved yet |
 | loading | 正在读取预约资料… | Loading booking details… |
 | load_error | 预约资料暂时无法读取，请重试。 | Your booking details could not be loaded. Please retry. |
@@ -1029,6 +1033,7 @@
 | address | 8 Hughson St N, Hamilton, ON L8R 0B1 | 8 Hughson St N, Hamilton, ON L8R 0B1 |
 | wechat | xiaogoushuangji | xiaogoushuangji |
 | phone | +1 4373624360 | +1 4373624360 |
+| email | staywithcsq@outlook.com | staywithcsq@outlook.com |
 | phone_href | tel:+14373624360 | tel:+14373624360 |
 | social_url | https://www.xiaohongshu.com/user/profile/65f8375c000000000b00c921 | https://www.xiaohongshu.com/user/profile/65f8375c000000000b00c921 |
 | original_post | https://xhslink.cn/o/8HFIo1pstmk | https://xhslink.cn/o/8HFIo1pstmk |
@@ -2408,6 +2413,7 @@
 | refresh_reservation_30af18 | 刷新预约状态 | Refresh reservation |
 | for_changes_contact_the_host_on_wechat_2921d8 | 如需调整安排，请联系店主。微信号： | For changes, contact the host on WeChat:  |
 | phone_0614da | 手机号： | Phone:  |
+| email | 邮箱： | Email:  |
 
 ## pages-Shop.json
 
@@ -2622,7 +2628,7 @@
 
 | 键 | 中文 | English |
 |---|---|---|
-| notice | 未标注价格商品紧急筹备中，暂时不可下单。无需网站付款，下单后联系店主。 | Unpriced products are being prepared and cannot be ordered yet. No payment is required on the website; contact the host after placing your order. |
+| notice | 未标注价格商品紧急筹备中，暂时不可下单。无需网站付款，下单后店主会主动联系您。 | Unpriced products are being prepared and cannot be ordered yet. No payment is required on the website; the host will contact you after you order. |
 | choose | 选择规格 | Choose an option |
 | variants | 商品规格 | Product variants |
 | addVariant | 增加规格 | Add a variant |
@@ -2655,7 +2661,7 @@
 | name | 姓名 | Name |
 | notes | 订单备注 / 定制要求 | Order notes / custom requests |
 | successTitle | 下单成功 | Order placed |
-| success | 您已成功提交订单，请等待店主主动联系您，谢谢合作！ | Your order has been submitted. Please wait for the host to contact you. Thank you! |
+| success | 您已成功提交订单，店主将会联系您，请注意查收信息，谢谢合作！ | Your order has been submitted. The host will contact you; please watch for their message. Thank you! |
 | addedToCart | 加入成功！ | Added to bag! |
 | backToCart | 返回购物车 | Back to bag |
 | deliveryTitle | 请填写收货信息 | Delivery details |
@@ -2667,7 +2673,7 @@
 | shippingAddress | 收货地址 | Delivery address |
 | notesHint | 如无特殊要求，请填写“无” | Enter “None” if you have no special requests |
 | requiredDetails | 请填写所有收货信息后再提交订单。 | Please complete all delivery details before submitting. |
-| paymentNotice | 网站暂不收取款项。提交订单后店主将会联系您，届时可使用 e-Transfer 或现金付款。请在提交订单后注意查收消息。 | The website does not collect payment. The host will contact you after your order is submitted; you can then pay by e-Transfer or cash. Please watch for their message. |
+| paymentNotice | 网站暂不收取款项。<br>提交订单后店主将会联系您，届时可使用 e-Transfer 或现金付款。<br>请在提交订单后注意查收消息。 | The website does not collect payment.<br>The host will contact you after your order is submitted; you can then pay by e-Transfer or cash.<br>Please watch for their message. |
 | confirmSubmit | 确认提交订单 | Confirm order |
 | leaveContact | 或留下您的联系方式，店主会第一时间联系您。 | Or leave your contact details and the host will get in touch as soon as possible. |
 | message | 短信 | Text message |
@@ -2680,13 +2686,20 @@
 | ordersHelp | 查看商品规格、优惠和联系方式，联系顾客安排付款与发货。 | Review variants, offers and contact details, then arrange payment and delivery with the customer. |
 | searchOrders | 搜索订单、姓名或联系方式 | Search orders, names or contact details |
 | orderNumber | 订单编号 | Order number |
-| manual_pending | 待联系 | Awaiting contact |
-| manual_confirmed | 已确认 | Confirmed |
+| manual_pending | 已下单 | Placed |
+| manual_confirmed | 备货中 | Preparing |
+| manual_preparing | 备货中 | Preparing |
+| manual_ready | 可取货 | Ready for pickup |
+| manual_shipped | 待收货 | Awaiting delivery |
 | manual_completed | 已完成 | Completed |
 | manual_cancelled | 已取消 | Cancelled |
 | status | 订单状态 | Order status |
 | staffNote | 店内备注（顾客不可见） | Staff note (private) |
-| completeHelp | 完成订单会扣除库存；取消订单会释放预留库存。已完成或已取消的订单不能再更改状态。 | Completing an order deducts stock; cancelling releases reserved stock. Completed or cancelled orders cannot change status. |
+| completeHelp | 完成订单会扣除库存；取消或删除订单会释放预留库存。历史订单保留查账。 | Completing an order deducts stock; cancelling or deleting releases reserved stock. Order history is retained for audit. |
+| deleteOrder | 删除订单 | Delete order |
+| cancelAction | 取消 | Cancel |
+| deleteConfirm | 删除后订单将从正常列表移除，历史记录仍保留用于查账。确定删除吗？ | The order will be removed from normal lists; its history stays for audit. Delete it? |
+| placedAt | 下单时间 | Placed at |
 | previous | 上一页 | Previous |
 | next | 下一页 | Next |
 | reloadQuote | 重新核对价格 | Refresh prices |
@@ -2732,7 +2745,7 @@
 | subtotal | 已定价商品小计 | Subtotal of priced items |
 | unavailable | 商品已下架 | Product unavailable |
 | ordersEmpty | 暂无商品订单 | No product orders yet |
-| ordersHelp | 这里显示此浏览器保存的商品订单。 | Product orders saved in this browser appear here. |
+| ordersHelp | 登录后可查看账号下的商品订单；本浏览器保存的旧订单也会关联到账号。 | Sign in to see orders across devices. Older orders saved in this browser can be linked to your account. |
 | orderOpen | 查看订单 | View order |
 | retry | 重新加载 | Reload |
 | loading | 正在加载商品… | Loading products… |
