@@ -15,7 +15,7 @@ for(const [engine,launcher,sizes] of [['chromium',chromium,[[320,740],[390,844],
  const b=await launcher.launch({headless:true});
  for(const [width,height] of sizes)for(const lang of ['zh','en']) {
   const c=await b.newContext({viewport:{width,height},reducedMotion:'reduce'});
-  await c.addInitScript(lang=>{localStorage.setItem('puppy-studio-locale',lang);sessionStorage.setItem('puppy-studio-admin','local-qa');},lang);
+  await c.addInitScript(lang=>{localStorage.setItem('puppy-studio-language',lang);sessionStorage.setItem('puppy-studio-admin','local-qa');},lang);
   const p=await c.newPage();p.on('pageerror',e=>errors.push({engine,width,lang,error:e.message}));
   const routes=process.env.STUDIO_VERIFY_SCOPE==='desk'?['manage']:engine==='chromium'?['','visit','details','journal','manage']:['','visit','manage'];
   for(const route of routes){

@@ -23,9 +23,9 @@ function write(key: string, value: string) {
     /* Browsing still works without storage. */
   }
 }
-const chosenLocale=new URLSearchParams(location.search).get("preview-locale")||read("puppy-studio-locale");
-export const locale = ref<Locale>(chosenLocale==='en'||chosenLocale==='zh'?chosenLocale:
-  /^zh\b/i.test(navigator.languages?.[0]||navigator.language)?'zh':'en');
+// English is the default; only a visitor's own language switch is remembered.
+const chosenLocale=new URLSearchParams(location.search).get("preview-locale")||read("puppy-studio-language");
+export const locale = ref<Locale>(chosenLocale==='zh'?'zh':'en');
 export const tr = (zh: string, en: string) => (locale.value === "zh" ? zh : en);
 export function say(pair: readonly string[]) {
   return tr(pair[0], pair[1]);
@@ -36,10 +36,12 @@ export function formatCopy(
 ) {
   return say(pair).replace(/\{(v\d+)\}/g, (_, key) => String(values[key]));
 }
+watch(locale, (value) => {
+  if (!new URLSearchParams(location.search).has("content-preview")) write("puppy-studio-language", value);
+});
 watch(
   locale,
   (value) => {
-    if (!new URLSearchParams(location.search).has("content-preview")) write("puppy-studio-locale", value);
     document.documentElement.lang = value === "zh" ? "zh-CN" : "en-CA";
     document.title = say(
       copyText.pindo_puppy_a_little_creative_studio_in_d8b24c,

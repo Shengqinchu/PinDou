@@ -6,7 +6,7 @@ const base='http://127.0.0.1:4184',out=new URL('../../artifacts/image-delivery-2
 const browser=await chromium.launch();
 try{
  const context=await browser.newContext({viewport:{width:1440,height:900}});
- await context.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','zh');localStorage.setItem('puppy-studio-motion','reduced')});
+ await context.addInitScript(()=>{localStorage.setItem('puppy-studio-language','zh');localStorage.setItem('puppy-studio-motion','reduced')});
  const page=await context.newPage();await page.goto(base+'/shop');
  await page.locator('.shop-children button').first().waitFor();
  await page.locator('.shop-children button').filter({hasText:'B系列'}).click();

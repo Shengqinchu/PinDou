@@ -20,7 +20,7 @@ const route=useRoute(),router=useRouter();
 const section=computed(()=>['home','finished','services'].includes(String(route.query.section))?String(route.query.section):'home');
 const searches=reactive<Record<string,string>>({home:'',finished:'',services:''});
 const search=computed({get:()=>searches[section.value],set:value=>{searches[section.value]=value}});
-const root=ref('refills'),leaf=ref('refill-a'),error=ref(''),loading=ref(!shopCatalog.value);
+const root=ref('kits'),leaf=ref('kits'),error=ref(''),loading=ref(!shopCatalog.value);
 const selected=ref<ShopProduct>(),detailsOpen=ref(false),photo=ref(0);
 const variant=ref(''),choice=ref('');
 const readySelection=computed(()=>!!selected.value&&(!selected.value.variants?.length||selected.value.variants.some(v=>v.id===variant.value))&&(!selected.value.choices?.length||selected.value.choices.some(v=>v.id===choice.value)));

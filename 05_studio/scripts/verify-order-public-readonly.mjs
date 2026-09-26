@@ -7,7 +7,7 @@ const expected=process.env.PINDOU_STUDIO_EXPECT_BUILD||'';
 const browser=await chromium.launch({headless:true});
 try{
  const context=await browser.newContext({locale:'zh-CN',viewport:{width:390,height:844}});
- await context.addInitScript(()=>localStorage.setItem('puppy-studio-locale','zh'));
+ await context.addInitScript(()=>localStorage.setItem('puppy-studio-language','zh'));
  const page=await context.newPage(),errors=[];
  page.on('pageerror',error=>errors.push(error.message));
  const version=await (await page.request.get(base+'/version.json')).json();

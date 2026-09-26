@@ -7,7 +7,7 @@ const results=[];const runId=Date.now().toString(36);
 try{
  for(const viewport of (process.argv.includes('--native')?[]:[{width:1440,height:900},{width:390,height:844},{width:320,height:568},{width:844,height:390}])){
   const context=await browser.newContext({viewport,reducedMotion:'reduce'});
-  await context.addInitScript(()=>{sessionStorage.setItem('puppy-studio-admin','local-qa');localStorage.setItem('puppy-studio-locale','zh');});
+  await context.addInitScript(()=>{sessionStorage.setItem('puppy-studio-admin','local-qa');localStorage.setItem('puppy-studio-language','zh');});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://127.0.0.1:5184/manage?view=finance');
   await expect(page.locator('.finance-panel h1')).toHaveText('营业状况');

@@ -175,7 +175,7 @@ try {
     });
     await ctx.addInitScript((locale) => {
       sessionStorage.setItem("puppy-studio-admin", "local-qa");
-      localStorage.setItem("puppy-studio-locale", locale);
+      localStorage.setItem("puppy-studio-language", locale);
     }, lang);
     const p = await ctx.newPage();
     p.on("pageerror", (e) => errors.push(e.message));

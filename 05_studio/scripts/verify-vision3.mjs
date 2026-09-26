@@ -17,7 +17,7 @@ for(const [engine,launch,sizes] of (process.env.STUDIO_FLOW_ONLY?[]:[['chromium'
    await context.addInitScript(()=>sessionStorage.setItem('puppy-studio-admin','local-qa'));
    const page=await context.newPage();page.on('pageerror',e=>errors.push({engine,width,error:e.message}));
    for(const lang of ['zh','en']){
-    await page.addInitScript(lang=>localStorage.setItem('puppy-studio-locale',lang),lang);
+    await page.addInitScript(lang=>localStorage.setItem('puppy-studio-language',lang),lang);
     for(const route of ['', 'visit','details','journal', 'manage?view=content', 'manage?view=journal-editor','manage?view=reservation-calendar']){
      await page.goto(base+'/'+route);await page.waitForTimeout(160);await page.evaluate(()=>document.fonts.ready);
      if(route==='visit')await page.locator('.reservation-grid').waitFor();

@@ -10,14 +10,16 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
  const browser=await engine.launch({headless:true});
  try{
   const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
-  await context.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','zh');sessionStorage.setItem('puppy-studio-admin','local-qa')});
+  await context.addInitScript(()=>{localStorage.setItem('puppy-studio-language','zh');sessionStorage.setItem('puppy-studio-admin','local-qa')});
   const page=await context.newPage(),errors=[];let requests=0;
   page.on('pageerror',e=>errors.push(e.message));
   page.on('request',r=>{if(r.url().endsWith('/shop/catalog'))requests++});
   await page.goto(base+'/shop?section=home');
   await page.locator('.shop-card').first().waitFor();
-  assert.equal(await page.locator('.shop-card').count(),27);
   const kits=page.locator('.shop-root').filter({hasText:'拼豆套装'});
+  // The shop opens on 在家拼豆 → 拼豆套装.
+  assert.equal(await kits.getAttribute('aria-pressed'),'true');
+  assert.equal(await page.locator('.shop-card').count(),4);
   await kits.click();
   assert.equal(await page.locator('.shop-card').count(),4);
   assert.equal(await page.locator('.shop-children').count(),0);

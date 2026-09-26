@@ -32,7 +32,7 @@ for(const [name,engine,viewports] of (process.argv.includes('--functional-only')
   const browser=await engine.launch({headless:true});
   try{for(const lang of ['zh','en']){
     const context=await browser.newContext({viewport:{width:1440,height:900},reducedMotion:'reduce'});
-    await context.addInitScript(lang=>localStorage.setItem('puppy-studio-locale',lang),lang);
+    await context.addInitScript(lang=>localStorage.setItem('puppy-studio-language',lang),lang);
     const page=await context.newPage();page.on('pageerror',e=>errors.push({name,message:e.message}));
     for(const route of ['/','/visit','/details','/journal','/shop']){
       await page.goto(base+route);await expect(page.locator('h1').first()).toBeVisible();await page.evaluate(()=>document.fonts.ready);

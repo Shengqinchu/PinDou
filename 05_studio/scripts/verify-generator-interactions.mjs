@@ -3,7 +3,7 @@ const base='http://127.0.0.1:19678',out=new URL('../../artifacts/generator-integ
 const browser=await chromium.launch({headless:true}),checks=[],errors=[];let page;
 try{
  const ctx=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true,locale:'en-CA',reducedMotion:'reduce',acceptDownloads:true});
- await ctx.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','en');localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('pd_web_user',JSON.stringify({user_id:'qa-owner',nickname:'Example'}));});
+ await ctx.addInitScript(()=>{localStorage.setItem('puppy-studio-language','en');localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('pd_web_user',JSON.stringify({user_id:'qa-owner',nickname:'Example'}));});
  page=await ctx.newPage();page.on('pageerror',e=>errors.push(e.message));await page.request.post(base+'/qa/controls',{data:{clear:true}});await page.goto(base+'/tools');await expect(page.locator('.control-panel')).toBeVisible();
  const order=await page.evaluate(()=>({upload:document.querySelector('.upload-stage').getBoundingClientRect().top,controls:document.querySelector('.control-panel').getBoundingClientRect().top}));assert(order.upload<order.controls);checks.push('mobile photo selection precedes settings');
  const camera=page.locator('input[type=file][capture]');await expect(camera).toHaveAttribute('capture','environment');

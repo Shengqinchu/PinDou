@@ -8,7 +8,7 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
  const browser=await engine.launch({headless:true});
  try{
   const ctx=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
-  await ctx.addInitScript(()=>localStorage.setItem('puppy-studio-locale','zh'));
+  await ctx.addInitScript(()=>localStorage.setItem('puppy-studio-language','zh'));
   const page=await ctx.newPage(),errors=[],telemetryErrors=[];
   page.on('pageerror',e=>{if(e.message==='/pindoupuppy.com/cdn-cgi/rum? due to access control checks.')telemetryErrors.push(e.message);else errors.push(e.message)});
   page.on('console',m=>{if(m.type()==='error'&&m.text().includes('/cdn-cgi/rum'))telemetryErrors.push(m.text())});

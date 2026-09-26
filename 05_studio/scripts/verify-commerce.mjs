@@ -95,7 +95,7 @@ try {
       reducedMotion: "reduce",
     });
     await ctx.addInitScript(
-      (locale) => localStorage.setItem("puppy-studio-locale", locale),
+      (locale) => localStorage.setItem("puppy-studio-language", locale),
       lang,
     );
     const p = await ctx.newPage();

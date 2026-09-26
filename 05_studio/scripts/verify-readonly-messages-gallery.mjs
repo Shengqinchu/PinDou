@@ -27,7 +27,7 @@ try {
     const context = await browser.newContext({ viewport, reducedMotion: 'reduce' });
     await context.addInitScript(() => {
       localStorage.setItem('pd_web_token', 'local-gallery-qa');
-      localStorage.setItem('puppy-studio-locale', 'zh');
+      localStorage.setItem('puppy-studio-language', 'zh');
     });
     const page = await context.newPage();
     const errors = [];

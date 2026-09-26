@@ -12,7 +12,7 @@ for(const [engine,type] of [['chromium',chromium],['webkit',webkit]]){
  const browser=await type.launch({headless:true});
  try {for(const lang of ['zh','en']){
   const ctx=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:engine==='webkit'?'reduce':'no-preference'});
-  await ctx.addInitScript(lang=>{localStorage.setItem('puppy-studio-locale',lang);localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('pd_web_user',JSON.stringify({user_id:'qa-owner',nickname:'QA'}));},lang);
+  await ctx.addInitScript(lang=>{localStorage.setItem('puppy-studio-language',lang);localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('pd_web_user',JSON.stringify({user_id:'qa-owner',nickname:'QA'}));},lang);
   const page=await ctx.newPage();page.setDefaultTimeout(8000);page.on('pageerror',e=>errors.push(e.message));
   await page.request.post(base+'/qa/controls',{data:{clear:true,tutorial:true}});
   await page.goto(base+'/tools');await expect(page.locator('.control-panel')).toBeVisible();

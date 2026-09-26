@@ -8,7 +8,7 @@ const checks=[];
 try{
  for(const viewport of [{width:1440,height:900},{width:390,height:844},{width:320,height:568},{width:844,height:390}]){
   const ctx=await browser.newContext({viewport,reducedMotion:'reduce'});
-  await ctx.addInitScript(()=>{sessionStorage.setItem('puppy-studio-admin','local-qa');localStorage.setItem('puppy-studio-locale','zh');});
+  await ctx.addInitScript(()=>{sessionStorage.setItem('puppy-studio-admin','local-qa');localStorage.setItem('puppy-studio-language','zh');});
   const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://127.0.0.1:5184/manage?view=messages');
   await page.locator('.sms-thread').filter({hasText:'+14165550123'}).click();

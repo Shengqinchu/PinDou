@@ -38,7 +38,7 @@ for(const [name,type] of [['chromium',chromium],['webkit',webkit]]){
  try{
   for(const [width,height,language,minimum] of [[390,700,'zh',500],[390,844,'en',736],[320,568,'zh',500],[430,932,'zh',912],[1440,900,'zh',250],[844,390,'en',100]]){
    const context=await browser.newContext({viewport:{width,height},locale:language==='zh'?'zh-CN':'en-CA',hasTouch:width<=700,reducedMotion:'reduce'});
-   await context.addInitScript(lang=>localStorage.setItem('puppy-studio-locale',lang),language);
+   await context.addInitScript(lang=>localStorage.setItem('puppy-studio-language',lang),language);
    page=await context.newPage();page.setDefaultTimeout(15000);page.on('pageerror',recordError);
    if(live)await page.route('**/studio-api/reservations',route=>{throw new Error('Live booking submission is forbidden in this check');});
    await openTime(page);
@@ -91,7 +91,7 @@ for(const [name,type] of [['chromium',chromium],['webkit',webkit]]){
   }
   if(!live){
    const context=await browser.newContext({viewport:{width:390,height:700},locale:'zh-CN',reducedMotion:'reduce'});
-   await context.addInitScript(()=>localStorage.setItem('puppy-studio-locale','zh'));
+   await context.addInitScript(()=>localStorage.setItem('puppy-studio-language','zh'));
    page=await context.newPage();page.on('pageerror',recordError);
    // Each browser uses a fresh fake customer on the isolated QA service.
    const email=`mobile-${name}-${Date.now()}@example.test`;

@@ -10,7 +10,7 @@ for(const [engine,type] of [['chromium',chromium],['webkit',webkit]]){
  const browser=await type.launch({headless:true});
  try{for(const [lang,viewport] of [['zh',{width:390,height:844}],['en',{width:1440,height:1000}]]){
   const ctx=await browser.newContext({viewport});
-  await ctx.addInitScript(lang=>{sessionStorage.setItem('puppy-studio-admin','local-qa');localStorage.setItem('puppy-studio-locale',lang);},lang);
+  await ctx.addInitScript(lang=>{sessionStorage.setItem('puppy-studio-admin','local-qa');localStorage.setItem('puppy-studio-language',lang);},lang);
   const page=await ctx.newPage();page.setDefaultTimeout(9000);page.on('pageerror',e=>errors.push(e.message));
   const api=async(path,method='GET',data)=>{const r=await ctx.request.fetch(base+'/studio-api'+path,{method,data});assert(r.ok(),await r.text());return r.json();};
   const seed=await api('/qa/completion-seed','POST'),payloads=[];

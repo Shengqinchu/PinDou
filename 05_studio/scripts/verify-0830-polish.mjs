@@ -198,7 +198,7 @@ try {
   for (const lang of ["zh", "en"]) {
     const p = track(await browser.newPage());
     await p.addInitScript(
-      (lang) => localStorage.setItem("puppy-studio-locale", lang),
+      (lang) => localStorage.setItem("puppy-studio-language", lang),
       lang,
     );
     await p.route("**/studio-api/catalog", (route) => route.abort("failed"));

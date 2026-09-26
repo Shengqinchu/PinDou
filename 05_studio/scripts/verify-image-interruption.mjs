@@ -6,7 +6,7 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
  const browser=await engine.launch();
  try{
   const context=await browser.newContext({viewport:{width:1440,height:900}});
-  await context.addInitScript(()=>localStorage.setItem('puppy-studio-locale','zh'));
+  await context.addInitScript(()=>localStorage.setItem('puppy-studio-language','zh'));
   const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://127.0.0.1:4184/shop',{waitUntil:'domcontentloaded'});
   await page.locator('.shop-action').first().waitFor();

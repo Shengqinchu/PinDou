@@ -12,7 +12,7 @@ for(const [engine,type] of [['chromium',chromium],['webkit',webkit]]){
   for(const lang of ['zh','en'])for(const width of engine==='chromium'?[320,390,768,1440,2560]:[390,1440]){
    const context=await browser.newContext({viewport:{width,height:width<600?844:1000},locale:lang==='zh'?'zh-CN':'en-CA'});
    try{
-    await context.addInitScript(lang=>{sessionStorage.setItem('puppy-studio-admin','qa-admin');localStorage.setItem('puppy-studio-locale',lang);},lang);
+    await context.addInitScript(lang=>{sessionStorage.setItem('puppy-studio-admin','qa-admin');localStorage.setItem('puppy-studio-language',lang);},lang);
     const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
     await page.request.post(base+'/qa/telegram-reset');await page.goto(base+'/manage?view=reservations');
     await page.locator('.telegram-notifications-open').click();

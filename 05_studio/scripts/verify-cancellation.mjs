@@ -10,7 +10,7 @@ const errors=[],measurements=[];let context,page;
 const browser=await chromium.launch({headless:true,ignoreDefaultArgs:['--hide-scrollbars']});
 async function start(engine,locale='zh',viewport={width:1706,height:1100}){
  context=await engine.newContext({viewport,locale:locale==='zh'?'zh-CN':'en-CA'});
- await context.addInitScript(locale=>{localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('puppy-studio-locale',locale);sessionStorage.setItem('puppy-studio-admin','qa-admin');},locale);
+ await context.addInitScript(locale=>{localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('puppy-studio-language',locale);sessionStorage.setItem('puppy-studio-admin','qa-admin');},locale);
  page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
 }
 async function shot(name){await page.screenshot({path:fileURLToPath(new URL(name+'.png',out))});}

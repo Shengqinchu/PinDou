@@ -10,7 +10,7 @@ for(const [engine,type] of [['chromium',chromium],['webkit',webkit]]){
  try{for(const lang of ['zh','en']){
   const index=lang==='zh'?0:1,word=key=>wallet[key][index];
   const ctx=await browser.newContext({viewport:{width:1440,height:1000}});
-  await ctx.addInitScript(lang=>{sessionStorage.setItem('puppy-studio-admin','local-qa');localStorage.setItem('puppy-studio-locale',lang);},lang);
+  await ctx.addInitScript(lang=>{sessionStorage.setItem('puppy-studio-admin','local-qa');localStorage.setItem('puppy-studio-language',lang);},lang);
   const page=await ctx.newPage();page.setDefaultTimeout(9000);page.on('pageerror',e=>errors.push(e.message));
   const api=async(path,method='GET',data)=>{const r=await page.request.fetch(base+'/studio-api'+path,{method,data});assert(r.ok(),`${path}: ${r.status()} ${await r.text()}`);return r.json();};
   const seed=await api('/qa/attended-visit','POST');

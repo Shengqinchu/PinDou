@@ -16,7 +16,7 @@ try {
       });
       p.on("pageerror", (e) => errors.push(e.message));
       await p.addInitScript(
-        (lang) => localStorage.setItem("puppy-studio-locale", lang),
+        (lang) => localStorage.setItem("puppy-studio-language", lang),
         lang,
       );
       for (const route of ["", "shop", "details", "journal"]) {

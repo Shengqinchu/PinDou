@@ -6,7 +6,7 @@ const png=await fs.readFile(path.join(root,'01_research/tech/test_inputs/cartoon
 const browser=await chromium.launch({headless:true,ignoreDefaultArgs:['--hide-scrollbars']}),results=[],errors=[];let currentPage;
 async function context(language='en',user='qa-owner'){
  const ctx=await browser.newContext({viewport:{width:1440,height:960},locale:language==='zh'?'zh-CN':'en-CA',acceptDownloads:true});
- await ctx.addInitScript(({language,user})=>{if(!localStorage.getItem('qa-init')){localStorage.setItem('qa-init','1');localStorage.setItem('puppy-studio-locale',language);if(user){localStorage.setItem('pd_web_token',user);localStorage.setItem('pd_web_user',JSON.stringify({user_id:user,nickname:'Local QA',email:user+'@example.test'}));}}},{language,user});
+ await ctx.addInitScript(({language,user})=>{if(!localStorage.getItem('qa-init')){localStorage.setItem('qa-init','1');localStorage.setItem('puppy-studio-language',language);if(user){localStorage.setItem('pd_web_token',user);localStorage.setItem('pd_web_user',JSON.stringify({user_id:user,nickname:'Local QA',email:user+'@example.test'}));}}},{language,user});
  const page=await ctx.newPage();currentPage=page;page.setDefaultTimeout(10000);page.on('pageerror',e=>errors.push(e.message));return {ctx,page};
 }
 async function controls(page,data){return page.request.post(base+'/qa/controls',{data});}
@@ -41,7 +41,7 @@ try{
  await controls(page,{});await page.getByRole('button',{name:'Save',exact:true}).click();await expect(page.locator('.editor-page')).not.toContainText('Saving failed');results.push({test:'save failure retains edits and prevents unconfirmed navigation',passed:true});
  const routes=[['/tools','.control-panel'],['/tools/result/'+id,'.result-card'],['/tools/editor/'+id,'.pattern-editor__overlay'],['/tools/works','.works-page'],['/tools/tutorial','.tutorial-page']];
  for(const language of ['zh','en']){
-  await page.evaluate(lang=>localStorage.setItem('puppy-studio-locale',lang),language);
+  await page.evaluate(lang=>localStorage.setItem('puppy-studio-language',lang),language);
   for(const width of [320,390,768,1440,2560])for(const [route,selector] of routes){
    await page.setViewportSize({width,height:900});await page.goto(base+route);await expect(page.locator(selector)).toBeVisible();await page.evaluate(()=>document.fonts.ready);await checkLayout(page,route,width,language);
    if(width===390||width===1440)await page.screenshot({path:path.join(out,`native-${language}-${width}-${route.split('/')[2]||'upload'}.png`)});

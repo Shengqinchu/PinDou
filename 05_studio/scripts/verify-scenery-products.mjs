@@ -11,7 +11,7 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
  const browser=await engine.launch({headless:true});let page;
  try{
   const ctx=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
-  await ctx.addInitScript(local=>{localStorage.setItem('puppy-studio-locale','zh');if(local)sessionStorage.setItem('puppy-studio-admin','local-qa')},!live);
+  await ctx.addInitScript(local=>{localStorage.setItem('puppy-studio-language','zh');if(local)sessionStorage.setItem('puppy-studio-admin','local-qa')},!live);
   page=await ctx.newPage();const errors=[],telemetryErrors=[];
   page.on('pageerror',e=>{if(e.message.includes('/cdn-cgi/rum'))telemetryErrors.push(e.message);else errors.push(e.message)});
   if(live)await ctx.route(/\/studio-api\//,route=>{

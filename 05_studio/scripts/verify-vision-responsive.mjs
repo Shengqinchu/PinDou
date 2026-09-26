@@ -52,7 +52,7 @@ for (const [engine, type, sizes] of [
         const p = await context.newPage();
         p.on("pageerror", (e) => errors.push(engine + ":" + e.message));
         await p.addInitScript((lang) => {
-          localStorage.setItem("puppy-studio-locale", lang);
+          localStorage.setItem("puppy-studio-language", lang);
           sessionStorage.setItem("puppy-studio-admin", "local-qa");
         }, lang);
         for (const route of ["visit", "manage"]) {

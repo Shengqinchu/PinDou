@@ -19,7 +19,7 @@ for(const [name,engine,widths] of [['chromium',chromium,[320,390,768,1440]],['we
  const browser=await engine.launch({headless:true});
  try{for(const width of widths)for(const lang of ['zh','en']){
   const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'});
-  await context.addInitScript(lang=>localStorage.setItem('puppy-studio-locale',lang),lang);
+  await context.addInitScript(lang=>localStorage.setItem('puppy-studio-language',lang),lang);
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base+'/');await expect(page.locator('h1')).toBeVisible();await expect(page.locator('dialog[open]')).toHaveCount(0);
   await layout(page,`${name}-${width}-${lang}-public`);

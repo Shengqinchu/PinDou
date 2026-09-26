@@ -13,7 +13,7 @@ for(const [engine,browserType] of [['chromium',chromium],['webkit',webkit]]){
   const word=key=>profileCopy[key][lang==='zh'?0:1],ctx=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'}),errors=[];
   await ctx.addInitScript(lang=>{
    localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('pd_token','qa-owner');
-   localStorage.setItem('puppy-studio-locale',lang);localStorage.setItem('pd_studio_language',lang);
+   localStorage.setItem('puppy-studio-language',lang);localStorage.setItem('pd_studio_language',lang);
    sessionStorage.setItem('puppy-studio-admin','local-qa');
   },lang);
   const api=async(path,method='GET',data)=>{const r=await ctx.request.fetch(origin+path,{method,data,headers:{Authorization:'Bearer qa-owner'}});assert(r.ok(),`${path} ${r.status()} ${await r.text()}`);return r.json();};

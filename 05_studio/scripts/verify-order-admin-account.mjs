@@ -7,7 +7,7 @@ const order={id:'PS'+'B'.repeat(24),status:'manual_pending',created_at:Date.now(
 let current={...order},deleted=false,address='8 Hughson St N, Hamilton',savedAddress='';
 try{
  const context=await browser.newContext({viewport:{width:1280,height:900},locale:'zh-CN'});
- await context.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','zh');localStorage.setItem('pd_web_token','fixture-token');sessionStorage.setItem('puppy-studio-admin','fixture-admin')});
+ await context.addInitScript(()=>{localStorage.setItem('puppy-studio-language','zh');localStorage.setItem('pd_web_token','fixture-token');sessionStorage.setItem('puppy-studio-admin','fixture-admin')});
  const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.stack||error.message));
  await page.route('**/studio-api/**',async route=>{
   const url=new URL(route.request().url()),path=url.pathname,method=route.request().method();let response={};let status=200;

@@ -4,7 +4,7 @@ const base='http://127.0.0.1:19678',assets=new URL('../../05_generator/src/asset
 const png=await fs.readFile(new URL('./fixtures/generator-tutorial/kitty-source.png',import.meta.url));
 try{for(const lang of ['zh','en']){
  const ctx=await browser.newContext({viewport:{width:1440,height:1000},locale:lang==='zh'?'zh-CN':'en-CA'});
- await ctx.addInitScript(lang=>{localStorage.setItem('puppy-studio-locale',lang);localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('pd_web_user',JSON.stringify({user_id:'qa-owner',nickname:'Example'}));},lang);
+ await ctx.addInitScript(lang=>{localStorage.setItem('puppy-studio-language',lang);localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('pd_web_user',JSON.stringify({user_id:'qa-owner',nickname:'Example'}));},lang);
  const page=await ctx.newPage();const shot=async(name,selector)=>{await page.evaluate(()=>document.fonts.ready);await page.locator(selector).first().screenshot({path:fileURLToPath(new URL(`${name}-${lang}.png`,assets))});};
  await page.request.post(base+'/qa/controls',{data:{delay:2,tutorial:true}});await page.goto(base+'/tools');await expect(page.locator('.control-panel')).toBeVisible();
  await page.locator('input[type=file]').first().setInputFiles({name:'kitty.png',mimeType:'image/png',buffer:png});

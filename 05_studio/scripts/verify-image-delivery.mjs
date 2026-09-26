@@ -15,7 +15,7 @@ async function visibleReady(page){
 }
 async function setup(context){
  await context.addInitScript(()=>{
-  localStorage.setItem('puppy-studio-locale','zh');
+  localStorage.setItem('puppy-studio-language','zh');
   window.__entrance=[];
   function sample(){
    const line=document.querySelector('#main h1.lift-title > .lift-line');

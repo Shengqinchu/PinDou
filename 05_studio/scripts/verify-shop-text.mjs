@@ -13,7 +13,7 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
  const browser=await engine.launch({headless:true});
  try{
   const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
-  await context.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','zh');sessionStorage.setItem('puppy-studio-admin','local-qa')});
+  await context.addInitScript(()=>{localStorage.setItem('puppy-studio-language','zh');sessionStorage.setItem('puppy-studio-admin','local-qa')});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base+'/manage?view=shop');await page.locator('.shop-admin-row').first().waitFor();
   await page.getByLabel('搜索商品或色号',{exact:true}).fill('长文字测试');

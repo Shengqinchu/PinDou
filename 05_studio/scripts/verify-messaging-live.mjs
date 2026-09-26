@@ -11,7 +11,7 @@ try {
   const context=await browser.newContext({viewport:{width:590,height:900}});
   await context.addInitScript(()=>{
     sessionStorage.setItem('puppy-studio-admin','local-qa');
-    localStorage.setItem('puppy-studio-locale','zh');
+    localStorage.setItem('puppy-studio-language','zh');
     window.qaVisibility='hidden';
     Object.defineProperty(document,'visibilityState',{get:()=>window.qaVisibility});
   });

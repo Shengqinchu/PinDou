@@ -10,7 +10,7 @@ try {
   });
   await ctx.addInitScript(() => {
     sessionStorage.setItem("puppy-studio-admin", "local-qa");
-    localStorage.setItem("puppy-studio-locale", "en");
+    localStorage.setItem("puppy-studio-language", "en");
   });
   const p = await ctx.newPage();
   await p.goto(base + "/studio/manage?view=schedule");

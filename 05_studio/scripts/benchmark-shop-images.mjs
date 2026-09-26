@@ -15,7 +15,7 @@ try{
  for(const mode of ['baseline','optimized','prefetched'])for(let trial=1;trial<=3;trial++){
   const context=await browser.newContext({viewport:{width:1440,height:1000},deviceScaleFactor:1});
   await context.addInitScript(limited=>{
-   localStorage.setItem('puppy-studio-locale','zh');localStorage.setItem('puppy-studio-motion','reduced');
+   localStorage.setItem('puppy-studio-language','zh');localStorage.setItem('puppy-studio-motion','reduced');
    Object.defineProperty(navigator,'connection',{value:{saveData:limited,effectiveType:'4g'},configurable:true});
   },mode!=='prefetched');
   const page=await context.newPage(),base='http://127.0.0.1:'+(mode==='baseline'?4185:4186);

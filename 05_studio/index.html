@@ -6,8 +6,8 @@
     <script>
       (() => {
         const preload = (attrs) => { const link = document.createElement('link'); Object.assign(link, {rel:'preload'}, attrs); document.head.appendChild(link); };
-        let chinese = true;
-        try { chinese = localStorage.getItem('puppy-studio-locale') !== 'en'; } catch {}
+        let chinese = false;
+        try { chinese = localStorage.getItem('puppy-studio-language') === 'zh'; } catch {}
         if (chinese) preload({as:'font',href:'/studio-fonts/xiaolai-00-ffa9c8da77.woff2',type:'font/woff2',crossOrigin:'anonymous'});
         if (/^\/(?:studio\/?)?$/.test(location.pathname)) {
           let hero;

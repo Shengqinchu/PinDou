@@ -12,7 +12,7 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
  const browser=await engine.launch({headless:true});
  try{
   const context=await browser.newContext({viewport:{width:390,height:844},locale:'zh-CN'});
-  await context.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','zh')});
+  await context.addInitScript(()=>{localStorage.setItem('puppy-studio-language','zh')});
   const page=await context.newPage();page.setDefaultTimeout(12000);
   const errors=[];page.on('pageerror',e=>errors.push(e.stack||e.message));let placed=0;
   await page.route('**/studio-api/shop/catalog',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({products:[product],categories:[{id:'refills',parent_id:null,zh:'拼豆补充装',en:'Refills',sort:1,visible:true,version:1},{id:'refill-a',parent_id:'refills',zh:'A系列',en:'A series',sort:2,visible:true,version:1}],checkout_ready:false,manual_ordering_ready:true})}));

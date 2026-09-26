@@ -356,7 +356,7 @@ for (const [name, engine] of [
       });
       await ctx.addInitScript(() => {
         sessionStorage.setItem("puppy-studio-admin", "local-qa");
-        localStorage.setItem("puppy-studio-locale", "en");
+        localStorage.setItem("puppy-studio-language", "en");
         const visual = new EventTarget();
         Object.assign(visual, { height: 844, offsetTop: 0, scale: 1 });
         Object.defineProperty(window, "visualViewport", {

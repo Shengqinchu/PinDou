@@ -11,7 +11,7 @@ for(const [engineName,engine] of [['chromium',chromium],['webkit',webkit]]){
  try{for(const [lang,width,height] of [['zh',1440,900],['en',390,844]]){
   const tag=engineName+'-'+lang+'-'+Date.now().toString(36),owner='qa-email-'+tag;
   const ctx=await browser.newContext({viewport:{width,height},locale:lang==='zh'?'zh-CN':'en-CA',reducedMotion:'reduce'});
-  await ctx.addInitScript(({lang,owner})=>{sessionStorage.setItem('puppy-studio-admin','local-qa');localStorage.setItem('puppy-studio-locale',lang);localStorage.setItem('pd_web_token',owner);},{lang,owner});
+  await ctx.addInitScript(({lang,owner})=>{sessionStorage.setItem('puppy-studio-admin','local-qa');localStorage.setItem('puppy-studio-language',lang);localStorage.setItem('pd_web_token',owner);},{lang,owner});
   const page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
   const word=(zh,en)=>lang==='zh'?zh:en;
   const get=async path=>{const r=await page.request.get(base+'/studio-api'+path);assert.equal(r.status(),200);return r.json();};

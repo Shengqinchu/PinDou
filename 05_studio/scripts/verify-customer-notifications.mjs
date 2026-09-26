@@ -9,7 +9,7 @@ async function routeLocal(context){await context.route('**/studio-api/**',async 
 try{
  for(const viewport of [{width:1440,height:900},{width:390,height:844},{width:320,height:568},{width:844,height:390}]){
   const context=await browser.newContext({viewport,reducedMotion:'reduce'});await routeLocal(context);
-  await context.addInitScript(()=>{localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('puppy-studio-locale','zh');sessionStorage.setItem('puppy-studio-admin','local-qa');});
+  await context.addInitScript(()=>{localStorage.setItem('pd_web_token','qa-owner');localStorage.setItem('puppy-studio-language','zh');sessionStorage.setItem('puppy-studio-admin','local-qa');});
   const customer=await context.newPage(),staff=await context.newPage(),errors=[];for(const p of [customer,staff])p.on('pageerror',e=>errors.push(e.message));
   await customer.goto('http://127.0.0.1:5184/messages');await expect(customer.getByRole('heading',{name:'我的消息'})).toBeVisible();await expect(customer.locator('.site-chat-composer')).toHaveCount(0);
   const question=`Local web question ${viewport.width} ${stamp}`;

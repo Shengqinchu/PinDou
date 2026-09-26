@@ -30,7 +30,7 @@ for (const [engine, type] of [['chromium', chromium], ['webkit', webkit]]) {
       const yesterday = plus(calendar.today, -1);
       await context.addInitScript(({ lang, owner }) => {
         localStorage.setItem('pd_web_token', owner); localStorage.setItem('pd_token', owner);
-        localStorage.setItem('puppy-studio-locale', lang);
+        localStorage.setItem('puppy-studio-language', lang);
         sessionStorage.setItem('puppy-studio-admin', 'local-admin-visits');
       }, { lang, owner });
       let loseNext = false, lostRecord = '', forceRejected = false;

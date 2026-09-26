@@ -18,7 +18,7 @@ for(const [engineName,engine] of [['chromium',chromium],['webkit',webkit]]){
  let tracePage;
  try{
   const c=await browser.newContext({viewport:{width:1440,height:1000},locale:'zh-CN'});
-  await c.addInitScript(()=>{sessionStorage.setItem('puppy-studio-admin','local-qa');localStorage.setItem('puppy-studio-locale','zh')});
+  await c.addInitScript(()=>{sessionStorage.setItem('puppy-studio-admin','local-qa');localStorage.setItem('puppy-studio-language','zh')});
   const page=await c.newPage();tracePage=page;page.setDefaultTimeout(10000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
   const getProducts=async()=>(await(await page.request.get('http://127.0.0.1:8011/studio-api/manage/shop')).json()).products;
   // Create a fresh group for each engine, so assertions never depend on earlier writes.

@@ -10,7 +10,7 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
  const browser=await engine.launch({headless:true});
  try{
   const context=await browser.newContext({viewport:{width:1440,height:1000},locale:'zh-CN',reducedMotion:'reduce'});
-  await context.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','zh');sessionStorage.setItem('puppy-studio-admin','local-qa')});
+  await context.addInitScript(()=>{localStorage.setItem('puppy-studio-language','zh');sessionStorage.setItem('puppy-studio-admin','local-qa')});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
   let catalogRequests=0;page.on('request',r=>{if(r.url().endsWith('/shop/catalog'))catalogRequests++});
   await page.goto(base+'/shop');await page.locator('.shop-card').first().waitFor();

@@ -9,7 +9,7 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
  let activePage;
  try{
   const ctx=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
-  await ctx.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','zh');sessionStorage.setItem('puppy-studio-admin','local-qa')});
+  await ctx.addInitScript(()=>{localStorage.setItem('puppy-studio-language','zh');sessionStorage.setItem('puppy-studio-admin','local-qa')});
   const page=await ctx.newPage(),errors=[];activePage=page;page.on('pageerror',e=>errors.push(e.message));
   const before=await (await ctx.request.get(base+'/studio-api/manage/shop')).json();
   await page.goto(base+'/shop?section=finished');await expect(page.locator('.shop-card')).toHaveCount(5);

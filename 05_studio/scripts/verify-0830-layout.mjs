@@ -33,7 +33,7 @@ for (const [engineName, engine] of [
           reducedMotion: "reduce",
         });
         await context.addInitScript((lang) => {
-          localStorage.setItem("puppy-studio-locale", lang);
+          localStorage.setItem("puppy-studio-language", lang);
           sessionStorage.setItem("puppy-studio-admin", "local-qa");
         }, lang);
         const p = await context.newPage();

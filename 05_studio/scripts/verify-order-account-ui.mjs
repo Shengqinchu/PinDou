@@ -16,7 +16,7 @@ for(const [name,engine] of [['chromium',chromium],['webkit',webkit]]){
  try{
   let orderReads=0,savedAddress='not-saved';
   async function fixture(context){
-   await context.addInitScript(()=>{localStorage.setItem('puppy-studio-locale','zh');localStorage.setItem('pd_web_token','fixture-token');sessionStorage.setItem('puppy-studio-admin','fixture-admin')});
+   await context.addInitScript(()=>{localStorage.setItem('puppy-studio-language','zh');localStorage.setItem('pd_web_token','fixture-token');sessionStorage.setItem('puppy-studio-admin','fixture-admin')});
    await context.route('**/studio-api/**',route=>{
     const path=new URL(route.request().url()).pathname,method=route.request().method();let response={};
     if(path==='/studio-api/manage/requests')response={items:[],total:0};
