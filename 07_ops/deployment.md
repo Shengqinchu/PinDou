@@ -1,6 +1,6 @@
 # PinDou 当前生产部署与运维
 
-更新：2026-09-24。生产已完整迁移至 **36.139.201.94**（移动云华东-上海1，8核 / 16GB / 80GB / 8Mbps），到期 **2027-09-18**。网站、小程序后端、店主后台及原图纸服务均使用新机。当前 Studio release 为 `20260924180611-studio-v7`；英文品牌名统一见 [验收](STUDIO_BRAND_NAME_RELEASE_20260924.md)，商品图片上传提速见 [验收](STUDIO_IMAGE_UPLOAD_SPEED_20260924.md)，原分片上传修复见 [记录](STUDIO_IMAGE_UPLOAD_RELEASE_20260924.md)，顾客消息只读与商品图片切换见 [验收](STUDIO_MESSAGES_GALLERY_RELEASE_20260924.md)，顾客英文提醒修正见 [验收](STUDIO_NOTIFICATION_ENGLISH_CORRECTION_20260924.md)，订单与账户六图修正见 [验收](STUDIO_ORDER_ACCOUNT_UI_RELEASE_20260923.md)，此前订单与账号功能见 [记录](STUDIO_ORDERS_ACCOUNT_20260923.md)，店铺下单与补充装定价见 [记录](STUDIO_SHOP_CHECKOUT_20260923.md)。详见 [服务器资产与密钥位置](SERVER_ASSETS.md) 和 [迁移验收](PINDOU_FULL_MIGRATION_ACCEPTANCE_20260918.md)。
+更新：2026-09-25。生产已完整迁移至 **36.139.201.94**（移动云华东-上海1，8核 / 16GB / 80GB / 8Mbps），到期 **2027-09-18**。网站、小程序后端、店主后台及原图纸服务均使用新机。当前 Studio release 为 `20260926001311-studio-v7`；默认英文与小店默认拼豆套装见 [验收](STUDIO_DEFAULT_EN_SHOP_RELEASE_20260925.md)，此前英文品牌名统一为 `20260924180611-studio-v7`；英文品牌名统一见 [验收](STUDIO_BRAND_NAME_RELEASE_20260924.md)，商品图片上传提速见 [验收](STUDIO_IMAGE_UPLOAD_SPEED_20260924.md)，原分片上传修复见 [记录](STUDIO_IMAGE_UPLOAD_RELEASE_20260924.md)，顾客消息只读与商品图片切换见 [验收](STUDIO_MESSAGES_GALLERY_RELEASE_20260924.md)，顾客英文提醒修正见 [验收](STUDIO_NOTIFICATION_ENGLISH_CORRECTION_20260924.md)，订单与账户六图修正见 [验收](STUDIO_ORDER_ACCOUNT_UI_RELEASE_20260923.md)，此前订单与账号功能见 [记录](STUDIO_ORDERS_ACCOUNT_20260923.md)，店铺下单与补充装定价见 [记录](STUDIO_SHOP_CHECKOUT_20260923.md)。详见 [服务器资产与密钥位置](SERVER_ASSETS.md) 和 [迁移验收](PINDOU_FULL_MIGRATION_ACCEPTANCE_20260918.md)。
 
 ## 连接与目标确认
 
