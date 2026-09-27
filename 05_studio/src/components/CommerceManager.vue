@@ -38,6 +38,7 @@ import { gsap } from "gsap";
 import { arrive } from "../motion";
 import { lockPageScroll, pageScrollY } from "../browser";
 import { createDesk, deskKey, type DeskIntent } from "../admin";
+import { revealAlerts } from "../form-feedback";
 import { hamiltonDate, locale, tr } from "../state";
 import OverviewPanel from "./admin/OverviewPanel.vue";
 import OrdersPanel from "./admin/OrdersPanel.vue";
@@ -121,7 +122,10 @@ function trapMenu(event: KeyboardEvent) {
     first?.focus();
   }
 }
+let stopRevealingAlerts: (() => void) | undefined;
+onMounted(() => { stopRevealingAlerts = revealAlerts(); });
 onBeforeUnmount(() => {
+  stopRevealingAlerts?.();
   mobileMedia.removeEventListener("change", resizeMenu);
   unlockMenu?.();
   arrival?.kill();

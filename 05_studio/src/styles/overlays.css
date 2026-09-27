@@ -181,3 +181,6 @@
   display: flex;
   align-items: center;
 }
+.drawer-bottom:has(.drawer-issue){flex-wrap:wrap}
+.drawer-issue{flex:1 1 100%;margin:0;padding:10px 14px;border-radius:12px;background:#faf1eb;font-size:14px;line-height:1.6}
+.studio-desk [role="alert"],.studio-drawer [role="alert"]{scroll-margin:180px 0 24px}
