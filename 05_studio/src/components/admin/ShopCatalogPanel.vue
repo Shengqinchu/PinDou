@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onDeactivated, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onDeactivated, ref, watch } from 'vue';
 import { PhPlus, PhArrowClockwise, PhPencilSimple } from '@phosphor-icons/vue';
 import { useDesk } from '../../admin';
 import { say, tr, formatCopy } from '../../state';
@@ -36,6 +36,7 @@ async function archived(){
 watch(deleted,()=>{selected.value=[];void refresh();});
 const selected=ref<string[]>([]),batchOpen=ref(false),batchProducts=ref<ShopProduct[]>([]),priceState=ref('all'),imageState=ref('all');
 const data=ref<ShopCatalog>(),busy=ref(false),error=ref(''),success=ref(''),search=ref(''),collection=ref('all'),category=ref('all'),optimizePhotos=ref(true);
+const fieldIssue=ref(''),savedId=ref('');
 const categoryMode=ref(false),edit=ref<ShopProduct>(),categoryEdit=ref<ShopCategory>(),open=ref(false),categoryOpen=ref(false),price=ref('');
 const textTooLong=computed(()=>!!edit.value&&([edit.value.zh,edit.value.en].some(v=>productTextLength(v)>productTextLimits.name)||[edit.value.detailZh,edit.value.detailEn].some(v=>productTextLength(v)>productTextLimits.description)));
 const textLimitMessage=computed(()=>formatCopy(w.textTooLong,{v0:productTextLimits.name,v1:productTextLimits.description}));
@@ -60,9 +61,23 @@ const roots=computed(()=>data.value?.categories.filter(c=>!c.parent_id&&c.id!==c
 function fail(e:unknown){const x=e as CommerceError;error.value=say(x.code==='version_conflict'?w.conflict:x.code==='shop_category_invalid'?w.invalidCategory:x.code==='shop_category_in_use'?w.categoryUsed:[])||x.message;}
 async function refresh(){const seq=++refreshSequence;error.value='';try{const result=await request<ShopCatalog>('/manage/shop?deleted='+deleted.value);if(seq===refreshSequence)data.value=result;}catch(e){if(seq===refreshSequence)fail(e)}}
 function keepDraft(){if(edit.value)drafts.set(edit.value.id,{product:clone(edit.value),price:price.value})}
-function editProduct(p:ShopProduct){if(busy.value)return;if(deleted.value){startArchive([p],true);return;}keepDraft();const draft=drafts.get(p.id);edit.value=clone(draft?.product||p);price.value=draft?.price??(p.price_cents===null?'':String(p.price_cents/100));error.value='';success.value='';open.value=true;}
+function editProduct(p:ShopProduct){if(busy.value)return;if(deleted.value){startArchive([p],true);return;}keepDraft();const draft=drafts.get(p.id);edit.value=clone(draft?.product||p);price.value=draft?.price??(p.price_cents===null?'':String(p.price_cents/100));error.value='';fieldIssue.value='';success.value='';open.value=true;}
 function create(){editProduct({id:'item-'+crypto.randomUUID().slice(0,12),kind:'physical',category:'beads',zh:'',en:'',detailZh:'',detailEn:'',image:'',images:[],price_cents:null,stock:0,active:false,version:1,shop_collection:collection.value==='finished'?'finished':collection.value==='services'?'services':'home',shop_category_id:collection.value==='finished'||collection.value==='services'?null:leaves.value[0]?.id||null,shop_visible:false,code:'',sort:500});}
 function changeCollection(){if(edit.value)edit.value.shop_category_id=edit.value.shop_collection==='home'?(leaves.value[0]?.id||null):null;}
+// Native validation bubbles vanish quickly; keep the first blocked field beside Save.
+function noteInvalid(event:Event){
+ if(fieldIssue.value)return;
+ const field=event.target as HTMLInputElement,label=field.closest('label');
+ const name=label?[...label.childNodes].find(n=>n.nodeType===Node.TEXT_NODE&&n.textContent?.trim())?.textContent?.trim():'';
+ fieldIssue.value=[name||field.getAttribute('aria-label')||'',field.validationMessage].filter(Boolean).join(' · ');
+}
+async function showSaved(id:string){
+ savedId.value=id;await nextTick();
+ // The drawer restores the page scroll when its exit finishes; scroll after that.
+ for(let wait=0;wait<40&&document.getElementById('shop-product-editor')?.closest('dialog')?.open;wait++)await new Promise(done=>setTimeout(done,50));
+ document.querySelector(`[data-product-id="${CSS.escape(id)}"]`)?.scrollIntoView({block:'center'});
+ setTimeout(()=>{if(savedId.value===id)savedId.value=''},4000);
+}
 async function save(){
  if(!edit.value||busy.value)return;
  if(textTooLong.value){error.value=textLimitMessage.value;return;}
@@ -73,7 +88,7 @@ async function save(){
  const current=clone(edit.value);current.price_cents=amount;current.image=current.images[0]||'';current.active=false;
  current.category=current.shop_collection==='home'?(data.value?.categories.find(c=>c.id===current.shop_category_id)?.parent_id==='tools'?'tools':'beads'):'finished';
  busy.value=true;error.value='';success.value='';
- try{const next=await request<ShopProduct>('/manage/products/'+current.id,{method:'PUT',body:JSON.stringify(current)});drafts.delete(current.id);edit.value=clone(next);await refresh();void loadShop(true).catch(()=>{});open.value=false;success.value=say(w.saved)}catch(e){fail(e)}finally{busy.value=false;}
+ try{const next=await request<ShopProduct>('/manage/products/'+current.id,{method:'PUT',body:JSON.stringify(current)});drafts.delete(current.id);edit.value=clone(next);await refresh();void loadShop(true).catch(()=>{});open.value=false;success.value=say(w.saved);void showSaved(current.id)}catch(e){fail(e)}finally{busy.value=false;}
 }
 async function reloadProduct(){if(!edit.value||busy.value)return;const id=edit.value.id;await refresh();const p=data.value?.products.find(p=>p.id===id);if(p){drafts.delete(id);edit.value=undefined;editProduct(p)}}
 async function upload(files:File[]){
@@ -96,7 +111,7 @@ onMounted(refresh);onDeactivated(()=>{keepDraft();open.value=false;categoryOpen.
    <div class="shop-admin-tools"><select v-model="collection" :aria-label="say(w.collection)"><option value="all">{{say(w.all)}}</option><option v-for="s in (['home','finished','services'] as const)" :key="s" :value="s">{{say(w[s])}}</option></select><select v-model="category" :aria-label="say(w.category)"><option value="all">{{say(w.all)}}</option><option v-for="c in leaves" :key="c.id" :value="c.id">{{tr(c.zh,c.en)}}</option></select><input v-model="search" type="search" :placeholder="say(w.search)" :aria-label="say(w.search)"/></div>
    <div class="shop-admin-tools"><select v-model="priceState" :aria-label="say(b.priceState)"><option value="all">{{say(b.priceState)}} · {{say(w.all)}}</option><option value="unpriced">{{say(b.unpriced)}}</option><option value="priced">{{say(b.priced)}}</option></select><select v-model="imageState" :aria-label="say(b.imageState)"><option value="all">{{say(b.imageState)}} · {{say(w.all)}}</option><option value="missing">{{say(b.missing)}}</option><option value="has-image">{{say(b.hasImage)}}</option></select></div>
    <div class="shop-selection-bar"><label><input type="checkbox" :checked="allSelected" :disabled="busy" @change="selectFiltered"/>{{say(b.selectFiltered)}}</label><span>{{formatCopy(b.selected,{v0:selected.length})}} / {{formatCopy(w.count,{v0:visible.length})}}</span><button class="desk-button secondary" :disabled="busy||!selected.length" @click="selected=[]">{{say(b.clear)}}</button><button type="button" class="desk-button" :class="deleted?'secondary':'admin-delete-button'" :disabled="busy||!selected.length||selected.length>500" @click="archiveSelected">{{say(deleted?controls.restoreSelected:controls.deleteSelected)}}</button><button v-if="!deleted" class="desk-button primary" :disabled="busy||!selected.length||selected.length>500" @click="startBatch">{{say(b.edit)}}</button></div>
-   <div class="shop-admin-list"><div v-for="p in visible" :key="p.id" class="shop-select-row"><input v-model="selected" type="checkbox" :value="p.id" :aria-label="formatCopy(b.select,{v0:tr(p.zh,p.en)})"/><button class="shop-admin-row" :disabled="busy" @click="editProduct(p)"><img v-if="p.images.length" :src="shopImage(p.images[0])" alt="" loading="lazy"/><span v-else class="shop-bag-thumb">{{p.code||'—'}}</span><span><strong>{{tr(p.zh,p.en)}}</strong><small>{{p.code}}</small></span><span>{{p.price_cents===null?say(w.unpriced):money(p.price_cents)}}</span><span>{{say(deleted?controls.restoreProduct:p.shop_visible?w.visible:w.hidden)}}<PhPencilSimple/></span></button></div></div>
+   <div class="shop-admin-list"><div v-for="p in visible" :key="p.id" class="shop-select-row" :class="{'shop-just-saved':savedId===p.id}" :data-product-id="p.id"><input v-model="selected" type="checkbox" :value="p.id" :aria-label="formatCopy(b.select,{v0:tr(p.zh,p.en)})"/><button class="shop-admin-row" :disabled="busy" @click="editProduct(p)"><img v-if="p.images.length" :src="shopImage(p.images[0])" alt="" loading="lazy"/><span v-else class="shop-bag-thumb">{{p.code||'—'}}</span><span><strong>{{tr(p.zh,p.en)}}</strong><small>{{p.code}}</small></span><span>{{p.price_cents===null?say(w.unpriced):money(p.price_cents)}}</span><span>{{say(deleted?controls.restoreProduct:p.shop_visible?w.visible:w.hidden)}}<PhPencilSimple/></span></button></div></div>
    <p v-if="!visible.length" class="shop-state">{{say(w.noMatch)}}</p>
   </template>
   <div v-else class="shop-admin-categories"><button v-for="c in data?.categories" :key="c.id" :class="{child:c.parent_id}" @click="editCat(c)">{{tr(c.zh,c.en)}}<small v-if="!c.visible"> · {{say(w.hidden)}}</small></button></div>
@@ -104,7 +119,7 @@ onMounted(refresh);onDeactivated(()=>{keepDraft();open.value=false;categoryOpen.
  <ArchiveDialog v-model="archiveOpen" :title="formatCopy(archiveRestore?controls.restoreProductsTitle:controls.deleteProductsTitle,{v0:archiveTargets.length})" :description="say(archiveRestore?controls.productRestoreHelp:controls.productDeleteHelp)" :items="archiveTargets.map(p=>tr(p.zh,p.en))" :restore="archiveRestore" path="/manage/shop/products/archive" :body="{action:archiveRestore?'restore':'delete',items:archiveTargets.map(p=>({id:p.id,version:p.version}))}" @saved="archived" @reload="refresh"/>
  <ShopBatchEditor v-model="batchOpen" :products="batchProducts" @saved="batchSaved"/>
  <SlideOver v-model="open" :title="say(w.editProduct)" :busy="busy">
-  <form v-if="edit" id="shop-product-editor" class="shop-edit-form" @submit.prevent="save">
+  <form v-if="edit" id="shop-product-editor" class="shop-edit-form" @submit.prevent="save" @invalid.capture="noteInvalid" @input="fieldIssue=''">
    <div class="shop-edit-pair"><label>{{say(w.nameZh)}}<input v-model="edit.zh" :aria-label="say(w.nameZh)" required/><small class="shop-text-count" :class="{exceeded:productTextLength(edit.zh)>productTextLimits.name}">{{textCount(edit.zh,productTextLimits.name)}}</small></label><label>{{say(w.nameEn)}}<input v-model="edit.en" :aria-label="say(w.nameEn)" required/><small class="shop-text-count" :class="{exceeded:productTextLength(edit.en)>productTextLimits.name}">{{textCount(edit.en,productTextLimits.name)}}</small></label></div>
    <div class="shop-edit-pair"><label>{{say(w.collection)}}<select :aria-label="say(w.collection)" v-model="edit.shop_collection" @change="changeCollection"><option v-for="s in (['home','finished','services'] as const)" :key="s" :value="s">{{say(w[s])}}</option></select></label><label v-if="edit.shop_collection==='home'">{{say(w.category)}}<select :aria-label="say(w.category)" v-model="edit.shop_category_id" required><option v-for="c in leaves" :key="c.id" :value="c.id">{{tr(c.zh,c.en)}}</option></select></label></div>
    <div class="shop-edit-pair"><label>{{say(w.price)}}<input v-model="price" inputmode="decimal" :placeholder="say(w.unpriced)"/></label><label>{{say(w.stock)}}<input v-model.number="edit.stock" type="number" min="0" max="100000" step="1" required/></label></div>
@@ -116,9 +131,8 @@ onMounted(refresh);onDeactivated(()=>{keepDraft();open.value=false;categoryOpen.
    <label class="shop-check"><input v-model="edit.shop_visible" type="checkbox"/>{{say(w.show)}}</label>
    <div><h3>{{say(w.photos)}}</h3><p class="shop-notice">{{say(w.photoHelp)}}</p><div class="shop-edit-photos"><div v-for="(src,i) in edit.images" :key="src"><img :src="shopImage(src)" :alt="formatCopy(w.imageNumber,{v0:i+1})"/><button v-if="i>0" type="button" :disabled="busy" @click="cover(i)">{{say(w.cover)}}</button><button type="button" :disabled="busy" @click="edit.images.splice(i,1)">{{say(w.remove)}}</button></div></div><label class="shop-check"><input v-model="optimizePhotos" type="checkbox" :disabled="busy"/>{{say(w.optimizePhotos)}}</label><MediaUpload multiple original :busy="busy" :disabled="busy||edit.images.length>=12" :label="say(w.upload)" :help="optimizePhotos?say(w.optimizePhotosHelp):undefined" @select="upload"/></div>
    <details v-if="data?.sources?.[edit.id]"><summary>{{say(w.source)}}</summary><p>{{data.sources[edit.id].platform}} · {{data.sources[edit.id].title}}</p><p>{{say(w.sourcePrice)}} {{(data.sources[edit.id].source_min_fen/100).toFixed(2)}}</p></details>
-   <p v-if="error" class="shop-error" role="alert">{{error}} <button type="button" :disabled="busy" @click="reloadProduct">{{say(w.retry)}}</button></p>
   </form>
-  <template #footer><button v-if="edit&&data?.products.some(p=>p.id===edit?.id)" type="button" class="desk-button admin-delete-button" :disabled="busy" @click="startArchive([edit],false)">{{say(controls.deleteProduct)}}</button><button class="desk-button primary" form="shop-product-editor" type="submit" :disabled="busy||textTooLong">{{say(w.save)}}</button></template>
+  <template #footer><p v-if="fieldIssue||error" class="shop-error shop-editor-issue" role="alert">{{fieldIssue||error}} <button v-if="!fieldIssue" type="button" :disabled="busy" @click="reloadProduct">{{say(w.retry)}}</button></p><button v-if="edit&&data?.products.some(p=>p.id===edit?.id)" type="button" class="desk-button admin-delete-button" :disabled="busy" @click="startArchive([edit],false)">{{say(controls.deleteProduct)}}</button><button class="desk-button primary" form="shop-product-editor" type="submit" :disabled="busy||textTooLong" @click="fieldIssue=''">{{say(w.save)}}</button></template>
  </SlideOver>
  <SlideOver v-model="categoryOpen" :title="say(w.editCategory)" :busy="busy"><form v-if="categoryEdit" id="shop-category-editor" class="shop-edit-form" @submit.prevent="saveCat">
   <label>{{say(w.nameZh)}}<input v-model="categoryEdit.zh" maxlength="60" required/></label><label>{{say(w.nameEn)}}<input v-model="categoryEdit.en" maxlength="100" required/></label><label>{{say(w.parent)}}<select v-model="categoryEdit.parent_id" :aria-label="say(w.parent)"><option :value="null">{{say(w.topCategory)}}</option><option v-for="c in roots" :key="c.id" :value="c.id">{{tr(c.zh,c.en)}}</option></select></label><label>{{say(w.sort)}}<input v-model.number="categoryEdit.sort" type="number" min="0" max="100000" required/></label><label class="shop-check"><input v-model="categoryEdit.visible" type="checkbox"/>{{say(w.show)}}</label><p v-if="error" class="shop-error" role="alert">{{error}} <button type="button" :disabled="busy" @click="reloadCat">{{say(w.retry)}}</button></p>
