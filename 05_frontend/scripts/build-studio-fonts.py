@@ -16,6 +16,8 @@ headings = ''.join(''.join(miniapp[key]) for key in (
 for module, key in (('account', 'account'), ('booking-profile', 'title')):
     headings += ''.join(json.loads((root / f'05_studio/src/content/{module}.json').read_text('utf-8'))[key])
 for module, keys in {
+    'patch-reservations': ['patch'],
+    'patch-promotion': ['title', 'desk_title'],
     'account': ['my_reservations','reservation_title'],
     'profile': ['edit'],
     'miniapp-legal': ['privacy_title','agreement_title'],

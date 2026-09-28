@@ -12,6 +12,7 @@ export function clearAdminViews(){views.clear();revisions.clear();generation++;}
 export function invalidateAdminViews(path:string){
  currentScope();
  const keys=path.startsWith('/manage/finance')?['home','finance']:
+ path.startsWith('/manage/patch-promotion')?['reservations','calendar']:
  path.startsWith('/manage/reservations')?['home','reservations','calendar','finance','members']:
  path.startsWith('/manage/messages')||path.startsWith('/manage/site-messages')?['home','messages']:
  path.startsWith('/manage/members')?['home','members']:[];

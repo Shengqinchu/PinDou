@@ -4,12 +4,16 @@ import { computed,ref } from 'vue';
 import {onViewShow as onShow} from '../../utils/studio-view-lifecycle';
 import StudioShell from '../../components/StudioShell.vue';
 import StudioGlyph from '../../components/StudioGlyph.vue';
+import StudioPatchOffer from '../StudioPatchOffer.vue';
+import {usePatchPromotion} from '../../utils/studio-patch-promotion';
 import { useStudioNative } from '../../utils/studio-native';
 import { refreshStudioContent,studioWords,studioPhoto } from '../../utils/studio-content';
 import {navigateStudio} from '../../utils/studio-navigation';
 const {language,width,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();
 const words=(module:Parameters<typeof studioWords>[0],key:string)=>say(studioWords(module,key));
 const photo=computed(studioPhoto),imageFailed=ref(false);
+const {offer,open,dismiss}=usePatchPromotion(true);
+function patchVisit(){dismiss();uni.navigateTo({url:'/pages/studio/visit?experience=patch'});}
 function visit(){uni.navigateTo({url:'/pages/studio/visit'});}
 function bookings(){navigateStudio('/pages/studio/reservations');}
 function details(){uni.navigateTo({url:'/pages/studio/details'});}
@@ -24,5 +28,6 @@ onShow(()=>void refreshStudioContent());
    <view class="studio-home-shortcuts"><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" @tap="bookings"><StudioGlyph name="clock"/><text>{{words('account','my_reservations')}}</text></button><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" @tap="details"><StudioGlyph name="pin"/><text>{{words('home','studio_details_7c4089')}}</text></button></view>
    <text class="studio-native-body studio-native-small">{{words('flow','confirmation_note')}}</text>
   </view>
+  <template #overlay><StudioPatchOffer v-if="open&&offer" :offer="offer" :language="language" @dismiss="dismiss" @book="patchVisit"/></template>
  </StudioShell>
 </template>

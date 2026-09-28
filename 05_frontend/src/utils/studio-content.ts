@@ -20,10 +20,12 @@ import profile from '../../../05_studio/src/content/profile.json';
 import notifications from '../../../05_studio/src/content/customer-notifications.json';
 import process from '../../../05_studio/src/content/components-BeadingProcess.json';
 import contacts from '../../../05_studio/src/content/contact-fields.json';
+import patch from '../../../05_studio/src/content/patch-reservations.json';
+import promotion from '../../../05_studio/src/content/patch-promotion.json';
 import media from '../../../05_studio/src/media-assets.json';
 
-const defaults={home,visit,flow,calendar,receipt,cancellation,booking,account,wallet,app,details,errors,generic,miniapp,profile,process,contacts};
-const names:Record<keyof typeof defaults,string>={home:'pages-Home',visit:'pages-Visit',flow:'visit-flow',calendar:'components-ReservationCalendar',receipt:'pages-ReservationReceipt',cancellation:'reservation-cancellation',booking:'booking-profile',account:'account',wallet:'wallet',app:'App',details:'pages-Details',errors:'data-commerce-messages',generic:'commerce',miniapp:'miniapp',profile:'profile',process:'components-BeadingProcess',contacts:'contact-fields'};
+const defaults={home,visit,flow,calendar,receipt,cancellation,booking,account,wallet,app,details,errors,generic,miniapp,profile,process,contacts,patch,promotion};
+const names:Record<keyof typeof defaults,string>={home:'pages-Home',visit:'pages-Visit',flow:'visit-flow',calendar:'components-ReservationCalendar',receipt:'pages-ReservationReceipt',cancellation:'reservation-cancellation',booking:'booking-profile',account:'account',wallet:'wallet',app:'App',details:'pages-Details',errors:'data-commerce-messages',generic:'commerce',miniapp:'miniapp',profile:'profile',process:'components-BeadingProcess',contacts:'contact-fields',patch:'patch-reservations',promotion:'patch-promotion'};
 const published=shallowRef<Record<string,Record<string,unknown>>>({});
 let pending:Promise<void>|undefined,updated=0;
 export function refreshStudioContent(){
@@ -56,6 +58,7 @@ export function studioMedia(name:keyof typeof media):StudioMedia{
   return {src:src.startsWith('/')?'https://pindoupuppy.com'+src:src,width:dimension(valid?override?.width:undefined,fallback.width),height:dimension(valid?override?.height:undefined,fallback.height)};
 }
 export function bookingError(code:string):string[]{
+  if(code==='reservation_patch_duration')return patch.duration_error;
   if(code in notifications)return (notifications as Record<string,string[]>)[code];
   if(code==='booking_profile_changed')return booking.changed;
   if(code==='booking_contact_invalid')return booking.incomplete;
@@ -63,6 +66,7 @@ export function bookingError(code:string):string[]{
   if(code==='reservation_rate_limit')return generic.too_many_requests_please_try_again_later_e30269;
   return miniapp.generic_error;
 }
+export function studioPlanWords(plan:string){return plan==='patch'?studioWords('patch','patch'):studioWords('visit',plan==='day'?'a_day_of_making_01d6e2':'by_the_hour_5300b2');}
 export function fillWords(words:string[],language:string,values:Record<string,string|number>){
   return words[language==='en'?1:0].replace(/\{(v\d+)\}/g,(match,key)=>values[key]===undefined?match:String(values[key]));
 }

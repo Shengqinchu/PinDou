@@ -4,6 +4,7 @@ import workbench from '../../../05_studio/src/content/workbench.json';
 import business from '../../../05_studio/src/content/business.json';
 import wallet from '../../../05_studio/src/content/wallet.json';
 import commerce from '../../../05_studio/src/content/commerce.json';
+import promotionErrors from '../../../05_studio/src/content/data-commerce-messages.json';
 import messaging from '../../../05_studio/src/content/messaging.json';
 import {clearAdminViews,invalidateAdminViews} from './studio-admin-cache';
 import {navigateStudio} from './studio-navigation';
@@ -35,7 +36,7 @@ export async function adminCall<T>(path:string,data:unknown={},method:'GET'|'POS
 }
 export function adminError(error:unknown,say:(s:string[])=>string){
  const key=error instanceof MiniappError?error.code:'generic_error';
- for(const source of [workbench,business,wallet,commerce,messaging]){const item=(source as Record<string,string[]>)[key];if(item)return say(item);}
+ for(const source of [workbench,business,wallet,commerce,messaging,promotionErrors]){const item=(source as Record<string,string[]>)[key];if(item)return say(item);}
  return say(workbench.generic_error);
 }
 export function today(){const d=new Date();return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);}

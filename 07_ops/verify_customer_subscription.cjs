@@ -32,12 +32,12 @@ function booking(h,native=true){
  const uni={hideKeyboard(){},pageScrollTo(){},getStorageSync:key=>storage.get(key),setStorageSync:(key,value)=>storage.set(key,value),removeStorageSync:key=>storage.delete(key),navigateTo(){},redirectTo(value){posts.push({redirect:value.url});}};
  const cached=async p=>p.startsWith('/auth/')?{profile:{owner_id:'member-a',complete:true,name:'QA guest',contact_method:'wechat',contact:'qa-only',version:1},can_omit_details:false}:{max_guests_per_group:4};
  const api=compile('05_frontend/src/utils/use-studio-visit.ts',{
-  vue,'@dcloudio/uni-app':{onShow:fn=>hooks.show=fn,onHide:fn=>hooks.hide=fn,onUnload:fn=>hooks.unload=fn},
-  './customer-notifications':h.api,'../store/user':{useUserStore:()=>user},
+  vue,'@dcloudio/uni-app':{onLoad:fn=>hooks.load=fn,onShow:fn=>hooks.show=fn,onHide:fn=>hooks.hide=fn,onUnload:fn=>hooks.unload=fn},
+  './customer-notifications':h.api,'../store/studio-user':{useUserStore:()=>user},
   './miniapp-client':{MiniappError:h.base.MiniappError,studioCall:async(p,data,t,token,method,headers)=>{posts.push({p,data,method,headers});return {id:'VIS-LOCAL-QA',status:'pending'};}},
   './studio-cache':{peekStudioSnapshot:()=>null,readStudioCached:cached,invalidateStudioSnapshots(){},rememberStudioSnapshot(){}},
   './studio-content':{refreshStudioContent:async()=>{}},
-  './studio-booking':{emptyBooking:()=>({date:'2026-10-01',start:'12:00',end:'14:00',guests:1,plan:'hourly'}),emptyContact:()=>({name:'',contact_method:'wechat',contact:''}),validBooking:()=>true,validContact:()=>true,requestId:()=> 'local-idempotency-key',retryUnchanged:()=>false},
+  './studio-booking':{emptyBooking:()=>({date:'2026-10-01',start:'12:00',end:'14:00',guests:1,plan:'hourly'}),emptyContact:()=>({name:'',contact_method:'wechat',contact:''}),validBooking:()=>true,validContact:()=>true,requestId:()=> 'local-idempotency-key',retryUnchanged:()=>false,calendarPath:b=>'/reservation-calendar?guests='+b.guests+'&experience=beads',experienceFor:()=> 'beads'},
  },{uni},native);
  const flow=api.useStudioVisit({value:'zh'});flow.step.value=2;
  return {flow,posts,hooks,user};

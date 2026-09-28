@@ -35,3 +35,18 @@
 .studio-native--fitted .studio-modal-panel{gap:14px;padding:22px 20px}.studio-native--fitted .studio-native-error{font-size:12px;line-height:1.6;padding:10px 12px}
 @media(max-width:350px){.studio-native--fitted .studio-plan{padding:10px 8px;gap:6px}.studio-plan-top .studio-plan-name{font-size:13px}.studio-native--fitted .studio-price{font-size:22px}.studio-price-unit{max-width:43px;font-size:9px}.studio-native--fitted .studio-promotion{padding:10px}.studio-native--fitted .studio-promotion-line{font-size:11px}.studio-native--fitted .studio-native-definition-row{grid-template-columns:68px minmax(0,1fr);gap:4px 7px}}
 @media(max-height:600px){.studio-native--fitted .studio-native-main{gap:10px}.studio-native-scroll-inner{padding-top:6px;padding-bottom:10px}.studio-native--fitted .studio-native-top{min-height:42px}.studio-native--fitted .studio-brand-touch{min-height:42px!important;width:108px}.studio-native--fitted .studio-brand-window{width:108px;height:40.75px}.studio-native--fitted .studio-brand-window--en{height:42.61px}.studio-native--fitted .studio-native-title{font-size:22px}.studio-native--fitted .studio-account{gap:8px}}
+
+/* Native patch booking: four compact modules, shared button and modal treatment. */
+.studio-native--fitted .studio-visit-plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.studio-native--fitted .studio-plan-patch>.studio-native-body{min-height:0}
+.studio-native--fitted .studio-plan-offers{display:flex;flex-direction:column;gap:5px;min-width:0;background:#f4f7f4;border:1px solid #dfe6e2;padding:12px 11px;border-radius:15px}
+.studio-native--fitted .studio-plan-offers .studio-native-small{font-size:11px;line-height:1.55}
+.studio-native .studio-offer-info{min-height:44px;min-width:44px;margin:-8px -8px -8px 0}
+.studio-offer-divider{height:1px;background:#dfe6e2;width:100%;margin:3px 0}
+.studio-patch-card-offer{display:flex;flex-direction:column;gap:3px;font-size:11px;line-height:1.55;color:#46677a;border-top:1px solid #dce7ed;padding-top:7px;margin-top:2px;width:100%}
+.studio-patch-popup-top{display:flex;justify-content:space-between;align-items:center;width:100%}
+.studio-patch-popup .studio-native-title{font-size:27px;line-height:1.5}
+.studio-patch-bonus{padding:16px;border-radius:14px;background:#f0f6fa;font-size:16px;line-height:1.6}
+.studio-patch-popup .studio-native-primary{width:100%}
+
+.admin-patch-gift{display:inline-flex;align-self:flex-start;color:#49667a;background:#eaf3f8;border:1px solid #d8e7ee;border-radius:7px;padding:4px 8px;font-size:12px;line-height:1.5}

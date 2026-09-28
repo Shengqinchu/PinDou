@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 const props = withDefaults(defineProps<{ name: string; size?: number }>(), { size: 22 });
 const paths: Record<string, string> = {
+  patch: '<path d="M8 3h8l5 5v8l-5 5H8l-5-5V8Z"/><path d="M9 6h6m3 3v6m-3 3H9m-3-3V9" stroke-dasharray="1 2"/><path d="m9 12 2 2 4-4"/>',
   home: '<path d="m3 10 9-7 9 7v10H3Z M9 20v-7h6v7"/>',
   calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h2m4 0h2"/>',
   back: '<path d="M19 12H5m6-6-6 6 6 6"/>',

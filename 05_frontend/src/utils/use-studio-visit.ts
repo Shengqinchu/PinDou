@@ -1,11 +1,11 @@
 import { computed, reactive, ref, shallowRef,watch } from 'vue';
-import { onShow, onHide, onUnload } from '@dcloudio/uni-app';
+import { onLoad, onShow, onHide, onUnload } from '@dcloudio/uni-app';
 import {saveNotifications,subscribeWechat,warmWechat,wechatPermissionReady,resetWechatChoices,skipWechatChoices,saveBookingWechatChoices} from './customer-notifications';
 import { useUserStore } from '../store/studio-user';
 import { MiniappError, studioCall } from './miniapp-client';
 import {peekStudioSnapshot,readStudioCached,invalidateStudioSnapshots,rememberStudioSnapshot} from './studio-cache';
 import { refreshStudioContent } from './studio-content';
-import { emptyBooking, emptyContact, validBooking, validContact, requestId, retryUnchanged, type Booking, type ContactContext, type Calendar, type Attempt, type Receipt,type Payload } from './studio-booking';
+import { emptyBooking, emptyContact, validBooking, validContact, requestId, retryUnchanged,calendarPath,experienceFor, type Plan,type Booking, type ContactContext, type Calendar, type Attempt, type Receipt,type Payload } from './studio-booking';
 
 export function useStudioVisit(language:{value:string}){
   const user=useUserStore(),booking=reactive(emptyBooking()),contact=reactive(emptyContact());
@@ -13,6 +13,7 @@ export function useStudioVisit(language:{value:string}){
   const context=ref<ContactContext>(),contactLoading=ref(false),contactError=ref(false),editing=ref(false),profileConflict=ref(false),attempt=ref<Attempt|null>(null);
   const confirmation=shallowRef<Payload|null>(null);
   const notificationLoading=ref(false),notificationNote=ref(''),confirming=ref(false);
+  let chosenPlan:Exclude<Plan,''>|null=null,requestedPatch=false;
   let alive=true,visible=true,calendarSeq=0,contactSeq=0,owner='',ownerToken='',timer:ReturnType<typeof setInterval>|undefined,restoring=false,resolveConfirmation:((value:boolean)=>void)|undefined;
   function settleConfirmation(value:boolean){const resolve=resolveConfirmation;resolveConfirmation=undefined;confirmation.value=null;resolve?.(value);}
   function dismissSubmission(){settleConfirmation(false);}
@@ -53,7 +54,7 @@ export function useStudioVisit(language:{value:string}){
     try{uni.setStorageSync(draftKey(owner),{booking:{...booking},contact:{...contact},notes:notes.value,step:step.value,editing:editing.value,profileVersion:context.value?.profile.version});}catch{}
   }
   function clearTime(){booking.start='';booking.end='';}
-  function choosePlan(plan:'hourly'|'day'){if(locked.value)return;if(booking.plan!==plan){booking.plan=plan;clearTime();}errorCode.value='';}
+  function choosePlan(plan:Exclude<Plan,''>){if(locked.value)return;chosenPlan=plan;requestedPatch=false;if(booking.plan!==plan){const previous=experienceFor(booking.plan);booking.plan=plan;clearTime();if(previous!==experienceFor(plan)){calendar.value=null;void loadCalendar();}}errorCode.value='';}
   async function chooseGuests(count:number){
     if(locked.value||!Number.isInteger(count)||count<1||count>(calendar.value?.max_guests_per_group||6))return;
     if(booking.guests===count)return;booking.guests=count;errorCode.value='';await loadCalendar();
@@ -66,12 +67,13 @@ export function useStudioVisit(language:{value:string}){
     step.value=value;errorCode.value='';uni.pageScrollTo({scrollTop:0,duration:180});
   }
   async function loadCalendar(force=false){
-    const seq=++calendarSeq,path='/reservation-calendar?guests='+booking.guests,saved=peekStudioSnapshot<Calendar>(path,'');calendarError.value=false;
+    const seq=++calendarSeq,path=calendarPath(booking),saved=peekStudioSnapshot<Calendar>(path,'');calendarError.value=false;
+    if(calendar.value&&(calendar.value.experience||'beads')!==experienceFor(booking.plan))calendar.value=null;
     if(saved&&!calendar.value)calendar.value=saved.data;
     loading.value=force||!saved||saved.age>=15000;
     try{
       const value=await readStudioCached<Calendar>(path,'',15000,force);
-      if(!alive||seq!==calendarSeq)return false;
+      if(!alive||seq!==calendarSeq||path!==calendarPath(booking))return false;
       calendar.value=value;
       if(!attempt.value&&booking.start&&!validBooking(value,booking)){clearTime();errorCode.value='reservation_interval_unavailable';if(step.value===2)step.value=1;}
       return true;
@@ -97,12 +99,16 @@ export function useStudioVisit(language:{value:string}){
       const id=result.profile.owner_id;
       if(!id)throw new MiniappError('account_login_required',401);
       if(owner!==id){
+        const currentBooking=chosenPlan?{...booking}:null,currentStep=step.value;
         restoring=true;owner=id;ownerToken=token;Object.assign(contact,emptyContact());notes.value='';editing.value=false;profileConflict.value=false;
         let pending:Attempt|null=null,saved:any=null;
         try{pending=uni.getStorageSync(attemptKey(id))||null;saved=uni.getStorageSync(draftKey(id))||null;}catch{}
         attempt.value=pending?.owner===id&&pending.key&&pending.body?pending:null;
         if(attempt.value){const body=attempt.value.body;Object.assign(booking,body.booking);Object.assign(contact,{name:body.name,contact_method:body.contact_method,contact:body.contact});notes.value=body.notes;step.value=2;}
         else if(saved?.booking&&saved?.contact){Object.assign(booking,saved.booking);Object.assign(contact,saved.contact);notes.value=String(saved.notes||'');step.value=Math.max(0,Math.min(2,saved.step||0));editing.value=!!saved.editing;profileConflict.value=editing.value&&saved.profileVersion!==result.profile.version;}
+        // A choice made in this visit takes precedence over an older account draft.
+        // An uncertain submitted request still has priority and remains immutable.
+        if(!attempt.value&&currentBooking){Object.assign(booking,currentBooking);step.value=currentStep;}
         restoring=false;
       }
       if(context.value&&context.value.profile.owner_id===id&&context.value.profile.version!==result.profile.version&&editing.value&&!attempt.value)profileConflict.value=true;
@@ -163,9 +169,10 @@ export function useStudioVisit(language:{value:string}){
     dismissSubmission();
     contactSeq++;ownerToken='';context.value=undefined;Object.assign(contact,emptyContact());notes.value='';owner='';attempt.value=null;editing.value=false;
   });
+  onLoad(query=>{requestedPatch=query?.experience==='patch';});
   async function resume(){
     clearInterval(timer);void refreshStudioContent();
-    if(!locked.value){await loadContact();if(alive)await loadCalendar();}
+    if(!locked.value){await loadContact();if(alive){if(requestedPatch){requestedPatch=false;if(!locked.value){chosenPlan='patch';booking.plan='patch';clearTime();step.value=0;saveDraft();}}await loadCalendar();}}
     if(alive)timer=setInterval(()=>{if(!locked.value&&!loading.value)void loadCalendar();},60000);
   }
   onShow(()=>{visible=true;void resume();});onHide(()=>{visible=false;clearInterval(timer);if(!confirming.value)dismissSubmission();});onUnload(()=>{alive=false;visible=false;dismissSubmission();calendarSeq++;contactSeq++;clearInterval(timer);});

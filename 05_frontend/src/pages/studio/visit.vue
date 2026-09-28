@@ -8,8 +8,10 @@ import StudioNotificationChoices from '../../components/StudioNotificationChoice
 import { useUserStore } from '../../store/studio-user';
 import { useStudioNative } from '../../utils/studio-native';
 import { useStudioVisit } from '../../utils/use-studio-visit';
-import { studioWords,studioRate,bookingError,fillWords } from '../../utils/studio-content';
+import { studioWords,studioRate,bookingError,fillWords,studioPlanWords } from '../../utils/studio-content';
 import { shortDate } from '../../utils/studio-booking';
+import {usePatchPromotion} from '../../utils/studio-patch-promotion';
+const {offer}=usePatchPromotion();
 const user=useUserStore();
 const {language,width,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();
 const flow=reactive(useStudioVisit(language)),showNotes=ref(false);
@@ -26,6 +28,7 @@ function guestChange(event:{detail:{value:string}}){void flow.chooseGuests(guest
 function methodChange(event:{detail:{value:string}}){flow.contact.contact_method=methods[Number(event.detail.value)].value;flow.editing=true;}
 function next(){if(flow.step<2)flow.navigate(flow.step+1);else void flow.submit();}
 function editContact(){flow.editing=true;}
+function offerInfo(){uni.showModal({title:words('flow','prepaid_details'),content:words('visit','prepay_at_least_10_hours_and_at_8815bf')+'\n\n'+words('visit','bead_cardholder_package_no_makingtime_limit_92105b'),showCancel:false});}
 </script>
 <template>
  <StudioShell id="studio-shell" fitted :reset-key="flow.step" :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" @language="changeLanguage">
@@ -36,10 +39,23 @@ function editContact(){flow.editing=true;}
     <view class="studio-visit-plans" role="radiogroup">
      <button :hover-stay-time="180" :hover-start-time="0" class="studio-plan" :class="{'studio-plan--selected':flow.booking.plan==='hourly'}" role="radio" :aria-checked="flow.booking.plan==='hourly'" hover-class="studio-native-pressed" @tap="flow.choosePlan('hourly')"><view class="studio-plan-top"><StudioGlyph name="clock" :size="19"/><text class="studio-plan-name">{{words('visit','by_the_hour_5300b2')}}</text><view class="studio-plan-radio"/></view><text class="studio-native-small studio-native-body">{{words('visit','at_least_two_hours_9f144b')}}</text><view class="studio-price"><text>{{studioRate('hourly')}}</text><text class="studio-price-currency">CAD</text><text class="studio-price-unit">{{words('visit','hour_person_7ea78f')}}</text></view></button>
      <button :hover-stay-time="180" :hover-start-time="0" class="studio-plan" :class="{'studio-plan--selected':flow.booking.plan==='day'}" role="radio" :aria-checked="flow.booking.plan==='day'" hover-class="studio-native-pressed" @tap="flow.choosePlan('day')"><view class="studio-plan-top"><StudioGlyph name="sun" :size="19"/><text class="studio-plan-name">{{words('visit','a_day_of_making_01d6e2')}}</text><view class="studio-plan-radio"/></view><text class="studio-native-small studio-native-body">{{words('flow','day_until_close')}}</text><view class="studio-price"><text>{{studioRate('day_one')}}</text><text class="studio-price-currency">CAD</text><text class="studio-price-unit">{{words('visit','one_guest_684bef')}}</text></view></button>
+
+     <button class="studio-plan studio-plan-patch" :class="{'studio-plan--selected':flow.booking.plan==='patch'}" role="radio" :aria-checked="flow.booking.plan==='patch'" hover-class="studio-native-pressed" @tap="flow.choosePlan('patch')">
+      <view class="studio-plan-top"><StudioGlyph name="patch" :size="19"/><text class="studio-plan-name">{{words('patch','patch')}}</text><view class="studio-plan-radio"/></view>
+      <text class="studio-native-body studio-native-small">{{words('patch','description')}}</text>
+      <view v-if="offer?.enabled" class="studio-patch-card-offer"><text>{{words('promotion','launch')}}</text><text>{{words('promotion',offer.remaining>0?'card':'exhausted')}}</text><text v-if="offer.remaining>0">{{fillWords(studioWords('promotion','remaining'),language,{v0:offer.remaining,v1:offer.quota})}}</text><text>{{words('promotion','bonus')}}</text></view>
+     </button>
+     <view class="studio-plan studio-plan-offers">
+      <view class="studio-plan-top"><text class="studio-plan-name">{{words('visit','ca7_hour_c87a20')}}</text><button class="studio-offer-info studio-native-eye" hover-class="studio-native-pressed" :aria-label="words('flow','prepaid_details')" @tap="offerInfo"><StudioGlyph name="info" :size="19"/></button></view>
+      <text class="studio-native-body studio-native-small">{{words('flow','prepaid_details')}}</text>
+      <view class="studio-offer-divider"/>
+      <text class="studio-native-label studio-native-small">{{words('visit','backtoschool_until_october_1_42119e')}}</text>
+      <text class="studio-native-small">{{words('visit','four_hours_of_making_for_two_8bb2b0')}} · {{studioRate('school_two_four_hours')}} CAD</text>
+      <text class="studio-native-small">{{words('flow','cardholder_short')}} · {{studioRate('school_card_holder')}} CAD</text>
+     </view>
     </view>
     <view v-if="flow.booking.plan==='day'" class="studio-group-prices"><text>{{words('flow','two')}} · {{studioRate('day_two')}} CAD</text><text>{{words('flow','three')}} · {{studioRate('day_three')}} CAD</text></view>
-    <view class="studio-promotions"><view class="studio-promotion studio-promotion--prepaid"><text class="studio-promotion-price">{{words('visit','ca7_hour_c87a20')}}</text><text class="studio-native-body studio-native-small">{{words('visit','prepay_at_least_10_hours_and_at_8815bf')}}</text></view><view class="studio-promotion"><text class="studio-native-label">{{words('visit','backtoschool_until_october_1_42119e')}}</text><view class="studio-promotion-line"><text>{{words('visit','four_hours_of_making_for_two_8bb2b0')}}</text><text>{{studioRate('school_two_four_hours')}} CAD</text></view><view class="studio-promotion-line"><text>{{words('visit','bead_cardholder_package_no_makingtime_limit_92105b')}}</text><text>{{studioRate('school_card_holder')}} CAD</text></view></view></view>
-   </template>
+    </template>
    <template v-else-if="flow.step===1">
     <view class="studio-visit-time-tools"><picker :range="guests" range-key="label" :value="Math.min(guests.length-1,Math.max(0,flow.booking.guests-1))" :disabled="flow.locked||flow.loading" @change="guestChange"><view class="studio-guest-control"><StudioGlyph name="user" :size="19"/><text>{{words('flow','guests')}} · {{guestLabel}}</text><text>⌄</text></view></picker><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-eye" :disabled="flow.loading||flow.locked" :aria-label="words('visit','refresh_timetable_491b53')" @tap="flow.loadCalendar(true)"><view v-if="flow.loading" class="studio-native-progress"/><StudioGlyph v-else name="refresh" :size="20"/></button></view>
     <text v-if="flow.calendarError" class="studio-native-error">{{words('flow','calendar_error')}}</text><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" v-if="flow.calendarError" class="studio-native-link" @tap="flow.loadCalendar(true)">{{words('flow','retry')}}</button>
@@ -47,7 +63,7 @@ function editContact(){flow.editing=true;}
     <view v-if="flow.booking.start" class="studio-visit-selection"><StudioGlyph name="check" :size="18"/><text>{{shortDate(flow.booking.date,language)}} · {{flow.booking.start}}–{{flow.booking.end}}</text></view>
    </template>
    <template v-else>
-    <view class="studio-visit-review"><view><text class="studio-native-label">{{words('flow','step_experience')}}</text><text>{{words('visit',flow.booking.plan==='day'?'a_day_of_making_01d6e2':'by_the_hour_5300b2')}}</text><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-link" :disabled="flow.locked" @tap="flow.navigate(0)">{{words('flow','edit')}}</button></view><view><text class="studio-native-label">{{words('flow','step_time')}}</text><text>{{guestLabel}} · {{shortDate(flow.booking.date,language)}}<text class="studio-review-time">{{flow.booking.start}}–{{flow.booking.end}}</text></text><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-link" :disabled="flow.locked" @tap="flow.navigate(1)">{{words('flow','edit')}}</button></view></view>
+    <view class="studio-visit-review"><view><text class="studio-native-label">{{words('flow','step_experience')}}</text><text>{{say(studioPlanWords(flow.booking.plan))}}</text><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-link" :disabled="flow.locked" @tap="flow.navigate(0)">{{words('flow','edit')}}</button></view><view><text class="studio-native-label">{{words('flow','step_time')}}</text><text>{{guestLabel}} · {{shortDate(flow.booking.date,language)}}<text class="studio-review-time">{{flow.booking.start}}–{{flow.booking.end}}</text></text><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-link" :disabled="flow.locked" @tap="flow.navigate(1)">{{words('flow','edit')}}</button></view></view>
     <template v-if="user.token">
      <text v-if="flow.contactLoading" class="studio-native-body">{{words('booking','loading')}}</text>
      <view v-if="flow.contactError"><text class="studio-native-error">{{words('booking','load_error')}}</text><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-link" @tap="flow.loadContact">{{words('booking','retry')}}</button></view>

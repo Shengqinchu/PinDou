@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {studioWords,fillWords} from '../utils/studio-content';
+import {studioPlanWords,studioWords,fillWords} from '../utils/studio-content';
 import type {Payload} from '../utils/studio-booking';
 import notices from '../../../05_studio/src/content/customer-notifications.json';
 defineOptions({options:{styleIsolation:'shared'}});
@@ -13,7 +13,7 @@ const notice=(key:string)=>(notices as Record<string,string[]>)[key]?.[props.rev
   <view class="studio-modal-panel studio-submit-panel" @tap.stop>
    <text class="studio-native-subtitle">{{words('flow','review')}}</text>
    <view class="studio-native-definition">
-    <view class="studio-native-definition-row"><text class="studio-native-label">{{words('receipt','experience_cc25a0')}}</text><text>{{words('visit',review.booking.plan==='day'?'a_day_of_making_01d6e2':'by_the_hour_5300b2')}}</text></view>
+    <view class="studio-native-definition-row"><text class="studio-native-label">{{words('receipt','experience_cc25a0')}}</text><text>{{studioPlanWords(review.booking.plan)[review.locale==='en'?1:0]}}</text></view>
     <view class="studio-native-definition-row"><text class="studio-native-label">{{words('flow','guests')}}</text><text>{{fillWords(studioWords('flow','guest_count'),review.locale,{v0:review.booking.guests})}}</text></view>
     <view class="studio-native-definition-row"><text class="studio-native-label">{{words('calendar','date_label')}}</text><text>{{review.booking.date}}</text></view>
     <view class="studio-native-definition-row"><text class="studio-native-label">{{words('calendar','time_296653')}}</text><text>{{review.booking.start}}–{{review.booking.end}}</text><text class="studio-native-label">{{words('receipt','hamilton_local_time_496f95')}}</text></view>
