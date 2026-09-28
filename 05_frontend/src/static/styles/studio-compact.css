@@ -46,7 +46,6 @@
 .studio-patch-card-offer{display:flex;flex-direction:column;gap:3px;font-size:11px;line-height:1.55;color:#46677a;border-top:1px solid #dce7ed;padding-top:7px;margin-top:2px;width:100%}
 .studio-patch-popup-top{display:flex;justify-content:space-between;align-items:center;width:100%}
 .studio-patch-popup .studio-native-title{font-size:27px;line-height:1.5}
-.studio-patch-bonus{padding:16px;border-radius:14px;background:#f0f6fa;font-size:16px;line-height:1.6}
 .studio-patch-popup .studio-native-primary{width:100%}
 
 .admin-patch-gift{display:inline-flex;align-self:flex-start;color:#49667a;background:#eaf3f8;border:1px solid #d8e7ee;border-radius:7px;padding:4px 8px;font-size:12px;line-height:1.5}
