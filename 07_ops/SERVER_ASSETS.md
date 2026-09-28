@@ -1,6 +1,6 @@
 # 小狗拼豆铺服务器资产
 
-更新：2026-09-24。**默认生产服务器为 `36.139.201.94`**；以后排查、备份和部署均使用此机。全项目共享总账为 `C:/Users/123/Desktop/apisell/服务器资产清单.md`，本文件是 PinDou 的运维入口。
+更新：2026-09-27。**默认生产服务器为 `36.139.201.94`**；以后排查、备份和部署均使用此机。全项目共享总账为 `C:/Users/123/Desktop/apisell/服务器资产清单.md`，本文件是 PinDou 的运维入口。
 
 ## 当前生产服务器
 
@@ -36,6 +36,22 @@
 | 密码本机存档 | `artifacts/migration-research-20260918/private/target-access.json`；Git 忽略 |
 
 私钥、密码、生产 `.env` 和凭据包仅保存在本机受限目录及授权服务器中；GitHub 保存路径、公钥指纹和操作说明。新机保留原密码登录配置；不能把旧机曾禁用密码的历史记录当作新机现状。
+
+## 店主回国浏览隧道（2026-09-27）
+
+店主在加拿大访问国内网站用。复用 SSH 22 端口，未在安全组开新端口。
+
+| 项目 | 值 |
+|---|---|
+| 服务器账户 | `cnproxy`（系统用户，shell `/usr/sbin/nologin`，家目录 `/var/lib/cnproxy`）；`authorized_keys` 带 `restrict,port-forwarding` |
+| sshd 限制 | `/etc/ssh/sshd_config` 末尾 `Match User cnproxy`：仅公钥、禁 TTY/Agent/X11/隧道、`ForceCommand /usr/sbin/nologin`、`PermitOpen *:80 *:443 *:8080 *:8443`；改前备份 `/root/sshd_config.before-cnproxy-20260927` |
+| 防护与限速 | `cnproxy-guard.service` → `/usr/local/sbin/cnproxy-guard`：iptables owner 规则拒绝该账户访问 127/8、10/8、172.16/12、192.168/16、100.64/10、169.254/16 及全部 IPv6；eth0 HTB 将源端口 22 的出站限在 5 Mbit/s（保底 1 Mbit/s），其余流量不限 |
+| 本机私钥 | `C:/Users/123/.ssh/pindou_cnproxy_ed25519`，指纹 `SHA256:ZE/FO+37Dxec4uGYqTgO1RDdoMYXhfZNwCSojwoVu1s`；Clash 配置 `C:/Users/123/Documents/回国VPN/回国-上海.yaml` 内嵌同一私钥，不入 Git |
+| 客户端 | Clash Verge Rev（mihomo `type: ssh`，固定 `ssh-ed25519` 主机密钥）；`GEOSITE cn` / `GEOIP CN` 走上海，其余直连 |
+| 实测 | 出口“中国 上海 移动”；百度、B站、爱奇艺、腾讯视频、抖音、淘宝、网易云音乐 200；国内镜像约 330–470 KB/s；本机/内网端口被拒；下载期间小店 0.3 s 正常 |
+| 停用 | `systemctl disable --now cnproxy-guard`，删除 sshd 中的 `Match User cnproxy` 块后 `sshd -t && systemctl reload ssh`，`userdel -r cnproxy` |
+
+仅限店主本人使用，不向他人提供。22 端口当前承受大量暴力登录尝试，sshd `MaxStartups` 限流可能偶发拒绝新连接；SSH 加固（仅密钥、fail2ban 等）后该账户不受影响。
 
 ## 业务与备份位置
 
