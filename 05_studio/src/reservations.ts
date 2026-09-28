@@ -17,6 +17,7 @@ export type ReservationSlot = {
   capacity_full?: boolean;
   buffered?: boolean;
   low_capacity?: boolean;
+  booked_groups?: number;
 };
 export type ReservationDay = {
   date: string;

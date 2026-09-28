@@ -3,7 +3,7 @@ import { contentModule } from "../../content-store";
 const copyText = contentModule("components-admin-ReservationSettings", copyTextDefault);
 
 import copyTextDefault from "../../content/components-admin-ReservationSettings.json";
-import { say } from "../../state";
+import { say, hamiltonDate, plusDays } from "../../state";
 
 import { computed, ref, watch } from "vue";
 import {
@@ -11,12 +11,14 @@ import {
   PhClock,
   PhUsers,
   PhCheck,
+  PhCalendarBlank, PhPlus, PhTrash,
 } from "@phosphor-icons/vue";
 import { useDesk } from "../../admin";
 import { tr } from "../../state";
 import SlideOver from "../SlideOver.vue";
 import ToggleSwitch from "../ToggleSwitch.vue";
 type Hours = { weekday: number; enabled: boolean; open: string; close: string };
+type DateHours = Omit<Hours, 'weekday'> & { date: string };
 type Settings = {
   version: number;
   exclusive_groups: boolean;
@@ -24,6 +26,7 @@ type Settings = {
   max_concurrent_groups: number | null;
   max_concurrent_guests: number | null;
   weekly_hours: Hours[];
+  date_overrides: DateHours[];
 };
 const props = defineProps<{ active: boolean }>();
 const emit = defineEmits<{ saved: [] }>();
@@ -55,6 +58,7 @@ async function load() {
   error.value = "";
   try {
     saved.value = await request<Settings>("/manage/reservation-policy");
+    saved.value.date_overrides ||= [];
     return true;
   } catch (e) {
     error.value = (e as Error).message;
@@ -95,6 +99,14 @@ async function save() {
   } finally {
     busy.value = false;
   }
+}
+function addDate() {
+  if(!draft.value || draft.value.date_overrides.length>=366)return;
+  let date=hamiltonDate();
+  while(draft.value.date_overrides.some(day=>day.date===date))date=plusDays(date,1);
+  const weekday=(new Date(date+'T12:00:00Z').getUTCDay()+6)%7;
+  const source=draft.value.weekly_hours.find(day=>day.weekday===weekday)!;
+  draft.value.date_overrides.push({date,enabled:true,open:source.open,close:source.close});
 }
 watch(
   () => props.active,
@@ -236,6 +248,22 @@ watch(
           </div>
         </div>
       </section>
+      <section class="reservation-date-overrides">
+        <h3><PhCalendarBlank />{{ say(copyText.specific_dates) }}</h3>
+        <p>{{ say(copyText.specific_dates_help) }}</p>
+        <article v-for="(day,index) in draft.date_overrides" :key="index" class="reservation-date-override">
+          <div class="reservation-date-override-heading">
+            <label class="desk-field">{{ say(copyText.specific_date) }}<input v-model="day.date" type="date" required :disabled="busy"/></label>
+            <ToggleSwitch v-model="day.enabled" :label="say(copyText.date_open)" :disabled="busy"/>
+            <button type="button" class="desk-icon-button" :aria-label="say(copyText.remove_date)" :disabled="busy" @click="draft.date_overrides.splice(index,1)"><PhTrash/></button>
+          </div>
+          <div class="reservation-hours-inputs">
+            <label><span>{{ say(copyText.open_281aec) }}</span><select v-model="day.open" :aria-label="day.date+say(copyText.opening_time_c36b8f)" :disabled="busy||!day.enabled"><option v-for="time in times" :key="time" :value="time">{{time}}</option></select></label>
+            <label><span>{{ say(copyText.close_15f8ae) }}</span><select v-model="day.close" :aria-label="day.date+say(copyText.closing_time_57b7cd)" :disabled="busy||!day.enabled"><option v-for="time in times" :key="time" :value="time">{{time}}</option></select></label>
+          </div>
+        </article>
+        <button type="button" class="desk-button secondary" :disabled="busy||draft.date_overrides.length>=366" @click="addDate"><PhPlus/>{{ say(copyText.add_date) }}</button>
+      </section>
       <p v-if="error" class="desk-error" role="alert">{{ error }}</p>
       <button v-if="error" class="desk-button secondary" type="button" :disabled="busy || loading" @click="edit">{{ say(copyText.reload_saved_rules) }}</button>
       <p>
@@ -253,3 +281,10 @@ watch(
     </form>
   </SlideOver>
 </template>
+<style>
+.reservation-date-override{padding:14px;border:1px solid var(--line);border-radius:12px;background:#f8fafb;margin-bottom:12px}
+.reservation-date-override-heading{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.reservation-date-override-heading>.desk-field{flex:1;min-width:0;margin:0}
+.reservation-date-override-heading input{min-width:0;max-width:100%}
+.reservation-date-override .reservation-hours-inputs{display:grid;grid-template-columns:1fr 1fr}
+</style>

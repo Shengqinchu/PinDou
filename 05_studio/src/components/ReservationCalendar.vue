@@ -87,7 +87,10 @@ function available(di: number, ri: number) {
 function capacityLabel(slot:ReservationSlot|undefined){
   if(slot?.buffered)return say(copyText.full_buffer);
   if(slot?.capacity_full)return say(copyText.full);
-  return slot?.low_capacity?formatCopy(copyText.remaining_seats,{v0:slot.remaining_seats!}):'';
+  if(!slot?.low_capacity)return '';
+  return slot.remaining_seats!=null && slot.remaining_seats<=2
+    ? formatCopy(copyText.remaining_seats,{v0:slot.remaining_seats})
+    : formatCopy(copyText.booked_groups,{v0:slot.booked_groups!});
 }
 function choose(di: number, ri: number) {
   if (!available(di, ri)) return;

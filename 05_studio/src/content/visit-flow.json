@@ -50,5 +50,8 @@
  "confirm_submit":["确认提交","Confirm request"],
  "back_to_edit":["返回修改","Back to edit"],
  "continue":["继续","Continue"],
- "close":["关闭","Close"]
+ "close":["关闭","Close"],
+  "prepaid_details": ["储值优惠说明", "Prepaid hours details"],
+  "cardholder_short": ["拼豆卡套套餐", "Bead cardholder package"],
+  "cardholder_details": ["卡套套餐说明", "Cardholder package details"]
 }

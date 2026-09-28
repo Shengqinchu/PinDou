@@ -1905,6 +1905,30 @@
     "save_reservation_rules_70acc7": [
       "保存预约规则",
       "Save reservation rules"
+    ],
+    "specific_dates": [
+      "指定日期营业时间",
+      "Hours for specific dates"
+    ],
+    "specific_dates_help": [
+      "仅覆盖所选日期，不改变每周规则。移除后恢复该星期的营业时间。",
+      "Applies only to the selected date. Remove it to restore the regular weekly hours."
+    ],
+    "specific_date": [
+      "日期",
+      "Date"
+    ],
+    "date_open": [
+      "当天营业",
+      "Open on this date"
+    ],
+    "remove_date": [
+      "移除此日期设置",
+      "Remove these date hours"
+    ],
+    "add_date": [
+      "添加日期",
+      "Add a date"
     ]
   },
   "components-admin-ReservationsPanel": {
@@ -2731,8 +2755,8 @@
       "Unavailable"
     ],
     "low_seats": [
-      "座位数≤2",
-      "Seats left ≤ 2"
+      "座位≤2 / 已约≥2组",
+      "≤2 seats / ≥2 groups"
     ],
     "remaining_seats": [
       "剩余 {v0} 个座位",
@@ -2801,6 +2825,10 @@
     "minimum_duration": [
       "预约时长至少 2 小时",
       "Minimum booking: 2 hours."
+    ],
+    "booked_groups": [
+      "已预约 {v0} 组",
+      "{v0} groups booked"
     ]
   },
   "components-SlideOver": {
@@ -7493,6 +7521,18 @@
     "close": [
       "关闭",
       "Close"
+    ],
+    "prepaid_details": [
+      "储值优惠说明",
+      "Prepaid hours details"
+    ],
+    "cardholder_short": [
+      "拼豆卡套套餐",
+      "Bead cardholder package"
+    ],
+    "cardholder_details": [
+      "卡套套餐说明",
+      "Cardholder package details"
     ]
   },
   "wallet": {

@@ -110,12 +110,14 @@ def default_hours():
 def read_policy(db):
     row = dict(db.execute("SELECT * FROM reservation_policy WHERE id=1").fetchone())
     values = {"max_guests_per_group": 4, "max_concurrent_groups": None,
-              "max_concurrent_guests": None, "weekly_hours": default_hours()}
+              "max_concurrent_guests": None, "weekly_hours": default_hours(), "date_overrides": []}
     values.update(json.loads(row["settings"]))
     return values | {"exclusive_groups": bool(row["exclusive_groups"]), "version": row["version"]}
 
 def hours(day, policy=None):
-    return (policy or {"weekly_hours": default_hours()})["weekly_hours"][day.weekday()]
+    settings = policy or {"weekly_hours": default_hours()}
+    return next((value for value in settings.get("date_overrides", []) if str(value["date"]) == str(day)),
+                settings["weekly_hours"][day.weekday()])
 
 def closing(day, policy=None):
     return minute(hours(day, policy)["close"])
@@ -198,12 +200,14 @@ def capacity_grid(confirmed, day, policy, experience="beads"):
         group_full = group_limit is not None and len(present) >= group_limit
         remaining = max(0, people_limit - sum(b["guests"] for b in present)) if people_limit is not None else None
         full = group_full or remaining == 0
-        slots[at] = {"remaining_seats": 0 if group_full else remaining, "capacity_full": full}
+        slots[at] = {"remaining_seats": 0 if group_full else remaining, "capacity_full": full,
+                     "booked_groups": len(present)}
     # Only genuinely full intervals create padding. Padding never creates more padding.
     full_slots = {at for at, slot in slots.items() if slot["capacity_full"]}
     for at, slot in slots.items():
         slot["buffered"] = not patch and not slot["capacity_full"] and (at - 30 in full_slots or at + 30 in full_slots)
-        slot["low_capacity"] = not slot["buffered"] and slot["remaining_seats"] is not None and 0 < slot["remaining_seats"] <= 2
+        low_seats = slot["remaining_seats"] is not None and 0 < slot["remaining_seats"] <= 2
+        slot["low_capacity"] = not patch and not slot["capacity_full"] and not slot["buffered"] and (low_seats or slot["booked_groups"] >= 2)
     return slots
 
 def availability_grid(confirmed, blocks, day, policy, guests=1, *, current=None, include_buffer=True, experience="beads"):
@@ -394,6 +398,19 @@ class DayHours(Strict):
         return self
 
 
+class DateHours(Strict):
+    date: date
+    enabled: bool
+    open: str = Field(pattern=r"^(?:[01]\d|2[0-3]):(?:00|30)$")
+    close: str = Field(pattern=r"^(?:[01]\d|2[0-3]):(?:00|30)$")
+
+    @model_validator(mode="after")
+    def ordered(self):
+        if self.enabled and minute(self.close) - minute(self.open) < 120:
+            raise ValueError("Opening hours need at least two hours")
+        return self
+
+
 def returning_customer(db, owner_id, current):
     """Attendance is tied to the authenticated account, never a contact match."""
     day=str(current.date())
@@ -437,6 +454,7 @@ class ReservationPolicy(Strict):
     max_concurrent_groups: int | None = Field(default=None, ge=1, le=999, strict=True)
     max_concurrent_guests: int | None = Field(default=None, ge=1, le=999, strict=True)
     weekly_hours: list[DayHours] = Field(default_factory=lambda: [DayHours(**v) for v in default_hours()], min_length=7, max_length=7)
+    date_overrides: list[DateHours] = Field(default_factory=list, max_length=366)
     version: int = Field(ge=1)
 
     @model_validator(mode="after")
@@ -444,6 +462,9 @@ class ReservationPolicy(Strict):
         if sorted(day.weekday for day in self.weekly_hours) != list(range(7)):
             raise ValueError("Provide each weekday exactly once")
         self.weekly_hours.sort(key=lambda day: day.weekday)
+        if len({day.date for day in self.date_overrides}) != len(self.date_overrides):
+            raise ValueError("Provide each date only once")
+        self.date_overrides.sort(key=lambda day: day.date)
         return self
 
 class Block(Strict):
@@ -513,7 +534,8 @@ def register(app, database, admin_actor):
             offer = available_offer(db, current)
             confirmed = occupying_bookings(db, since=str(current.date()))
             blocks = [dict(r) for r in db.execute('SELECT date,start,end FROM reservation_blocks WHERE date>=?', (str(current.date()),))]
-        enabled = [h for h in settings["weekly_hours"] if h["enabled"]]
+        window_hours = [hours(current.date() + timedelta(days=n), settings) for n in range(14)]
+        enabled = [h for h in window_hours if h["enabled"]]
         grid_start = min((minute(h["open"]) for h in enabled), default=600)
         grid_end = max((minute(h["close"]) for h in enabled), default=1320)
         days = []
@@ -841,7 +863,7 @@ def register(app, database, admin_actor):
             db.execute("BEGIN IMMEDIATE")
             current = read_policy(db)
             if current["version"] != payload.version: raise HTTPException(409,"version_conflict")
-            settings = ReservationPolicy(**(current | payload.model_dump(exclude_unset=True))).model_dump()
+            settings = ReservationPolicy(**(current | payload.model_dump(exclude_unset=True))).model_dump(mode='json')
             future = db.execute("SELECT id,payload FROM studio_reservations WHERE deleted_at IS NULL AND (status='confirmed' OR (status='pending' AND json_extract(payload,'$.booking.plan')='patch')) AND json_extract(payload,'$.booking.date')>=?", (str(now_local().date()),)).fetchall()
             for row in future:
                 booking = Visit(**json.loads(row["payload"])["booking"])

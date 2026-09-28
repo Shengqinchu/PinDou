@@ -1,5 +1,6 @@
 """Shared public/native/host availability and non-recursive full-capacity padding."""
 import json
+import pytest
 from test_reservations import client, submit, body, admin, confirm
 import app as studio
 import reservations as visits
@@ -130,3 +131,40 @@ def test_closed_and_past_slots_do_not_show_low_seats_and_days_are_independent(cl
     assert not slots['15:00']['low_capacity'] and slots['15:30']['low_capacity']
     day_grid=visits.capacity_grid([{'date':'2026-09-08','start':'20:00','end':'22:00','guests':2}], '2026-09-09', {'exclusive_groups':False,'max_concurrent_groups':None,'max_concurrent_guests':2})
     assert not any(s['buffered'] or s['capacity_full'] for s in day_grid.values())
+
+
+@pytest.mark.parametrize("seats", [6, None])
+def test_two_small_groups_trigger_pink_even_with_many_or_unlimited_seats(client, seats):
+    configure(client, max_concurrent_guests=seats, max_concurrent_groups=3)
+    refs=[]
+    for start,end in [("10:00","22:00"),("10:00","12:00")]:
+        payload=body(start=start,end=end)
+        payload["booking"]["guests"]=1
+        refs.append(submit(client,payload).json()["id"])
+        assert confirm(client,refs[-1]).status_code==200
+    public,host=grid(client),grid(client,admin_view=True)
+    for time in ("10:00","10:30","11:00","11:30"):
+        assert public[time]["available"] and public[time]["low_capacity"]
+        assert public[time]["booked_groups"]==2
+        assert public[time]["remaining_seats"]==(4 if seats else None)
+        assert host[time]["low_capacity"] and host[time]["booked_groups"]==2
+    assert public["12:00"]["booked_groups"]==1 and not public["12:00"]["low_capacity"]
+    assert client.patch('/studio-api/manage/reservations/'+refs[-1],json={'version':2,'status':'cancelled'}).status_code==200
+    assert not grid(client)["10:00"]["low_capacity"]
+
+
+def test_full_buffer_and_patch_capacity_take_priority_over_group_hint(client):
+    configure(client,max_concurrent_guests=6,max_concurrent_groups=3)
+    for _ in range(3):
+        payload=body()
+        payload["booking"]["guests"]=1
+        ref=submit(client,payload).json()["id"]
+        assert confirm(client,ref).status_code==200
+    slots=grid(client)
+    assert slots["14:00"]["booked_groups"]==3 and slots["14:00"]["capacity_full"]
+    assert not slots["14:00"]["low_capacity"] and not slots["13:30"]["low_capacity"]
+    assert slots["13:30"]["buffered"]
+    patch=client.get("/studio-api/reservation-calendar?experience=patch").json()
+    target=next(d for d in patch["days"] if d["date"]=="2026-09-08")
+    assert all(s["booked_groups"]==0 and not s["low_capacity"] for s in target["slots"])
+    assert next(s for s in target["slots"] if s["start"]=="14:00")["available"]

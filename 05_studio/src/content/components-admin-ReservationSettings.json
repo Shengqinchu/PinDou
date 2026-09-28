@@ -54,5 +54,11 @@
     "Saving does not change confirmed reservations. If the new rules conflict with an existing visit, contact the guest to rearrange it first."
   ],
   "saving_f3d3eb": ["正在保存…", "Saving…"],
-  "save_reservation_rules_70acc7": ["保存预约规则", "Save reservation rules"]
+  "save_reservation_rules_70acc7": ["保存预约规则", "Save reservation rules"],
+  "specific_dates": ["指定日期营业时间", "Hours for specific dates"],
+  "specific_dates_help": ["仅覆盖所选日期，不改变每周规则。移除后恢复该星期的营业时间。", "Applies only to the selected date. Remove it to restore the regular weekly hours."],
+  "specific_date": ["日期", "Date"],
+  "date_open": ["当天营业", "Open on this date"],
+  "remove_date": ["移除此日期设置", "Remove these date hours"],
+  "add_date": ["添加日期", "Add a date"]
 }

@@ -718,6 +718,12 @@
 | saving_does_not_change_confirmed_reservations_if_824304 | 保存不会改变已确认的预约。若新规则与现有预约冲突，请先联系客人调整安排。 | Saving does not change confirmed reservations. If the new rules conflict with an existing visit, contact the guest to rearrange it first. |
 | saving_f3d3eb | 正在保存… | Saving… |
 | save_reservation_rules_70acc7 | 保存预约规则 | Save reservation rules |
+| specific_dates | 指定日期营业时间 | Hours for specific dates |
+| specific_dates_help | 仅覆盖所选日期，不改变每周规则。移除后恢复该星期的营业时间。 | Applies only to the selected date. Remove it to restore the regular weekly hours. |
+| specific_date | 日期 | Date |
+| date_open | 当天营业 | Open on this date |
+| remove_date | 移除此日期设置 | Remove these date hours |
+| add_date | 添加日期 | Add a date |
 
 ## components-admin-ReservationsPanel.json
 
@@ -988,7 +994,7 @@
 | your_selection_0fc834 | 已选时段 | Your selection |
 | minimum_duration | 预约时长至少 2 小时 | Minimum booking: 2 hours. |
 | unavailable_fb3489 | 不可预约 | Unavailable |
-| low_seats | 座位数≤2 | Seats left ≤ 2 |
+| low_seats | 座位≤2 / 已约≥2组 | ≤2 seats / ≥2 groups |
 | remaining_seats | 剩余 {v0} 个座位 | {v0} seats left |
 | full | 已满员 | Fully booked |
 | full_buffer | 满员时段前后 0.5 小时不可预约。 | The 0.5 hours before and after a fully booked period are unavailable. |
@@ -1005,6 +1011,7 @@
 | start_ba3401 | 开始 | Start |
 | end_c4265b | 结束 | End |
 | all_times_are_local_to_hamilton_the_8a3607 | 均为汉密尔顿当地时间，营业时间以当前时间表为准。 | All times are local to Hamilton. The timetable shows the current opening hours. |
+| booked_groups | 已预约 {v0} 组 | {v0} groups booked |
 
 ## components-SlideOver.json
 
@@ -2976,6 +2983,9 @@
 | back_to_edit | 返回修改 | Back to edit |
 | continue | 继续 | Continue |
 | close | 关闭 | Close |
+| prepaid_details | 储值优惠说明 | Prepaid hours details |
+| cardholder_short | 拼豆卡套套餐 | Bead cardholder package |
+| cardholder_details | 卡套套餐说明 | Cardholder package details |
 
 ## wallet.json
 
