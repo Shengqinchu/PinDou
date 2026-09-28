@@ -24,4 +24,21 @@
 
 ## 发布
 
-待本次 release 发布及只读线上验证后补记。发布前 current 已核对为 `20260927015327-studio-v7`（36.139.201.94）；manifest 有效，两服务 active。部署器生成的 Nginx 和 systemd 配置与线上逐字一致，保留现有上传设置、owner tunnel 与生成器进程。
+- 生产 `36.139.201.94` 已由 `20260927015327-studio-v7` 切换至 **`20260928200242-studio-v7`**。前端 build 为 `2026-09-28T19:56:44.424Z`。实现提交 `b837641`，范围打包支持提交 `3406500`。
+- 以发布前线上 manifest 为基底，通过 `studio_frontend_pack.py` 替换 57 个前端文件和 13 个明确列出的服务文件，764 个文件原字节复用。发布后 834 项文件哈希全部有效，历史静态文件继续保留。
+- 包 SHA-256：`e314794be6b256f4c21c5cc48cba2a4fcec540dc3454ec449babeec8b29e8a63`。本地位置为工作树 `artifacts/studio-release/20260928200242-studio-v7.tar.gz`。
+- Studio、生成器两个 SQLite 在线一致性备份位于 `/opt/pindou/studio/backups/20260928200242-studio-v7-preflight/`，备份和发布后数据库完整性均为 `ok`。环境及配置备份只保留在服务器私有目录；图片原件和既有依赖留在共享目录，本次没有声称重做完整媒体备份。
+- 发布前后预约、事件、规则、会员、储值／积分流水、身份、商品、订单、生成器受保护数据指纹一致。72 个原文案覆盖记录逐项哈希一致；只新增 `business`、`customer-notifications`、`patch-reservations` 的缺省记录。原拼豆日历每个已有字段完全一致，实际线上规则为 version 7、每组最多 6 人。
+- 四项服务（`pindou`、`pindou-studio`、Nginx、cloudflared）均 active，Studio 健康检查正常。Nginx 与 Studio unit 文件哈希未变，生成器进程 PID 67327 及启动时间未变。
+
+## 公网验收
+
+- `verify-patch-live.mjs` 对 `https://pindoupuppy.com/visit` 仅允许 GET／HEAD／OPTIONS，没有生产写入。
+- 中文 1440×1000、英文 390×844：三个体验、一个含两项旧优惠的模块；布贴无价格。点击开始后恰好选中两个半小时格，下一步可用，说明为自动预约一小时；无页面错误和水平溢出。
+- 两种语言读到上述相同 build。布贴日历返回 `experience=patch`、`minimum_minutes=60`、`capacity_buffer_minutes=0`，使用当前线上人数上限。
+- 公网截图已实际查看：`browser/live-zh-experiences.png`、`browser/live-en-time.png`。原始结果在 `browser/live-results.json`；数据比对在 `preservation-comparison.json`，最终健康核查在 `final-health.json`，均位于忽略目录 `artifacts/patch-booking/`。
+- 实际提交及后台确认／取消在隔离 QA 中验证；公网只验证公开流程与发布文件，未用真实顾客预约、店主登录或真实收件来冒充端到端测试。
+
+## 回退边界
+
+旧 release 与 `/opt/pindou/studio/backups/20260928200242-studio-v7/` 的部署回退资料已保留。新布贴预约一旦进入生产，旧服务不能正确管理 `plan=patch`，应优先向前修复；确需回退时先停止新增布贴入口并核对新增预约／通知状态，不能恢复旧数据库快照覆盖期间新增业务。
