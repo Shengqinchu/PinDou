@@ -47,6 +47,7 @@
 | sshd 限制 | `/etc/ssh/sshd_config` 末尾 `Match User cnproxy`：仅公钥、禁 TTY/Agent/X11/隧道、`ForceCommand /usr/sbin/nologin`、`PermitOpen *:80 *:443 *:8080 *:8443`；改前备份 `/root/sshd_config.before-cnproxy-20260927` |
 | 防护与限速 | `cnproxy-guard.service` → `/usr/local/sbin/cnproxy-guard`：iptables owner 规则拒绝该账户访问 127/8、10/8、172.16/12、192.168/16、100.64/10、169.254/16 及全部 IPv6；eth0 HTB 将源端口 22 的出站限在 5 Mbit/s（保底 1 Mbit/s），其余流量不限 |
 | 本机私钥 | `C:/Users/123/.ssh/pindou_cnproxy_ed25519`，指纹 `SHA256:ZE/FO+37Dxec4uGYqTgO1RDdoMYXhfZNwCSojwoVu1s`；Clash 配置 `C:/Users/123/Documents/回国VPN/回国-上海.yaml` 内嵌同一私钥，不入 Git |
+| 手机私钥 | `C:/Users/123/.ssh/pindou_cnproxy_phone_ed25519`，指纹 `SHA256:8yww/AG/0nuJ13lSq7vlIpIx/fKn7mQeRQysZPK/YUM`；手机配置 `C:/Users/123/Documents/回国VPN/回国-上海-手机.yaml`（含 fake-ip DNS）。手机丢失时只从 `/var/lib/cnproxy/.ssh/authorized_keys` 删除注释为 `cnproxy-phone@pindou-prod 20260927` 的一行 |
 | 客户端 | Clash Verge Rev（mihomo `type: ssh`，固定 `ssh-ed25519` 主机密钥）；`GEOSITE cn` / `GEOIP CN` 走上海，其余直连 |
 | 实测 | 出口“中国 上海 移动”；百度、B站、爱奇艺、腾讯视频、抖音、淘宝、网易云音乐 200；国内镜像约 330–470 KB/s；本机/内网端口被拒；下载期间小店 0.3 s 正常 |
 | 停用 | `systemctl disable --now cnproxy-guard`，删除 sshd 中的 `Match User cnproxy` 块后 `sshd -t && systemctl reload ssh`，`userdel -r cnproxy` |
