@@ -50,7 +50,8 @@
 | 手机私钥 | `C:/Users/123/.ssh/pindou_cnproxy_phone_ed25519`，指纹 `SHA256:8yww/AG/0nuJ13lSq7vlIpIx/fKn7mQeRQysZPK/YUM`；手机配置 `C:/Users/123/Documents/回国VPN/回国-上海-手机.yaml`（含 fake-ip DNS）。手机丢失时只从 `/var/lib/cnproxy/.ssh/authorized_keys` 删除注释为 `cnproxy-phone@pindou-prod 20260927` 的一行 |
 | 客户端 | Clash Verge Rev（mihomo `type: ssh`，固定 `ssh-ed25519` 主机密钥）；`GEOSITE cn` / `GEOIP CN` 走上海，其余直连 |
 | 实测 | 出口“中国 上海 移动”；百度、B站、爱奇艺、腾讯视频、抖音、淘宝、网易云音乐 200；国内镜像约 330–470 KB/s；本机/内网端口被拒；下载期间小店 0.3 s 正常 |
-| 停用 | `systemctl disable --now cnproxy-guard`，删除 sshd 中的 `Match User cnproxy` 块后 `sshd -t && systemctl reload ssh`，`userdel -r cnproxy` |
+| 手机订阅 | nginx `pindou-staging` 中 `location = /cn-sub/<随机令牌>`（位于 studio_deploy.py 管理区块之后，发布不会覆盖），返回 `/etc/nginx/cnproxy-sub/profile.yaml`（手机配置，root:www-data 640），no-store / noindex，经 Cloudflare 不缓存；完整地址只保存在本机 `C:/Users/123/Documents/回国VPN/订阅地址.txt`。改前备份 `/root/pindou-staging.before-cnsub-20260927`。泄露时删除该 location 或换令牌，并作废手机密钥 |
+| 停用 | `systemctl disable --now cnproxy-guard`，删除 sshd 中的 `Match User cnproxy` 块后 `sshd -t && systemctl reload ssh`，`userdel -r cnproxy`；同时删除 `/cn-sub/` location 与 `/etc/nginx/cnproxy-sub` |
 
 仅限店主本人使用，不向他人提供。22 端口当前承受大量暴力登录尝试，sshd `MaxStartups` 限流可能偶发拒绝新连接；SSH 加固（仅密钥、fail2ban 等）后该账户不受影响。
 
