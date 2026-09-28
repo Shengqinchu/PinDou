@@ -8,10 +8,14 @@ await fs.mkdir(out,{recursive:true});
 const expected=JSON.parse(await fs.readFile(new URL('../dist/version.json',import.meta.url),'utf8')).build,results=[];
 for(const [type,width,height,lang] of [[chromium,1366,768,'zh'],[webkit,390,844,'en']]){
  const browser=await type.launch(),ctx=await browser.newContext({viewport:{width,height},hasTouch:width<700,reducedMotion:null});
- const writes=[],errors=[];
+ const writes=[],blockedTelemetry=[],telemetryErrors=[],errors=[];
  await ctx.addInitScript(lang=>localStorage.setItem('puppy-studio-language',lang),lang);
- await ctx.route('**/*',route=>{if(['GET','HEAD','OPTIONS'].includes(route.request().method()))return route.continue();writes.push(route.request().url());return route.abort();});
- const page=await ctx.newPage();page.setDefaultTimeout(25000);page.on('pageerror',e=>errors.push(e.message));
+ await ctx.route('**/*',route=>{if(['GET','HEAD','OPTIONS'].includes(route.request().method()))return route.continue();const url=route.request().url();if(new URL(url).pathname==='/cdn-cgi/rum'){blockedTelemetry.push(url);return route.fulfill({status:204,body:''});}writes.push(url);return route.abort();});
+ const page=await ctx.newPage();page.setDefaultTimeout(25000);page.on('pageerror',e=>{
+  // WebKit can surface an access-control error from the intercepted Cloudflare
+  // beacon. Retain it separately; never hide application errors or allow writes.
+  (/\/cdn-cgi\/rum\?.*access control checks/.test(e.message)?telemetryErrors:errors).push(e.message);
+ });
  const shot=async name=>page.screenshot({path:fileURLToPath(new URL(lang+'-'+name+'.png',out)),fullPage:true,animations:'disabled'});
  try{
   const version=await (await ctx.request.get(base+'/version.json?verify=booking-layout')).json();assert.equal(version.build,expected);
@@ -35,7 +39,7 @@ for(const [type,width,height,lang] of [[chromium,1366,768,'zh'],[webkit,390,844,
   const wed=data.days.find(d=>d.date==='2026-09-30'),next=data.days.find(d=>d.date==='2026-10-07');
   assert.equal(wed.close,'22:00');assert.equal(next.close,'16:00');
   assert.deepEqual(writes,[]);assert.deepEqual(errors,[]);
-  results.push({width,height,lang,build:version.build,policy:data.policy_version,layout,calendar,wednesday:wed.close,nextWednesday:next.close,writes,errors});
+  results.push({width,height,lang,build:version.build,policy:data.policy_version,layout,calendar,wednesday:wed.close,nextWednesday:next.close,writes,blockedTelemetry,telemetryErrors,errors});
  }catch(e){await shot('FAIL');throw e;}finally{await browser.close();}
 }
 await fs.writeFile(new URL('results.json',out),JSON.stringify(results,null,2));console.log(JSON.stringify(results));

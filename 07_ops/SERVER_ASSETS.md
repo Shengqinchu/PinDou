@@ -60,7 +60,7 @@
 | 对象 | 位置 |
 |---|---|
 | 生成器 current | `/opt/pindou/current` → `releases/20260910015453-studio-v7`（迁移验收时） |
-| Studio current | `/opt/pindou/studio/current` → `releases/20260928200242-studio-v7`（2026-09-28 布贴 DIY 独立预约；[验收](STUDIO_PATCH_BOOKING_RELEASE_20260928.md)） |
+| Studio current | `/opt/pindou/studio/current` → `releases/20260928210145-studio-v7`（2026-09-28 预约布局、容量提示与指定日期营业；[验收](STUDIO_BOOKING_LAYOUT_RELEASE_20260928.md)） |
 | 生成器数据库 / 环境 | `/opt/pindou/shared/var/pindou.db` / `/opt/pindou/shared/.env` |
 | Studio 数据库 / 环境 | `/opt/pindou/studio/shared/studio.sqlite3` / `/opt/pindou/studio/shared/.env` |
 | 图片与资料 | 两个 `shared` 目录、`/opt/pindou/shared/data`、Studio `shared/media`、全部历史 release / static-history 保留 |
