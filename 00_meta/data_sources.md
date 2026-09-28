@@ -417,6 +417,19 @@
 
 ---
 
+## 布贴热压知识库（2026-09-27）
+
+### 现成布贴、热压设备与加拿大 Patch Bar 公开资料
+
+- URL / 标识：19 项来源及逐项证据边界见 [布贴来源清单](../01_research/patches/SOURCES.md)，覆盖 STAHLS’ Canada、Falcon Transfers、Emblemtek、Cricut、ESA、Therm O Web、Michaels、Q-Tees 与经营案例。
+- 抓取 / 拉取日期：2026-09-27。
+- 用途：用户确认计划采用现成布贴，热压定制帆布包、衣服；整理工艺知识、采购问题、成本模型、门店 SOP 与实物测试模板。
+- 数据格式：官方 HTML / PDF 文本及主办方活动索引；保存摘要和链接。
+- 许可状态：公开查阅；未取得第三方图案、商品图、全文或视频的商业复用授权，未将其素材复制入库。
+- 存储位置：[布贴知识库](../01_research/patches/INDEX.md)，总入口为 [手作知识索引](../01_research/KNOWLEDGE_INDEX.md)。
+- 证据边界：厂家说明不等于本店实测；Chenille 耐洗次数同页矛盾、Eventbrite 完整页 429、无样品/报价等缺口已逐项记录。
+- 责任人：Codex。
+
 ## 类别建议（Codex 调研时分类）
 - 色卡数据：MARD 官方、COCO 官方、电商列表
 - 算法参考：GitHub 仓库、ECCV/CVPR 论文、博客教程

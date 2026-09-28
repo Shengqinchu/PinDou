@@ -9,3 +9,9 @@
 - 保留其他任务的工作区改动。按任务范围提交，不能把本地未验收产品代码随运维修改部署。
 - 服务器、key 或续费变化同步 [资产记录](07_ops/SERVER_ASSETS.md)、部署文档和共享 `apisell/服务器资产清单.md`；重要变更记入 `05_studio/DEVLOG.md`。历史时间点不作为当前状态。
 - `05_studio` 目录继续遵守其自身的 `AGENTS.md`。
+
+## 手作业务知识
+
+- 先查 [手作知识总索引](01_research/KNOWLEDGE_INDEX.md)。既有拼豆资料在 [拼豆知识库索引](01_research/colormap/INDEX.md) 和 [拼豆领域知识](01_research/tech/perler_bead_domain_notes.md)，早期阶段建议不代表当前门店配置。
+- 用户已确认后续布贴业务为 **选现成布贴，热压定制帆布包、衣服等**。布贴、烫贴、绣章、patch bar 相关任务先读 [布贴知识库](01_research/patches/INDEX.md)，再查工艺、采购与试样文档。
+- 布贴参数必须匹配实际背胶 SKU、底材和机器；厂家说明、门店建议与本店实测分别标记。未有测试卡的组合不能称为已验证，价格和供货状态在采购前重新核对。

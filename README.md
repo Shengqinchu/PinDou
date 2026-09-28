@@ -23,6 +23,12 @@
 - 决策日志：`00_meta/DECISION_LOG.md` + `04_architecture/ADRs/`
 - Phase 0 综合简报（产出中）：`00_meta/phase0_summary.md`
 
+## 手作业务知识
+
+- [知识总索引](01_research/KNOWLEDGE_INDEX.md)：查找拼豆与后续手作业务资料。
+- [拼豆知识库](01_research/colormap/INDEX.md)：色卡、品牌、供应链与领域知识。
+- [布贴热压知识库](01_research/patches/INDEX.md)：现成布贴定制帆布包/衣服的材料、设备、工艺、采购、成本与试样 SOP。2026-09-27 完成首轮文献调研，具体材料效果仍待实测。
+
 ## 角色
 - 用户：产品负责人，最终拍板
 - chat 端 Claude：架构顾问 / 评审
