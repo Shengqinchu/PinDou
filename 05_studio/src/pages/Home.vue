@@ -14,6 +14,7 @@ import StudioImage from "../components/StudioImage.vue";
 import StudioCarousel from "../components/StudioCarousel.vue";
 import BrandMotif from "../components/BrandMotif.vue";
 import LiftTitle from '../components/LiftTitle.vue';
+import PatchLaunchPopup from '../components/PatchLaunchPopup.vue';
 import { tr } from "../state";
 import { reducedMotion, onMotionPreferenceChange } from "../motion-preference";
 const page = ref<HTMLElement>();
@@ -86,6 +87,7 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <div ref="page" class="vision-home">
+    <PatchLaunchPopup/>
     <section class="vision-hero container">
       <p class="vision-location">
         {{ say(copyText.hamilton_ontario_canada_fbf034) }}

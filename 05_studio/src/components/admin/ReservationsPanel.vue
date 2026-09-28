@@ -2,6 +2,8 @@
 import { patchCopy, type ExperienceFilter } from '../../patch-reservations';
 import CopyContact from "../CopyContact.vue";
 import OwnerDeliveryStatus from './OwnerDeliveryStatus.vue';
+import PatchPromotionSettings from './PatchPromotionSettings.vue';
+import { promotionCopy } from '../../patch-promotion';
 import OfferLabel from '../../visit/OfferLabel.vue';
 import { contentModule } from "../../content-store";
 const copyText = contentModule("components-admin-ReservationsPanel", copyTextDefault);
@@ -36,7 +38,7 @@ import ReservationHistory from './ReservationHistory.vue';
 import type {WalletAccount} from '../../wallet';
 import { useRoute, useRouter } from 'vue-router';
 import { messageCopy } from '../../messaging';
-type Entry = Reservation & { payload: ReservationPayload; staff_note: string;owner_id:string;deleted_at:string|null;created_by?:string };
+type Entry = Reservation & { patch_gift_guests:number;payload: ReservationPayload; staff_note: string;owner_id:string;deleted_at:string|null;created_by?:string };
 const props = defineProps<{ active: boolean; calendar?: boolean }>();
 const at=ref(''),timetableRevision=ref(0),experience=ref<ExperienceFilter>('all');
 const { request } = useDesk();
@@ -233,6 +235,7 @@ defineExpose({ refresh: load });
       </button>
     </header>
     <OwnerDeliveryStatus :active="active" />
+    <PatchPromotionSettings :active="active" :refresh-key="timetableRevision"/>
     <div class="reservation-experience-filter" role="group" :aria-label="say(patchCopy.filter)">
       <button v-for="kind in (['all','beads','patch'] as const)" :key="kind" type="button" class="desk-button secondary" :class="{selected:experience===kind}" :aria-pressed="experience===kind" @click="experience=kind">{{say(patchCopy[kind])}}</button>
     </div>
@@ -328,6 +331,7 @@ defineExpose({ refresh: load });
             {{ item.booking.guests }} {{ say(copyText.guests_24bfb5) }}</small
           >
           <small v-if="item.offer"><OfferLabel :offer="item.offer"/></small>
+          <small v-if="item.patch_gift_guests" class="patch-gift-badge">{{formatCopy(promotionCopy.gift_count,{v0:item.patch_gift_guests})}}</small>
         </div>
         <span :class="['reservation-status', item.status]">{{
           labels[item.status]
@@ -386,6 +390,7 @@ defineExpose({ refresh: load });
               }}
               · {{ entry.booking.guests }} {{ say(copyText.guests_24bfb5) }}
               <p v-if="entry.offer"><OfferLabel :offer="entry.offer"/></p>
+              <p v-if="entry.patch_gift_guests" class="patch-gift-badge">{{formatCopy(promotionCopy.gift_count,{v0:entry.patch_gift_guests})}}</p>
             </dd>
           </div>
           <div>

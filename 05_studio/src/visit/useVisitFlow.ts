@@ -21,6 +21,11 @@ export function useVisitFlow(){
  const offer=computed(()=>calendar.value?.offers?.find(o=>o.id===draft.offer));
  const firstReady=computed(()=>['hourly','day','patch'].includes(draft.booking.plan));
  if(!attempt.value){delete draft.offer;delete draft.offer_revision;}
+ // A campaign link preselects only the experience. Keep contact details and
+ // protect an in-flight request's saved body and idempotency key.
+ if(!attempt.value&&route.query.experience==='patch'&&draft.booking.plan!=='patch'){
+  draft.booking.plan='patch';draft.booking.start='';draft.booking.end='';
+ }
  const contactProfile=ref<BookingProfile>(),contactLoading=ref(!!customerToken()),contactError=ref('');
  const contactEditedKey='puppy-reservation-contact-edited-v1',contactOwnerKey='puppy-reservation-contact-owner-v1';
  const savedEditing=readSession<boolean>(contactEditedKey);
@@ -126,7 +131,7 @@ export function useVisitFlow(){
  watch(step,value=>{if(value===2)void loadContactContext();});
  watch(()=>route.query.step,()=>{if(!restored||locked.value)return;const value=safeStep(requestedStep());direction.value=value>=step.value?1:-1;step.value=value;persist();});
  function refreshDetails(){if(!locked.value)void loadContactContext();}
- onMounted(()=>{void load();timer=setInterval(visible,60000);window.addEventListener('pageshow',visible);window.addEventListener('focus',visible);document.addEventListener('visibilitychange',visible);window.addEventListener('studio-booking-profile-change',refreshDetails);});
+ onMounted(()=>{if(route.query.experience==='patch'&&!attempt.value&&!isContentPreview()){const query={...route.query};delete query.experience;void router.replace({query});}void load();timer=setInterval(visible,60000);window.addEventListener('pageshow',visible);window.addEventListener('focus',visible);document.addEventListener('visibilitychange',visible);window.addEventListener('studio-booking-profile-change',refreshDetails);});
  onBeforeUnmount(()=>{alive=false;sequence++;contactSequence++;clearInterval(timer);window.removeEventListener('pageshow',visible);window.removeEventListener('focus',visible);document.removeEventListener('visibilitychange',visible);window.removeEventListener('studio-booking-profile-change',refreshDetails);closeAccount();});
  return reactive({draft,step,direction,calendar,loading,sending,checkingAccount,error,loadError,attempt,locked,offer,contactProfile,contactLoading,contactError,savedDetails,detailsEditing,loadContactContext,editDetails,beginDetailsEdit,useSavedDetails,firstReady,selected,load,navigate,choosePlan,chooseGuests,chooseInterval,back,submit});
 }

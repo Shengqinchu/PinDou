@@ -3,6 +3,8 @@
 Other service files and previous hashed assets are reused byte-for-byte from
 the base manifest. Name changed service files explicitly to avoid shipping
 unrelated local backend changes.
+Use --add-service=<filename> for an explicitly reviewed new service module;
+existing files must already be present in the verified live manifest.
 """
 from __future__ import annotations
 
@@ -44,7 +46,9 @@ copy_sources = {
     "telegram-notification-copy.json": "telegram-notifications.json",
 }
 service = {}
-for filename in sys.argv[2:]:
+for argument in sys.argv[2:]:
+    adding = argument.startswith("--add-service=")
+    filename = argument.removeprefix("--add-service=") if adding else argument
     if filename in copy_sources:
         path = root / "05_studio/src/content" / copy_sources[filename]
     elif filename == "content-defaults.json" or re.fullmatch(r"[a-z][a-z0-9_]*\.py", filename):
@@ -52,7 +56,7 @@ for filename in sys.argv[2:]:
     else:
         raise SystemExit(f"Invalid service filename: {filename}")
     name = "service/" + filename
-    if name not in base_hashes or not path.is_file() or path.is_symlink():
+    if (adding and name in base_hashes) or (not adding and name not in base_hashes) or not path.is_file() or path.is_symlink():
         raise SystemExit(f"Service file missing from live manifest or local tree: {name}")
     service[name] = path
 

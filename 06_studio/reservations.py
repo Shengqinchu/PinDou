@@ -13,6 +13,7 @@ from zoneinfo import ZoneInfo
 from fastapi import Depends, Header, HTTPException, Request, Response
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from customer_auth import require_customer
+import patch_promotion
 
 ZONE = ZoneInfo("America/Toronto")
 COOKIE = "puppy_reservation_session"
@@ -91,6 +92,9 @@ def initialize(database):
         CREATE TRIGGER IF NOT EXISTS reservation_history_delete BEFORE DELETE ON reservation_events
           BEGIN SELECT RAISE(ABORT,'reservation history is append-only'); END;
         """)
+
+    patch_promotion.initialize(database, now_local().isoformat())
+
 
 def clock(value):
     return f"{value // 60:02d}:{value % 60:02d}"
@@ -479,6 +483,7 @@ class Block(Strict):
         return self
 
 def register(app, database, admin_actor):
+    patch_promotion.register(app, database, admin_actor, lambda: now_local())
     def owned_reservation(db,reference,customer):
         row=db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone()
         if not row or row['deleted_at'] or row['owner_id']!=customer['id']:
@@ -512,6 +517,7 @@ def register(app, database, admin_actor):
             db.execute("INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,'cancelled','')",
                        (reference,'customer:'+customer['id'],timestamp))
             row=db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone()
+            patch_promotion.reconcile(db, row, timestamp, 'customer:'+customer['id'])
             import owner_notifications
             owner_notifications.enqueue_reservation(db,'cancelled',row)
             return {'reservation':public_row(row),'policy':cancellation_policy(db,customer['id'],row,current)}
@@ -591,6 +597,7 @@ def register(app, database, admin_actor):
             import booking_profile
             booking_profile.capture(db,customer['id'],json.loads(stored),payload.contact_profile_version,ref)
             row = db.execute("SELECT * FROM studio_reservations WHERE id=?", (ref,)).fetchone()
+            patch_promotion.enroll(db, row, timestamp, 'customer:'+customer['id'])
             audit_creation(db, row, 'customer:'+customer['id'])
             import owner_notifications
             owner_notifications.enqueue_reservation(db, 'created', row)
@@ -633,6 +640,7 @@ def register(app, database, admin_actor):
               (reference, stamp, stamp, payload.status, json.dumps(stored, ensure_ascii=False), '', idempotency_key,
                digest, owner_id, source, actor, payload.actual_minutes, payload.actual_guests, payload.public_note, payload.staff_note))
             row = db.execute('SELECT * FROM studio_reservations WHERE id=?', (reference,)).fetchone()
+            patch_promotion.enroll(db, row, stamp, actor)
             audit_creation(db, row, actor, payload.reason)
             if payload.kind == 'backfill':
                 from studio_finance import from_completed
@@ -687,7 +695,8 @@ def register(app, database, admin_actor):
             rows = db.execute("SELECT * FROM studio_reservations"+where+" ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'confirmed' THEN 1 WHEN 'completed' THEN 2 WHEN 'cancelled' THEN 3 ELSE 4 END,created_at DESC,id DESC LIMIT 30 OFFSET ?", (*params,(page-1)*30)).fetchall()
             counts = dict(db.execute("SELECT status,count(*) FROM studio_reservations WHERE deleted_at IS NULL" + (" AND " + experience_clause if experience != "all" else "") + " GROUP BY status").fetchall())
             policy = read_policy(db)
-        return {"items":[public_row(r) | {"payload":json.loads(r["payload"]),"staff_note":r["staff_note"],'owner_id':r['owner_id'],'deleted_at':r['deleted_at'],'created_by':r['created_by']} for r in rows], "total":count,"counts":counts,"policy":policy}
+            gifts = patch_promotion.awards(db)
+        return {"items":[public_row(r) | {"patch_gift_guests":gifts.get(r['id'],0),"payload":json.loads(r["payload"]),"staff_note":r["staff_note"],'owner_id':r['owner_id'],'deleted_at':r['deleted_at'],'created_by':r['created_by']} for r in rows], "total":count,"counts":counts,"policy":policy}
 
     @app.get('/studio-api/manage/reservations/{reference}/events')
     def reservation_history(reference:str, page:int=1, _actor=Depends(admin_actor)):
@@ -706,6 +715,7 @@ def register(app, database, admin_actor):
             policy=read_policy(db)
             # Aggregate every overlapping booking, independently of the list's 30-row pagination.
             rows=db.execute("SELECT r.*,m.name AS member_name,m.staff_note AS member_note FROM studio_reservations r LEFT JOIN studio_members m ON m.owner_id=r.owner_id WHERE r.deleted_at IS NULL AND r.status IN ('pending','confirmed','completed') AND json_extract(r.payload,'$.booking.date')>=? AND json_extract(r.payload,'$.booking.date')<? ORDER BY r.id",(str(first),str(last))).fetchall()
+            gifts = patch_promotion.awards(db)
             blocks=[dict(r) for r in db.execute('SELECT date,start,end FROM reservation_blocks WHERE date>=? AND date<?',(str(first),str(last)))]
         days=[]
         if experience != "all":
@@ -715,7 +725,7 @@ def register(app, database, admin_actor):
         for row in rows:
             data=json.loads(row['payload'])
             note='\n'.join(dict.fromkeys(n.strip() for n in (row['member_note'] or '',row['staff_note'],data.get('notes','')) if n.strip()))
-            groups.append({'id':row['id'],'status':row['status'],'name':data.get('name') or row['member_name'] or row['id'],'note':note,**data['booking']})
+            groups.append({'id':row['id'],'status':row['status'],'name':data.get('name') or row['member_name'] or row['id'],'note':note,'patch_gift_guests':gifts.get(row['id'],0),**data['booking']})
         for index in range(14):
             day=first+timedelta(days=index);opening=hours(day,policy);slots=[]
             present=[(s,b) for s,b in booked if b['date']==str(day)]
@@ -770,6 +780,7 @@ def register(app, database, admin_actor):
                 if json.loads(row['payload'])['booking']['date'] > str(current.date()):
                     raise HTTPException(422, 'wallet_visit_not_arrived')
             db.execute("UPDATE studio_reservations SET status=?,staff_note=?,actual_minutes=?,actual_guests=?,public_note=?,version=version+1,updated_at=? WHERE id=?", (payload.status,payload.staff_note,actual,guests,public_note,current.isoformat(),reference))
+            patch_promotion.reconcile(db, db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone(), current.isoformat(), actor, restoring=row['status']=='cancelled' and payload.status in ('pending','confirmed'))
             if payload.status=='completed':
                 from wallet import reward_visit
                 reward_visit(db,db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone(),actor)
@@ -794,6 +805,7 @@ def register(app, database, admin_actor):
             if row['version']!=payload.version: raise HTTPException(409,'version_conflict')
             if row['status']=='confirmed': raise HTTPException(409,'reservation_cancel_before_delete')
             db.execute('UPDATE studio_reservations SET deleted_at=?,updated_at=?,version=version+1 WHERE id=?',(now_local().isoformat(),now_local().isoformat(),reference))
+            patch_promotion.reconcile(db, db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone(), now_local().isoformat(), actor)
             db.execute('INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)',(reference,actor,now_local().isoformat(),'deleted',payload.reason))
         return {'deleted':True}
 
@@ -810,6 +822,7 @@ def register(app, database, admin_actor):
                 if not has_capacity(db, booking, read_policy(db), reference):
                     raise HTTPException(409, "reservation_confirmation_conflict")
             db.execute('UPDATE studio_reservations SET deleted_at=NULL,updated_at=?,version=version+1 WHERE id=?',(now_local().isoformat(),reference))
+            patch_promotion.reconcile(db, db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone(), now_local().isoformat(), actor, restoring=True)
             db.execute('INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)',(reference,actor,now_local().isoformat(),'restored',payload.reason))
         return {'restored':True}
 

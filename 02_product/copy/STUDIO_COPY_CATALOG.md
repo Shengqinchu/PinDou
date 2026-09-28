@@ -2499,6 +2499,38 @@
 | your_request_will_wait_for_the_hosts_cd36bf | 提交后等待店主确认，无需在此付款。 | Your request will wait for the host's confirmation. No payment is needed here. |
 | host_wechat_ac7b7e | 店主微信： | Host WeChat:  |
 
+## patch-promotion.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| title | 布贴DIY试营业特惠 | Patch DIY opening offer |
+| intro | 预约前 {v0} 名赠送帆布带！ | A free canvas strap for the first {v0} guests to book! |
+| bonus | 布贴物品买二赠一！ | Buy two patch items, get one free! |
+| book | 点击预约 | Book a visit |
+| close | 关闭活动弹窗 | Close the opening offer |
+| launch | 试营业特惠！ | Opening offer! |
+| card | 现在预约即可获得免费帆布带 | Book now for a free canvas strap |
+| remaining | 剩余数 {v0}/{v1} | Remaining: {v0}/{v1} |
+| exhausted | 帆布带赠送名额已领完 | All free canvas straps have been claimed |
+| desk_title | 布贴试营业 · 赠送名额 | Patch opening · giveaway places |
+| allocated | 已占用 {v0} 人 | {v0} guests allocated |
+| edit | 编辑活动 | Edit offer |
+| quota | 赠送总名额（人数） | Total giveaway places (people) |
+| enabled | 显示活动并开放赠送 | Show the offer and accept giveaway claims |
+| paused | 活动已暂停 | Offer paused |
+| rules_label | 赠送规则 | Giveaway rules |
+| rules | 仅计入活动上线后新提交的布贴预约。按预约人数占用名额，取消后释放；已完成到店的赠送保留。只要还剩名额，最后一组全部赠送。 | Only new Patch DIY bookings submitted after launch qualify. Places are counted by guests and released on cancellation; completed gifts remain counted. If any places remain, the entire final group qualifies. |
+| quota_help | 调整总名额不会撤回已有赠送。恢复已取消的预约时，按当时剩余名额重新判断；增加名额只适用于之后的新预约。 | Changing the total never withdraws existing gifts. Restored bookings are checked against the remaining places. Added places apply to subsequent new bookings. |
+| gift | 赠送帆布带 | Free canvas strap |
+| gift_count | 赠送帆布带 · {v0} 人 | Free canvas strap · {v0} guests |
+| save | 保存活动 | Save offer |
+| saved | 活动已保存 | Offer saved |
+| saving | 保存中… | Saving… |
+| cancel | 取消 | Cancel |
+| retry | 重新加载 | Reload |
+| loading | 正在读取活动… | Loading offer… |
+| load_error | 活动暂时无法读取，请重试。 | The offer could not be loaded. Please try again. |
+
 ## patch-reservations.json
 
 | 键 | 中文 | English |
