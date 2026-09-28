@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { patchCopy } from '../patch-reservations';
 import LiftTitle from '../components/LiftTitle.vue';
 import CancelReservation from '../components/CancelReservation.vue';
 import { reservationRevision } from '../cancellation';
@@ -125,7 +126,7 @@ onBeforeUnmount(() => {
           <dt>{{ say(copyText.experience_cc25a0) }}</dt>
           <dd>
             <OfferLabel v-if="result.offer" :offer="result.offer"/><template v-else>{{
-              result.booking.plan === "day"
+              result.booking.plan === "patch" ? say(patchCopy.patch) : result.booking.plan === "day"
                 ? say(copyText.day_visit_aad886)
                 : say(copyText.hourly_visit_681491)
             }}</template>

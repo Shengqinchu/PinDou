@@ -4,13 +4,14 @@ export type ReservationBooking = {
   date: string;
   start: string;
   end: string;
-  plan: "hourly" | "day" | "";
+  plan: "hourly" | "day" | "patch" | "";
   guests: number;
 };
 export type ReservationSlot = {
   start: string;
   end: string;
   available: boolean;
+  start_available?: boolean;
   reason: string | null;
   remaining_seats?: number | null;
   capacity_full?: boolean;
@@ -25,6 +26,7 @@ export type ReservationDay = {
   slots: ReservationSlot[];
 };
 export type ReservationCalendar = {
+  experience?: "beads" | "patch";
   offers?: ReservationOffer[];
   today: string;
   timezone: string;
@@ -125,13 +127,14 @@ export function validSelection(
   if (
     !day ||
     day.closed ||
-    !booking.plan ||
+    !["hourly", "day", "patch"].includes(booking.plan) ||
+    (calendar?.experience || "beads") !== (booking.plan === "patch" ? "patch" : "beads") ||
     !Number.isInteger(booking.guests) ||
     booking.guests < 1 ||
     booking.guests > (calendar?.max_guests_per_group || 4) ||
     !Number.isFinite(start) ||
     !Number.isFinite(end) ||
-    end - start < 120 ||
+    (booking.plan === "patch" ? end - start !== 60 : end - start < 120) ||
     start < minutes(day.open || "10:00") ||
     end > minutes(day.close)
   )

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { patchCopy, type ExperienceFilter } from '../../patch-reservations';
 import CopyContact from "../CopyContact.vue";
 import OwnerDeliveryStatus from './OwnerDeliveryStatus.vue';
 import OfferLabel from '../../visit/OfferLabel.vue';
@@ -37,7 +38,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { messageCopy } from '../../messaging';
 type Entry = Reservation & { payload: ReservationPayload; staff_note: string;owner_id:string;deleted_at:string|null;created_by?:string };
 const props = defineProps<{ active: boolean; calendar?: boolean }>();
-const at=ref(''),timetableRevision=ref(0);
+const at=ref(''),timetableRevision=ref(0),experience=ref<ExperienceFilter>('all');
 const { request } = useDesk();
 const router=useRouter(),route=useRoute();
 const deleted=ref(false),deleting=ref(false),deleteReason=ref(''),publicNote=ref('');
@@ -78,6 +79,7 @@ async function load() {
   try {
     const query = new URLSearchParams({
       status: status.value,
+      experience: experience.value,
       page: String(page.value),
       search: search.value,
       deleted:String(deleted.value),
@@ -188,7 +190,7 @@ watch(
   },
   { immediate: true },
 );
-watch([status, day,deleted,at], () => {
+watch([status, day,deleted,at,experience], () => {
   if(deleted.value||!day.value)at.value='';
   page.value = 1;
   if (props.active) load();
@@ -231,6 +233,10 @@ defineExpose({ refresh: load });
       </button>
     </header>
     <OwnerDeliveryStatus :active="active" />
+    <div class="reservation-experience-filter" role="group" :aria-label="say(patchCopy.filter)">
+      <button v-for="kind in (['all','beads','patch'] as const)" :key="kind" type="button" class="desk-button secondary" :class="{selected:experience===kind}" :aria-pressed="experience===kind" @click="experience=kind">{{say(patchCopy[kind])}}</button>
+    </div>
+    <p class="fine-print">{{say(patchCopy.capacity)}}</p>
     <ReservationAvailability v-if="calendar" :active="active" />
     <div v-if="!calendar" class="reservation-desk-metrics">
       <button @click="status = 'pending'">
@@ -262,7 +268,7 @@ defineExpose({ refresh: load });
       </button>
     </div>
     <ReservationSettings :active="active" @saved="load" />
-    <ReservationTimetable v-if="!deleted" :active="active" :refresh-key="timetableRevision" :selected-date="day" :selected-time="at" @inspect="inspectBooking" @select="value=>{day=value.date;at=value.at;status='all';search='';}"/>
+    <ReservationTimetable v-if="!deleted" :active="active" :refresh-key="timetableRevision" :experience="experience" :selected-date="day" :selected-time="at" @inspect="inspectBooking" @select="value=>{day=value.date;at=value.at;status='all';search='';}"/>
     <div v-if="at&&day&&!deleted" class="timetable-filter"><span>{{formatCopy(timetableCopy.selected,{v0:prettyDate(day),v1:at})}}</span><button class="desk-link" @click="at=''">{{say(timetableCopy.clear)}}</button></div>
     <div class="reservation-deleted-toggle" role="group" :aria-label="say(walletCopy.deleted)"><button class="desk-link" :aria-pressed="!deleted" @click="deleted=false">{{say(walletCopy.active)}}</button><button class="desk-link" :aria-pressed="deleted" @click="deleted=true">{{say(walletCopy.deleted)}}</button></div>
     <div class="reservation-desk-filters">
@@ -283,6 +289,7 @@ defineExpose({ refresh: load });
       ><button
         class="desk-link"
         @click="
+          experience = 'all';
           status = 'all';
           day = '';
           search = '';
@@ -311,7 +318,7 @@ defineExpose({ refresh: load });
         @click="inspect(item)"
       >
         <div>
-          <strong>{{ item.name }}</strong
+          <span class="reservation-experience-label" :class="{patch:item.booking.plan==='patch'}">{{say(item.booking.plan==='patch'?patchCopy.patch:patchCopy.beads)}}</span><strong>{{ item.name }}</strong
           ><small>{{ item.id }}</small>
         </div>
         <div>
@@ -373,7 +380,7 @@ defineExpose({ refresh: load });
             <dt>{{ say(copyText.experience_and_guests_369b9e) }}</dt>
             <dd>
               {{
-                entry.booking.plan === "day"
+                entry.booking.plan === "patch" ? say(patchCopy.patch) : entry.booking.plan === "day"
                   ? say(copyText.day_visit_aad886)
                   : say(copyText.hourly_visit_681491)
               }}

@@ -119,8 +119,11 @@ def delivery_payload(job,payload):
         body_key=kind+'_'+job['channel']+'_body' if kind=='confirmed' and job['channel'] in ('sms','email') else kind+'_body'
     else:
         fields={'url':url};body_key=kind+'_body'
+    body = words(body_key,DELIVERY_LOCALE).format(**fields)
+    if kind in BOOKING_KINDS and booking.get('plan') == 'patch':
+        body = words('patch_experience',DELIVERY_LOCALE) + '\n' + body
     return payload|{'title':words(kind+'_title',DELIVERY_LOCALE),
-      'body':words(body_key,DELIVERY_LOCALE).format(**fields),'url':url,'locale':DELIVERY_LOCALE,'kind':kind}
+      'body':body,'url':url,'locale':DELIVERY_LOCALE,'kind':kind}
 
 
 def render(row,kind):
@@ -249,7 +252,7 @@ def wechat_message(job,payload,template,grant):
     fields=json.loads(template['fields']);booking=payload['booking'];locale=DELIVERY_LOCALE
     text=lambda value:re.sub(r'[\x00-\x1f\x7f]',' ',str(value))[:20]
     values={'place':text(words('place',locale)),'start':booking['date']+' '+booking['start'],
-      'end':booking['date']+' '+booking['end'],'service':text(words('day' if booking['plan']=='day' else 'hourly',locale)),
+      'end':booking['date']+' '+booking['end'],'service':text(words('patch' if booking['plan']=='patch' else 'day' if booking['plan']=='day' else 'hourly',locale)),
       'note':text(words('card_'+job['kind'],locale).format(
         guests=booking['guests'],guest_label='guest' if booking['guests']==1 else 'guests'))}
     return {'touser':grant['openid'],'template_id':template['template_id'],

@@ -76,5 +76,6 @@
   "version_conflict": ["记录已被更新，请刷新后再编辑。", "This record changed. Refresh before editing."],
   "invalid_items": ["请填写至少一个项目，每项不超过 200 字。", "Enter at least one item, up to 200 characters each."],
   "generic_error": ["暂时未能完成，请稍后重试。", "Could not complete this. Please try again."],
-  "month": ["本月", "This month"]
+  "month": ["本月", "This month"],
+  "patch": ["布贴DIY", "Patch DIY"]
 }

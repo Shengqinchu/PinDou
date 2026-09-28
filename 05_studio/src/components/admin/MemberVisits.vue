@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { patchCopy, bookingExperience } from '../../patch-reservations';
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 import { useDesk } from '../../admin';
@@ -6,13 +7,13 @@ import { CommerceError } from '../../commerce';
 import { adminVisitCopy as copy, visitSourceLabel, visitStatusLabel } from '../../admin-visits';
 import { walletCopy, duration, type WalletAccount } from '../../wallet';
 import { say, formatCopy, locale, hamiltonDate, plusDays, prettyDate } from '../../state';
-import { readSession, saveSession, validSelection, type Reservation, type ReservationCalendar } from '../../reservations';
+import { minutes, clock, readSession, saveSession, validSelection, type Reservation, type ReservationCalendar } from '../../reservations';
 import { minutesFromHours } from '../../time-units';
 
 const props = defineProps<{ account: WalletAccount; disabled?: boolean }>();
 const emit = defineEmits<{ busy: [value: boolean]; recorded: [] }>();
 const { request } = useDesk();
-type Draft = { kind: 'booking' | 'backfill'; date: string; start: string; end: string; plan: 'hourly' | 'day'; guests: number; status: 'pending' | 'confirmed'; actualHours: number | string; actualGuests: number | string; reason: string; publicNote: string; staffNote: string };
+type Draft = { kind: 'booking' | 'backfill'; date: string; start: string; end: string; plan: 'hourly' | 'day' | 'patch'; guests: number; status: 'pending' | 'confirmed'; actualHours: number | string; actualGuests: number | string; reason: string; publicNote: string; staffNote: string };
 type Pending = { key: string; body: Record<string, unknown> };
 const storageKey = `studio-admin-visit-v1:${props.account.owner_id}`;
 const stored = readSession<{ draft: Draft; open: boolean; pending: Pending | null }>(storageKey);
@@ -37,7 +38,7 @@ async function loadCalendar() {
   if (!formOpen.value || draft.value.kind !== 'booking') return;
   const n = ++calendarSequence; calendarBusy.value = true; calendarError.value = '';
   try {
-    const result = await request<ReservationCalendar>(`/reservation-calendar?guests=${draft.value.guests}`);
+    const result = await request<ReservationCalendar>(`/reservation-calendar?guests=${draft.value.guests}&experience=${bookingExperience(draft.value.plan)}`);
     if (n === calendarSequence) calendar.value = result;
   } catch (e) { if (n === calendarSequence) { calendar.value = undefined; calendarError.value = (e as Error).message; } }
   finally { if (n === calendarSequence) calendarBusy.value = false; }
@@ -74,7 +75,10 @@ async function save() {
 }
 function persist() { saveSession(storageKey, { draft: draft.value, open: formOpen.value, pending: pending.value }); }
 watch([draft, formOpen, pending], persist, { deep: true, flush: 'sync' });
-watch([formOpen, () => draft.value.kind, () => draft.value.guests], loadCalendar, { immediate: true });
+watch([() => draft.value.plan, () => draft.value.start], () => {
+  if (!frozen.value && draft.value.plan === 'patch') draft.value.end = clock(minutes(draft.value.start) + 60);
+});
+watch([formOpen, () => draft.value.kind, () => draft.value.guests, () => bookingExperience(draft.value.plan)], loadCalendar, { immediate: true });
 watch(page, load, { immediate: true });
 onBeforeUnmount(() => { listSequence++; calendarSequence++; });
 </script>
@@ -96,12 +100,13 @@ onBeforeUnmount(() => { listSequence++; calendarSequence++; });
     <form v-if="formOpen" class="wallet-form admin-visit-form" @submit.prevent="save">
       <h4>{{ say(draft.kind === 'booking' ? copy.add_booking : copy.add_backfill) }}</h4>
       <p class="wallet-rule">{{ say(draft.kind === 'booking' ? copy.booking_help : copy.backfill_help) }}</p>
+      <p v-if="draft.plan==='patch'" class="wallet-rule">{{say(patchCopy.booking_note)}}</p>
       <fieldset :disabled="frozen">
         <label class="desk-field">{{ say(copy.date) }}<input v-model="draft.date" type="date" :min="draft.kind === 'booking' ? hamiltonDate() : undefined" :max="draft.kind === 'booking' ? plusDays(hamiltonDate(), 13) : hamiltonDate()" required /></label>
         <div class="wallet-input-grid">
           <label class="desk-field">{{ say(copy.start) }}<select v-model="draft.start"><option v-for="time in times" :key="time">{{ time }}</option></select></label>
-          <label class="desk-field">{{ say(copy.end) }}<select v-model="draft.end"><option v-for="time in times" :key="time">{{ time }}</option></select></label>
-          <label class="desk-field">{{ say(copy.plan) }}<select v-model="draft.plan"><option value="hourly">{{ say(copy.hourly) }}</option><option value="day">{{ say(copy.day) }}</option></select></label>
+          <label class="desk-field">{{ say(copy.end) }}<select v-model="draft.end" :disabled="draft.plan==='patch'"><option v-for="time in times" :key="time">{{ time }}</option></select></label>
+          <label class="desk-field">{{ say(copy.plan) }}<select v-model="draft.plan"><option value="hourly">{{ say(copy.hourly) }}</option><option value="day">{{ say(copy.day) }}</option><option value="patch">{{ say(patchCopy.patch) }}</option></select></label>
           <label v-if="draft.kind === 'booking'" class="desk-field">{{ say(copy.guests) }}<input v-model.number="draft.guests" type="number" min="1" :max="calendar?.max_guests_per_group || 99" step="1" required /></label>
         </div>
         <template v-if="draft.kind === 'booking'">
@@ -128,7 +133,7 @@ onBeforeUnmount(() => { listSequence++; calendarSequence++; });
     <p v-else-if="!items.length">{{ say(copy.empty) }}</p>
     <article v-for="item in items" :key="item.id" class="member-visit-row">
       <strong>{{ prettyDate(item.booking.date) }} · {{ item.booking.start }}–{{ item.booking.end }}</strong>
-      <p>{{ visitStatusLabel(item.status) }} · {{ visitSourceLabel(item.creation_source) }}</p>
+      <p>{{ say(item.booking.plan==='patch'?patchCopy.patch:patchCopy.beads) }} · {{ visitStatusLabel(item.status) }} · {{ visitSourceLabel(item.creation_source) }}</p>
       <p v-if="item.actual_minutes">{{ formatCopy(walletCopy.per_guest, { v0: duration(item.actual_minutes), v1: item.actual_guests }) }}</p>
       <RouterLink :to="{ path: '/manage', query: { view: 'reservations', booking: item.id } }" class="desk-link" :aria-disabled="saving" @click="saving && $event.preventDefault()">{{ say(copy.open_record) }}</RouterLink>
     </article>

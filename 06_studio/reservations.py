@@ -137,7 +137,7 @@ class Visit(Strict):
     date: date
     start: str = Field(pattern=r"^\d{2}:\d{2}$")
     end: str = Field(pattern=r"^\d{2}:\d{2}$")
-    plan: Literal["hourly", "day"]
+    plan: Literal["hourly", "day", "patch"]
     guests: int = Field(ge=1, le=99, strict=True)
 
 class Submission(Strict):
@@ -170,7 +170,9 @@ def validate_interval(booking, current, policy=None):
     opening = hours(booking.date, policy)
     if not current.date() <= booking.date < current.date() + timedelta(days=14):
         raise HTTPException(422, "reservation_outside_window")
-    if not opening["enabled"] or start < minute(opening["open"]) or end > closing(booking.date, policy) or end - start < 120:
+    if booking.plan == "patch" and end - start != 60:
+        raise HTTPException(422, "reservation_patch_duration")
+    if not opening["enabled"] or start < minute(opening["open"]) or end > closing(booking.date, policy) or end - start < (60 if booking.plan == "patch" else 120):
         raise HTTPException(422, "reservation_interval_unavailable")
     if policy and booking.guests > policy["max_guests_per_group"]:
         raise HTTPException(422, "reservation_group_limit")
@@ -184,10 +186,12 @@ def overlaps(db, booking, exclude=""):
     return any(minute(json.loads(r["payload"])["booking"]["start"]) < minute(booking.end)
                and minute(json.loads(r["payload"])["booking"]["end"]) > minute(booking.start) for r in rows)
 
-def capacity_grid(confirmed, day, policy):
+def capacity_grid(confirmed, day, policy, experience="beads"):
     """One authoritative half-hour map, independent of the requested group size."""
-    group_limit = 1 if policy["exclusive_groups"] else policy["max_concurrent_groups"]
-    people_limit = policy["max_concurrent_guests"]
+    patch = experience == "patch"
+    confirmed = [b for b in confirmed if (b.get("plan") == "patch") == patch]
+    group_limit = 1 if patch or policy["exclusive_groups"] else policy["max_concurrent_groups"]
+    people_limit = None if patch else policy["max_concurrent_guests"]
     slots = {}
     for at in range(0, 1440, 30):
         present = [b for b in confirmed if b["date"] == str(day) and minute(b["start"]) < at + 30 and minute(b["end"]) > at]
@@ -198,17 +202,18 @@ def capacity_grid(confirmed, day, policy):
     # Only genuinely full intervals create padding. Padding never creates more padding.
     full_slots = {at for at, slot in slots.items() if slot["capacity_full"]}
     for at, slot in slots.items():
-        slot["buffered"] = not slot["capacity_full"] and (at - 30 in full_slots or at + 30 in full_slots)
+        slot["buffered"] = not patch and not slot["capacity_full"] and (at - 30 in full_slots or at + 30 in full_slots)
         slot["low_capacity"] = not slot["buffered"] and slot["remaining_seats"] is not None and 0 < slot["remaining_seats"] <= 2
     return slots
 
-def availability_grid(confirmed, blocks, day, policy, guests=1, *, current=None, include_buffer=True):
+def availability_grid(confirmed, blocks, day, policy, guests=1, *, current=None, include_buffer=True, experience="beads"):
     """Close free runs shorter than two hours after all existing restrictions.
 
     Exactly two hours remains bookable. Gap closure adds no new capacity
     padding and never changes an existing reservation.
     """
-    slots = capacity_grid(confirmed, day, policy)
+    slots = capacity_grid(confirmed, day, policy, experience)
+    minimum = 60 if experience == "patch" else 120
     opening = hours(day, policy)
     day_blocks = [(minute(b['start']), minute(b['end'])) for b in blocks if b['date'] == str(day)]
     for at, state in slots.items():
@@ -224,10 +229,15 @@ def availability_grid(confirmed, blocks, day, policy, guests=1, *, current=None,
         if at in slots and slots[at]['available']:
             run.append(at)
             continue
-        if 0 < len(run) * 30 < 120:
+        if 0 < len(run) * 30 < minimum:
             for free_at in run:
                 slots[free_at].update(available=False, reason='short_gap', gap_blocked=True, low_capacity=False)
         run = []
+    # Keep half-hour occupancy distinct from valid fixed-duration start times.
+    # A free 11:30 cell cannot start a patch visit when 12:00 is already occupied.
+    if experience == "patch":
+        for at, state in slots.items():
+            state["start_available"] = state["available"] and slots.get(at + 30, {}).get("available", False)
     return slots
 
 
@@ -240,9 +250,29 @@ def capacity_available(confirmed, day, start, end, guests, policy, *, include_bu
 
 def has_capacity(db, booking, policy, exclude="", *, include_buffer=True):
     blocks = [dict(r) for r in db.execute('SELECT date,start,end FROM reservation_blocks WHERE date=?', (str(booking.date),))]
-    confirmed = [json.loads(r[0])["booking"] for r in db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed' AND id!=? AND json_extract(payload,'$.booking.date')=?", (exclude, str(booking.date)))]
-    slots = availability_grid(confirmed, blocks, booking.date, policy, booking.guests, include_buffer=include_buffer)
+    confirmed = occupying_bookings(db, exclude=exclude, day=str(booking.date))
+    slots = availability_grid(confirmed, blocks, booking.date, policy, booking.guests, include_buffer=include_buffer,
+                              experience="patch" if booking.plan == "patch" else "beads")
     return all(slots[at]['available'] for at in range(minute(booking.start), minute(booking.end), 30))
+
+
+def occupying_bookings(db, *, exclude="", day=None, since=None):
+    """Caller holds BEGIN IMMEDIATE when using this to reserve capacity.
+
+    Beads retain confirmed-only occupancy; patch requests reserve their own
+    single group immediately, including completed visits through their slot.
+    """
+    clauses = ["deleted_at IS NULL", "id!=?",
+               "(status='confirmed' OR (json_extract(payload,'$.booking.plan')='patch' AND status IN ('pending','completed')))"]
+    params = [exclude]
+    if day is not None:
+        clauses.append("json_extract(payload,'$.booking.date')=?")
+        params.append(day)
+    if since is not None:
+        clauses.append("json_extract(payload,'$.booking.date')>=?")
+        params.append(since)
+    return [json.loads(r[0])["booking"] for r in db.execute(
+        "SELECT payload FROM studio_reservations WHERE " + " AND ".join(clauses), params)]
 
 def available_offer(db, current):
     from pathlib import Path
@@ -473,7 +503,7 @@ def register(app, database, admin_actor):
             return {'can_omit_details':profile['complete'] or returning_customer(db,customer['id'],now_local()),'profile':profile}
 
     @app.get("/studio-api/reservation-calendar")
-    def calendar(request: Request, response: Response, guests: int = 1):
+    def calendar(request: Request, response: Response, guests: int = 1, experience: Literal["beads", "patch"] = "beads"):
         visitor(request, response)
         current = now_local()
         if not 1 <= guests <= 99:
@@ -481,7 +511,7 @@ def register(app, database, admin_actor):
         with database() as db:
             settings = read_policy(db)
             offer = available_offer(db, current)
-            confirmed = [json.loads(r[0])["booking"] for r in db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed' AND json_extract(payload,'$.booking.date')>=?", (str(current.date()),))]
+            confirmed = occupying_bookings(db, since=str(current.date()))
             blocks = [dict(r) for r in db.execute('SELECT date,start,end FROM reservation_blocks WHERE date>=?', (str(current.date()),))]
         enabled = [h for h in settings["weekly_hours"] if h["enabled"]]
         grid_start = min((minute(h["open"]) for h in enabled), default=600)
@@ -491,12 +521,12 @@ def register(app, database, admin_actor):
             day = current.date() + timedelta(days=n)
             slots = []
             opening = hours(day, settings)
-            capacity = availability_grid(confirmed, blocks, day, settings, guests, current=current)
+            capacity = availability_grid(confirmed, blocks, day, settings, guests, current=current, experience=experience)
             for start in range(grid_start, grid_end, 30):
                 state = capacity[start]
                 slots.append({**state, "start": clock(start), "end": clock(start + 30)})
             days.append({"date": str(day), "open": opening["open"], "close": opening["close"], "closed": not opening["enabled"], "slots": slots})
-        return {"today": str(current.date()), "timezone": "America/Toronto", "minimum_minutes": 120, "capacity_buffer_minutes": 30, "max_guests_per_group": settings["max_guests_per_group"], "weekly_hours": settings["weekly_hours"], "policy_version": settings["version"], "days": days, "offers": [offer] if offer and settings['max_guests_per_group'] >= 2 else []}
+        return {"experience": experience, "today": str(current.date()), "timezone": "America/Toronto", "minimum_minutes": 60 if experience == "patch" else 120, "capacity_buffer_minutes": 0 if experience == "patch" else 30, "max_guests_per_group": settings["max_guests_per_group"], "weekly_hours": settings["weekly_hours"], "policy_version": settings["version"], "days": days, "offers": [offer] if experience == "beads" and offer and settings['max_guests_per_group'] >= 2 else []}
 
     @app.post("/studio-api/reservations", status_code=201)
     def submit(payload: Submission, request: Request, idempotency_key: Annotated[str, Header()], customer=Depends(require_customer)):
@@ -614,10 +644,12 @@ def register(app, database, admin_actor):
         return {"items":[public_row(row) for row in rows],'total':total,'page':page}
 
     @app.get("/studio-api/manage/reservations")
-    def listing(_actor=Depends(admin_actor), status: str="all", day: date | None=None, search: str="", page: int=1, deleted:bool=False, at:str="", owner_id:str=''):
+    def listing(_actor=Depends(admin_actor), status: str="all", day: date | None=None, search: str="", page: int=1, deleted:bool=False, at:str="", owner_id:str='', experience:Literal["all","beads","patch"]="all"):
         if status not in STATES | {"all"} or not 1 <= page <= 10000 or len(search) > 120:
             raise HTTPException(422, "invalid_filter")
         clauses, params = ['deleted_at IS NOT NULL' if deleted else 'deleted_at IS NULL'], []
+        experience_clause = "json_extract(payload,'$.booking.plan')" + ("='patch'" if experience == "patch" else " IN ('hourly','day')")
+        if experience != "all": clauses.append(experience_clause)
         if status != "all": clauses.append("status=?"); params.append(status)
         if owner_id: clauses.append('owner_id=?'); params.append(owner_id)
         if day: clauses.append("json_extract(payload,'$.booking.date')=?"); params.append(str(day))
@@ -631,7 +663,7 @@ def register(app, database, admin_actor):
         with database() as db:
             count = db.execute("SELECT count(*) FROM studio_reservations"+where, params).fetchone()[0]
             rows = db.execute("SELECT * FROM studio_reservations"+where+" ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'confirmed' THEN 1 WHEN 'completed' THEN 2 WHEN 'cancelled' THEN 3 ELSE 4 END,created_at DESC,id DESC LIMIT 30 OFFSET ?", (*params,(page-1)*30)).fetchall()
-            counts = dict(db.execute("SELECT status,count(*) FROM studio_reservations WHERE deleted_at IS NULL GROUP BY status").fetchall())
+            counts = dict(db.execute("SELECT status,count(*) FROM studio_reservations WHERE deleted_at IS NULL" + (" AND " + experience_clause if experience != "all" else "") + " GROUP BY status").fetchall())
             policy = read_policy(db)
         return {"items":[public_row(r) | {"payload":json.loads(r["payload"]),"staff_note":r["staff_note"],'owner_id':r['owner_id'],'deleted_at':r['deleted_at'],'created_by':r['created_by']} for r in rows], "total":count,"counts":counts,"policy":policy}
 
@@ -646,7 +678,7 @@ def register(app, database, admin_actor):
         return {'items': [dict(row) for row in rows], 'total': total, 'page': page}
 
     @app.get('/studio-api/manage/reservation-timetable')
-    def timetable(_actor=Depends(admin_actor),start:date|None=None):
+    def timetable(_actor=Depends(admin_actor),start:date|None=None,experience:Literal["all","beads","patch"]="all"):
         first=start or now_local().date();last=first+timedelta(days=14)
         with database() as db:
             policy=read_policy(db)
@@ -654,6 +686,8 @@ def register(app, database, admin_actor):
             rows=db.execute("SELECT r.*,m.name AS member_name,m.staff_note AS member_note FROM studio_reservations r LEFT JOIN studio_members m ON m.owner_id=r.owner_id WHERE r.deleted_at IS NULL AND r.status IN ('pending','confirmed','completed') AND json_extract(r.payload,'$.booking.date')>=? AND json_extract(r.payload,'$.booking.date')<? ORDER BY r.id",(str(first),str(last))).fetchall()
             blocks=[dict(r) for r in db.execute('SELECT date,start,end FROM reservation_blocks WHERE date>=? AND date<?',(str(first),str(last)))]
         days=[]
+        if experience != "all":
+            rows = [r for r in rows if (json.loads(r['payload'])['booking']['plan'] == 'patch') == (experience == 'patch')]
         booked=[(r['status'],json.loads(r['payload'])['booking']) for r in rows]
         groups=[]
         for row in rows:
@@ -663,7 +697,8 @@ def register(app, database, admin_actor):
         for index in range(14):
             day=first+timedelta(days=index);opening=hours(day,policy);slots=[]
             present=[(s,b) for s,b in booked if b['date']==str(day)]
-            capacity=availability_grid([b for s,b in present if s=='confirmed'],blocks,day,policy)
+            capacity=availability_grid([b for s,b in present if s=='confirmed' or b.get('plan')=='patch'],blocks,day,policy,
+                                       experience="patch" if experience=="patch" else "beads")
             for at in range(0,1440,30):
                 begin,end=clock(at),clock(at+30)
                 slot={**capacity[at],'start':begin,'end':end}
@@ -684,6 +719,12 @@ def register(app, database, admin_actor):
             row = db.execute("SELECT * FROM studio_reservations WHERE id=?", (reference,)).fetchone()
             if not row or row['deleted_at']: raise HTTPException(404,"reservation_not_found")
             if row["version"] != payload.version: raise HTTPException(409,"version_conflict")
+            booking = Visit(**json.loads(row["payload"])["booking"])
+            if booking.plan == "patch" and payload.status == "pending" and row["status"] == "cancelled":
+                settings = read_policy(db)
+                validate_interval(booking, current, settings)
+                if not has_capacity(db, booking, settings, reference):
+                    raise HTTPException(409, "reservation_confirmation_conflict")
             if payload.status == "confirmed" and row["status"] != "confirmed":
                 booking = Visit(**json.loads(row["payload"])["booking"])
                 settings = read_policy(db)
@@ -742,6 +783,10 @@ def register(app, database, admin_actor):
             if row is None: raise HTTPException(404,'reservation_not_found')
             if not row['deleted_at']: return {'restored':True}
             if row['version']!=payload.version: raise HTTPException(409,'version_conflict')
+            booking = Visit(**json.loads(row["payload"])["booking"])
+            if booking.plan == "patch" and row["status"] in ("pending","confirmed","completed") and str(booking.date) >= str(now_local().date()):
+                if not has_capacity(db, booking, read_policy(db), reference):
+                    raise HTTPException(409, "reservation_confirmation_conflict")
             db.execute('UPDATE studio_reservations SET deleted_at=NULL,updated_at=?,version=version+1 WHERE id=?',(now_local().isoformat(),reference))
             db.execute('INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)',(reference,actor,now_local().isoformat(),'restored',payload.reason))
         return {'restored':True}
@@ -762,8 +807,8 @@ def register(app, database, admin_actor):
         if not now_local().date()<=payload.date<=now_local().date()+timedelta(days=365):raise HTTPException(422,'block_invalid_date')
         with database() as db:
             db.execute('BEGIN IMMEDIATE')
-            confirmed=db.execute("SELECT payload FROM studio_reservations WHERE status='confirmed' AND json_extract(payload,'$.booking.date')=?",(str(payload.date),)).fetchall()
-            if any(json.loads(r[0])['booking']['start']<payload.end and json.loads(r[0])['booking']['end']>payload.start for r in confirmed):
+            confirmed=occupying_bookings(db, day=str(payload.date))
+            if any(b['start']<payload.end and b['end']>payload.start for b in confirmed):
                 raise HTTPException(409,'block_confirmed_conflict')
             ident=uuid.uuid4().hex
             db.execute('INSERT INTO reservation_blocks(id,date,start,end,note,actor,created_at) VALUES(?,?,?,?,?,?,?)',(ident,str(payload.date),payload.start,payload.end,payload.note,actor,now_local().isoformat()))
@@ -797,7 +842,7 @@ def register(app, database, admin_actor):
             current = read_policy(db)
             if current["version"] != payload.version: raise HTTPException(409,"version_conflict")
             settings = ReservationPolicy(**(current | payload.model_dump(exclude_unset=True))).model_dump()
-            future = db.execute("SELECT id,payload FROM studio_reservations WHERE status='confirmed' AND json_extract(payload,'$.booking.date')>=?", (str(now_local().date()),)).fetchall()
+            future = db.execute("SELECT id,payload FROM studio_reservations WHERE deleted_at IS NULL AND (status='confirmed' OR (status='pending' AND json_extract(payload,'$.booking.plan')='patch')) AND json_extract(payload,'$.booking.date')>=?", (str(now_local().date()),)).fetchall()
             for row in future:
                 booking = Visit(**json.loads(row["payload"])["booking"])
                 opening = hours(booking.date, settings)

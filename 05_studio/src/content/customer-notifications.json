@@ -350,5 +350,7 @@
   "prompt_later": [
     "暂不开启",
     "Not now"
-  ]
+  ],
+  "patch": ["Patch DIY", "Patch DIY"],
+  "patch_experience": ["Experience: Patch DIY", "Experience: Patch DIY"]
 }

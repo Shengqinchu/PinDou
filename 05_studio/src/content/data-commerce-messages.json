@@ -230,5 +230,6 @@
   "reservation_offer_changed": [
     "套餐信息已更新，请核对后重新提交。",
     "The offer has changed. Review it before submitting again."
-  ]
+  ],
+  "reservation_patch_duration": ["布贴DIY每次固定预约1小时，请重新选择到店时间。", "Patch DIY bookings must be exactly 1 hour. Please choose your arrival time again."]
 }

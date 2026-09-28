@@ -114,7 +114,7 @@ def message_payload(job, binding):
             "lang": "zh_CN", "data": {"thing1": {"value": copy["studio"][0]},
                 "time2": {"value": booking["date"] + " " + booking["start"]},
                 "time3": {"value": booking["date"] + " " + booking["end"]},
-                "thing4": {"value": name}, "thing5": {"value": copy["card_note"][0].format(guests=booking["guests"])}}}
+                "thing4": {"value": name}, "thing5": {"value": copy["patch_card_note" if booking.get("plan") == "patch" else "card_note"][0].format(guests=booking["guests"])}}}
 
 
 def process_one(database):

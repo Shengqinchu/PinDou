@@ -1,4 +1,4 @@
-export type TimetableBooking={id:string;date:string;start:string;end:string;name:string;note:string;guests:number;status:'pending'|'confirmed'|'completed'};
+export type TimetableBooking={plan?:'hourly'|'day'|'patch';id:string;date:string;start:string;end:string;name:string;note:string;guests:number;status:'pending'|'confirmed'|'completed'};
 export type PlacedBooking=TimetableBooking&{lane:number;columns:number};
 // Connected overlap groups share columns; adjacent bookings can reuse a lane.
 export function layoutBookings(bookings:TimetableBooking[]):PlacedBooking[]{

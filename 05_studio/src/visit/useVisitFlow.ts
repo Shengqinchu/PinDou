@@ -9,6 +9,7 @@ import { locale,say } from '../state';
 import { reservationDraft as draft,readSession,saveSession,validSelection,minutes,type Reservation,type ReservationPayload,type ReservationCalendar } from '../reservations';
 import { copy,words } from './copy';
 import {saveNotificationPreferences} from '../customer-notifications';
+import { bookingExperience } from '../patch-reservations';
 
 export function useVisitFlow(){
  const route=useRoute(),router=useRouter();
@@ -18,7 +19,7 @@ export function useVisitFlow(){
  const calendar=ref<ReservationCalendar|null>(null),loading=ref(true),sending=ref(false),checkingAccount=ref(false),error=ref(''),loadError=ref('');
  const locked=computed(()=>sending.value||checkingAccount.value||!!attempt.value);
  const offer=computed(()=>calendar.value?.offers?.find(o=>o.id===draft.offer));
- const firstReady=computed(()=>draft.booking.plan==='hourly'||draft.booking.plan==='day');
+ const firstReady=computed(()=>['hourly','day','patch'].includes(draft.booking.plan));
  if(!attempt.value){delete draft.offer;delete draft.offer_revision;}
  const contactProfile=ref<BookingProfile>(),contactLoading=ref(!!customerToken()),contactError=ref('');
  const contactEditedKey='puppy-reservation-contact-edited-v1',contactOwnerKey='puppy-reservation-contact-owner-v1';
@@ -61,7 +62,7 @@ export function useVisitFlow(){
  async function load(){
   const revision=++sequence;loading.value=true;loadError.value='';
   try{
-   const data=await commerceApi<ReservationCalendar>('/reservation-calendar?guests='+(Number.isInteger(draft.booking.guests)&&draft.booking.guests>0?draft.booking.guests:1));
+   const data=await commerceApi<ReservationCalendar>('/reservation-calendar?experience='+bookingExperience(draft.booking.plan)+'&guests='+(Number.isInteger(draft.booking.guests)&&draft.booking.guests>0?draft.booking.guests:1));
    if(!alive||revision!==sequence)return false;calendar.value=data;loading.value=false;
    if(!attempt.value){
     if(draft.offer&&(!offer.value||offer.value.revision!==draft.offer_revision)){
@@ -74,7 +75,7 @@ export function useVisitFlow(){
   finally{if(alive&&revision===sequence)loading.value=false;}
  }
  function clearTime(){draft.booking.start='';draft.booking.end='';}
- function choosePlan(plan:'hourly'|'day'){if(locked.value)return;delete draft.offer;delete draft.offer_revision;if(draft.booking.plan!==plan){draft.booking.plan=plan;clearTime();}error.value='';}
+ function choosePlan(plan:'hourly'|'day'|'patch'){if(locked.value)return;delete draft.offer;delete draft.offer_revision;if(draft.booking.plan!==plan){draft.booking.plan=plan;clearTime();}error.value='';}
  function chooseGuests(value:number){if(locked.value||!Number.isInteger(value)||value<1||value>99)return;draft.booking.guests=value;error.value='';}
  function chooseInterval(value:{date:string;start:string;end:string}){if(locked.value)return;Object.assign(draft.booking,value);error.value='';}
  function back(){void navigate(step.value-1);}
@@ -113,7 +114,7 @@ export function useVisitFlow(){
   }finally{if(alive)sending.value=false;}
  }
  function visible(){if(!document.hidden&&!locked.value&&!loading.value)void load();}
- watch(()=>draft.booking.guests,()=>{if(!locked.value)void load();});
+ watch(()=>[draft.booking.guests,bookingExperience(draft.booking.plan)],()=>{if(!locked.value)void load();});
  watch(()=>accountUser.value?.id,(id,previous)=>{
   contactProfile.value=undefined;
   if((contactOwner&&id&&contactOwner!==id)||(previous&&!id)||(contactOwner&&!id&&!customerToken())){

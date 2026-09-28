@@ -3137,6 +3137,10 @@
     "import_browser_login_required": [
       "小红书要求登录或验证，暂时无法读取完整文章，未创建草稿。请使用可打开的帖子分享链接，或手动添加图文。",
       "Xiaohongshu requires sign-in or verification. The complete post could not be read, so no draft was created. Use a readable post share link, or add the text and images manually."
+    ],
+    "reservation_patch_duration": [
+      "布贴DIY每次固定预约1小时，请重新选择到店时间。",
+      "Patch DIY bookings must be exactly 1 hour. Please choose your arrival time again."
     ]
   },
   "data-editor-module-labels": {
@@ -5661,6 +5665,10 @@
     "message_open": [
       "打开店主工作台",
       "Open the host desk"
+    ],
+    "message_patch": [
+      "体验：布贴DIY",
+      "Experience: Patch DIY"
     ]
   },
   "pages-Cart": {
@@ -8543,6 +8551,10 @@
     "channel_hint": [
       "按手机号联系，实际使用的短信或 iMessage 会显示在消息旁。",
       "Contact this phone number; each message shows its actual SMS or iMessage channel."
+    ],
+    "owner_patch": [
+      "体验：布贴DIY",
+      "Experience: Patch DIY"
     ]
   },
   "owner-wechat": {
@@ -8765,6 +8777,10 @@
     "copied": [
       "后台地址已复制",
       "Admin address copied"
+    ],
+    "patch_card_note": [
+      "布贴DIY · {guests} 人",
+      "Patch DIY · {guests} guests"
     ]
   },
   "workbench": {
@@ -9875,6 +9891,68 @@
     "invalidRedemption": [
       "请填写最多两位小数的正数金额；抵扣不能超过积分余额或本次消费金额。",
       "Enter a positive amount with up to two decimals, within the points balance and eligible bill amount."
+    ]
+  },
+  "patch-reservations": {
+    "patch": [
+      "布贴DIY",
+      "Patch DIY"
+    ],
+    "description": [
+      "大约需要0.5h，来制作你的专属布贴作品吧。",
+      "About 0.5 hours — come create your own patch design."
+    ],
+    "booking_note": [
+      "布贴diy自动预约1小时，确定好到店时间即可。",
+      "Patch DIY automatically reserves 1 hour. Just choose your arrival time."
+    ],
+    "unavailable": [
+      "这里无法安排完整的1小时布贴体验，请选择其他到店时间。",
+      "A full 1-hour Patch DIY slot is not available here. Please choose another arrival time."
+    ],
+    "all": [
+      "全部体验",
+      "All experiences"
+    ],
+    "beads": [
+      "拼豆体验",
+      "Beadmaking"
+    ],
+    "filter": [
+      "体验类型",
+      "Experience"
+    ],
+    "capacity": [
+      "布贴预约独立接待，每时段一组，待确认预约也占用时段。",
+      "Patch DIY has its own capacity: one group at a time. Pending requests also hold their slot."
+    ],
+    "timetable_help": [
+      "一组客人一个色块，点击查看详情；点击空白时段筛选预约。拼豆与布贴独立接待，布贴待确认预约也占用时段。",
+      "Each block is one group. Select it for details, or select an empty slot to filter bookings. Beadmaking and Patch DIY use separate capacity. Pending patch requests hold their slot."
+    ],
+    "timetable_all": [
+      "全部体验视图的时段底色显示拼豆余位；查看布贴空闲时段请选择“布贴DIY”。",
+      "In the all-experiences view, slot backgrounds show beadmaking availability. Choose Patch DIY to see its free slots."
+    ],
+    "duration_error": [
+      "布贴DIY每次固定预约1小时，请重新选择到店时间。",
+      "Patch DIY bookings must be exactly 1 hour. Please choose your arrival time again."
+    ]
+  },
+  "business": {
+    "patch": [
+      "布贴DIY",
+      "Patch DIY"
+    ]
+  },
+  "customer-notifications": {
+    "patch": [
+      "Patch DIY",
+      "Patch DIY"
+    ],
+    "patch_experience": [
+      "Experience: Patch DIY",
+      "Experience: Patch DIY"
     ]
   }
 }

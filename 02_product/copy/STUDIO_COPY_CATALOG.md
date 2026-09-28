@@ -290,6 +290,7 @@
 | invalid_items | 请填写至少一个项目，每项不超过 200 字。 | Enter at least one item, up to 200 characters each. |
 | generic_error | 暂时未能完成，请稍后重试。 | Could not complete this. Please try again. |
 | month | 本月 | This month |
+| patch | 布贴DIY | Patch DIY |
 
 ## carousel-labels.json
 
@@ -1141,6 +1142,8 @@
 | prompt_body | 允许后，我们会通过微信发送预约成功、取消和到店前提醒，方便你及时查看预约状态。 | Allow WeChat notifications for booking confirmations, cancellations and reminders before your visit. |
 | prompt_allow | 允许提醒 | Allow |
 | prompt_later | 暂不开启 | Not now |
+| patch | Patch DIY | Patch DIY |
+| patch_experience | Experience: Patch DIY | Experience: Patch DIY |
 
 ## data-commerce-labels.json
 
@@ -1217,6 +1220,7 @@
 | reservation_offer_invalid | 此套餐需选择两人、连续四小时，请重新选择。 | This offer requires two guests and four consecutive hours. Please select again. |
 | reservation_offer_expired | 此套餐不适用于所选日期，请选择其他体验。 | This offer is unavailable for the selected date. Choose another experience. |
 | reservation_offer_changed | 套餐信息已更新，请核对后重新提交。 | The offer has changed. Review it before submitting again. |
+| reservation_patch_duration | 布贴DIY每次固定预约1小时，请重新选择到店时间。 | Patch DIY bookings must be exactly 1 hour. Please choose your arrival time again. |
 
 ## data-components-admin-SchedulePanel-labels.json
 
@@ -1879,6 +1883,7 @@
 | sender_mismatch | 发信号码需要核对 | Sending number needs checking |
 | notification_settings | 通知设置 | Notification settings |
 | channel_hint | 按手机号联系，实际使用的短信或 iMessage 会显示在消息旁。 | Contact this phone number; each message shows its actual SMS or iMessage channel. |
+| owner_patch | 体验：布贴DIY | Experience: Patch DIY |
 
 ## miniapp-legal.json
 
@@ -2079,6 +2084,7 @@
 | message_reference | 预约编号 | Reference |
 | message_timezone | 以上为汉密尔顿当地时间。 | All times are local to Hamilton, Ontario. |
 | message_open | 打开店主工作台 | Open the host desk |
+| message_patch | 体验：布贴DIY | Experience: Patch DIY |
 
 ## owner-wechat.json
 
@@ -2143,6 +2149,7 @@
 | timezone | 汉密尔顿当地时间 | Hamilton local time |
 | open_desk | 复制后台地址 | Copy admin desk address |
 | copied | 后台地址已复制 | Admin address copied |
+| patch_card_note | 布贴DIY · {guests} 人 | Patch DIY · {guests} guests |
 
 ## pages-Cart.json
 
@@ -2484,6 +2491,22 @@
 | request_this_visit_611e11 | 提交预约 | Request this visit |
 | your_request_will_wait_for_the_hosts_cd36bf | 提交后等待店主确认，无需在此付款。 | Your request will wait for the host's confirmation. No payment is needed here. |
 | host_wechat_ac7b7e | 店主微信： | Host WeChat:  |
+
+## patch-reservations.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| patch | 布贴DIY | Patch DIY |
+| description | 大约需要0.5h，来制作你的专属布贴作品吧。 | About 0.5 hours — come create your own patch design. |
+| booking_note | 布贴diy自动预约1小时，确定好到店时间即可。 | Patch DIY automatically reserves 1 hour. Just choose your arrival time. |
+| unavailable | 这里无法安排完整的1小时布贴体验，请选择其他到店时间。 | A full 1-hour Patch DIY slot is not available here. Please choose another arrival time. |
+| all | 全部体验 | All experiences |
+| beads | 拼豆体验 | Beadmaking |
+| filter | 体验类型 | Experience |
+| capacity | 布贴预约独立接待，每时段一组，待确认预约也占用时段。 | Patch DIY has its own capacity: one group at a time. Pending requests also hold their slot. |
+| timetable_help | 一组客人一个色块，点击查看详情；点击空白时段筛选预约。拼豆与布贴独立接待，布贴待确认预约也占用时段。 | Each block is one group. Select it for details, or select an empty slot to filter bookings. Beadmaking and Patch DIY use separate capacity. Pending patch requests hold their slot. |
+| timetable_all | 全部体验视图的时段底色显示拼豆余位；查看布贴空闲时段请选择“布贴DIY”。 | In the all-experiences view, slot backgrounds show beadmaking availability. Choose Patch DIY to see its free slots. |
+| duration_error | 布贴DIY每次固定预约1小时，请重新选择到店时间。 | Patch DIY bookings must be exactly 1 hour. Please choose your arrival time again. |
 
 ## profile.json
 

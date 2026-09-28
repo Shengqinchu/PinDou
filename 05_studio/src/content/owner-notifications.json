@@ -67,5 +67,6 @@
   "message_guests_unit": ["人", "guests"],
   "message_reference": ["预约编号", "Reference"],
   "message_timezone": ["以上为汉密尔顿当地时间。", "All times are local to Hamilton, Ontario."],
-  "message_open": ["打开店主工作台", "Open the host desk"]
+  "message_open": ["打开店主工作台", "Open the host desk"],
+  "message_patch": ["体验：布贴DIY", "Experience: Patch DIY"]
 }

@@ -146,6 +146,7 @@ def on_reservation(db, kind, row):
     name = re.sub(r"[\x00-\x1f\x7f]", " ", value.get("name", ""))[:30]
     copy = json.loads(COPY_PATH.read_text(encoding="utf-8"))
     body = copy["owner_sms"][1 if settings["language"] == "en" else 0].format(name=name, **booking)
+    if booking.get("plan") == "patch": body = copy["owner_patch"][1 if settings["language"] == "en" else 0] + "\n" + body
     queue_job(db, bridge["id"], settings["owner_phone"], body,
               request_key="owner-created:" + row["id"], reservation_id=row["id"], notification_key="created:" + row["id"])
 

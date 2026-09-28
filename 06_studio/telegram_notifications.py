@@ -125,6 +125,8 @@ def deliver(token, chat_id, job, language):
     lines=['<b>'+html.escape(title)+'</b>']
     if job['reservation_id']:
         data=json.loads(job['payload']);booking=data['booking']
+        if booking.get('plan') == 'patch':
+            lines.append(html.escape(common['message_patch'][lang]))
         for key,value in (
             ('message_time',f"{booking['date']} {booking['start']}–{booking['end']}"),
             ('message_guests',booking['guests']),('message_name',data['name']),

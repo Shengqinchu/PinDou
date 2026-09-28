@@ -89,7 +89,7 @@ def from_completed(db, row, actor):
     if db.execute('SELECT 1 FROM studio_finance_entries WHERE reservation_id=?',(row['id'],)).fetchone():
         return
     payload=json.loads(row['payload']);booking=payload['booking']
-    item=words('duo4h' if payload.get('offer')=='duo4h' else 'day' if booking.get('plan')=='day' else 'hourly')[0]
+    item=words('patch' if booking.get('plan')=='patch' else 'duo4h' if payload.get('offer')=='duo4h' else 'day' if booking.get('plan')=='day' else 'hourly')[0]
     ident='FIN-'+uuid.uuid4().hex;stamp=time.time()
     db.execute("""INSERT OR IGNORE INTO studio_finance_entries
       (id,kind,category,occurred_on,customer_name,items,amount_cents,reservation_id,source,created_at,updated_at,actor)

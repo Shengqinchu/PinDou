@@ -21,4 +21,16 @@
 .timetable-booking-content{position:sticky;top:56px;display:flex;flex-direction:column;gap:4px;min-width:0;font-size:12px;line-height:1.5;overflow-wrap:anywhere;}
 .timetable-booking strong{font-size:13px;font-weight:600;}.timetable-booking strong,.timetable-booking-note{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;white-space:pre-line;}.timetable-booking small{font-size:10px;}.timetable-booking-status{display:flex;align-items:center;gap:4px;}.timetable-booking-status:before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;background:#577d98;}.timetable-booking-status.pending:before{background:#a57b35;}.timetable-booking-status.completed:before{background:#658356;}
 .timetable-booking:focus-visible{outline:2px solid #304f65;outline-offset:1px;z-index:3;}
+.reservation-experience-filter{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 10px}
+.reservation-experience-filter>.selected{background:#eaf3f9;border-color:#99b2c3;color:var(--ink)}
+.reservation-experience-label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px}
+.reservation-experience-label.patch{color:#58694e}
+.timetable-booking.is-patch{background:#edf3e9;border-color:#bfceba;border-left-color:#809475}
+.timetable-experience{font-size:10px;font-weight:500;line-height:1.3}
+.timetable-booking-heading{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.timetable-patch-details{white-space:nowrap}
+/* A fixed 1-hour visit has only two cells: always show its type and guest name. */
+.timetable-booking.is-patch .timetable-booking-content{gap:2px}
+.timetable-booking.is-patch .timetable-booking-note{display:none}
+.timetable-booking.is-patch strong{-webkit-line-clamp:1}
 @media(hover:hover) and (pointer:fine){.timetable-booking:hover{filter:brightness(.98);box-shadow:0 2px 8px #25384720;}}

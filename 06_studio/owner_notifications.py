@@ -164,6 +164,8 @@ def render_message(job, language):
     if job['reservation_id']:
         data = json.loads(job['payload'])
         booking = data['booking']
+        if booking.get('plan') == 'patch':
+            lines.append(copy['message_patch'][lang])
         title += f" · {booking['date'][5:]} {booking['start']} · {booking['guests']} " + copy['message_guests_unit'][lang]
         for label, value in (
             ('message_name', data['name']), ('message_time', f"{booking['date']} {booking['start']}–{booking['end']}"),

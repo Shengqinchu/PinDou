@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { patchCopy } from '../patch-reservations';
 import LiftTitle from '../components/LiftTitle.vue';
 import { nextTick,ref } from 'vue';
 import { PhPencilSimple } from '@phosphor-icons/vue';
@@ -15,7 +16,7 @@ async function edit(){props.flow.beginDetailsEdit();await nextTick();fields.valu
 </script>
 <template>
  <div class="visit-stage-title"><LiftTitle as="h2" :text="say(copy.contact)"/></div>
- <div class="visit-review"><div><small>{{say(copy.step_experience)}}</small><strong>{{say(flow.offer?.label||(flow.draft.booking.plan==='day'?words.a_day_of_making_01d6e2:words.by_the_hour_5300b2))}}<MoneyText v-if="flow.offer" :text="flow.offer.currency+' '+flow.offer.amount"/></strong><button type="button" :disabled="flow.locked" @click="flow.navigate(0)"><PhPencilSimple/>{{say(copy.edit)}}</button></div><div><small>{{say(copy.step_time)}}</small><strong>{{guestCount(flow.draft.booking.guests)}} · {{prettyDate(flow.draft.booking.date)}} · {{flow.draft.booking.start}}–{{flow.draft.booking.end}}</strong><button type="button" :disabled="flow.locked" @click="flow.navigate(1)"><PhPencilSimple/>{{say(copy.edit)}}</button></div></div>
+ <div class="visit-review"><div><small>{{say(copy.step_experience)}}</small><strong>{{say(flow.offer?.label||(flow.draft.booking.plan==='patch'?patchCopy.patch:flow.draft.booking.plan==='day'?words.a_day_of_making_01d6e2:words.by_the_hour_5300b2))}}<MoneyText v-if="flow.offer" :text="flow.offer.currency+' '+flow.offer.amount"/></strong><button type="button" :disabled="flow.locked" @click="flow.navigate(0)"><PhPencilSimple/>{{say(copy.edit)}}</button></div><div><small>{{say(copy.step_time)}}</small><strong>{{guestCount(flow.draft.booking.guests)}} · {{prettyDate(flow.draft.booking.date)}} · {{flow.draft.booking.start}}–{{flow.draft.booking.end}}</strong><button type="button" :disabled="flow.locked" @click="flow.navigate(1)"><PhPencilSimple/>{{say(copy.edit)}}</button></div></div>
  <p v-if="flow.contactLoading&&!flow.attempt" class="form-help" role="status">{{say(profileCopy.loading)}}</p>
  <p v-if="flow.contactError" class="form-error" role="alert">{{flow.contactError}} <button type="button" class="text-link" @click="flow.loadContactContext()">{{say(profileCopy.retry)}}</button></p>
  <div v-if="flow.savedDetails&&!flow.attempt" class="booking-profile-summary visit-saved-contact" role="group" :aria-label="say(profileCopy.title)"><div><strong>{{flow.draft.name}}</strong><p>{{contactMethodLabel(flow.draft.contact_method)}} · {{flow.draft.contact}}</p></div><button type="button" :disabled="flow.locked||flow.contactLoading" @click="edit"><PhPencilSimple/>{{say(copy.edit)}}</button></div>

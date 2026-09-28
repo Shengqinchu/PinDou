@@ -250,5 +250,6 @@
   "channel_hint": [
     "按手机号联系，实际使用的短信或 iMessage 会显示在消息旁。",
     "Contact this phone number; each message shows its actual SMS or iMessage channel."
-  ]
+  ],
+  "owner_patch": ["体验：布贴DIY", "Experience: Patch DIY"]
 }

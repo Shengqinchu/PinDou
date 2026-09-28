@@ -1,0 +1,13 @@
+{
+  "patch": ["布贴DIY", "Patch DIY"],
+  "description": ["大约需要0.5h，来制作你的专属布贴作品吧。", "About 0.5 hours — come create your own patch design."],
+  "booking_note": ["布贴diy自动预约1小时，确定好到店时间即可。", "Patch DIY automatically reserves 1 hour. Just choose your arrival time."],
+  "unavailable": ["这里无法安排完整的1小时布贴体验，请选择其他到店时间。", "A full 1-hour Patch DIY slot is not available here. Please choose another arrival time."],
+  "all": ["全部体验", "All experiences"],
+  "beads": ["拼豆体验", "Beadmaking"],
+  "filter": ["体验类型", "Experience"],
+  "capacity": ["布贴预约独立接待，每时段一组，待确认预约也占用时段。", "Patch DIY has its own capacity: one group at a time. Pending requests also hold their slot."],
+  "timetable_help": ["一组客人一个色块，点击查看详情；点击空白时段筛选预约。拼豆与布贴独立接待，布贴待确认预约也占用时段。", "Each block is one group. Select it for details, or select an empty slot to filter bookings. Beadmaking and Patch DIY use separate capacity. Pending patch requests hold their slot."],
+  "timetable_all": ["全部体验视图的时段底色显示拼豆余位；查看布贴空闲时段请选择“布贴DIY”。", "In the all-experiences view, slot backgrounds show beadmaking availability. Choose Patch DIY to see its free slots."],
+  "duration_error": ["布贴DIY每次固定预约1小时，请重新选择到店时间。", "Patch DIY bookings must be exactly 1 hour. Please choose your arrival time again."]
+}

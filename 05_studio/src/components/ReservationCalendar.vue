@@ -5,6 +5,7 @@ const copyText = contentModule("components-ReservationCalendar", copyTextDefault
 import copyTextDefault from "../content/components-ReservationCalendar.json";
 import ReservationHoursNote from './ReservationHoursNote.vue';
 import InfoTip from './InfoTip.vue';
+import { patchCopy } from '../patch-reservations';
 import { say,formatCopy } from "../state";
 
 import {
@@ -41,6 +42,8 @@ const offset = ref(0),
 const message = ref<keyof typeof copyTextDefault | "">("");
 const table = ref<HTMLElement>();
 const messageElement = ref<HTMLElement>();
+const patch = computed(() => props.booking.plan === 'patch');
+const selectionHelp = computed(() => patch.value ? patchCopy.booking_note : props.booking.plan === 'day' ? copyText.day_selection_help : copyText.choose_a_start_time_for_a_twohour_a3470d);
 const days = computed(() =>
   props.calendar.days.slice(offset.value, offset.value + pageSize.value),
 );
@@ -78,7 +81,8 @@ function selected(day: string, time: string) {
   );
 }
 function available(di: number, ri: number) {
-  return !!days.value[di]?.slots[ri]?.available && !props.disabled;
+  const day = days.value[di], slot = day?.slots[ri];
+  return !!slot?.available && !props.disabled && (!patch.value || validSelection(props.calendar, {...props.booking,date:day.date,start:slot.start,end:clock(minutes(slot.start)+60)}));
 }
 function capacityLabel(slot:ReservationSlot|undefined){
   if(slot?.buffered)return say(copyText.full_buffer);
@@ -93,9 +97,10 @@ function choose(di: number, ri: number) {
     ...props.booking,
     date: day.date,
     start,
-    end: clock(minutes(start) + 120),
+    end: clock(minutes(start) + (patch.value ? 60 : 120)),
   };
   if (props.booking.plan === "day") booking.end = day.close;
+  else if (patch.value) choosingEnd.value = false;
   else if (
     choosingEnd.value &&
     props.booking.date === day.date &&
@@ -192,7 +197,7 @@ watch(
       <span><i />{{ say(copyText.available_to_book_9bb918) }}</span
       ><span><i class="chosen" />{{ say(copyText.your_selection_0fc834) }}</span
       ><span><i class="closed" />{{ say(copyText.unavailable_fb3489) }}</span>
-      <span><i class="low-capacity" />{{ say(copyText.low_seats) }}</span>
+      <span v-if="!patch"><i class="low-capacity" />{{ say(copyText.low_seats) }}</span>
     </div>
     <div class="reservation-week-nav">
       <button
@@ -218,7 +223,7 @@ watch(
       </div>
       <div class="reservation-date-actions">
       <slot name="tools"/>
-      <InfoTip v-if="compact" :label="say(copyText.reservation_timetable_use_arrow_keys_to_move_3bb451)"><p>{{say(booking.plan==='day'?copyText.day_selection_help:copyText.choose_a_start_time_for_a_twohour_a3470d)}}</p></InfoTip>
+      <InfoTip v-if="compact" :label="say(copyText.reservation_timetable_use_arrow_keys_to_move_3bb451)"><p>{{say(selectionHelp)}}</p></InfoTip>
       <button
         type="button"
         class="icon-button"
@@ -231,7 +236,7 @@ watch(
       </div>
     </div>
     <p v-if="!compact" class="reservation-grid-help">
-      {{ say(copyText.choose_a_start_time_for_a_twohour_a3470d) }}
+      {{ say(selectionHelp) }}
     </p>
     <div ref="table" class="reservation-grid-scroll">
       <table
@@ -267,7 +272,7 @@ watch(
                 :disabled="!available(di, ri)"
                 :class="{
                   chosen: selected(day.date, time),
-                  unavailable: !day.slots[ri]?.available,
+                  unavailable: !available(di, ri) && !selected(day.date,time),
                   'low-capacity': !!day.slots[ri]?.low_capacity,
                   buffered: !!day.slots[ri]?.buffered,
                   start: selected(day.date, time) && booking.start === time,
@@ -279,7 +284,7 @@ watch(
                   '—' +
                   day.slots[ri]?.end +
                   ' ' +
-                  (day.slots[ri]?.available
+                  (available(di, ri)
                     ? say(copyText.available_d07da8)
                     : say(copyText.unavailable_e939b7)) + ' ' + capacityLabel(day.slots[ri])
                 "
@@ -298,7 +303,7 @@ watch(
                   "
                   >{{ booking.end }} {{ say(copyText.end_c4265b) }}</span
                 ><span v-else aria-hidden="true">{{
-                  day.slots[ri]?.available ? "·" : "—"
+                  available(di, ri) ? "·" : "—"
                 }}</span>
               </button>
             </td>
@@ -308,8 +313,8 @@ watch(
       </table>
     </div>
     <ReservationHoursNote/>
-    <p class="reservation-minimum-note">{{ say(copyText.minimum_duration) }}</p>
-    <p v-if="message" ref="messageElement" class="form-error" role="alert">{{ say(copyText[message]) }}</p>
+    <p class="reservation-minimum-note">{{ say(patch ? patchCopy.booking_note : copyText.minimum_duration) }}</p>
+    <p v-if="message" ref="messageElement" class="form-error" role="alert">{{ say(patch ? patchCopy.unavailable : copyText[message]) }}</p>
     <p v-if="!compact" class="reservation-hours">
       {{ say(copyText.all_times_are_local_to_hamilton_the_8a3607) }}
     </p>

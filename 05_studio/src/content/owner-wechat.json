@@ -57,5 +57,6 @@
   "generic_error": ["暂时未能完成，请稍后重试。", "Could not complete this. Please try again."],
   "timezone": ["汉密尔顿当地时间", "Hamilton local time"],
   "open_desk": ["复制后台地址", "Copy admin desk address"],
-  "copied": ["后台地址已复制", "Admin address copied"]
+  "copied": ["后台地址已复制", "Admin address copied"],
+  "patch_card_note": ["布贴DIY · {guests} 人", "Patch DIY · {guests} guests"]
 }
