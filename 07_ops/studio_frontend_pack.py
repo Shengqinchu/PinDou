@@ -36,6 +36,7 @@ if len(site) < 100:
     raise SystemExit("Frontend build looks incomplete")
 
 copy_sources = {
+    "business-copy.json": "business.json",
     "customer-notification-copy.json": "customer-notifications.json",
     "messaging-copy.json": "messaging.json",
     "owner-notification-copy.json": "owner-notifications.json",
