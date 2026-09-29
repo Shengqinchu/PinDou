@@ -3037,9 +3037,10 @@
 | point_count | {v0} 积分 | {v0} points |
 | redeemable | 可抵扣 CAD {v0} | Redeemable: CAD {v0} |
 | rules | 100 积分抵扣 CAD 1，每次按整数 CAD 使用，剩余积分保留。 | 100 points = CAD 1. Redeem in whole CAD amounts; unused points stay in your account. |
-| earn_rule | 注册账号即可获得166积分；每次通过网站预约并到店游玩可获得166 积分。 | Receive 166 points when you register an account, and 166 points each time you book through the website and attend a beading session. |
+| earn_rule | 注册账号即可获得166积分；每次通过网站或小程序自助预约拼豆或布贴DIY并到店游玩可获得166 积分。 | Receive 166 points when you register an account, and 166 points each time you book a beading or Patch DIY session yourself through the website or mini program and attend. |
+| patch_points_rule | 布贴DIY可获得积分，但不可使用积分抵扣消费。 | Patch DIY visits earn points, but points cannot be redeemed against Patch DIY charges. |
 | time_rule | 储值、赠送与实际扣时由店主核实后记录。预约不会自动扣除钱包时长。 | The host records verified top-ups, gifts and time used. Making a booking does not deduct wallet time. |
-| redeem_rule | 积分在到店结算时由店主确认抵扣，也可在拼豆小店购物使用。 | The host confirms redemption when you settle your visit. Points can also be used for purchases in the Little shop. |
+| redeem_rule | 积分在拼豆体验结算时由店主确认抵扣，也可在拼豆小店购物使用。 | The host confirms redemption when you settle your beading session. Points can also be used for purchases in the Little shop. |
 | empty | 还没有明细，店主记账后会显示在这里。 | No entries yet. Records will appear after the host saves them. |
 | loading | 正在读取账户… | Loading your wallet… |
 | refresh | 刷新记录 | Refresh records |
@@ -3121,11 +3122,12 @@
 | promotion_rule | 积分和优惠活动不可同时使用。 | Points cannot be combined with promotional offers. |
 | registration_reward | 注册赠分 | Registration reward |
 | redemption_use | 抵扣用途 | Redemption use |
-| redeem_visit | 到店游玩 | Studio visit |
+| redeem_visit | 拼豆体验 | Beading session |
 | redeem_shop | 小店购物 | Little shop purchase |
 | no_promotion | 确认本单未使用其他优惠活动 | I confirm this bill does not use another promotional offer |
 | wallet_promotion_confirmation_required | 积分和优惠活动不可同时使用，请确认本单未使用其他优惠。 | Points cannot be combined with promotional offers. Confirm that this bill has no other offer. |
-| wallet_redemption_use_required | 请选择到店游玩或小店购物。 | Choose a studio visit or Little shop purchase. |
+| wallet_redemption_use_required | 请选择拼豆体验或小店购物。 | Choose a beading session or Little shop purchase. |
+| wallet_patch_redemption_forbidden | 布贴DIY消费不可使用积分抵扣，未扣除积分。 | Points cannot be redeemed against Patch DIY charges. No points were deducted. |
 
 ## wechat.json
 

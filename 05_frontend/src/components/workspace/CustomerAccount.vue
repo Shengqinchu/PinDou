@@ -24,7 +24,7 @@ type Wallet = {account:{minutes:number;points:number};booking_profile:{name:stri
 const user = useUserStore();
 const { language, keyboardOpen, shellStyle, say, t, changeLanguage, website } = useStudioNative();
 const profile = ref<Profile>(), wallet = ref<Wallet>(), busy = ref(false), failed = ref(false), avatarFailed = ref(false);
-const isOwner=ref(false),pageReset=ref(0);
+const isOwner=ref(false),pageReset=ref(0),pointsHelpOpen=ref(false);
 let sequence = 0;
 const name = computed(() => profile.value?.nickname || profile.value?.email || user.userInfo?.nickname || user.userInfo?.email || '—');
 const hours = computed(() => wallet.value ? say(walletCopy.whole_hours).replace('{v0}',String(Math.round(wallet.value.account.minutes / 60 * 100) / 100)) : '—');
@@ -62,7 +62,7 @@ function reservations() { navigateStudio('/pages/studio/reservations'); }
 function edit() { uni.navigateTo({url:'/pages/auth/studio-profile'}); }
 function ownerAlerts(){uni.navigateTo({url:'/pages/studio/owner'});}
 function openWorkbench(){uni.navigateTo({url:'/pages/studio/manage'});}
-watch(()=>user.token,()=>{sequence++;profile.value=undefined;wallet.value=undefined;isOwner.value=false;busy.value=false;failed.value=false;});
+watch(()=>user.token,()=>{sequence++;profile.value=undefined;wallet.value=undefined;isOwner.value=false;busy.value=false;failed.value=false;pointsHelpOpen.value=false;});
 onShow(() => { pageReset.value++; void refresh(); });
 onUnload(() => { ++sequence; });
 </script>
@@ -80,7 +80,7 @@ onUnload(() => { ++sequence; });
       <view v-if="busy&&!wallet" class="studio-native-status"><view class="studio-native-progress"/><text class="studio-native-body">{{say(walletCopy.loading)}}</text></view>
       <view class="studio-native-balances">
         <view class="studio-native-balance"><text class="studio-native-label">{{say(walletCopy.remaining_time)}}</text><text class="studio-native-balance-value">{{hours}}</text></view>
-        <view class="studio-native-balance"><text class="studio-native-label">{{say(walletCopy.remaining_points)}}</text><text class="studio-native-balance-value">{{wallet?wallet.account.points:'—'}}</text></view>
+        <view class="studio-native-balance"><view class="studio-points-label"><text class="studio-native-label">{{say(walletCopy.remaining_points)}}</text><button class="studio-native-eye studio-points-info" :aria-label="say(profileCopy.points_help)" hover-class="studio-native-pressed" @tap="pointsHelpOpen=true"><StudioGlyph name="info" :size="16"/></button></view><text class="studio-native-balance-value">{{wallet?wallet.account.points:'—'}}</text></view>
       </view>
       <view v-if="wallet" class="studio-native-section">
         <view class="studio-native-section-head"><text class="studio-native-subtitle">{{say(bookingCopy.title)}}</text><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-link" @tap="edit">{{say(bookingCopy.edit)}}</button></view>
@@ -98,9 +98,17 @@ onUnload(() => { ++sequence; });
       <button class="studio-native-menu-row" @tap="notices"><StudioGlyph name="info"/><text class="studio-native-menu-label">{{say(noticeCopy.title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
       <view class="studio-account-end"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-link" hover-class="studio-native-pressed" @tap="logout">{{say(accountCopy.sign_out)}}</button><StudioLegalLinks :language="language"/></view>
     </view>
+    <template #overlay><view v-if="pointsHelpOpen" class="studio-modal" role="dialog" aria-modal="true" :aria-label="say(profileCopy.points_help)" @tap="pointsHelpOpen=false" @touchmove.stop.prevent>
+      <view class="studio-modal-panel studio-points-help" @tap.stop @touchmove.stop>
+        <view class="studio-native-section-head"><text class="studio-native-subtitle">{{say(profileCopy.points_help)}}</text><button class="studio-native-eye" :aria-label="say(walletCopy.close)" hover-class="studio-native-pressed" @tap="pointsHelpOpen=false"><StudioGlyph name="close"/></button></view>
+        <text class="studio-native-body">{{say(walletCopy.rules)}}</text><text class="studio-native-body">{{say(walletCopy.redeem_rule)}}</text><text class="studio-native-body">{{say(walletCopy.promotion_rule)}}</text><text class="studio-native-body">{{say(walletCopy.earn_rule)}}</text><text class="studio-native-body">{{say(walletCopy.patch_points_rule)}}</text>
+      </view>
+    </view></template>
   </StudioShell>
 </template>
 
 <style scoped>
 .studio-account-end{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.studio-points-label{display:flex;align-items:center;justify-content:center;position:relative;padding-right:22px}
+.studio-native .studio-points-info{position:absolute;right:-11px;top:calc(50% - 22px);width:44px;height:44px}
 </style>

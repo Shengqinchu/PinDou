@@ -157,6 +157,13 @@ def fingerprint(value):
 
 def append(db, owner_id, *, kind, minutes, points, note, actor, key, digest,
            effective_date=None, reservation_id='', bill_cents=None, reverses_id=None,redemption_use='',no_promotion=None):
+    # Eligibility follows the saved booking, including when a caller labels a
+    # linked Patch DIY bill as a shop purchase. Reversals retain their own path.
+    if kind == 'redeem' and reservation_id:
+        booking = db.execute("SELECT json_extract(payload,'$.booking.plan') FROM studio_reservations WHERE id=?",
+                             (reservation_id,)).fetchone()
+        if booking and booking[0] == 'patch':
+            raise HTTPException(422, 'wallet_patch_redemption_forbidden')
     account = member(db, owner_id)
     remaining_minutes, remaining_points = account['minutes']+minutes, account['points']+points
     if min(remaining_minutes, remaining_points) < 0:
