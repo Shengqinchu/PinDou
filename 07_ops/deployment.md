@@ -65,6 +65,8 @@ curl --fail --silent http://127.0.0.1:8000/health
 
 私钥、密码、应用环境文件及完整客户备份保持在授权的本机/服务器目录。模板 `.env.example` 只提供非秘密字段。
 
+账号登录／微信重复号的受控恢复使用 [2026-09-29 恢复规则与发布记录](STUDIO_ACCOUNT_RECOVERY_20260929.md) 和 `studio_account_recovery.py`。先只读预检；恢复前双库备份，保留稳定顾客 ID 和账本，不按注册时间或填写的联系号批量合并。
+
 ## 备份与旧机
 
 本次完整迁移备份在新机 `/root/pindou-migration-20260918` 及本机 `D:/Users/123/Documents/PinDouBackups/20260918`，校验索引为 `MIGRATION_BACKUP_INDEX.json`。整根归档、最终数据库/文件和系统增量已验证恢复；**没有在本次迁移中新建持续定时备份**，不能把迁移快照当作今天之后的最新数据。
