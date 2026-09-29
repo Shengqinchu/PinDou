@@ -2516,6 +2516,8 @@
 | allocated | 已占用 {v0} 人 | {v0} guests allocated |
 | edit | 编辑活动 | Edit offer |
 | quota | 赠送总名额（人数） | Total giveaway places (people) |
+| remaining_label | 剩余赠送名额（人数） | Remaining giveaway places (people) |
+| remaining_help | 可单独调整剩余名额，总名额和已有赠送记录不变。保存后，新预约继续扣减，取消后释放。 | Adjust the remaining places without changing the total or existing gifts. New bookings continue to use places, and cancellations release them. |
 | enabled | 显示活动并开放赠送 | Show the offer and accept giveaway claims |
 | paused | 活动已暂停 | Offer paused |
 | rules_label | 赠送规则 | Giveaway rules |

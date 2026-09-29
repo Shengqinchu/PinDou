@@ -4,7 +4,7 @@ import { contentModule } from './content-store';
 import defaults from './content/patch-promotion.json';
 export const promotionCopy = contentModule('patch-promotion', defaults);
 export type PatchPromotion = {campaign:string;enabled:boolean;quota:number;remaining:number};
-export type ManagedPromotion = PatchPromotion & {allocated:number;started_at:string;version:number};
+export type ManagedPromotion = PatchPromotion & {allocated:number;remaining_adjustment:number;started_at:string;version:number};
 
 // Refresh on navigation, focus and while visible. A failed refresh removes stale
 // availability rather than continuing to advertise gifts which may be gone.

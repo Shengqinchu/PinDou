@@ -10,13 +10,14 @@ import InfoTip from '../InfoTip.vue';
 import ToggleSwitch from '../ToggleSwitch.vue';
 const props=defineProps<{active:boolean;refreshKey:number}>();
 const {request}=useDesk(),promotion=ref<ManagedPromotion>(),open=ref(false),busy=ref(false),loading=ref(false),error=ref(''),saveError=ref('');
-const quota=ref<number|string>(10),enabled=ref(true),version=ref(0);let seq=0;
+const quota=ref<number|string>(10),remaining=ref<number|string>(10),remainingEdited=ref(false),enabled=ref(true),version=ref(0);let seq=0;
 async function load(){const n=++seq;loading.value=true;error.value='';try{const data=await request<ManagedPromotion>('/manage/patch-promotion');if(n===seq)promotion.value=data;}catch(e){if(n===seq)error.value=(e as Error).message;}finally{if(n===seq)loading.value=false;}}
-function edit(){if(!promotion.value)return;quota.value=promotion.value.quota;enabled.value=promotion.value.enabled;version.value=promotion.value.version;saveError.value='';open.value=true;}
+function edit(){if(!promotion.value)return;quota.value=promotion.value.quota;remaining.value=promotion.value.remaining;remainingEdited.value=false;enabled.value=promotion.value.enabled;version.value=promotion.value.version;saveError.value='';open.value=true;}
+watch(quota,()=>{if(!remainingEdited.value&&promotion.value&&Number.isInteger(quota.value))remaining.value=Math.max(0,Number(quota.value)-promotion.value.allocated+(promotion.value.remaining_adjustment??0));});
 async function save(){
- if(busy.value||!Number.isInteger(quota.value)||Number(quota.value)<0||Number(quota.value)>100000)return;
+ if(busy.value||[quota.value,remaining.value].some(v=>!Number.isInteger(v)||Number(v)<0||Number(v)>100000))return;
  busy.value=true;saveError.value='';
- try{promotion.value=await request<ManagedPromotion>('/manage/patch-promotion',{method:'PUT',body:JSON.stringify({quota:quota.value,enabled:enabled.value,version:version.value})});open.value=false;notify(copy.saved[0],copy.saved[1]);}
+ try{promotion.value=await request<ManagedPromotion>('/manage/patch-promotion',{method:'PUT',body:JSON.stringify({quota:quota.value,...(remainingEdited.value?{remaining:remaining.value}:{}),enabled:enabled.value,version:version.value})});open.value=false;notify(copy.saved[0],copy.saved[1]);}
  catch(e){saveError.value=(e as Error).message;}
  finally{busy.value=false;}
 }
@@ -33,6 +34,8 @@ onBeforeUnmount(()=>seq++);
  <SlideOver v-model="open" :title="say(copy.desk_title)" :busy="busy">
   <form id="patch-promotion-form" class="patch-promotion-form" @submit.prevent="save">
    <label class="desk-field">{{say(copy.quota)}}<input v-model.number="quota" type="number" min="0" max="100000" step="1" required :disabled="busy"/></label>
+   <label class="desk-field">{{say(copy.remaining_label)}}<input v-model.number="remaining" type="number" min="0" max="100000" step="1" required :disabled="busy" aria-describedby="patch-remaining-help" @input="remainingEdited=true"/></label>
+   <p id="patch-remaining-help" class="fine-print">{{say(copy.remaining_help)}}</p>
    <div class="patch-promotion-toggle"><span>{{say(copy.enabled)}}</span><ToggleSwitch v-model="enabled" :label="say(copy.enabled)" :disabled="busy"/></div>
    <p class="fine-print">{{say(copy.rules)}}</p><p class="fine-print">{{say(copy.quota_help)}}</p>
    <p v-if="saveError" class="desk-error" role="alert">{{saveError}} <button type="button" class="desk-link" :disabled="busy" @click="reloadEdit">{{say(copy.retry)}}</button></p>

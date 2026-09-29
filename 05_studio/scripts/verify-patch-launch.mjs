@@ -91,7 +91,7 @@ for(const [engine,type,width,height,lang,motion] of [
    await expect(settings).toContainText('10/10');
    await settings.locator('button.desk-button').click();
    const form=page.locator('#patch-promotion-form:visible');
-   await form.locator('input').fill('1');await page.locator('button[form=patch-promotion-form]:visible').click();
+   await form.locator('input[type=number]').first().fill('1');await page.locator('button[form=patch-promotion-form]:visible').click();
    await expect(form).not.toBeVisible();await expect(settings).toContainText('1/1');
    // Create a real local booking with two guests; a quota of one grants both.
    await call('/reservation-calendar');

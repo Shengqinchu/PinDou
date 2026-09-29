@@ -80,7 +80,7 @@ async function run(browser,engine,lang,width,height){
   await shown('.admin-filters').locator('uni-button').nth(2).click();
   await expect.poll(()=>calls.some(c=>c.path.endsWith('/manage/reservation-timetable')&&c.query.includes('experience=patch'))).toBe(true);
   await page.goto(base+'#/pages/studio/manage-patch-offer');
-  await page.locator('.admin-input input').fill('12');await shown('.admin-native-actions .admin-primary').click();
+  await page.locator('.admin-input input').first().fill('12');await shown('.admin-native-actions .admin-primary').click();
   await expect.poll(()=>calls.filter(c=>c.path.endsWith('/manage/patch-promotion')&&c.method==='PUT').length).toBe(1);
   assert.equal(offer.quota,12);assert.equal(offer.version,2);await shot('quota');
   offer.enabled=false;await page.goto(base+'#/pages/studio/home');await shown('.studio-home').waitFor();await page.waitForTimeout(250);assert.equal(await shown('.studio-patch-popup').count(),0);

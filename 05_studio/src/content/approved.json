@@ -1,5 +1,5 @@
 {
-  "source": "2026-09-28 owner annotated points screenshot: Patch DIY self-booking attendance earns points, no Patch DIY redemption; see STUDIO_COPY_CHANGES.md",
+  "source": "2026-09-29 owner requested independent remaining giveaway places with unchanged total; see STUDIO_COPY_CHANGES.md",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -88,6 +88,6 @@
     "wallet.json": "0e8ce78f19b588a98752159ff7ff5936ed9001b75b4300d6e44c57dc746101bc",
     "wechat.json": "ec03e405ce841460edd8350968393173d7cc037bb950d6d552563366c8b043d5",
     "workbench.json": "5f247e49c6eb9e7bc477ce6f9b6cc09d660d88069426240ceb870025d84d027e",
-    "patch-promotion.json": "7065416b941ebccaaeb5f5205da0799c57ff362b7c3b236e10e223529266e121"
+    "patch-promotion.json": "59756c52d54b74c3be33039e569b6b344dc12ec72d0aa57626a48fada5454048"
   }
 }

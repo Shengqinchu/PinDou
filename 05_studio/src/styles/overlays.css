@@ -123,6 +123,10 @@
   border-bottom: 1px solid #d4e1e5;
   flex-shrink: 0;
 }
+.drawer-top h2.lift-title {
+  text-wrap: wrap;
+  overflow-wrap: normal;
+}
 .drawer-top h2 {
   font-family: var(--body);
   font-size: 23px;
