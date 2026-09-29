@@ -23,6 +23,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 import authing_login as auth
 import wallet
+import account_recovery
 from customer_auth import NoRedirect, limit, require_customer
 
 LIFETIME=300
@@ -171,6 +172,8 @@ def create_identity(db,openid):
     # Keep the bridge's existing internal user namespace. The hash is domain
     # separated from Authing subjects; no generator change or asset migration.
     subject_key=auth.digest('pindou-native-wechat-v1|'+config().app_id+'|'+openid)
+    if account_recovery.retired(db,'wechat_authing_'+subject_key):
+        raise HTTPException(409,'wechat_binding_conflict')
     result=auth.account_action('wechat_create',subject_key=subject_key)
     expected='wechat_authing_'+subject_key
     if result['user']['id']!=expected:raise HTTPException(400,'wechat_identity_invalid')
@@ -221,7 +224,15 @@ def register(app,database):
         ensure_available();customer=require_customer(request,request.headers.get('authorization'))
         with database() as db:
             db.execute('BEGIN IMMEDIATE');ticket=ticket_for(db,request)
-            bind_identity(db,ticket['openid'],customer['id'])
+            try:
+                bind_identity(db,ticket['openid'],customer['id'])
+            except HTTPException as exc:
+                if exc.status_code!=409 or exc.detail!='wechat_binding_conflict':raise
+                account_recovery.record_conflict(db,config().app_id,ticket['openid'],customer['id'])
+                # Released native clients save the already-verified password
+                # session only after this call. Keep that login usable without
+                # overwriting either binding. Updated clients explain this result.
+                return {'linked':False,'reason':'wechat_binding_conflict'}
         return {'linked':True}
 
     @app.post(prefix+'/native/create')

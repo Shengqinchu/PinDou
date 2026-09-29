@@ -1,5 +1,5 @@
 {
-  "source": "2026-09-29 owner requested independent remaining giveaway places with unchanged total; see STUDIO_COPY_CHANGES.md",
+  "source": "2026-09-29 owner-approved WeChat duplicate account and email login recovery; STUDIO_COPY_CHANGES.md",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -57,7 +57,7 @@
     "journal-posts.json": "0d729d67cc00df5499308c9093d76f9afb9f64d49314dffa7e414df57cca610b",
     "messaging.json": "8802a0475be5f05e6129cd82585911cf2e354ce69b9e0b9bb48fdc988475be30",
     "miniapp-legal.json": "5322d9cbb4746741bc5f790fb9ed6a567d1a8e8a95836647a7eb987e8a7605fa",
-    "miniapp.json": "62bf41ed2bed41a29d1d9e98fcadfb18d19685b7db08af505dbfbd3ea3231dc4",
+    "miniapp.json": "eeae0d9cc505dbba8008888db311844335c8a04c02c4da350861ed1125b27f11",
     "owner-delivery.json": "520fb29c5db5a79e5779ab79948892283e7debfaa1cbd58879e379c2d5db6c4a",
     "owner-notifications.json": "bd06fe1a5b6d392e6e093e5138be755243045921e7e682373cd47a56402efb5d",
     "owner-wechat.json": "f19e82e7dc5f03e756c910d698c79c682c7f2d4353a329afe9a09abb724064cd",

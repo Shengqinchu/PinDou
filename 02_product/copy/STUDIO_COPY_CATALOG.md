@@ -1965,7 +1965,12 @@
 | native_intro | 已有网站账号，登录后可查看预约、积分和时长。 | Sign in with your website account to view bookings, points and studio time. |
 | email | 邮箱地址 | Email address |
 | password | 密码 | Password |
-| password_login | 登录并绑定当前微信 | Sign in and connect this WeChat |
+| password_login | 登录 | Sign in |
+| connect_optional | 同时绑定当前微信（可选） | Also connect this WeChat (optional) |
+| existing_email_login | 已有邮箱账号，去登录 | Sign in to an existing email account |
+| new_wechat_account_help | 微信注册会创建独立账号。已有邮箱账号，请先用邮箱登录，保留原来的积分和时长。 | WeChat registration creates a separate account. If you have an email account, sign in with it to keep your existing points and studio time. |
+| signed_in_binding_conflict | 已登录邮箱账号。当前微信或该账号已有其他绑定，本次未改绑；原有积分、时长和预约均保留。如需调整微信绑定，请联系店主。 | You are signed in to your email account. This WeChat or account is already connected elsewhere, so the connection was not changed. Your points, studio time and bookings are preserved. Contact the host to change the WeChat connection. |
+| signed_in_without_wechat | 已登录邮箱账号，暂未连接微信。你可以正常查看预约、积分和时长。 | You are signed in to your email account without connecting WeChat. You can view your bookings, points and studio time as usual. |
 | wechat_login | 使用已绑定的微信登录 | Continue with your connected WeChat |
 | wechat_create | 新用户，使用微信创建账号 | New here? Create an account with WeChat |
 | website_account | 已有微信网站账号但未设置密码？请先在网站登录，再用自有小程序二维码绑定当前微信。 | Already use WeChat on the website without a password? Sign in there first, then connect this WeChat using the mini program QR code. |

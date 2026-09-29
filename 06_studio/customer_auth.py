@@ -26,6 +26,8 @@ class NoRedirect(HTTPRedirectHandler):
 
 def initialize(database):
     with database() as db:
+        import account_recovery
+        account_recovery.initialize(db)
         db.executescript("""
         CREATE TABLE IF NOT EXISTS studio_auth_limits (
           scope TEXT NOT NULL, actor TEXT NOT NULL, bucket INTEGER NOT NULL,
@@ -109,6 +111,12 @@ def require_customer(request: Request, authorization: Annotated[str | None, Head
     if not authorization or not authorization.startswith("Bearer ") or len(authorization)>5000:
         raise HTTPException(401,"account_login_required")
     customer=public_user(upstream("profile",request,token=authorization[7:]))
+    import account_recovery
+    with _database() as db:
+        if account_recovery.retired(db,customer['id']):
+            # Do not turn an old duplicate account's JWT into access to another
+            # customer's assets. Re-authentication follows the corrected link.
+            raise HTTPException(401,"account_login_required")
     import wallet
     wallet.remember_customer(customer)
     return customer

@@ -17,6 +17,7 @@ type Method = 'register' | 'password' | 'wechat';
 const method = ref<Method>('password');
 const email = ref(''), password = ref(''), confirmation = ref(''), ticket = ref('');
 const linked = ref(false), loading = ref(false), busy = ref(false), reveal = ref(false), focus = ref(''), errorCode = ref('');
+const connectWechat = ref(false);
 let alive = true, proofExpires = 0;
 const tabs = computed(() => [
   { value: 'register' as Method, label: say(accountCopy.register) },
@@ -46,11 +47,13 @@ function choose(value: Method) {
   uni.hideKeyboard(); method.value = value; errorCode.value = ''; reveal.value = false;
   if (value === 'wechat') void prepare();
 }
-async function complete(result: SharedSession,requestWechat=false) {
+async function complete(result: SharedSession,requestWechat=false,notice='') {
   if (!alive) return;
   user.token = result.token; user.userInfo = result.shared_user;
   uni.setStorageSync('pd_token', result.token); uni.setStorageSync('pd_user', JSON.stringify(result.shared_user));
   password.value = ''; confirmation.value = '';
+  if(notice)await new Promise<void>(resolve=>uni.showModal({title:say(accountCopy.signed_in),content:t(notice),showCancel:false,complete:()=>resolve()}));
+  if(!alive||user.token!==result.token)return;
   try{await loadNotifications(result.token);await saveNotifications(result.token);}catch{}
   if(requestWechat)await askWechatNotifications(result.token,language.value);
   if(!alive||user.token!==result.token)return;
@@ -62,15 +65,30 @@ async function signIn() {
   if (busy.value || !valid.value) return;
   busy.value = true; errorCode.value = ''; uni.hideKeyboard();
   try {
-    if (!await prepare() || !alive) return;
     // A connected WeChat cannot be assigned to a second account. Reject before
     // registering, so a UI retry does not leave an unintended spare account.
-    if (method.value === 'register' && linked.value) throw new MiniappError('wechat_binding_conflict');
+    const registering=method.value==='register';
+    if(registering){
+      if(!await prepare()||!alive)return;
+      if(linked.value)throw new MiniappError('wechat_binding_conflict');
+    }
     const result = await studioCall<SharedSession>(method.value === 'register' ? '/auth/password-register' : '/auth/password-login',
       { email: email.value.trim().toLowerCase(), password: password.value });
     if (!alive) return;
-    await studioCall(miniappPrefix + '/native/bind', {}, ticket.value, result.token);
-    await complete(result,method.value==='register');
+    let notice='';
+    if(registering||connectWechat.value){
+      // Email authentication stands on its own. A failed optional connection
+      // must never discard a valid session, including on older backends.
+      try{
+        if(!await prepare())notice='signed_in_without_wechat';
+        else{
+          const binding=await studioCall<{linked:boolean}>(miniappPrefix+'/native/bind',{},ticket.value,result.token);
+          if(!binding.linked)notice='signed_in_binding_conflict';
+        }
+      }catch(e){notice=e instanceof MiniappError&&e.code==='wechat_binding_conflict'?'signed_in_binding_conflict':'signed_in_without_wechat';}
+    }
+    errorCode.value='';
+    await complete(result,registering,notice);
   } catch (e) { if (alive) fail(e); }
   finally { if (alive) busy.value = false; }
 }
@@ -100,6 +118,7 @@ onUnload(() => { alive = false; ticket.value = ''; password.value = ''; confirma
         <label class="studio-native-field" for="studio-password"><text>{{method==='register'?say(accountCopy.new_password):t('password')}}</text><view class="studio-native-input" :class="{'studio-native-input--focused':focus==='password'}"><input id="studio-password" v-model="password" :password="!reveal" :maxlength="128" :disabled="busy" :focus="focus==='password'" :confirm-type="method==='register'?'next':'done'" :cursor-spacing="80" :adjust-position="true" :aria-label="t('password')" @focus="focus='password'" @blur="focus=''" @confirm="method==='register'?focus='confirmation':signIn()" /><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-eye" hover-class="studio-native-pressed" :disabled="busy" :aria-label="say(reveal?accountCopy.hide_password:accountCopy.show_password)" @tap="reveal=!reveal"><StudioGlyph :name="reveal?'hidden':'eye'" :size="20" /></button></view></label>
         <label v-if="method==='register'" class="studio-native-field" for="studio-confirm-password"><text>{{say(accountCopy.confirm_password)}}</text><view class="studio-native-input" :class="{'studio-native-input--focused':focus==='confirmation'}"><input id="studio-confirm-password" v-model="confirmation" :password="!reveal" :maxlength="128" :disabled="busy" :focus="focus==='confirmation'" confirm-type="done" :cursor-spacing="80" :adjust-position="true" :aria-label="say(accountCopy.confirm_password)" @focus="focus='confirmation'" @blur="focus=''" @confirm="signIn" /></view></label>
         <text v-if="method==='register'&&confirmation&&confirmation!==password" class="studio-native-error" role="alert">{{say(accountCopy.password_mismatch)}}</text>
+        <checkbox-group v-if="method==='password'" @change="connectWechat=$event.detail.value.includes('connect')"><label class="studio-login-connect"><checkbox value="connect" :checked="connectWechat" :disabled="busy" color="#6b8492"/><text>{{t('connect_optional')}}</text></label></checkbox-group>
         <text v-if="errorCode" class="studio-native-error" role="alert">{{error}}</text>
         <button :hover-start-time="0" class="studio-native-primary" :disabled="busy||!valid" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="signIn"><view v-if="busy" class="studio-native-progress"/><text class="studio-native-primary-label">{{busy?say(method==='register'?accountCopy.registering:accountCopy.working):method==='register'?say(accountCopy.register):t('password_login')}}</text><view v-if="!busy" class="studio-native-button-arrow"><StudioGlyph name="arrow" :size="18"/></view></button>
         <button :hover-stay-time="180" :hover-start-time="0" v-if="method==='password'" class="studio-native-link" :disabled="busy" hover-class="studio-native-pressed" @tap="recover">{{t('forgot')}}</button>
@@ -110,6 +129,8 @@ onUnload(() => { alive = false; ticket.value = ''; password.value = ''; confirma
         <text v-if="errorCode" class="studio-native-error" role="alert">{{error}}</text>
         <button :hover-stay-time="180" :hover-start-time="0" v-if="errorCode" class="studio-native-secondary" :disabled="loading||busy" hover-class="studio-native-pressed" @tap="proofExpires=0;prepare()">{{t('retry')}}</button>
         <button :hover-start-time="0" v-else-if="!loading" class="studio-native-primary" :disabled="busy||!ticket" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="wechat"><view v-if="busy" class="studio-native-progress"/><text>{{t(busy?'working':linked?'wechat_login':'wechat_create')}}</text></button>
+        <button class="studio-native-secondary" :disabled="busy" hover-class="studio-native-pressed" @tap="choose('password')">{{t('existing_email_login')}}</button>
+        <text v-if="!linked" class="studio-native-body studio-native-small">{{t('new_wechat_account_help')}}</text>
         <text class="studio-native-body studio-native-small">{{t('website_account')}}</text>
       </view>
     </view>
@@ -117,3 +138,7 @@ onUnload(() => { alive = false; ticket.value = ''; password.value = ''; confirma
     <StudioLegalLinks :language="language"/>
   </StudioShell>
 </template>
+<style scoped>
+.studio-login-connect{display:flex;align-items:center;gap:10px;min-height:44px;font-size:14px;line-height:1.5;color:var(--studio-muted,#667781)}
+.studio-login-connect checkbox{flex:none}
+</style>

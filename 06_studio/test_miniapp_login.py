@@ -178,9 +178,9 @@ def test_expiration_app_change_and_authing_flow_isolation(setup,monkeypatch):
 def test_binding_never_reassigns_wechat_or_existing_customer(setup):
     client,_,_=setup;proof=ticket(client)
     assert client.post(PREFIX+'/native/bind',headers=proof).status_code==200
-    assert client.post(PREFIX+'/native/bind',headers=proof|{'Authorization':'Bearer qa-other'}).json()['detail']=='wechat_binding_conflict'
+    assert client.post(PREFIX+'/native/bind',headers=proof|{'Authorization':'Bearer qa-other'}).json()=={'linked':False,'reason':'wechat_binding_conflict'}
     other=ticket(client,'another-wechat-code')
-    assert client.post(PREFIX+'/native/bind',headers=other).status_code==409
+    assert client.post(PREFIX+'/native/bind',headers=other).json()=={'linked':False,'reason':'wechat_binding_conflict'}
     flow=start(setup,mode='link')
     client.headers['Authorization']='Bearer qa-other'
     flow=start(setup,mode='link')
