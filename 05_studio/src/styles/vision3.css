@@ -30,11 +30,6 @@
 .vision-shop-teaser > img { height:auto; width:100%; object-fit:contain; }
 .vision-shop-teaser > div { background:#f0f7fc; }
 .vision-coming-copy > .puppy-motif { width:70px; margin-bottom:20px; }
-.journal-story-cover { aspect-ratio:auto; background:transparent; }
-.journal-story-cover img { display:block; width:100%; height:auto; object-fit:contain; }
-.journal-story.featured .journal-story-cover { aspect-ratio:auto; }
-.journal-story.featured .journal-story-cover img { height:auto; max-height:680px; object-fit:contain; }
-.journal-story-source { font-variant-numeric:tabular-nums; }
 .journal-entry-text { max-width:65ch; }
 .reservation-grid .chosen { background:#dcecf8; }
 @media(max-width:760px) {
@@ -46,7 +41,3 @@
   .vision-carousel-window img { height:100%; }
   .vision-hero-photo img { height:auto; }
 }
-
-.journal-story-cover img, .journal-story.featured .journal-story-cover img { aspect-ratio:auto; }
-
-.journal-story:hover .journal-story-cover img { transform:none; }

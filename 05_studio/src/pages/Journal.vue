@@ -51,7 +51,7 @@ onBeforeUnmount(() => clearInterval(refresh));
         </div>
         <div class="journal-story-copy">
           <time class="journal-story-source" :datetime="post.date">{{ post.date.slice(5) }}</time>
-          <LiftTitle as="h2" :text="tr(post.title, post.title_en)"/>
+          <LiftTitle as="h2" :text="tr(post.title, post.title_en)" :title="tr(post.title, post.title_en)"/>
           <p>
             <FlagText
               :text="
