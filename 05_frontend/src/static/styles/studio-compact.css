@@ -41,6 +41,9 @@
 .studio-native--fitted .studio-plan-patch>.studio-native-body{min-height:0}
 .studio-native--fitted .studio-plan-offers{display:flex;flex-direction:column;gap:5px;min-width:0;background:#f4f7f4;border:1px solid #dfe6e2;padding:12px 11px;border-radius:15px}
 .studio-native--fitted .studio-plan-offers .studio-native-small{font-size:11px;line-height:1.55}
+.studio-offer-prepaid{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.studio-offer-price{font-size:18px;font-weight:500;line-height:1.4;overflow-wrap:break-word}
+.studio-plan-offers .studio-offer-highlight{font-weight:500;color:#26353d}
 .studio-native .studio-offer-info{min-height:44px;min-width:44px;margin:-8px -8px -8px 0}
 .studio-offer-divider{height:1px;background:#dfe6e2;width:100%;margin:3px 0}
 .studio-patch-card-offer{display:flex;flex-direction:column;gap:3px;font-size:11px;line-height:1.55;color:#46677a;border-top:1px solid #dce7ed;padding-top:7px;margin-top:2px;width:100%}

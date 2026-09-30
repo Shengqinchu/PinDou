@@ -28,7 +28,7 @@ function guestChange(event:{detail:{value:string}}){void flow.chooseGuests(guest
 function methodChange(event:{detail:{value:string}}){flow.contact.contact_method=methods[Number(event.detail.value)].value;flow.editing=true;}
 function next(){if(flow.step<2)flow.navigate(flow.step+1);else void flow.submit();}
 function editContact(){flow.editing=true;}
-function offerInfo(){uni.showModal({title:words('flow','prepaid_details'),content:words('visit','prepay_at_least_10_hours_and_at_8815bf')+'\n\n'+words('visit','bead_cardholder_package_no_makingtime_limit_92105b'),showCancel:false});}
+function offerInfo(){uni.showModal({title:words('flow','prepaid_details'),content:words('visit','prepay_at_least_10_hours_and_at_8815bf'),showCancel:false});}
 </script>
 <template>
  <StudioShell id="studio-shell" fitted :reset-key="flow.step" :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" @language="changeLanguage">
@@ -46,12 +46,11 @@ function offerInfo(){uni.showModal({title:words('flow','prepaid_details'),conten
       <view v-if="offer?.enabled" class="studio-patch-card-offer"><text>{{words('promotion','launch')}}</text><text>{{words('promotion',offer.remaining>0?'card':'exhausted')}}</text><text v-if="offer.remaining>0">{{fillWords(studioWords('promotion','remaining'),language,{v0:offer.remaining,v1:offer.quota})}}</text><text>{{words('promotion','bonus')}}</text></view>
      </button>
      <view class="studio-plan studio-plan-offers">
-      <view class="studio-plan-top"><text class="studio-plan-name">{{words('visit','ca7_hour_c87a20')}}</text><button class="studio-offer-info studio-native-eye" hover-class="studio-native-pressed" :aria-label="words('flow','prepaid_details')" @tap="offerInfo"><StudioGlyph name="info" :size="19"/></button></view>
-      <text class="studio-native-body studio-native-small">{{words('flow','prepaid_details')}}</text>
+      <view class="studio-plan-top"><view class="studio-offer-prepaid"><text class="studio-native-label studio-native-small">{{words('flow','prepaid_title')}}</text><text class="studio-offer-price">{{words('visit','ca7_hour_c87a20')}}</text></view><button class="studio-offer-info studio-native-eye" hover-class="studio-native-pressed" :aria-label="words('flow','prepaid_details')" @tap="offerInfo"><StudioGlyph name="info" :size="19"/></button></view>
       <view class="studio-offer-divider"/>
-      <text class="studio-native-label studio-native-small">{{words('visit','backtoschool_until_october_1_42119e')}}</text>
-      <text class="studio-native-small">{{words('visit','four_hours_of_making_for_two_8bb2b0')}} · {{studioRate('school_two_four_hours')}} CAD</text>
-      <text class="studio-native-small">{{words('flow','cardholder_short')}} · {{studioRate('school_card_holder')}} CAD</text>
+      <text class="studio-native-label studio-native-small">{{words('flow','holiday_offer_title')}}</text>
+      <text class="studio-native-small studio-offer-highlight">{{words('flow','holiday_new_guests')}}</text>
+      <text class="studio-native-body studio-native-small">{{words('flow','holiday_bring_friends')}}</text>
      </view>
     </view>
     <view v-if="flow.booking.plan==='day'" class="studio-group-prices"><text>{{words('flow','two')}} · {{studioRate('day_two')}} CAD</text><text>{{words('flow','three')}} · {{studioRate('day_three')}} CAD</text></view>
