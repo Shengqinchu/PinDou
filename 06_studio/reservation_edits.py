@@ -110,7 +110,7 @@ def validate_admin_change(db, row, booking, status, current):
         # minimum-duration or party-size policy retroactively.
         return
     policy = visits.read_policy(db)
-    visits.validate_interval(booking, current, policy)
+    visits.validate_interval(booking, current, policy, allow_past=True)
     if not visits.has_capacity(db, booking, policy, row['id']):
         raise HTTPException(409, 'reservation_confirmation_conflict')
 
