@@ -55,6 +55,19 @@
 
 仅限店主本人使用，不向他人提供。22 端口当前承受大量暴力登录尝试，sshd `MaxStartups` 限流可能偶发拒绝新连接；SSH 加固（仅密钥、fail2ban 等）后该账户不受影响。
 
+## 大冲锋测试服（与店铺隔离，2026-10-03）
+
+生产机上同时运行店主的大冲锋（FinalCombat）回环测试服，由 GPT/Codex 会话维护。
+
+| 项目 | 值 |
+|---|---|
+| 运行身份 | 系统用户 `dcflab`（nologin，家目录 `/home/dcflab`）；`pindou` 加入 `dcflab` 组以便继续维护 |
+| 服务 | `dcf-lab-channel.service`：`/home/pindou/finalcombat-lab/build-4ed19be/game_server/bin/channelserver`，仅监听 `127.0.0.1:29024`；命令行与原手动进程逐字相同，另设 `LOCPATH=<build>/locale`；不自启、不自动重启 |
+| 隔离 | `InaccessiblePaths` 屏蔽 `/opt/pindou`、`/home/pindou/.ssh`、`dcf-ipc`、`finalcombat-friend-lab`、`admin.html`、`/root`、cnproxy 订阅/账户；`/home/pindou` 仅给 dcflab ACL `--x` |
+| 路径 | 未搬动；`finalcombat-lab` 改为 `dcflab:dcflab`、组权限同属主、目录 setgid；说明文件 `finalcombat-lab/DCFLAB-README.md` |
+| 未改动 | `finalcombat-friend-lab`（14 GB）、`dcf-ipc` 仍属 pindou |
+| 回退 | `/root/dcflab-before-20261003/`：原 ACL、原 `owned-lab-process.json`、原命令行 |
+
 ## 业务与备份位置
 
 | 对象 | 位置 |
