@@ -113,6 +113,16 @@ def test_past_today_and_rate_limit(client,monkeypatch):
 def confirm(client, ref):
     return client.patch('/studio-api/manage/reservations/'+ref,json={'version':1,'status':'confirmed'})
 
+def test_owner_can_confirm_after_start_time_or_date_passed(client,monkeypatch):
+    today=submit(client,body("2026-09-07","14:00","16:00")).json()['id']
+    tomorrow=submit(client).json()['id'];admin()
+    monkeypatch.setattr(visits,"now_local",lambda:datetime(2026,9,7,15,0,tzinfo=visits.ZONE))
+    assert confirm(client,today).status_code==200
+    monkeypatch.setattr(visits,"now_local",lambda:datetime(2026,9,9,9,0,tzinfo=visits.ZONE))
+    assert confirm(client,tomorrow).status_code==200
+    # Customers still cannot book a start time that has passed.
+    assert submit(client,body("2026-09-09","08:00","10:00")).status_code==422
+
 def test_group_limit_and_unlimited_totals(client):
     large=body();large['booking']['guests']=5
     assert submit(client,large).json()['detail']=='reservation_group_limit'

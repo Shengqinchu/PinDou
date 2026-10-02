@@ -173,10 +173,11 @@ class Submission(Strict):
             raise ValueError("Invalid email")
         return self
 
-def validate_interval(booking, current, policy=None):
+def validate_interval(booking, current, policy=None, *, allow_past=False):
+    """allow_past: the owner may confirm a request whose start time has passed."""
     start, end = minute(booking.start), minute(booking.end)
     opening = hours(booking.date, policy)
-    if not current.date() <= booking.date < current.date() + timedelta(days=14):
+    if not (allow_past or current.date() <= booking.date) or booking.date >= current.date() + timedelta(days=14):
         raise HTTPException(422, "reservation_outside_window")
     if booking.plan == "patch" and end - start != 60:
         raise HTTPException(422, "reservation_patch_duration")
@@ -186,7 +187,7 @@ def validate_interval(booking, current, policy=None):
         raise HTTPException(422, "reservation_group_limit")
     if booking.plan == "day" and end != closing(booking.date, policy):
         raise HTTPException(422, "reservation_day_end")
-    if datetime.combine(booking.date, datetime.min.time(), tzinfo=ZONE) + timedelta(minutes=start) <= current:
+    if not allow_past and datetime.combine(booking.date, datetime.min.time(), tzinfo=ZONE) + timedelta(minutes=start) <= current:
         raise HTTPException(422, "reservation_in_past")
 
 def overlaps(db, booking, exclude=""):
@@ -782,7 +783,7 @@ def register(app, database, admin_actor):
                     raise HTTPException(409, "reservation_confirmation_conflict")
             if payload.status == "confirmed" and row["status"] != "confirmed":
                 settings = read_policy(db)
-                validate_interval(booking, current, settings)
+                validate_interval(booking, current, settings, allow_past=True)
                 if not has_capacity(db, booking, settings, reference):
                     raise HTTPException(409,"reservation_confirmation_conflict")
             if payload.status == "completed" and row["status"] not in ("confirmed","completed"):
