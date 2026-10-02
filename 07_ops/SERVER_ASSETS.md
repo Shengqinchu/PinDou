@@ -1,6 +1,6 @@
 # 小狗拼豆铺服务器资产
 
-更新：2026-09-28。**默认生产服务器为 `36.139.201.94`**；以后排查、备份和部署均使用此机。全项目共享总账为 `C:/Users/123/Desktop/apisell/服务器资产清单.md`，本文件是 PinDou 的运维入口。
+更新：2026-09-29。**默认生产服务器为 `36.139.201.94`**；以后排查、备份和部署均使用此机。全项目共享总账为 `C:/Users/123/Desktop/apisell/服务器资产清单.md`，本文件是 PinDou 的运维入口。
 
 ## 当前生产服务器
 
@@ -37,18 +37,20 @@
 
 私钥、密码、生产 `.env` 和凭据包仅保存在本机受限目录及授权服务器中；GitHub 保存路径、公钥指纹和操作说明。新机保留原密码登录配置；不能把旧机曾禁用密码的历史记录当作新机现状。
 
-## 店主回国浏览隧道（2026-09-27）
+## 店主回国浏览与游戏隧道（2026-09-29 更新）
 
-店主在加拿大访问国内网站用。复用 SSH 22 端口，未在安全组开新端口。
+店主在加拿大访问国内网站及排查大冲锋登录用。复用 SSH 22 端口，未在安全组开新端口。该 SSH 节点仅支持 TCP，不支持 UDP；游戏对局与语音尚未验收。
 
 | 项目 | 值 |
 |---|---|
 | 服务器账户 | `cnproxy`（系统用户，shell `/usr/sbin/nologin`，家目录 `/var/lib/cnproxy`）；`authorized_keys` 带 `restrict,port-forwarding` |
-| sshd 限制 | `/etc/ssh/sshd_config` 末尾 `Match User cnproxy`：仅公钥、禁 TTY/Agent/X11/隧道、`ForceCommand /usr/sbin/nologin`、`PermitOpen *:80 *:443 *:8080 *:8443`；改前备份 `/root/sshd_config.before-cnproxy-20260927` |
+| sshd 限制 | `/etc/ssh/sshd_config` 末尾 `Match User cnproxy`：仅公钥、禁 TTY/Agent/X11/SSH 隧道设备、`ForceCommand /usr/sbin/nologin`、`AllowTcpForwarding local`、`PermitOpen any`；2026-09-29 经用户授权解除原网页端口白名单，保留 owner 防火墙内网限制。改前备份 `/root/sshd_config.before-cnproxy-game-20260930T045359`，仅 reload ssh；原始账户创建前备份 `/root/sshd_config.before-cnproxy-20260927` |
 | 防护与限速 | `cnproxy-guard.service` → `/usr/local/sbin/cnproxy-guard`：iptables owner 规则拒绝该账户访问 127/8、10/8、172.16/12、192.168/16、100.64/10、169.254/16 及全部 IPv6；eth0 HTB 将源端口 22 的出站限在 5 Mbit/s（保底 1 Mbit/s），其余流量不限 |
 | 本机私钥 | `C:/Users/123/.ssh/pindou_cnproxy_ed25519`，指纹 `SHA256:ZE/FO+37Dxec4uGYqTgO1RDdoMYXhfZNwCSojwoVu1s`；Clash 配置 `C:/Users/123/Documents/回国VPN/回国-上海.yaml` 内嵌同一私钥，不入 Git |
 | 手机私钥 | `C:/Users/123/.ssh/pindou_cnproxy_phone_ed25519`，指纹 `SHA256:8yww/AG/0nuJ13lSq7vlIpIx/fKn7mQeRQysZPK/YUM`；手机配置 `C:/Users/123/Documents/回国VPN/回国-上海-手机.yaml`（含 fake-ip DNS）。手机丢失时只从 `/var/lib/cnproxy/.ssh/authorized_keys` 删除注释为 `cnproxy-phone@pindou-prod 20260927` 的一行 |
 | 客户端 | Clash Verge Rev（mihomo `type: ssh`，固定 `ssh-ed25519` 主机密钥）；`GEOSITE cn` / `GEOIP CN` 走上海，其余直连 |
+| 游戏客户端配置 | 本机 `Documents/回国VPN/回国-上海-游戏全局.yaml`、`回国-上海-游戏分流.yaml`；Clash 已登记两个本地配置。DCF 目录有开启全局、开启分流、关闭线路快捷方式；正常 UAC 启动 TUN，两小时自动关闭。原订阅不变；文件含专用账户私钥，不入 Git |
+| 游戏线路实测（2026-09-29） | 全局 TUN 的公网出口为上海，公告 HTTPS 200、游戏 TCP 成功；实际客户端短暂到达昵称页，未创建角色/进大厅。分流仅完成配置与语法检查；详见 [运维记录](CNPROXY_GAME_CONFIGURATION_20260929.md) |
 | 实测 | 出口“中国 上海 移动”；百度、B站、爱奇艺、腾讯视频、抖音、淘宝、网易云音乐 200；国内镜像约 330–470 KB/s；本机/内网端口被拒；下载期间小店 0.3 s 正常 |
 | 手机订阅 | nginx `pindou-staging` 中 `location = /cn-sub/<随机令牌>`（位于 studio_deploy.py 管理区块之后，发布不会覆盖），返回 `/etc/nginx/cnproxy-sub/profile.yaml`（手机配置，root:www-data 640），no-store / noindex，经 Cloudflare 不缓存；完整地址只保存在本机 `C:/Users/123/Documents/回国VPN/订阅地址.txt`。改前备份 `/root/pindou-staging.before-cnsub-20260927`。泄露时删除该 location 或换令牌，并作废手机密钥 |
 | 停用 | `systemctl disable --now cnproxy-guard`，删除 sshd 中的 `Match User cnproxy` 块后 `sshd -t && systemctl reload ssh`，`userdel -r cnproxy`；同时删除 `/cn-sub/` location 与 `/etc/nginx/cnproxy-sub` |
