@@ -37,7 +37,7 @@ function details(){uni.navigateTo({url:'/pages/studio/details'});}
 function notifications(){uni.navigateTo({url:'/pages/studio/notifications'});}
 function phone(){uni.makePhoneCall({phoneNumber:studioProfile.phone.replace(/\s/g,'')});}
 function copyWechat(){uni.setClipboardData({data:studioProfile.wechat});}
-function changed(value:Receipt){result.value=value;}
+function changed(value:Receipt){sequence++;loading.value=false;result.value=value;}
 watch(()=>user.token,()=>{sequence++;loading.value=false;result.value=undefined;});
 onLoad(options=>{id.value=String(options?.id||'');});
 onShow(()=>{void refreshStudioContent();void refresh();clearInterval(timer);timer=setInterval(()=>void refresh(true),15000);});
