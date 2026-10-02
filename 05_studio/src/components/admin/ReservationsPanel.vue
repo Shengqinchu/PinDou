@@ -35,6 +35,9 @@ import { hoursInput,minutesFromHours } from '../../time-units';
 import CustomerIdentity from '../CustomerIdentity.vue';
 import { adminVisitCopy, visitSourceLabel } from '../../admin-visits';
 import ReservationHistory from './ReservationHistory.vue';
+import ReservationScheduleFields from '../ReservationScheduleFields.vue';
+import { changeRequestKey } from '../../reservation-edit';
+import { clock,minutes,type ReservationBooking } from '../../reservations';
 import type {WalletAccount} from '../../wallet';
 import { useRoute, useRouter } from 'vue-router';
 import { messageCopy } from '../../messaging';
@@ -63,6 +66,9 @@ const entry = ref<Entry>(),
   nextStatus = ref("pending"),
   note = ref(""),
   saveError = ref("");
+const bookingEdit=ref<ReservationBooking>({date:'',start:'',end:'',plan:'',guests:1});
+let scheduleIntent:{body:string;key:string}|undefined;
+watch(()=>[bookingEdit.value.start,bookingEdit.value.plan],()=>{if(bookingEdit.value.plan==='patch')bookingEdit.value.end=clock(minutes(bookingEdit.value.start)+60);});
 const days = computed(() =>
   Array.from({ length: 14 }, (_, i) => plusDays(hamiltonDate(), i)),
 );
@@ -113,6 +119,7 @@ function inspect(item: Entry) {
   customer.value=undefined;const identitySequence=++customerSequence;
   if(item.owner_id)void request<{account:WalletAccount}>('/manage/members/'+encodeURIComponent(item.owner_id)).then(data=>{if(identitySequence===customerSequence)customer.value=data.account;}).catch(()=>{});
   entry.value = item;
+  bookingEdit.value={...item.booking};scheduleIntent=undefined;
   nextStatus.value = item.status;
   note.value = item.staff_note;
   actualHours.value=hoursInput(item.actual_minutes);actualGuests.value=item.actual_guests??'';
@@ -136,6 +143,8 @@ async function save() {
   saving.value = true;
   saveError.value = "";
   try {
+    const changed=JSON.stringify(bookingEdit.value)!==JSON.stringify(entry.value.booking);
+    if(changed){const body=JSON.stringify({booking:bookingEdit.value,status:nextStatus.value,staff_note:note.value,public_note:publicNote.value,actual_minutes:actualMinutes,actual_guests:actualGuests.value,version:entry.value.version});if(!scheduleIntent||scheduleIntent.body!==body)scheduleIntent={body,key:changeRequestKey()};}
     await request("/manage/reservations/" + entry.value.id, {
       method: "PATCH",
       body: JSON.stringify({
@@ -144,6 +153,7 @@ async function save() {
         version: entry.value.version,
         ...(completing?{actual_minutes:actualMinutes,actual_guests:actualGuests.value}:{}),
         public_note:publicNote.value,
+        ...(changed?{booking:bookingEdit.value,request_key:scheduleIntent!.key}:{}),
       }),
     });
     open.value = false;
@@ -417,6 +427,7 @@ defineExpose({ refresh: load });
         </dl>
         <button v-if="entry.owner_id" class="desk-button secondary" @click="openWallet">{{say(walletCopy.open_wallet)}}<PhArrowRight/></button>
         <button v-if="!entry.deleted_at" class="desk-button secondary" @click="openMessages">{{say(messageCopy.new_conversation)}}<PhArrowRight/></button>
+        <ReservationScheduleFields v-if="!entry.deleted_at" v-model="bookingEdit" :disabled="saving"/>
         <div v-if="!entry.deleted_at" class="reservation-attendance">
           <p class="fine-print">{{say(walletCopy.booked)}} · {{duration(entry.booked_minutes)}}</p>
           <label class="desk-field">{{say(walletCopy.public_note)}}<textarea v-model="publicNote" rows="3" maxlength="600" :disabled="saving"/></label>

@@ -251,5 +251,16 @@
     "按手机号联系，实际使用的短信或 iMessage 会显示在消息旁。",
     "Contact this phone number; each message shows its actual SMS or iMessage channel."
   ],
-  "owner_patch": ["体验：布贴DIY", "Experience: Patch DIY"]
+  "owner_patch": [
+    "体验：布贴DIY",
+    "Experience: Patch DIY"
+  ],
+  "owner_sms_changed": [
+    "小狗拼豆铺 · 顾客修改预约\n{name}\n{date} {start}–{end} · {guests} 人\n汉密尔顿当地时间\n请重新确认： https://pindoupuppy.com/manage?view=reservations",
+    "Pindou Puppy · Booking change\n{name}\n{date} {start}–{end} · {guests} guests\nHamilton local time\nPlease confirm again: https://pindoupuppy.com/manage?view=reservations"
+  ],
+  "owner_sms_previous": [
+    "修改前：{date} {start}–{end} · {guests} 人",
+    "Previous: {date} {start}–{end} · {guests} guests"
+  ]
 }

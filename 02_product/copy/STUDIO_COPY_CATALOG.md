@@ -1891,6 +1891,8 @@
 | notification_settings | 通知设置 | Notification settings |
 | channel_hint | 按手机号联系，实际使用的短信或 iMessage 会显示在消息旁。 | Contact this phone number; each message shows its actual SMS or iMessage channel. |
 | owner_patch | 体验：布贴DIY | Experience: Patch DIY |
+| owner_sms_changed | 小狗拼豆铺 · 顾客修改预约<br>{name}<br>{date} {start}–{end} · {guests} 人<br>汉密尔顿当地时间<br>请重新确认： https://pindoupuppy.com/manage?view=reservations | Pindou Puppy · Booking change<br>{name}<br>{date} {start}–{end} · {guests} guests<br>Hamilton local time<br>Please confirm again: https://pindoupuppy.com/manage?view=reservations |
+| owner_sms_previous | 修改前：{date} {start}–{end} · {guests} 人 | Previous: {date} {start}–{end} · {guests} guests |
 
 ## miniapp-legal.json
 
@@ -2029,7 +2031,7 @@
 |---|---|---|
 | title | 微信预约提醒 | WeChat reservation alerts |
 | open | 微信提醒 | WeChat alerts |
-| intro | 新预约和顾客取消预约时提醒你，关闭网站后仍会发送。 | Receive alerts for new reservations and customer cancellations, even when the website is closed. |
+| intro | 新预约、顾客修改和取消预约时提醒你，关闭网站后仍会发送。 | Receive alerts for new bookings, customer changes and cancellations, even when the website is closed. |
 | configured | 已配置 Server 酱 | ServerChan configured |
 | not_configured | 尚未配置 | Not configured |
 | paused | 提醒已暂停 | Alerts paused |
@@ -2097,6 +2099,9 @@
 | message_timezone | 以上为汉密尔顿当地时间。 | All times are local to Hamilton, Ontario. |
 | message_open | 打开店主工作台 | Open the host desk |
 | message_patch | 体验：布贴DIY | Experience: Patch DIY |
+| changed | 顾客修改预约 | Customer booking change |
+| message_changed | 小狗拼豆铺 · 顾客修改预约待确认 | Pindou Puppy · Booking change awaiting confirmation |
+| message_previous | 修改前：{date} {start}–{end} · {guests} 人 | Previous: {date} {start}–{end} · {guests} guests |
 
 ## owner-wechat.json
 
@@ -2162,6 +2167,7 @@
 | open_desk | 复制后台地址 | Copy admin desk address |
 | copied | 后台地址已复制 | Admin address copied |
 | patch_card_note | 布贴DIY · {guests} 人 | Patch DIY · {guests} guests |
+| changed_card_note | 修改预约 · {guests}人待确认 | Booking changed · {guests} guests |
 
 ## pages-Cart.json
 
@@ -2626,6 +2632,39 @@
 | confirmed | 已确认 | Confirmed |
 | completed | 已到店 | Attended |
 | cancelled | 已取消 | Cancelled |
+
+## reservation-edit.json
+
+| 键 | 中文 | English |
+|---|---|---|
+| action | 修改预约 | Change booking |
+| title | 修改预约时间和人数 | Change booking time and guests |
+| admin_title | 预约日期、时间和人数 | Booking date, time and guests |
+| date | 预约日期 | Booking date |
+| start | 开始时间 | Start time |
+| end | 结束时间 | End time |
+| guests | 预约人数 | Guests |
+| customer_help | 提交后会通知店主，预约将变为待确认，请等待店主重新确认。 | The host will be notified. Your booking will be pending until the host confirms it again. |
+| completed_help | 原到店记录、结算和已获积分会保留，新安排需重新确认。 | Your previous visit, settlement and points will be kept. The new schedule needs confirmation. |
+| admin_help | 更改时间和人数会保留当前状态；如需更改状态，请在下方选择。 | Changing the schedule keeps its status. To change the status, choose it below. |
+| choose | 选择新的到店时间 | Choose a new visit time |
+| summary | {v0} · {v1}–{v2} · {v3} 人 | {v0} · {v1}–{v2} · {v3} guests |
+| guest_count | {v0} 人 | {v0} guests |
+| submit | 提交修改 | Submit changes |
+| saving | 正在提交… | Submitting… |
+| cancel | 暂不修改 | Keep booking |
+| loading | 正在读取可预约时段… | Loading available times… |
+| retry | 重新读取 | Reload |
+| saved | 修改已提交，等待店主确认。 | Changes submitted. Waiting for the host to confirm. |
+| invalid | 请选择有效的日期、时间和人数。 | Choose a valid date, time and number of guests. |
+| version_conflict | 预约已被更新，请重新读取后核对，再提交修改。 | This booking has changed. Reload and review it before submitting. |
+| reload | 重新读取预约 | Reload booking |
+| previous | 修改前 | Previous schedule |
+| next | 修改后 | New schedule |
+| history | 预约时间和人数修改 | Schedule and guest change |
+| previous_visit | 此前到店记录 | Previous visit record |
+| reservation_edit_request_changed | 重试内容已改变，请重新核对预约后提交。 | The retry content changed. Review the booking and submit again. |
+| reservation_edit_plan_locked | 本次只可修改日期、时间和人数，体验类型保持不变。 | You can change the date, time and guests. The experience stays the same. |
 
 ## reservation-timetable.json
 

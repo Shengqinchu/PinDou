@@ -88,18 +88,20 @@ def public_binding(row):
 
 
 def on_reservation(db, kind, row):
-    if kind != "created":
+    if kind not in ("created", "changed"):
         return
     settings = db.execute("SELECT * FROM studio_owner_wechat_settings WHERE id=1").fetchone()
     if not settings or not settings["enabled"] or not settings["template_id"]:
         return
     value = json.loads(row["payload"])
     data = {"name": value.get("name", ""), "booking": value["booking"]}
+    if kind == 'changed':
+        data['changed'] = True
     stamp = time.time()
     for binding in db.execute("SELECT * FROM studio_owner_wechat_bindings WHERE enabled=1 AND app_id=?", (miniapp.config().app_id,)).fetchall():
         db.execute("""INSERT OR IGNORE INTO studio_owner_wechat_jobs(id,event_key,binding_id,reservation_id,
           template_id,payload,state,created_at,updated_at,expires_at) VALUES(?,?,?,?,?,?,?,?,?,?)""",
-          (uuid.uuid4().hex, "created:" + row["id"] + ":" + binding["id"], binding["id"], row["id"],
+          (uuid.uuid4().hex, ('created:' + row['id'] if kind == 'created' else 'changed:' + row['id'] + ':' + str(row['version'])) + ':' + binding['id'], binding["id"], row["id"],
            settings["template_id"], json.dumps(data, ensure_ascii=False), "queued" if binding["grants"] else "waiting_subscription", stamp, stamp, stamp + 86400))
 
 
@@ -114,7 +116,7 @@ def message_payload(job, binding):
             "lang": "zh_CN", "data": {"thing1": {"value": copy["studio"][0]},
                 "time2": {"value": booking["date"] + " " + booking["start"]},
                 "time3": {"value": booking["date"] + " " + booking["end"]},
-                "thing4": {"value": name}, "thing5": {"value": copy["patch_card_note" if booking.get("plan") == "patch" else "card_note"][0].format(guests=booking["guests"])}}}
+                "thing4": {"value": name}, "thing5": {"value": copy['changed_card_note' if value.get('changed') else "patch_card_note" if booking.get("plan") == "patch" else "card_note"][0].format(guests=booking["guests"])}}}
 
 
 def process_one(database):

@@ -2,6 +2,8 @@
 import { patchCopy } from '../patch-reservations';
 import LiftTitle from '../components/LiftTitle.vue';
 import CancelReservation from '../components/CancelReservation.vue';
+import EditReservation from '../components/EditReservation.vue';
+import { reservationEditCopy } from '../reservation-edit';
 import { reservationRevision } from '../cancellation';
 import CopyContact from "../components/CopyContact.vue";
 import OfferLabel from '../visit/OfferLabel.vue';
@@ -135,6 +137,7 @@ onBeforeUnmount(() => {
         <div><dt>{{say(walletCopy.booked)}}</dt><dd>{{duration(result.booked_minutes)}}</dd></div>
         <div v-if="result.public_note"><dt>{{say(walletCopy.public_note)}}</dt><dd>{{result.public_note}}</dd></div>
       </dl>
+      <p v-if="result.previous_visit" class="fine-print">{{say(reservationEditCopy.previous_visit)}} · {{prettyDate(result.previous_visit.booking.date)}} · {{duration(result.previous_visit.actual_minutes||0)}} · {{result.previous_visit.actual_guests}}</p>
       <p class="reservation-details-link">
         {{ say(copyText.come_along_and_read_our_ad449d)
         }}<RouterLink to="/details">{{
@@ -152,7 +155,7 @@ onBeforeUnmount(() => {
       <PhArrowClockwise :class="{ spinning: busy }" />{{
         say(copyText.refresh_reservation_30af18)
       }}
-     </button><CancelReservation v-if="result" :reservation="result"/></div>
+     </button><EditReservation v-if="result" :reservation="result" @changed="result=$event"/><CancelReservation v-if="result" :reservation="result"/></div>
      <p class="fine-print reservation-receipt-contacts">
       {{ say(copyText.for_changes_contact_the_host_on_wechat_2921d8)
       }}<CopyContact :value="wechat" /> · {{ say(copyText.phone_0614da)

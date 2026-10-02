@@ -101,7 +101,7 @@ def settings_for(db):
     return dict(db.execute('SELECT * FROM studio_owner_notification_settings WHERE id=1').fetchone())
 
 
-def enqueue(db, kind, row=None, *, event_key=None, channel='serverchan'):
+def enqueue(db, kind, row=None, *, event_key=None, channel='serverchan', previous=None):
     """Called inside the same transaction as the source event; no history replay."""
     stamp = time.time()
     settings, send_key = channel_settings(db, channel)
@@ -117,6 +117,8 @@ def enqueue(db, kind, row=None, *, event_key=None, channel='serverchan'):
         source = json.loads(row['payload'])
         # Contact details, customer notes and owner-private notes stay in the desk.
         payload = {'name': source.get('name', ''), 'booking': source['booking']}
+        if previous is not None:
+            payload['previous_booking'] = previous
     enabled = settings['enabled'] and bool(send_key)
     state, error = ('queued', '') if enabled else ('skipped', 'not_enabled')
     ident = uuid.uuid4().hex
@@ -138,13 +140,13 @@ def channel_settings(db, channel):
     raise ValueError('Unknown owner notification channel')
 
 
-def enqueue_reservation(db, kind, row):
-    enqueue(db, kind, row)
+def enqueue_reservation(db, kind, row, *, previous=None):
+    enqueue(db, kind, row, previous=previous)
     settings, key = channel_settings(db, 'telegram')
     if settings['enabled'] and key:
-        enqueue(db, kind, row, channel='telegram')
+        enqueue(db, kind, row, channel='telegram', previous=previous)
     import sms_inbox
-    sms_inbox.on_reservation(db, kind, row)
+    sms_inbox.on_reservation(db, kind, row, previous=previous)
     import owner_wechat
     owner_wechat.on_reservation(db, kind, row)
     import customer_notifications
@@ -173,6 +175,9 @@ def render_message(job, language):
         ):
             lines.append(f"**{copy[label][lang]}**: {safe_text(value)}")
         lines.extend(['', copy['message_timezone'][lang]])
+        if data.get('previous_booking'):
+            old = data['previous_booking']
+            lines.append(copy['message_previous'][lang].format(date=old['date'], start=old['start'], end=old['end'], guests=old['guests']))
     else:
         lines.append(copy['message_test_body'][lang])
     lines.extend(['', f"[{copy['message_open'][lang]}](https://pindoupuppy.com/manage?view=reservations)"])
@@ -219,8 +224,9 @@ def public_job(row):
 def obsolete(db, job):
     if not job['reservation_id']:
         return False
-    row = db.execute('SELECT status,deleted_at FROM studio_reservations WHERE id=?', (job['reservation_id'],)).fetchone()
-    return not row or row['deleted_at'] or row['status'] != ('pending' if job['kind'] == 'created' else 'cancelled')
+    row = db.execute('SELECT status,deleted_at,payload FROM studio_reservations WHERE id=?', (job['reservation_id'],)).fetchone()
+    return (not row or row['deleted_at'] or row['status'] != ('pending' if job['kind'] in ('created','changed') else 'cancelled')
+            or json.loads(row['payload'])['booking'] != json.loads(job['payload'])['booking'])
 
 
 def process_one(database, channel='serverchan'):
@@ -243,7 +249,7 @@ def process_one(database, channel='serverchan'):
         if obsolete(db, job) or job['target'] != settings.get('target',''):
             db.execute("UPDATE studio_owner_notifications SET state='skipped',error='superseded',updated_at=?,lease_until=0 WHERE id=?", (current, job['id']))
             return True
-        persistent = job['kind'] == 'created'
+        persistent = job['kind'] in ('created', 'changed')
         if job['attempts'] >= MAX_ATTEMPTS and not persistent:
             db.execute("UPDATE studio_owner_notifications SET state='failed',error='retry_exhausted',updated_at=?,lease_until=0 WHERE id=?", (current, job['id']))
             return True
@@ -366,7 +372,7 @@ def register(app, database, admin_actor):
                 raise HTTPException(404, 'notification_not_found')
             if row['state'] in ('queued', 'retry', 'sending'):
                 return public_job(row)
-            persistent = row['kind'] == 'created' and not obsolete(db, row)
+            persistent = row['kind'] in ('created', 'changed') and not obsolete(db, row)
             if row['state'] != 'failed' or (not persistent and (row['expires_at'] <= time.time() or row['attempts'] >= MAX_ATTEMPTS)):
                 raise HTTPException(409, 'notification_not_retryable')
             db.execute("UPDATE studio_owner_notifications SET state='queued',next_attempt=?,updated_at=? WHERE id=?", (time.time(), time.time(), ident))

@@ -10,7 +10,7 @@ export type ContactProfile=Contact&{owner_id:string;version:number;complete:bool
 export type ContactContext={can_omit_details:boolean;profile:ContactProfile};
 export type Payload=Contact&{booking:Booking;notes:string;locale:'zh'|'en';website:'';contact_profile_version:number};
 export type Attempt={owner:string;key:string;body:Payload};
-export type Receipt={id:string;status:'pending'|'confirmed'|'completed'|'cancelled';name:string;booking:Booking;can_cancel:boolean;version:number;booked_minutes:number;actual_minutes:number|null;actual_guests:number|null;public_note:string};
+export type Receipt={id:string;status:'pending'|'confirmed'|'completed'|'cancelled';name:string;booking:Booking;can_cancel:boolean;can_edit?:boolean;previous_visit?:{booking:Booking;actual_minutes:number|null;actual_guests:number|null}|null;version:number;booked_minutes:number;actual_minutes:number|null;actual_guests:number|null;public_note:string};
 export type CancelPolicy={limit:number;used:number;remaining:number;reset_date:string;month:string;timezone:string;eligible:boolean;reason:string|null;version:number};
 export const emptyBooking=():Booking=>({date:'',start:'',end:'',plan:'',guests:1});
 export const emptyContact=():Contact=>({name:'',contact_method:'wechat',contact:''});

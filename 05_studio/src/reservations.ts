@@ -58,6 +58,8 @@ export type ReservationPayload = {
 export type Reservation = {
   creation_source?: 'customer_self' | 'legacy_customer' | 'admin_booking' | 'admin_backfill' | 'unknown';
   can_cancel: boolean;
+  can_edit?: boolean;
+  previous_visit?: {booking:ReservationBooking;actual_minutes:number|null;actual_guests:number|null} | null;
   offer?: ReservationOffer | null;
   id: string;
   status: string;

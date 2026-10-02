@@ -94,6 +94,8 @@ def initialize(database):
         """)
 
     patch_promotion.initialize(database, now_local().isoformat())
+    import reservation_edits
+    reservation_edits.initialize(database)
 
 
 def clock(value):
@@ -319,7 +321,9 @@ def public_row(row):
         "booking": booking, "name": data["name"],
         "booked_minutes": minute(booking['end'])-minute(booking['start']),
         "offer": data.get('offer_snapshot'),
+        "previous_visit": data.get('previous_visit'),
         "can_cancel": self_cancellable(row,now_local()),
+        "can_edit": bool(row['owner_id'] and not row['deleted_at']),
     }
 
 def self_cancellable(row,current):
@@ -347,6 +351,8 @@ class ReservationUpdate(Strict):
     actual_minutes: int | None = Field(default=None, ge=1, le=1440, strict=True)
     actual_guests: int | None = Field(default=None, ge=1, le=99, strict=True)
     public_note: str = Field(default='',max_length=600)
+    booking: Visit | None = None
+    request_key: str | None = Field(default=None, pattern=r"^[a-f0-9-]{36}$")
 
 class ReservationDeletion(Strict):
     version: int = Field(ge=1,strict=True)
@@ -482,8 +488,33 @@ class Block(Strict):
         if minute(self.end)<=minute(self.start):raise ValueError('End must follow start')
         return self
 
+def calendar_data(db, current, guests, experience, *, exclude=''):
+    settings = read_policy(db)
+    offer = available_offer(db, current)
+    confirmed = occupying_bookings(db, since=str(current.date()), exclude=exclude)
+    blocks = [dict(r) for r in db.execute('SELECT date,start,end FROM reservation_blocks WHERE date>=?', (str(current.date()),))]
+    window_hours = [hours(current.date() + timedelta(days=n), settings) for n in range(14)]
+    enabled = [h for h in window_hours if h['enabled']]
+    grid_start = min((minute(h['open']) for h in enabled), default=600)
+    grid_end = max((minute(h['close']) for h in enabled), default=1320)
+    days = []
+    for n in range(14):
+        day = current.date() + timedelta(days=n)
+        opening = hours(day, settings)
+        capacity = availability_grid(confirmed, blocks, day, settings, guests, current=current, experience=experience)
+        slots = [{**capacity[start], 'start': clock(start), 'end': clock(start+30)} for start in range(grid_start, grid_end, 30)]
+        days.append({'date': str(day), 'open': opening['open'], 'close': opening['close'], 'closed': not opening['enabled'], 'slots': slots})
+    return {'experience': experience, 'today': str(current.date()), 'timezone': str(ZONE),
+        'minimum_minutes': 60 if experience == 'patch' else 120, 'capacity_buffer_minutes': 0 if experience == 'patch' else 30,
+        'max_guests_per_group': settings['max_guests_per_group'], 'weekly_hours': settings['weekly_hours'],
+        'policy_version': settings['version'], 'days': days,
+        'offers': [offer] if experience == 'beads' and offer and settings['max_guests_per_group'] >= 2 else []}
+
+
 def register(app, database, admin_actor):
     patch_promotion.register(app, database, admin_actor, lambda: now_local())
+    import reservation_edits
+    reservation_edits.register(app, database, admin_actor)
     def owned_reservation(db,reference,customer):
         row=db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone()
         if not row or row['deleted_at'] or row['owner_id']!=customer['id']:
@@ -536,25 +567,7 @@ def register(app, database, admin_actor):
         if not 1 <= guests <= 99:
             raise HTTPException(422, "reservation_group_limit")
         with database() as db:
-            settings = read_policy(db)
-            offer = available_offer(db, current)
-            confirmed = occupying_bookings(db, since=str(current.date()))
-            blocks = [dict(r) for r in db.execute('SELECT date,start,end FROM reservation_blocks WHERE date>=?', (str(current.date()),))]
-        window_hours = [hours(current.date() + timedelta(days=n), settings) for n in range(14)]
-        enabled = [h for h in window_hours if h["enabled"]]
-        grid_start = min((minute(h["open"]) for h in enabled), default=600)
-        grid_end = max((minute(h["close"]) for h in enabled), default=1320)
-        days = []
-        for n in range(14):
-            day = current.date() + timedelta(days=n)
-            slots = []
-            opening = hours(day, settings)
-            capacity = availability_grid(confirmed, blocks, day, settings, guests, current=current, experience=experience)
-            for start in range(grid_start, grid_end, 30):
-                state = capacity[start]
-                slots.append({**state, "start": clock(start), "end": clock(start + 30)})
-            days.append({"date": str(day), "open": opening["open"], "close": opening["close"], "closed": not opening["enabled"], "slots": slots})
-        return {"experience": experience, "today": str(current.date()), "timezone": "America/Toronto", "minimum_minutes": 60 if experience == "patch" else 120, "capacity_buffer_minutes": 0 if experience == "patch" else 30, "max_guests_per_group": settings["max_guests_per_group"], "weekly_hours": settings["weekly_hours"], "policy_version": settings["version"], "days": days, "offers": [offer] if experience == "beads" and offer and settings['max_guests_per_group'] >= 2 else []}
+            return calendar_data(db, current, guests, experience)
 
     @app.post("/studio-api/reservations", status_code=201)
     def submit(payload: Submission, request: Request, idempotency_key: Annotated[str, Header()], customer=Depends(require_customer)):
@@ -750,15 +763,24 @@ def register(app, database, admin_actor):
             db.execute("BEGIN IMMEDIATE")
             row = db.execute("SELECT * FROM studio_reservations WHERE id=?", (reference,)).fetchone()
             if not row or row['deleted_at']: raise HTTPException(404,"reservation_not_found")
+            import reservation_edits
+            fingerprint = reservation_edits.digest(payload.model_dump(mode='json'))
+            if reservation_edits.replay(db, row, actor, payload.request_key, fingerprint):
+                return {"id": reference, "status": row['status'], "version": row['version']}
             if row["version"] != payload.version: raise HTTPException(409,"version_conflict")
-            booking = Visit(**json.loads(row["payload"])["booking"])
+            old_booking = json.loads(row["payload"])["booking"]
+            booking = payload.booking or Visit(**old_booking)
+            booking_changed = booking.model_dump(mode='json') != old_booking
+            if booking.plan != old_booking['plan']:
+                raise HTTPException(422, 'reservation_edit_plan_locked')
+            if booking_changed:
+                reservation_edits.validate_admin_change(db, row, booking, payload.status, current)
             if booking.plan == "patch" and payload.status == "pending" and row["status"] == "cancelled":
                 settings = read_policy(db)
                 validate_interval(booking, current, settings)
                 if not has_capacity(db, booking, settings, reference):
                     raise HTTPException(409, "reservation_confirmation_conflict")
             if payload.status == "confirmed" and row["status"] != "confirmed":
-                booking = Visit(**json.loads(row["payload"])["booking"])
                 settings = read_policy(db)
                 validate_interval(booking, current, settings)
                 if not has_capacity(db, booking, settings, reference):
@@ -772,22 +794,33 @@ def register(app, database, admin_actor):
                 raise HTTPException(422,'wallet_actual_details_required')
             # Once attendance has earned points, status cannot quietly erase the visit.
             earned=db.execute('SELECT 1 FROM studio_wallet_ledger l WHERE idempotency_key=? AND NOT EXISTS(SELECT 1 FROM studio_wallet_ledger r WHERE r.reverses_id=l.id)',('visit-reward:'+reference,)).fetchone()
-            if earned and (payload.status!='completed' or actual is None):
+            if earned and (payload.status!='completed' or actual is None) and not reservation_edits.reopened_attendance(db, row):
                 raise HTTPException(409,'wallet_completed_record_locked')
             if payload.status=='completed' and (not actual or not guests):
                 raise HTTPException(422,'wallet_actual_hours_details_required')
             if payload.status=='completed' and row['creation_source'] in ('admin_booking','admin_backfill'):
-                if json.loads(row['payload'])['booking']['date'] > str(current.date()):
+                if booking.date > current.date():
                     raise HTTPException(422, 'wallet_visit_not_arrived')
+            if payload.status == 'completed' and reservation_edits.reopened_attendance(db, row) and booking.date > current.date():
+                raise HTTPException(422, 'wallet_visit_not_arrived')
+            if booking_changed:
+                db.execute('UPDATE studio_reservations SET payload=? WHERE id=?', (reservation_edits.booking_payload(row, booking), reference))
             db.execute("UPDATE studio_reservations SET status=?,staff_note=?,actual_minutes=?,actual_guests=?,public_note=?,version=version+1,updated_at=? WHERE id=?", (payload.status,payload.staff_note,actual,guests,public_note,current.isoformat(),reference))
             patch_promotion.reconcile(db, db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone(), current.isoformat(), actor, restoring=row['status']=='cancelled' and payload.status in ('pending','confirmed'))
+            if booking_changed:
+                changed_row = db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone()
+                reservation_edits.resize_claim(db, changed_row, actor, current.isoformat())
+                reservation_edits.record(db, row, changed_row, actor, payload.request_key or 'admin:'+str(payload.version), fingerprint)
+                reservation_edits.supersede_owner_alerts(db, reference)
+                import customer_notifications
+                customer_notifications.on_reservation(db, 'rescheduled', changed_row)
             if payload.status=='completed':
                 from wallet import reward_visit
                 reward_visit(db,db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone(),actor)
                 from studio_finance import from_completed
                 from_completed(db,db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone(),actor)
             db.execute("INSERT INTO reservation_events(reservation_id,actor,created_at,status,note) VALUES(?,?,?,?,?)", (reference,actor,current.isoformat(),payload.status,payload.staff_note))
-            if payload.status!=row['status'] and payload.status in ('confirmed','cancelled'):
+            if not booking_changed and payload.status!=row['status'] and payload.status in ('confirmed','cancelled'):
                 import customer_notifications
                 customer_notifications.on_reservation(db,payload.status,db.execute('SELECT * FROM studio_reservations WHERE id=?',(reference,)).fetchone())
             if (actual,guests,public_note)!=(row['actual_minutes'],row['actual_guests'],row['public_note']):

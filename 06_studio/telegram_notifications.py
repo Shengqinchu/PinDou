@@ -134,6 +134,9 @@ def deliver(token, chat_id, job, language):
         ):
             lines.append('<b>'+html.escape(common[key][lang])+':</b> '+html.escape(clean(value)))
         lines.append(common['message_timezone'][lang])
+        if data.get('previous_booking'):
+            old = data['previous_booking']
+            lines.append(html.escape(common['message_previous'][lang].format(date=old['date'],start=old['start'],end=old['end'],guests=old['guests'])))
     else:
         lines.append(html.escape(copy['message_test_body'][lang]))
     response=api(token,'sendMessage',{

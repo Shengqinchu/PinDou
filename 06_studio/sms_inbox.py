@@ -126,8 +126,8 @@ def ensure_thread(db, number, name="", *, reservation_id="", since=None):
     return db.execute("SELECT * FROM studio_sms_threads WHERE id=?", (ident,)).fetchone()
 
 
-def on_reservation(db, kind, row):
-    if kind != "created":
+def on_reservation(db, kind, row, *, previous=None):
+    if kind not in ("created", "changed"):
         return
     value = json.loads(row["payload"])
     if value.get("contact_method") == "phone":
@@ -145,10 +145,14 @@ def on_reservation(db, kind, row):
     booking = value["booking"]
     name = re.sub(r"[\x00-\x1f\x7f]", " ", value.get("name", ""))[:30]
     copy = json.loads(COPY_PATH.read_text(encoding="utf-8"))
-    body = copy["owner_sms"][1 if settings["language"] == "en" else 0].format(name=name, **booking)
+    lang = 1 if settings['language'] == 'en' else 0
+    body = copy["owner_sms_changed" if kind == 'changed' else "owner_sms"][lang].format(name=name, **booking)
+    if previous is not None:
+        body += '\n' + copy['owner_sms_previous'][lang].format(**previous)
     if booking.get("plan") == "patch": body = copy["owner_patch"][1 if settings["language"] == "en" else 0] + "\n" + body
+    event = 'created:' + row['id'] if kind == 'created' else 'changed:' + row['id'] + ':' + str(row['version'])
     queue_job(db, bridge["id"], settings["owner_phone"], body,
-              request_key="owner-created:" + row["id"], reservation_id=row["id"], notification_key="created:" + row["id"])
+              request_key='owner-' + event, reservation_id=row["id"], notification_key=event)
 
 
 def queue_job(db, bridge_id, number, content, *, request_key, message_id=None, reservation_id="", notification_key=None):

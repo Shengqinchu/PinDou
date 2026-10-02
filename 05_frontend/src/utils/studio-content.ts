@@ -6,6 +6,7 @@ import flow from '../../../05_studio/src/content/visit-flow.json';
 import calendar from '../../../05_studio/src/content/components-ReservationCalendar.json';
 import receipt from '../../../05_studio/src/content/pages-ReservationReceipt.json';
 import cancellation from '../../../05_studio/src/content/reservation-cancellation.json';
+import edit from '../../../05_studio/src/content/reservation-edit.json';
 import booking from '../../../05_studio/src/content/booking-profile.json';
 import account from '../../../05_studio/src/content/account.json';
 import wallet from '../../../05_studio/src/content/wallet.json';
@@ -24,8 +25,8 @@ import patch from '../../../05_studio/src/content/patch-reservations.json';
 import promotion from '../../../05_studio/src/content/patch-promotion.json';
 import media from '../../../05_studio/src/media-assets.json';
 
-const defaults={home,visit,flow,calendar,receipt,cancellation,booking,account,wallet,app,details,errors,generic,miniapp,profile,process,contacts,patch,promotion};
-const names:Record<keyof typeof defaults,string>={home:'pages-Home',visit:'pages-Visit',flow:'visit-flow',calendar:'components-ReservationCalendar',receipt:'pages-ReservationReceipt',cancellation:'reservation-cancellation',booking:'booking-profile',account:'account',wallet:'wallet',app:'App',details:'pages-Details',errors:'data-commerce-messages',generic:'commerce',miniapp:'miniapp',profile:'profile',process:'components-BeadingProcess',contacts:'contact-fields',patch:'patch-reservations',promotion:'patch-promotion'};
+const defaults={home,visit,flow,calendar,receipt,cancellation,edit,booking,account,wallet,app,details,errors,generic,miniapp,profile,process,contacts,patch,promotion};
+const names:Record<keyof typeof defaults,string>={home:'pages-Home',visit:'pages-Visit',flow:'visit-flow',calendar:'components-ReservationCalendar',receipt:'pages-ReservationReceipt',cancellation:'reservation-cancellation',edit:'reservation-edit',booking:'booking-profile',account:'account',wallet:'wallet',app:'App',details:'pages-Details',errors:'data-commerce-messages',generic:'commerce',miniapp:'miniapp',profile:'profile',process:'components-BeadingProcess',contacts:'contact-fields',patch:'patch-reservations',promotion:'patch-promotion'};
 const published=shallowRef<Record<string,Record<string,unknown>>>({});
 let pending:Promise<void>|undefined,updated=0;
 export function refreshStudioContent(){
@@ -62,7 +63,7 @@ export function bookingError(code:string):string[]{
   if(code in notifications)return (notifications as Record<string,string[]>)[code];
   if(code==='booking_profile_changed')return booking.changed;
   if(code==='booking_contact_invalid')return booking.incomplete;
-  for(const group of ['errors','cancellation','account','miniapp'] as const)if(code in defaults[group])return studioWords(group,code);
+  for(const group of ['errors','cancellation','edit','account','miniapp'] as const)if(code in defaults[group])return studioWords(group,code);
   if(code==='reservation_rate_limit')return generic.too_many_requests_please_try_again_later_e30269;
   return miniapp.generic_error;
 }

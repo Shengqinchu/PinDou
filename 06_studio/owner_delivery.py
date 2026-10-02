@@ -9,7 +9,7 @@ def keep_pending_alerts(db, stamp):
     # An unhandled reservation, unlike a test or cancellation message, is not
     # obsolete merely because the free provider window lasted 24 hours.
     db.execute("""UPDATE studio_owner_notifications SET state='skipped',error='superseded',
-      updated_at=?,lease_until=0 WHERE kind='created' AND state IN ('queued','retry','expired','failed')
+      updated_at=?,lease_until=0 WHERE kind IN ('created','changed') AND state IN ('queued','retry','expired','failed')
       AND NOT EXISTS(SELECT 1 FROM studio_reservations r WHERE r.id=reservation_id
         AND r.status='pending' AND r.deleted_at IS NULL)""", (stamp,))
     db.execute("""UPDATE studio_owner_notifications SET
@@ -17,7 +17,7 @@ def keep_pending_alerts(db, stamp):
       error=CASE WHEN state IN ('expired','failed') THEN '' ELSE error END,
       next_attempt=CASE WHEN state IN ('expired','failed') THEN ? ELSE next_attempt END,
       expires_at=MAX(expires_at,?),updated_at=?
-      WHERE kind='created' AND (state IN ('queued','retry') OR
+      WHERE kind IN ('created','changed') AND (state IN ('queued','retry') OR
         (state='expired' AND error='expired') OR (state='failed' AND error='retry_exhausted'))
       AND (expires_at<=? OR state IN ('expired','failed'))
       AND EXISTS(SELECT 1 FROM studio_reservations r WHERE r.id=reservation_id
@@ -30,7 +30,7 @@ def keep_pending_sms(db, stamp):
     # Customer messages, explicit failures and uncertain sends keep their existing
     # expiry/idempotency rules; a changed recipient must not replay old messages.
     db.execute("""UPDATE studio_sms_jobs SET state='queued',error='',expires_at=?
-      WHERE message_id IS NULL AND notification_key='created:'||reservation_id
+      WHERE message_id IS NULL AND (notification_key='created:'||reservation_id OR notification_key LIKE 'changed:'||reservation_id||':%')
       AND started_at=0 AND expires_at<=?
       AND (state='queued' OR (state='skipped' AND error='expired'))
       AND bridge_id IN (SELECT id FROM studio_sms_bridges WHERE role='owner_alert')
@@ -73,11 +73,14 @@ def snapshot(db, stamp=None):
       'authorized': bool(bindings[1]>0), 'continuous': False}
     pending = db.execute("""SELECT r.id,r.created_at,
       EXISTS(SELECT 1 FROM studio_owner_notifications j WHERE j.reservation_id=r.id
-        AND j.kind='created' AND j.state='accepted') OR
+        AND j.kind IN ('created','changed') AND j.state='accepted'
+        AND j.created_at>=coalesce((SELECT max(c.created_at) FROM reservation_schedule_changes c WHERE c.reservation_id=r.id AND c.actor LIKE 'customer:%'),0)) OR
       EXISTS(SELECT 1 FROM studio_sms_jobs j JOIN studio_sms_bridges b ON b.id=j.bridge_id
-        WHERE j.reservation_id=r.id AND b.role='owner_alert' AND j.notification_key='created:'||r.id
-        AND j.state IN ('sent','delivered')) OR
-      EXISTS(SELECT 1 FROM studio_owner_wechat_jobs j WHERE j.reservation_id=r.id AND j.state='accepted') AS acknowledged
+        WHERE j.reservation_id=r.id AND b.role='owner_alert' AND (j.notification_key='created:'||r.id OR j.notification_key LIKE 'changed:'||r.id||':%')
+        AND j.state IN ('sent','delivered')
+        AND j.created_at>=coalesce((SELECT max(c.created_at) FROM reservation_schedule_changes c WHERE c.reservation_id=r.id AND c.actor LIKE 'customer:%'),0)) OR
+      EXISTS(SELECT 1 FROM studio_owner_wechat_jobs j WHERE j.reservation_id=r.id AND j.state='accepted'
+        AND j.created_at>=coalesce((SELECT max(c.created_at) FROM reservation_schedule_changes c WHERE c.reservation_id=r.id AND c.actor LIKE 'customer:%'),0)) AS acknowledged
       FROM studio_reservations r WHERE r.status='pending' AND r.deleted_at IS NULL ORDER BY r.created_at""").fetchall()
     needs_attention = []
     for row in pending:

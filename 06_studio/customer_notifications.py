@@ -158,6 +158,13 @@ def enqueue(db,row,kind,due=None):
 
 def on_reservation(db,kind,row):
     if not row['owner_id']:return
+    if kind in ('changed', 'rescheduled'):
+        db.execute("UPDATE studio_customer_notification_jobs SET state='skipped',error='superseded',updated_at=? WHERE reservation_id=? AND state IN ('queued','retry','waiting_subscription','waiting_config')", (time.time(),row['id']))
+        if row['status'] == 'pending':
+            enqueue(db, row, 'pending')
+        elif row['status'] in ('confirmed', 'cancelled'):
+            on_reservation(db, row['status'], row)
+        return
     if kind=='created':
         pref=preferences(db,row['owner_id']);locale=json.loads(row['payload']).get('locale','zh')
         db.execute('INSERT OR IGNORE INTO studio_booking_notification_choices VALUES(?,?,?,?,?,?,?)',

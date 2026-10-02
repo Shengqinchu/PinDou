@@ -1,7 +1,7 @@
 {
   "title": ["微信预约提醒", "WeChat reservation alerts"],
   "open": ["微信提醒", "WeChat alerts"],
-  "intro": ["新预约和顾客取消预约时提醒你，关闭网站后仍会发送。", "Receive alerts for new reservations and customer cancellations, even when the website is closed."],
+  "intro": ["新预约、顾客修改和取消预约时提醒你，关闭网站后仍会发送。", "Receive alerts for new bookings, customer changes and cancellations, even when the website is closed."],
   "configured": ["已配置 Server 酱", "ServerChan configured"],
   "not_configured": ["尚未配置", "Not configured"],
   "paused": ["提醒已暂停", "Alerts paused"],
@@ -68,5 +68,8 @@
   "message_reference": ["预约编号", "Reference"],
   "message_timezone": ["以上为汉密尔顿当地时间。", "All times are local to Hamilton, Ontario."],
   "message_open": ["打开店主工作台", "Open the host desk"],
-  "message_patch": ["体验：布贴DIY", "Experience: Patch DIY"]
+  "message_patch": ["体验：布贴DIY", "Experience: Patch DIY"],
+  "changed": ["顾客修改预约", "Customer booking change"],
+  "message_changed": ["小狗拼豆铺 · 顾客修改预约待确认", "Pindou Puppy · Booking change awaiting confirmation"],
+  "message_previous": ["修改前：{date} {start}–{end} · {guests} 人", "Previous: {date} {start}–{end} · {guests} guests"]
 }

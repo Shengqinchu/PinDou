@@ -34,9 +34,10 @@ export async function adminCall<T>(path:string,data:unknown={},method:'GET'|'POS
  try{const result=await studioCall<T>(path,data,'',useUserStore().token,requestMethod,extra);if(requestMethod!=='GET')invalidateAdminViews(path);return result;}catch(e){clearRejectedAdmin(e);throw e;}
  // #endif
 }
+import editWords from '../../../05_studio/src/content/reservation-edit.json';
 export function adminError(error:unknown,say:(s:string[])=>string){
  const key=error instanceof MiniappError?error.code:'generic_error';
- for(const source of [workbench,business,wallet,commerce,messaging,promotionErrors]){const item=(source as Record<string,string[]>)[key];if(item)return say(item);}
+ for(const source of [editWords,workbench,business,wallet,commerce,messaging,promotionErrors]){const item=(source as Record<string,string[]>)[key];if(item)return say(item);}
  return say(workbench.generic_error);
 }
 export function today(){const d=new Date();return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);}
