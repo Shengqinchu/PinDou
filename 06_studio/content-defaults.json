@@ -7550,9 +7550,13 @@
       "储值优惠",
       "Prepaid hours"
     ],
-    "limited_badge": [
-      "限时活动",
-      "Limited time"
+    "offer_details": [
+      "期中特惠说明",
+      "Midterm offer details"
+    ],
+    "offer_note": [
+      "请在<联系与确认>界面备注。",
+      "Please include a note on the <Contact & Confirmation> screen."
     ],
     "holiday_offer_title": [
       "期中特惠 至11.11",

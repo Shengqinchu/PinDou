@@ -1,5 +1,5 @@
 {
-  "source": "2026-10-07 owner feedback: make the limited-time offer card stand out; adds visit-flow.limited_badge; STUDIO_COPY_CHANGES.md",
+  "source": "2026-10-07 owner annotated screenshot: remove badge, title+date one row, info note, divider; STUDIO_COPY_CHANGES.md",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -86,7 +86,7 @@
     "studio-miniapp-legal.json": "0c09281868357f60389d4eae115a003ca08b337ed4e7cac9cd4ab78b4387bd2d",
     "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3",
     "telegram-notifications.json": "b7fa03f044584ed03ba9867c1499d19328639f666dd9350a9a68b4b8356902c7",
-    "visit-flow.json": "e7be833f0c2a667d26f21cb8c456e6998bad5f91dfcca2deb193ab85a66420f0",
+    "visit-flow.json": "31d790a98e161853613e56e46ebfe72a4166a653e11d22096ed58b96bbb7ba07",
     "wallet.json": "0e8ce78f19b588a98752159ff7ff5936ed9001b75b4300d6e44c57dc746101bc",
     "wechat.json": "ec03e405ce841460edd8350968393173d7cc037bb950d6d552563366c8b043d5",
     "workbench.json": "5f247e49c6eb9e7bc477ce6f9b6cc09d660d88069426240ceb870025d84d027e"
