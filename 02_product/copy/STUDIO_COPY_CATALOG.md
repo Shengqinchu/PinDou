@@ -3063,9 +3063,9 @@
 | close | 关闭 | Close |
 | prepaid_title | 储值优惠 | Prepaid hours |
 | prepaid_details | 储值优惠说明 | Prepaid hours details |
-| holiday_offer_title | 双节特惠 至10.7 | Holiday offer · until October 7 |
-| holiday_new_guests | 新朋友可免费体验1小时 | New guests enjoy 1 hour free |
-| holiday_bring_friends | 老友带新友可同享（游玩3h起） | Returning guests who bring a new friend enjoy it too (minimum 3-hour visit) |
+| holiday_offer_title | 期中特惠 至11.11 | Midterm offer · until November 11 |
+| holiday_new_guests | 单板不限时（52钉） CAD 29.9 | One 52-peg board, no time limit · CAD 29.9 |
+| holiday_bring_friends | 四人同行，一人免单 | Groups of four: one guest free |
 | cardholder_short | 拼豆卡套套餐 | Bead cardholder package |
 | cardholder_details | 卡套套餐说明 | Cardholder package details |
 
