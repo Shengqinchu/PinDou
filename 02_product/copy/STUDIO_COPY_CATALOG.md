@@ -3063,6 +3063,7 @@
 | close | 关闭 | Close |
 | prepaid_title | 储值优惠 | Prepaid hours |
 | prepaid_details | 储值优惠说明 | Prepaid hours details |
+| limited_badge | 限时活动 | Limited time |
 | holiday_offer_title | 期中特惠 至11.11 | Midterm offer · until November 11 |
 | holiday_new_guests | 单板不限时（52钉） CAD 29.9 | One 52-peg board, no time limit · CAD 29.9 |
 | holiday_bring_friends | 四人同行，一人免单 | Groups of four: one guest free |
