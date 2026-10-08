@@ -59,7 +59,8 @@ const offer=computed(()=>({...splitOffer(say(copy.holiday_offer_title)),board:sp
 .visit-offer-heading{flex-wrap:wrap}.visit-offer-heading h3{margin:0}.visit-offer-heading>strong{margin-left:auto;white-space:nowrap}
 .visit-limited-offer{padding-bottom:10px!important}
 .visit-limited-offer .visit-offer-heading{flex-wrap:nowrap}
-.visit-limited-offer .visit-offer-heading h3{margin:0;font-family:var(--chinese-display);font-size:22px;font-weight:400;line-height:1.35;color:var(--ink)}
+/* Both offer names share one heading style. */
+.visit-combined-offers .visit-offer-heading h3{margin:0;font-family:var(--chinese-display);font-size:22px;font-weight:400;line-height:1.35;color:var(--ink)}
 .visit-offer-motif{position:relative;display:inline-block;padding:0;border:0;background:none;font:inherit;color:inherit;line-height:inherit;cursor:pointer;touch-action:manipulation}
 .visit-offer-motif .motif-float,.visit-offer-motif .motif-touch{display:inline-block;transform-origin:50% 60%}
 .visit-offer-motif:focus-visible{outline:2px solid #66849a;outline-offset:3px;border-radius:6px}
@@ -69,7 +70,6 @@ const offer=computed(()=>({...splitOffer(say(copy.holiday_offer_title)),board:sp
 .visit-combined-offers .visit-limited-row+.visit-limited-row{border-top:1px solid #dfe5e1}
 .visit-combined-offers .visit-limited-row strong{font-size:24px;font-weight:400;line-height:1.2;white-space:nowrap;color:var(--ink)}
 .visit-limited-group b{font-weight:500;color:var(--ink)}
-.visit-combined-offers .visit-prepaid h3{margin:0;font-size:12px;font-weight:400;line-height:1;color:var(--muted)}
 .visit-combined-offers .visit-prepaid .visit-offer-heading{align-items:center}
 .visit-combined-offers .visit-prepaid strong{font-size:18px}
 .visit-combined-offers .info-tip-trigger{min-width:36px;min-height:36px}
