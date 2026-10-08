@@ -26,10 +26,10 @@ function splitEmphasis(text:string){
  const at=text.search(/[，,:：]/);
  return at>0?{lead:text.slice(0,at+1)+(/[,:]/.test(text[at])?' ':''),strong:text.slice(at+1).trim()}:{lead:'',strong:text};
 }
-// The offer name reuses the home puppy's motif: slow drift, hover tilt, tap squash.
-const offerMotif=ref<HTMLElement>();let stopMotif:(()=>void)|undefined;
-onMounted(()=>{if(offerMotif.value)stopMotif=installMotif(offerMotif.value);});
-onBeforeUnmount(()=>stopMotif?.());
+// Both offer names reuse the home puppy's motif: slow drift, hover tilt, tap squash.
+const offerMotif=ref<HTMLElement>(),prepaidMotif=ref<HTMLElement>();let stopMotifs:(()=>void)[]=[];
+onMounted(()=>{stopMotifs=[offerMotif.value,prepaidMotif.value].filter((el):el is HTMLElement=>!!el).map(installMotif);});
+onBeforeUnmount(()=>stopMotifs.forEach(stop=>stop()));
 const offer=computed(()=>({...splitOffer(say(copy.holiday_offer_title)),board:splitPrice(say(copy.holiday_new_guests)),group:splitEmphasis(say(copy.holiday_bring_friends))}));
 </script>
 <template>
@@ -44,7 +44,7 @@ const offer=computed(()=>({...splitOffer(say(copy.holiday_offer_title)),board:sp
    <p class="visit-limited-row"><span>{{offer.board.label}}</span><strong v-if="offer.board.price"><MoneyText :text="offer.board.price"/></strong></p>
    <p class="visit-limited-row visit-limited-group"><span>{{offer.group.lead}}<b>{{offer.group.strong}}</b></span></p>
   </article>
-  <article class="visit-prepaid"><div class="visit-offer-heading"><h3>{{say(copy.prepaid_title)}}</h3><InfoTip :label="say(copy.prepaid_details)"><p>{{say(words.prepay_at_least_10_hours_and_at_8815bf)}}</p></InfoTip><strong><MoneyText :text="say(words.ca7_hour_c87a20)"/></strong></div></article>
+  <article class="visit-prepaid"><div class="visit-offer-heading"><h3><button ref="prepaidMotif" type="button" class="visit-offer-motif motif-interactive"><span class="motif-float"><span class="motif-touch">{{say(copy.prepaid_title)}}</span></span></button></h3><InfoTip :label="say(copy.prepaid_details)"><p>{{say(words.prepay_at_least_10_hours_and_at_8815bf)}}</p></InfoTip><strong><MoneyText :text="say(words.ca7_hour_c87a20)"/></strong></div></article>
  </div>
  </fieldset>
 </template>
