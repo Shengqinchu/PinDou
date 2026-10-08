@@ -23,9 +23,9 @@ function write(key: string, value: string) {
     /* Browsing still works without storage. */
   }
 }
-// English is the default; only a visitor's own language switch is remembered.
+// Chinese is the default; only a visitor's own language switch is remembered.
 const chosenLocale=new URLSearchParams(location.search).get("preview-locale")||read("puppy-studio-language");
-export const locale = ref<Locale>(chosenLocale==='zh'?'zh':'en');
+export const locale = ref<Locale>(chosenLocale==='en'?'en':'zh');
 export const tr = (zh: string, en: string) => (locale.value === "zh" ? zh : en);
 export function say(pair: readonly string[]) {
   return tr(pair[0], pair[1]);
