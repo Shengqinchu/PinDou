@@ -29,6 +29,16 @@ function methodChange(event:{detail:{value:string}}){flow.contact.contact_method
 function next(){if(flow.step<2)flow.navigate(flow.step+1);else void flow.submit();}
 function editContact(){flow.editing=true;}
 function offerInfo(){uni.showModal({title:words('flow','prepaid_details'),content:words('visit','prepay_at_least_10_hours_and_at_8815bf'),showCancel:false});}
+function offerNote(){uni.showModal({title:words('flow','offer_details'),content:words('flow','offer_note'),showCancel:false});}
+// Presentation only (same split as the website): the owner's copy keys stay whole.
+const limited=computed(()=>{
+ const title=words('flow','holiday_offer_title'),cut=title.includes(' · ')?title.indexOf(' · '):title.lastIndexOf(' ');
+ const board=words('flow','holiday_new_guests'),price=board.match(/^(.*?)[\s·]*(?:CAD\s*(\d[\d.,]*)|(\d[\d.,]*)\s*CAD)$/);
+ const group=words('flow','holiday_bring_friends'),at=group.search(/[，,:：]/);
+ return {name:cut>0?title.slice(0,cut):title,until:cut>0?title.slice(cut).replace(/^\s*·?\s*/,''):'',
+  board:price?{label:price[1],amount:price[2]||price[3]}:{label:board,amount:''},
+  lead:at>0?group.slice(0,at+1)+(/[,:]/.test(group[at])?' ':''):'',strong:at>0?group.slice(at+1).trim():group};
+});
 </script>
 <template>
  <StudioShell id="studio-shell" fitted :reset-key="flow.step" :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" @language="changeLanguage">
@@ -46,11 +56,12 @@ function offerInfo(){uni.showModal({title:words('flow','prepaid_details'),conten
       <view v-if="offer?.enabled" class="studio-patch-card-offer"><text>{{words('promotion','launch')}}</text><text>{{words('promotion',offer.remaining>0?'card':'exhausted')}}</text><text v-if="offer.remaining>0">{{fillWords(studioWords('promotion','remaining'),language,{v0:offer.remaining,v1:offer.quota})}}</text><text>{{words('promotion','bonus')}}</text></view>
      </button>
      <view class="studio-plan studio-plan-offers">
-      <view class="studio-plan-top"><view class="studio-offer-prepaid"><text class="studio-native-label studio-native-small">{{words('flow','prepaid_title')}}</text><text class="studio-offer-price">{{words('visit','ca7_hour_c87a20')}}</text></view><button class="studio-offer-info studio-native-eye" hover-class="studio-native-pressed" :aria-label="words('flow','prepaid_details')" @tap="offerInfo"><StudioGlyph name="info" :size="19"/></button></view>
+      <view class="studio-offer-head"><button :hover-start-time="0" :hover-stay-time="260" hover-class="studio-offer-squeezed" class="studio-offer-name"><text class="studio-plan-name">{{limited.name}}</text></button><button class="studio-offer-info studio-native-eye" hover-class="studio-native-pressed" :aria-label="words('flow','offer_details')" @tap="offerNote"><StudioGlyph name="info" :size="19"/></button><text v-if="limited.until" class="studio-native-label studio-native-small studio-offer-until">{{limited.until}}</text></view>
+      <view class="studio-offer-row"><text class="studio-native-body studio-native-small">{{limited.board.label}}</text><view v-if="limited.board.amount" class="studio-price studio-offer-amount"><text>{{limited.board.amount}}</text><text class="studio-price-currency">CAD</text></view></view>
       <view class="studio-offer-divider"/>
-      <text class="studio-native-label studio-native-small">{{words('flow','holiday_offer_title')}}</text>
-      <text class="studio-native-small studio-offer-highlight">{{words('flow','holiday_new_guests')}}</text>
-      <text class="studio-native-body studio-native-small">{{words('flow','holiday_bring_friends')}}</text>
+      <text class="studio-native-body studio-native-small">{{limited.lead}}<text class="studio-offer-highlight">{{limited.strong}}</text></text>
+      <view class="studio-offer-divider"/>
+      <view class="studio-offer-head"><button :hover-start-time="0" :hover-stay-time="260" hover-class="studio-offer-squeezed" class="studio-offer-name"><text class="studio-plan-name">{{words('flow','prepaid_title')}}</text></button><button class="studio-offer-info studio-native-eye" hover-class="studio-native-pressed" :aria-label="words('flow','prepaid_details')" @tap="offerInfo"><StudioGlyph name="info" :size="19"/></button><text class="studio-offer-price studio-offer-until">{{words('visit','ca7_hour_c87a20')}}</text></view>
      </view>
     </view>
     <view v-if="flow.booking.plan==='day'" class="studio-group-prices"><text>{{words('flow','two')}} · {{studioRate('day_two')}} CAD</text><text>{{words('flow','three')}} · {{studioRate('day_three')}} CAD</text></view>

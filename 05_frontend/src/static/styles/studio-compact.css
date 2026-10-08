@@ -53,3 +53,14 @@
 .studio-patch-popup .studio-native-primary{width:100%}
 
 .admin-patch-gift{display:inline-flex;align-self:flex-start;color:#49667a;background:#eaf3f8;border:1px solid #d8e7ee;border-radius:7px;padding:4px 8px;font-size:12px;line-height:1.5}
+/* Offer card: names reuse the plan title and the brand puppy's tap squash. */
+.studio-offer-head{display:flex;flex-wrap:wrap;align-items:center;width:100%;min-width:0;column-gap:2px;row-gap:0}
+.studio-native .studio-offer-name{display:inline-flex;flex-shrink:0;max-width:calc(100% - 46px);min-height:36px!important;padding:0!important;margin:0;background:transparent!important;border:0;overflow:visible!important;line-height:1.5}
+.studio-offer-name .studio-plan-name{display:block;text-align:left;transition:transform .6s cubic-bezier(.22,1.5,.45,1)}
+.studio-offer-squeezed .studio-plan-name{transform:scale(1.08,.88) rotate(-4deg);transition-duration:.18s}
+.studio-offer-until{margin-left:auto;white-space:nowrap;text-align:right;max-width:100%}
+.studio-offer-row{display:flex;flex-wrap:wrap;width:100%;align-items:baseline;justify-content:space-between;column-gap:6px;row-gap:0}
+.studio-offer-row>.studio-native-body{flex:1 1 110px;min-width:0}
+.studio-native .studio-offer-amount{margin-left:auto}
+.studio-native .studio-offer-amount{flex-shrink:0;margin-top:0;width:auto;font-size:21px}
+@media(prefers-reduced-motion:reduce){.studio-offer-name .studio-plan-name{transition:none!important}.studio-offer-squeezed .studio-plan-name{transform:none}}
