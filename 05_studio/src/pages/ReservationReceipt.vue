@@ -100,8 +100,10 @@ onBeforeUnmount(() => {
         }}</em>
       </h1>
       <LiftTitle v-else as="h1" :text="say(copyText.this_reservation_was_cancelled_54b1d2)"/>
-      <p v-if="result.status === 'pending'">
-        {{ say(copyText.the_host_will_review_your_plans_as_fec716) }}
+      <p v-if="result.status === 'pending'" class="reservation-details-link">
+        {{ say(copyText.pending_details_lead) }}<RouterLink to="/details">{{
+          say(copyText.studio_details_fbed84)
+        }}</RouterLink>{{ say(copyText.pending_details_tail) }}
       </p>
       <p v-if="result.status === 'pending'" class="reservation-urgent">
         {{ say(copyText.if_your_visit_starts_in_less_than_4b8a93) }}

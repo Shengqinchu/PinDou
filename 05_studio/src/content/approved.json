@@ -1,5 +1,5 @@
 {
-  "source": "2026-10-07 owner annotated screenshot: remove badge, title+date one row, info note, divider; STUDIO_COPY_CHANGES.md",
+  "source": "2026-10-14 owner annotated screenshots: booking timetable notes and reservation receipt copy; STUDIO_COPY_CHANGES.md",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -35,7 +35,7 @@
     "components-MotionSettings.json": "21047eb1d7179abe0209efcbdbd947d48962af9ac6f779e14a45e6d443d4f12f",
     "components-PhotoViewer.json": "4345fb992a989bfb81ad81181fe27fbe67edc3ffc6219f777e9275fd8a16784d",
     "components-ReleaseNotice.json": "6a6254580cd2de4b0a6005e84c788d50b0883f68a22daf1bf1b2564d825cf88d",
-    "components-ReservationCalendar.json": "2882400f4e096c492f008d3f74b1655d27bc539bdea2dad3beaee33f78315418",
+    "components-ReservationCalendar.json": "175b26460d35df3c5cb77d3636fc6910f4fe8ce381eb7481b70d2a206110e905",
     "components-SlideOver.json": "c466c459f8199dbbf64bbc82550c610126a719358f2d3975d129d6e7ae0158d0",
     "components-StudioCarousel.json": "3d95089ba11a06f03e6ecc8592208dcafa3be2fe1afbc6b592667c4ee30323a9",
     "components-StudioToast.json": "3901e64e5116ccf047f593172fa5945a6df55fff548cd84df0e293f72efa7f52",
@@ -69,7 +69,7 @@
     "pages-Manage.json": "88543d009c819379ade75ceb7a3a0dec3355529d355bcf0144731d4c973c4309",
     "pages-NotFound.json": "16191ee07c361a155fa5690df68e18f3c86b87c80f0227c75520af859ed6b455",
     "pages-Order.json": "d3086b46d00cca732ecbca9fd1d2a3ab60ea25dd1abd32a7a66966bba17b7508",
-    "pages-ReservationReceipt.json": "884556a3b0108d1f98949bc54dcf86cea6f7b7657c83cd4674d61c8f8efb7120",
+    "pages-ReservationReceipt.json": "f8d85ace63472c86b58c3421aecc4ba26e52d059a3307119e41c3cd16c76f363",
     "pages-Shop.json": "e5ec408e16a4b59c824bf7664b684a5b17796a7da24cc7133e598426a5891e2c",
     "pages-Visit.json": "221e2cbfe362f001f02b6d5dc62c0a430e9f6409d4f67bacab48006ccc746ac4",
     "patch-promotion.json": "59756c52d54b74c3be33039e569b6b344dc12ec72d0aa57626a48fada5454048",
@@ -86,7 +86,7 @@
     "studio-miniapp-legal.json": "0c09281868357f60389d4eae115a003ca08b337ed4e7cac9cd4ab78b4387bd2d",
     "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3",
     "telegram-notifications.json": "b7fa03f044584ed03ba9867c1499d19328639f666dd9350a9a68b4b8356902c7",
-    "visit-flow.json": "31d790a98e161853613e56e46ebfe72a4166a653e11d22096ed58b96bbb7ba07",
+    "visit-flow.json": "d5585e4bef6f7650d5e2c01ad5aacd1e666dccf88821bdc0b3e61a0bc953cb49",
     "wallet.json": "0e8ce78f19b588a98752159ff7ff5936ed9001b75b4300d6e44c57dc746101bc",
     "wechat.json": "ec03e405ce841460edd8350968393173d7cc037bb950d6d552563366c8b043d5",
     "workbench.json": "5f247e49c6eb9e7bc477ce6f9b6cc09d660d88069426240ceb870025d84d027e"

@@ -10,9 +10,9 @@
   ],
   "available_to_book_9bb918": ["可以预约", "Available to book"],
   "your_selection_0fc834": ["已选时段", "Your selection"],
-  "minimum_duration": ["预约时长至少 2 小时", "Minimum booking: 2 hours."],
+  "minimum_duration": ["请先选择人数，能看到可预约时间；预约时长至少两小时。如无法预约请联系店主。", "Choose the number of guests first to see available times; bookings are at least two hours. If you can't book, please contact the host."],
   "unavailable_fb3489": ["不可预约", "Unavailable"],
-  "low_seats": ["座位≤2 / 已约≥2组", "≤2 seats / ≥2 groups"],
+  "low_seats": ["座位≤2", "≤2 seats"],
   "remaining_seats": ["剩余 {v0} 个座位", "{v0} seats left"],
   "full": ["已满员", "Fully booked"],
   "full_buffer": ["满员时段前后 0.5 小时不可预约。", "The 0.5 hours before and after a fully booked period are unavailable."],
@@ -21,10 +21,7 @@
   "date_label": ["日期", "Dates"],
   "booking_window": ["只开放未来两周座位", "Booking opens for the next two weeks only"],
   "next_dates_4c8209": ["下一组日期", "Next dates"],
-  "choose_a_start_time_for_a_twohour_a3470d": [
-    "点击开始时间，默认选择两小时；再点同一天较晚的格子可延长。使用日期上方箭头查看其他日期。",
-    "Choose a start time for a two-hour visit, then a later cell to extend it. Use the date arrows to see other days."
-  ],
+  "choose_a_start_time_for_a_twohour_a3470d": ["点击开始时间，默认选择两小时，再点预计结束时间的格子。右边小箭头可以查看其他日期。", "Choose a start time for a two-hour visit, then tap the cell for your expected end time. Use the arrows on the right to see other dates."],
   "reservation_timetable_use_arrow_keys_to_move_3bb451": [
     "预约时间表，使用方向键移动，回车选择",
     "Reservation timetable. Use arrow keys to move and Enter to select."

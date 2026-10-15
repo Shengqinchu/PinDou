@@ -2755,8 +2755,8 @@
       "Unavailable"
     ],
     "low_seats": [
-      "座位≤2 / 已约≥2组",
-      "≤2 seats / ≥2 groups"
+      "座位≤2",
+      "≤2 seats"
     ],
     "remaining_seats": [
       "剩余 {v0} 个座位",
@@ -2791,8 +2791,8 @@
       "Next dates"
     ],
     "choose_a_start_time_for_a_twohour_a3470d": [
-      "点击开始时间，默认选择两小时；再点同一天较晚的格子可延长。使用日期上方箭头查看其他日期。",
-      "Choose a start time for a two-hour visit, then a later cell to extend it. Use the date arrows to see other days."
+      "点击开始时间，默认选择两小时，再点预计结束时间的格子。右边小箭头可以查看其他日期。",
+      "Choose a start time for a two-hour visit, then tap the cell for your expected end time. Use the arrows on the right to see other dates."
     ],
     "reservation_timetable_use_arrow_keys_to_move_3bb451": [
       "预约时间表，使用方向键移动，回车选择",
@@ -2823,8 +2823,8 @@
       "All times are local to Hamilton. The timetable shows the current opening hours."
     ],
     "minimum_duration": [
-      "预约时长至少 2 小时",
-      "Minimum booking: 2 hours."
+      "请先选择人数，能看到可预约时间；预约时长至少两小时。如无法预约请联系店主。",
+      "Choose the number of guests first to see available times; bookings are at least two hours. If you can't book, please contact the host."
     ],
     "booked_groups": [
       "已预约 {v0} 组",
@@ -6565,8 +6565,16 @@
       "This reservation was cancelled"
     ],
     "the_host_will_review_your_plans_as_fec716": [
-      "店主正在赶来查看，确认后将主动联系你，收到消息即表示预约成功。",
-      "The host is coming to review your request and will contact you once it is confirmed. Your reservation is confirmed when you receive that message."
+      "店主正在赶来查看，请稍等片刻……可以先看看拼豆铺详细信息喔！",
+      "The host is on the way to review your request. Hang tight… Meanwhile, take a look at our studio details!"
+    ],
+    "pending_details_lead": [
+      "店主正在赶来查看，请稍等片刻……可以先看看",
+      "The host is on the way to review your request. Hang tight… Meanwhile, take a look at our "
+    ],
+    "pending_details_tail": [
+      "喔！",
+      "!"
     ],
     "if_your_visit_starts_in_less_than_4b8a93": [
       "如果距离预约玩耍时间小于 2h，请主动联系店主，谢谢合作！",
@@ -6605,16 +6613,16 @@
       "Hourly visit"
     ],
     "come_along_and_read_our_ad449d": [
-      "欢迎来玩，先看看",
-      "Come along, and read our "
+      "点击",
+      "Tap "
     ],
     "studio_details_fbed84": [
       "拼豆铺详细信息",
       "studio details"
     ],
     "before_your_visit_1e5e77": [
-      "吧！",
-      " before your visit!"
+      "可查看店铺位置，停车位等详情！",
+      " for our location, parking and more!"
     ],
     "loading_your_reservation_9f91f7": [
       "正在查看预约……",
@@ -7463,8 +7471,8 @@
       "End"
     ],
     "overtime_notice": [
-      "小店最晚经营到24:00，超过22:00需额外5cad/小时加班费。",
-      "The studio can stay open until 24:00. An additional CAD 5 per hour applies after 22:00."
+      "小店最晚经营到24:00，超过22:00需额外每组客人5cad/小时加班费。",
+      "The studio can stay open until 24:00. After 22:00, an additional CAD 5 per hour applies to each group."
     ],
     "fixed_duration": [
       "套餐时长",

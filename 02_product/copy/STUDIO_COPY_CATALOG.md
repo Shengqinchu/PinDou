@@ -992,9 +992,9 @@
 | choose_an_earlier_or_another_available_time_f98d07 | 这里无法安排至少两小时，请选择更早或其他可用时段。 | Choose an earlier or another available time for a visit of at least two hours. |
 | available_to_book_9bb918 | 可以预约 | Available to book |
 | your_selection_0fc834 | 已选时段 | Your selection |
-| minimum_duration | 预约时长至少 2 小时 | Minimum booking: 2 hours. |
+| minimum_duration | 请先选择人数，能看到可预约时间；预约时长至少两小时。如无法预约请联系店主。 | Choose the number of guests first to see available times; bookings are at least two hours. If you can't book, please contact the host. |
 | unavailable_fb3489 | 不可预约 | Unavailable |
-| low_seats | 座位≤2 / 已约≥2组 | ≤2 seats / ≥2 groups |
+| low_seats | 座位≤2 | ≤2 seats |
 | remaining_seats | 剩余 {v0} 个座位 | {v0} seats left |
 | full | 已满员 | Fully booked |
 | full_buffer | 满员时段前后 0.5 小时不可预约。 | The 0.5 hours before and after a fully booked period are unavailable. |
@@ -1003,7 +1003,7 @@
 | date_label | 日期 | Dates |
 | booking_window | 只开放未来两周座位 | Booking opens for the next two weeks only |
 | next_dates_4c8209 | 下一组日期 | Next dates |
-| choose_a_start_time_for_a_twohour_a3470d | 点击开始时间，默认选择两小时；再点同一天较晚的格子可延长。使用日期上方箭头查看其他日期。 | Choose a start time for a two-hour visit, then a later cell to extend it. Use the date arrows to see other days. |
+| choose_a_start_time_for_a_twohour_a3470d | 点击开始时间，默认选择两小时，再点预计结束时间的格子。右边小箭头可以查看其他日期。 | Choose a start time for a two-hour visit, then tap the cell for your expected end time. Use the arrows on the right to see other dates. |
 | reservation_timetable_use_arrow_keys_to_move_3bb451 | 预约时间表，使用方向键移动，回车选择 | Reservation timetable. Use arrow keys to move and Enter to select. |
 | time_296653 | 时间 | Time |
 | available_d07da8 | 可选 | available |
@@ -2426,7 +2426,9 @@
 | thank_you_for_coming_285672 | 谢谢你来， | Thank you for coming. |
 | lets_make_again_soon_12f0b9 | 下次再一起拼。 | Let's make again soon. |
 | this_reservation_was_cancelled_54b1d2 | 这次预约已取消 | This reservation was cancelled |
-| the_host_will_review_your_plans_as_fec716 | 店主正在赶来查看，确认后将主动联系你，收到消息即表示预约成功。 | The host is coming to review your request and will contact you once it is confirmed. Your reservation is confirmed when you receive that message. |
+| the_host_will_review_your_plans_as_fec716 | 店主正在赶来查看，请稍等片刻……可以先看看拼豆铺详细信息喔！ | The host is on the way to review your request. Hang tight… Meanwhile, take a look at our studio details! |
+| pending_details_lead | 店主正在赶来查看，请稍等片刻……可以先看看 | The host is on the way to review your request. Hang tight… Meanwhile, take a look at our  |
+| pending_details_tail | 喔！ | ! |
 | if_your_visit_starts_in_less_than_4b8a93 | 如果距离预约玩耍时间小于 2h，请主动联系店主，谢谢合作！ | If your visit starts in less than 2 hours, please contact the host directly. Thank you! |
 | guest_9302c0 | 客人 | Guest |
 | visit_time_9fc550 | 到店时间 | Visit time |
@@ -2436,9 +2438,9 @@
 | experience_cc25a0 | 体验 | Experience |
 | day_visit_aad886 | 全天体验 | Day visit |
 | hourly_visit_681491 | 按时体验 | Hourly visit |
-| come_along_and_read_our_ad449d | 欢迎来玩，先看看 | Come along, and read our  |
+| come_along_and_read_our_ad449d | 点击 | Tap  |
 | studio_details_fbed84 | 拼豆铺详细信息 | studio details |
-| before_your_visit_1e5e77 | 吧！ |  before your visit! |
+| before_your_visit_1e5e77 | 可查看店铺位置，停车位等详情！ |  for our location, parking and more! |
 | loading_your_reservation_9f91f7 | 正在查看预约…… | Loading your reservation… |
 | refresh_reservation_30af18 | 刷新预约状态 | Refresh reservation |
 | for_changes_contact_the_host_on_wechat_2921d8 | 如需调整安排，请联系店主。微信号： | For changes, contact the host on WeChat:  |
@@ -3043,7 +3045,7 @@
 | closes | 当天闭店时间 | Closes at |
 | regular_end | 普通预约截止 | Regular bookings end |
 | end_marker | 结束 | End |
-| overtime_notice | 小店最晚经营到24:00，超过22:00需额外5cad/小时加班费。 | The studio can stay open until 24:00. An additional CAD 5 per hour applies after 22:00. |
+| overtime_notice | 小店最晚经营到24:00，超过22:00需额外每组客人5cad/小时加班费。 | The studio can stay open until 24:00. After 22:00, an additional CAD 5 per hour applies to each group. |
 | fixed_duration | 套餐时长 | Included in this offer |
 | closed | 休息 | Closed |
 | no_time | 这一天没有符合条件的时段，可以换一天或缩短时长。 | No times fit this selection. Choose another day or a shorter visit. |

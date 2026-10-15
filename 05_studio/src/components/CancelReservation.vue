@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount,ref,useId,watch } from 'vue';
-import { PhX } from '@phosphor-icons/vue';
+import { PhX,PhCalendarX } from '@phosphor-icons/vue';
 import { cancellationCopy as copy,reservationRevision,type CancellationPolicy } from '../cancellation';
 import { commerceApi } from '../commerce';
 import { accountUser } from '../account';
@@ -34,7 +34,7 @@ async function cancel(){
 }
 </script>
 <template>
- <button v-if="reservation.can_cancel" type="button" class="text-link reservation-cancel-link" @click="begin">{{say(copy.action)}}</button>
+ <button v-if="reservation.can_cancel" type="button" class="text-link reservation-cancel-link" @click="begin"><PhCalendarX/>{{say(copy.action)}}</button>
  <Teleport to="body"><dialog ref="dialog" class="modal-shell cancellation-dialog" :aria-labelledby="heading" :aria-describedby="description" @cancel.prevent="dismiss">
   <div class="modal-shade" aria-hidden="true" @click="dismiss"/>
   <section class="modal-panel cancellation-panel">

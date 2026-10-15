@@ -27,10 +27,9 @@
     "这次预约已取消",
     "This reservation was cancelled"
   ],
-  "the_host_will_review_your_plans_as_fec716": [
-    "店主正在赶来查看，确认后将主动联系你，收到消息即表示预约成功。",
-    "The host is coming to review your request and will contact you once it is confirmed. Your reservation is confirmed when you receive that message."
-  ],
+  "the_host_will_review_your_plans_as_fec716": ["店主正在赶来查看，请稍等片刻……可以先看看拼豆铺详细信息喔！", "The host is on the way to review your request. Hang tight… Meanwhile, take a look at our studio details!"],
+  "pending_details_lead": ["店主正在赶来查看，请稍等片刻……可以先看看", "The host is on the way to review your request. Hang tight… Meanwhile, take a look at our "],
+  "pending_details_tail": ["喔！", "!"],
   "if_your_visit_starts_in_less_than_4b8a93": [
     "如果距离预约玩耍时间小于 2h，请主动联系店主，谢谢合作！",
     "If your visit starts in less than 2 hours, please contact the host directly. Thank you!"
@@ -67,18 +66,12 @@
     "按时体验",
     "Hourly visit"
   ],
-  "come_along_and_read_our_ad449d": [
-    "欢迎来玩，先看看",
-    "Come along, and read our "
-  ],
+  "come_along_and_read_our_ad449d": ["点击", "Tap "],
   "studio_details_fbed84": [
     "拼豆铺详细信息",
     "studio details"
   ],
-  "before_your_visit_1e5e77": [
-    "吧！",
-    " before your visit!"
-  ],
+  "before_your_visit_1e5e77": ["可查看店铺位置，停车位等详情！", " for our location, parking and more!"],
   "loading_your_reservation_9f91f7": [
     "正在查看预约……",
     "Loading your reservation…"
