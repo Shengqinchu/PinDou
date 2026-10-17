@@ -44,8 +44,10 @@ def test_customer_identity_credits_and_replay(api):
         user=db.query(User).filter(User.openid=='email-fixture').one()
         assert user.paid_credits==188 and user.free_credits_remaining==3
 
-@pytest.mark.parametrize('changes',[{'user_id':'unknown'},{'user_id':'anonymous-fixture'}, {'issued_at':1},{'issued_at':int(time.time())+60}])
+@pytest.mark.parametrize('changes',[{'user_id':'unknown'},{'user_id':'anonymous-fixture'}, {'issued_at':1},{'issued_at':'future'}])
 def test_invalid_existing_customer_or_time(api,changes):
+    # Build the future timestamp at run time; a collection-time value expires during a long test run.
+    if changes.get('issued_at')=='future':changes={'issued_at':int(time.time())+60}
     assert api[0].post('/studio-session/exchange',**assertion(**changes)).status_code==401
 
 def test_requires_loopback_key_and_fixed_claims(api,monkeypatch):

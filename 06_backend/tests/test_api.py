@@ -20,7 +20,20 @@ from pindou.api.deps import get_db
 from pindou.api.generate import refund_reserved_ai_credit
 from pindou.config import get_settings
 from pindou.api.security import create_access_token
-from pindou.db.models import AdminAuditLog, Artwork, Base, CDK, DailyQuota, EmailCode, GenerationJob, Order, User
+from pindou.db.models import (
+    AdminAuditLog,
+    Artwork,
+    Base,
+    CDK,
+    CreditGrant,
+    DailyQuota,
+    DeviceClaim,
+    EmailCode,
+    GenerationJob,
+    MembershipGrant,
+    Order,
+    User,
+)
 from pindou.main import create_app
 from pindou.providers.base import PreviewResult
 from pindou.services.hupijiao_service import sign_params
@@ -321,8 +334,10 @@ def test_artwork_gallery_paginates_current_user(api_client) -> None:
         )
         session.commit()
 
-    unauthorized = client.get("/api/artwork/gallery")
-    assert unauthorized.status_code == 401
+    anonymous_page = client.get("/api/artwork/gallery")
+    assert anonymous_page.status_code == 200
+    assert anonymous_page.json()["total"] == 0
+    assert anonymous_page.json()["items"] == []
 
     default_page = client.get("/api/artwork/gallery", headers=headers)
     assert default_page.status_code == 200
@@ -1527,3 +1542,363 @@ def test_cdk_redeem_and_admin_batch_generate(api_client) -> None:
         headers=headers_admin,
     )
     assert batch.status_code == 403
+
+
+def test_wallet_profile_issues_signed_device_and_rejects_tampered_token(api_client) -> None:
+    client, _ = api_client
+    first = client.get("/api/wallet/profile")
+    assert first.status_code == 200
+    payload = first.json()
+    assert payload["owner_type"] == "device"
+    assert payload["is_anonymous"] is True
+    assert payload["normal_trial_remaining"] == 0
+    assert payload["device_token"]
+    assert "pd_device=" in first.headers.get("set-cookie", "")
+
+    token = payload["device_token"]
+    repeated = client.get("/api/wallet/profile", headers={"X-PinDou-Device": token})
+    assert repeated.status_code == 200
+    assert repeated.json()["owner_id"] == payload["owner_id"]
+
+    client.cookies.clear()
+    tampered = token[:-1] + ("A" if token[-1] != "A" else "B")
+    forged = client.get("/api/wallet/profile", headers={"X-PinDou-Device": tampered})
+    assert forged.status_code == 200
+    assert forged.json()["owner_type"] == "device"
+    assert forged.json()["owner_id"] != payload["owner_id"]
+    assert forged.json()["ai_points_balance"] == 0
+
+
+def test_anonymous_cdk_redeem_grants_device_wallet(api_client) -> None:
+    client, session_factory = api_client
+    wallet = client.get("/api/wallet/profile")
+    assert wallet.status_code == 200
+    token = wallet.json()["device_token"]
+    device_id = wallet.json()["device_id"]
+
+    with session_factory() as session:
+        service = CDKService(session)
+        service.create_cdk(code="DEVICEPOINTSABCDEFG", cdk_type="points", value=200)
+        service.create_cdk(code="DEVICEMEMBERABCDEFG", cdk_type="membership", value=7)
+
+    headers = {"X-PinDou-Device": token}
+    points = client.post("/api/cdk/redeem", json={"cdk_code": "DEVICEPOINTSABCDEFG"}, headers=headers)
+    assert points.status_code == 200
+    assert points.json()["owner_type"] == "device"
+    assert points.json()["is_anonymous"] is True
+    assert points.json()["device_token"] == token
+
+    membership = client.post("/api/cdk/redeem", json={"cdk_code": "DEVICEMEMBERABCDEFG"}, headers=headers)
+    assert membership.status_code == 200
+
+    refreshed = client.get("/api/wallet/profile", headers=headers).json()
+    assert refreshed["owner_id"] == device_id
+    assert refreshed["ai_points_balance"] == 200
+    assert refreshed["membership_expires_at"] is not None
+
+    with session_factory() as session:
+        balance = get_credit_balance(session, owner_type="device", owner_id=device_id)
+        assert balance.available == 200
+        assert session.get(CDK, "DEVICEPOINTSABCDEFG").redeemed_owner_type == "device"
+        assert session.get(CDK, "DEVICEPOINTSABCDEFG").redeemed_owner_id == device_id
+        assert session.get(CDK, "DEVICEPOINTSABCDEFG").redeemed_by is None
+        assert (
+            session.query(MembershipGrant)
+            .filter(MembershipGrant.owner_type == "device", MembershipGrant.owner_id == device_id)
+            .count()
+            == 1
+        )
+
+
+def test_anonymous_device_with_membership_can_generate_and_owns_artwork(api_client) -> None:
+    client, session_factory = api_client
+    wallet = client.get("/api/wallet/profile")
+    assert wallet.status_code == 200
+    token = wallet.json()["device_token"]
+    device_id = wallet.json()["device_id"]
+    headers = {"X-PinDou-Device": token}
+
+    # Standard generation is free since 2026-10-17, so a device without any allowance can generate.
+    free = client.post(
+        "/api/generate/script",
+        data={"size": "26x26", "auto_remove_white_bg": "true"},
+        files={"raw_image": ("sample.png", png_bytes(), "image/png")},
+        headers=headers,
+    )
+    assert free.status_code == 200
+
+    with session_factory() as session:
+        CDKService(session).create_cdk(code="DEVICEGENMEMBERABC", cdk_type="membership", value=7)
+
+    redeemed = client.post("/api/cdk/redeem", json={"cdk_code": "DEVICEGENMEMBERABC"}, headers=headers)
+    assert redeemed.status_code == 200
+    assert redeemed.json()["owner_type"] == "device"
+
+    generated = client.post(
+        "/api/generate/script",
+        data={"size": "26x26", "auto_remove_white_bg": "true"},
+        files={"raw_image": ("sample.png", png_bytes(), "image/png")},
+        headers=headers,
+    )
+    assert generated.status_code == 200
+    artwork_id = generated.json()["artwork_id"]
+
+    with session_factory() as session:
+        artwork = session.get(Artwork, artwork_id)
+        assert artwork is not None
+        assert artwork.user_id is None
+        assert artwork.owner_type == "device"
+        assert artwork.owner_id == device_id
+
+    detail = client.get(f"/api/artwork/{artwork_id}", headers=headers)
+    assert detail.status_code == 200
+    assert detail.json()["owner_type"] == "device"
+    assert client.get(f"/api/pattern/{artwork_id}", headers=headers).status_code == 200
+    gallery = client.get("/api/artwork/gallery", headers=headers)
+    assert gallery.status_code == 200
+    assert gallery.json()["total"] == 2
+    assert artwork_id in {item["artwork_id"] for item in gallery.json()["items"]}
+
+    client.cookies.clear()
+    stranger_wallet = client.get("/api/wallet/profile")
+    stranger_token = stranger_wallet.json()["device_token"]
+    stranger_headers = {"X-PinDou-Device": stranger_token}
+    assert stranger_wallet.json()["device_id"] != device_id
+    assert client.get(f"/api/artwork/{artwork_id}", headers=stranger_headers).status_code == 404
+    assert client.get(f"/api/pattern/{artwork_id}", headers=stranger_headers).status_code == 404
+    stranger_gallery = client.get("/api/artwork/gallery", headers=stranger_headers)
+    assert stranger_gallery.status_code == 200
+    assert stranger_gallery.json()["total"] == 0
+
+
+def test_anonymous_device_with_points_can_generate_ai_and_poll_result(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, session_factory = api_client
+    wallet = client.get("/api/wallet/profile")
+    assert wallet.status_code == 200
+    token = wallet.json()["device_token"]
+    device_id = wallet.json()["device_id"]
+    headers = {"X-PinDou-Device": token}
+
+    no_points = client.post(
+        "/api/generate/ai",
+        data={"style_preset": "q_pet", "size_preset": "52x52"},
+        files={"image": ("sample.png", png_bytes((255, 255, 255)), "image/png")},
+        headers=headers,
+    )
+    assert no_points.status_code == 402
+    assert no_points.json()["details"]["kind"] == "ai"
+    assert no_points.json()["details"]["missing"] == "points"
+
+    with session_factory() as session:
+        grant_points(
+            session,
+            owner_type="device",
+            owner_id=device_id,
+            amount=AI_GENERATION_POINT_COST,
+            kind="paid",
+            source_type="test",
+            source_id="anonymous_ai",
+        )
+        session.commit()
+
+    class FakeChain:
+        def generate(self, image: bytes, style_preset, size_preset, seed=None) -> PreviewResult:
+            return PreviewResult.from_image_bytes(
+                png_bytes((255, 255, 255)),
+                target_color_count=8,
+                provider_used="fake",
+                cost_estimate=0.0,
+                latency_ms=10,
+            )
+
+    monkeypatch.setattr("pindou.api.generate.build_preview_chain", lambda: FakeChain())
+    submitted = client.post(
+        "/api/generate/ai",
+        data={"style_preset": "q_pet", "size_preset": "52x52"},
+        files={"image": ("sample.png", png_bytes((255, 255, 255)), "image/png")},
+        headers=headers,
+    )
+    assert submitted.status_code == 200
+    job_id = submitted.json()["job_id"]
+    finished = wait_generation_job(client, headers, job_id)
+    assert finished["status"] == "succeeded"
+    artwork_id = finished["result"]["artwork_id"]
+
+    with session_factory() as session:
+        assert get_credit_balance(session, owner_type="device", owner_id=device_id).available == 0
+        job = session.get(GenerationJob, job_id)
+        assert job is not None
+        assert job.user_id is None
+        assert job.owner_type == "device"
+        assert job.owner_id == device_id
+        artwork = session.get(Artwork, artwork_id)
+        assert artwork is not None
+        assert artwork.user_id is None
+        assert artwork.owner_type == "device"
+        assert artwork.owner_id == device_id
+
+    assert client.get(f"/api/artwork/{artwork_id}", headers=headers).status_code == 200
+    client.cookies.clear()
+    stranger = client.get("/api/wallet/profile").json()
+    stranger_headers = {"X-PinDou-Device": stranger["device_token"]}
+    assert stranger["device_id"] != device_id
+    assert client.get(f"/api/generate/status/{job_id}", headers=stranger_headers).status_code == 404
+    assert client.get(f"/api/artwork/{artwork_id}", headers=stranger_headers).status_code == 404
+
+
+def test_register_migrates_anonymous_device_wallet_artwork_and_jobs_and_retires_device(
+    api_client,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client, session_factory = api_client
+    sent_codes = capture_email_codes(monkeypatch)
+    wallet = client.get("/api/wallet/profile")
+    assert wallet.status_code == 200
+    old_token = wallet.json()["device_token"]
+    old_device_id = wallet.json()["device_id"]
+    old_headers = {"X-PinDou-Device": old_token}
+
+    with session_factory() as session:
+        service = CDKService(session)
+        service.create_cdk(code="MIGRATEPOINTSABC", cdk_type="points", value=200)
+        service.create_cdk(code="MIGRATEMEMBERABC", cdk_type="membership", value=7)
+
+    assert client.post("/api/cdk/redeem", json={"cdk_code": "MIGRATEPOINTSABC"}, headers=old_headers).status_code == 200
+    assert client.post("/api/cdk/redeem", json={"cdk_code": "MIGRATEMEMBERABC"}, headers=old_headers).status_code == 200
+
+    generated = client.post(
+        "/api/generate/script",
+        data={"size": "26x26", "auto_remove_white_bg": "true"},
+        files={"raw_image": ("sample.png", png_bytes(), "image/png")},
+        headers=old_headers,
+    )
+    assert generated.status_code == 200
+    artwork_id = generated.json()["artwork_id"]
+
+    with session_factory() as session:
+        pending_job = GenerationJob(
+            job_id="pending-device-migration-job",
+            user_id=None,
+            owner_type="device",
+            owner_id=old_device_id,
+            status="queued",
+            mode="ai",
+            progress=5,
+            stage="queued",
+            message_cn="等待中",
+        )
+        session.add(pending_job)
+        session.commit()
+
+    assert client.post("/api/user/email/send-code", json={"email": "device.move@example.com"}).status_code == 200
+    email_code = sent_codes[-1][1]
+    registered = client.post(
+        "/api/user/register",
+        json={"email": "device.move@example.com", "code": email_code, "password": "secret123"},
+        headers=old_headers,
+    )
+    assert registered.status_code == 200
+    payload = registered.json()
+    user_id = payload["user"]["user_id"]
+    assert payload["device_token"] and payload["device_token"] != old_token
+    assert payload["device_id"] != old_device_id
+    assert payload["device_migration"]["status"] == "migrated"
+    assert payload["device_migration"]["moved_artworks"] == 1
+    assert payload["device_migration"]["moved_jobs"] == 1
+    assert payload["device_migration"]["moved_cdks"] == 2
+    assert payload["user"]["ai_points_balance"] == 200 + 188
+    assert payload["user"]["membership_expires_at"] is not None
+
+    auth = {"Authorization": f"Bearer {payload['token']}"}
+    detail = client.get(f"/api/artwork/{artwork_id}", headers=auth)
+    assert detail.status_code == 200
+    assert detail.json()["owner_type"] == "user"
+    assert detail.json()["user_id"] == user_id
+    pending = client.get("/api/generate/status/pending-device-migration-job", headers=auth)
+    assert pending.status_code == 200
+    gallery = client.get("/api/artwork/gallery", headers=auth)
+    assert gallery.status_code == 200
+    assert gallery.json()["total"] == 1
+
+    with session_factory() as session:
+        claim = session.get(DeviceClaim, old_device_id)
+        assert claim is not None
+        assert claim.claimed_by_user_id == user_id
+        assert session.query(CreditGrant).filter(CreditGrant.owner_type == "device", CreditGrant.owner_id == old_device_id).count() == 0
+        assert session.query(MembershipGrant).filter(MembershipGrant.owner_type == "device", MembershipGrant.owner_id == old_device_id).count() == 0
+        migrated_artwork = session.get(Artwork, artwork_id)
+        assert migrated_artwork is not None
+        assert migrated_artwork.owner_type == "user"
+        assert migrated_artwork.owner_id == user_id
+        migrated_job = session.get(GenerationJob, "pending-device-migration-job")
+        assert migrated_job is not None
+        assert migrated_job.owner_type == "user"
+        assert migrated_job.owner_id == user_id
+        assert session.get(CDK, "MIGRATEPOINTSABC").redeemed_owner_type == "user"
+        assert session.get(CDK, "MIGRATEPOINTSABC").redeemed_by == user_id
+
+    retired = client.get("/api/wallet/profile", headers=old_headers)
+    assert retired.status_code == 200
+    assert retired.json()["owner_type"] == "device"
+    assert retired.json()["device_id"] != old_device_id
+    assert retired.json()["ai_points_balance"] == 0
+    assert client.get(f"/api/artwork/{artwork_id}", headers=old_headers).status_code == 404
+
+
+def test_device_migration_is_idempotent_and_blocks_second_account(api_client) -> None:
+    client, session_factory = api_client
+    wallet = client.get("/api/wallet/profile")
+    old_token = wallet.json()["device_token"]
+    old_device_id = wallet.json()["device_id"]
+    old_headers = {"X-PinDou-Device": old_token}
+
+    with session_factory() as session:
+        grant_points(
+            session,
+            owner_type="device",
+            owner_id=old_device_id,
+            amount=300,
+            kind="paid",
+            source_type="test",
+            source_id="first_claim",
+        )
+        session.commit()
+
+    first = client.post("/api/user/login", json={"code": "claim-owner", "nickname": "Owner"}, headers=old_headers)
+    assert first.status_code == 200
+    first_payload = first.json()
+    first_user_id = first_payload["user"]["user_id"]
+    assert first_payload["device_migration"]["status"] == "migrated"
+    assert first_payload["user"]["ai_points_balance"] == 300 + 188
+
+    repeated = client.post("/api/user/login", json={"code": "claim-owner", "nickname": "Owner"}, headers=old_headers)
+    assert repeated.status_code == 200
+    assert repeated.json()["device_migration"]["status"] == "already_claimed_by_user"
+    assert repeated.json()["user"]["ai_points_balance"] == 300 + 188
+
+    with session_factory() as session:
+        grant_points(
+            session,
+            owner_type="device",
+            owner_id=old_device_id,
+            amount=1000,
+            kind="paid",
+            source_type="test",
+            source_id="stale_claimed_device",
+        )
+        session.commit()
+
+    second = client.post("/api/user/login", json={"code": "second-owner", "nickname": "Second"}, headers=old_headers)
+    assert second.status_code == 200
+    second_payload = second.json()
+    assert second_payload["user"]["user_id"] != first_user_id
+    assert second_payload["device_migration"]["status"] == "claimed_by_other"
+    assert second_payload["device_migration"]["claimed_by_user_id"] == first_user_id
+    assert second_payload["user"]["ai_points_balance"] == 188
+
+    with session_factory() as session:
+        stale_balance = get_credit_balance(session, owner_type="device", owner_id=old_device_id)
+        assert stale_balance.available == 1000
+        claim = session.get(DeviceClaim, old_device_id)
+        assert claim is not None
+        assert claim.claimed_by_user_id == first_user_id
