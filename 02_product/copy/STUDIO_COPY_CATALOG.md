@@ -1407,7 +1407,7 @@
 | eab90bb178 | 当前 {v0} 积分，正在同步本次所需积分。 | Balance: {v0} credits. Checking the cost of this generation. |
 | a62b070054 | 当前 {v0} 积分，本次需要 {v1}，还差 {v2} 积分。 | Balance: {v0} credits. This needs {v1}; you need {v2} more. |
 | e8fdb1124f | 普通额度用完啦，开通时间卡后普通图纸不限次。 | Your standard allowance is used up. A pass unlocks unlimited standard patterns. |
-| 201b78553f | AI 生成按积分扣费，普通模式可用时间卡解锁不限次。 | AI uses credits. A pass unlocks unlimited standard generation. |
+| 201b78553f | AI 生成按积分扣费，普通模式免费不限次。 | AI uses credits. Standard generation is free and unlimited. |
 | 947dc7fdd2 | 权益已到账 | Your allowance is ready |
 | 0d42c38abb | +{v0} 积分已到账 | {v0} credits added |
 | 63c402a9fc | ，赠 {v0} 积分已到账 | , including {v0} bonus credits |
@@ -1441,7 +1441,7 @@
 | e09555c652 | 支付成功后自动到账。 | Your allowance is added after successful payment. |
 | 42ae141886 | 查看计费说明 | How billing works |
 | eabbe3a148 | AI 按 | AI costs |
-| 706479a7e8 | 积分/张计费，成功才扣；时间卡只解锁普通模式不限次，赠送积分可用于 AI。 | credits per pattern, charged on success. Passes unlock unlimited standard patterns; bonus credits can be used for AI. |
+| 706479a7e8 | 积分/张计费，成功才扣；普通模式免费不限次。 | credits per pattern, charged on success. Standard generation is free and unlimited. |
 | 04ad726f66 | 生成成功才扣，失败不扣。 | Charged on success. Failed generations are not charged. |
 | 25e74dceac | 当前 | Balance |
 | d0c3e8f8d5 | 积分 · 可生成 AI | credits · AI patterns available |
@@ -1460,9 +1460,9 @@
 | 55fa8292fb | 有兑换码？ | Have a code? |
 | 5f734c32b7 | 输入 CDK 兑换码 | Enter CDK redemption code |
 | 25940ac897 | AI 积分还差一点 | More AI credits needed |
-| 91b6dd66bc | 普通生成权益不足 | Standard allowance needed |
+| 91b6dd66bc | 普通生成稍后再试 | Try standard generation again shortly |
 | bbeebfa249 | AI 模式需要可用积分。你可以兑换 CDK、注册领取免费额度，或充值后继续生成。 | AI requires available credits. Redeem a CDK, sign up for a welcome allowance, or buy credits to continue. |
-| 5119b50f1a | 普通模式需要时间卡或普通额度。你可以兑换 CDK、注册领取免费额度，或开通时间卡。 | Standard generation requires a pass or available uses. Redeem a CDK, sign up for a welcome allowance, or activate a pass. |
+| 5119b50f1a | 普通模式免费不限次，请稍后再试。 | Standard generation is free and unlimited. Please try again in a moment. |
 | 3d02b40bad | 充值积分 | Get AI credits |
 | 1cadea35a6 | 开通时间卡 | Get a pass |
 | b9b46e1144 | 关闭额度引导 | Close allowance options |
@@ -1663,14 +1663,14 @@
 | 01f16d30a0 | Pindou Puppy 结果页预览 | Pindou Puppy result preview |
 | fd233dfd58 | 教程小节 | Tutorial sections |
 | 2eaed05412 | 普通 vs AI | Standard vs AI |
-| a14c799d9d | 积分会员 | Credits and passes |
+| a14c799d9d | 积分与 CDK | Credits and CDKs |
 | 4b6cea87bf | 怎么生成图纸 | How to make a pattern |
 | 26efcd088b | 上传、选择、生成、编辑、下载，五步就能拿到可照着摆的图纸。 | Upload, choose, generate, edit and download: five steps to a pattern you can bead from. |
 | e32b9acfeb | 普通 vs AI 怎么选 | Choosing standard or AI |
 | d30bff5e4b | 不需要纠结参数。看原图类型，选对模式就行。 | Start with your source image and choose the mode that suits it. |
 | 5c5bcb0931 | Pindou Puppy 模式和尺寸选择 | Pindou Puppy mode and size settings |
 | 807918f91b | Pindou Puppy 生成进度 | Pindou Puppy generation progress |
-| d7cefc27ac | 积分 / 会员 / CDK 怎么用 | Using credits, passes and CDKs |
+| d7cefc27ac | 积分 / CDK 怎么用 | Using credits and CDKs |
 | 3dbec82003 | 一句话：AI 用积分，普通模式免费不限次，CDK 可直接兑换到账户或设备。 | In short: AI uses points, standard generation is free and unlimited, and CDKs can be redeemed to your account or device. |
 | dceac6b0b5 | 避坑 / FAQ | Tips and FAQ |
 | 1bc74a21ab | 先把容易翻车的点记住，后面就省很多豆。 | A few things to check before you start beading. |
@@ -1794,7 +1794,7 @@
 | 6141f14166 | 将替换 {v0} 格，撤销时会一次全部恢复。 | This replaces {v0} cells. Undo restores them together. |
 | 5dfad5abca | {v0} 格 | {v0} cells |
 | 5b197d238e | AI 积分不足 | Not enough AI credits |
-| 99cf553562 | AI 按 {v0} 积分/张计费，成功才扣；时间卡只解锁普通模式不限次，赠送积分可用于 AI。 | AI costs {v0} credits per successful pattern. A tool pass unlocks unlimited Standard generation; its bonus credits can be used for AI. |
+| 99cf553562 | AI 按 {v0} 积分/张计费，成功才扣；普通模式免费不限次。 | AI costs {v0} credits per successful pattern. Standard generation is free and unlimited. |
 | c3a737b344 | 当前 {v0} 积分 · 可生成 AI {v1} 张 | {v0} credits · {v1} AI patterns available |
 | d70b675a07 | 点击编辑图纸，即可修改配色。 | Open the editor to change colours. |
 | d6241eb215 | {v0} · {v1} 颗豆 · {v2} 色 | {v0} · {v1} beads · {v2} colours |

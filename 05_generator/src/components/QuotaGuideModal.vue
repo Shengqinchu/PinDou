@@ -21,16 +21,16 @@ const emit = defineEmits<{
 }>();
 
 const isAi = computed(() => props.kind === 'ai');
-const title = computed(() => isAi.value ? 'AI 积分还差一点' : '普通生成权益不足');
+const title = computed(() => isAi.value ? 'AI 积分还差一点' : '普通生成稍后再试');
 const lead = computed(() => {
   if (props.message) {
     return props.message;
   }
   return isAi.value
     ? 'AI 模式需要可用积分。你可以兑换 CDK、注册领取免费额度，或充值后继续生成。'
-    : '普通模式需要时间卡或普通额度。你可以兑换 CDK、注册领取免费额度，或开通时间卡。';
+    : '普通模式免费不限次，请稍后再试。';
 });
-const rechargeLabel = computed(() => isAi.value ? '充值积分' : '开通时间卡');
+const rechargeLabel = computed(() => '充值积分');
 </script>
 
 <template>

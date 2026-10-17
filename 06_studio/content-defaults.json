@@ -3633,8 +3633,8 @@
       "Your standard allowance is used up. A pass unlocks unlimited standard patterns."
     ],
     "201b78553f": [
-      "AI 生成按积分扣费，普通模式可用时间卡解锁不限次。",
-      "AI uses credits. A pass unlocks unlimited standard generation."
+      "AI 生成按积分扣费，普通模式免费不限次。",
+      "AI uses credits. Standard generation is free and unlimited."
     ],
     "947dc7fdd2": [
       "权益已到账",
@@ -3769,8 +3769,8 @@
       "AI costs"
     ],
     "706479a7e8": [
-      "积分/张计费，成功才扣；时间卡只解锁普通模式不限次，赠送积分可用于 AI。",
-      "credits per pattern, charged on success. Passes unlock unlimited standard patterns; bonus credits can be used for AI."
+      "积分/张计费，成功才扣；普通模式免费不限次。",
+      "credits per pattern, charged on success. Standard generation is free and unlimited."
     ],
     "04ad726f66": [
       "生成成功才扣，失败不扣。",
@@ -3845,16 +3845,16 @@
       "More AI credits needed"
     ],
     "91b6dd66bc": [
-      "普通生成权益不足",
-      "Standard allowance needed"
+      "普通生成稍后再试",
+      "Try standard generation again shortly"
     ],
     "bbeebfa249": [
       "AI 模式需要可用积分。你可以兑换 CDK、注册领取免费额度，或充值后继续生成。",
       "AI requires available credits. Redeem a CDK, sign up for a welcome allowance, or buy credits to continue."
     ],
     "5119b50f1a": [
-      "普通模式需要时间卡或普通额度。你可以兑换 CDK、注册领取免费额度，或开通时间卡。",
-      "Standard generation requires a pass or available uses. Redeem a CDK, sign up for a welcome allowance, or activate a pass."
+      "普通模式免费不限次，请稍后再试。",
+      "Standard generation is free and unlimited. Please try again in a moment."
     ],
     "3d02b40bad": [
       "充值积分",
@@ -4657,8 +4657,8 @@
       "Standard vs AI"
     ],
     "a14c799d9d": [
-      "积分会员",
-      "Credits and passes"
+      "积分与 CDK",
+      "Credits and CDKs"
     ],
     "4b6cea87bf": [
       "怎么生成图纸",
@@ -4685,8 +4685,8 @@
       "Pindou Puppy generation progress"
     ],
     "d7cefc27ac": [
-      "积分 / 会员 / CDK 怎么用",
-      "Using credits, passes and CDKs"
+      "积分 / CDK 怎么用",
+      "Using credits and CDKs"
     ],
     "3dbec82003": [
       "一句话：AI 用积分，普通模式免费不限次，CDK 可直接兑换到账户或设备。",
@@ -5181,8 +5181,8 @@
       "Not enough AI credits"
     ],
     "99cf553562": [
-      "AI 按 {v0} 积分/张计费，成功才扣；时间卡只解锁普通模式不限次，赠送积分可用于 AI。",
-      "AI costs {v0} credits per successful pattern. A tool pass unlocks unlimited Standard generation; its bonus credits can be used for AI."
+      "AI 按 {v0} 积分/张计费，成功才扣；普通模式免费不限次。",
+      "AI costs {v0} credits per successful pattern. Standard generation is free and unlimited."
     ],
     "c3a737b344": [
       "当前 {v0} 积分 · 可生成 AI {v1} 张",

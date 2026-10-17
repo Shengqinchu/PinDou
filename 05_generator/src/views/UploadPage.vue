@@ -86,7 +86,7 @@ const membershipActive = computed(() => {
   return Number.isFinite(expiresAt) && expiresAt > Date.now();
 });
 const aiModeCostText = computed(() => aiCost.value ? `${formatInteger(aiCost.value)} 积分/张` : '积分同步中');
-const normalModeCostText = computed(() => '消耗 1 次 · 会员期内无限');
+const normalModeCostText = computed(() => '免费');
 const aiCtaCostText = computed(() => aiCost.value ? `消耗 ${formatInteger(aiCost.value)} 积分` : '积分同步中');
 const normalCtaCostText = computed(() => '免费');
 const customSizeDraft = computed(() => ({

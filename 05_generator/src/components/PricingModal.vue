@@ -50,7 +50,8 @@ const SKU_DISPLAY_ORDER: Partial<Record<PaymentSkuId, number>> = {
 const PAYMENT_QR_TTL_MS = 5 * 60 * 1000;
 
 const auth = useAuthStore();
-const activePanel = ref<PaymentSkuCategory>(props.initialPanel);
+// Time cards are off sale since 2026-10-17; only AI credits can be bought.
+const activePanel = ref<PaymentSkuCategory>('points');
 const catalog = ref<PaymentSkuCatalog | null>(null);
 const loadingSkus = ref(false);
 const skuError = ref('');
@@ -80,27 +81,7 @@ const isUnlimitedAccount = computed(() => Boolean(user.value?.is_unlimited_accou
 const aiCost = computed(() => Number(catalog.value?.ai_generation_cost_points || user.value?.ai_generation_cost_points || 0));
 const aiCostLabel = computed(() => aiCost.value > 0 ? `${aiCost.value}` : '…');
 const aiBalance = computed(() => Number(user.value?.ai_points_balance ?? user.value?.paid_credits ?? 0));
-const normalTrialRemaining = computed(() => Number(user.value?.normal_trial_remaining ?? user.value?.free_credits_remaining ?? 0));
-const membershipExpiresAt = computed(() => user.value?.membership_expires_at || user.value?.monthly_card_expires_at || null);
-const membershipActive = computed(() => {
-  if (!membershipExpiresAt.value) {
-    return false;
-  }
-  const expiresAt = Date.parse(membershipExpiresAt.value);
-  return Number.isFinite(expiresAt) && expiresAt > Date.now();
-});
-const membershipLabel = computed(() => {
-  if (!isLoggedIn.value) {
-    return '未登录';
-  }
-  if (isUnlimitedAccount.value) {
-    return '普通不限';
-  }
-  if (membershipActive.value && membershipExpiresAt.value) {
-    return `会员至 ${formatMonthDay(membershipExpiresAt.value)}`;
-  }
-  return `普通剩余 ${normalTrialRemaining.value} 次`;
-});
+const membershipLabel = computed(() => '普通模式免费不限次');
 const aiGenerations = computed(() => {
   if (isUnlimitedAccount.value) {
     return '不限';
@@ -126,10 +107,7 @@ const reasonText = computed(() => {
     }
     return `当前 ${aiBalance.value} 积分，本次需要 ${aiCost.value}，还差 ${aiShortfall.value} 积分。`;
   }
-  if (props.reason === 'script-low') {
-    return '普通额度用完啦，开通时间卡后普通图纸不限次。';
-  }
-  return 'AI 生成按积分扣费，普通模式可用时间卡解锁不限次。';
+  return 'AI 生成按积分扣费，普通模式免费不限次。';
 });
 const orderRef = computed(() => currentOrder.value?.order_no || currentOrder.value?.order_id || '');
 const qrUrl = computed(() => normalizeQrUrl(currentOrder.value?.qr_code_url || ''));
@@ -156,7 +134,7 @@ watch(
   () => props.open,
   (open) => {
     if (open) {
-      activePanel.value = props.initialPanel;
+      activePanel.value = 'points';
       resetPaymentState();
       cdkExpanded.value = props.focusCdk;
       void loadSkus().then(() => {
@@ -171,14 +149,6 @@ watch(
     }
   },
   { immediate: true }
-);
-
-watch(
-  () => props.initialPanel,
-  (panel) => {
-    activePanel.value = panel;
-    selectRecommendedSku();
-  }
 );
 
 watch(
@@ -222,14 +192,6 @@ function close(): void {
   emit('close');
 }
 
-function selectPanel(panel: PaymentSkuCategory): void {
-  if (activePanel.value === panel) {
-    return;
-  }
-  activePanel.value = panel;
-  resetPaymentState();
-  selectRecommendedSku();
-}
 
 function selectRecommendedSku(): void {
   if (!catalog.value || currentOrder.value) {
@@ -490,14 +452,6 @@ function formatPrice(value: string): string {
   return `CNY ${numeric.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1')}`;
 }
 
-function formatMonthDay(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return `${date.getMonth() + 1}/${date.getDate()}`;
-}
-
 function formatDuration(milliseconds: number): string {
   const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
   const minutes = Math.floor(totalSeconds / 60);
@@ -548,7 +502,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
               <span>{{ gt("支付成功后自动到账。") }}</span>
               <details class="pricing-info">
                 <summary :aria-label='gt("查看计费说明")'>ⓘ</summary>
-                <p>{{ gt(`AI 按 ${aiCostLabel} 积分/张计费，成功才扣；时间卡只解锁普通模式不限次，赠送积分可用于 AI。`) }}</p>
+                <p>{{ gt(`AI 按 ${aiCostLabel} 积分/张计费，成功才扣；普通模式免费不限次。`) }}</p>
               </details>
             </div>
             <p v-if="props.reason !== 'manual'" class="pricing-context">{{ gt(reasonText) }}{{ gt("生成成功才扣，失败不扣。") }}</p>
@@ -557,18 +511,6 @@ function readErrorMessage(error: unknown, fallback: string): string {
             <p v-if="!isLoggedIn" class="pricing-guest-note">{{ gt("CDK 可直接兑换到本设备；充值请先登录/注册，避免换设备后余额丢失。") }}</p>
           </header>
 
-          <nav v-if="paymentView === 'catalog'" class="pricing-tabs" :aria-label='gt("充值类型")'>
-            <button
-              type="button"
-              :class="{ 'pricing-tab--active': activePanel === 'points' }"
-              @click="selectPanel('points')"
-            >{{ gt("AI 积分") }}</button>
-            <button
-              type="button"
-              :class="{ 'pricing-tab--active': activePanel === 'membership' }"
-              @click="selectPanel('membership')"
-            >{{ gt("时间卡会员") }}</button>
-          </nav>
 
           <div v-if="paymentView === 'catalog' && skuError" class="pricing-alert pricing-alert--error">{{ gt(skuError) }}</div>
           <div v-else-if="paymentView === 'catalog' && loadingSkus" class="pricing-loading">{{ gt("正在加载套餐…") }}</div>

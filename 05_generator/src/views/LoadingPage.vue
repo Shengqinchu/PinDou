@@ -208,7 +208,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function openQuotaRedeem(): void {
   quotaGuideOpen.value = false;
-  pricingPanel.value = quotaKind.value === 'script' ? 'membership' : 'points';
+  pricingPanel.value = 'points';
   pricingReason.value = quotaKind.value === 'script' ? 'script-low' : 'ai-low';
   pricingFocusCdk.value = true;
   pricingOpen.value = true;
@@ -221,7 +221,7 @@ async function openQuotaRegister(): Promise<void> {
 
 function openQuotaRecharge(): void {
   quotaGuideOpen.value = false;
-  pricingPanel.value = quotaKind.value === 'script' ? 'membership' : 'points';
+  pricingPanel.value = 'points';
   pricingReason.value = quotaKind.value === 'script' ? 'script-low' : 'ai-low';
   pricingFocusCdk.value = false;
   pricingOpen.value = true;

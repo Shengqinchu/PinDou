@@ -27,6 +27,7 @@ from pindou.services.hupijiao_service import sign_params
 from pindou.services.cdk_service import CDKService
 from pindou.services.credit_service import AI_GENERATION_POINT_COST, get_credit_balance, grant_points
 from pindou.services.storage_util import get_storage_backend
+from pindou.api import payment as payment_api
 
 
 @pytest.fixture()
@@ -1031,11 +1032,8 @@ def test_payment_and_admin_read_only_flow(api_client) -> None:
         "points_standard_990",
         "points_value_2990",
     ]
-    assert [item["sku"] for item in sku_payload["items"] if item["category"] == "membership"] == [
-        "membership_week_990",
-        "membership_month_1990",
-        "membership_season_4990",
-    ]
+    # Time cards are off sale; they must not be listed.
+    assert [item["sku"] for item in sku_payload["items"] if item["category"] == "membership"] == []
     assert all(item["sku"] not in {"single_9.9", "monthly_28", "custom_99"} for item in sku_payload["items"])
 
     order = client.post("/api/payment/order/create", json={"sku_id": "single_9.9"}, headers=headers)
@@ -1383,7 +1381,9 @@ def test_admin_cdk_batch_generation_and_csv_export(api_client) -> None:
     assert {row["sales_channel"] for row in rows} == {"xhs"}
 
 
-def test_hupijiao_webhook_marks_order_paid_and_grants_monthly_card(api_client) -> None:
+def test_hupijiao_webhook_marks_order_paid_and_grants_monthly_card(api_client, monkeypatch) -> None:
+    # Orders placed before the time-card sale ended must still be fulfilled.
+    monkeypatch.setitem(payment_api.SKU_CATALOG["membership_month_1990"], "active", True)
     client, session_factory = api_client
     headers = auth_headers(client)
     order = client.post("/api/payment/order/create", json={"sku_id": "monthly_28"}, headers=headers)
@@ -1468,7 +1468,18 @@ def test_hupijiao_webhook_grants_points_pack_idempotently(api_client) -> None:
         assert balance.paid == 200
 
 
-def test_hupijiao_webhook_rejects_missing_amount(api_client) -> None:
+def test_time_card_orders_are_off_sale(api_client) -> None:
+    client, _ = api_client
+    headers = auth_headers(client)
+    for sku in ("membership_week_990", "membership_month_1990", "membership_season_4990", "monthly_card"):
+        order = client.post("/api/payment/order/create", json={"sku_id": sku}, headers=headers)
+        assert order.status_code == 422
+    assert client.post("/api/payment/order/create", json={"sku_id": "points_standard_990"}, headers=headers).status_code == 200
+
+
+def test_hupijiao_webhook_rejects_missing_amount(api_client, monkeypatch) -> None:
+    # Orders placed before the time-card sale ended must still be fulfilled.
+    monkeypatch.setitem(payment_api.SKU_CATALOG["membership_month_1990"], "active", True)
     client, session_factory = api_client
     headers = auth_headers(client)
     order = client.post("/api/payment/order/create", json={"sku_id": "monthly_28"}, headers=headers)

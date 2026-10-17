@@ -69,12 +69,6 @@ const walletItems = computed(()=>[
     alt: 'Pindou Puppy 充值中心截图'
   },
   {
-    title: '时间卡会员',
-    text: '时间卡解锁普通模式不限次，并随卡赠送积分；AI 仍按积分扣。',
-    image: pricingImage.value,
-    alt: 'Pindou Puppy 时间卡会员截图'
-  },
-  {
     title: 'CDK 兑换',
     text: '有兑换码时可以直接兑换。游客也能把 CDK 兑到当前设备钱包。',
     image: cdkImage.value,
@@ -113,7 +107,7 @@ const walletItems = computed(()=>[
     <nav class="tutorial-anchor-nav" :aria-label='gt("教程小节")'>
       <a href="#generate">{{ gt("生成图纸") }}</a>
       <a href="#mode">{{ gt("普通 vs AI") }}</a>
-      <a href="#wallet">{{ gt("积分会员") }}</a>
+      <a href="#wallet">{{ gt("积分与 CDK") }}</a>
       <a href="#faq">FAQ</a>
     </nav>
 
@@ -165,7 +159,7 @@ const walletItems = computed(()=>[
     <section id="wallet" class="tutorial-section">
       <div class="tutorial-section__heading">
         <span class="tutorial-kicker">03</span>
-        <LiftTitle as="h2" :text="gt('积分 / 会员 / CDK 怎么用')"/>
+        <LiftTitle as="h2" :text="gt('积分 / CDK 怎么用')"/>
         <p>{{ gt("一句话：AI 用积分，普通模式免费不限次，CDK 可直接兑换到账户或设备。") }}</p>
       </div>
 

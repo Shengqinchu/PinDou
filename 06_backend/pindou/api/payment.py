@@ -43,6 +43,9 @@ logger = logging.getLogger(__name__)
 
 DEV_MOCK_WEBHOOK_SECRET = "pindou-dev-hupijiao-mock-secret"
 
+# Time cards are off sale since 2026-10-17 (standard generation is free); existing holders and CDKs still work.
+MEMBERSHIP_ON_SALE = False
+
 SKU_CATALOG: dict[str, dict[str, Any]] = {
     **{
         sku: {
@@ -63,7 +66,7 @@ SKU_CATALOG: dict[str, dict[str, Any]] = {
             "entitlement": "membership",
             "days": int(item["days"]),
             "gift_points": int(item["gift_points"]),
-            "active": True,
+            "active": MEMBERSHIP_ON_SALE,
             "badge": item.get("badge"),
             "subtitle": item.get("subtitle"),
         }
