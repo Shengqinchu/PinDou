@@ -285,18 +285,16 @@ async function submitCdk(): Promise<void> {
     cdkError.value = '请输入兑换码。';
     return;
   }
-  if (!isLoggedIn.value) {
-    cdkError.value = '请先登录/注册后兑换，余额会绑定到你的账号。';
-    return;
-  }
   cdkBusy.value = true;
   try {
-    const result = await redeemCdk(code);
-    await refreshProfileAfterPayment();
+    const result = await redeemCdk(code, { auth: isLoggedIn.value });
+    if (isLoggedIn.value) {
+      await refreshProfileAfterPayment();
+    }
     cdkCode.value = '';
     cdkMessage.value = result.cdk_type === 'membership' || result.cdk_type === 'monthly_card'
-      ? '时间卡兑换成功，会员权益已刷新。'
-      : '积分兑换成功，余额已刷新。';
+      ? (isLoggedIn.value ? '时间卡兑换成功，会员权益已刷新。' : '时间卡已兑换到本设备。')
+      : (isLoggedIn.value ? '积分兑换成功，余额已刷新。' : '积分已兑换到本设备。');
     emit('success');
   } catch (error) {
     cdkError.value = readErrorMessage(error, '兑换失败，请检查兑换码。');
@@ -553,7 +551,7 @@ function readErrorMessage(error: unknown, fallback: string): string {
             <p v-if="isLoggedIn && !isUnlimitedAccount" class="pricing-wallet-line">
               当前 {{ aiBalance }} 积分 · 可生成 AI {{ aiGenerations }}{{ aiGenerationsUnit }} · {{ membershipLabel }}
             </p>
-            <p v-if="!isLoggedIn" class="pricing-guest-note">未登录状态暂按 0 余额展示。购买或兑换前请先登录/注册，避免换设备后余额丢失。</p>
+            <p v-if="!isLoggedIn" class="pricing-guest-note">CDK 可直接兑换到本设备；充值请先登录/注册，避免换设备后余额丢失。</p>
           </header>
 
           <nav v-if="paymentView === 'catalog'" class="pricing-tabs" aria-label="充值类型">

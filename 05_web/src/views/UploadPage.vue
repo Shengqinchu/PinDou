@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { getSkus } from '../api';
-import { hasToken } from '../auth/tokenStorage';
-import AuthPanel from '../components/AuthPanel.vue';
-import PricingModal from '../components/PricingModal.vue';
-import type { PaymentSkuCategory } from '../api/types';
-import { useAuthStore } from '../stores/auth';
+import { getSkus, getWalletProfile } from '../api';
+import type { User } from '../api/types';
 import {
   GENERATION_MODE_DETAILS,
   GENERATION_MODE_OPTIONS,
@@ -21,12 +17,13 @@ import {
   type GenerationStylePreset,
   type ResultSizePreset
 } from '../stores/generation';
+import { useAuthStore } from '../stores/auth';
 
 type TooltipKey = 'mode' | 'size';
 
 const router = useRouter();
-const auth = useAuthStore();
 const generation = useGenerationStore();
+const auth = useAuthStore();
 const galleryInput = ref<HTMLInputElement | null>(null);
 const cameraInput = ref<HTMLInputElement | null>(null);
 const customWidthField = ref<HTMLInputElement | null>(null);
@@ -39,12 +36,9 @@ const customWidthInput = ref('120');
 const customHeightInput = ref('120');
 const activeTooltip = ref<TooltipKey | null>(null);
 const isConfirmOpen = ref(false);
-const isAuthModalOpen = ref(false);
-const isPricingOpen = ref(false);
-const pricingPanel = ref<PaymentSkuCategory>('points');
-const pricingReason = ref<'manual' | 'ai-low' | 'script-low'>('manual');
-const skuAiCost = ref(0);
 const isCustomSizeSelected = ref(false);
+const walletProfile = ref<User | null>(null);
+const skuAiCost = ref(0);
 const CUSTOM_MIN_SIZE = 1;
 const CUSTOM_MAX_SIZE = 200;
 
@@ -73,18 +67,24 @@ const generationVerb = computed(() => GENERATION_MODE_DETAILS[generation.generat
 const selectedSizeLabel = computed(() => resultSizeLabel(generation.selectedSize));
 const selectedStyleLabel = computed(() => STYLE_OPTION_DETAILS[generation.selectedStyle].label);
 const isAiMode = computed(() => generation.generationMode === 'ai');
-const isUnlimitedAccount = computed(() => Boolean(auth.user?.is_unlimited_account));
-const aiCost = computed(() => Number(auth.user?.ai_generation_cost_points || skuAiCost.value || 0));
-const aiPoints = computed(() => Number(auth.user?.ai_points_balance ?? auth.user?.paid_credits ?? 0));
-const normalTrialRemaining = computed(() => Number(auth.user?.normal_trial_remaining ?? auth.user?.free_credits_remaining ?? 0));
-const membershipExpiresAt = computed(() => auth.user?.membership_expires_at || auth.user?.monthly_card_expires_at || null);
+const walletUser = computed(() => auth.user || walletProfile.value);
+const isUnlimitedAccount = computed(() => Boolean(walletUser.value?.is_unlimited_account));
+const aiCost = computed(() => Number(walletUser.value?.ai_generation_cost_points || skuAiCost.value || 0));
+const membershipExpiresAt = computed(() => walletUser.value?.membership_expires_at || walletUser.value?.monthly_card_expires_at || null);
 const membershipActive = computed(() => {
+  if (isUnlimitedAccount.value) {
+    return true;
+  }
   if (!membershipExpiresAt.value) {
     return false;
   }
   const expiresAt = Date.parse(membershipExpiresAt.value);
   return Number.isFinite(expiresAt) && expiresAt > Date.now();
 });
+const aiModeCostText = computed(() => aiCost.value ? `${formatInteger(aiCost.value)} 积分/张` : '积分同步中');
+const normalModeCostText = computed(() => '消耗 1 次 · 会员期内无限');
+const aiCtaCostText = computed(() => aiCost.value ? `消耗 ${formatInteger(aiCost.value)} 积分` : '积分同步中');
+const normalCtaCostText = computed(() => membershipActive.value ? '会员免次' : '消耗 1 次');
 const customSizeDraft = computed(() => ({
   width: parseCustomDimension(customWidthInput.value),
   height: parseCustomDimension(customHeightInput.value)
@@ -97,19 +97,54 @@ const hasInvalidCustomSize = computed(() => isCustomSizeActive.value && !isCusto
 const canStartGenerate = computed(() => Boolean(selectedFile.value) && !hasInvalidCustomSize.value);
 const creditSummary = computed(() => {
   if (isAiMode.value) {
-    return aiCost.value ? `AI 模式：本次消耗 ${aiCost.value} 积分` : 'AI 模式：本次消耗 AI 积分';
+    return aiCost.value ? `本次消耗 ${formatInteger(aiCost.value)} 积分，生成成功才扣` : 'AI 积分同步中，生成成功才扣';
   }
-  if (isUnlimitedAccount.value || membershipActive.value) {
-    return '普通模式：会员普通无限';
-  }
-  return `普通模式：消耗 1 次普通额度（剩余 ${normalTrialRemaining.value} 次）`;
+  return membershipActive.value ? '会员期内普通模式免次' : '普通模式消耗 1 次';
 });
 const ctaLabel = computed(() => {
   if (hasInvalidCustomSize.value) {
     return '请输入至少 1 × 1 的格数';
   }
-  return selectedFile.value ? `${generationVerb.value} · ${selectedSizeLabel.value}格 ->` : '选择照片后开始生成';
+  if (!selectedFile.value) {
+    return '选择照片后开始生成';
+  }
+  return `开始生成 · ${isAiMode.value ? aiCtaCostText.value : normalCtaCostText.value}`;
 });
+
+function modeCostLabel(mode: GenerationMode): string {
+  return mode === 'ai' ? aiModeCostText.value : normalModeCostText.value;
+}
+
+async function refreshWalletContext(): Promise<void> {
+  try {
+    if (auth.isLoggedIn) {
+      await auth.refreshProfile();
+      walletProfile.value = null;
+    } else {
+      walletProfile.value = await getWalletProfile();
+    }
+  } catch {
+    if (!auth.isLoggedIn) {
+      walletProfile.value = null;
+    }
+  }
+  if (!aiCost.value) {
+    await refreshSkuCost();
+  }
+}
+
+async function refreshSkuCost(): Promise<void> {
+  try {
+    const catalog = await getSkus();
+    skuAiCost.value = Number(catalog.ai_generation_cost_points || 0);
+  } catch {
+    skuAiCost.value = 0;
+  }
+}
+
+function formatInteger(value: number): string {
+  return new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 0 }).format(Math.max(0, Math.floor(value)));
+}
 
 function openGallery(): void {
   galleryInput.value?.click();
@@ -194,12 +229,8 @@ async function confirmGenerate(): Promise<void> {
     isConfirmOpen.value = false;
     return;
   }
-  if (!hasToken()) {
-    isConfirmOpen.value = false;
-    isAuthModalOpen.value = true;
-    return;
-  }
-  await checkWalletAndContinue();
+  isConfirmOpen.value = false;
+  await continueGenerate();
 }
 
 async function continueGenerate(): Promise<void> {
@@ -214,85 +245,8 @@ async function continueGenerate(): Promise<void> {
   await router.push({ name: 'loading', query: { from: 'upload' } });
 }
 
-async function checkWalletAndContinue(): Promise<void> {
-  if (!await refreshProfileForWallet()) {
-    return;
-  }
-  if (isAiMode.value && !await ensureAiCostReady()) {
-    return;
-  }
-  if (!isUnlimitedAccount.value && isAiMode.value && aiPoints.value < aiCost.value) {
-    isConfirmOpen.value = false;
-    openPricing('points', 'ai-low');
-    return;
-  }
-  if (
-    !isUnlimitedAccount.value &&
-    !isAiMode.value &&
-    !membershipActive.value &&
-    normalTrialRemaining.value <= 0
-  ) {
-    isConfirmOpen.value = false;
-    openPricing('membership', 'script-low');
-    return;
-  }
-  isConfirmOpen.value = false;
-  await continueGenerate();
-}
-
-async function ensureAiCostReady(): Promise<boolean> {
-  if (aiCost.value > 0) {
-    return true;
-  }
-  try {
-    const catalog = await getSkus();
-    skuAiCost.value = Number(catalog.ai_generation_cost_points || 0);
-  } catch (_error) {
-    message.value = 'AI 价格信息暂时加载失败，请稍后再试。';
-    return false;
-  }
-  if (aiCost.value <= 0) {
-    message.value = 'AI 价格信息暂时不可用，请稍后再试。';
-    return false;
-  }
-  return true;
-}
-
-async function refreshProfileForWallet(): Promise<boolean> {
-  try {
-    await auth.refreshProfile();
-    return true;
-  } catch (_error) {
-    message.value = '钱包信息暂时加载失败，请稍后再试。';
-    return false;
-  }
-}
-
 function closeConfirm(): void {
   isConfirmOpen.value = false;
-}
-
-async function handleAuthSuccess(): Promise<void> {
-  isAuthModalOpen.value = false;
-  await checkWalletAndContinue();
-}
-
-function closeAuthModal(): void {
-  isAuthModalOpen.value = false;
-}
-
-function openPricing(panel: PaymentSkuCategory, reason: 'manual' | 'ai-low' | 'script-low'): void {
-  pricingPanel.value = panel;
-  pricingReason.value = reason;
-  isPricingOpen.value = true;
-}
-
-function closePricing(): void {
-  isPricingOpen.value = false;
-}
-
-async function handlePricingSuccess(): Promise<void> {
-  await refreshProfileForWallet();
 }
 
 function chooseMode(mode: GenerationMode): void {
@@ -376,6 +330,10 @@ function hideTooltip(key: TooltipKey): void {
     activeTooltip.value = null;
   }
 }
+
+onMounted(() => {
+  void refreshWalletContext();
+});
 
 onUnmounted(revokePreview);
 </script>
@@ -491,6 +449,7 @@ onUnmounted(revokePreview);
                 {{ GENERATION_MODE_DETAILS[mode].badge }}
               </span>
               <strong>{{ GENERATION_MODE_DETAILS[mode].label }}</strong>
+              <span class="mode-cost">{{ modeCostLabel(mode) }}</span>
             </button>
           </div>
         </section>
@@ -640,20 +599,6 @@ onUnmounted(revokePreview);
       </section>
     </div>
 
-    <div v-if="isAuthModalOpen" class="auth-backdrop" role="presentation" @click.self="closeAuthModal">
-      <section class="auth-modal" role="dialog" aria-modal="true" aria-label="登录或注册后继续生成">
-        <button class="auth-modal__close" type="button" aria-label="关闭登录弹窗" @click="closeAuthModal">×</button>
-        <AuthPanel @success="handleAuthSuccess" />
-      </section>
-    </div>
-
-    <PricingModal
-      :open="isPricingOpen"
-      :initial-panel="pricingPanel"
-      :reason="pricingReason"
-      @close="closePricing"
-      @success="handlePricingSuccess"
-    />
   </section>
 </template>
 
@@ -1040,11 +985,13 @@ onUnmounted(revokePreview);
 
 .mode-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: clamp(70px, 7.8vw, 84px);
+  gap: 7px;
+  min-height: clamp(86px, 8vw, 98px);
   border-radius: 20px;
-  padding: 12px clamp(8px, 1.6vw, 14px);
+  padding: 13px clamp(8px, 1.6vw, 14px) 12px;
 }
 
 .mode-card:hover,
@@ -1058,6 +1005,7 @@ onUnmounted(revokePreview);
 }
 
 .mode-card strong,
+.mode-cost,
 .style-copy,
 .style-pill strong,
 .style-pill em,
@@ -1075,10 +1023,21 @@ onUnmounted(revokePreview);
   justify-content: center;
   padding-right: 0;
   font-family: var(--pd-font-display);
-  font-size: clamp(24px, 2.625vw, 27px);
+  font-size: clamp(22px, 2.4vw, 26px);
   font-weight: 900;
   line-height: 1;
   text-align: center;
+  transform: translateY(3px);
+  white-space: nowrap;
+}
+
+.mode-cost {
+  color: var(--pd-fg-2);
+  font-size: clamp(10px, 1.35vw, 12px);
+  font-weight: 900;
+  line-height: 1.25;
+  text-align: center;
+  transform: translateY(3px);
   white-space: nowrap;
 }
 
@@ -1125,11 +1084,13 @@ onUnmounted(revokePreview);
 }
 
 .style-pill--active em,
+.mode-card--active .mode-cost,
 .size-card--active span {
   color: rgba(255, 255, 255, 0.86);
 }
 
 .style-pill--active:hover em,
+.mode-card--active:hover .mode-cost,
 .size-card--active:hover span {
   color: rgba(255, 255, 255, 0.86);
 }
@@ -1392,13 +1353,13 @@ onUnmounted(revokePreview);
 
 .auth-modal {
   position: relative;
-  width: min(100%, 540px);
+  width: min(100%, 520px);
 }
 
 .auth-modal__close {
   position: absolute;
-  top: clamp(16px, 4vw, 22px);
-  right: clamp(16px, 4vw, 22px);
+  top: 16px;
+  right: 16px;
   z-index: 30;
   width: 38px;
   height: 38px;
@@ -1635,7 +1596,7 @@ onUnmounted(revokePreview);
   }
 
   .mode-card {
-    min-height: 72px;
+    min-height: 82px;
   }
 
   .style-pill em,
@@ -1693,7 +1654,7 @@ onUnmounted(revokePreview);
   }
 
   .mode-card {
-    min-height: 70px;
+    min-height: 80px;
     padding-inline: 6px;
   }
 

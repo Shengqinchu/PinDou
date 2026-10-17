@@ -18,6 +18,7 @@ const isEditorPage = computed(() => route.name === 'editor');
       </a>
       <nav class="app-nav" aria-label="主导航">
         <a class="nav-link nav-link--home" href="/">首页</a>
+        <RouterLink class="nav-link nav-link--tutorial" to="/tutorial">教程</RouterLink>
         <AccountMenu />
       </nav>
     </header>

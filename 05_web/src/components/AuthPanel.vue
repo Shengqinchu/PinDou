@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue';
 
-import { ApiError } from '../api';
+import { ApiError, redeemCdk } from '../api';
 import { useAuthStore } from '../stores/auth';
 
-type AuthMode = 'register' | 'login';
+type AuthMode = 'register' | 'login' | 'cdk';
 type LoginMethod = 'password' | 'code';
 type FeedbackKind = 'info' | 'success' | 'error';
 
@@ -59,6 +59,7 @@ const canLogin = computed(() => {
   }
   return loginPassword.value.length > 0;
 });
+const canRedeemCdk = computed(() => cdk.value.trim().length >= 4 && !submitting.value);
 const sendButtonText = computed(() => {
   if (sending.value) {
     return '发送中';
@@ -178,6 +179,31 @@ async function handleLogin(): Promise<void> {
   }
 }
 
+async function handleCdkDirect(): Promise<void> {
+  const code = cdk.value.trim();
+  if (!code) {
+    showMessage('请输入 CDK 兑换码。', 'error');
+    return;
+  }
+
+  submitting.value = true;
+  showMessage('', 'info');
+  try {
+    const result = await redeemCdk(code, { auth: false });
+    const message = result.cdk_type === 'membership' || result.cdk_type === 'monthly_card'
+      ? '时间卡已兑换到当前设备，正在继续。'
+      : '积分已兑换到当前设备，正在继续。';
+    cdk.value = '';
+    showMessage(result.message || message, 'success');
+    await wait(360);
+    emit('success');
+  } catch (error) {
+    showMessage(readErrorMessage(error, '兑换失败，请检查兑换码。'), 'error');
+  } finally {
+    submitting.value = false;
+  }
+}
+
 function startCooldown(seconds: number): void {
   cooldown.value = Math.max(1, Math.floor(seconds));
   if (cooldownTimer) {
@@ -232,10 +258,11 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div class="auth-tabs" role="tablist" aria-label="登录注册切换">
+    <div class="auth-tabs" role="tablist" aria-label="登录注册兑换切换">
       <span class="auth-tabs__indicator" :class="`auth-tabs__indicator--${mode}`" aria-hidden="true"></span>
       <button type="button" role="tab" :aria-selected="mode === 'register'" :class="{ 'is-active': mode === 'register' }" @click="switchMode('register')">注册</button>
       <button type="button" role="tab" :aria-selected="mode === 'login'" :class="{ 'is-active': mode === 'login' }" @click="switchMode('login')">登录</button>
+      <button type="button" role="tab" :aria-selected="mode === 'cdk'" :class="{ 'is-active': mode === 'cdk' }" @click="switchMode('cdk')">CDK直用</button>
     </div>
 
     <Transition name="auth-form" mode="out-in">
@@ -287,7 +314,7 @@ onUnmounted(() => {
         <button class="auth-submit" type="submit" :disabled="!canRegister">{{ submitting ? '注册中' : '注册并继续' }}</button>
       </form>
 
-      <form v-else key="login" class="auth-form" @submit.prevent="handleLogin">
+      <form v-else-if="mode === 'login'" key="login" class="auth-form" @submit.prevent="handleLogin">
         <div class="auth-heading">
           <h1>欢迎回来</h1>
           <p>{{ loginMethod === 'code' ? '收取邮箱验证码，临时登录并继续生成。' : '用邮箱和密码登录，继续刚才的生成。' }}</p>
@@ -323,6 +350,27 @@ onUnmounted(() => {
 
         <p v-if="feedback" class="auth-feedback" :class="`auth-feedback--${feedbackKind}`" role="status" aria-live="polite">{{ feedback }}</p>
         <button class="auth-submit" type="submit" :disabled="!canLogin">{{ submitting ? '登录中' : '登录并继续' }}</button>
+      </form>
+
+      <form v-else key="cdk" class="auth-form" @submit.prevent="handleCdkDirect">
+        <div class="auth-heading">
+          <h1>有兑换码就直接用</h1>
+          <p>不用注册也能把 CDK 兑换到当前设备；之后注册会迁移保存。</p>
+        </div>
+
+        <label class="auth-field">
+          <span>CDK 兑换码</span>
+          <input v-model="cdk" type="text" autocomplete="off" placeholder="输入 CDK 兑换码" />
+        </label>
+
+        <div class="auth-cdk-benefits" aria-label="CDK 直用说明">
+          <span>游客可用</span>
+          <span>生成成功才扣</span>
+          <span>注册后可保存</span>
+        </div>
+
+        <p v-if="feedback" class="auth-feedback" :class="`auth-feedback--${feedbackKind}`" role="status" aria-live="polite">{{ feedback }}</p>
+        <button class="auth-submit" type="submit" :disabled="!canRedeemCdk">{{ submitting ? '兑换中' : '兑换并继续' }}</button>
       </form>
     </Transition>
 
@@ -381,7 +429,7 @@ onUnmounted(() => {
 .auth-tabs {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   border: 1px solid rgba(255, 142, 83, 0.18);
   border-radius: 999px;
   background: rgba(255, 241, 232, 0.64);
@@ -391,7 +439,7 @@ onUnmounted(() => {
 .auth-tabs__indicator {
   position: absolute;
   inset: 4px auto 4px 4px;
-  width: calc(50% - 4px);
+  width: calc((100% - 8px) / 3);
   border-radius: 999px;
   background: #fff;
   box-shadow: 0 10px 22px rgba(255, 142, 83, 0.12);
@@ -400,6 +448,10 @@ onUnmounted(() => {
 
 .auth-tabs__indicator--login {
   transform: translateX(100%);
+}
+
+.auth-tabs__indicator--cdk {
+  transform: translateX(200%);
 }
 
 .auth-tabs button,
@@ -420,6 +472,8 @@ onUnmounted(() => {
   border-radius: 999px;
   background: transparent;
   color: var(--pd-fg-2);
+  white-space: nowrap;
+  padding: 0 6px;
 }
 
 .auth-tabs button.is-active {
@@ -562,6 +616,26 @@ onUnmounted(() => {
   color: var(--pd-orange);
 }
 
+.auth-cdk-benefits {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.auth-cdk-benefits span {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 198, 107, 0.45);
+  border-radius: 999px;
+  background: rgba(255, 198, 107, 0.18);
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 0 10px;
+}
+
 .auth-feedback {
   margin: 0;
   border-radius: 14px;
@@ -608,6 +682,11 @@ onUnmounted(() => {
   .auth-card {
     border-radius: 24px;
     padding: 18px;
+  }
+
+  .auth-tabs button {
+    font-size: 13px;
+    padding: 0 4px;
   }
 
   .auth-code-row {

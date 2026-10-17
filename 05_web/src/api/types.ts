@@ -13,6 +13,12 @@ export type PaymentSkuId =
 
 export interface User {
   user_id: string;
+  owner_type?: 'user' | 'device' | string;
+  owner_id?: string | null;
+  device_id?: string | null;
+  device_token?: string | null;
+  device_token_expires_at?: string | null;
+  is_anonymous?: boolean;
   openid?: string | null;
   email?: string | null;
   nickname?: string;
@@ -100,7 +106,9 @@ export interface PreviewResult {
 
 export interface Artwork {
   artwork_id: string;
-  user_id: string;
+  user_id?: string | null;
+  owner_type?: 'user' | 'device' | string;
+  owner_id?: string | null;
   title?: string | null;
   original_path?: string | null;
   original_image_url?: string | null;
@@ -182,6 +190,10 @@ export interface CDKRedeemResult {
   cdk_type?: CDKType;
   value?: number;
   expires_at?: string | null;
+  owner_type?: 'user' | 'device' | string;
+  owner_id?: string | null;
+  is_anonymous?: boolean;
+  device_token?: string | null;
   message?: string;
 }
 

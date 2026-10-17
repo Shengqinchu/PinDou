@@ -32,6 +32,9 @@ export interface EmailCodeResponse {
 export interface AuthResponse {
   token: string;
   user: User;
+  device_token?: string | null;
+  device_id?: string | null;
+  device_migration?: DeviceMigrationResult | null;
 }
 
 export interface RegisterResponse extends AuthResponse {
@@ -41,6 +44,21 @@ export interface RegisterResponse extends AuthResponse {
     value?: number;
     message_cn?: string;
   };
+}
+
+export interface DeviceMigrationResult {
+  status: string;
+  device_id: string;
+  user_id: string;
+  migrated: boolean;
+  moved_points?: number;
+  moved_credit_grants?: number;
+  moved_credit_transactions?: number;
+  moved_memberships?: number;
+  moved_artworks?: number;
+  moved_jobs?: number;
+  moved_cdks?: number;
+  claimed_by_user_id?: string | null;
 }
 
 export function sendEmailCode(email: string): Promise<EmailCodeResponse> {
@@ -84,6 +102,12 @@ export function getProfile(): Promise<User> {
   return apiRequest<User>('/user/profile');
 }
 
+export function getWalletProfile(): Promise<User> {
+  return apiRequest<User>('/wallet/profile', {
+    auth: false
+  });
+}
+
 export function updateProfile(payload: { nickname?: string; avatar_url?: string }): Promise<User> {
   return apiRequest<User>('/user/profile', {
     method: 'PATCH',
@@ -117,9 +141,10 @@ export function getOrder(orderRef: string): Promise<OrderStatusResponse> {
   return apiRequest<OrderStatusResponse>(`/payment/order/${encodeURIComponent(orderRef)}`);
 }
 
-export function redeemCdk(cdk_code: string): Promise<CDKRedeemResult> {
+export function redeemCdk(cdk_code: string, options: { auth?: boolean } = {}): Promise<CDKRedeemResult> {
   return apiRequest<CDKRedeemResult>('/cdk/redeem', {
     method: 'POST',
+    auth: options.auth ?? true,
     body: { cdk_code }
   });
 }

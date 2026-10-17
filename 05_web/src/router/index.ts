@@ -6,10 +6,9 @@ import EditorPage from '../views/EditorPage.vue';
 import LoginPage from '../views/LoginPage.vue';
 import LoadingPage from '../views/LoadingPage.vue';
 import ResultPage from '../views/ResultPage.vue';
+import TutorialPage from '../views/TutorialPage.vue';
 import UploadPage from '../views/UploadPage.vue';
 import WorksPage from '../views/WorksPage.vue';
-
-const protectedRoutes = new Set(['loading', 'result', 'editor', 'works']);
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -26,25 +25,31 @@ export const router = createRouter({
       path: '/loading',
       name: 'loading',
       component: LoadingPage,
-      meta: { title: '生成中', requiresAuth: true }
+      meta: { title: '生成中' }
     },
     {
       path: '/result/:id',
       name: 'result',
       component: ResultPage,
-      meta: { title: '结果', requiresAuth: true }
+      meta: { title: '结果' }
     },
     {
       path: '/editor/:id',
       name: 'editor',
       component: EditorPage,
-      meta: { title: '编辑图纸', requiresAuth: true }
+      meta: { title: '编辑图纸' }
     },
     {
       path: '/works',
       name: 'works',
       component: WorksPage,
-      meta: { title: '作品集', requiresAuth: true }
+      meta: { title: '作品集' }
+    },
+    {
+      path: '/tutorial',
+      name: 'tutorial',
+      component: TutorialPage,
+      meta: { title: '教程' }
     },
     {
       path: '/me',
@@ -56,7 +61,7 @@ export const router = createRouter({
 });
 
 router.beforeEach((to) => {
-  if (to.meta.requiresAuth || protectedRoutes.has(String(to.name))) {
+  if (to.meta.requiresAuth) {
     if (!hasToken()) {
       return {
         path: '/login',

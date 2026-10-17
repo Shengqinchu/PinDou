@@ -2,6 +2,11 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+import { ApiError } from '../api';
+import type { PaymentSkuCategory } from '../api/types';
+import AuthPanel from '../components/AuthPanel.vue';
+import PricingModal from '../components/PricingModal.vue';
+import QuotaGuideModal from '../components/QuotaGuideModal.vue';
 import {
   GENERATION_MODE_DETAILS,
   STYLE_OPTION_DETAILS,
@@ -24,6 +29,14 @@ const progress = ref(8);
 const progressCeiling = ref(92);
 const serverMessage = ref('');
 const error = ref('');
+const quotaGuideOpen = ref(false);
+const quotaKind = ref<'ai' | 'script'>('ai');
+const quotaMessage = ref('');
+const authModalOpen = ref(false);
+const pricingOpen = ref(false);
+const pricingPanel = ref<PaymentSkuCategory>('points');
+const pricingReason = ref<'manual' | 'ai-low' | 'script-low'>('manual');
+const pricingFocusCdk = ref(false);
 let progressTimer: number | undefined;
 
 const aiStages: StageItem[] = [
@@ -76,6 +89,7 @@ async function runGeneration(): Promise<void> {
     return;
   }
 
+  quotaGuideOpen.value = false;
   error.value = '';
   progress.value = generation.generationMode === 'ai' ? 6 : 12;
   progressCeiling.value = generation.generationMode === 'ai' ? 22 : 88;
@@ -93,6 +107,14 @@ async function runGeneration(): Promise<void> {
     }, 380);
   } catch (generateError) {
     stopProgress();
+    if (isQuotaExceeded(generateError)) {
+      quotaKind.value = quotaKindFromError(generateError);
+      quotaMessage.value = generateError instanceof Error ? generateError.message : '';
+      serverMessage.value = '';
+      progress.value = 0;
+      quotaGuideOpen.value = true;
+      return;
+    }
     error.value = generateError instanceof Error ? generateError.message : '图纸生成失败，请重新试一次。';
   }
 }
@@ -159,6 +181,62 @@ function stopProgress(): void {
   }
 }
 
+function isQuotaExceeded(errorValue: unknown): boolean {
+  return errorValue instanceof ApiError && (errorValue.status === 402 || errorValue.code === 'QUOTA_EXCEEDED');
+}
+
+function quotaKindFromError(errorValue: unknown): 'ai' | 'script' {
+  const detail = errorValue instanceof ApiError ? errorValue.detail : null;
+  if (isRecord(detail) && detail.kind === 'script') {
+    return 'script';
+  }
+  return generation.generationMode === 'script' ? 'script' : 'ai';
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function openQuotaRedeem(): void {
+  quotaGuideOpen.value = false;
+  pricingPanel.value = quotaKind.value === 'script' ? 'membership' : 'points';
+  pricingReason.value = quotaKind.value === 'script' ? 'script-low' : 'ai-low';
+  pricingFocusCdk.value = true;
+  pricingOpen.value = true;
+}
+
+function openQuotaRegister(): void {
+  quotaGuideOpen.value = false;
+  authModalOpen.value = true;
+}
+
+function openQuotaRecharge(): void {
+  quotaGuideOpen.value = false;
+  pricingPanel.value = quotaKind.value === 'script' ? 'membership' : 'points';
+  pricingReason.value = quotaKind.value === 'script' ? 'script-low' : 'ai-low';
+  pricingFocusCdk.value = false;
+  pricingOpen.value = true;
+}
+
+function closePricing(): void {
+  pricingOpen.value = false;
+  pricingFocusCdk.value = false;
+}
+
+async function handlePricingSuccess(): Promise<void> {
+  closePricing();
+  await runGeneration();
+}
+
+async function handleAuthSuccess(): Promise<void> {
+  authModalOpen.value = false;
+  await runGeneration();
+}
+
+function closeAuthModal(): void {
+  authModalOpen.value = false;
+}
+
 </script>
 
 <template>
@@ -204,6 +282,32 @@ function stopProgress(): void {
       </div>
     </div>
   </section>
+
+  <QuotaGuideModal
+    :open="quotaGuideOpen"
+    :kind="quotaKind"
+    :message="quotaMessage"
+    @close="quotaGuideOpen = false"
+    @redeem="openQuotaRedeem"
+    @register="openQuotaRegister"
+    @recharge="openQuotaRecharge"
+  />
+
+  <div v-if="authModalOpen" class="loading-auth-backdrop" role="presentation" @click.self="closeAuthModal">
+    <section class="loading-auth-modal" role="dialog" aria-modal="true" aria-label="注册或登录后继续生成">
+      <button class="loading-auth-modal__close" type="button" aria-label="关闭登录弹窗" @click="closeAuthModal">×</button>
+      <AuthPanel @success="handleAuthSuccess" />
+    </section>
+  </div>
+
+  <PricingModal
+    :open="pricingOpen"
+    :initial-panel="pricingPanel"
+    :focus-cdk="pricingFocusCdk"
+    :reason="pricingReason"
+    @close="closePricing"
+    @success="handlePricingSuccess"
+  />
 </template>
 
 <style scoped>
@@ -397,6 +501,53 @@ function stopProgress(): void {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-top: 16px;
+}
+
+.loading-auth-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 88;
+  display: grid;
+  place-items: center;
+  background: rgba(45, 36, 30, 0.34);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  padding: 16px;
+}
+
+.loading-auth-modal {
+  position: relative;
+  width: min(100%, 520px);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.loading-auth-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 30;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 142, 83, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--pd-fg-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: 21px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.loading-auth-modal__close:hover {
+  color: var(--pd-orange);
+  box-shadow: 0 12px 24px rgba(255, 142, 83, 0.16);
 }
 
 .loading-secondary {

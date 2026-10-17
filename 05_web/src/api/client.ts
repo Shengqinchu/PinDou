@@ -1,4 +1,4 @@
-import { getToken } from '../auth/tokenStorage';
+import { getDeviceToken, getToken, setDeviceToken } from '../auth/tokenStorage';
 import { expireAuthSession } from '../router';
 
 export const API_BASE = '/api/v1';
@@ -8,6 +8,7 @@ export interface ApiErrorBody {
   message?: string;
   message_cn?: string;
   detail?: unknown;
+  details?: unknown;
 }
 
 export class ApiError extends Error {
@@ -20,7 +21,7 @@ export class ApiError extends Error {
     this.name = 'ApiError';
     this.status = status;
     this.code = body.error || String(status);
-    this.detail = body.detail;
+    this.detail = body.detail ?? body.details;
   }
 }
 
@@ -37,6 +38,11 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
 
   if (auth && token) {
     requestHeaders.set('Authorization', `Bearer ${token}`);
+  } else {
+    const deviceToken = getDeviceToken();
+    if (deviceToken) {
+      requestHeaders.set('X-PinDou-Device', deviceToken);
+    }
   }
 
   if (body instanceof FormData || body instanceof Blob || body instanceof URLSearchParams) {
@@ -54,8 +60,11 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
   });
 
   if (response.status === 401) {
-    expireAuthSession();
-    throw new ApiError(401, await readErrorBody(response));
+    const errorBody = await readErrorBody(response);
+    if (auth) {
+      expireAuthSession();
+    }
+    throw new ApiError(401, errorBody);
   }
 
   if (!response.ok) {
@@ -66,7 +75,9 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
     return undefined as T;
   }
 
-  return (await response.json()) as T;
+  const payload = await response.json();
+  persistDeviceToken(payload);
+  return payload as T;
 }
 
 async function readErrorBody(response: Response): Promise<ApiErrorBody> {
@@ -74,5 +85,15 @@ async function readErrorBody(response: Response): Promise<ApiErrorBody> {
     return (await response.json()) as ApiErrorBody;
   } catch (_error) {
     return { error: String(response.status), message: response.statusText };
+  }
+}
+
+function persistDeviceToken(payload: unknown): void {
+  if (!payload || typeof payload !== 'object') {
+    return;
+  }
+  const token = (payload as { device_token?: unknown }).device_token;
+  if (typeof token === 'string' && token) {
+    setDeviceToken(token);
   }
 }

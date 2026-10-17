@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
 
-import { generateAiPattern, generateScriptPattern, getGenerationStatus, submitConsent } from '../api';
+import { ApiError, generateAiPattern, generateScriptPattern, getGenerationStatus, submitConsent } from '../api';
 import type { Artwork, GenerationJobResponse, GenerateScriptResponse, PatternSheet, SizePreset, StylePreset } from '../api/types';
+import { hasToken } from '../auth/tokenStorage';
 import styleCartoonIcon from '../assets/brand/style-cartoon.png';
 import stylePetIcon from '../assets/brand/style-pet.png';
 import stylePortraitIcon from '../assets/brand/style-portrait.png';
@@ -91,7 +92,9 @@ export const useGenerationStore = defineStore('generation', {
       this.isGenerating = true;
       this.error = '';
       try {
-        await submitConsent('sensitive');
+        if (hasToken()) {
+          await submitConsent('sensitive');
+        }
         const result = this.generationMode === 'ai'
           ? await this.generateAiWithPolling(onJobUpdate)
           : await generateScriptPattern(this.sourceFile, this.selectedSize as SizePreset);
@@ -209,6 +212,9 @@ function sleep(ms: number): Promise<void> {
 }
 
 function normalizeGenerationError(error: unknown): Error {
+  if (error instanceof ApiError && (error.status === 402 || error.code === 'QUOTA_EXCEEDED')) {
+    return error;
+  }
   const rawMessage = error instanceof Error ? error.message : String(error || '');
   const status = typeof (error as { status?: unknown })?.status === 'number'
     ? (error as { status: number }).status

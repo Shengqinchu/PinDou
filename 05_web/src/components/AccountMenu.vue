@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 
-import { ApiError } from '../api';
+import { ApiError, getWalletProfile } from '../api';
 import PricingModal from './PricingModal.vue';
 import styleCartoonAvatar from '../assets/brand/style-cartoon.png';
 import stylePetAvatar from '../assets/brand/style-pet.png';
@@ -44,19 +44,29 @@ const toastMessage = ref('');
 const saving = ref(false);
 const profileLoading = ref(false);
 const avatarFailed = ref(false);
+const walletProfile = ref<User | null>(null);
 
 let toastTimer: number | undefined;
+let clockTimer: number | undefined;
+const nowTick = ref(Date.now());
+const ONE_MINUTE_MS = 60 * 1000;
+const ONE_HOUR_MS = 60 * ONE_MINUTE_MS;
+const ONE_DAY_MS = 24 * ONE_HOUR_MS;
 
 const isLoggedIn = computed(() => auth.isLoggedIn);
 const user = computed(() => auth.user);
+const walletUser = computed(() => user.value || walletProfile.value);
 const displayName = computed(() => auth.displayName);
 const emailLabel = computed(() => user.value?.email || '邮箱未绑定');
 const avatarSrc = computed(() => avatarFailed.value ? DEFAULT_AVATAR : user.value?.avatar || DEFAULT_AVATAR);
-const isUnlimitedAccount = computed(() => Boolean(user.value?.is_unlimited_account));
-const aiCost = computed(() => Number(user.value?.ai_generation_cost_points || 0));
-const aiPoints = computed(() => Number(user.value?.ai_points_balance ?? user.value?.paid_credits ?? 0));
-const normalTrialRemaining = computed(() => Number(user.value?.normal_trial_remaining ?? user.value?.free_credits_remaining ?? 0));
-const aiPointsLabel = computed(() => isUnlimitedAccount.value ? '不限' : `${aiPoints.value} 分`);
+const walletAvatarSrc = computed(() => isLoggedIn.value ? avatarSrc.value : DEFAULT_AVATAR);
+const walletIdentityName = computed(() => isLoggedIn.value ? displayName.value : '设备钱包');
+const walletIdentityNote = computed(() => isLoggedIn.value ? emailLabel.value : '兑换 CDK 可直接用，注册后永久保存。');
+const isUnlimitedAccount = computed(() => Boolean(walletUser.value?.is_unlimited_account));
+const aiCost = computed(() => Number(walletUser.value?.ai_generation_cost_points || 0));
+const aiPoints = computed(() => Number(walletUser.value?.ai_points_balance ?? walletUser.value?.paid_credits ?? 0));
+const normalTrialRemaining = computed(() => Number(walletUser.value?.normal_trial_remaining ?? walletUser.value?.free_credits_remaining ?? 0));
+const aiPointsLabel = computed(() => isUnlimitedAccount.value ? '不限' : formatInteger(aiPoints.value));
 const aiGenerationsLabel = computed(() => {
   if (isUnlimitedAccount.value) {
     return '不限';
@@ -66,29 +76,104 @@ const aiGenerationsLabel = computed(() => {
   }
   return `${Math.floor(aiPoints.value / aiCost.value)} 张`;
 });
-const membershipExpiresAt = computed(() => user.value?.membership_expires_at || user.value?.monthly_card_expires_at || null);
-const membershipActive = computed(() => {
+const membershipExpiresAt = computed(() => walletUser.value?.membership_expires_at || walletUser.value?.monthly_card_expires_at || null);
+const membershipExpiresTime = computed(() => {
   if (!membershipExpiresAt.value) {
-    return false;
+    return 0;
   }
   const expiresAt = Date.parse(membershipExpiresAt.value);
-  return Number.isFinite(expiresAt) && expiresAt > Date.now();
+  return Number.isFinite(expiresAt) ? expiresAt : 0;
+});
+const membershipRemainingMs = computed(() => Math.max(0, membershipExpiresTime.value - nowTick.value));
+const membershipActive = computed(() => {
+  return membershipExpiresTime.value > nowTick.value;
+});
+const membershipUrgent = computed(() => membershipActive.value && membershipRemainingMs.value < ONE_DAY_MS);
+const membershipRemainingText = computed(() => formatMembershipRemaining(membershipRemainingMs.value));
+const membershipFullLabel = computed(() => {
+  if (!membershipActive.value || !membershipExpiresAt.value) {
+    return '';
+  }
+  return `时间卡会员 · 至 ${formatDateTime(membershipExpiresAt.value)}（${membershipRemainingText.value}）`;
 });
 const normalEntitlementLabel = computed(() => {
   if (isUnlimitedAccount.value) {
     return '不限';
   }
-  if (membershipActive.value && membershipExpiresAt.value) {
-    return `会员至 ${formatMonthDay(membershipExpiresAt.value)}`;
+  if (membershipActive.value) {
+    return membershipRemainingText.value;
   }
-  return `${normalTrialRemaining.value} 次`;
+  if (normalTrialRemaining.value > 0) {
+    return `${normalTrialRemaining.value} 次`;
+  }
+  return '未开通';
+});
+const normalPillLabel = computed(() => {
+  if (isUnlimitedAccount.value) {
+    return '普通 · 不限';
+  }
+  if (membershipActive.value) {
+    return `会员 · ${membershipRemainingText.value}`;
+  }
+  if (normalTrialRemaining.value > 0) {
+    return `普通 · 剩 ${normalTrialRemaining.value} 次`;
+  }
+  return '普通 · 未开通';
+});
+const navNormalLabel = computed(() => {
+  if (isUnlimitedAccount.value) {
+    return '不限';
+  }
+  if (membershipActive.value) {
+    return membershipRemainingText.value;
+  }
+  if (normalTrialRemaining.value > 0) {
+    return `剩 ${normalTrialRemaining.value} 次`;
+  }
+  return '未开通';
+});
+const navNormalShortLabel = computed(() => {
+  if (isUnlimitedAccount.value) {
+    return '不限';
+  }
+  if (membershipActive.value) {
+    return membershipUrgent.value ? membershipRemainingText.value : '会员';
+  }
+  if (normalTrialRemaining.value > 0) {
+    return `${normalTrialRemaining.value}次`;
+  }
+  return '未开通';
+});
+const membershipActionLabel = computed(() => membershipActive.value ? '续费' : '开通时间卡');
+const membershipStatusTone = computed(() => membershipUrgent.value ? 'urgent' : membershipActive.value ? 'active' : 'idle');
+const normalWalletLabel = computed(() => {
+  if (isUnlimitedAccount.value) {
+    return '普通模式不限次';
+  }
+  if (membershipActive.value) {
+    return membershipFullLabel.value;
+  }
+  if (normalTrialRemaining.value > 0) {
+    return `普通模式 · 剩 ${normalTrialRemaining.value} 次`;
+  }
+  return '普通模式 · 未开通';
+});
+const walletHint = computed(() => {
+  if (isLoggedIn.value) {
+    return '账号钱包';
+  }
+  return aiPoints.value > 0 || normalTrialRemaining.value > 0 || membershipActive.value
+    ? '设备余额'
+    : '可兑换 CDK';
 });
 const lowBalanceHint = computed(() => {
   if (isUnlimitedAccount.value || !aiCost.value || aiPoints.value >= aiCost.value) {
     return '';
   }
   const shortfall = Math.max(0, aiCost.value - aiPoints.value);
-  return `差 ${shortfall} 积分，充值后就能继续生成 AI 图纸。`;
+  return isLoggedIn.value
+    ? `差 ${shortfall} 积分，充值后就能继续生成 AI 图纸。`
+    : `差 ${shortfall} 积分，兑换 CDK 或注册领积分后继续。`;
 });
 const nicknameCount = computed(() => [...draftNickname.value.trim()].length);
 const normalizedNickname = computed(() => normalizeNickname(draftNickname.value));
@@ -105,15 +190,20 @@ const saveDisabled = computed(() => saving.value || Boolean(nicknameError.value)
 onMounted(() => {
   document.addEventListener('click', handleDocumentClick);
   window.addEventListener('keydown', handleKeydown);
-  if (auth.isLoggedIn && (!auth.user || auth.user.ai_generation_cost_points == null)) {
-    void refreshProfile();
-  }
+  clockTimer = window.setInterval(() => {
+    nowTick.value = Date.now();
+  }, ONE_MINUTE_MS);
+  void refreshWalletContext({ silent: true });
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleDocumentClick);
   window.removeEventListener('keydown', handleKeydown);
   clearToastTimer();
+  if (clockTimer !== undefined) {
+    window.clearInterval(clockTimer);
+    clockTimer = undefined;
+  }
   revokeLocalPreview();
 });
 
@@ -131,25 +221,36 @@ watch(
   }
 );
 
+watch(
+  () => auth.isLoggedIn,
+  () => {
+    walletProfile.value = null;
+    void refreshWalletContext({ silent: true });
+  }
+);
+
 function openAccountCentre(): void { window.location.assign('/account'); }
 
 function toggleMenu(): void {
-  if (!auth.isLoggedIn) {
-    void router.push('/login');
-    return;
-  }
   menuOpen.value = !menuOpen.value;
-  if (menuOpen.value && !auth.user) {
-    void refreshProfile();
+  if (menuOpen.value) {
+    void refreshWalletContext();
   }
 }
 
-async function refreshProfile(): Promise<void> {
+async function refreshWalletContext(options: { silent?: boolean } = {}): Promise<void> {
   profileLoading.value = true;
   try {
-    await auth.refreshProfile();
+    if (auth.isLoggedIn) {
+      await auth.refreshProfile();
+      walletProfile.value = null;
+    } else {
+      walletProfile.value = await getWalletProfile();
+    }
   } catch (_error) {
-    showToast('资料暂时加载失败，稍后刷新即可。');
+    if (!options.silent) {
+      showToast('钱包暂时同步失败，稍后刷新即可。');
+    }
   } finally {
     profileLoading.value = false;
   }
@@ -254,7 +355,14 @@ async function saveProfile(): Promise<void> {
 async function logout(): Promise<void> {
   menuOpen.value = false;
   auth.logout();
+  walletProfile.value = null;
+  void refreshWalletContext({ silent: true });
   await router.push('/login');
+}
+
+function goLogin(): void {
+  menuOpen.value = false;
+  void router.push('/login');
 }
 
 function goWorks(): void {
@@ -280,6 +388,7 @@ function closePricing(): void {
 
 function handlePricingSuccess(): void {
   showToast('钱包已刷新。');
+  void refreshWalletContext({ silent: true });
 }
 
 function handleDocumentClick(event: MouseEvent): void {
@@ -355,12 +464,35 @@ function readErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
-function formatMonthDay(value: string): string {
+function formatDateTime(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
     return value;
   }
-  return `${date.getMonth() + 1}/${date.getDate()}`;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hour = String(date.getHours()).padStart(2, '0');
+  const minute = String(date.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hour}:${minute}`;
+}
+
+function formatMembershipRemaining(ms: number): string {
+  const safeMs = Math.max(0, ms);
+  if (safeMs >= ONE_DAY_MS) {
+    return `剩 ${Math.ceil(safeMs / ONE_DAY_MS)} 天`;
+  }
+  if (safeMs >= ONE_HOUR_MS) {
+    const totalMinutes = Math.max(1, Math.ceil(safeMs / ONE_MINUTE_MS));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return minutes > 0 ? `剩 ${hours} 小时 ${minutes} 分` : `剩 ${hours} 小时`;
+  }
+  return `剩 ${Math.max(1, Math.ceil(safeMs / ONE_MINUTE_MS))} 分钟`;
+}
+
+function formatInteger(value: number): string {
+  return new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 0 }).format(Math.max(0, Math.floor(value)));
 }
 </script>
 
@@ -368,16 +500,53 @@ function formatMonthDay(value: string): string {
   <div class="account-menu" ref="rootRef">
     <RouterLink class="nav-link account-works-link" to="/works">作品集</RouterLink>
 
-    <button
-      v-if="isLoggedIn"
-      class="credit-chip"
-      type="button"
-      title="当前可用额度"
-      @click="toggleMenu"
+    <div
+      class="wallet-pill"
+      :class="{
+        'wallet-pill--open': menuOpen,
+        'wallet-pill--guest': !isLoggedIn,
+        'wallet-pill--urgent': membershipUrgent
+      }"
+      role="group"
+      aria-label="钱包额度"
     >
-      <span aria-hidden="true">🫘</span>
-      <strong>AI {{ aiPointsLabel }}</strong>
-    </button>
+      <button
+        class="wallet-pill__main"
+        type="button"
+        :aria-expanded="menuOpen"
+        aria-haspopup="menu"
+        :title="`AI ${aiPointsLabel} 积分，${normalPillLabel}`"
+        @click="toggleMenu"
+      >
+        <span class="wallet-pill__ai-segment">
+          <span class="wallet-pill__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M12 3.8 13.8 9l5.2 1.8-5.2 1.8L12 17.8l-1.8-5.2L5 10.8 10.2 9 12 3.8Z" />
+              <path d="M18.2 15.8 19 18l2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2Z" />
+            </svg>
+          </span>
+          <span class="wallet-pill__ai">
+            <span class="wallet-pill__mode wallet-pill__mode--ai">AI</span>
+            <strong>{{ aiPointsLabel }}</strong>
+            <em>积分</em>
+          </span>
+        </span>
+        <span class="wallet-pill__divider" aria-hidden="true"></span>
+        <span class="wallet-pill__normal" :class="`wallet-pill__normal--${membershipStatusTone}`">
+          <span class="wallet-pill__normal-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M5 5h14v14H5z" />
+              <path d="M9.7 5v14M14.3 5v14M5 9.7h14M5 14.3h14" />
+            </svg>
+          </span>
+          <span class="wallet-pill__normal-copy">
+            <span class="wallet-pill__mode wallet-pill__mode--normal">普通</span>
+            <span class="wallet-pill__normal-value wallet-pill__normal-value--full">{{ navNormalLabel }}</span>
+            <span class="wallet-pill__normal-value wallet-pill__normal-value--short">{{ navNormalShortLabel }}</span>
+          </span>
+        </span>
+      </button>
+    </div>
 
     <button
       v-if="isLoggedIn"
@@ -396,12 +565,12 @@ function formatMonthDay(value: string): string {
     <RouterLink v-else class="account-login" to="/login">登录</RouterLink>
 
     <Transition name="account-pop">
-      <section v-if="menuOpen && isLoggedIn" class="account-dropdown" role="menu" aria-label="账户菜单">
+      <section v-if="menuOpen" class="account-dropdown" role="menu" aria-label="账户菜单">
         <div class="account-identity">
-          <img class="account-identity__avatar" :src="avatarSrc" alt="" @error="avatarFailed = true" />
+          <img class="account-identity__avatar" :src="walletAvatarSrc" alt="" @error="avatarFailed = true" />
           <div>
-            <strong>{{ displayName }}</strong>
-            <span>{{ emailLabel }}</span>
+            <strong>{{ walletIdentityName }}</strong>
+            <span>{{ walletIdentityNote }}</span>
           </div>
         </div>
 
@@ -409,6 +578,7 @@ function formatMonthDay(value: string): string {
           <div class="account-credit-card__head">
             <strong>我的钱包</strong>
             <span v-if="profileLoading">同步中</span>
+            <span v-else>{{ walletHint }}</span>
           </div>
           <div class="account-credit-grid">
             <div>
@@ -424,18 +594,45 @@ function formatMonthDay(value: string): string {
               <strong>{{ normalEntitlementLabel }}</strong>
             </div>
           </div>
+          <div
+            class="account-membership-line"
+            :class="{ 'account-membership-line--urgent': membershipUrgent }"
+          >
+            <span>{{ normalWalletLabel }}</span>
+            <button
+              type="button"
+              :class="{ 'account-membership-renew--urgent': membershipUrgent }"
+              @click="openPricing('membership')"
+            >
+              {{ membershipActionLabel }}
+            </button>
+          </div>
           <p v-if="lowBalanceHint" class="account-low-hint">{{ lowBalanceHint }}</p>
           <div class="account-credit-actions">
-            <button class="account-credit-action--primary" type="button" @click="openPricing('points')">充值 / 开通会员</button>
+            <button class="account-credit-action--primary" type="button" @click="openPricing('points')">充值</button>
             <button class="account-credit-action--secondary" type="button" @click="openCdkPricing">兑换 CDK</button>
+            <button
+              class="account-credit-action--secondary"
+              :class="{ 'account-credit-action--urgent': membershipUrgent }"
+              type="button"
+              @click="openPricing('membership')"
+            >
+              {{ membershipActionLabel }}
+            </button>
           </div>
         </div>
 
         <div class="account-menu-list">
           <button type="button" role="menuitem" @click="openAccountCentre">账号中心 · 时长与积分</button>
-          <button type="button" role="menuitem" @click="openEditor">编辑资料</button>
-          <button type="button" role="menuitem" @click="goWorks">我的作品</button>
-          <button class="account-menu-list__danger" type="button" role="menuitem" @click="logout">退出登录</button>
+          <template v-if="isLoggedIn">
+            <button type="button" role="menuitem" @click="openEditor">编辑资料</button>
+            <button type="button" role="menuitem" @click="goWorks">我的作品</button>
+            <button class="account-menu-list__danger" type="button" role="menuitem" @click="logout">退出登录</button>
+          </template>
+          <template v-else>
+            <button type="button" role="menuitem" @click="goLogin">注册 / 登录，永久保存</button>
+            <button type="button" role="menuitem" @click="goWorks">查看设备作品</button>
+          </template>
         </div>
       </section>
     </Transition>
@@ -548,7 +745,7 @@ function formatMonthDay(value: string): string {
   flex: 0 0 auto;
 }
 
-.credit-chip,
+.wallet-pill__main,
 .account-trigger,
 .account-login,
 .account-dropdown button,
@@ -557,7 +754,6 @@ function formatMonthDay(value: string): string {
   cursor: pointer;
 }
 
-.credit-chip,
 .account-trigger,
 .account-login {
   min-height: 40px;
@@ -578,15 +774,202 @@ function formatMonthDay(value: string): string {
     transform 180ms var(--pd-ease-out);
 }
 
-.credit-chip {
-  gap: 5px;
-  padding: 0 12px;
-  color: var(--pd-orange);
-  box-shadow: inset 0 -1px 0 rgba(255, 142, 83, 0.12);
+.wallet-pill {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid rgba(255, 142, 83, 0.34);
+  border-radius: 999px;
+  background:
+    linear-gradient(135deg, rgba(255, 249, 233, 0.96), rgba(255, 232, 216, 0.92)),
+    rgba(255, 246, 239, 0.96);
+  box-shadow:
+    0 10px 22px rgba(255, 142, 83, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  padding: 2px;
+  transition:
+    border-color 180ms var(--pd-ease-out),
+    background 180ms var(--pd-ease-out),
+    box-shadow 180ms var(--pd-ease-out),
+    transform 180ms var(--pd-ease-out);
 }
 
-.credit-chip strong {
+.wallet-pill:hover,
+.wallet-pill--open {
+  border-color: rgba(255, 142, 83, 0.62);
+  background:
+    linear-gradient(135deg, rgba(255, 252, 241, 0.98), rgba(255, 236, 224, 0.96)),
+    #fff8f1;
+  box-shadow:
+    0 14px 28px rgba(255, 142, 83, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  transform: translateY(-1px);
+}
+
+.wallet-pill--urgent {
+  border-color: rgba(255, 91, 91, 0.46);
+  background:
+    linear-gradient(135deg, rgba(255, 247, 232, 0.98), rgba(255, 224, 216, 0.96)),
+    rgba(255, 241, 234, 0.96);
+  box-shadow:
+    0 12px 28px rgba(255, 91, 91, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+.wallet-pill__main {
+  border: 0;
+  font: inherit;
+}
+
+.wallet-pill__main {
+  min-width: 0;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pd-fg-1);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 17px 0 11px;
+}
+
+.wallet-pill__ai-segment,
+.wallet-pill__normal {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  line-height: 1;
+}
+
+.wallet-pill__ai-segment {
+  gap: 7px;
+}
+
+.wallet-pill__icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  color: var(--pd-orange);
+}
+
+.wallet-pill__icon svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.wallet-pill__ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  line-height: 1;
   white-space: nowrap;
+}
+
+.wallet-pill__mode {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  font-size: 12px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.wallet-pill__mode--ai {
+  color: var(--pd-orange);
+}
+
+.wallet-pill__mode--normal {
+  color: var(--pd-fg-2);
+}
+
+.wallet-pill__ai strong {
+  color: var(--pd-fg-1);
+  font-size: 16px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.wallet-pill__ai em {
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.wallet-pill__divider {
+  width: 1px;
+  height: 16px;
+  flex: 0 0 auto;
+  background: rgba(255, 142, 83, 0.28);
+  margin-inline: 2px;
+}
+
+.wallet-pill__normal {
+  gap: 6px;
+  color: var(--pd-fg-1);
+  font-size: 12px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.wallet-pill__normal-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  color: var(--pd-fg-2);
+}
+
+.wallet-pill__normal--urgent,
+.wallet-pill__normal--urgent .wallet-pill__mode--normal,
+.wallet-pill__normal--urgent .wallet-pill__normal-value,
+.wallet-pill__normal--urgent .wallet-pill__normal-icon {
+  color: #d9503f;
+}
+
+.wallet-pill__normal-icon svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wallet-pill__normal-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.wallet-pill__normal-value {
+  color: var(--pd-fg-1);
+  font-size: 12px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.wallet-pill__normal-value--short {
+  display: none;
 }
 
 .account-trigger {
@@ -594,7 +977,6 @@ function formatMonthDay(value: string): string {
   padding: 0 11px 0 6px;
 }
 
-.credit-chip:hover,
 .account-trigger:hover,
 .account-trigger--open,
 .account-login:hover {
@@ -634,6 +1016,7 @@ function formatMonthDay(value: string): string {
 
 .account-login {
   padding: 0 16px;
+  white-space: nowrap;
 }
 
 .account-dropdown {
@@ -766,9 +1149,59 @@ function formatMonthDay(value: string): string {
   padding: 7px 9px;
 }
 
+.account-membership-line {
+  min-height: 38px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid rgba(255, 198, 107, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--pd-fg-2);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.35;
+  padding: 7px 8px 7px 10px;
+}
+
+.account-membership-line span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-membership-line button {
+  min-height: 28px;
+  border: 1px solid rgba(255, 142, 83, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 247, 240, 0.9);
+  color: var(--pd-orange);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 950;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.account-membership-line--urgent {
+  border-color: rgba(255, 91, 91, 0.28);
+  background: rgba(255, 236, 230, 0.74);
+  color: #c74738;
+}
+
+.account-membership-renew--urgent,
+.account-credit-action--urgent {
+  border-color: rgba(255, 91, 91, 0.38) !important;
+  background: linear-gradient(135deg, #ff9f6e 0%, #ff5f6f 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 24px rgba(255, 91, 91, 0.18);
+}
+
 .account-credit-actions {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(96px, 0.75fr);
+  grid-template-columns: 1fr 1fr 1.08fr;
   gap: 8px;
 }
 
@@ -1136,9 +1569,24 @@ function formatMonthDay(value: string): string {
     gap: 6px;
   }
 
-  .credit-chip {
+  .wallet-pill {
     min-height: 36px;
-    padding: 0 9px;
+    padding: 2px;
+  }
+
+  .wallet-pill__main {
+    min-height: 30px;
+    gap: 8px;
+    padding-inline: 8px 10px;
+  }
+
+  .wallet-pill__icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .wallet-pill__ai strong {
+    font-size: 14px;
   }
 
   .account-trigger {
@@ -1169,16 +1617,50 @@ function formatMonthDay(value: string): string {
 }
 
 @media (max-width: 520px) {
+  .wallet-pill__main {
+    gap: 6px;
+    padding-inline: 8px;
+  }
+
+  .wallet-pill__ai-segment,
+  .wallet-pill__normal {
+    gap: 0;
+  }
+
+  .wallet-pill__ai,
+  .wallet-pill__normal-copy {
+    gap: 4px;
+  }
+
+  .wallet-pill__icon,
+  .wallet-pill__normal-icon,
+  .wallet-pill__ai em {
+    display: none;
+  }
+
+  .wallet-pill__mode,
+  .wallet-pill__normal-value {
+    font-size: 11px;
+  }
+
+  .wallet-pill__divider {
+    margin-inline: 0;
+  }
+
+  .wallet-pill__normal-value--full {
+    display: none;
+  }
+
+  .wallet-pill__normal-value--short {
+    display: inline-flex;
+  }
+
   .account-trigger__name {
     display: none;
   }
 }
 
 @media (max-width: 430px) {
-  .credit-chip strong {
-    display: none;
-  }
-
   .account-works-link {
     padding-inline: 10px;
   }
