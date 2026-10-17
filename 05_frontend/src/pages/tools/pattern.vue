@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {pressTo} from '../../utils/press';
 import {computed,ref} from 'vue';
 import {onShow,onUnload} from '@dcloudio/uni-app';
 import StudioShell from '../../components/StudioShell.vue';
@@ -38,7 +39,7 @@ async function generate(){
  finally{busy.value=false;}
 }
 function zoom(){if(result.value)uni.previewImage({urls:[result.value.imageUrl],current:result.value.imageUrl});}
-function edit(){if(result.value){patternState.set(result.value);uni.navigateTo({url:'/pages/tools/edit'});}}
+function edit(){if(result.value){patternState.set(result.value);pressTo('/pages/tools/edit');}}
 async function save(){
  if(!result.value||saving.value)return;saving.value=true;
  try{await savePatternImage(result.value);uni.showToast({title:words('pattern_saved'),icon:'success'});}
@@ -49,7 +50,7 @@ async function save(){
  }finally{saving.value=false;}
 }
 function again(){result.value=null;photo.value='';errorCode.value='';progress.value=0;resetKey.value++;}
-function visit(){uni.navigateTo({url:'/pages/studio/visit'});}
+function visit(){pressTo('/pages/studio/visit');}
 </script>
 <template>
  <StudioShell id="studio-pattern-shell" fitted :reset-key="resetKey" :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" @language="changeLanguage">

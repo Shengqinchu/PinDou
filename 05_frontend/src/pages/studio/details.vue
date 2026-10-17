@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {pressTo} from '../../utils/press';
 import {computed,nextTick,ref} from 'vue';
 import {onShow} from '@dcloudio/uni-app';
 import StudioShell from '../../components/StudioShell.vue';
@@ -46,7 +47,7 @@ function phone(){uni.makePhoneCall({phoneNumber:contact('phone').replace(/\s/g,'
 function copyWechat(){uni.setClipboardData({data:contact('wechat')});}
 function copyTools(){const url=processWords('toolsUrl');if(/^https:\/\//.test(url))uni.setClipboardData({data:url});}
 async function jump(id:string){scrollTo.value='';await nextTick();scrollTo.value='studio-detail-'+id;}
-function visit(){uni.navigateTo({url:'/pages/studio/visit'});}
+function visit(){pressTo('/pages/studio/visit');}
 onShow(()=>void refreshStudioContent());
 </script>
 <template>

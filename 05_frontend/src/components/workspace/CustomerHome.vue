@@ -8,7 +8,7 @@ import StudioPatchOffer from '../StudioPatchOffer.vue';
 import {usePatchPromotion} from '../../utils/studio-patch-promotion';
 import { useStudioNative } from '../../utils/studio-native';
 import { refreshStudioContent,studioWords,studioPhoto } from '../../utils/studio-content';
-import {navigateStudio} from '../../utils/studio-navigation';
+import {pressTo,pressNavigate} from '../../utils/press';
 import {readStudioCached} from '../../utils/studio-cache';
 import {calendarPath,emptyBooking} from '../../utils/studio-booking';
 import {prefetchShop} from '../../utils/shop-catalog';
@@ -16,12 +16,12 @@ const {language,width,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNativ
 const words=(module:Parameters<typeof studioWords>[0],key:string)=>say(studioWords(module,key));
 const photo=computed(studioPhoto),imageFailed=ref(false);
 const {offer,open,dismiss}=usePatchPromotion(true);
-function patchVisit(){dismiss();uni.navigateTo({url:'/pages/studio/visit?experience=patch'});}
-function visit(){uni.navigateTo({url:'/pages/studio/visit'});}
-function bookings(){navigateStudio('/pages/studio/reservations');}
-function details(){uni.navigateTo({url:'/pages/studio/details'});}
-function patterns(){uni.navigateTo({url:'/pages/tools/pattern'});}
-function shop(){uni.navigateTo({url:'/pages/shop/index'});}
+function patchVisit(){dismiss();pressTo('/pages/studio/visit?experience=patch');}
+function visit(){pressTo('/pages/studio/visit');}
+function bookings(){pressNavigate('/pages/studio/reservations');}
+function details(){pressTo('/pages/studio/details');}
+function patterns(){pressTo('/pages/tools/pattern');}
+function shop(){pressTo('/pages/shop/index');}
 // After the home settles, quietly load the next likely pages: open booking times and the shop.
 let warmTimer:ReturnType<typeof setTimeout>|undefined;
 onShow(()=>{void refreshStudioContent();clearTimeout(warmTimer);warmTimer=setTimeout(()=>{void readStudioCached(calendarPath(emptyBooking()),'',15000).catch(()=>{});prefetchShop();},900);});

@@ -7,6 +7,11 @@
 .studio-native .studio-native-pressed{transform:translateY(1px) scale(.985);transition-duration:.2s;background-color:#dcebf5;box-shadow:none}
 .studio-native .studio-native-primary.studio-native-pressed{transform:translateY(2px);box-shadow:0 1px 0 #cbdfec,0 2px 6px #30475708}
 .studio-native .studio-calendar-cell.studio-native-pressed{transform:none;background-color:#dcebf5}
+/* Controls that leave the screen give light feedback; the native page slide is the motion (as in WeUI and mature mini programs). */
+.studio-native .studio-app-nav .studio-native-pressed{transform:none;background-color:#eef4f8}
+.studio-native .studio-home-shortcuts .studio-native-pressed,.studio-native .studio-shop-card.studio-native-pressed,.studio-native .studio-pattern-actions .studio-native-pressed{transform:scale(.98);box-shadow:none}
+/* Pushed pages already slide in natively; stacking an entrance on top reads as a jolt. */
+.studio-native--pushed .studio-native-title,.studio-native--pushed .studio-native-section-head>.studio-native-subtitle,.studio-native--pushed .studio-native-balances,.studio-native--pushed .studio-visit-plans,.studio-native--pushed .studio-visit-review,.studio-native--pushed .studio-profile-avatar-row{animation:none}
 .studio-native button[disabled]{transform:none!important}
 .studio-plan-radio{transition:background-color .2s ease,border-color .2s ease}.studio-native-input:focus-within{border-color:#83a7bd;box-shadow:0 0 0 3px #eaf2f7}
 .studio-submit-actions{display:flex;gap:10px;flex-shrink:0}.studio-native .studio-submit-actions>button{flex:1;min-width:0;min-height:46px;padding:10px 12px;font-size:14px}

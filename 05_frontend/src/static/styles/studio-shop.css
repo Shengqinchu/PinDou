@@ -11,7 +11,7 @@
 .studio-native .studio-shop-children button{width:100%;padding:7px 6px;background:transparent;border-radius:8px;font-size:12px;color:#7c8f9b;text-align:left;justify-content:flex-start}
 .studio-native .studio-shop-children .studio-shop-child--active{color:#304d60;background:#f4f8fb;font-weight:600}
 .studio-shop-grid{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:12px 8px}
-.studio-shop-card{width:calc(50% - 4px);min-width:0;background:#fff;border:1px solid #e6ecef;border-radius:14px;overflow:hidden;box-sizing:border-box}
+.studio-shop-card{transition:transform .3s cubic-bezier(.4,0,.2,1),background-color .3s cubic-bezier(.4,0,.2,1);width:calc(50% - 4px);min-width:0;background:#fff;border:1px solid #e6ecef;border-radius:14px;overflow:hidden;box-sizing:border-box}
 .studio-shop-grid--services .studio-shop-card{width:100%;display:flex;align-items:center}
 .studio-shop-card-photo{width:100%;aspect-ratio:1;padding:7px;box-sizing:border-box}
 .studio-shop-grid--services .studio-shop-card-photo{width:42%;flex-shrink:0}

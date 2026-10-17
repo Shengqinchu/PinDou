@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {pressTo} from '../../utils/press';
 import {computed,ref,shallowRef} from 'vue';
 import {onShow} from '@dcloudio/uni-app';
 import StudioShell from '../../components/StudioShell.vue';
@@ -28,7 +29,7 @@ onShow(()=>void load());
 function pickSection(id:Section){if(section.value!==id){section.value=id;resetKey.value++;}}
 function pickRoot(id:string){root.value=id;const first=catalog.value?.categories.find(c=>c.parent_id===id);leaf.value=first?.id||id;resetKey.value++;}
 function pickLeaf(id:string){leaf.value=id;resetKey.value++;}
-function open(p:ShopProduct){uni.navigateTo({url:'/pages/shop/item?id='+encodeURIComponent(p.id)});}
+function open(p:ShopProduct){pressTo('/pages/shop/item?id='+encodeURIComponent(p.id));}
 const price=(p:ShopProduct)=>p.price_cents===null?'':amount(minimumPrice(p));
 </script>
 <template>

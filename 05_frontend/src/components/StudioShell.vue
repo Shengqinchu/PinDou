@@ -9,7 +9,7 @@ watch(()=>props.resetKey,async()=>{scrollTop.value=1;await nextTick();scrollTop.
 defineEmits<{ language: [] }>();
 </script>
 <template>
-  <view class="studio-native" :class="{'studio-native--en':language==='en','studio-native--keyboard':keyboardOpen,'studio-native--nav':nav,'studio-native--fitted':fitted,'studio-native--embedded':embedded}" :style="shellStyle">
+  <view class="studio-native" :class="{'studio-native--en':language==='en','studio-native--keyboard':keyboardOpen,'studio-native--nav':nav,'studio-native--fitted':fitted,'studio-native--embedded':embedded,'studio-native--pushed':!embedded&&!workspace}" :style="shellStyle">
     <view v-if="!embedded" class="studio-native-top">
       <StudioBrand :language="language" />
       <button :hover-start-time="0" class="studio-native-language" hover-class="studio-native-pressed" :hover-stay-time="180" @tap="$emit('language')">{{language==='zh'?'English':'中文'}}</button>

@@ -11,14 +11,14 @@ import StudioGlyph from '../../components/StudioGlyph.vue';
 import StudioLegalLinks from '../../components/StudioLegalLinks.vue';
 import { useStudioNative } from '../../utils/studio-native';
 import { MiniappError } from '../../utils/miniapp-client';
-import {navigateStudio} from '../../utils/studio-navigation';
+import {pressTo,pressNavigate} from '../../utils/press';
 import {peekStudioSnapshot,readStudioCached} from '../../utils/studio-cache';
 import { useUserStore } from '../../store/studio-user';
 import profileCopy from '../../../../05_studio/src/content/profile.json';
 import ownerCopy from '../../../../05_studio/src/content/owner-wechat.json';
 import workbenchCopy from '../../../../05_studio/src/content/workbench.json';
 import noticeCopy from '../../../../05_studio/src/content/customer-notifications.json';
-function notices(){uni.navigateTo({url:'/pages/studio/notifications'});}
+function notices(){pressTo('/pages/studio/notifications');}
 type Profile = {nickname:string;email:string;avatar?:string;is_admin?:boolean;customer_code?:string};
 type Wallet = {account:{minutes:number;points:number};booking_profile:{name:string;contact_method:string;contact:string;complete:boolean}};
 const user = useUserStore();
@@ -57,10 +57,10 @@ async function refresh(force=false) {
   await Promise.allSettled([core,owner]);
 }
 function logout() { ++sequence; user.logout(); profile.value = undefined; wallet.value = undefined; uni.reLaunch({url:'/pages/auth/studio-login'}); }
-function visit() { uni.navigateTo({url:'/pages/studio/visit'}); }
-function reservations() { navigateStudio('/pages/studio/reservations'); }
-function edit() { uni.navigateTo({url:'/pages/auth/studio-profile'}); }
-function ownerAlerts(){uni.navigateTo({url:'/pages/studio/owner'});}
+function visit() { pressTo('/pages/studio/visit'); }
+function reservations() { pressNavigate('/pages/studio/reservations'); }
+function edit() { pressTo('/pages/auth/studio-profile'); }
+function ownerAlerts(){pressTo('/pages/studio/owner');}
 function openWorkbench(){uni.navigateTo({url:'/pages/studio/manage'});}
 watch(()=>user.token,()=>{sequence++;profile.value=undefined;wallet.value=undefined;isOwner.value=false;busy.value=false;failed.value=false;pointsHelpOpen.value=false;});
 onShow(() => { pageReset.value++; void refresh(); });

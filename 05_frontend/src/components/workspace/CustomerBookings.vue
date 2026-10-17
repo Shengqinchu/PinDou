@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {pressTo} from '../../utils/press';
 defineOptions({options:{styleIsolation:'shared',virtualHost:true}});
 import {ref,watch} from 'vue';
 import {onViewShow as onShow,onViewHide as onHide,onViewUnload as onUnload} from '../../utils/studio-view-lifecycle';
@@ -26,9 +27,9 @@ async function refresh(force=false){
  finally{if(alive&&seq===sequence)loading.value=false;}
 }
 function changePage(delta:number){if(loading.value)return;page.value+=delta;items.value=[];loaded.value=false;void refresh();uni.pageScrollTo({scrollTop:0,duration:0});}
-function login(){uni.navigateTo({url:'/pages/auth/studio-login'});}
-function visit(){uni.navigateTo({url:'/pages/studio/visit'});}
-function detail(id:string){uni.navigateTo({url:'/pages/studio/reservation?id='+encodeURIComponent(id)});}
+function login(){pressTo('/pages/auth/studio-login');}
+function visit(){pressTo('/pages/studio/visit');}
+function detail(id:string){pressTo('/pages/studio/reservation?id='+encodeURIComponent(id));}
 function changed(result:Receipt){items.value=items.value.map(item=>item.id===result.id?result:item);}
 watch(()=>user.token,()=>{sequence++;loading.value=false;loaded.value=false;items.value=[];total.value=0;page.value=1;});
 onShow(()=>{void refreshStudioContent();void refresh();clearInterval(timer);timer=setInterval(()=>void refresh(true),15000);});

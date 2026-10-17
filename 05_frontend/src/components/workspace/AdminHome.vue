@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {pressTo} from '../../utils/press';
 defineOptions({options:{styleIsolation:'shared'}});
 import {ref} from 'vue';
 import {onViewShow as onShow,onViewHide as onHide,onViewUnload as onUnload} from '../../utils/studio-view-lifecycle';
@@ -19,7 +20,7 @@ let alive=true;
 const remember=()=>view.save({data:data.value});
 async function refresh(force=true){if(!view.valid())data.value=undefined;if(busy.value||(!force&&view.fresh()))return;busy.value=true;error.value='';const revision=view.begin();try{const value=await adminCall<Summary>('/manage/desk-summary');if(alive){data.value=value;view.loaded(revision);remember();}}catch(e){error.value=adminError(e,say);if(!view.valid())data.value=undefined;}finally{busy.value=false;}}
 const entries=[{page:'-notifications',label:notices.delivery_log,icon:'info'},{page:'-reservations',label:copy.reservations,icon:'calendar'},{page:'-messages',label:copy.messages,icon:'wechat'},{page:'-members',label:copy.members,icon:'user'},{page:'-finance',label:copy.finance,icon:'grid'},{page:'-calendar',label:copy.calendar,icon:'calendar'}];
-function openAlerts(){uni.navigateTo({url:'/pages/studio/owner'});}
+function openAlerts(){pressTo('/pages/studio/owner');}
 onShow(()=>void refresh(false));onHide(remember);onUnload(()=>{remember();alive=false;});
 </script>
 <template>

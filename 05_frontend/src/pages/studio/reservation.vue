@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {pressTo} from '../../utils/press';
 import {computed,ref,watch} from 'vue';
 import {onLoad,onShow,onHide,onUnload} from '@dcloudio/uni-app';
 import StudioShell from '../../components/StudioShell.vue';
@@ -32,9 +33,9 @@ async function refresh(force=false){
  catch(e){if(alive&&seq===sequence){errorCode.value=e instanceof MiniappError?e.code:'generic_error';if(e instanceof MiniappError&&[401,403,404].includes(e.status))result.value=undefined;if(e instanceof MiniappError&&e.status===401)user.logout();}}
  finally{if(alive&&seq===sequence)loading.value=false;}
 }
-function login(){uni.navigateTo({url:'/pages/auth/studio-login'});}
-function details(){uni.navigateTo({url:'/pages/studio/details'});}
-function notifications(){uni.navigateTo({url:'/pages/studio/notifications'});}
+function login(){pressTo('/pages/auth/studio-login');}
+function details(){pressTo('/pages/studio/details');}
+function notifications(){pressTo('/pages/studio/notifications');}
 function phone(){uni.makePhoneCall({phoneNumber:studioProfile.phone.replace(/\s/g,'')});}
 function copyWechat(){uni.setClipboardData({data:studioProfile.wechat});}
 function changed(value:Receipt){sequence++;loading.value=false;result.value=value;}

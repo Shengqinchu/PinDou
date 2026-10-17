@@ -1,0 +1,15 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict'),ts=require('typescript');
+const file=path.join(__dirname,'../src/utils/press.ts');
+const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+let clock=0;const timers=[],navigated=[],studio=[];
+const setTimeout=(fn,ms)=>{timers.push({at:clock+ms,fn});};
+const advance=ms=>{clock+=ms;for(const t of timers.splice(0).sort((a,b)=>a.at-b.at)){if(t.at<=clock)t.fn();else timers.push(t);}};
+const exportsObject={};
+vm.runInNewContext(code,{exports:exportsObject,setTimeout,uni:{navigateTo:({url})=>navigated.push(url)},require:id=>{assert.equal(id,'./studio-navigation');return {navigateStudio:url=>studio.push(url)};}});
+const p=exportsObject;
+p.pressTo('/pages/shop/index');advance(89);assert.equal(navigated.length,0,'waits for the press to land');
+p.pressTo('/pages/shop/index');advance(1);assert.equal(navigated.join(),'/pages/shop/index','a double tap opens once');
+p.pressNavigate('/pages/studio/reservations');advance(90);assert.equal(studio.join(),'/pages/studio/reservations');
+p.pressTo('/pages/tools/pattern');advance(90);assert.equal(navigated.length,2,'usable again after the window');
+assert.equal(p.PRESS_ACK_MS,90);
+console.log('Press checks passed: navigation waits 90ms for the press, double taps open once, the guard resets.');

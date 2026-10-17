@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import {pressTo} from '../utils/press';
 import copy from '../../../05_studio/src/content/studio-miniapp-legal.json';
 defineProps<{language:string}>();
-function open(type:'privacy'|'agreement'){uni.navigateTo({url:'/pages/consent/consent?type='+type});}
+function open(type:'privacy'|'agreement'){pressTo('/pages/consent/consent?type='+type);}
 </script>
 <template>
  <view class="studio-legal-links">

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {pressTo} from '../../utils/press';
 import {computed,nextTick,ref,watch} from 'vue';
 import {onLoad,onShow,onHide,onUnload} from '@dcloudio/uni-app';
 import {useUserStore} from '../../store/studio-user';
@@ -14,7 +15,7 @@ const endpoint=computed(()=>thread.value?'/manage/site-messages/'+thread.value:'
 const mine=(item:any)=>item.sender_role===(thread.value?'staff':'customer');
 const call=<T,>(path:string,data:unknown={},method:'GET'|'POST'='GET')=>thread.value?adminCall<T>(path,data,method):studioCall<T>(path,data,'',user.token,method);
 function back(){uni.navigateBack({fail:()=>uni.redirectTo({url:'/pages/auth/studio-account'})});}
-function openBooking(id:string){uni.navigateTo({url:'/pages/studio/reservation?id='+encodeURIComponent(id)});}
+function openBooking(id:string){pressTo('/pages/studio/reservation?id='+encodeURIComponent(id));}
 function remember(){view?.save({items:items.value,draft:draft.value,hasOlder:hasOlder.value});}
 watch(()=>user.token,()=>{generation++;items.value=[];draft.value='';key='';sentBody='';hasOlder.value=false;view=adminView<any>('site-chat:'+thread.value);void load();});
 async function load(older=false){if(loading||!active)return;if(!user.token&&!thread.value){uni.navigateTo({url:'/pages/auth/studio-login'});return;}loading=true;const token=user.token,n=generation;
