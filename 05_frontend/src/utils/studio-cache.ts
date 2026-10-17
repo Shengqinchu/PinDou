@@ -1,4 +1,5 @@
 import {MiniappError,studioRead} from './miniapp-client';
+import {readPublic,writePublic} from './public-store';
 
 // Session-only snapshots: never persist balances or contact details to disk.
 type Entry={json:string;at:number};
@@ -6,16 +7,22 @@ const values=new Map<string,Entry>(),pending=new Map<string,{generation:number;r
 let ownerToken='',generation=0;
 const key=(path:string,token:string)=>(token?'private:':'public:')+path;
 const allowed=(token:string)=>!token||token===ownerToken;
+// Only anonymous public reads may outlive the session; they are shown while a fresh copy loads.
+const persistable=(path:string,token:string)=>!token&&/^\/(reservation-calendar\?|patch-promotion$)/.test(path);
+const DISK_AGE=86400000;
 export function setStudioCacheOwner(token:string){if(token!==ownerToken){ownerToken=token;generation++;values.clear();pending.clear();}}
 export function invalidateStudioSnapshots(token:string){if(token!==ownerToken)return;generation++;values.clear();pending.clear();}
 export function rememberStudioSnapshot<T>(path:string,token:string,data:T){
  if(!allowed(token))return;
  const id=key(path,token);values.delete(id);values.set(id,{json:JSON.stringify(data),at:Date.now()});
  while(values.size>32)values.delete(values.keys().next().value!);
+ if(persistable(path,token))writePublic(path,data);
 }
 export function peekStudioSnapshot<T>(path:string,token:string,maxAge=300000):{data:T;age:number}|undefined{
  if(!allowed(token))return;
- const id=key(path,token),value=values.get(id);if(!value)return;
+ const id=key(path,token);let value=values.get(id);
+ if(!value&&persistable(path,token)){const stored=readPublic<T>(path,DISK_AGE);if(stored){value={json:JSON.stringify(stored.data),at:stored.at};values.set(id,value);maxAge=Math.max(maxAge,DISK_AGE);}}
+ if(!value)return;
  const age=Date.now()-value.at;if(age<0||age>maxAge){values.delete(id);return;}
  return {data:JSON.parse(value.json),age};
 }

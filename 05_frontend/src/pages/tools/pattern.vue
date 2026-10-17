@@ -66,7 +66,7 @@ function visit(){uni.navigateTo({url:'/pages/studio/visit'});}
      <view class="studio-pattern-stages"><text v-for="(key,index) in stages" :key="key" :class="{'studio-pattern-stage--done':index<stage,'studio-pattern-stage--active':index===stage}">{{index+1}} {{words(key)}}</text></view>
     </view>
     <template v-else>
-     <button v-if="photo" class="studio-native-link studio-pattern-change" hover-class="studio-native-pressed" @tap="choose"><StudioGlyph name="refresh" :size="17"/><text>{{words('pattern_change')}}</text></button>
+     <button v-if="photo" class="studio-native-link studio-pattern-change" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="choose"><StudioGlyph name="refresh" :size="17"/><text>{{words('pattern_change')}}</text></button>
      <view class="studio-pattern-sizes"><button v-for="value in sizes" :key="value" class="studio-plan" :class="{'studio-plan--selected':size===value}" hover-class="studio-native-pressed" :hover-start-time="0" :hover-stay-time="180" :aria-pressed="size===value" @tap="size=value"><text class="studio-pattern-size">{{value}}</text><text class="studio-pattern-size-unit">× {{value}}</text></button></view>
      <text class="studio-native-body studio-native-small">{{words('pattern_photo_note')}}</text>
     </template>
@@ -75,13 +75,13 @@ function visit(){uni.navigateTo({url:'/pages/studio/visit'});}
     <image class="studio-pattern-result" :src="result.imageUrl" mode="widthFix" :aria-label="words('pattern_result')" @tap="zoom"/>
     <view class="studio-pattern-colors"><view v-for="color in result.colors" :key="color.code" class="studio-pattern-color"><view class="studio-pattern-swatch" :style="{background:color.hex}"/><text class="studio-pattern-code">{{color.code}}</text><text class="studio-pattern-count">{{color.count}}</text></view></view>
     <text class="studio-native-body studio-native-small">{{words('pattern_brand_note')}}</text>
-    <view class="studio-pattern-actions"><button class="studio-native-secondary" hover-class="studio-native-pressed" @tap="edit"><StudioGlyph name="brush" :size="18"/><text>{{words('pattern_edit')}}</text></button><button class="studio-native-secondary" hover-class="studio-native-pressed" @tap="again"><StudioGlyph name="image" :size="18"/><text>{{words('pattern_again')}}</text></button><button class="studio-native-secondary" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar" :size="18"/><text>{{words('pattern_visit')}}</text></button></view>
+    <view class="studio-pattern-actions"><button class="studio-native-secondary" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="edit"><StudioGlyph name="brush" :size="18"/><text>{{words('pattern_edit')}}</text></button><button class="studio-native-secondary" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="again"><StudioGlyph name="image" :size="18"/><text>{{words('pattern_again')}}</text></button><button class="studio-native-secondary" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="visit"><StudioGlyph name="calendar" :size="18"/><text>{{words('pattern_visit')}}</text></button></view>
    </template>
    <text v-if="errorCode" class="studio-native-error" role="alert">{{words(errorCode)}}</text>
   </view>
   <template #actions><view class="studio-visit-actions">
-   <button v-if="!result" class="studio-native-primary" hover-class="studio-native-pressed" :disabled="busy||!photo" @tap="generate"><StudioGlyph name="grid"/><text class="studio-native-primary-label">{{words(busy?'pattern_working':photo?'pattern_generate':'pattern_pick_first')}}</text></button>
-   <button v-else class="studio-native-primary" hover-class="studio-native-pressed" :disabled="saving" :loading="saving" @tap="save"><StudioGlyph name="download"/><text class="studio-native-primary-label">{{words('pattern_save')}}</text></button>
+   <button v-if="!result" class="studio-native-primary" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" :disabled="busy||!photo" @tap="generate"><StudioGlyph name="grid"/><text class="studio-native-primary-label">{{words(busy?'pattern_working':photo?'pattern_generate':'pattern_pick_first')}}</text></button>
+   <button v-else class="studio-native-primary" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" :disabled="saving" :loading="saving" @tap="save"><StudioGlyph name="download"/><text class="studio-native-primary-label">{{words('pattern_save')}}</text></button>
   </view></template>
  </StudioShell>
 </template>

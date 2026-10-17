@@ -1,5 +1,6 @@
 import { shallowRef } from 'vue';
 import { studioRead } from './miniapp-client';
+import { readPublic, writePublic } from './public-store';
 import home from '../../../05_studio/src/content/pages-Home.json';
 import visit from '../../../05_studio/src/content/pages-Visit.json';
 import flow from '../../../05_studio/src/content/visit-flow.json';
@@ -27,12 +28,13 @@ import media from '../../../05_studio/src/media-assets.json';
 
 const defaults={home,visit,flow,calendar,receipt,cancellation,edit,booking,account,wallet,app,details,errors,generic,miniapp,profile,process,contacts,patch,promotion};
 const names:Record<keyof typeof defaults,string>={home:'pages-Home',visit:'pages-Visit',flow:'visit-flow',calendar:'components-ReservationCalendar',receipt:'pages-ReservationReceipt',cancellation:'reservation-cancellation',edit:'reservation-edit',booking:'booking-profile',account:'account',wallet:'wallet',app:'App',details:'pages-Details',errors:'data-commerce-messages',generic:'commerce',miniapp:'miniapp',profile:'profile',process:'components-BeadingProcess',contacts:'contact-fields',patch:'patch-reservations',promotion:'patch-promotion'};
-const published=shallowRef<Record<string,Record<string,unknown>>>({});
+// The last published copy paints the first screen; a fresh copy replaces it once loaded.
+const published=shallowRef<Record<string,Record<string,unknown>>>(readPublic<Record<string,Record<string,unknown>>>('content',7*86400000)?.data||{});
 let pending:Promise<void>|undefined,updated=0;
 export function refreshStudioContent(){
   if(pending)return pending;
   if(Date.now()-updated<60000)return Promise.resolve();
-  pending=studioRead<{modules:Record<string,Record<string,unknown>>}>('/content').then(value=>{if(value.modules){published.value=value.modules;updated=Date.now();}}).catch(()=>{}).finally(()=>{pending=undefined;});
+  pending=studioRead<{modules:Record<string,Record<string,unknown>>}>('/content').then(value=>{if(value.modules){published.value=value.modules;updated=Date.now();writePublic('content',value.modules);}}).catch(()=>{}).finally(()=>{pending=undefined;});
   return pending;
 }
 export function studioWords(module:keyof typeof defaults,key:string):string[]{

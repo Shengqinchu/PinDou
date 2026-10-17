@@ -53,18 +53,18 @@ onShow(()=>void refreshStudioContent());
  <StudioShell id="studio-shell" fitted :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" :scroll-to="scrollTo" @language="changeLanguage">
   <view class="studio-native-main studio-details">
    <view class="studio-native-section"><text class="studio-native-label">{{words('a_little_knowhow_before_you_visit_b1dd61')}}</text><text class="studio-native-title">{{words('a_little_guide_to_the_studio_1b38da')}}</text><text class="studio-native-body">{{words('getting_here_finding_parking_and_the_little_0ec5c9')}}</text></view>
-   <view class="studio-detail-nav" :aria-label="words('studio_information_sections_45baee')"><button v-for="section in sections" :key="section.id" hover-class="studio-native-pressed" @tap="jump(section.id)">{{section.key?words(section.key):processWords('title')}}</button></view>
+   <view class="studio-detail-nav" :aria-label="words('studio_information_sections_45baee')"><button v-for="section in sections" :key="section.id" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="jump(section.id)">{{section.key?words(section.key):processWords('title')}}</button></view>
    <view id="studio-detail-arrival" class="studio-native-section studio-detail-section">
     <text class="studio-native-subtitle">{{words('studio_address_171634')}}</text>
-    <button class="studio-native-secondary studio-address" hover-class="studio-native-pressed" @tap="copyAddress()"><StudioGlyph name="pin"/><text>{{contact('address')}}</text><StudioGlyph name="copy" :size="17"/></button>
+    <button class="studio-native-secondary studio-address" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="copyAddress()"><StudioGlyph name="pin"/><text>{{contact('address')}}</text><StudioGlyph name="copy" :size="17"/></button>
     <text v-for="key in ['in_downtown_hamilton_accessible_by_local_buses_657f96','visits_are_by_appointment_you_are_welcome_008328','the_host_will_meet_you_downstairs_when_aeec4f']" :key="key" class="studio-native-body">{{words(key)}}</text>
     <StudioDetailPhoto :photo="photos['arrival-entrance']" :alt="words(arrivalPhotos[0].alt)" :language="language" eager @open="preview('arrival-entrance')"/>
-    <view class="studio-contact-shortcuts"><button class="studio-native-secondary" hover-class="studio-native-pressed" @tap="copyWechat"><StudioGlyph name="wechat" :size="18"/><text>{{contact('wechat')}}</text></button><button class="studio-native-secondary" hover-class="studio-native-pressed" @tap="phone"><StudioGlyph name="phone" :size="18"/><text>{{contact('phone')}}</text></button></view>
+    <view class="studio-contact-shortcuts"><button class="studio-native-secondary" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="copyWechat"><StudioGlyph name="wechat" :size="18"/><text>{{contact('wechat')}}</text></button><button class="studio-native-secondary" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="phone"><StudioGlyph name="phone" :size="18"/><text>{{contact('phone')}}</text></button></view>
    </view>
    <view id="studio-detail-parking" class="studio-native-section studio-detail-section">
     <text class="studio-native-subtitle">{{words('a_place_to_park_fcb8e3')}}</text><text class="studio-native-body">{{words('free_visitor_parking_is_available_downstairs_usually_7daf39')}}</text>
     <StudioDetailPhoto v-for="photo in arrivalPhotos.slice(1)" :key="photo.key" :photo="photos[photo.key]" :alt="words(photo.alt)" :language="language" @open="preview(photo.key)"/>
-    <text class="studio-plan-name">{{words('nearby_parking_options_1a311a')}}</text><button v-for="key in ['parking_1','parking_2']" :key="key" class="studio-native-secondary studio-address" hover-class="studio-native-pressed" @tap="copyAddress(contact(key))"><StudioGlyph name="pin" :size="18"/><text>{{contact(key)}}</text><StudioGlyph name="copy" :size="17"/></button>
+    <text class="studio-plan-name">{{words('nearby_parking_options_1a311a')}}</text><button v-for="key in ['parking_1','parking_2']" :key="key" class="studio-native-secondary studio-address" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="copyAddress(contact(key))"><StudioGlyph name="pin" :size="18"/><text>{{contact(key)}}</text><StudioGlyph name="copy" :size="17"/></button>
    </view>
    <view id="studio-detail-services" class="studio-native-section studio-detail-section"><text class="studio-native-subtitle">{{words('made_comfortable_made_yours_0c8904')}}</text><view v-for="item in services" :key="item[0]" class="studio-native-section studio-detail-article"><text class="studio-plan-name">{{words(item[0])}}</text><text class="studio-native-body">{{words(item[1])}}</text></view></view>
    <view id="studio-detail-notes" class="studio-native-section studio-detail-section"><text class="studio-native-subtitle">{{words('a_few_little_notes_7bbea4')}}</text><view v-for="item in notes" :key="item[0]" class="studio-native-section studio-detail-article"><text class="studio-plan-name">{{words(item[0])}}</text><text class="studio-native-body">{{words(item[1])}}</text></view></view>
@@ -72,13 +72,13 @@ onShow(()=>void refreshStudioContent());
     <text class="studio-native-subtitle">{{processWords('title')}}</text>
     <view v-for="(step,index) in steps" :key="step.title" class="studio-native-section studio-detail-step">
      <text class="studio-native-label">{{String(index+1).padStart(2,'0')}}</text><text class="studio-native-subtitle">{{processWords(step.title)}}</text><text class="studio-native-body">{{processWords(step.body)}}</text><text v-if="step.extra" class="studio-native-body">{{processWords(step.extra)}}</text>
-     <button v-if="index===1" class="studio-native-link studio-detail-tools" hover-class="studio-native-pressed" @tap="copyTools"><text>{{processWords('toolsLink')}}</text><StudioGlyph name="copy" :size="17"/></button>
+     <button v-if="index===1" class="studio-native-link studio-detail-tools" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="copyTools"><text>{{processWords('toolsLink')}}</text><StudioGlyph name="copy" :size="17"/></button>
      <StudioDetailPhoto v-for="key in step.photos" :key="key" :photo="processPhoto(key)" :alt="processWords(key+'Alt')" :language="language" @open="previewProcess(key)"/>
     </view>
     <text class="studio-native-body">{{processWords('booked')}}</text><text class="studio-native-body">{{processWords('notBooked')}}</text>
    </view>
   </view>
-  <template #actions><view class="studio-visit-actions"><button class="studio-native-primary" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-primary-label">{{processWords('visit')}}</text><StudioGlyph name="arrow"/></button></view></template>
+  <template #actions><view class="studio-visit-actions"><button class="studio-native-primary" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-primary-label">{{processWords('visit')}}</text><StudioGlyph name="arrow"/></button></view></template>
  </StudioShell>
 </template>
 <style>

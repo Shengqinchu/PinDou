@@ -75,12 +75,12 @@ onUnload(() => { ++sequence; });
         <view class="studio-native-profile-text"><text class="studio-native-name">{{name}}</text><text v-if="profile?.email&&profile.email!==name" class="studio-native-body">{{profile.email}}</text><text class="studio-native-label">{{say(profile?.is_admin?workbenchCopy.admin:accountCopy.signed_in)}}</text></view>
         <button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-link studio-profile-edit" @tap="edit">{{say(profileCopy.edit)}}</button>
       </view>
-      <button v-if="profile?.is_admin" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="openWorkbench"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(workbenchCopy.entry)}}</text><StudioGlyph name="arrow" :size="18"/></button>
+      <button v-if="profile?.is_admin" class="studio-native-menu-row" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="openWorkbench"><StudioGlyph name="grid"/><text class="studio-native-menu-label">{{say(workbenchCopy.entry)}}</text><StudioGlyph name="arrow" :size="18"/></button>
       <text v-if="failed" class="studio-native-error" role="alert">{{t('generic_error')}}</text>
       <view v-if="busy&&!wallet" class="studio-native-status"><view class="studio-native-progress"/><text class="studio-native-body">{{say(walletCopy.loading)}}</text></view>
       <view class="studio-native-balances">
         <view class="studio-native-balance"><text class="studio-native-label">{{say(walletCopy.remaining_time)}}</text><text class="studio-native-balance-value">{{hours}}</text></view>
-        <view class="studio-native-balance"><view class="studio-points-label"><text class="studio-native-label">{{say(walletCopy.remaining_points)}}</text><button class="studio-native-eye studio-points-info" :aria-label="say(profileCopy.points_help)" hover-class="studio-native-pressed" @tap="pointsHelpOpen=true"><StudioGlyph name="info" :size="16"/></button></view><text class="studio-native-balance-value">{{wallet?wallet.account.points:'—'}}</text></view>
+        <view class="studio-native-balance"><view class="studio-points-label"><text class="studio-native-label">{{say(walletCopy.remaining_points)}}</text><button class="studio-native-eye studio-points-info" :aria-label="say(profileCopy.points_help)" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="pointsHelpOpen=true"><StudioGlyph name="info" :size="16"/></button></view><text class="studio-native-balance-value">{{wallet?wallet.account.points:'—'}}</text></view>
       </view>
       <view v-if="wallet" class="studio-native-section">
         <view class="studio-native-section-head"><text class="studio-native-subtitle">{{say(bookingCopy.title)}}</text><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-link" @tap="edit">{{say(bookingCopy.edit)}}</button></view>
@@ -93,14 +93,14 @@ onUnload(() => { ++sequence; });
         </view>
       </view>
       <view class="studio-native-menu"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(visitCopy.come_make_something_f834ec)}}</text><StudioGlyph name="arrow" :size="18"/></button></view>
-      <button v-if="isOwner" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="ownerAlerts"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(ownerCopy.page_title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
+      <button v-if="isOwner" class="studio-native-menu-row" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="ownerAlerts"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(ownerCopy.page_title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
 
       <button class="studio-native-menu-row" @tap="notices"><StudioGlyph name="info"/><text class="studio-native-menu-label">{{say(noticeCopy.title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
       <view class="studio-account-end"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-link" hover-class="studio-native-pressed" @tap="logout">{{say(accountCopy.sign_out)}}</button><StudioLegalLinks :language="language"/></view>
     </view>
     <template #overlay><view v-if="pointsHelpOpen" class="studio-modal" role="dialog" aria-modal="true" :aria-label="say(profileCopy.points_help)" @tap="pointsHelpOpen=false" @touchmove.stop.prevent>
       <view class="studio-modal-panel studio-points-help" @tap.stop @touchmove.stop>
-        <view class="studio-native-section-head"><text class="studio-native-subtitle">{{say(profileCopy.points_help)}}</text><button class="studio-native-eye" :aria-label="say(walletCopy.close)" hover-class="studio-native-pressed" @tap="pointsHelpOpen=false"><StudioGlyph name="close"/></button></view>
+        <view class="studio-native-section-head"><text class="studio-native-subtitle">{{say(profileCopy.points_help)}}</text><button class="studio-native-eye" :aria-label="say(walletCopy.close)" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="pointsHelpOpen=false"><StudioGlyph name="close"/></button></view>
         <text class="studio-native-body">{{say(walletCopy.rules)}}</text><text class="studio-native-body">{{say(walletCopy.redeem_rule)}}</text><text class="studio-native-body">{{say(walletCopy.promotion_rule)}}</text><text class="studio-native-body">{{say(walletCopy.earn_rule)}}</text><text class="studio-native-body">{{say(walletCopy.patch_points_rule)}}</text>
       </view>
     </view></template>

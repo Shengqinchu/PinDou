@@ -40,11 +40,11 @@ function wechat(){uni.setClipboardData({data:say(studioWords('contacts','wechat'
      <text v-if="product.price_cents!==null" class="studio-shop-price studio-shop-item-price">{{price}}<text class="studio-shop-price-unit">CAD</text><text v-if="!variant&&hasVariantPrices(product)&&!price.includes('–')" class="studio-shop-price-unit">{{words('shop_from')}}</text></text>
      <text v-else class="studio-shop-unpriced">{{words('shop_unpriced')}}</text>
     </view>
-    <view v-if="product.variants?.length" class="studio-shop-variants"><button v-for="item in product.variants" :key="item.id" class="studio-plan" :class="{'studio-plan--selected':variant?.id===item.id}" hover-class="studio-native-pressed" :aria-pressed="variant?.id===item.id" @tap="pick(item)">{{tr(item.zh,item.en)}}</button></view>
+    <view v-if="product.variants?.length" class="studio-shop-variants"><button v-for="item in product.variants" :key="item.id" class="studio-plan" :class="{'studio-plan--selected':variant?.id===item.id}" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" :aria-pressed="variant?.id===item.id" @tap="pick(item)">{{tr(item.zh,item.en)}}</button></view>
     <text v-if="description" class="studio-native-body studio-shop-description" selectable>{{description}}</text>
     <text class="studio-native-body studio-native-small">{{words('shop_note')}}</text>
    </template>
   </view>
-  <template #actions><view class="studio-visit-actions"><button class="studio-native-primary" hover-class="studio-native-pressed" @tap="wechat"><StudioGlyph name="wechat"/><text class="studio-native-primary-label">{{words('shop_contact')}}</text><StudioGlyph name="copy" :size="18"/></button></view></template>
+  <template #actions><view class="studio-visit-actions"><button class="studio-native-primary" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="wechat"><StudioGlyph name="wechat"/><text class="studio-native-primary-label">{{words('shop_contact')}}</text><StudioGlyph name="copy" :size="18"/></button></view></template>
  </StudioShell>
 </template>

@@ -47,10 +47,10 @@ watch(()=>props.reservation.version,value=>{if(open.value&&base.value&&value!==b
 onBeforeUnmount(()=>sequence++);onViewHide(()=>{if(!busy.value){sequence++;open.value=false;loading.value=false;}});
 </script>
 <template>
- <button v-if="reservation.can_edit" class="studio-native-link" hover-class="studio-native-pressed" @tap="begin">{{text('action')}}</button>
+ <button v-if="reservation.can_edit" class="studio-native-link" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="begin">{{text('action')}}</button>
  <view v-if="open" class="studio-modal studio-edit-overlay" role="dialog" aria-modal="true" :aria-label="text('title')" @touchmove.stop.prevent @tap="dismiss">
   <view class="studio-modal-panel studio-edit-panel" @tap.stop>
-   <view class="studio-edit-heading"><text class="studio-native-subtitle">{{text('title')}}</text><button class="studio-native-eye" :disabled="busy" :aria-label="text('cancel')" hover-class="studio-native-pressed" @tap="dismiss"><StudioGlyph name="close" :size="22"/></button></view>
+   <view class="studio-edit-heading"><text class="studio-native-subtitle">{{text('title')}}</text><button class="studio-native-eye" :disabled="busy" :aria-label="text('cancel')" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="dismiss"><StudioGlyph name="close" :size="22"/></button></view>
    <scroll-view scroll-y class="studio-edit-body" @touchmove.stop>
     <text class="studio-native-small">{{text('customer_help')}}</text><text v-if="base?.status==='completed'" class="studio-native-small">{{text('completed_help')}}</text>
     <view class="studio-edit-guests"><text class="studio-native-label">{{text('guests')}}</text><picker :range="guests" :value="Math.max(0,guests.indexOf(booking.guests))" :disabled="busy||loading" @change="guestChange"><view class="studio-native-select">{{fillWords(studioWords('edit','guest_count'),language,{v0:booking.guests})}}</view></picker></view>
@@ -59,7 +59,7 @@ onBeforeUnmount(()=>sequence++);onViewHide(()=>{if(!busy.value){sequence++;open.
     <text v-if="booking.date&&booking.start&&booking.end" class="studio-native-small studio-edit-summary">{{fillWords(studioWords('edit','summary'),language,{v0:booking.date,v1:booking.start,v2:booking.end,v3:booking.guests})}}</text>
     <text v-if="errorCode" class="studio-native-error">{{bookingError(errorCode)[language==='en'?1:0]}}</text><button v-if="errorCode" class="studio-native-link" :disabled="busy||loading" @tap="load(conflict)">{{text(conflict?'reload':'retry')}}</button>
    </scroll-view>
-   <view class="studio-edit-actions"><button class="studio-native-secondary" :disabled="busy" hover-class="studio-native-pressed" @tap="dismiss">{{text('cancel')}}</button><button class="studio-native-primary" :disabled="busy||loading||!eligible" hover-class="studio-native-pressed" @tap="submit">{{text(busy?'saving':'submit')}}</button></view>
+   <view class="studio-edit-actions"><button class="studio-native-secondary" :disabled="busy" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="dismiss">{{text('cancel')}}</button><button class="studio-native-primary" :disabled="busy||loading||!eligible" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="submit">{{text(busy?'saving':'submit')}}</button></view>
   </view>
  </view>
 </template>

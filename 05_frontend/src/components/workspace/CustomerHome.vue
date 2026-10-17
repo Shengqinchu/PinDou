@@ -9,6 +9,9 @@ import {usePatchPromotion} from '../../utils/studio-patch-promotion';
 import { useStudioNative } from '../../utils/studio-native';
 import { refreshStudioContent,studioWords,studioPhoto } from '../../utils/studio-content';
 import {navigateStudio} from '../../utils/studio-navigation';
+import {readStudioCached} from '../../utils/studio-cache';
+import {calendarPath,emptyBooking} from '../../utils/studio-booking';
+import {prefetchShop} from '../../utils/shop-catalog';
 const {language,width,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();
 const words=(module:Parameters<typeof studioWords>[0],key:string)=>say(studioWords(module,key));
 const photo=computed(studioPhoto),imageFailed=ref(false);
@@ -19,7 +22,9 @@ function bookings(){navigateStudio('/pages/studio/reservations');}
 function details(){uni.navigateTo({url:'/pages/studio/details'});}
 function patterns(){uni.navigateTo({url:'/pages/tools/pattern'});}
 function shop(){uni.navigateTo({url:'/pages/shop/index'});}
-onShow(()=>void refreshStudioContent());
+// After the home settles, quietly load the next likely pages: open booking times and the shop.
+let warmTimer:ReturnType<typeof setTimeout>|undefined;
+onShow(()=>{void refreshStudioContent();clearTimeout(warmTimer);warmTimer=setTimeout(()=>{void readStudioCached(calendarPath(emptyBooking()),'',15000).catch(()=>{});prefetchShop();},900);});
 </script>
 <template>
  <StudioShell id="studio-home-pane" fitted embedded :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle">

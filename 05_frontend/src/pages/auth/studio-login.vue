@@ -129,7 +129,7 @@ onUnload(() => { alive = false; ticket.value = ''; password.value = ''; confirma
         <text v-if="errorCode" class="studio-native-error" role="alert">{{error}}</text>
         <button :hover-stay-time="180" :hover-start-time="0" v-if="errorCode" class="studio-native-secondary" :disabled="loading||busy" hover-class="studio-native-pressed" @tap="proofExpires=0;prepare()">{{t('retry')}}</button>
         <button :hover-start-time="0" v-else-if="!loading" class="studio-native-primary" :disabled="busy||!ticket" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="wechat"><view v-if="busy" class="studio-native-progress"/><text>{{t(busy?'working':linked?'wechat_login':'wechat_create')}}</text></button>
-        <button class="studio-native-secondary" :disabled="busy" hover-class="studio-native-pressed" @tap="choose('password')">{{t('existing_email_login')}}</button>
+        <button class="studio-native-secondary" :disabled="busy" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="choose('password')">{{t('existing_email_login')}}</button>
         <text v-if="!linked" class="studio-native-body studio-native-small">{{t('new_wechat_account_help')}}</text>
         <text class="studio-native-body studio-native-small">{{t('website_account')}}</text>
       </view>

@@ -3,7 +3,10 @@ const filename=path.join(__dirname,'../src/utils/studio-cache.ts');
 const code=ts.transpileModule(fs.readFileSync(filename,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 let now=1000;const calls=[],exportsObject={};
 class MiniappError extends Error{constructor(code,status){super(code);this.code=code;this.status=status;}}
-vm.runInNewContext(code,{exports:exportsObject,Date:{now:()=>now},require:name=>{assert.equal(name,'./miniapp-client');return {MiniappError,studioRead:(route,token)=>new Promise((resolve,reject)=>calls.push({route,token,resolve,reject}))};}});
+const disk=new Map();
+const publicStore={readPublic:(name,maxAge)=>{const v=disk.get(name);return v&&now-v.at<=maxAge?v:undefined;},writePublic:(name,data)=>disk.set(name,{at:now,data:JSON.parse(JSON.stringify(data))})};
+const load=target=>vm.runInNewContext(code,{exports:target,Date:{now:()=>now},require:name=>{if(name==='./public-store')return publicStore;assert.equal(name,'./miniapp-client');return {MiniappError,studioRead:(route,token)=>new Promise((resolve,reject)=>calls.push({route,token,resolve,reject}))};}});
+load(exportsObject);
 const c=exportsObject,flush=()=>new Promise(resolve=>setImmediate(resolve));
 (async()=>{
  c.setStudioCacheOwner('owner-a');
@@ -21,5 +24,13 @@ const c=exportsObject,flush=()=>new Promise(resolve=>setImmediate(resolve));
  now+=300001;assert.equal(c.peekStudioSnapshot('/reservations/VIS-test','owner-b'),undefined);
  for(let i=0;i<40;i++)c.rememberStudioSnapshot('/public/'+i,'',{value:i});assert.equal(c.peekStudioSnapshot('/public/0',''),undefined);assert.equal(c.peekStudioSnapshot('/public/39','').data.value,39);
  c.setStudioCacheOwner('');assert.equal(c.peekStudioSnapshot('/auth/reservations?page=1',''),undefined);
- console.log('Cache checks passed: deduplication, fresh/forced/expired reads, copy isolation, account switch, in-flight invalidation, mutation seed, bounded storage and logout.');
+ // Public calendar reads survive a restart for instant paint; private reads never touch disk.
+ const calPath='/reservation-calendar?guests=1&experience=beads';
+ c.rememberStudioSnapshot(calPath,'',{days:[1]});c.setStudioCacheOwner('owner-z');c.rememberStudioSnapshot('/auth/wallet','owner-z',{points:9});
+ assert(disk.has(calPath));assert(![...disk.keys()].some(k=>k.startsWith('/auth')));
+ const restarted={};load(restarted);now+=3600000;
+ const cold=restarted.peekStudioSnapshot(calPath,'');assert.equal(cold.data.days[0],1);assert.equal(cold.age,3600000);
+ assert.equal(restarted.peekStudioSnapshot('/auth/wallet','owner-z'),undefined);
+ now+=86400001;const coldExpired={};load(coldExpired);assert.equal(coldExpired.peekStudioSnapshot(calPath,''),undefined);
+ console.log('Cache checks passed: deduplication, fresh/forced/expired reads, copy isolation, account switch, in-flight invalidation, mutation seed, bounded storage, logout, and public-only persistence across restarts.');
 })().catch(e=>{console.error(e);process.exit(1)});

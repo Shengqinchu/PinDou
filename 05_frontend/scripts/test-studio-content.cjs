@@ -1,7 +1,7 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict'),ts=require('typescript');
 const file=path.join(__dirname,'../src/utils/studio-content.ts'),exportsObject={};let response={modules:{}},now=100000;
 const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText;
-vm.runInNewContext(code,{exports:exportsObject,Date:{now:()=>now},require:id=>id==='vue'?{shallowRef:value=>({value})}:id==='./miniapp-client'?{studioRead:async()=>response}:require(path.resolve(path.dirname(file),id))});
+vm.runInNewContext(code,{exports:exportsObject,Date:{now:()=>now},require:id=>id==='vue'?{shallowRef:value=>({value})}:id==='./miniapp-client'?{studioRead:async()=>response}:id==='./public-store'?{readPublic:()=>undefined,writePublic:()=>{}}:require(path.resolve(path.dirname(file),id))});
 const c=exportsObject;
 (async()=>{
  const original=c.studioMedia('process-pattern');assert(original.src.endsWith('/studio-media/v4/process-pattern.webp'));assert.equal(original.width,1400);

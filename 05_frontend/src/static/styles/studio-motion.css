@@ -3,21 +3,22 @@
 .studio-home-photo,.studio-native-balances,.studio-visit-plans,.studio-visit-review,.studio-profile-avatar-row{animation:studio-card-enter .32s cubic-bezier(.4,0,.2,1) both}
 .studio-native-heading .studio-native-title{animation:none}
 .studio-modal{animation:studio-overlay-enter .16s ease-out}.studio-modal-panel{animation:studio-panel-enter .28s cubic-bezier(.4,0,.2,1) both}
-.studio-native .studio-native-pressed{transform:translateY(2px) scale(.985);transition-duration:80ms;background-color:#dcebf5;box-shadow:none}
+/* Press like the website's tactile controls: one 0.3s control curve, a short sink, and a key edge that thins instead of vanishing. */
+.studio-native .studio-native-pressed{transform:translateY(1px) scale(.985);transition-duration:.2s;background-color:#dcebf5;box-shadow:none}
+.studio-native .studio-native-primary.studio-native-pressed{transform:translateY(2px);box-shadow:0 1px 0 #cbdfec,0 2px 6px #30475708}
 .studio-native .studio-calendar-cell.studio-native-pressed{transform:none;background-color:#dcebf5}
 .studio-native button[disabled]{transform:none!important}
 .studio-plan-radio{transition:background-color .2s ease,border-color .2s ease}.studio-native-input:focus-within{border-color:#83a7bd;box-shadow:0 0 0 3px #eaf2f7}
 .studio-submit-actions{display:flex;gap:10px;flex-shrink:0}.studio-native .studio-submit-actions>button{flex:1;min-width:0;min-height:46px;padding:10px 12px;font-size:14px}
 .studio-submit-panel .studio-native-definition{gap:8px}.studio-submit-panel>.studio-native-body{font-size:12px;line-height:1.6}
 .studio-cancel-remaining{font-variant-numeric:tabular-nums}
-/* Functional screens give immediate feedback; the home keeps its brand entry. */
-.studio-native-title,.studio-native-section-head>.studio-native-subtitle{animation-duration:.16s}
-.studio-native-balances,.studio-visit-plans,.studio-visit-review,.studio-profile-avatar-row{animation-duration:.16s}
-.studio-native button{transition-duration:.12s}
-.studio-native-heading{animation-duration:.22s}
+/* Screens settle on the website's travel curve rather than snapping in. */
+.studio-native-title,.studio-native-section-head>.studio-native-subtitle{animation-duration:.34s;animation-timing-function:cubic-bezier(.22,.68,0,1)}
+.studio-native-balances,.studio-visit-plans,.studio-visit-review,.studio-profile-avatar-row{animation-duration:.34s;animation-timing-function:cubic-bezier(.22,.68,0,1)}
+.studio-native-heading{animation-duration:.4s}
 .studio-home .studio-native-heading{animation-duration:.55s}
-@keyframes studio-title-enter{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
-@keyframes studio-card-enter{from{opacity:.65;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes studio-title-enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes studio-card-enter{from{opacity:.7;transform:translateY(4px)}to{opacity:1;transform:none}}
 @keyframes studio-overlay-enter{from{opacity:0}to{opacity:1}}
 @keyframes studio-panel-enter{from{opacity:.5;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.studio-native-title,.studio-native-heading,.studio-native-result,.studio-native-section-head>.studio-native-subtitle,.studio-home-photo,.studio-native-balances,.studio-visit-plans,.studio-visit-review,.studio-profile-avatar-row,.studio-modal,.studio-modal-panel{animation:none!important}.studio-native button,.studio-plan-radio{transition:none!important}.studio-native .studio-native-pressed{transform:none}}
