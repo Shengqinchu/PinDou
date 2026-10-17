@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed,reactive,ref } from 'vue';
+import { computed,reactive,ref,watch } from 'vue';
 import StudioShell from '../../components/StudioShell.vue';
 import StudioGlyph from '../../components/StudioGlyph.vue';
 import StudioCalendar from '../../components/StudioCalendar.vue';
@@ -23,6 +23,8 @@ const contactIndex=computed(()=>Math.max(0,methods.findIndex(item=>item.value===
 const guests=computed(()=>Array.from({length:flow.calendar?.max_guests_per_group||6},(_,i)=>({value:i+1,label:fillWords(studioWords('flow','guest_count'),language.value,{v0:i+1})})));
 const guestLabel=computed(()=>guests.value.find(item=>item.value===flow.booking.guests)?.label||String(flow.booking.guests));
 const error=computed(()=>['choose_first','choose_available'].includes(flow.errorCode)?words('flow',flow.errorCode):say(bookingError(flow.errorCode)));
+// Only step changes animate in; the first step arrives with the native page slide.
+const stepped=ref(false);watch(()=>flow.step,()=>{stepped.value=true;});
 const canContinue=computed(()=>!flow.locked&&(flow.step===0?!!flow.booking.plan:flow.selected));
 function guestChange(event:{detail:{value:string}}){void flow.chooseGuests(guests.value[Number(event.detail.value)].value);}
 function methodChange(event:{detail:{value:string}}){flow.contact.contact_method=methods[Number(event.detail.value)].value;flow.editing=true;}
@@ -42,7 +44,7 @@ const limited=computed(()=>{
 </script>
 <template>
  <StudioShell id="studio-shell" fitted :reset-key="flow.step" :language="language" :keyboard-open="keyboardOpen" :shell-style="shellStyle" @language="changeLanguage">
-  <view :key="flow.step" class="studio-native-main studio-visit" :class="{'studio-visit--time':flow.step===1}">
+  <view :key="flow.step" class="studio-native-main studio-visit" :class="{'studio-visit--time':flow.step===1,'studio-visit--stepped':stepped}">
    <view class="studio-visit-steps" :aria-label="words('flow','progress')"><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" v-for="(key,index) in steps" :key="key" :class="{'studio-visit-step--active':flow.step===index,'studio-visit-step--done':flow.step>index}" :disabled="flow.locked||index>flow.step" :aria-current="flow.step===index?'step':undefined" @tap="flow.navigate(index)"><text class="studio-visit-number">{{String(index+1).padStart(2,'0')}}</text><text>{{words('flow',key)}}</text></button></view>
    <text class="studio-native-title studio-visit-title">{{words('flow',flow.step===0?'experience':flow.step===1?'time':'contact')}}</text>
    <template v-if="flow.step===0">

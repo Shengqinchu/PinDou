@@ -17,8 +17,8 @@ const say = (words: string[]) => words[props.language === 'en' ? 1 : 0];
       </checkbox-group>
       <text class="owner-save-note">{{say(copy.save_alert_note)}}</text>
       <view class="owner-save-actions">
-        <button class="owner-save-secondary" hover-class="admin-pressed" @tap="$emit('dismiss')">{{say(workbench.cancel)}}</button>
-        <button class="owner-save-primary" hover-class="admin-pressed" @tap="$emit('confirm', subscribe)">{{say(subscribe ? copy.confirm_with_alert : workbench.confirm)}}</button>
+        <button class="owner-save-secondary" hover-class="admin-pressed" :hover-start-time="0" :hover-stay-time="180" @tap="$emit('dismiss')">{{say(workbench.cancel)}}</button>
+        <button class="owner-save-primary" hover-class="admin-pressed" :hover-start-time="0" :hover-stay-time="180" @tap="$emit('confirm', subscribe)">{{say(subscribe ? copy.confirm_with_alert : workbench.confirm)}}</button>
       </view>
     </view>
   </view>

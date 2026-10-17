@@ -95,7 +95,7 @@ onUnload(() => { ++sequence; });
       <view class="studio-native-menu"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-menu-row" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(visitCopy.come_make_something_f834ec)}}</text><StudioGlyph name="arrow" :size="18"/></button></view>
       <button v-if="isOwner" class="studio-native-menu-row" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="ownerAlerts"><StudioGlyph name="calendar"/><text class="studio-native-menu-label">{{say(ownerCopy.page_title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
 
-      <button class="studio-native-menu-row" @tap="notices"><StudioGlyph name="info"/><text class="studio-native-menu-label">{{say(noticeCopy.title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
+      <button hover-class="studio-native-pressed" :hover-start-time="0" :hover-stay-time="180" class="studio-native-menu-row" @tap="notices"><StudioGlyph name="info"/><text class="studio-native-menu-label">{{say(noticeCopy.title)}}</text><StudioGlyph name="arrow" :size="18"/></button>
       <view class="studio-account-end"><button :hover-stay-time="180" :hover-start-time="0" class="studio-native-link" hover-class="studio-native-pressed" @tap="logout">{{say(accountCopy.sign_out)}}</button><StudioLegalLinks :language="language"/></view>
     </view>
     <template #overlay><view v-if="pointsHelpOpen" class="studio-modal" role="dialog" aria-modal="true" :aria-label="say(profileCopy.points_help)" @tap="pointsHelpOpen=false" @touchmove.stop.prevent>

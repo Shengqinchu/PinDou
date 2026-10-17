@@ -24,7 +24,7 @@ const notice=(key:string)=>(notices as Record<string,string[]>)[key]?.[props.rev
    <!-- #endif -->
    <view class="studio-submit-actions"><button :disabled="confirming" :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-secondary" @tap="$emit('dismiss')">{{words('flow','back_to_edit')}}</button><button :disabled="confirming||notificationLoading" :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" class="studio-native-primary" @tap="$emit('confirm')">{{words('flow','confirm_submit')}}</button></view>
    <!-- #ifdef MP-WEIXIN -->
-   <button v-if="notificationNote==='wechat_unavailable'" :disabled="confirming" class="studio-native-link" @tap="$emit('withoutWechat')">{{notice('wechat_submit_without')}}</button>
+   <button hover-class="studio-native-pressed" :hover-start-time="0" :hover-stay-time="180" v-if="notificationNote==='wechat_unavailable'" :disabled="confirming" class="studio-native-link" @tap="$emit('withoutWechat')">{{notice('wechat_submit_without')}}</button>
    <!-- #endif -->
   </view>
  </view>

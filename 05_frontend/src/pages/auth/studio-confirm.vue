@@ -64,7 +64,7 @@ onUnload(() => { alive = false; ticket.value = ''; });
       </template>
       <text v-if="errorCode" class="studio-native-error" role="alert">{{error}}</text>
     </view>
-    <view class="studio-native-actions"><button v-if="status==='approved'" class="studio-native-secondary" :disabled="busy" @tap="setupProfile">{{say(profileCopy.setup_title)}}</button>
+    <view class="studio-native-actions"><button hover-class="studio-native-pressed" :hover-start-time="0" :hover-stay-time="180" v-if="status==='approved'" class="studio-native-secondary" :disabled="busy" @tap="setupProfile">{{say(profileCopy.setup_title)}}</button>
       <button :hover-start-time="0" v-if="done||terminal" class="studio-native-primary" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="home"><text class="studio-native-primary-label">{{t('home')}}</text><view class="studio-native-button-arrow"><StudioGlyph name="arrow" :size="18"/></view></button>
       <template v-else-if="details&&!loading">
         <button :hover-start-time="0" class="studio-native-primary" :disabled="busy" hover-class="studio-native-pressed" :hover-stay-time="220" @tap="confirm(true)"><view v-if="busy" class="studio-native-progress"/><text class="studio-native-primary-label">{{t(busy?'working':details.mode==='link'?'link':'confirm')}}</text><view v-if="!busy" class="studio-native-button-arrow"><StudioGlyph name="arrow" :size="18"/></view></button>

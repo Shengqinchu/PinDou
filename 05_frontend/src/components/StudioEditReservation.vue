@@ -57,7 +57,7 @@ onBeforeUnmount(()=>sequence++);onViewHide(()=>{if(!busy.value){sequence++;open.
     <text v-if="loading" class="studio-native-label">{{text('loading')}}</text>
     <StudioCalendar v-if="calendar&&!conflict" :calendar="calendar" :booking="booking" :disabled="busy||loading" :language="language" :width="Math.min(900,width-72)" @select="select"/>
     <text v-if="booking.date&&booking.start&&booking.end" class="studio-native-small studio-edit-summary">{{fillWords(studioWords('edit','summary'),language,{v0:booking.date,v1:booking.start,v2:booking.end,v3:booking.guests})}}</text>
-    <text v-if="errorCode" class="studio-native-error">{{bookingError(errorCode)[language==='en'?1:0]}}</text><button v-if="errorCode" class="studio-native-link" :disabled="busy||loading" @tap="load(conflict)">{{text(conflict?'reload':'retry')}}</button>
+    <text v-if="errorCode" class="studio-native-error">{{bookingError(errorCode)[language==='en'?1:0]}}</text><button hover-class="studio-native-pressed" :hover-start-time="0" :hover-stay-time="180" v-if="errorCode" class="studio-native-link" :disabled="busy||loading" @tap="load(conflict)">{{text(conflict?'reload':'retry')}}</button>
    </scroll-view>
    <view class="studio-edit-actions"><button class="studio-native-secondary" :disabled="busy" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="dismiss">{{text('cancel')}}</button><button class="studio-native-primary" :disabled="busy||loading||!eligible" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="submit">{{text(busy?'saving':'submit')}}</button></view>
   </view>

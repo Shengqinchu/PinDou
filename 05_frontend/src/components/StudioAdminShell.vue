@@ -22,12 +22,12 @@ function navigate(item:{id:string;page:string}){if(item.id!==props.active||props
 </script>
 <template>
  <view class="admin-native" :class="{'admin-native--en':language==='en'}" :style="shellStyle">
-  <view class="admin-native-heading"><button v-if="back" class="admin-icon" :aria-label="say(copy.back)" hover-class="admin-pressed" @tap="navigateBack">‹</button><text class="admin-native-title">{{title}}</text><button class="admin-icon" :disabled="busy" :aria-label="say(copy.refresh)" hover-class="admin-pressed" @tap="$emit('refresh')"><StudioGlyph name="refresh" :size="21"/></button><button class="admin-language" hover-class="admin-pressed" @tap="$emit('language')">{{language==='zh'?'EN':'中文'}}</button></view>
+  <view class="admin-native-heading"><button v-if="back" class="admin-icon" :aria-label="say(copy.back)" hover-class="admin-pressed" :hover-start-time="0" :hover-stay-time="180" @tap="navigateBack">‹</button><text class="admin-native-title">{{title}}</text><button class="admin-icon" :disabled="busy" :aria-label="say(copy.refresh)" hover-class="admin-pressed" :hover-start-time="0" :hover-stay-time="180" @tap="$emit('refresh')"><StudioGlyph name="refresh" :size="21"/></button><button class="admin-language" hover-class="admin-pressed" :hover-start-time="0" :hover-stay-time="180" @tap="$emit('language')">{{language==='zh'?'EN':'中文'}}</button></view>
   <view v-if="error" class="admin-error"><text>{{error}}</text></view>
   <view v-if="busy" class="admin-loading"><text>{{say(copy.loading)}}</text></view>
   <scroll-view v-if="retained" class="admin-native-body" scroll-y :scroll-into-view="scrollTo" :scroll-with-animation="false" :show-scrollbar="false"><view class="admin-native-content"><slot/></view></scroll-view>
   <scroll-view v-else class="admin-native-body" scroll-y :scroll-top="scrollTop" :scroll-into-view="scrollTo" :scroll-with-animation="false" :show-scrollbar="false" @scroll="lastTop=$event.detail.scrollTop"><view class="admin-native-content"><slot/></view></scroll-view>
   <view class="admin-native-actions"><slot name="actions"/></view>
-  <view v-if="!keyboardOpen" class="admin-native-tabs"><button v-for="item in tabs" :key="item.id" :class="{chosen:active===item.id}" hover-class="admin-pressed" @tap="navigate(item)"><StudioGlyph :name="item.icon" :size="21"/><text>{{say(item.label)}}</text></button></view>
+  <view v-if="!keyboardOpen" class="admin-native-tabs"><button v-for="item in tabs" :key="item.id" :class="{chosen:active===item.id}" hover-class="admin-pressed" :hover-start-time="0" :hover-stay-time="180" @tap="navigate(item)"><StudioGlyph :name="item.icon" :size="21"/><text>{{say(item.label)}}</text></button></view>
  </view>
 </template>

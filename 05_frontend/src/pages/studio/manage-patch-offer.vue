@@ -45,7 +45,7 @@ onShow(()=>void load());onUnload(()=>{alive=false;sequence++;});
    </view>
    <view class="admin-card admin-stack"><text class="admin-name">{{words('rules_label')}}</text><text class="admin-muted">{{words('rules')}}</text><text class="admin-muted">{{words('quota_help')}}</text></view>
   </template>
-  <button v-if="error" class="admin-secondary" :disabled="saving||loading" @tap="load(true)">{{words('retry')}}</button>
-  <template #actions><button class="admin-primary" hover-class="admin-pressed" :disabled="!offer||!valid||!dirty||saving||loading" @tap="save">{{words(saving?'saving':'save')}}</button></template>
+  <button hover-class="admin-pressed" :hover-start-time="0" :hover-stay-time="180" v-if="error" class="admin-secondary" :disabled="saving||loading" @tap="load(true)">{{words('retry')}}</button>
+  <template #actions><button class="admin-primary" hover-class="admin-pressed" :hover-start-time="0" :hover-stay-time="180" :disabled="!offer||!valid||!dirty||saving||loading" @tap="save">{{words(saving?'saving':'save')}}</button></template>
  </StudioAdminShell>
 </template>
