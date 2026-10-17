@@ -954,6 +954,103 @@
     }
     .toolbar .field { width: 210px; }
     .panel { overflow: hidden; }
+    .cdk-generator {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 18px;
+      padding: 18px;
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .cdk-generator__head,
+    .cdk-generated__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .cdk-generator__head h2 {
+      margin: 0 0 4px;
+      color: var(--gray-900);
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .cdk-generator__head p {
+      margin: 0;
+      color: var(--gray-500);
+      font-size: 13px;
+    }
+    .cdk-generator__controls {
+      display: grid;
+      grid-template-columns: 240px minmax(160px, 220px) minmax(160px, 220px);
+      gap: 12px;
+      align-items: end;
+    }
+    .cdk-generator .field {
+      margin: 0;
+      width: auto;
+    }
+    .cdk-kind-toggle {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      min-height: 32px;
+      padding: 4px;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      background: var(--gray-50);
+    }
+    .cdk-kind-toggle button {
+      height: 34px;
+      border: 0;
+      border-radius: 9px;
+      color: var(--gray-600);
+      background: transparent;
+      font-weight: 800;
+    }
+    .cdk-kind-toggle button.active {
+      color: #fff;
+      background: var(--brand);
+      box-shadow: 0 8px 18px rgba(31, 111, 235, 0.22);
+    }
+    .cdk-generated {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid #b7dfc8;
+      border-radius: 14px;
+      background: #f4fbf7;
+    }
+    .cdk-code-list {
+      display: grid;
+      gap: 8px;
+      max-height: 320px;
+      overflow: auto;
+    }
+    .cdk-code-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 42px;
+      padding: 7px 8px 7px 12px;
+      border: 1px solid #d9eadf;
+      border-radius: 10px;
+      background: #fff;
+    }
+    .cdk-code-row code {
+      min-width: 0;
+      color: var(--gray-900);
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .table {
       margin-bottom: 0;
       color: var(--gray-800);
@@ -1135,6 +1232,17 @@
       .login-panel { padding: 28px; }
       .metrics { grid-template-columns: 1fr; }
       .toolbar .field { width: 100%; }
+      .cdk-generator__head,
+      .cdk-generated__head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .cdk-generator__controls {
+        grid-template-columns: 1fr;
+      }
+      .cdk-code-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -1174,9 +1282,8 @@
           cdks: { items: [], total: 0, page: 1, size: 20 },
           cdkFilters: { status: "", type: "", batch_id: "" },
           cdkLoading: false,
-          cdkBatchOpen: false,
           cdkBatchLoading: false,
-          cdkForm: { type: "credit_pack_5", value: 5, count: 10, sales_channel: "", expires_at: "", notes: "", reason: "" },
+          cdkForm: { kind: "points", points: 200, days: 7, count: 10 },
           cdkGenerated: null,
           users: { items: [], total: 0, page: 1, size: 20 },
           userFilters: { search: "" },
@@ -1438,27 +1545,29 @@
           this.cdkFilters = { status: "", type: "", batch_id: "" };
           this.loadCdks(1);
         },
-        openCdkBatch() {
-          this.cdkBatchOpen = true;
-          this.cdkGenerated = null;
-        },
-        closeCdkBatch() {
-          if (!this.cdkBatchLoading) this.cdkBatchOpen = false;
+        setCdkKind(kind) {
+          if (!["points", "membership"].includes(kind)) return;
+          this.cdkForm.kind = kind;
         },
         async submitCdkBatch() {
-          if (!this.cdkForm.reason.trim()) {
-            this.showBad("请填写 reason。");
+          const kind = this.cdkForm.kind === "membership" ? "membership" : "points";
+          const value = Number(kind === "points" ? this.cdkForm.points : this.cdkForm.days);
+          const count = Number(this.cdkForm.count);
+          if (!Number.isFinite(value) || value < 1) {
+            this.showBad(kind === "points" ? "请填写有效的积分数量。" : "请填写有效的天数。");
+            return;
+          }
+          if (!Number.isFinite(count) || count < 1 || count > 500) {
+            this.showBad("生成张数必须在 1-500 之间。");
             return;
           }
           const body = {
-            type: this.cdkForm.type,
-            value: Number(this.cdkForm.value),
-            count: Number(this.cdkForm.count),
-            reason: this.cdkForm.reason.trim()
+            type: kind,
+            value,
+            count,
+            reason: `后台批量生成 ${kind === "points" ? `${value} 积分` : `${value} 天`} CDK，共 ${count} 张`
           };
-          if (this.cdkForm.sales_channel.trim()) body.sales_channel = this.cdkForm.sales_channel.trim();
-          if (this.cdkForm.expires_at) body.expires_at = this.cdkForm.expires_at;
-          if (this.cdkForm.notes.trim()) body.notes = this.cdkForm.notes.trim();
+          this.cdkGenerated = null;
           this.cdkBatchLoading = true;
           try {
             const payload = await this.api("/cdks/batch", {
@@ -1478,12 +1587,28 @@
         async copyGeneratedCodes() {
           if (!this.cdkGenerated || !this.cdkGenerated.codes) return;
           const text = this.cdkGenerated.codes.join("\n");
-          if (!navigator.clipboard) {
-            this.showBad("当前浏览器不支持剪贴板 API。");
-            return;
+          await this.copyText(text, "全部 CDK 已复制。");
+        },
+        async copyText(text, successMessage = "已复制。") {
+          if (!text) return;
+          try {
+            if (navigator.clipboard && window.isSecureContext) {
+              await navigator.clipboard.writeText(text);
+            } else {
+              const textarea = document.createElement("textarea");
+              textarea.value = text;
+              textarea.setAttribute("readonly", "");
+              textarea.style.position = "fixed";
+              textarea.style.left = "-9999px";
+              document.body.appendChild(textarea);
+              textarea.select();
+              document.execCommand("copy");
+              document.body.removeChild(textarea);
+            }
+            this.showOk(successMessage);
+          } catch (error) {
+            this.showBad("复制失败，请手动选择复制。");
           }
-          await navigator.clipboard.writeText(text);
-          this.showOk("codes 已复制。");
         },
         async downloadCdkCsv() {
           const params = new URLSearchParams();
@@ -1741,6 +1866,8 @@
         },
         cdkTypeText(type) {
           const map = {
+            points: "积分",
+            membership: "天数",
             single_use: "单次兑换",
             monthly_card: "月卡",
             credit_pack_5: "5 额度包",
@@ -2100,6 +2227,8 @@
                   <span class="label">类型</span>
                   <select v-model="cdkFilters.type" @change="loadCdks(1)">
                     <option value="">全部</option>
+                    <option value="points">积分</option>
+                    <option value="membership">天数</option>
                     <option value="single_use">单次兑换</option>
                     <option value="monthly_card">月卡</option>
                     <option value="credit_pack_5">5 额度包</option>
@@ -2112,9 +2241,55 @@
                 </label>
                 <button class="btn btn-primary btn-sm" @click="loadCdks(1)"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
                 <button class="btn btn-secondary btn-sm" @click="resetCdkFilters">重置</button>
-                <button class="btn btn-danger btn-sm" @click="openCdkBatch"><i class="fa-solid fa-plus"></i> 批量生成</button>
                 <button class="btn btn-secondary btn-sm" @click="downloadCdkCsv"><i class="fa-solid fa-file-csv"></i> 导出 CSV</button>
               </div>
+              <form class="cdk-generator" :class="{ loading: cdkBatchLoading }" @submit.prevent="submitCdkBatch">
+                <div class="cdk-generator__head">
+                  <div>
+                    <h2>生成 CDK</h2>
+                    <p>选择积分或天数，填数量和张数后直接生成。</p>
+                  </div>
+                  <button class="btn btn-danger btn-sm" type="submit" :disabled="cdkBatchLoading">
+                    <i class="fa-solid fa-plus"></i> {{ cdkBatchLoading ? "生成中…" : "生成" }}
+                  </button>
+                </div>
+                <div class="cdk-generator__controls">
+                  <div class="cdk-kind-toggle" role="group" aria-label="CDK 类型">
+                    <button type="button" :class="{ active: cdkForm.kind === 'points' }" @click="setCdkKind('points')">积分</button>
+                    <button type="button" :class="{ active: cdkForm.kind === 'membership' }" @click="setCdkKind('membership')">天数</button>
+                  </div>
+                  <label class="field" v-if="cdkForm.kind === 'points'">
+                    <span class="label">积分数量</span>
+                    <input v-model.number="cdkForm.points" type="number" min="1" step="1" required>
+                  </label>
+                  <label class="field" v-else>
+                    <span class="label">天数</span>
+                    <input v-model.number="cdkForm.days" type="number" min="1" step="1" required>
+                  </label>
+                  <label class="field">
+                    <span class="label">生成张数</span>
+                    <input v-model.number="cdkForm.count" type="number" min="1" max="500" step="1" required>
+                  </label>
+                </div>
+                <div v-if="cdkGenerated" class="cdk-generated">
+                  <div class="cdk-generated__head">
+                    <div class="inline-actions">
+                      <span class="badge ok">batch_id={{ cdkGenerated.batch_id }}</span>
+                      <span class="badge ok">audit_id={{ cdkGenerated.audit_id }}</span>
+                      <span class="badge">{{ cdkGenerated.codes.length }} 张</span>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" type="button" @click="copyGeneratedCodes">
+                      <i class="fa-solid fa-copy"></i> 复制全部 CDK
+                    </button>
+                  </div>
+                  <div class="cdk-code-list">
+                    <div class="cdk-code-row" v-for="code in cdkGenerated.codes" :key="code">
+                      <code>{{ code }}</code>
+                      <button class="btn btn-secondary btn-sm" type="button" @click="copyText(code, 'CDK 已复制。')">复制</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
               <div class="panel">
                 <div class="table-scroll">
                   <table class="table table-hover table-sm align-middle mb-0">
@@ -2477,68 +2652,6 @@
               </div>
             </div>
           </aside>
-
-          <div v-if="cdkBatchOpen" class="modal-backdrop" @click.self="closeCdkBatch">
-            <form class="modal" :class="{ loading: cdkBatchLoading }" @submit.prevent="submitCdkBatch">
-              <div class="modal-head">
-                <h2>批量生成 CDK</h2>
-                <button type="button" @click="closeCdkBatch">关闭</button>
-              </div>
-              <div class="modal-body">
-                <div class="impact">
-                  <div><strong>影响：</strong>生成一批可兑换 CDK，created_by 为当前管理员。</div>
-                  <div><strong>审计：</strong>提交后写入 admin.cdk.batch_generate。</div>
-                </div>
-                <div class="form-grid">
-                  <label class="field">
-                    <span class="label">type</span>
-                    <select v-model="cdkForm.type" required>
-                      <option value="single_use">single_use</option>
-                      <option value="monthly_card">monthly_card</option>
-                      <option value="credit_pack_5">credit_pack_5</option>
-                      <option value="credit_pack_10">credit_pack_10</option>
-                    </select>
-                  </label>
-                  <label class="field">
-                    <span class="label">value</span>
-                    <input v-model.number="cdkForm.value" type="number" min="1" step="1" required>
-                  </label>
-                  <label class="field">
-                    <span class="label">count</span>
-                    <input v-model.number="cdkForm.count" type="number" min="1" max="500" step="1" required>
-                  </label>
-                  <label class="field">
-                    <span class="label">sales_channel</span>
-                    <input v-model.trim="cdkForm.sales_channel">
-                  </label>
-                  <label class="field">
-                    <span class="label">expires_at</span>
-                    <input v-model="cdkForm.expires_at" type="datetime-local">
-                  </label>
-                  <label class="field full">
-                    <span class="label">notes</span>
-                    <input v-model.trim="cdkForm.notes">
-                  </label>
-                  <label class="field full">
-                    <span class="label">reason</span>
-                    <textarea v-model="cdkForm.reason" placeholder="请输入操作原因" required></textarea>
-                  </label>
-                </div>
-                <div v-if="cdkGenerated">
-                  <div class="inline-actions">
-                    <span class="badge ok">batch_id={{ cdkGenerated.batch_id }}</span>
-                    <span class="badge ok">audit_id={{ cdkGenerated.audit_id }}</span>
-                    <button class="btn btn-secondary btn-sm" type="button" @click="copyGeneratedCodes">复制 codes</button>
-                  </div>
-                  <textarea class="code-output" readonly :value="cdkGenerated.codes.join(String.fromCharCode(10))"></textarea>
-                </div>
-              </div>
-              <div class="modal-foot">
-                <button class="btn btn-secondary" type="button" @click="closeCdkBatch">取消</button>
-                <button class="btn btn-danger" type="submit" :disabled="cdkBatchLoading || !cdkForm.reason.trim()">确认生成</button>
-              </div>
-            </form>
-          </div>
 
           <div v-if="modal" class="modal-backdrop" @click.self="closeModal">
             <div class="modal" :class="{ loading: modal.loading }">

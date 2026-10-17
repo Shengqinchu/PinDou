@@ -6,7 +6,7 @@ import hashlib
 import re
 from io import BytesIO
 
-from fastapi import APIRouter, File, Request, UploadFile
+from fastapi import APIRouter, File, Request, Response, UploadFile
 from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel, Field
 
@@ -18,6 +18,14 @@ from pindou.api.storage import MAX_IMAGE_PIXELS
 from pindou.db.models import User
 from pindou.services.storage_util import get_storage_backend
 from pindou.services.cdk_service import CDKAlreadyRedeemedError, CDKInvalidError, CDKRateLimitError, CDKService
+from pindou.services.device_identity import (
+    DEVICE_COOKIE_NAME,
+    DEVICE_HEADER_NAME,
+    issue_device_identity,
+    parse_device_identity,
+    set_device_cookie,
+)
+from pindou.services.device_migration_service import migrate_device_to_user
 from pindou.services.email_verification import EmailVerificationService, validate_email_or_raise
 from pindou.services.user_service import UserService
 
@@ -81,7 +89,7 @@ class ProfilePatchRequest(BaseModel):
 
 
 @router.post("/login")
-def login(payload: LoginRequest, db: DbSession) -> dict:
+def login(payload: LoginRequest, request: Request, response: Response, db: DbSession) -> dict:
     """微信 code 登录；Phase 2 本地开发用 code 派生稳定 openid。"""
     openid = "wx_" + hashlib.sha256(payload.code.encode("utf-8")).hexdigest()[:24]
     user = UserService(db).register_or_login(
@@ -89,7 +97,7 @@ def login(payload: LoginRequest, db: DbSession) -> dict:
         nickname=payload.nickname,
         avatar=payload.avatar,
     )
-    return {"token": create_access_token(subject=user.user_id), "user": user_payload(db, user)}
+    return authenticated_payload(request=request, response=response, db=db, user=user)
 
 
 @router.post("/email/send-code")
@@ -102,15 +110,15 @@ async def send_email_code(payload: EmailSendCodeRequest, request: Request, db: D
 
 
 @router.post("/email/verify")
-def verify_email_code(payload: EmailVerifyRequest, db: DbSession) -> dict:
+def verify_email_code(payload: EmailVerifyRequest, request: Request, response: Response, db: DbSession) -> dict:
     """H5 邮箱登录/注册第二步：验证通过后返回普通用户 JWT。"""
     email = EmailVerificationService(db).verify_code(email=payload.email, code=payload.code)
     user = UserService(db).register_or_login_email(email=email)
-    return {"token": create_access_token(subject=user.user_id), "user": user_payload(db, user)}
+    return authenticated_payload(request=request, response=response, db=db, user=user)
 
 
 @router.post("/register")
-def register(payload: RegisterRequest, request: Request, db: DbSession) -> dict:
+def register(payload: RegisterRequest, request: Request, response: Response, db: DbSession) -> dict:
     """Web 邮箱 + 验证码 + 密码注册，可选 CDK 激活码。"""
     normalized_email = validate_email_or_raise(payload.email)
     user_service = UserService(db)
@@ -126,16 +134,13 @@ def register(payload: RegisterRequest, request: Request, db: DbSession) -> dict:
         user_id=user.user_id,
         request_ip=client_ip(request),
     )
-    db.refresh(user)
-    return {
-        "token": create_access_token(subject=user.user_id),
-        "user": user_payload(db, user),
-        "cdk": cdk_result,
-    }
+    payload_out = authenticated_payload(request=request, response=response, db=db, user=user)
+    payload_out["cdk"] = cdk_result
+    return payload_out
 
 
 @router.post("/email-login")
-def email_password_login(payload: EmailPasswordLoginRequest, db: DbSession) -> dict:
+def email_password_login(payload: EmailPasswordLoginRequest, request: Request, response: Response, db: DbSession) -> dict:
     """Web 邮箱 + 密码登录。"""
     normalized_email = validate_email_or_raise(payload.email)
     user_service = UserService(db)
@@ -145,7 +150,7 @@ def email_password_login(payload: EmailPasswordLoginRequest, db: DbSession) -> d
     authed_user = user_service.authenticate_email_password(email=normalized_email, password=payload.password)
     if authed_user is None:
         raise ApiException(401, "PASSWORD_INVALID", "密码不正确，请重新输入。")
-    return {"token": create_access_token(subject=authed_user.user_id), "user": user_payload(db, authed_user)}
+    return authenticated_payload(request=request, response=response, db=db, user=authed_user)
 
 
 @router.get("/me")
@@ -260,6 +265,30 @@ def user_payload(db: DbSession, user: User) -> dict:
     payload = user.to_frontend_dict()
     payload.update(UserService(db).credit_summary(user.user_id))
     return payload
+
+
+def authenticated_payload(*, request: Request, response: Response, db: DbSession, user: User) -> dict:
+    migration = None
+    device_identity = _request_device_identity(request)
+    if device_identity is not None:
+        migration = migrate_device_to_user(db, device_id=device_identity.device_id, user_id=user.user_id).to_dict()
+        db.refresh(user)
+
+    new_device = issue_device_identity()
+    set_device_cookie(response, new_device)
+    return {
+        "token": create_access_token(subject=user.user_id),
+        "user": user_payload(db, user),
+        "device_token": new_device.token,
+        "device_id": new_device.device_id,
+        "device_migration": migration,
+    }
+
+
+def _request_device_identity(request: Request):
+    return parse_device_identity(request.headers.get(DEVICE_HEADER_NAME)) or parse_device_identity(
+        request.cookies.get(DEVICE_COOKIE_NAME)
+    )
 
 
 def _try_redeem_register_cdk(*, db: DbSession, cdk_code: str | None, user_id: str, request_ip: str | None) -> dict:

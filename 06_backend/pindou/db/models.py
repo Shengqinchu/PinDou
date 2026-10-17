@@ -72,6 +72,21 @@ class User(Base):
         }
 
 
+class DeviceClaim(Base):
+    __tablename__ = "device_claims"
+    __table_args__ = (
+        UniqueConstraint("idempotency_key", name="uq_device_claims_idempotency_key"),
+        Index("ix_device_claims_claimed_by_user", "claimed_by_user_id"),
+    )
+
+    device_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    claimed_by_user_id: Mapped[str] = mapped_column(String(128), ForeignKey("users.openid"), nullable=False)
+    idempotency_key: Mapped[str] = mapped_column(String(160), nullable=False)
+    claimed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    migration_summary_json: Mapped[dict[str, Any] | None] = mapped_column(SAJSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+
 class EmailCode(Base):
     __tablename__ = "email_codes"
 
@@ -116,7 +131,9 @@ class Artwork(Base):
     __tablename__ = "artworks"
 
     artwork_id: Mapped[str] = mapped_column(String(64), primary_key=True, default=uuid_hex)
-    user_id: Mapped[str] = mapped_column(String(128), ForeignKey("users.openid"), index=True, nullable=False)
+    user_id: Mapped[str | None] = mapped_column(String(128), ForeignKey("users.openid"), index=True, nullable=True)
+    owner_type: Mapped[str] = mapped_column(String(16), default="user", index=True, nullable=False)
+    owner_id: Mapped[str | None] = mapped_column(String(128), index=True, nullable=True)
     original_path: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     preview_path: Mapped[str] = mapped_column(String(1024), nullable=False)
     pattern_json: Mapped[dict[str, Any]] = mapped_column(SAJSON, nullable=False)
@@ -128,7 +145,7 @@ class Artwork(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True, nullable=False)
     original_deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    user: Mapped[User] = relationship(back_populates="artworks")
+    user: Mapped[User | None] = relationship(back_populates="artworks")
 
     @property
     def original_image_url(self) -> str | None:
@@ -151,6 +168,8 @@ class Artwork(Base):
         return {
             "artwork_id": self.artwork_id,
             "user_id": self.user_id,
+            "owner_type": self.owner_type,
+            "owner_id": self.owner_id,
             "created_at": iso_or_none(self.created_at),
             "original_image_url": self.original_image_url,
             "original_image_deleted_at": iso_or_none(self.original_image_deleted_at),
@@ -168,7 +187,9 @@ class GenerationJob(Base):
     __tablename__ = "generation_jobs"
 
     job_id: Mapped[str] = mapped_column(String(64), primary_key=True, default=uuid_hex)
-    user_id: Mapped[str] = mapped_column(String(128), ForeignKey("users.openid"), index=True, nullable=False)
+    user_id: Mapped[str | None] = mapped_column(String(128), ForeignKey("users.openid"), index=True, nullable=True)
+    owner_type: Mapped[str] = mapped_column(String(16), default="user", index=True, nullable=False)
+    owner_id: Mapped[str | None] = mapped_column(String(128), index=True, nullable=True)
     status: Mapped[str] = mapped_column(String(32), default="queued", index=True, nullable=False)
     mode: Mapped[str] = mapped_column(String(32), default="ai", nullable=False)
     progress: Mapped[int] = mapped_column(Integer, default=0, nullable=False)

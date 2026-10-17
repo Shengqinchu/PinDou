@@ -8,11 +8,13 @@ from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from pindou.api.errors import ApiException, ErrorCode
+from pindou.api.deps import Actor
 from pindou.config import get_settings
 from pindou.db.models import DailyQuota, User, as_aware_utc
 from pindou.services.credit_service import (
     AI_GENERATION_POINT_COST,
     active_membership_expires_at,
+    active_membership_expires_at_for_owner,
     ensure_legacy_paid_credit_grant,
     get_credit_balance,
     release_reservation,
@@ -23,6 +25,11 @@ from pindou.services.credit_service import (
 def require_sensitive_consent(user: User) -> None:
     if user.sensitive_consent_at is None:
         raise ApiException(403, ErrorCode.CONSENT_REQUIRED, "请先同意敏感个人信息处理说明，再上传或处理照片。")
+
+
+def require_sensitive_consent_for_actor(actor: Actor) -> None:
+    if actor.user is not None:
+        require_sensitive_consent(actor.user)
 
 
 def require_privacy_consent(user: User) -> None:
@@ -65,6 +72,30 @@ def consume_script_quota(session: Session, user: User) -> bool:
     return True
 
 
+def consume_script_quota_for_actor(session: Session, actor: Actor) -> bool:
+    if actor.user is not None:
+        try:
+            return consume_script_quota(session, actor.user)
+        except ApiException as exc:
+            if exc.error != ErrorCode.QUOTA_EXCEEDED:
+                raise
+            raise _quota_exceeded(
+                kind="script",
+                message="普通额度不足，兑换时间卡 CDK、注册领取免费额度，或开通时间卡后再生成吧。",
+                normal_trial_remaining=max(0, actor.user.free_credits_remaining),
+                membership_active=False,
+            ) from exc
+
+    if active_membership_expires_at_for_owner(session, owner_type="device", owner_id=actor.owner_id) is not None:
+        return False
+    raise _quota_exceeded(
+        kind="script",
+        message="当前游客设备没有普通时间卡，兑换 CDK、注册领取免费额度，或开通时间卡后再生成吧。",
+        normal_trial_remaining=0,
+        membership_active=False,
+    )
+
+
 def refund_script_quota(session: Session, user_id: str, *, consumed: bool = True) -> None:
     if not consumed:
         return
@@ -74,6 +105,12 @@ def refund_script_quota(session: Session, user_id: str, *, consumed: bool = True
         .values(free_credits_remaining=User.free_credits_remaining + 1)
     )
     session.commit()
+
+
+def refund_script_quota_for_actor(session: Session, actor: Actor, *, consumed: bool = True) -> None:
+    if actor.user is None:
+        return
+    refund_script_quota(session, actor.user.user_id, consumed=consumed)
 
 
 def consume_white_bg_quota(session: Session, user: User) -> None:
@@ -92,6 +129,41 @@ def consume_ai_credit(session: Session, user: User, *, reservation_key: str) -> 
         amount=AI_GENERATION_POINT_COST,
         reservation_key=reservation_key,
     )
+    session.commit()
+    return reservation_key
+
+
+def consume_ai_credit_for_actor(session: Session, actor: Actor, *, reservation_key: str) -> str | None:
+    if actor.user is not None:
+        try:
+            return consume_ai_credit(session, actor.user, reservation_key=reservation_key)
+        except ApiException as exc:
+            if exc.error != ErrorCode.QUOTA_EXCEEDED:
+                raise
+            balance = get_credit_balance(session, owner_id=actor.user.user_id)
+            raise _quota_exceeded(
+                kind="ai",
+                message="AI 积分不足，兑换 CDK、注册领取免费额度，或购买积分后再生成吧。",
+                current_points=balance.available,
+            ) from exc
+
+    try:
+        reserve_points(
+            session,
+            owner_type="device",
+            owner_id=actor.owner_id,
+            amount=AI_GENERATION_POINT_COST,
+            reservation_key=reservation_key,
+        )
+    except ApiException as exc:
+        if exc.error != ErrorCode.QUOTA_EXCEEDED:
+            raise
+        balance = get_credit_balance(session, owner_type="device", owner_id=actor.owner_id)
+        raise _quota_exceeded(
+            kind="ai",
+            message="当前游客设备 AI 积分不足，兑换 CDK、注册领取免费额度，或购买积分后再生成吧。",
+            current_points=balance.available,
+        ) from exc
     session.commit()
     return reservation_key
 
@@ -117,3 +189,23 @@ def has_ai_credit(session: Session, user: User, *, now=None) -> bool:
         return True
     ensure_legacy_paid_credit_grant(session, user, now=as_aware_utc(now))
     return get_credit_balance(session, owner_id=user.user_id, now=as_aware_utc(now)).available >= AI_GENERATION_POINT_COST
+
+
+def _quota_exceeded(
+    *,
+    kind: str,
+    message: str,
+    current_points: int | None = None,
+    normal_trial_remaining: int | None = None,
+    membership_active: bool | None = None,
+) -> ApiException:
+    details = {
+        "kind": kind,
+        "missing": "points" if kind == "ai" else "membership",
+        "required_points": AI_GENERATION_POINT_COST if kind == "ai" else None,
+        "current_points": current_points,
+        "normal_trial_remaining": normal_trial_remaining,
+        "membership_active": membership_active,
+        "actions": ["redeem_cdk", "register", "recharge"],
+    }
+    return ApiException(402, ErrorCode.QUOTA_EXCEEDED, message, details)

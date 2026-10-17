@@ -16,15 +16,17 @@ from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.datastructures import UploadFile
 
-from pindou.api.deps import CurrentUser, DbSession
+from pindou.api.deps import Actor, CurrentActor, CurrentUser, DbSession
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.api.pattern_assets import finalize_artwork_pattern_assets
 from pindou.api.quota import (
     consume_ai_credit,
-    consume_script_quota,
+    consume_ai_credit_for_actor,
+    consume_script_quota_for_actor,
     consume_white_bg_quota,
     refund_ai_credit,
-    refund_script_quota,
+    refund_script_quota_for_actor,
+    require_sensitive_consent_for_actor,
     require_sensitive_consent,
 )
 from pindou.api.request_meta import client_ip
@@ -34,13 +36,14 @@ from pindou.api.storage import (
     save_preview_png,
     save_uploaded_image,
 )
-from pindou.db.models import GenerationJob, User, utc_now, uuid_hex
+from pindou.db.models import GenerationJob, utc_now, uuid_hex
 from pindou.pattern.builder import PatternBuilder
 from pindou.providers.base import PreviewProviderError, SizePreset, StylePreset
 from pindou.providers.chain import PreviewProviderChain
 from pindou.providers.fallback_quantize import FallbackProvider
 from pindou.providers.xiaochi_gpt import XiaochiGptProvider
 from pindou.services.artwork_service import ArtworkService
+from pindou.services.ownership import belongs_to_owner
 from pindou.services.rate_limit_service import RateLimitExceeded, RateLimitRule, consume_rate_limits
 from pindou.services.credit_service import AI_GENERATION_POINT_COST, commit_reservation, grant_points, release_reservation
 
@@ -51,16 +54,16 @@ SessionFactory = Callable[[], Session]
 
 
 @router.post("/script")
-async def generate_script(request: Request, current_user: CurrentUser, db: DbSession) -> dict:
+async def generate_script(request: Request, actor: CurrentActor, db: DbSession) -> dict:
     """脚本快速生成：原图直接量化为 PatternSheet，并保存 Artwork。"""
-    require_sensitive_consent(current_user)
-    enforce_generate_rate_limits(db, request=request, user_id=current_user.user_id, mode="script")
+    require_sensitive_consent_for_actor(actor)
+    enforce_generate_rate_limits(db, request=request, actor=actor, mode="script")
     payload, raw_upload = await parse_payload_or_upload(request, upload_field="raw_image")
     raw_image, original_path = await resolve_raw_image(payload, raw_upload)
     size = parse_size(payload.get("size_preset") or payload.get("size") or "26x26")
     auto_remove_white_bg = parse_bool_default_false(payload.get("auto_remove_white_bg", False))
 
-    script_quota_consumed = consume_script_quota(db, current_user)
+    script_quota_consumed = consume_script_quota_for_actor(db, actor)
     try:
         sheet = PatternBuilder().build(
             size=size,
@@ -72,11 +75,14 @@ async def generate_script(request: Request, current_user: CurrentUser, db: DbSes
         )
 
         if sheet.metadata.get("white_bg_detected"):
-            consume_white_bg_quota(db, current_user)
+            if actor.user is not None:
+                consume_white_bg_quota(db, actor.user)
 
         pattern_data = sheet.to_frontend_dict()
         artwork = ArtworkService(db).save_artwork(
-            user_id=current_user.user_id,
+            user_id=actor.user.user_id if actor.user else None,
+            owner_type=actor.owner_type,
+            owner_id=actor.owner_id,
             original_path=str(original_path) if original_path else None,
             preview_path="",
             pattern_json=pattern_data,
@@ -91,7 +97,7 @@ async def generate_script(request: Request, current_user: CurrentUser, db: DbSes
             pattern_data=pattern_data,
         )
     except Exception as exc:  # noqa: BLE001 - API normalizes build/export failures and refunds consumed quota.
-        refund_script_quota(db, current_user.user_id, consumed=script_quota_consumed)
+        refund_script_quota_for_actor(db, actor, consumed=script_quota_consumed)
         raise ApiException(500, ErrorCode.PATTERN_BUILD_FAILED, "图纸生成失败，请换一张照片再试。") from exc
 
     return {
@@ -102,23 +108,25 @@ async def generate_script(request: Request, current_user: CurrentUser, db: DbSes
 
 
 @router.post("/ai")
-async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession) -> dict:
+async def generate_ai(request: Request, actor: CurrentActor, db: DbSession) -> dict:
     """AI 精品生成：提交后台任务，避免 Cloudflare 524 长连接超时。"""
-    require_sensitive_consent(current_user)
-    enforce_generate_rate_limits(db, request=request, user_id=current_user.user_id, mode="ai")
-    ensure_ai_job_capacity(db, current_user.user_id)
+    require_sensitive_consent_for_actor(actor)
+    enforce_generate_rate_limits(db, request=request, actor=actor, mode="ai")
+    ensure_ai_job_capacity(db, owner_type=actor.owner_type, owner_id=actor.owner_id)
     payload, upload = await parse_payload_or_upload(request, upload_field="image")
     raw_image, original_path = await resolve_raw_image(payload, upload)
     size = parse_size(payload.get("size_preset") or payload.get("size") or "26x26")
     style = parse_style(payload.get("style_preset") or payload.get("style") or "q_portrait")
     seed = int(payload["seed"]) if payload.get("seed") not in (None, "") else None
     reservation_key = f"ai_generation:{uuid_hex()}"
-    ai_credit_reservation_key = consume_ai_credit(db, current_user, reservation_key=reservation_key)
+    ai_credit_reservation_key = consume_ai_credit_for_actor(db, actor, reservation_key=reservation_key)
     job: GenerationJob | None = None
     job_committed = False
     try:
         job = GenerationJob(
-            user_id=current_user.user_id,
+            user_id=actor.user.user_id if actor.user else None,
+            owner_type=actor.owner_type,
+            owner_id=actor.owner_id,
             mode="ai",
             progress=4,
             stage="queued",
@@ -136,7 +144,9 @@ async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession
         start_ai_generation_job(
             job_id=job.job_id,
             session_factory=session_factory,
-            user_id=current_user.user_id,
+            user_id=actor.user.user_id if actor.user else None,
+            owner_type=actor.owner_type,
+            owner_id=actor.owner_id,
             raw_image=raw_image,
             original_path=str(original_path) if original_path else None,
             payload={
@@ -160,10 +170,10 @@ async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession
                     error_code=ErrorCode.PREVIEW_FAILED,
                     error_message_cn="AI 生成暂时失败，请稍后重试或切换普通模式。",
                 )
-                refund_reserved_ai_credit(db, job_id=job.job_id, user_id=current_user.user_id)
+                refund_reserved_ai_credit(db, job_id=job.job_id, user_id=actor.user.user_id if actor.user else None)
             else:
                 db.rollback()
-                refund_ai_credit(db, current_user.user_id, reservation_key=ai_credit_reservation_key)
+                refund_ai_credit(db, actor.owner_id, reservation_key=ai_credit_reservation_key)
         raise
 
     if job is None:
@@ -172,9 +182,9 @@ async def generate_ai(request: Request, current_user: CurrentUser, db: DbSession
 
 
 @router.get("/status/{job_id}")
-def generation_status(job_id: str, current_user: CurrentUser, db: DbSession) -> dict:
+def generation_status(job_id: str, actor: CurrentActor, db: DbSession) -> dict:
     job = db.get(GenerationJob, job_id)
-    if job is None or job.user_id != current_user.user_id:
+    if job is None or not belongs_to_owner(job, owner_type=actor.owner_type, owner_id=actor.owner_id):
         raise ApiException(404, ErrorCode.IMAGE_NOT_FOUND, "生成任务不存在或已过期，请重新提交。")
     return job.to_frontend_dict()
 
@@ -183,7 +193,9 @@ def start_ai_generation_job(
     *,
     job_id: str,
     session_factory: sessionmaker[Session],
-    user_id: str,
+    user_id: str | None,
+    owner_type: str,
+    owner_id: str,
     raw_image: bytes,
     original_path: str | None,
     payload: dict[str, Any],
@@ -194,6 +206,8 @@ def start_ai_generation_job(
             "job_id": job_id,
             "session_factory": session_factory,
             "user_id": user_id,
+            "owner_type": owner_type,
+            "owner_id": owner_id,
             "raw_image": raw_image,
             "original_path": original_path,
             "payload": payload,
@@ -208,7 +222,9 @@ def run_ai_generation_job(
     *,
     job_id: str,
     session_factory: SessionFactory,
-    user_id: str,
+    user_id: str | None,
+    owner_type: str,
+    owner_id: str,
     raw_image: bytes,
     original_path: str | None,
     payload: dict[str, Any],
@@ -252,13 +268,11 @@ def run_ai_generation_job(
                 stage="export",
                 message_cn="导出图纸中，正在保存预览和清单。",
             )
-            user = db.scalar(select(User).where(User.openid == user_id))
-            if user is None:
-                raise ApiException(401, ErrorCode.AUTH_REQUIRED, "登录用户不存在，请重新登录。")
-
             pattern_data = sheet.to_frontend_dict()
             artwork = ArtworkService(db).save_artwork(
                 user_id=user_id,
+                owner_type=owner_type,
+                owner_id=owner_id,
                 original_path=original_path,
                 preview_path=preview_url,
                 pattern_json=pattern_data,
@@ -354,7 +368,7 @@ def update_generation_job(
     db.commit()
 
 
-def refund_reserved_ai_credit(db: Session, *, job_id: str, user_id: str) -> None:
+def refund_reserved_ai_credit(db: Session, *, job_id: str, user_id: str | None = None) -> None:
     updated_job = db.execute(
         update(GenerationJob)
         .where(
@@ -367,14 +381,19 @@ def refund_reserved_ai_credit(db: Session, *, job_id: str, user_id: str) -> None
     if updated_job.rowcount != 1:
         db.rollback()
         return
-    _ = user_id
     job = db.get(GenerationJob, job_id)
     if job is not None and job.ai_credit_reservation_key:
         release_reservation(db, reservation_key=job.ai_credit_reservation_key)
     elif job is not None:
+        owner_type = job.owner_type or ("user" if job.user_id else "user")
+        owner_id = job.owner_id or job.user_id or user_id
+        if not owner_id:
+            db.commit()
+            return
         grant_points(
             db,
-            owner_id=user_id,
+            owner_type=owner_type,
+            owner_id=owner_id,
             amount=AI_GENERATION_POINT_COST,
             kind="paid",
             source_type="legacy_ai_refund",
@@ -384,16 +403,18 @@ def refund_reserved_ai_credit(db: Session, *, job_id: str, user_id: str) -> None
     db.commit()
 
 
-def enforce_generate_rate_limits(db: Session, *, request: Request, user_id: str, mode: str) -> None:
+def enforce_generate_rate_limits(db: Session, *, request: Request, actor: Actor, mode: str) -> None:
     source_ip = client_ip(request)
+    actor_identity = f"{actor.owner_type}:{actor.owner_id}"
+    actor_scope = "user" if actor.owner_type == "user" else "device"
     if mode == "ai":
         rules = [
-            RateLimitRule("generate_ai:user:10m", user_id, limit=5, window_seconds=10 * 60),
+            RateLimitRule(f"generate_ai:{actor_scope}:10m", actor_identity, limit=5, window_seconds=10 * 60),
             RateLimitRule("generate_ai:ip:10m", source_ip, limit=20, window_seconds=10 * 60),
         ]
     else:
         rules = [
-            RateLimitRule("generate_script:user:minute", user_id, limit=10, window_seconds=60),
+            RateLimitRule(f"generate_script:{actor_scope}:minute", actor_identity, limit=10, window_seconds=60),
             RateLimitRule("generate_script:ip:minute", source_ip, limit=30, window_seconds=60),
         ]
     try:
@@ -407,14 +428,15 @@ def enforce_generate_rate_limits(db: Session, *, request: Request, user_id: str,
         ) from exc
 
 
-def ensure_ai_job_capacity(db: Session, user_id: str) -> None:
+def ensure_ai_job_capacity(db: Session, *, owner_type: str, owner_id: str) -> None:
     cutoff = utc_now() - timedelta(hours=1)
     active = int(
         db.scalar(
             select(func.count())
             .select_from(GenerationJob)
             .where(
-                GenerationJob.user_id == user_id,
+                GenerationJob.owner_type == owner_type,
+                GenerationJob.owner_id == owner_id,
                 GenerationJob.mode == "ai",
                 GenerationJob.status.in_(("queued", "running")),
                 GenerationJob.created_at >= cutoff,
@@ -430,7 +452,12 @@ def ensure_ai_job_capacity(db: Session, user_id: str) -> None:
 async def generate_preview(request: Request, current_user: CurrentUser, db: DbSession) -> dict:
     """前端 PreviewResult 兼容端点：只生成并保存 AI preview，不立即建作品。"""
     require_sensitive_consent(current_user)
-    enforce_generate_rate_limits(db, request=request, user_id=current_user.user_id, mode="ai")
+    enforce_generate_rate_limits(
+        db,
+        request=request,
+        actor=Actor(owner_type="user", owner_id=current_user.user_id, user=current_user),
+        mode="ai",
+    )
     payload, upload = await parse_payload_or_upload(request, upload_field="image")
     if upload is not None:
         raw_image = normalized_upload_png_bytes(

@@ -7,11 +7,12 @@ from pathlib import Path
 from typing import Any
 
 from PIL import Image, ImageOps, UnidentifiedImageError
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 
 from pindou.db.models import Artwork
+from pindou.services.ownership import belongs_to_owner
 from pindou.services.storage_util import get_storage_backend, storage_key_from_url_or_path
 
 THUMBNAIL_SIZE = 200
@@ -24,7 +25,9 @@ class ArtworkService:
     def save_artwork(
         self,
         *,
-        user_id: str,
+        user_id: str | None,
+        owner_type: str | None = None,
+        owner_id: str | None = None,
         preview_path: str,
         pattern_json: dict[str, Any],
         style_preset: str,
@@ -34,8 +37,14 @@ class ArtworkService:
         tier: str = "basic",
         is_paid_unlocked: bool = False,
     ) -> Artwork:
+        normalized_owner_type = owner_type or ("user" if user_id else "")
+        normalized_owner_id = owner_id or user_id
+        if normalized_owner_type not in {"user", "device"} or not normalized_owner_id:
+            raise ValueError("Artwork requires a user or device owner.")
         artwork = Artwork(
             user_id=user_id,
+            owner_type=normalized_owner_type,
+            owner_id=normalized_owner_id,
             original_path=original_path,
             preview_path=preview_path,
             pattern_json=pattern_json,
@@ -53,18 +62,34 @@ class ArtworkService:
     def get_artwork(self, artwork_id: str) -> Artwork | None:
         return self.session.get(Artwork, artwork_id)
 
-    def list_artworks(self, *, user_id: str) -> list[Artwork]:
+    def list_artworks(
+        self,
+        *,
+        user_id: str | None = None,
+        owner_type: str | None = None,
+        owner_id: str | None = None,
+    ) -> list[Artwork]:
+        owner_type, owner_id = self._normalize_owner(user_id=user_id, owner_type=owner_type, owner_id=owner_id)
         return list(
             self.session.scalars(
-                select(Artwork).where(Artwork.user_id == user_id).order_by(Artwork.created_at.desc())
+                select(Artwork).where(self._owner_clause(owner_type=owner_type, owner_id=owner_id)).order_by(Artwork.created_at.desc())
             )
         )
 
-    def list_frontend_artworks(self, *, user_id: str, limit: int = 50, offset: int = 0) -> list[dict[str, Any]]:
+    def list_frontend_artworks(
+        self,
+        *,
+        user_id: str | None = None,
+        owner_type: str | None = None,
+        owner_id: str | None = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        owner_type, owner_id = self._normalize_owner(user_id=user_id, owner_type=owner_type, owner_id=owner_id)
         artworks = list(
             self.session.scalars(
                 select(Artwork)
-                .where(Artwork.user_id == user_id)
+                .where(self._owner_clause(owner_type=owner_type, owner_id=owner_id))
                 .order_by(Artwork.created_at.desc())
                 .offset(offset)
                 .limit(limit)
@@ -72,15 +97,33 @@ class ArtworkService:
         )
         return [self.to_frontend_dict(artwork) for artwork in artworks]
 
-    def count_artworks(self, *, user_id: str) -> int:
-        total = self.session.scalar(select(func.count()).select_from(Artwork).where(Artwork.user_id == user_id))
+    def count_artworks(
+        self,
+        *,
+        user_id: str | None = None,
+        owner_type: str | None = None,
+        owner_id: str | None = None,
+    ) -> int:
+        owner_type, owner_id = self._normalize_owner(user_id=user_id, owner_type=owner_type, owner_id=owner_id)
+        total = self.session.scalar(
+            select(func.count()).select_from(Artwork).where(self._owner_clause(owner_type=owner_type, owner_id=owner_id))
+        )
         return int(total or 0)
 
-    def list_gallery_artworks(self, *, user_id: str, limit: int = 12, offset: int = 0) -> list[dict[str, Any]]:
+    def list_gallery_artworks(
+        self,
+        *,
+        user_id: str | None = None,
+        owner_type: str | None = None,
+        owner_id: str | None = None,
+        limit: int = 12,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        owner_type, owner_id = self._normalize_owner(user_id=user_id, owner_type=owner_type, owner_id=owner_id)
         artworks = list(
             self.session.scalars(
                 select(Artwork)
-                .where(Artwork.user_id == user_id)
+                .where(self._owner_clause(owner_type=owner_type, owner_id=owner_id))
                 .order_by(Artwork.created_at.desc(), Artwork.artwork_id.desc())
                 .offset(offset)
                 .limit(limit)
@@ -151,11 +194,22 @@ class ArtworkService:
         self.session.refresh(artwork)
         return thumbnail_url
 
-    def delete_artwork(self, *, artwork_id: str, user_id: str | None = None) -> bool:
+    def delete_artwork(
+        self,
+        *,
+        artwork_id: str,
+        user_id: str | None = None,
+        owner_type: str | None = None,
+        owner_id: str | None = None,
+    ) -> bool:
         artwork = self.get_artwork(artwork_id)
         if artwork is None:
             return False
-        if user_id is not None and artwork.user_id != user_id:
+        if owner_type is not None or owner_id is not None:
+            owner_type, owner_id = self._normalize_owner(user_id=user_id, owner_type=owner_type, owner_id=owner_id)
+            if not belongs_to_owner(artwork, owner_type=owner_type, owner_id=owner_id):
+                raise PermissionError("Artwork does not belong to the requested owner.")
+        elif user_id is not None and not belongs_to_owner(artwork, owner_type="user", owner_id=user_id):
             raise PermissionError("Artwork does not belong to the requested user.")
 
         delete_file_if_exists(artwork.original_path)
@@ -164,6 +218,29 @@ class ArtworkService:
         self.session.delete(artwork)
         self.session.commit()
         return True
+
+    @staticmethod
+    def _normalize_owner(
+        *,
+        user_id: str | None = None,
+        owner_type: str | None = None,
+        owner_id: str | None = None,
+    ) -> tuple[str, str]:
+        normalized_owner_type = owner_type or ("user" if user_id else "")
+        normalized_owner_id = owner_id or user_id or ""
+        if normalized_owner_type not in {"user", "device"} or not normalized_owner_id:
+            raise ValueError("A user or device owner is required.")
+        return normalized_owner_type, normalized_owner_id
+
+    @staticmethod
+    def _owner_clause(*, owner_type: str, owner_id: str):
+        if owner_type == "user":
+            return or_(
+                and_(Artwork.owner_type == "user", Artwork.owner_id == owner_id),
+                and_(Artwork.user_id == owner_id, Artwork.owner_id.is_(None)),
+                and_(Artwork.user_id == owner_id, Artwork.owner_id == ""),
+            )
+        return and_(Artwork.owner_type == owner_type, Artwork.owner_id == owner_id)
 
 
 def delete_file_if_exists(path: str | Path | None) -> bool:

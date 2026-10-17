@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Request
 
-from pindou.api.deps import CurrentUser, DbSession
+from pindou.api.deps import CurrentActor, CurrentUser, DbSession
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.api.generate import parse_bool_default_false, parse_payload_or_upload, parse_size, resolve_raw_image
 from pindou.api.pattern_assets import finalize_artwork_pattern_assets
@@ -13,6 +13,7 @@ from pindou.api.storage import load_preview_image, load_uploaded_image, save_pat
 from pindou.pattern.builder import PatternBuilder, pattern_sheet_from_frontend_dict
 from pindou.pattern.exporter import PatternExporter, partition_filename
 from pindou.services.artwork_service import ArtworkService
+from pindou.services.ownership import belongs_to_owner
 from pindou.services.storage_util import storage_url
 
 router = APIRouter(prefix="/pattern", tags=["pattern"])
@@ -87,14 +88,14 @@ async def build_pattern(request: Request, current_user: CurrentUser, db: DbSessi
 @router.get("/{artwork_id}/partitions")
 def get_pattern_partitions(
     artwork_id: str,
-    current_user: CurrentUser,
+    actor: CurrentActor,
     db: DbSession,
     partition_size: int | None = None,
 ) -> dict:
     """返回高级分区图 URL 列表；固定为 2x2 四象限。"""
     _ = partition_size
     artwork = ArtworkService(db).get_artwork(artwork_id)
-    if artwork is None or artwork.user_id != current_user.user_id:
+    if artwork is None or not belongs_to_owner(artwork, owner_type=actor.owner_type, owner_id=actor.owner_id):
         raise ApiException(404, ErrorCode.ARTWORK_NOT_FOUND, "没有找到这个作品。")
     sheet = pattern_sheet_from_frontend_dict(artwork.pattern_json)
     partitions = PatternExporter().export_partitions(sheet)
@@ -129,9 +130,9 @@ def get_pattern_partitions(
 
 
 @router.get("/{artwork_id}")
-def get_pattern(artwork_id: str, current_user: CurrentUser, db: DbSession) -> dict:
+def get_pattern(artwork_id: str, actor: CurrentActor, db: DbSession) -> dict:
     """返回作品保存的 PatternSheet JSON。"""
     artwork = ArtworkService(db).get_artwork(artwork_id)
-    if artwork is None or artwork.user_id != current_user.user_id:
+    if artwork is None or not belongs_to_owner(artwork, owner_type=actor.owner_type, owner_id=actor.owner_id):
         raise ApiException(404, ErrorCode.ARTWORK_NOT_FOUND, "没有找到这个作品。")
     return artwork.pattern_json

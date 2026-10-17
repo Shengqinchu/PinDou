@@ -23,6 +23,7 @@ from pindou.services.device_identity import (
     parse_device_identity,
     set_device_cookie,
 )
+from pindou.services.device_migration_service import is_device_claimed
 
 
 def get_db() -> Iterator[Session]:
@@ -68,7 +69,7 @@ def get_current_actor(
         user = get_current_user_from_token(token, db)
         return Actor(owner_type="user", owner_id=user.user_id, user=user)
 
-    identity = parse_device_identity(device_header) or parse_device_identity(device_cookie)
+    identity = _first_unclaimed_device_identity(db, device_header, device_cookie)
     if identity is None:
         identity = issue_device_identity()
     set_device_cookie(response, identity)
@@ -88,6 +89,14 @@ def get_current_user_from_token(token: str, db: Session) -> User:
     if user is None:
         raise ApiException(401, ErrorCode.AUTH_REQUIRED, "登录用户不存在，请重新登录。")
     return user
+
+
+def _first_unclaimed_device_identity(db: Session, *tokens: str | None) -> DeviceIdentity | None:
+    for raw_token in tokens:
+        identity = parse_device_identity(raw_token)
+        if identity is not None and not is_device_claimed(db, identity.device_id):
+            return identity
+    return None
 
 
 def get_current_admin(token: Annotated[str, Depends(bearer_token)]) -> dict:

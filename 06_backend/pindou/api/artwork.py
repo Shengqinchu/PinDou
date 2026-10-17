@@ -9,13 +9,14 @@ from fastapi import APIRouter, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.orm.attributes import flag_modified
 
-from pindou.api.deps import CurrentUser, DbSession
+from pindou.api.deps import CurrentActor, DbSession
 from pindou.api.errors import ApiException, ErrorCode
 from pindou.api.pattern_assets import attach_labeled_pattern_image
 from pindou.api.storage import save_pattern_json
 from pindou.colormap.loader import estimate_cost_cny
 from pindou.pattern.builder import ColorRef, NoBead, PatternSheet, color_ref_from_frontend_dict
 from pindou.services.artwork_service import ArtworkService
+from pindou.services.ownership import belongs_to_owner
 
 router = APIRouter(prefix="/artwork", tags=["artwork"])
 
@@ -27,18 +28,23 @@ class SavePatternRequest(BaseModel):
 
 @router.get("/list")
 def list_artworks(
-    current_user: CurrentUser,
+    actor: CurrentActor,
     db: DbSession,
     limit: int = Query(default=50, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
 ) -> list[dict]:
     """分页返回当前用户作品列表。"""
-    return ArtworkService(db).list_frontend_artworks(user_id=current_user.user_id, limit=limit, offset=offset)
+    return ArtworkService(db).list_frontend_artworks(
+        owner_type=actor.owner_type,
+        owner_id=actor.owner_id,
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.get("/gallery")
 def list_artwork_gallery(
-    current_user: CurrentUser,
+    actor: CurrentActor,
     db: DbSession,
     page: int = Query(default=1, ge=1),
     size: int = Query(default=12, ge=1, le=20),
@@ -46,8 +52,8 @@ def list_artwork_gallery(
     """返回当前用户作品集轻量摘要，供 Web /works 分页使用。"""
     offset = (page - 1) * size
     service = ArtworkService(db)
-    total = service.count_artworks(user_id=current_user.user_id)
-    items = service.list_gallery_artworks(user_id=current_user.user_id, limit=size, offset=offset)
+    total = service.count_artworks(owner_type=actor.owner_type, owner_id=actor.owner_id)
+    items = service.list_gallery_artworks(owner_type=actor.owner_type, owner_id=actor.owner_id, limit=size, offset=offset)
     return {
         "items": items,
         "total": total,
@@ -58,10 +64,10 @@ def list_artwork_gallery(
 
 
 @router.get("/{artwork_id}")
-def get_artwork(artwork_id: str, current_user: CurrentUser, db: DbSession) -> dict:
+def get_artwork(artwork_id: str, actor: CurrentActor, db: DbSession) -> dict:
     """返回单个作品详情。"""
     artwork = ArtworkService(db).get_artwork(artwork_id)
-    if artwork is None or artwork.user_id != current_user.user_id:
+    if artwork is None or not belongs_to_owner(artwork, owner_type=actor.owner_type, owner_id=actor.owner_id):
         raise ApiException(404, ErrorCode.ARTWORK_NOT_FOUND, "没有找到这个作品。")
     return ArtworkService(db).to_frontend_dict(artwork)
 
@@ -70,13 +76,13 @@ def get_artwork(artwork_id: str, current_user: CurrentUser, db: DbSession) -> di
 def save_artwork_pattern(
     artwork_id: str,
     payload: SavePatternRequest,
-    current_user: CurrentUser,
+    actor: CurrentActor,
     db: DbSession,
 ) -> dict:
     """保存编辑后的图纸 JSON，并重新导出带网格色号的 PNG。"""
     service = ArtworkService(db)
     artwork = service.get_artwork(artwork_id)
-    if artwork is None or artwork.user_id != current_user.user_id:
+    if artwork is None or not belongs_to_owner(artwork, owner_type=actor.owner_type, owner_id=actor.owner_id):
         raise ApiException(404, ErrorCode.ARTWORK_NOT_FOUND, "没有找到这个作品。")
 
     try:
@@ -109,9 +115,16 @@ def save_artwork_pattern(
 
 
 @router.delete("/{artwork_id}")
-def delete_artwork(artwork_id: str, current_user: CurrentUser, db: DbSession) -> dict:
+def delete_artwork(artwork_id: str, actor: CurrentActor, db: DbSession) -> dict:
     """删除作品并同步删除磁盘上的原图文件。"""
-    deleted = ArtworkService(db).delete_artwork(artwork_id=artwork_id, user_id=current_user.user_id)
+    try:
+        deleted = ArtworkService(db).delete_artwork(
+            artwork_id=artwork_id,
+            owner_type=actor.owner_type,
+            owner_id=actor.owner_id,
+        )
+    except PermissionError as exc:
+        raise ApiException(404, ErrorCode.ARTWORK_NOT_FOUND, "没有找到这个作品。") from exc
     if not deleted:
         raise ApiException(404, ErrorCode.ARTWORK_NOT_FOUND, "没有找到这个作品。")
     return {"success": True}
