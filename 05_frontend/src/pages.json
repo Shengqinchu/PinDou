@@ -249,6 +249,36 @@
       }
     },
     {
+      "path": "pages/tools/edit",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#ffffff",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/shop/index",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#ffffff",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/shop/item",
+      "style": {
+        "navigationBarTitleText": "小狗拼豆铺",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#ffffff",
+        "disableScroll": true
+      }
+    },
+    {
       "path": "pages/consent/consent",
       "style": {
         "navigationBarTitleText": "小狗拼豆铺",

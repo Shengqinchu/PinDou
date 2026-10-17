@@ -13,6 +13,8 @@ onLaunch(()=>{
 @import "./static/styles/studio-booking.css";
 @import "./static/styles/studio-compact.css";
 @import "./static/styles/studio-motion.css";
+@import "./static/styles/studio-shop.css";
+@import "./static/styles/studio-tools.css";
 page{background:#fff;color:#2f3438;font-family:'Studio Outfit',-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;font-size:16px;line-height:1.6;box-sizing:border-box}
 view,scroll-view,text,image,button,input,textarea{box-sizing:border-box}
 /* #ifdef H5 */

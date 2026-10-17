@@ -1,0 +1,36 @@
+/* Read-only shop showcase (pages/shop). */
+.studio-shop{gap:14px}
+.studio-shop-tabs{display:flex;justify-content:space-between;gap:4px;border-bottom:1px solid #e3ebef}
+.studio-native .studio-shop-tabs button{flex:1;min-width:0;padding:8px 2px 10px;background:transparent;border-radius:0;font-size:14px;color:#7c8f9b;border-bottom:2px solid transparent}
+.studio-native .studio-shop-tabs .studio-shop-tab--active{color:#304d60;font-weight:600;border-bottom-color:#89acc5}
+.studio-shop-layout{display:flex;gap:10px;align-items:flex-start}
+.studio-shop-categories{width:96px;flex-shrink:0;display:flex;flex-direction:column;gap:4px}
+.studio-native .studio-shop-root{width:100%;padding:9px 6px;background:transparent;border-radius:10px;font-size:13px;color:#5a6f7d;text-align:left;justify-content:flex-start}
+.studio-native .studio-shop-root--active{background:#eef6fc;color:#304d60;font-weight:600}
+.studio-shop-children{display:flex;flex-direction:column;gap:2px;padding:2px 0 4px 6px}
+.studio-native .studio-shop-children button{width:100%;padding:7px 6px;background:transparent;border-radius:8px;font-size:12px;color:#7c8f9b;text-align:left;justify-content:flex-start}
+.studio-native .studio-shop-children .studio-shop-child--active{color:#304d60;background:#f4f8fb;font-weight:600}
+.studio-shop-grid{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:12px 8px}
+.studio-shop-card{width:calc(50% - 4px);min-width:0;background:#fff;border:1px solid #e6ecef;border-radius:14px;overflow:hidden;box-sizing:border-box}
+.studio-shop-grid--services .studio-shop-card{width:100%;display:flex;align-items:center}
+.studio-shop-card-photo{width:100%;aspect-ratio:1;padding:7px;box-sizing:border-box}
+.studio-shop-grid--services .studio-shop-card-photo{width:42%;flex-shrink:0}
+.studio-shop-card-photo image{width:100%;height:100%;border-radius:10px}
+.studio-shop-placeholder{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px;width:100%;height:100%;background:linear-gradient(135deg,#f2f7fa,#f8faf9);border-radius:12px;color:#687f8a;font-size:9px}
+.studio-shop-placeholder-code{font-size:22px;color:#687f8a}
+.studio-shop-card-body{display:flex;flex-direction:column;gap:5px;padding:3px 8px 10px}
+.studio-shop-grid--services .studio-shop-card-body{padding:14px}
+.studio-shop-name{font-size:13px;font-weight:600;line-height:1.5;color:#2b353b;overflow-wrap:anywhere}
+.studio-shop-grid--services .studio-shop-name{font-size:18px}
+.studio-shop-intro{font-size:11px;line-height:1.6;color:#939b9f}
+.studio-shop-price{font-size:18px;font-weight:600;color:#395b6b;white-space:nowrap}
+.studio-shop-price-unit{font-size:10px;margin-left:4px;font-weight:400}
+.studio-shop-unpriced{font-size:11px;color:#869399}
+.studio-shop-item{gap:16px}
+.studio-shop-gallery{width:100%;height:300px;background:#fff;border:1px solid #e6ecef;border-radius:16px;overflow:hidden}
+.studio-shop-gallery-image{width:100%;height:100%}
+.studio-shop-item-title{font-size:22px!important}
+.studio-shop-item-price{font-size:24px}
+.studio-shop-variants{display:flex;flex-wrap:wrap;gap:8px}
+.studio-native .studio-shop-variants .studio-plan{flex:0 0 auto;min-height:0;padding:8px 14px;border-radius:12px;font-size:13px}
+.studio-shop-description{white-space:pre-line}

@@ -1,5 +1,5 @@
 {
-  "source": "2026-10-17 owner: mini program free bead pattern tool (去做); STUDIO_COPY_CHANGES.md",
+  "source": "2026-10-17 owner: mini program editor, progress, shorter copy and shop showcase; STUDIO_COPY_CHANGES.md",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -57,7 +57,7 @@
     "journal-posts.json": "0d729d67cc00df5499308c9093d76f9afb9f64d49314dffa7e414df57cca610b",
     "messaging.json": "8bcb28ef3e95c7c556bfeffc2a5dc3fa1ec0cd5b1c508b09a7ce9d646adc606d",
     "miniapp-legal.json": "5322d9cbb4746741bc5f790fb9ed6a567d1a8e8a95836647a7eb987e8a7605fa",
-    "miniapp.json": "818db5a3ee7a0d98ca07c09e187388390c80f15f0447c7303c116300371fd4b3",
+    "miniapp.json": "2caea93ca9c8ab0778ec8c99cee3ecacde01260caa82f4a368c423c977f17f03",
     "owner-delivery.json": "520fb29c5db5a79e5779ab79948892283e7debfaa1cbd58879e379c2d5db6c4a",
     "owner-notifications.json": "f4fa362eb4bf371fc04aefd45f4540e6edad61b773dd5fbe0ced22c03d3e5b75",
     "owner-wechat.json": "9686d2d1f3548e0d7206b56a628c773d6058afa83c2e70583262bf189dfc3d89",

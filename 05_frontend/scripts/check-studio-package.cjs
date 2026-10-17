@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const project=path.resolve(__dirname,'..'),output=path.resolve(process.argv.find(arg=>arg.startsWith('--path='))?.slice(7)||path.join(project,'dist/build/mp-weixin'));
-const allowedPage=p=>/^pages\/studio\/[a-z-]+$/.test(p)||/^pages\/auth\/studio-[a-z-]+$/.test(p)||p==='pages/consent/consent'||p==='pages/tools/pattern';
+const allowedPage=p=>/^pages\/studio\/[a-z-]+$/.test(p)||/^pages\/auth\/studio-[a-z-]+$/.test(p)||p==='pages/consent/consent'||/^pages\/(tools|shop)\/[a-z-]+$/.test(p);
 const read=file=>fs.readFileSync(file,'utf8'),app=JSON.parse(read(path.join(output,'app.json')));
 assert.equal(app.pages[0],'pages/studio/home');assert(app.pages.every(allowedPage),'Only studio routes belong in the mini program');assert(!app.tabBar,'Legacy generator tabBar must not ship');assert(!app.subPackages?.length,'Review any new subpackage before shipping it');
 if(process.argv.includes('--prepare')){

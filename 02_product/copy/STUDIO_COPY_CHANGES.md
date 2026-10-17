@@ -4,6 +4,10 @@
 
 # Studio 文案授权记录
 
+## 2026-10-17 / 小程序图纸编辑、进度、文案精简与小店展示
+
+来源：店主试用体验版后反馈“生成图纸时候没有进度条 并且我们的编辑功能怎么也没做 图纸没法编辑 文案精简一下把二级小标题适当的去一下或者精简一下不然太乱”，并问“拼豆小店还没上啊？”。`miniapp`：删除 `pattern_label`、`pattern_size`、`pattern_size_hint`、`pattern_preview`、`pattern_colors`（去掉二级小标题与重复提示）；`pattern_intro`、`pattern_photo_note`、`pattern_total`、`pattern_brand_note` 精简；新增进度阶段 `pattern_stage_*`（沿用网站“整理照片/匹配豆色/生成图纸”）、编辑器 `pattern_edit`、`pattern_counts`、`pattern_tool_*`、`pattern_undo/redo`、`pattern_zoom_*`、`pattern_more_colors`、`pattern_pick_color`、`pattern_replace_*`、`pattern_save_edit`、`pattern_saving`、`pattern_unsaved`；新增小店展示 `shop_*`（标题与分区、价格待定、图片待补充、商品整理中、加载/重试、“起”沿用网站小店文字，另加仅展示说明 `shop_note` 与“复制店主微信”）。均含英文。
+
 ## 2026-10-17 / 小程序普通拼豆图纸工具
 
 来源：店主要求“我们把拼豆小店和图纸生成搬到小程序吧”，确认“完全免费就行”“可以 一起免费”，并回复“去做”开始小程序 0.1.32。`miniapp` 新增 `pattern_*` 键（首页入口“拼豆图纸”、工具页标题/说明/格数/照片用途说明/生成与保存/颜色清单/错误提示及对应英文），只描述按颜色量化的普通生成，不含 AI、积分、CDK 或购买。`studio-miniapp-legal` 更新日期改为 2026 年 10 月 17 日，`images_title`、`images_body`、`permissions_body` 补充图纸照片的处理、保存与相册/相机/保存到相册权限说明。

@@ -5,12 +5,13 @@ const ORIGIN='https://pindoupuppy.com';
 const DEVICE_KEY='pd_pattern_device';
 
 export type PatternColor={code:string;hex:string;count:number};
-export type PatternResult={artworkId:string;imageUrl:string;total:number;colors:PatternColor[]};
+// `sheet` is the full PatternSheet the editor works on; `viaAccount` records which identity owns it.
+export type PatternResult={artworkId:string;imageUrl:string;total:number;colors:PatternColor[];sheet:any;viaAccount:boolean};
 export type PatternErrorCode='pattern_error_busy'|'pattern_error_large'|'pattern_error_network'|'pattern_error';
 export class PatternError extends Error{constructor(public code:PatternErrorCode,public status=0){super(code);}}
 
 type Reply={statusCode:number;data:any};
-function call(path:string,method:'GET'|'POST',data:unknown,header:Record<string,string>):Promise<Reply>{
+function call(path:string,method:'GET'|'POST'|'PUT',data:unknown,header:Record<string,string>):Promise<Reply>{
  return new Promise((resolve,reject)=>uni.request({
   url:API+path,method,data:data as UniApp.RequestOptions['data'],timeout:60000,
   header:{'Content-Type':'application/json',...header},
@@ -48,12 +49,14 @@ export function compressPhoto(path:string):Promise<string>{
  return new Promise(resolve=>uni.compressImage({src:path,quality:80,compressedWidth:1280,success:result=>resolve(result.tempFilePath),fail:()=>resolve(path)} as UniApp.CompressImageOptions));
 }
 
-export function toResult(body:any):PatternResult{
+export function toResult(body:any,viaAccount=false,version=''):PatternResult{
  const pattern=body?.pattern||{},counts:Record<string,number>=pattern.color_counts||{};
  const hex=new Map<string,string>((pattern.palette_used||[]).map((item:any)=>[String(item.code),String(item.hex||'#ffffff')]));
  const colors=Object.entries(counts).map(([code,count])=>({code,hex:hex.get(code)||'#ffffff',count:Number(count)||0})).sort((a,b)=>b.count-a.count||a.code.localeCompare(b.code));
  const path=String(pattern.image_url||pattern.metadata?.labeled_image_url||'');
- return {artworkId:String(body?.artwork_id||''),imageUrl:path.startsWith('/')?ORIGIN+path:path,total:Number(pattern.bead_total)||colors.reduce((sum,item)=>sum+item.count,0),colors};
+ // An edited pattern keeps its file name, so a version marker refreshes cached images.
+ const url=(path.startsWith('/')?ORIGIN+path:path)+(version&&path?`?v=${version}`:'');
+ return {artworkId:String(body?.artwork_id||pattern.metadata?.artwork_id||''),imageUrl:url,total:Number(pattern.bead_total)||colors.reduce((sum,item)=>sum+item.count,0),colors,sheet:pattern,viaAccount};
 }
 
 function failure(reply:Reply):PatternError{
@@ -68,7 +71,7 @@ export async function makePattern(photoBase64:string,size:number,extension:strin
  for(let attempt=0;attempt<3;attempt++){
   const header=await identity(useAccount);
   const reply=await call('/generate/script','POST',body,header);
-  if(reply.statusCode>=200&&reply.statusCode<300)return toResult(reply.data);
+  if(reply.statusCode>=200&&reply.statusCode<300)return toResult(reply.data,!!header.Authorization);
   // Tapping "make the pattern" under the photo note is the consent the website also records.
   if(reply.statusCode===403&&reply.data?.error==='CONSENT_REQUIRED'&&header.Authorization&&!consented){consented=true;await call('/user/consent','POST',{type:'sensitive'},header);continue;}
   if(reply.statusCode===401){
@@ -83,6 +86,18 @@ export async function makePattern(photoBase64:string,size:number,extension:strin
  throw new PatternError('pattern_error');
 }
 
+// The pattern page hands its latest result to the editor and back.
+let current:PatternResult|null=null;
+export const patternState={get:()=>current,set:(value:PatternResult|null)=>{current=value;}};
+
+// Saves an edited sheet with the identity that generated it; the backend re-renders the labelled image.
+export async function savePattern(result:PatternResult,sheet:unknown):Promise<PatternResult>{
+ const header=result.viaAccount?{Authorization:'Bearer '+(uni.getStorageSync('pd_token')||'')}:await deviceHeader();
+ const reply=await call(`/artwork/${encodeURIComponent(result.artworkId)}/pattern`,'PUT',{pattern_json:sheet,render_preview:true},header);
+ if(reply.statusCode>=200&&reply.statusCode<300)return toResult({artwork_id:result.artworkId,pattern:reply.data?.pattern},result.viaAccount,String(Date.now()));
+ throw failure(reply);
+}
+
 // Saving uses an ordinary HTTPS request so it relies on the existing request domain.
 export function savePatternImage(result:PatternResult):Promise<void>{
  // #ifdef H5
@@ -93,7 +108,7 @@ export function savePatternImage(result:PatternResult):Promise<void>{
   url:result.imageUrl,method:'GET',responseType:'arraybuffer',timeout:60000,
   success:response=>{
    if(response.statusCode!==200){reject(new PatternError('pattern_error_network'));return;}
-   const filePath=`${(globalThis as any).wx?.env?.USER_DATA_PATH||''}/pattern-${result.artworkId||Date.now()}.png`;
+   const filePath=`${(globalThis as any).wx?.env?.USER_DATA_PATH||''}/pattern-${result.artworkId||'image'}-${Date.now()}.png`;
    uni.getFileSystemManager().writeFile({filePath,data:response.data as ArrayBuffer,encoding:'binary',
     success:()=>uni.saveImageToPhotosAlbum({filePath,success:()=>resolve(),fail:error=>reject(error)}),
     fail:()=>reject(new PatternError('pattern_error'))});

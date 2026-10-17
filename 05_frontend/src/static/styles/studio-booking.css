@@ -4,7 +4,7 @@
 .studio-native .studio-app-nav button{flex:1;flex-direction:column;gap:3px;min-width:0;background:transparent;color:#71808a;font-size:11px;padding:5px 6px;min-height:52px;border-radius:14px}
 .studio-native .studio-app-nav .studio-app-nav-active{background:#eaf3f9;color:#304d60}
 .studio-home{gap:20px!important}.studio-home .studio-native-heading{text-align:center;gap:10px}.studio-home-title-line{display:block}.studio-home-photo{display:block;width:100%;height:auto;border-radius:18px;flex-shrink:0}
-.studio-home-shortcuts{display:flex;gap:12px}.studio-native .studio-home-shortcuts button{flex:1;min-width:0;min-height:72px;flex-direction:column;gap:7px;background:#f6f9fb;border:1px solid #e0e9ef;border-radius:18px;font-size:14px}
+.studio-home-shortcuts{display:flex;flex-wrap:wrap;gap:12px}.studio-native .studio-home-shortcuts button{flex:1 1 calc(50% - 6px);min-width:0;min-height:72px;flex-direction:column;gap:7px;background:#f6f9fb;border:1px solid #e0e9ef;border-radius:18px;font-size:14px}
 .studio-native .studio-address{text-align:left;border-radius:16px;justify-content:flex-start}.studio-address text{flex:1;min-width:0;overflow-wrap:anywhere}
 .studio-visit{gap:16px!important;padding-top:16px!important;padding-bottom:20px!important}.studio-visit-title{font-size:24px!important}.studio-native--en .studio-visit-title{font-size:25px!important}
 .studio-visit-steps{display:flex;gap:4px;border-bottom:1px solid #d7e2e9;padding-bottom:12px}

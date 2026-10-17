@@ -22,6 +22,16 @@ const paths: Record<string, string> = {
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
   image: '<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m4 18 5-5 4 4 3-3 4 4"/>',
   download: '<path d="M12 4v11m-5-5 5 5 5-5M5 20h14"/>',
+  move: '<path d="M12 3v18M3 12h18m-9-9-3 3m3-3 3 3m-3 15-3-3m3 3 3-3M3 12l3-3m-3 3 3 3m15-3-3-3m3 3-3 3"/>',
+  brush: '<path d="M14.5 4.5 19.5 9.5 10 19H5v-5Z"/><path d="m12.5 6.5 5 5"/>',
+  eraser: '<path d="m8 20-4-4 10-10 6 6-8 8Z"/><path d="M8 20h12M9 11l6 6"/>',
+  undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+  redo: '<path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/>',
+  plus: '<circle cx="11" cy="11" r="7"/><path d="M11 8v6m-3-3h6m4 7 3 3"/>',
+  minus: '<circle cx="11" cy="11" r="7"/><path d="M8 11h6m4 7 3 3"/>',
+  swap: '<path d="M4 8h13l-3-3m6 11H7l3 3"/>',
+  palette: '<path d="M12 3a9 9 0 0 0 0 18c1.5 0 2-1 2-2s-1-1.5-1-2.5S14 15 15 15h2a4 4 0 0 0 4-4c0-4.4-4-8-9-8Z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/>',
+  bag: '<path d="M5 8h14l-1 12H6Z"/><path d="M9 8a3 3 0 0 1 6 0"/>',
   grid: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
 };
 const source = computed(() => {

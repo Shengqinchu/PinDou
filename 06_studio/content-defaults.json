@@ -5420,17 +5420,13 @@
       "拼豆图纸",
       "Bead patterns"
     ],
-    "pattern_label": [
-      "免费小工具",
-      "Free tool"
-    ],
     "pattern_title": [
       "把照片变成拼豆图纸",
       "Turn a photo into a bead pattern"
     ],
     "pattern_intro": [
-      "选一张照片和格数，按颜色生成带色号的拼豆图纸，免费不限次。",
-      "Choose a photo and a grid size. Its colours are matched to bead codes in a numbered pattern, free and unlimited."
+      "免费不限次，照片按颜色变成带色号的拼豆图纸。",
+      "Free and unlimited: your photo becomes a numbered bead pattern."
     ],
     "pattern_pick": [
       "选择或拍摄照片",
@@ -5444,17 +5440,9 @@
       "换一张照片",
       "Choose another photo"
     ],
-    "pattern_size": [
-      "图纸格数",
-      "Grid size"
-    ],
-    "pattern_size_hint": [
-      "格数越多，细节越多，用豆也越多。52 格适合大多数照片。",
-      "More squares keep more detail and use more beads. 52 suits most photos."
-    ],
     "pattern_photo_note": [
-      "照片只用于生成图纸。登录后生成的图纸也会出现在网站的“我的作品”里。",
-      "Your photo is only used to make the pattern. When you are signed in, patterns also appear under My works on the website."
+      "照片只用于生成图纸。",
+      "Your photo is only used to make the pattern."
     ],
     "pattern_generate": [
       "生成图纸",
@@ -5469,20 +5457,12 @@
       "Your bead pattern"
     ],
     "pattern_total": [
-      "共 {v0} 颗豆 · {v1} 种颜色",
-      "{v0} beads · {v1} colours"
-    ],
-    "pattern_preview": [
-      "点图纸可以放大查看色号。",
-      "Tap the pattern to zoom in on the codes."
-    ],
-    "pattern_colors": [
-      "颜色清单",
-      "Colour list"
+      "{v0} 颗豆 · {v1} 种颜色 · 点图放大",
+      "{v0} beads · {v1} colours · tap to zoom"
     ],
     "pattern_brand_note": [
-      "色号对应 MARD 拼豆色卡，实物颜色以豆子为准。",
-      "Codes follow the MARD bead chart; actual bead colours may vary slightly."
+      "色号对应 MARD 色卡。",
+      "Codes follow the MARD chart."
     ],
     "pattern_save": [
       "保存到相册",
@@ -5523,6 +5503,142 @@
     "pattern_error_network": [
       "网络不太稳定，请稍后再试。",
       "The connection is unstable. Please try again shortly."
+    ],
+    "pattern_stage_photo": [
+      "整理照片",
+      "Preparing photo"
+    ],
+    "pattern_stage_colors": [
+      "匹配豆色",
+      "Matching colours"
+    ],
+    "pattern_stage_render": [
+      "生成图纸",
+      "Drawing pattern"
+    ],
+    "pattern_edit": [
+      "编辑图纸",
+      "Edit pattern"
+    ],
+    "pattern_counts": [
+      "{v0} 颗 · {v1} 色",
+      "{v0} beads · {v1} colours"
+    ],
+    "pattern_tool_move": [
+      "移动",
+      "Move"
+    ],
+    "pattern_tool_paint": [
+      "画笔",
+      "Brush"
+    ],
+    "pattern_tool_erase": [
+      "橡皮",
+      "Eraser"
+    ],
+    "pattern_tool_replace": [
+      "换色",
+      "Swap"
+    ],
+    "pattern_undo": [
+      "撤销",
+      "Undo"
+    ],
+    "pattern_redo": [
+      "重做",
+      "Redo"
+    ],
+    "pattern_zoom_in": [
+      "放大",
+      "Zoom in"
+    ],
+    "pattern_zoom_out": [
+      "缩小",
+      "Zoom out"
+    ],
+    "pattern_more_colors": [
+      "更多颜色",
+      "More colours"
+    ],
+    "pattern_pick_color": [
+      "选择颜色",
+      "Choose a colour"
+    ],
+    "pattern_replace_hint": [
+      "点图纸或下方颜色，选出要换掉的颜色",
+      "Tap a bead or colour to swap it"
+    ],
+    "pattern_replace_to": [
+      "把 {v0} 换成…",
+      "Change {v0} to…"
+    ],
+    "pattern_replace_confirm": [
+      "把 {v1} 颗 {v0} 全部换成 {v2}？",
+      "Change all {v1} {v0} beads to {v2}?"
+    ],
+    "pattern_save_edit": [
+      "保存修改",
+      "Save changes"
+    ],
+    "pattern_saving": [
+      "正在保存…",
+      "Saving…"
+    ],
+    "pattern_unsaved": [
+      "修改还没保存，确定离开吗？",
+      "Your changes are not saved. Leave anyway?"
+    ],
+    "shop_entry": [
+      "拼豆小店",
+      "Bead shop"
+    ],
+    "shop_title": [
+      "拼豆小店",
+      "The little shop"
+    ],
+    "shop_home": [
+      "在家拼豆",
+      "Bead at home"
+    ],
+    "shop_finished": [
+      "拼豆成品",
+      "Finished pieces"
+    ],
+    "shop_services": [
+      "代拼/代烫服务",
+      "Beading & ironing"
+    ],
+    "shop_unpriced": [
+      "价格待定",
+      "Price to be confirmed"
+    ],
+    "shop_no_photo": [
+      "图片待补充",
+      "Photo coming soon"
+    ],
+    "shop_empty": [
+      "商品整理中",
+      "Products are being prepared"
+    ],
+    "shop_loading": [
+      "正在加载商品…",
+      "Loading products…"
+    ],
+    "shop_retry": [
+      "重新加载",
+      "Reload"
+    ],
+    "shop_from": [
+      "起",
+      "and up"
+    ],
+    "shop_note": [
+      "小程序里仅展示商品，喜欢的话欢迎到店看看，或微信咨询店主。",
+      "This is a showcase only. Visit the studio or message the host on WeChat if something catches your eye."
+    ],
+    "shop_contact": [
+      "复制店主微信",
+      "Copy the host's WeChat"
     ]
   },
   "owner-notifications": {

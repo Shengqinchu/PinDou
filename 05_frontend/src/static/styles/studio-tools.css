@@ -1,0 +1,55 @@
+/* Bead pattern tool and editor (pages/tools). */
+.studio-pattern{gap:16px}
+.studio-native .studio-pattern-photo{display:flex;align-items:center;justify-content:center;width:100%;height:220px;padding:0;background:#f6f9fb;border:1px dashed #c7d6e0;border-radius:18px;overflow:hidden}
+.studio-native .studio-pattern-photo--filled{border-style:solid;border-color:#e0e9ef;background:#fff}
+.studio-pattern-photo-image{width:100%;height:100%;transition:opacity .2s}
+.studio-pattern-photo-image--busy{opacity:.55}
+.studio-pattern-photo-empty{display:flex;flex-direction:column;align-items:center;gap:9px;color:#5a6f7d;font-size:14px}
+.studio-native .studio-pattern-change{align-self:flex-start;gap:6px}
+.studio-pattern-sizes{display:flex;gap:8px}
+.studio-native .studio-pattern-sizes .studio-plan{min-height:0;align-items:center;gap:2px;padding:10px 4px;border-radius:14px}
+.studio-pattern-size{font-size:20px;font-weight:600;color:#304d60;line-height:1.2}
+.studio-pattern-size-unit{font-size:11px;color:#7c8f9b}
+.studio-pattern-progress{display:flex;flex-direction:column;gap:10px;padding:14px;background:#f6f9fb;border:1px solid #e0e9ef;border-radius:16px}
+.studio-pattern-progress-head{display:flex;align-items:center;gap:10px}
+.studio-pattern-puppy{width:34px;height:34px;flex-shrink:0}
+.studio-pattern-progress-stage{flex:1;font-size:14px;color:#344957}
+.studio-pattern-progress-value{min-width:52px;text-align:center;font-size:15px;font-weight:600;color:#304d60;background:#fff;border:1px solid #dce5eb;border-radius:999px;padding:2px 10px}
+.studio-pattern-progress-track{height:10px;border-radius:999px;background:#e5e8eb;overflow:hidden}
+.studio-pattern-progress-fill{height:100%;border-radius:999px;background:linear-gradient(135deg,#cfe3f1,#8fb3cb);transition:width .26s ease-out}
+.studio-pattern-stages{display:flex;justify-content:space-between;gap:6px;font-size:11px;color:#9aa8b1}
+.studio-pattern-stage--active{color:#304d60;font-weight:600}
+.studio-pattern-stage--done{color:#54714c}
+.studio-pattern-result{width:100%;border-radius:14px;border:1px solid #e0e9ef;background:#fff}
+.studio-pattern-colors{display:flex;flex-wrap:wrap;gap:8px}
+.studio-pattern-color{display:flex;align-items:center;gap:6px;padding:6px 10px 6px 6px;background:#f6f9fb;border:1px solid #e0e9ef;border-radius:12px}
+.studio-pattern-swatch{width:20px;height:20px;border-radius:50%;border:1px solid #0000001f}
+.studio-pattern-code{font-size:13px;font-weight:600;color:#344957}
+.studio-pattern-count{font-size:12px;color:#6d808c}
+.studio-pattern-actions{display:flex;gap:8px}
+.studio-native .studio-pattern-actions button{flex:1;min-width:0;flex-direction:column;gap:4px;min-height:64px;padding:8px 4px;border-radius:16px;font-size:13px}
+.studio-editor{display:flex;flex-direction:column;gap:10px;height:100%;padding:6px 12px 8px;box-sizing:border-box}
+.studio-editor-status{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:0 4px}
+.studio-editor-viewport{flex:1;min-height:0;background:#f6f9fb;border:1px solid #e0e9ef;border-radius:14px;overflow:hidden}
+.studio-editor-canvas{display:block}
+.studio-editor-tools{display:flex;align-items:center;gap:6px}
+.studio-native .studio-editor-tool{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;padding:5px 8px;background:#f6f9fb;border:1px solid #e0e9ef;border-radius:12px;font-size:11px;line-height:1.3;color:#344957}
+.studio-native .studio-editor-tool--active{background:#eef6fc;border-color:#89acc5}
+.studio-editor-tool-gap{flex:1}
+.studio-native .studio-editor-icon{display:flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;background:transparent;border-radius:10px}
+.studio-native .studio-editor-icon[disabled]{opacity:.35}
+.studio-editor-colors{flex-shrink:0;white-space:nowrap}
+.studio-editor-color-row{display:flex;gap:8px;padding:2px 0}
+.studio-native .studio-editor-chip{display:flex;flex-shrink:0;align-items:center;gap:6px;padding:6px 10px 6px 6px;background:#f6f9fb;border:1px solid #e0e9ef;border-radius:12px}
+.studio-native .studio-editor-chip--active{background:#eef6fc;border-color:#89acc5}
+.studio-editor-sheet-mask{position:fixed;inset:0;z-index:30;background:#1f2d3740;display:flex;align-items:flex-end}
+.studio-editor-sheet{width:100%;max-height:70%;display:flex;flex-direction:column;gap:10px;background:#fff;border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));box-sizing:border-box}
+.studio-editor-sheet-head{display:flex;align-items:center;justify-content:space-between}
+.studio-editor-series{white-space:nowrap;flex-shrink:0}
+.studio-native .studio-editor-series-tab{flex-shrink:0;min-width:40px;padding:6px 12px;background:#f2f7fa;border-radius:10px;font-size:13px}
+.studio-native .studio-editor-series-tab--active{background:#e5f0f8;color:#304d60;font-weight:600}
+.studio-editor-swatches{height:300px}
+.studio-editor-swatch-grid{display:flex;flex-wrap:wrap;gap:8px}
+.studio-native .studio-editor-swatch{display:flex;flex-direction:column;align-items:center;gap:3px;width:calc((100% - 40px)/6);padding:6px 0;background:#fff;border:1px solid #e0e9ef;border-radius:12px;font-size:11px}
+.studio-native .studio-editor-swatch--active{border-color:#89acc5;background:#eef6fc}
+.studio-editor-swatch-color{width:26px;height:26px;border-radius:50%;border:1px solid #0000001f}

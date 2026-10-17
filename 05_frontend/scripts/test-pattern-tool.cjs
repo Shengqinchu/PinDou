@@ -36,6 +36,14 @@ const pattern={artwork_id:'a1',pattern:{bead_total:12,color_counts:{H7:2,G6:10},
  calls=[];replies=[{statusCode:401,data:{}},ok({device_token:'dev-2'}),ok(pattern)];await t.makePattern('AAA',52,'jpg');
  assert.equal(calls[1].url.split('/v1')[1],'/wallet/profile');assert.equal(calls[2].header['X-PinDou-Device'],'dev-2');assert.equal(storage.pd_pattern_device,'dev-2');
  replies=[{statusCode:401,data:{}},ok({device_token:'dev-3'}),{statusCode:401,data:{}}];await assert.rejects(t.makePattern('AAA',52,'jpg'));assert.equal(storage.pd_pattern_device,undefined);
+ // Saving an edit reuses the identity that generated the pattern and versions the image URL.
+ storage.pd_pattern_device='dev-9';calls=[];replies=[ok({pattern:pattern.pattern})];
+ const saved=await t.savePattern({artworkId:'a1',viaAccount:false},{grid:[]});
+ assert.equal(calls[0].method,'PUT');assert.equal(calls[0].url,'https://pindoupuppy.com/api/v1/artwork/a1/pattern');assert.equal(calls[0].header['X-PinDou-Device'],'dev-9');assert.equal(calls[0].data.render_preview,true);
+ assert.match(saved.imageUrl,/p\.png\?v=\d+$/);assert.equal(saved.artworkId,'a1');
+ storage.pd_token='acct-2';calls=[];replies=[ok({pattern:pattern.pattern})];await t.savePattern({artworkId:'a1',viaAccount:true},{grid:[]});assert.equal(calls[0].header.Authorization,'Bearer acct-2');
+ replies=[{statusCode:404,data:{}}];await assert.rejects(t.savePattern({artworkId:'a1',viaAccount:true},{}),error=>error.code==='pattern_error');
+ t.patternState.set(saved);assert.equal(t.patternState.get(),saved);
  assert.equal(replies.length,0);
- console.log('Pattern tool checks passed: guest device identity, account token, consent retry, expired-token fallback, error mapping, colour list and image URL.');
+ console.log('Pattern tool checks passed: guest device identity, account token, consent retry, expired-token fallback, error mapping, colour list, image URL and saving edits.');
 })().catch(error=>{console.error(error);process.exitCode=1;});
