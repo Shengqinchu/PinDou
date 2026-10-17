@@ -1,0 +1,27 @@
+Use case: text-localization. Edit the supplied square Chinese service poster into a finished English poster, retaining its charming, black-ink, slightly irregular hand-lettered style on pure white. Output a single high-resolution square image, ideally 2048 x 2048. Preserve the original composition, all its existing dog cartoons, paw-print section bullets, and its hand-drawn visual identity. The first reference is the poster to edit. The second reference is the owner's approved English logo: replace the top-left Chinese logo with that exact English logo artwork, retaining its dog face, bone, star, heart, Hamilton and PindouPuppy lettering; use only the logo content, without the huge surrounding blank margins. Do not invent or redesign a brand mark. Remove every Chinese character from the final poster. Reflow English text elegantly within the corresponding original areas so it is comfortably readable, with generous line spacing, and no text clipped, overlapping, omitted, duplicated, or compressed into tiny print. Header typography should be bold, friendly, hand drawn uppercase lettering, while body is clean legible handwritten English. Keep original prices, discounts, policies and service terms exactly as specified. Do not add QR codes, URLs, addresses, watermarks, promotions, colored elements, shadows, paper texture, or new illustrations. Render only the English copy below; instruction prose is not part of the artwork. Preserve all existing non-logo dog illustrations faithfully.
+
+POSTER 2 — CUSTOM PATTERNS.
+Keep the little wide-grinning doodle with two small ears and two exclamation marks at upper right, and paw prints beside section headings. Retain the original centered single-column pricing and process layout. Balance whitespace so all English steps fit easily in a square.
+
+Title:
+CUSTOM PATTERNS
+
+Intro:
+A one-of-a-kind bead pattern made just for you!
+Turn a photo of you or your pet into adorable bead art!
+
+PRICING
+Up to 52 × 52 beads (14 cm square): 3 CAD
+52–78-bead grids (22 cm square): 5 CAD
+Over 78: quoted individually
+
+HOW IT WORKS
+Send your image and tell us your preferred style.
+Confirm the price and turnaround time.
+Pay a 50% deposit.
+Review the pattern and request changes.
+(Up to 3 revisions; minor adjustments after approval.)
+Pay the balance once you're happy.
+Receive your finished pattern.
+
+Keep the 14 cm and 22 cm figures exactly as supplied, and the prices exactly 3 CAD and 5 CAD. Do not change the deposit percentage or omit the three-revision condition.

@@ -1,0 +1,29 @@
+[
+  {
+    "name": "bead-assembly-en.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "bytes": 1655186,
+    "sha256": "73f1b51cc6d6844763ad7708c333fa8ba9d60835740c29438aab274e60d1e12e"
+  },
+  {
+    "name": "bead-fusing-en.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "bytes": 1278805,
+    "sha256": "c4b5207fad4fe9a114a554a768c63d5ffe243f7a4aa0e8f223a1a205f398d1be"
+  },
+  {
+    "name": "custom-patterns-en.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "bytes": 1339883,
+    "sha256": "3c2827a137f070c9a78d604440136dcfa556a07ea33fa6b6fdde991c3865b3f3"
+  }
+]

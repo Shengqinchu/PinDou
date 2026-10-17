@@ -1,0 +1,25 @@
+Use case: text-localization. Edit the supplied square Chinese service poster into a finished English poster, retaining its charming, black-ink, slightly irregular hand-lettered style on pure white. Output a single high-resolution square image, ideally 2048 x 2048. Preserve the original composition, all its existing dog cartoons, paw-print section bullets, and its hand-drawn visual identity. The first reference is the poster to edit. The second reference is the owner's approved English logo: replace the top-left Chinese logo with that exact English logo artwork, retaining its dog face, bone, star, heart, Hamilton and PindouPuppy lettering; use only the logo content, without the huge surrounding blank margins. Do not invent or redesign a brand mark. Remove every Chinese character from the final poster. Reflow English text elegantly within the corresponding original areas so it is comfortably readable, with generous line spacing, and no text clipped, overlapping, omitted, duplicated, or compressed into tiny print. Header typography should be bold, friendly, hand drawn uppercase lettering, while body is clean legible handwritten English. Keep original prices, discounts, policies and service terms exactly as specified. Do not add QR codes, URLs, addresses, watermarks, promotions, colored elements, shadows, paper texture, or new illustrations. Render only the English copy below; instruction prose is not part of the artwork. Preserve all existing non-logo dog illustrations faithfully.
+
+POSTER 1 — BEAD FUSING.
+Keep the large dog face on the right of the pricing section and the tall upside-down cartoon dog at bottom left. Keep paw prints next to PRICING and FUSING NOTES.
+
+Title:
+BEAD FUSING
+
+Tagline:
+Love placing beads, but not ironing?
+Leave it to us!
+
+PRICING
+Up to 52 × 52 beads: 1 CAD / piece
+52–78-bead grids: 2 CAD / piece
+Over 78: quoted individually
+
+FUSING NOTES
+Lift your finished piece with masking tape.
+For regular fusing, use a mirrored pattern.
+Please keep your piece neat.
+Please allow for minor imperfections.
+Fuse it yourself with our tools for half price.
+
+Translate the service title clearly as bead fusing; never translate it as burning or ironing clothes. "52–78-bead grids" refers to the grid size, not to a total bead count. Price numbers must read exactly 1 CAD and 2 CAD.

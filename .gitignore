@@ -72,3 +72,6 @@ artifacts/
 01_research/tech/user_poc_private/incoming/
 dist/
 unpackage/
+
+# Local scratch databases and verification screenshots
+/var/

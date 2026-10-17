@@ -72,6 +72,19 @@
 - 配置：只读，公开/敏感分离展示
 - 审计日志：列表 + 筛选 + before/after JSON 可折叠
 
+### Batch 5 — admin.html UI 换皮（复刻 T-Check 设计语言）
+- 背景：Batch 3/4 功能全对，但裸 HTML 太丑、首屏甩 JSON 不专业。用户指定复刻参考 UI。
+- 参考文件（Codex 直接打开抄设计系统）：`C:\Users\123\Desktop\AI_Test\v2\admin.html`
+  - 技术栈：Bootstrap 5.3 + Font Awesome 6 + Chart.js（均 CDN，零构建）
+  - 配色 :root —— primary #4f46e5 / light #6366f1 / bg #eef2ff / success #10b981 / warning #f59e0b / danger #ef4444 / gray 50–900；sidebar 260px；卡片 radius 16px；柔阴影
+- 原则：**只换皮，不动逻辑**。Batch 1–4 的 fetch/token/401/两步补发/额度>100二次确认/reason必填/审计/JSON折叠全部保留不变。
+- 布局复刻参考：
+  - 左侧栏 260px：品牌「PinDou Admin」+ 分组带 FA 图标导航（概览：Dashboard；管理：订单/CDK/用户/作品；系统：配置/审计）+ 底部用户卡（admin + 角色 + 退出）
+  - 顶部面包屑
+  - Dashboard：彩色图标统计卡（总用户/今日订单/支付成功率/异常订单/CDK总量/已用CDK）+ 2 个 Chart.js 图表（近7天用户增长折线 + 近7天订单柱状）；**移除首屏裸 Dashboard JSON dump**
+  - 各 Tab 表格→Bootstrap 表格，危险按钮→btn-danger，确认弹窗→Bootstrap modal
+- 图表数据：若 GET /admin/dashboard 没有近7天序列，补只读字段（按天 用户增长 + 订单数），require_role 不变。
+
 ## 全局约束
 - Batch 1/2 只动 `06_backend/`；Batch 3/4 动 `06_backend/pindou/static_admin/` + main.py
 - 不改小程序前端 `05_frontend/`；不改 `.env`

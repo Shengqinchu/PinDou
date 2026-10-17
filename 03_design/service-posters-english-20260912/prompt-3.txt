@@ -1,0 +1,43 @@
+Use case: text-localization. Edit the supplied square Chinese service poster into a finished English poster, retaining its charming, black-ink, slightly irregular hand-lettered style on pure white. Output a single high-resolution square image, ideally 2048 x 2048. Preserve the original composition, all its existing dog cartoons, paw-print section bullets, and its hand-drawn visual identity. The first reference is the poster to edit. The second reference is the owner's approved English logo: replace the top-left Chinese logo with that exact English logo artwork, retaining its dog face, bone, star, heart, Hamilton and PindouPuppy lettering; use only the logo content, without the huge surrounding blank margins. Do not invent or redesign a brand mark. Remove every Chinese character from the final poster. Reflow English text elegantly within the corresponding original areas so it is comfortably readable, with generous line spacing, and no text clipped, overlapping, omitted, duplicated, or compressed into tiny print. Header typography should be bold, friendly, hand drawn uppercase lettering, while body is clean legible handwritten English. Keep original prices, discounts, policies and service terms exactly as specified. Do not add QR codes, URLs, addresses, watermarks, promotions, colored elements, shadows, paper texture, or new illustrations. Render only the English copy below; instruction prose is not part of the artwork. Preserve all existing non-logo dog illustrations faithfully.
+
+POSTER 3 — BEAD ASSEMBLY.
+Retain the original wobbly black dashed compartment boundaries: small pricing compartment upper left; fusing/accessories middle left; turnaround and aftercare lower left; order process upper right; pickup/delivery and shipping lower right. Retain paw-print heading markers. Rebalance box proportions and wrap English lines where needed to fit ALL content, without shrinking text excessively. This third poster has denser content; make headings less tall than the original if needed to keep body text clear. Avoid unnecessary duplicate headings or duplicate phrases. No bullet or text may touch a dashed border. Keep each heading with its section.
+
+Title:
+BEAD ASSEMBLY
+
+PRICING
+0.01 CAD per bead
+Returning customers: 15% off
+
+FUSING & ACCESSORIES
+All fusing styles included.
+Over 78-bead grids: add 2 CAD.
+All accessories included.
+Complex designs are quoted individually.
+
+TURNAROUND & AFTERCARE
+Small pieces: within 3 days.
+Large pieces: around 5 days.
+We'll send photos for you to check after fusing.
+No returns or exchanges unless there is an obvious defect.
+Deposits are non-refundable once work begins.
+Report shipping damage within 48 hours.
+
+HOW TO ORDER
+If needed, send an image so we can discuss the style and create a pattern.
+Confirm the pattern, price, fusing style and details.
+Pay a 50% deposit; we start making your piece.
+Review completion photos and pay the balance.
+Collect your order or have it shipped.
+
+PICKUP & DELIVERY
+Pick up at the studio.
+Free delivery in downtown Hamilton.
+Free delivery around Hamilton and in downtown Toronto on orders of 50 CAD or more.
+
+SHIPPING
+Shipping payable on delivery or priced by distance.
+Free shipping on orders of 100 CAD or more.
+
+Be extremely careful with these business rules: 0.01 CAD per bead, returning customers get 15% OFF (not 85% off), additional 2 CAD over 78, 50% deposit, 3 days small / around 5 days large, 48 hours shipping damage reporting, 50 CAD free delivery threshold for nearby Hamilton / downtown Toronto, and 100 CAD free shipping. Do not claim all Toronto deliveries are free or that free shipping starts at 50 CAD.
