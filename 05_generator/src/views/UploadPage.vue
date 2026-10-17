@@ -88,7 +88,7 @@ const membershipActive = computed(() => {
 const aiModeCostText = computed(() => aiCost.value ? `${formatInteger(aiCost.value)} 积分/张` : '积分同步中');
 const normalModeCostText = computed(() => '消耗 1 次 · 会员期内无限');
 const aiCtaCostText = computed(() => aiCost.value ? `消耗 ${formatInteger(aiCost.value)} 积分` : '积分同步中');
-const normalCtaCostText = computed(() => membershipActive.value ? '会员免次' : '消耗 1 次');
+const normalCtaCostText = computed(() => '免费');
 const customSizeDraft = computed(() => ({
   width: parseCustomDimension(customWidthInput.value),
   height: parseCustomDimension(customHeightInput.value)
@@ -104,7 +104,7 @@ const creditSummary = computed(() => {
   if (isAiMode.value) {
     return aiCost.value ? `本次消耗 ${formatInteger(aiCost.value)} 积分，生成成功才扣` : 'AI 积分同步中，生成成功才扣';
   }
-  return membershipActive.value ? '会员期内普通模式免次' : '普通模式消耗 1 次';
+  return '普通模式免费不限次';
 });
 const ctaLabel = computed(() => {
   if (hasInvalidCustomSize.value) {

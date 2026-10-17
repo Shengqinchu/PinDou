@@ -4557,8 +4557,8 @@
       "Converts the source image while keeping its composition"
     ],
     "ad304396f5": [
-      "有时间卡时普通生成不限次",
-      "A pass includes unlimited standard generation"
+      "普通生成免费不限次",
+      "Standard generation is free and unlimited"
     ],
     "3e853b213a": [
       "想快速试尺寸、看豆数，先用它。",
@@ -4689,8 +4689,8 @@
       "Using credits, passes and CDKs"
     ],
     "3dbec82003": [
-      "一句话：AI 用积分，普通看时间卡或普通额度，CDK 可直接兑换到账户或设备。",
-      "AI uses credits. Standard mode uses a pass or available uses. CDKs can be redeemed to an account or device."
+      "一句话：AI 用积分，普通模式免费不限次，CDK 可直接兑换到账户或设备。",
+      "In short: AI uses points, standard generation is free and unlimited, and CDKs can be redeemed to your account or device."
     ],
     "dceac6b0b5": [
       "避坑 / FAQ",
@@ -4769,8 +4769,8 @@
       "Included in your pass"
     ],
     "c6ce215edf": [
-      "消耗 1 次",
-      "Uses 1 standard allowance"
+      "免费",
+      "Free"
     ],
     "cad0ebf315": [
       "本次消耗 {v0} 积分，生成成功才扣",
@@ -4785,8 +4785,8 @@
       "Standard generation is included in your pass"
     ],
     "3e13dfab60": [
-      "普通模式消耗 1 次",
-      "Uses 1 standard allowance"
+      "普通模式免费不限次",
+      "Standard generation is free and unlimited"
     ],
     "bb046fcd8b": [
       "请输入至少 1 × 1 的格数",

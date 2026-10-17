@@ -50,7 +50,7 @@ const modeCards = [
   {
     title: '普通模式',
     badge: '秒出',
-    points: ['适合本来就是卡通、线稿、图标的图片', '直接量化原图，保留原始构图', '有时间卡时普通生成不限次'],
+    points: ['适合本来就是卡通、线稿、图标的图片', '直接量化原图，保留原始构图', '普通生成免费不限次'],
     hint: '想快速试尺寸、看豆数，先用它。'
   },
   {
@@ -166,7 +166,7 @@ const walletItems = computed(()=>[
       <div class="tutorial-section__heading">
         <span class="tutorial-kicker">03</span>
         <LiftTitle as="h2" :text="gt('积分 / 会员 / CDK 怎么用')"/>
-        <p>{{ gt("一句话：AI 用积分，普通看时间卡或普通额度，CDK 可直接兑换到账户或设备。") }}</p>
+        <p>{{ gt("一句话：AI 用积分，普通模式免费不限次，CDK 可直接兑换到账户或设备。") }}</p>
       </div>
 
       <div class="wallet-grid">

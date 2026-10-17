@@ -636,7 +636,8 @@ def test_generate_script_artwork_pattern_and_delete_flow(api_client) -> None:
     with session_factory() as session:
         user = session.scalar(select(User).where(User.openid.like("wx_%")))
         assert user is not None
-        assert user.free_credits_remaining == 2
+        # Standard generation is free; allowances are left untouched.
+        assert user.free_credits_remaining == 3
         assert user.paid_credits == 1
     artwork_id = generated.json()["artwork_id"]
     assert generated.json()["pattern"]["metadata"]["artwork_id"] == artwork_id
@@ -647,6 +648,27 @@ def test_generate_script_artwork_pattern_and_delete_flow(api_client) -> None:
     assert client.get(f"/api/pattern/{artwork_id}", headers=headers).status_code == 200
     assert client.delete(f"/api/artwork/{artwork_id}", headers=headers).json() == {"success": True}
     assert client.get(f"/api/artwork/{artwork_id}", headers=headers).status_code == 404
+
+
+def test_standard_generation_is_free_without_any_allowance(api_client) -> None:
+    client, session_factory = api_client
+    user_id = "wx_no_allowance"
+    with session_factory() as session:
+        session.add(User(openid=user_id, nickname="Zero", avatar="", free_credits_remaining=0, paid_credits=0,
+                         sensitive_consent_at=datetime.now(timezone.utc)))
+        session.commit()
+    headers = {"Authorization": f"Bearer {create_access_token(subject=user_id)}"}
+    for _ in range(4):
+        response = client.post(
+            "/api/v1/generate/script",
+            data={"size": "26x26", "mode": "script"},
+            files={"raw_image": ("sample.png", png_bytes((40, 120, 200)), "image/png")},
+            headers=headers,
+        )
+        assert response.status_code == 200
+    with session_factory() as session:
+        user = session.scalar(select(User).where(User.openid == user_id))
+        assert user is not None and user.free_credits_remaining == 0 and user.paid_credits == 0
 
 
 def test_save_artwork_pattern_rebuilds_counts_and_exports_png(api_client) -> None:

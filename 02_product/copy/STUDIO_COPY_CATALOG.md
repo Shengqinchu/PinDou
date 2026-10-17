@@ -1638,7 +1638,7 @@
 | 0f1d2bf234 | 秒出 | Quick |
 | c8400530cc | 适合本来就是卡通、线稿、图标的图片 | For existing cartoons, line art and icons |
 | 0bbd9424e6 | 直接量化原图，保留原始构图 | Converts the source image while keeping its composition |
-| ad304396f5 | 有时间卡时普通生成不限次 | A pass includes unlimited standard generation |
+| ad304396f5 | 普通生成免费不限次 | Standard generation is free and unlimited |
 | 3e853b213a | 想快速试尺寸、看豆数，先用它。 | Use this to try sizes and check bead counts quickly. |
 | d45aa287ef | 推荐真人/宠物 | Recommended for people and pets |
 | b910673797 | 先把照片变成 Q 版卡通，再转拼豆图纸 | Stylizes your photo before creating the bead pattern |
@@ -1671,7 +1671,7 @@
 | 5c5bcb0931 | Pindou Puppy 模式和尺寸选择 | Pindou Puppy mode and size settings |
 | 807918f91b | Pindou Puppy 生成进度 | Pindou Puppy generation progress |
 | d7cefc27ac | 积分 / 会员 / CDK 怎么用 | Using credits, passes and CDKs |
-| 3dbec82003 | 一句话：AI 用积分，普通看时间卡或普通额度，CDK 可直接兑换到账户或设备。 | AI uses credits. Standard mode uses a pass or available uses. CDKs can be redeemed to an account or device. |
+| 3dbec82003 | 一句话：AI 用积分，普通模式免费不限次，CDK 可直接兑换到账户或设备。 | In short: AI uses points, standard generation is free and unlimited, and CDKs can be redeemed to your account or device. |
 | dceac6b0b5 | 避坑 / FAQ | Tips and FAQ |
 | 1bc74a21ab | 先把容易翻车的点记住，后面就省很多豆。 | A few things to check before you start beading. |
 | 9fd7728e93 | 尺寸怎么选？ | Which size should I choose? |
@@ -1691,11 +1691,11 @@
 | 5757c4a64e | 消耗 1 次 · 会员期内无限 | Uses 1 · unlimited with a pass |
 | d58e544df1 | 消耗 {v0} 积分 | Uses {v0} credits |
 | 753bb2dc14 | 会员免次 | Included in your pass |
-| c6ce215edf | 消耗 1 次 | Uses 1 standard allowance |
+| c6ce215edf | 免费 | Free |
 | cad0ebf315 | 本次消耗 {v0} 积分，生成成功才扣 | This uses {v0} credits, charged on success |
 | 3d73441ec8 | AI 积分同步中，生成成功才扣 | Syncing AI credits; charged on success |
 | a7fdc46723 | 会员期内普通模式免次 | Standard generation is included in your pass |
-| 3e13dfab60 | 普通模式消耗 1 次 | Uses 1 standard allowance |
+| 3e13dfab60 | 普通模式免费不限次 | Standard generation is free and unlimited |
 | bb046fcd8b | 请输入至少 1 × 1 的格数 | Enter a grid of at least 1 × 1 |
 | ee636e1bb6 | 选择照片后开始生成 | Choose a photo to generate |
 | b15be1822f | 开始生成 · {v0} | Generate · {v0} |

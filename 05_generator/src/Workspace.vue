@@ -23,7 +23,8 @@ const pageFrame=ref<HTMLElement>();let entrance:ReturnType<typeof arrive>;
 const stopMotion=onMotionPreferenceChange(()=>entrance?.progress(1).kill());
 const editor=computed(()=>route.meta.toolEditor),balance=computed(()=>wallet.value||auth.user);
 const points=computed(()=>balance.value?.is_unlimited_account?say(copy.unlimited):String(balance.value?.ai_points_balance??balance.value?.paid_credits??0));
-const standard=computed(()=>{const p=balance.value;if(p?.is_unlimited_account||(p?.membership_expires_at&&Date.parse(p.membership_expires_at)>Date.now()))return say(copy.unlimited);return formatCopy(copy.units,{v0:p?.normal_trial_remaining??p?.free_credits_remaining??0});});
+// Standard generation is free for everyone.
+const standard=computed(()=>say(copy.unlimited));
 async function sync(){const n=++revision;auth.syncFromStorage();try{const result=await getWalletProfile();if(n===revision){wallet.value=result;if(auth.isLoggedIn)auth.applyUser(result);}}catch{}}
 watch(accountUser,(user,old)=>{
  auth.syncFromStorage();if(old?.id&&old.id!==user?.id){wallet.value=undefined;generation.resetOwner();}

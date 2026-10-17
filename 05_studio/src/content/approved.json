@@ -1,5 +1,5 @@
 {
-  "source": "2026-10-14 owner annotated screenshots: booking timetable notes and reservation receipt copy; STUDIO_COPY_CHANGES.md",
+  "source": "2026-10-17 owner: standard generation free on website and mini program; STUDIO_COPY_CHANGES.md",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -52,7 +52,7 @@
     "experience-rates.json": "9a5515b8f56c8564d9b2a7fe99b1ace1c69dff5ab51ea67790b85027fb25a66a",
     "gallery-labels.json": "def6dfca6ed941ced5e8f4098880a93f7dc5c20e7a71d20764327523d9860d20",
     "generator-shell.json": "663e0e410fbc06933f7c76818f925b7a5d00ac9fb495bdf21c58270ec3262bc5",
-    "generator.json": "b41114e280016e0c4413865577bba858dc4029d5037ce04c12fe2d8c50fa9f2a",
+    "generator.json": "7b6107381c1670fece66c43957c98c17b097e4259f753d19eab4eea7cf38cc1d",
     "journal-collection.json": "b58215725c1eba05052d83ac53eda17ae46f4923ea4be4d1d1d8cc1b5a5e2bd8",
     "journal-posts.json": "0d729d67cc00df5499308c9093d76f9afb9f64d49314dffa7e414df57cca610b",
     "messaging.json": "8bcb28ef3e95c7c556bfeffc2a5dc3fa1ec0cd5b1c508b09a7ce9d646adc606d",

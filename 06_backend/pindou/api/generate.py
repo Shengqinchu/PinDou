@@ -63,7 +63,8 @@ async def generate_script(request: Request, actor: CurrentActor, db: DbSession) 
     size = parse_size(payload.get("size_preset") or payload.get("size") or "26x26")
     auto_remove_white_bg = parse_bool_default_false(payload.get("auto_remove_white_bg", False))
 
-    script_quota_consumed = consume_script_quota_for_actor(db, actor)
+    # Normal (script) generation is free for everyone since 2026-10-17; only rate limits apply.
+    script_quota_consumed = False
     try:
         sheet = PatternBuilder().build(
             size=size,
@@ -416,6 +417,8 @@ def enforce_generate_rate_limits(db: Session, *, request: Request, actor: Actor,
         rules = [
             RateLimitRule(f"generate_script:{actor_scope}:minute", actor_identity, limit=10, window_seconds=60),
             RateLimitRule("generate_script:ip:minute", source_ip, limit=30, window_seconds=60),
+            RateLimitRule(f"generate_script:{actor_scope}:hour", actor_identity, limit=60, window_seconds=60 * 60),
+            RateLimitRule("generate_script:ip:hour", source_ip, limit=150, window_seconds=60 * 60),
         ]
     try:
         consume_rate_limits(db, rules)
