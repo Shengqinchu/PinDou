@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const project=path.resolve(__dirname,'..'),output=path.resolve(process.argv.find(arg=>arg.startsWith('--path='))?.slice(7)||path.join(project,'dist/build/mp-weixin'));
-const allowedPage=p=>/^pages\/studio\/[a-z-]+$/.test(p)||/^pages\/auth\/studio-[a-z-]+$/.test(p)||p==='pages/consent/consent';
+const allowedPage=p=>/^pages\/studio\/[a-z-]+$/.test(p)||/^pages\/auth\/studio-[a-z-]+$/.test(p)||p==='pages/consent/consent'||p==='pages/tools/pattern';
 const read=file=>fs.readFileSync(file,'utf8'),app=JSON.parse(read(path.join(output,'app.json')));
 assert.equal(app.pages[0],'pages/studio/home');assert(app.pages.every(allowedPage),'Only studio routes belong in the mini program');assert(!app.tabBar,'Legacy generator tabBar must not ship');assert(!app.subPackages?.length,'Review any new subpackage before shipping it');
 if(process.argv.includes('--prepare')){
@@ -15,7 +15,7 @@ if(process.argv.includes('--prepare')){
  }
 }
 const walk=dir=>fs.readdirSync(dir,{withFileTypes:true}).flatMap(item=>item.isDirectory()?walk(path.join(dir,item.name)):[path.join(dir,item.name)]);
-const files=walk(output),forbidden=['AI 精品生成','AI 重绘','AI 智能生成','拼豆图纸生成器','生成英文','/preview/generate','/pattern/build','generateAIPreview','generatePreview(','CDK 兑换','choice-ai-target','pages/generate/','pages/upload/','pages/preview/','pages/result/','pages/cdk/','pages/artwork/','pages/user/','pages/index/'];
+const files=walk(output),forbidden=['AI 精品生成','AI 重绘','AI 智能生成','拼豆图纸生成器','生成英文','/preview/generate','/pattern/build','generateAIPreview','generatePreview(','CDK 兑换','choice-ai-target','pages/generate/','pages/upload/','pages/preview/','pages/result/','pages/cdk/','pages/artwork/','pages/user/','pages/index/','/generate/ai','/generate/status','/payment/','/cdk/redeem','AI 生成','AI 积分'];
 for(const file of files){
  const relative=path.relative(output,file).replaceAll('\\','/');assert(!/^static\/(assets|tabbar)\//.test(relative),'Legacy visual assets must not ship');
  if(relative.startsWith('pages/')&&relative.endsWith('.json'))assert(allowedPage(relative.slice(0,-5)),'Unregistered legacy page left in package');

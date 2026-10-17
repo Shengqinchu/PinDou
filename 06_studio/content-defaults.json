@@ -5415,6 +5415,114 @@
     "generic_error": [
       "暂时未能完成，请稍后重试。",
       "Could not complete this action. Please try again."
+    ],
+    "pattern_entry": [
+      "拼豆图纸",
+      "Bead patterns"
+    ],
+    "pattern_label": [
+      "免费小工具",
+      "Free tool"
+    ],
+    "pattern_title": [
+      "把照片变成拼豆图纸",
+      "Turn a photo into a bead pattern"
+    ],
+    "pattern_intro": [
+      "选一张照片和格数，按颜色生成带色号的拼豆图纸，免费不限次。",
+      "Choose a photo and a grid size. Its colours are matched to bead codes in a numbered pattern, free and unlimited."
+    ],
+    "pattern_pick": [
+      "选择或拍摄照片",
+      "Choose or take a photo"
+    ],
+    "pattern_pick_first": [
+      "先选一张照片",
+      "Choose a photo first"
+    ],
+    "pattern_change": [
+      "换一张照片",
+      "Choose another photo"
+    ],
+    "pattern_size": [
+      "图纸格数",
+      "Grid size"
+    ],
+    "pattern_size_hint": [
+      "格数越多，细节越多，用豆也越多。52 格适合大多数照片。",
+      "More squares keep more detail and use more beads. 52 suits most photos."
+    ],
+    "pattern_photo_note": [
+      "照片只用于生成图纸。登录后生成的图纸也会出现在网站的“我的作品”里。",
+      "Your photo is only used to make the pattern. When you are signed in, patterns also appear under My works on the website."
+    ],
+    "pattern_generate": [
+      "生成图纸",
+      "Make the pattern"
+    ],
+    "pattern_working": [
+      "正在生成图纸…",
+      "Making your pattern…"
+    ],
+    "pattern_result": [
+      "你的拼豆图纸",
+      "Your bead pattern"
+    ],
+    "pattern_total": [
+      "共 {v0} 颗豆 · {v1} 种颜色",
+      "{v0} beads · {v1} colours"
+    ],
+    "pattern_preview": [
+      "点图纸可以放大查看色号。",
+      "Tap the pattern to zoom in on the codes."
+    ],
+    "pattern_colors": [
+      "颜色清单",
+      "Colour list"
+    ],
+    "pattern_brand_note": [
+      "色号对应 MARD 拼豆色卡，实物颜色以豆子为准。",
+      "Codes follow the MARD bead chart; actual bead colours may vary slightly."
+    ],
+    "pattern_save": [
+      "保存到相册",
+      "Save to photos"
+    ],
+    "pattern_saved": [
+      "已保存",
+      "Saved"
+    ],
+    "pattern_save_denied": [
+      "需要允许保存到相册，才能把图纸存下来。",
+      "Allow saving to photos to keep the pattern."
+    ],
+    "pattern_open_settings": [
+      "去设置",
+      "Settings"
+    ],
+    "pattern_again": [
+      "再做一张",
+      "Make another"
+    ],
+    "pattern_visit": [
+      "到店拼出来",
+      "Make it here"
+    ],
+    "pattern_error": [
+      "图纸没有生成成功，请换一张照片再试。",
+      "The pattern could not be made. Please try another photo."
+    ],
+    "pattern_error_busy": [
+      "生成得太频繁啦，请稍后再试。",
+      "Too many patterns in a short time. Please try again shortly."
+    ],
+    "pattern_error_large": [
+      "照片太大了，请换一张小一点的。",
+      "That photo is too large. Please choose a smaller one."
+    ],
+    "pattern_error_network": [
+      "网络不太稳定，请稍后再试。",
+      "The connection is unstable. Please try again shortly."
     ]
   },
   "owner-notifications": {

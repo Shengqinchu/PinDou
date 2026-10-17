@@ -1,5 +1,5 @@
 {
-  "source": "2026-10-17 owner: time cards off sale (暂时下架); STUDIO_COPY_CHANGES.md",
+  "source": "2026-10-17 owner: mini program free bead pattern tool (去做); STUDIO_COPY_CHANGES.md",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -57,7 +57,7 @@
     "journal-posts.json": "0d729d67cc00df5499308c9093d76f9afb9f64d49314dffa7e414df57cca610b",
     "messaging.json": "8bcb28ef3e95c7c556bfeffc2a5dc3fa1ec0cd5b1c508b09a7ce9d646adc606d",
     "miniapp-legal.json": "5322d9cbb4746741bc5f790fb9ed6a567d1a8e8a95836647a7eb987e8a7605fa",
-    "miniapp.json": "eeae0d9cc505dbba8008888db311844335c8a04c02c4da350861ed1125b27f11",
+    "miniapp.json": "818db5a3ee7a0d98ca07c09e187388390c80f15f0447c7303c116300371fd4b3",
     "owner-delivery.json": "520fb29c5db5a79e5779ab79948892283e7debfaa1cbd58879e379c2d5db6c4a",
     "owner-notifications.json": "f4fa362eb4bf371fc04aefd45f4540e6edad61b773dd5fbe0ced22c03d3e5b75",
     "owner-wechat.json": "9686d2d1f3548e0d7206b56a628c773d6058afa83c2e70583262bf189dfc3d89",
@@ -83,7 +83,7 @@
     "shop-ordering.json": "b9d32ca916fa8923895283188e098ed3965f9c91d7d3b9925f216de134859f27",
     "shop.json": "72a97799975c9dd54883d42301ecd11bf0c42e8d173e3d89d91aeb3943f464e6",
     "state.json": "10cc1ef51c01c8db5e32cc76377a60323c2a45087d516de012aae6709373d1be",
-    "studio-miniapp-legal.json": "0c09281868357f60389d4eae115a003ca08b337ed4e7cac9cd4ab78b4387bd2d",
+    "studio-miniapp-legal.json": "7c6d9b49e5ebca0fd25bb9d34e575e89de08db26e87f9b5eefd48983a12b999b",
     "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3",
     "telegram-notifications.json": "b7fa03f044584ed03ba9867c1499d19328639f666dd9350a9a68b4b8356902c7",
     "visit-flow.json": "d5585e4bef6f7650d5e2c01ad5aacd1e666dccf88821bdc0b3e61a0bc953cb49",

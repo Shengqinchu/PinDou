@@ -8,8 +8,8 @@
     "Service terms"
   ],
   "updated": [
-    "更新日期：2026 年 9 月 16 日",
-    "Updated: September 16, 2026"
+    "更新日期：2026 年 10 月 17 日",
+    "Updated: October 17, 2026"
   ],
   "privacy_intro": [
     "本说明适用于小狗拼豆铺（Pindou Puppy）小程序的店铺信息、账号、预约及店主工作台服务。我们按你使用的功能处理相应信息。你可以先浏览首页和店铺信息，再决定是否登录、预约或设置头像。",
@@ -32,20 +32,20 @@
     "Bookings use your chosen experience, party size, date and time, together with your name, contact details and notes, so the host can review and confirm arrangements. The name and contact details from your first booking are saved to your account for future bookings and can be edited in your profile. Email and phone details you provide at registration or booking are used for booking updates, visit reminders and related communication. You can disable these in notification settings; WeChat notices require separate approval. Necessary booking-notification and communication records help the host reconcile arrangements."
   ],
   "images_title": [
-    "头像与店铺图片",
-    "Avatars and studio images"
+    "头像、图纸照片与店铺图片",
+    "Avatars, pattern photos and studio images"
   ],
   "images_body": [
-    "设置头像时，我们处理你主动选择或拍摄的图片，用于展示个人资料和帮助店主核对顾客。请只使用你有权使用的图片。店铺指引和拼豆流程图片用于说明线下体验，可点击查看。设置头像不是浏览店铺信息或提交预约的前提。",
-    "When you set an avatar, we process the image you choose or photograph to display your profile and help the host identify you. Only use images you are entitled to use. Studio directions and beadmaking photographs describe the in-person experience and can be opened for viewing. Setting an avatar is not required to browse studio information or submit a booking."
+    "设置头像时，我们处理你主动选择或拍摄的图片，用于展示个人资料和帮助店主核对顾客。请只使用你有权使用的图片。店铺指引和拼豆流程图片用于说明线下体验，可点击查看。设置头像不是浏览店铺信息或提交预约的前提。使用拼豆图纸工具时，我们处理你选择或拍摄的照片，只用于按颜色生成拼豆图纸；照片和图纸保存在图纸服务中，登录后可在网站“我的作品”查看，如需删除可联系店主。",
+    "When you set an avatar, we process the image you choose or photograph to display your profile and help the host identify you. Only use images you are entitled to use. Studio directions and beadmaking photographs describe the in-person experience and can be opened for viewing. Setting an avatar is not required to browse studio information or submit a booking. When you use the bead pattern tool, we process the photo you choose or take only to turn its colours into a bead pattern. The photo and pattern are kept by the pattern service; patterns made while signed in appear under My works on the website, and you can ask the host to delete them."
   ],
   "permissions_title": [
     "设备权限与本地存储",
     "Permissions and local storage"
   ],
   "permissions_body": [
-    "相册、相机和头像选择权限按你设置头像时的操作申请，你可以拒绝或在微信设置中管理权限。本机保存登录状态、语言及预约草稿，便于继续操作；账号和预约的短时数据缓存按当前登录隔离。复制店铺信息和拨打店主电话由你主动触发，不用于读取通讯录或获取定位。",
-    "Photo library, camera and avatar-selection permissions are requested when you choose how to set an avatar. You may decline or manage them in WeChat settings. Login state, language and booking drafts are stored locally so you can continue later. Temporary account and booking caches are isolated by login. Copying studio information and calling the host are actions you initiate; they do not read your contacts or location."
+    "相册、相机和头像选择权限按你设置头像或为拼豆图纸选择照片时的操作申请；保存图纸时会申请保存到相册的权限。你可以拒绝或在微信设置中管理权限。本机保存登录状态、语言及预约草稿，便于继续操作；账号和预约的短时数据缓存按当前登录隔离。复制店铺信息和拨打店主电话由你主动触发，不用于读取通讯录或获取定位。",
+    "Photo library, camera and avatar-selection permissions are requested when you set an avatar or choose a photo for a bead pattern; saving a pattern asks for permission to save to your photos. You may decline or manage them in WeChat settings. Login state, language and booking drafts are stored locally so you can continue later. Temporary account and booking caches are isolated by login. Copying studio information and calling the host are actions you initiate; they do not read your contacts or location."
   ],
   "providers_title": [
     "服务支持与信息传输",

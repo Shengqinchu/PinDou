@@ -1994,6 +1994,33 @@
 | account_rate_limited | 尝试次数较多，请稍后再试。 | Too many attempts. Please try again later. |
 | account_check_details | 请检查填写的信息。 | Check the information entered. |
 | generic_error | 暂时未能完成，请稍后重试。 | Could not complete this action. Please try again. |
+| pattern_entry | 拼豆图纸 | Bead patterns |
+| pattern_label | 免费小工具 | Free tool |
+| pattern_title | 把照片变成拼豆图纸 | Turn a photo into a bead pattern |
+| pattern_intro | 选一张照片和格数，按颜色生成带色号的拼豆图纸，免费不限次。 | Choose a photo and a grid size. Its colours are matched to bead codes in a numbered pattern, free and unlimited. |
+| pattern_pick | 选择或拍摄照片 | Choose or take a photo |
+| pattern_pick_first | 先选一张照片 | Choose a photo first |
+| pattern_change | 换一张照片 | Choose another photo |
+| pattern_size | 图纸格数 | Grid size |
+| pattern_size_hint | 格数越多，细节越多，用豆也越多。52 格适合大多数照片。 | More squares keep more detail and use more beads. 52 suits most photos. |
+| pattern_photo_note | 照片只用于生成图纸。登录后生成的图纸也会出现在网站的“我的作品”里。 | Your photo is only used to make the pattern. When you are signed in, patterns also appear under My works on the website. |
+| pattern_generate | 生成图纸 | Make the pattern |
+| pattern_working | 正在生成图纸… | Making your pattern… |
+| pattern_result | 你的拼豆图纸 | Your bead pattern |
+| pattern_total | 共 {v0} 颗豆 · {v1} 种颜色 | {v0} beads · {v1} colours |
+| pattern_preview | 点图纸可以放大查看色号。 | Tap the pattern to zoom in on the codes. |
+| pattern_colors | 颜色清单 | Colour list |
+| pattern_brand_note | 色号对应 MARD 拼豆色卡，实物颜色以豆子为准。 | Codes follow the MARD bead chart; actual bead colours may vary slightly. |
+| pattern_save | 保存到相册 | Save to photos |
+| pattern_saved | 已保存 | Saved |
+| pattern_save_denied | 需要允许保存到相册，才能把图纸存下来。 | Allow saving to photos to keep the pattern. |
+| pattern_open_settings | 去设置 | Settings |
+| pattern_again | 再做一张 | Make another |
+| pattern_visit | 到店拼出来 | Make it here |
+| pattern_error | 图纸没有生成成功，请换一张照片再试。 | The pattern could not be made. Please try another photo. |
+| pattern_error_busy | 生成得太频繁啦，请稍后再试。 | Too many patterns in a short time. Please try again shortly. |
+| pattern_error_large | 照片太大了，请换一张小一点的。 | That photo is too large. Please choose a smaller one. |
+| pattern_error_network | 网络不太稳定，请稍后再试。 | The connection is unstable. Please try again shortly. |
 
 ## owner-delivery.json
 
@@ -2925,16 +2952,16 @@
 |---|---|---|
 | privacy_title | 隐私政策说明 | Privacy notice |
 | agreement_title | 用户服务协议 | Service terms |
-| updated | 更新日期：2026 年 9 月 16 日 | Updated: September 16, 2026 |
+| updated | 更新日期：2026 年 10 月 17 日 | Updated: October 17, 2026 |
 | privacy_intro | 本说明适用于小狗拼豆铺（Pindou Puppy）小程序的店铺信息、账号、预约及店主工作台服务。我们按你使用的功能处理相应信息。你可以先浏览首页和店铺信息，再决定是否登录、预约或设置头像。 | This notice covers studio information, accounts, bookings and the host workspace in the Pindou Puppy mini program. We process information for the features you choose. You can browse the home page and studio information before deciding to sign in, book or set an avatar. |
 | identity_title | 账号与个人资料 | Account and profile |
 | identity_body | 微信登录使用微信提供的登录凭证与身份标识，用于验证登录、关联账号和完成网站扫码授权。邮箱登录使用你填写的邮箱和密码。昵称、头像和选填的微信号由你主动填写或选择。店主可查看当前账号的顾客编号、昵称、头像、预约称呼及你提供的联系方式，用于核对预约和沟通；不会按同名或同一联系方式自动合并账号。打开首页不会自动取得微信手机号、微信号、昵称或头像。 | WeChat login uses credentials and identifiers supplied by WeChat to authenticate you, link your account and approve website sign-in. Email login uses the email address and password you enter. You choose your nickname and avatar and may provide a WeChat ID. The host can see your customer reference, nickname, avatar, booking name and provided contact details to match bookings and communicate. Accounts are not automatically merged by matching names or contact details. Opening the home page does not automatically give us your WeChat phone number, WeChat ID, nickname or avatar. |
 | booking_title | 预约与联系资料 | Bookings and contact details |
 | booking_body | 预约使用你选择的体验、人数、日期和时间，以及填写的称呼、联系方式和备注，供店主查看和确认安排。首次预约填写的称呼及联系方式会保存到当前账号，供再次预约复用，也可在个人资料中修改。你在注册或预约中留下的邮箱、手机会用于预约状态、到店提醒及相关沟通，可在“预约提醒”中关闭；微信提醒由你单独允许。必要的预约通知及沟通记录用于店主核对安排。 | Bookings use your chosen experience, party size, date and time, together with your name, contact details and notes, so the host can review and confirm arrangements. The name and contact details from your first booking are saved to your account for future bookings and can be edited in your profile. Email and phone details you provide at registration or booking are used for booking updates, visit reminders and related communication. You can disable these in notification settings; WeChat notices require separate approval. Necessary booking-notification and communication records help the host reconcile arrangements. |
-| images_title | 头像与店铺图片 | Avatars and studio images |
-| images_body | 设置头像时，我们处理你主动选择或拍摄的图片，用于展示个人资料和帮助店主核对顾客。请只使用你有权使用的图片。店铺指引和拼豆流程图片用于说明线下体验，可点击查看。设置头像不是浏览店铺信息或提交预约的前提。 | When you set an avatar, we process the image you choose or photograph to display your profile and help the host identify you. Only use images you are entitled to use. Studio directions and beadmaking photographs describe the in-person experience and can be opened for viewing. Setting an avatar is not required to browse studio information or submit a booking. |
+| images_title | 头像、图纸照片与店铺图片 | Avatars, pattern photos and studio images |
+| images_body | 设置头像时，我们处理你主动选择或拍摄的图片，用于展示个人资料和帮助店主核对顾客。请只使用你有权使用的图片。店铺指引和拼豆流程图片用于说明线下体验，可点击查看。设置头像不是浏览店铺信息或提交预约的前提。使用拼豆图纸工具时，我们处理你选择或拍摄的照片，只用于按颜色生成拼豆图纸；照片和图纸保存在图纸服务中，登录后可在网站“我的作品”查看，如需删除可联系店主。 | When you set an avatar, we process the image you choose or photograph to display your profile and help the host identify you. Only use images you are entitled to use. Studio directions and beadmaking photographs describe the in-person experience and can be opened for viewing. Setting an avatar is not required to browse studio information or submit a booking. When you use the bead pattern tool, we process the photo you choose or take only to turn its colours into a bead pattern. The photo and pattern are kept by the pattern service; patterns made while signed in appear under My works on the website, and you can ask the host to delete them. |
 | permissions_title | 设备权限与本地存储 | Permissions and local storage |
-| permissions_body | 相册、相机和头像选择权限按你设置头像时的操作申请，你可以拒绝或在微信设置中管理权限。本机保存登录状态、语言及预约草稿，便于继续操作；账号和预约的短时数据缓存按当前登录隔离。复制店铺信息和拨打店主电话由你主动触发，不用于读取通讯录或获取定位。 | Photo library, camera and avatar-selection permissions are requested when you choose how to set an avatar. You may decline or manage them in WeChat settings. Login state, language and booking drafts are stored locally so you can continue later. Temporary account and booking caches are isolated by login. Copying studio information and calling the host are actions you initiate; they do not read your contacts or location. |
+| permissions_body | 相册、相机和头像选择权限按你设置头像或为拼豆图纸选择照片时的操作申请；保存图纸时会申请保存到相册的权限。你可以拒绝或在微信设置中管理权限。本机保存登录状态、语言及预约草稿，便于继续操作；账号和预约的短时数据缓存按当前登录隔离。复制店铺信息和拨打店主电话由你主动触发，不用于读取通讯录或获取定位。 | Photo library, camera and avatar-selection permissions are requested when you set an avatar or choose a photo for a bead pattern; saving a pattern asks for permission to save to your photos. You may decline or manage them in WeChat settings. Login state, language and booking drafts are stored locally so you can continue later. Temporary account and booking caches are isolated by login. Copying studio information and calling the host are actions you initiate; they do not read your contacts or location. |
 | providers_title | 服务支持与信息传输 | Service providers and transfers |
 | providers_body | 微信提供小程序运行和身份验证，服务器及网络服务支持账号、预约、头像和店主工作台。相关基础设施可能位于中国境外。服务器记录必要的请求时间、接口状态等运行信息，用于维护安全和排查故障。微信平台登记的个人信息处理事项可通过下方入口查看。 | WeChat provides the runtime and authentication. Server and network services support accounts, bookings, avatars and the host workspace. Supporting infrastructure may be outside China. Servers record necessary operational information such as request times and response status for security and troubleshooting. You can view the disclosures registered with WeChat using the button below. |
 | storage_title | 保存与删除 | Retention and deletion |

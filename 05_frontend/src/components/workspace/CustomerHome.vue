@@ -17,6 +17,7 @@ function patchVisit(){dismiss();uni.navigateTo({url:'/pages/studio/visit?experie
 function visit(){uni.navigateTo({url:'/pages/studio/visit'});}
 function bookings(){navigateStudio('/pages/studio/reservations');}
 function details(){uni.navigateTo({url:'/pages/studio/details'});}
+function patterns(){uni.navigateTo({url:'/pages/tools/pattern'});}
 onShow(()=>void refreshStudioContent());
 </script>
 <template>
@@ -25,7 +26,7 @@ onShow(()=>void refreshStudioContent());
    <view class="studio-native-heading"><text class="studio-native-site">{{words('home','hamilton_ontario_canada_fbf034')}}</text><text class="studio-native-title">{{words('home','a_little_time_all_yours_9e9d60')}}<text class="studio-home-title-line">{{words('home','make_something_lovely_04db64')}}</text></text></view>
    <image v-if="!imageFailed" class="studio-home-photo" :src="photo" mode="widthFix" :aria-label="words('home','sunlit_worktables_and_a_wall_of_bead_46e326')" @error="imageFailed=true"/>
    <button :hover-stay-time="180" :hover-start-time="0" class="studio-native-primary" hover-class="studio-native-pressed" @tap="visit"><StudioGlyph name="calendar"/><text class="studio-native-primary-label">{{words('home','come_create_2eee81')}}</text><view class="studio-native-button-arrow"><StudioGlyph name="arrow" :size="18"/></view></button>
-   <view class="studio-home-shortcuts"><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" @tap="bookings"><StudioGlyph name="clock"/><text>{{words('account','my_reservations')}}</text></button><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" @tap="details"><StudioGlyph name="pin"/><text>{{words('home','studio_details_7c4089')}}</text></button></view>
+   <view class="studio-home-shortcuts"><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" @tap="bookings"><StudioGlyph name="clock"/><text>{{words('account','my_reservations')}}</text></button><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" @tap="details"><StudioGlyph name="pin"/><text>{{words('home','studio_details_7c4089')}}</text></button><button :hover-stay-time="180" :hover-start-time="0" hover-class="studio-native-pressed" @tap="patterns"><StudioGlyph name="grid"/><text>{{words('miniapp','pattern_entry')}}</text></button></view>
    <text class="studio-native-body studio-native-small">{{words('flow','confirmation_note')}}</text>
   </view>
   <template #overlay><StudioPatchOffer v-if="open&&offer" :offer="offer" :language="language" @dismiss="dismiss" @book="patchVisit"/></template>

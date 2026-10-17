@@ -20,6 +20,8 @@ const paths: Record<string, string> = {
   copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/>',
   wechat: '<path d="M14 6a7 7 0 0 0-5-2C5 4 2 6.5 2 10c0 2 1 3.5 3 4.5L4 17l3-1.5M22 14c0-3-3-5.5-6.5-5.5S9 11 9 14s3 5.5 6.5 5.5c1 0 2-.2 3-.5l2.5 1-1-2c1.3-1 2-2.5 2-4Z"/><path d="M6 8h.1M10 8h.1M13 13h.1M18 13h.1"/>',
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
+  image: '<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m4 18 5-5 4 4 3-3 4 4"/>',
+  download: '<path d="M12 4v11m-5-5 5 5 5-5M5 20h14"/>',
   grid: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
 };
 const source = computed(() => {
