@@ -1,5 +1,5 @@
 {
-  "source": "2026-10-21 owner: home carousel, studio environment gallery, seats copy, merged process step; STUDIO_COPY_CHANGES.md",
+  "source": "2026-10-21 owner: home carousel order (sunset last); STUDIO_COPY_CHANGES.md",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -44,7 +44,7 @@
     "data-commerce-labels.json": "5155567d136dedbf4dc78ab99e7b35a7748a5b1284b6c8577cd87d1a6c80c1e5",
     "data-commerce-messages.json": "b89fcc172c4eb6db8bbd04d9063e45624e6c6632040157d4179db220018fc674",
     "data-components-admin-SchedulePanel-labels.json": "5800653cc2886f2313e67babd9486fb8190ccbe74cd2f47a8c57877517aec97a",
-    "data-components-StudioCarousel-photos.json": "bb1cce6862fac177d0298f9535aee4f16952c8812dc5ad88142d5bd7e03f7f78",
+    "data-components-StudioCarousel-photos.json": "5bb594061d32195535eeb9daafad282b8ff0bb9bf6c7c1a1efebce4293e2f92a",
     "data-editor-module-labels.json": "e62d1a524eedcb603f13d27b0c5fd8fc93c82a8e984ae44c5831e6bc4f757d73",
     "data-state-gallery.json": "9e6a73784deb8e6d371fd8f5372273176b5ef9c5663b766079787e10afa01dd1",
     "data-state-products.json": "dda7e9f229f7837b20ed143459141a21806bc7dad4fb2a5105a75a2b09403a95",

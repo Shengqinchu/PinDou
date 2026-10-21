@@ -34,10 +34,12 @@ const visitPhotos = computed(() => [
   { image: 'parking-entrance', words: copyText.visitor_parking_entrance_30c573 },
   { image: 'parking-location', words: copyText.visitor_parking_location_c046e2 },
 ].map(photo => ({ image: photo.image, src: asset(photo.image).src, zh: photo.words[0], en: photo.words[1] })));
-// The studio environment gallery shares the home carousel's photographs and captions.
+// The studio environment gallery shares the home carousel's photographs and captions,
+// minus the sunset, the angled mirror and the two display grids (owner, 2026-10-21).
+const spaceHidden = new Set(["space-v5-01", "space-v5-09", "space-v5-14", "space-v5-15"]);
 const spaceViewer = ref<InstanceType<typeof PhotoViewer>>();
 const spacePhotos = contentPhotos("carousel-labels", carouselPhotos);
-const spaceItems = computed(() => spacePhotos.map(photo => ({ image: photo.image, src: asset(photo.image).src, zh: photo.zh, en: photo.en })));
+const spaceItems = computed(() => spacePhotos.filter(photo => !spaceHidden.has(photo.image)).map(photo => ({ image: photo.image, src: asset(photo.image).src, zh: photo.zh, en: photo.en })));
 </script>
 <template>
   <div class="vision-details container">
