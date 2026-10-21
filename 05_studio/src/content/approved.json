@@ -1,5 +1,5 @@
 {
-  "source": "2026-10-17 owner: mini program editor, progress, shorter copy and shop showcase; STUDIO_COPY_CHANGES.md",
+  "source": "2026-10-21 owner: home carousel, studio environment gallery, seats copy, merged process step; STUDIO_COPY_CHANGES.md",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -12,7 +12,7 @@
     "App.json": "ff6aa48001c624bef920213bc8be3c05e80ac6f00e48f085abf6f2f0e6c6c493",
     "booking-profile.json": "3b67336cb2aa83e46675a91794a65c3f5d0ad94d1b290e433aadca76465127dc",
     "business.json": "f0a31a8e38cb83958d85c3b6359b7dfac3447085b52ecadd04810eb403d37947",
-    "carousel-labels.json": "9eebcd13734eb636c39e80301a2d1c92baeea4f839c54b32057949965b0c88ab",
+    "carousel-labels.json": "a1d9dd36a24a6f32e707b4e7957f2eb0e3c7ff50fc4fd5a5b4ab236867ee54ac",
     "commerce.json": "aaefe10888f4213e2c5595cd8ba90e118649f143839b732a60b27707ae6c8c3a",
     "components-admin-ActivityPanel.json": "1999c2fc63b0dfe8546aa8f15b91aca9097194d50333f5d03c1a832feb0b238c",
     "components-admin-CheckoutPanel.json": "5392671070678ce8e824a6b7bc3ae7b01e4470d7051c96709706f238ba798734",
@@ -26,7 +26,7 @@
     "components-admin-ReservationSettings.json": "e6dc6e08858084a5eec1421bb5f04b8cb454ee4a2569db8b3fc4326c0e0448e4",
     "components-admin-ReservationsPanel.json": "92d9b86b416d5c1ebc12b01858089840a140f15f2ad0500ef142c8ab2d1edc28",
     "components-admin-SchedulePanel.json": "2d4b563ebe1a456a2c3e489d8f054c67cf453315b385101f614600469fab3cd4",
-    "components-BeadingProcess.json": "20a8c3d3102fb2e424ea982d5f065f6923b02816051be3f5c74ff4a4e977f354",
+    "components-BeadingProcess.json": "f9a8b413e1139072ab02f4869c8fd77179c93897df630063c26dd5b214ec37ad",
     "components-BrandMark.json": "b14be9bf2c5cd4a9a415f5991950d3e8f655ed13a517e5aedfd060964d5d4f21",
     "components-BrandMotif.json": "67eb0a93ddfc2df38d569b226a13c3045c19c3a24dd5bd16f4d20af818ced7ad",
     "components-CommerceManager.json": "baa0c681deaf1825708aa37bb173854d0f095f260a952b8eb45bc50178e34d97",
@@ -44,7 +44,7 @@
     "data-commerce-labels.json": "5155567d136dedbf4dc78ab99e7b35a7748a5b1284b6c8577cd87d1a6c80c1e5",
     "data-commerce-messages.json": "b89fcc172c4eb6db8bbd04d9063e45624e6c6632040157d4179db220018fc674",
     "data-components-admin-SchedulePanel-labels.json": "5800653cc2886f2313e67babd9486fb8190ccbe74cd2f47a8c57877517aec97a",
-    "data-components-StudioCarousel-photos.json": "0de9f21ee4aecc483c2db6827a58032faf32245d8e8713d6c4ed79a564740737",
+    "data-components-StudioCarousel-photos.json": "bb1cce6862fac177d0298f9535aee4f16952c8812dc5ad88142d5bd7e03f7f78",
     "data-editor-module-labels.json": "e62d1a524eedcb603f13d27b0c5fd8fc93c82a8e984ae44c5831e6bc4f757d73",
     "data-state-gallery.json": "9e6a73784deb8e6d371fd8f5372273176b5ef9c5663b766079787e10afa01dd1",
     "data-state-products.json": "dda7e9f229f7837b20ed143459141a21806bc7dad4fb2a5105a75a2b09403a95",
@@ -62,7 +62,7 @@
     "owner-notifications.json": "f4fa362eb4bf371fc04aefd45f4540e6edad61b773dd5fbe0ced22c03d3e5b75",
     "owner-wechat.json": "9686d2d1f3548e0d7206b56a628c773d6058afa83c2e70583262bf189dfc3d89",
     "pages-Cart.json": "877954464d055594da1e658d84de59655929265f6d9795dd9b793e4a2a0a02cd",
-    "pages-Details.json": "4917ff00b06001a685c4c31d177e23bae600ffd1fc78a1bb86986c2737a36204",
+    "pages-Details.json": "b12a62a27208db92eba1d321fb72d862039a742165f1102b987e2ec45e722c77",
     "pages-Home.json": "87cd77e9a6769fd9174a439e5f6e1662d1057507c483d8652b48946c40061c9d",
     "pages-Journal.json": "cacad2b0593d4d1824fa93d9c0436e68effa6aaf51efdf0c63d73dd0a252e653",
     "pages-JournalEntry.json": "ce8ca253f087a72d42253bef267cb3a27bc6605854e78fcb50701efe7a9d6ce5",

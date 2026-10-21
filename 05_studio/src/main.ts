@@ -26,6 +26,7 @@ import "./styles/process.css";
 import "./styles/copy-contact.css";
 import "./styles/responsive.css";
 import "./styles/arrival-photos.css";
+import "./styles/studio-space.css";
 import "./styles/wallet.css";
 import "./styles/home-journal.css";
 import "./styles/reduced-motion.css";

@@ -57,8 +57,8 @@
   ],
   "seats_and_tools_4b0a0a": ["座位与工具", "Seats and tools"],
   "a_comfortable_chair_an_individual_seat_and_f15251": [
-    "舒适的老板椅、独立座位，一组客人一套拼豆，无需拼桌或共用豆子。桌上配齐工具，操作台的备用工具也可自行取用；补豆联系店主即可。",
-    "A comfortable chair, an individual seat and a set of beads for your group. Tools are ready on the table, with spares at the workbench. Ask the host whenever you need more beads."
+    "舒适的老板椅、独立座位，一组客人一套拼豆，无需拼桌或共用豆子。正常配备常用221色豆子，店内还有全色系302色豆子。桌上配备全套拼豆工具，操作台的备用工具也可自行取用。",
+    "A comfortable chair, an individual seat and a set of beads for your group, with no shared tables or beads. Each set holds the 221 everyday colours, and the studio stocks the full 302-colour range. A complete set of tools is ready on the table, with spares at the workbench."
   ],
   "textures_and_finishing_touches_6d3e7b": [
     "特殊烫与不同纹理",
@@ -102,5 +102,9 @@
   "time_is_measured_by_actual_making_time_8a7c82": [
     "计时以实际拼豆时长为准，超出 0.25 小时按 0.5 小时计。\n付款方式为现金，emt，或微信支付宝。",
     "Time is measured by actual making time; more than 0.25 hours counts as 0.5 hours.\nPayment is accepted by cash, EMT, WeChat Pay or Alipay."
+  ],
+  "studio_environment_6f2a91": [
+    "拼豆铺环境",
+    "Around the studio"
   ]
 }

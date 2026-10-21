@@ -6,10 +6,10 @@
     "srcset": "/studio-media/v3/hero-illustration-640.webp 640w, /studio-media/v3/hero-illustration-1269.webp 1269w"
   },
   "shop-collage": {
-    "src": "/studio-media/v3/shop-collage-1202.webp",
-    "width": 1202,
-    "height": 1603,
-    "srcset": "/studio-media/v3/shop-collage-640.webp 640w, /studio-media/v3/shop-collage-1202.webp 1202w"
+    "src": "/studio-media/v5/space-v5-11-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-11-640.webp 640w, /studio-media/v5/space-v5-11-1200.webp 1200w"
   },
   "space-01": {
     "src": "/studio-media/v3/space-01-1280.webp",
@@ -272,5 +272,107 @@
     "src": "/studio-media/arrival/visitor-parking-20260908.jpg",
     "width": 1280,
     "height": 1707
+  },
+  "space-v5-01": {
+    "src": "/studio-media/v5/space-v5-01-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-01-640.webp 640w, /studio-media/v5/space-v5-01-1200.webp 1200w"
+  },
+  "space-v5-02": {
+    "src": "/studio-media/v5/space-v5-02-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-02-640.webp 640w, /studio-media/v5/space-v5-02-1200.webp 1200w"
+  },
+  "space-v5-03": {
+    "src": "/studio-media/v5/space-v5-03-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-03-640.webp 640w, /studio-media/v5/space-v5-03-1200.webp 1200w"
+  },
+  "space-v5-04": {
+    "src": "/studio-media/v5/space-v5-04-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-04-640.webp 640w, /studio-media/v5/space-v5-04-1200.webp 1200w"
+  },
+  "space-v5-05": {
+    "src": "/studio-media/v5/space-v5-05-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-05-640.webp 640w, /studio-media/v5/space-v5-05-1200.webp 1200w"
+  },
+  "space-v5-06": {
+    "src": "/studio-media/v5/space-v5-06-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-06-640.webp 640w, /studio-media/v5/space-v5-06-1200.webp 1200w"
+  },
+  "space-v5-07": {
+    "src": "/studio-media/v5/space-v5-07-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-07-640.webp 640w, /studio-media/v5/space-v5-07-1200.webp 1200w"
+  },
+  "space-v5-08": {
+    "src": "/studio-media/v5/space-v5-08-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-08-640.webp 640w, /studio-media/v5/space-v5-08-1200.webp 1200w"
+  },
+  "space-v5-09": {
+    "src": "/studio-media/v5/space-v5-09-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-09-640.webp 640w, /studio-media/v5/space-v5-09-1200.webp 1200w"
+  },
+  "space-v5-10": {
+    "src": "/studio-media/v5/space-v5-10-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-10-640.webp 640w, /studio-media/v5/space-v5-10-1200.webp 1200w"
+  },
+  "space-v5-11": {
+    "src": "/studio-media/v5/space-v5-11-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-11-640.webp 640w, /studio-media/v5/space-v5-11-1200.webp 1200w"
+  },
+  "space-v5-12": {
+    "src": "/studio-media/v5/space-v5-12-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-12-640.webp 640w, /studio-media/v5/space-v5-12-1200.webp 1200w"
+  },
+  "space-v5-13": {
+    "src": "/studio-media/v5/space-v5-13-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-13-640.webp 640w, /studio-media/v5/space-v5-13-1200.webp 1200w"
+  },
+  "space-v5-14": {
+    "src": "/studio-media/v5/space-v5-14-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-14-640.webp 640w, /studio-media/v5/space-v5-14-1200.webp 1200w"
+  },
+  "space-v5-15": {
+    "src": "/studio-media/v5/space-v5-15-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-15-640.webp 640w, /studio-media/v5/space-v5-15-1200.webp 1200w"
+  },
+  "space-v5-16": {
+    "src": "/studio-media/v5/space-v5-16-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-16-640.webp 640w, /studio-media/v5/space-v5-16-1200.webp 1200w"
+  },
+  "process-choices": {
+    "src": "/studio-media/v5/space-v5-10-1200.webp",
+    "width": 1200,
+    "height": 1600,
+    "srcset": "/studio-media/v5/space-v5-10-640.webp 640w, /studio-media/v5/space-v5-10-1200.webp 1200w"
   }
 }

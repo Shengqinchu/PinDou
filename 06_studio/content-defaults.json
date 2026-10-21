@@ -416,53 +416,69 @@
     ]
   },
   "carousel-labels": {
-    "space-01": [
-      "走进拼豆小屋",
-      "Step into the studio"
+    "space-v5-01": [
+      "窗外的汉密尔顿落日",
+      "Sunset over Hamilton"
     ],
-    "space-02": [
-      "小狗作品墙",
-      "The puppy art wall"
+    "space-v5-02": [
+      "门边挂满了小作品",
+      "Little creations by the door"
     ],
-    "space-03": [
-      "拼豆作品展示",
-      "Beadwork on display"
+    "space-v5-03": [
+      "午后阳光洒满拼豆小屋",
+      "Afternoon light across the studio"
     ],
-    "space-04": [
-      "靠墙的工作桌",
-      "A worktable by the wall"
+    "space-v5-04": [
+      "靠窗的拼豆座位",
+      "A beading seat by the window"
     ],
-    "space-05": [
-      "阳光下的拼豆座位",
-      "Sunlit beadwork seats"
+    "space-v5-05": [
+      "并排的拼豆桌",
+      "Beading tables side by side"
     ],
-    "space-06": [
-      "甜点与小狗作品",
-      "Treats and puppies in beads"
+    "space-v5-06": [
+      "桌前的作品墙",
+      "The art wall above the desk"
     ],
-    "space-07": [
-      "颜色与工具",
-      "Colours and tools"
+    "space-v5-07": [
+      "窗边的烫豆台",
+      "The ironing station by the window"
     ],
-    "space-08": [
-      "准备好开始拼豆",
-      "Ready to start creating"
+    "space-v5-08": [
+      "拼豆小屋全景",
+      "The whole studio"
     ],
-    "space-09": [
-      "窗边的作品展示",
-      "The display by the window"
+    "space-v5-09": [
+      "镜子上的制品大全与烫法大全",
+      "Keepsake and ironing guides on the mirror"
     ],
-    "space-10": [
-      "收纳角落",
-      "The storage corner"
+    "space-v5-10": [
+      "一面镜子看懂制品和烫法",
+      "Keepsakes and finishes at a glance"
     ],
-    "space-11": [
-      "配件与装饰",
-      "Findings and decorations"
+    "space-v5-11": [
+      "挂满成品的作品墙",
+      "A wall of finished charms"
     ],
-    "space-12": [
-      "客人的拼豆作品",
-      "Our guests’ beadwork"
+    "space-v5-12": [
+      "每组一套豆盘和工具",
+      "Trays and tools for every group"
+    ],
+    "space-v5-13": [
+      "分好色号的拼豆",
+      "Beads sorted by colour code"
+    ],
+    "space-v5-14": [
+      "店里的拼豆作品",
+      "Creations from the studio"
+    ],
+    "space-v5-15": [
+      "更多拼豆作品",
+      "More creations"
+    ],
+    "space-v5-16": [
+      "傍晚的拼豆小屋",
+      "The studio at golden hour"
     ]
   },
   "commerce": {
@@ -2312,6 +2328,14 @@
       "咱们是一组客人一套拼豆，所以不用先找颜色，直接上手开始拼就好啦！\n拼豆时先拼外框，可以理解为先描边；\n再拼数量较少的颜色；\n最后大面积铺色。",
       "Each group has its own set of beads, so you can start right away without gathering colours first!\nBegin with the outline.\nThen place the colours used in smaller quantities.\nFill the larger areas last."
     ],
+    "choicesTitle": [
+      "选择烫法和手工制品",
+      "Choose a finish and a keepsake"
+    ],
+    "choicesBody": [
+      "拼好后交给店主，选择喜欢的纹理烫。\n然后考虑一下做成什么东西吧！无论是挂件还是冰箱贴，所有手工制品都由店主免费制作，只有较为复杂的款式需额外收费。\n最后店主会认真把成品包装好交给你喔！",
+      "When you finish, hand your pegboard to the host and pick the ironing texture you like.\nThen decide what to make! Whether a charm or a fridge magnet, the host makes every keepsake for free; only more complex designs cost extra.\nFinally, the host will carefully package your creation for you!"
+    ],
     "ironingTitle": [
       "选择烫法",
       "Choose your finish"
@@ -2359,6 +2383,10 @@
     "makingAlt": [
       "在豆板上逐颗拼出图案",
       "A pattern taking shape on the pegboard"
+    ],
+    "choicesAlt": [
+      "镜子上的制品大全与烫法大全",
+      "Keepsake and ironing guides on the mirror"
     ],
     "ironingAlt": [
       "烫好后的小狗拼豆挂件",
@@ -6207,8 +6235,8 @@
       "Seats and tools"
     ],
     "a_comfortable_chair_an_individual_seat_and_f15251": [
-      "舒适的老板椅、独立座位，一组客人一套拼豆，无需拼桌或共用豆子。桌上配齐工具，操作台的备用工具也可自行取用；补豆联系店主即可。",
-      "A comfortable chair, an individual seat and a set of beads for your group. Tools are ready on the table, with spares at the workbench. Ask the host whenever you need more beads."
+      "舒适的老板椅、独立座位，一组客人一套拼豆，无需拼桌或共用豆子。正常配备常用221色豆子，店内还有全色系302色豆子。桌上配备全套拼豆工具，操作台的备用工具也可自行取用。",
+      "A comfortable chair, an individual seat and a set of beads for your group, with no shared tables or beads. Each set holds the 221 everyday colours, and the studio stocks the full 302-colour range. A complete set of tools is ready on the table, with spares at the workbench."
     ],
     "textures_and_finishing_touches_6d3e7b": [
       "特殊烫与不同纹理",
@@ -6261,6 +6289,10 @@
     "time_is_measured_by_actual_making_time_8a7c82": [
       "计时以实际拼豆时长为准，超出 0.25 小时按 0.5 小时计。\n付款方式为现金，emt，或微信支付宝。",
       "Time is measured by actual making time; more than 0.25 hours counts as 0.5 hours.\nPayment is accepted by cash, EMT, WeChat Pay or Alipay."
+    ],
+    "studio_environment_6f2a91": [
+      "拼豆铺环境",
+      "Around the studio"
     ]
   },
   "pages-Home": {
@@ -8347,10 +8379,10 @@
       "srcset": "/studio-media/v3/hero-illustration-640.webp 640w, /studio-media/v3/hero-illustration-1269.webp 1269w"
     },
     "shop-collage": {
-      "src": "/studio-media/v3/shop-collage-1202.webp",
-      "width": 1202,
-      "height": 1603,
-      "srcset": "/studio-media/v3/shop-collage-640.webp 640w, /studio-media/v3/shop-collage-1202.webp 1202w"
+      "src": "/studio-media/v5/space-v5-11-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-11-640.webp 640w, /studio-media/v5/space-v5-11-1200.webp 1200w"
     },
     "space-01": {
       "src": "/studio-media/v3/space-01-1280.webp",
@@ -8613,6 +8645,108 @@
       "src": "/studio-media/arrival/visitor-parking-20260908.jpg",
       "width": 1280,
       "height": 1707
+    },
+    "space-v5-01": {
+      "src": "/studio-media/v5/space-v5-01-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-01-640.webp 640w, /studio-media/v5/space-v5-01-1200.webp 1200w"
+    },
+    "space-v5-02": {
+      "src": "/studio-media/v5/space-v5-02-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-02-640.webp 640w, /studio-media/v5/space-v5-02-1200.webp 1200w"
+    },
+    "space-v5-03": {
+      "src": "/studio-media/v5/space-v5-03-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-03-640.webp 640w, /studio-media/v5/space-v5-03-1200.webp 1200w"
+    },
+    "space-v5-04": {
+      "src": "/studio-media/v5/space-v5-04-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-04-640.webp 640w, /studio-media/v5/space-v5-04-1200.webp 1200w"
+    },
+    "space-v5-05": {
+      "src": "/studio-media/v5/space-v5-05-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-05-640.webp 640w, /studio-media/v5/space-v5-05-1200.webp 1200w"
+    },
+    "space-v5-06": {
+      "src": "/studio-media/v5/space-v5-06-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-06-640.webp 640w, /studio-media/v5/space-v5-06-1200.webp 1200w"
+    },
+    "space-v5-07": {
+      "src": "/studio-media/v5/space-v5-07-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-07-640.webp 640w, /studio-media/v5/space-v5-07-1200.webp 1200w"
+    },
+    "space-v5-08": {
+      "src": "/studio-media/v5/space-v5-08-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-08-640.webp 640w, /studio-media/v5/space-v5-08-1200.webp 1200w"
+    },
+    "space-v5-09": {
+      "src": "/studio-media/v5/space-v5-09-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-09-640.webp 640w, /studio-media/v5/space-v5-09-1200.webp 1200w"
+    },
+    "space-v5-10": {
+      "src": "/studio-media/v5/space-v5-10-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-10-640.webp 640w, /studio-media/v5/space-v5-10-1200.webp 1200w"
+    },
+    "space-v5-11": {
+      "src": "/studio-media/v5/space-v5-11-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-11-640.webp 640w, /studio-media/v5/space-v5-11-1200.webp 1200w"
+    },
+    "space-v5-12": {
+      "src": "/studio-media/v5/space-v5-12-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-12-640.webp 640w, /studio-media/v5/space-v5-12-1200.webp 1200w"
+    },
+    "space-v5-13": {
+      "src": "/studio-media/v5/space-v5-13-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-13-640.webp 640w, /studio-media/v5/space-v5-13-1200.webp 1200w"
+    },
+    "space-v5-14": {
+      "src": "/studio-media/v5/space-v5-14-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-14-640.webp 640w, /studio-media/v5/space-v5-14-1200.webp 1200w"
+    },
+    "space-v5-15": {
+      "src": "/studio-media/v5/space-v5-15-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-15-640.webp 640w, /studio-media/v5/space-v5-15-1200.webp 1200w"
+    },
+    "space-v5-16": {
+      "src": "/studio-media/v5/space-v5-16-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-16-640.webp 640w, /studio-media/v5/space-v5-16-1200.webp 1200w"
+    },
+    "process-choices": {
+      "src": "/studio-media/v5/space-v5-10-1200.webp",
+      "width": 1200,
+      "height": 1600,
+      "srcset": "/studio-media/v5/space-v5-10-640.webp 640w, /studio-media/v5/space-v5-10-1200.webp 1200w"
     }
   },
   "messaging": {

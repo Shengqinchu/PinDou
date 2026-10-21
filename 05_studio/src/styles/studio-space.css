@@ -1,0 +1,20 @@
+/* Studio environment gallery on /details: every photograph uncropped (all 3:4),
+   with alternate columns lowered for a light, hand-arranged rhythm. */
+.studio-space-grid { list-style:none; margin:28px 0 0; padding:0 0 32px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(12px,1.6vw,20px); }
+.studio-space-grid > li { min-width:0; }
+.studio-space-grid > li:nth-child(4n+2), .studio-space-grid > li:nth-child(4n+4) { transform:translateY(32px); }
+.studio-space-photo { position:relative; display:block; width:100%; padding:0; border:0; border-radius:14px; overflow:hidden; background:var(--line); cursor:zoom-in; box-shadow:0 1px 2px rgb(41 42 43 / 6%); transition:transform var(--surface-duration) var(--surface-ease), box-shadow var(--surface-duration) var(--surface-ease); }
+.studio-space-photo img { display:block; width:100%; height:auto; aspect-ratio:3/4; object-fit:contain; }
+.studio-space-caption { position:absolute; inset:auto 0 0 0; padding:28px 14px 12px; font-size:13px; line-height:1.5; color:#fff; text-align:left; background:linear-gradient(180deg, transparent, rgb(20 24 28 / 58%)); opacity:0; transform:translateY(6px); transition:opacity var(--surface-duration) var(--surface-ease), transform var(--surface-duration) var(--surface-ease); pointer-events:none; }
+.studio-space-photo:focus-visible { outline:2px solid var(--ink); outline-offset:4px; }
+.studio-space-photo:focus-visible .studio-space-caption { opacity:1; transform:none; }
+@media (hover:hover) and (pointer:fine) {
+  .studio-space-photo:hover { transform:translateY(-4px); box-shadow:0 18px 36px -18px rgb(41 42 43 / 32%); }
+  .studio-space-photo:hover .studio-space-caption { opacity:1; transform:none; }
+}
+@media (max-width:900px) {
+  .studio-space-grid { grid-template-columns:repeat(2,minmax(0,1fr)); padding-bottom:24px; }
+  .studio-space-grid > li:nth-child(4n+2), .studio-space-grid > li:nth-child(4n+4) { transform:none; }
+  .studio-space-grid > li:nth-child(2n) { transform:translateY(24px); }
+  .studio-space-photo { border-radius:12px; }
+}

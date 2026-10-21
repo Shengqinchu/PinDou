@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import LiftTitle from '../components/LiftTitle.vue';
-import { asset, contentModule } from "../content-store";
+import { asset, contentModule, contentPhotos } from "../content-store";
+import carouselPhotos from "../content/data-components-StudioCarousel-photos.json";
 const copyText = contentModule("pages-Details", copyTextDefault);
 
 import BeadingProcess from "../components/BeadingProcess.vue";
@@ -33,6 +34,10 @@ const visitPhotos = computed(() => [
   { image: 'parking-entrance', words: copyText.visitor_parking_entrance_30c573 },
   { image: 'parking-location', words: copyText.visitor_parking_location_c046e2 },
 ].map(photo => ({ image: photo.image, src: asset(photo.image).src, zh: photo.words[0], en: photo.words[1] })));
+// The studio environment gallery shares the home carousel's photographs and captions.
+const spaceViewer = ref<InstanceType<typeof PhotoViewer>>();
+const spacePhotos = contentPhotos("carousel-labels", carouselPhotos);
+const spaceItems = computed(() => spacePhotos.map(photo => ({ image: photo.image, src: asset(photo.image).src, zh: photo.zh, en: photo.en })));
 </script>
 <template>
   <div class="vision-details container">
@@ -51,6 +56,7 @@ const visitPhotos = computed(() => [
     >
       <a href="#arrival">{{ say(copyText.getting_here_1f608d) }}</a
       ><a href="#parking">{{ say(copyText.parking_8188de) }}</a
+      ><a href="#space">{{ say(copyText.studio_environment_6f2a91) }}</a
       ><a href="#services">{{ say(copyText.at_the_studio_0bc0c9) }}</a
       ><a href="#notes">{{ say(copyText.good_to_know_fc4515) }}</a>
       <a href="#process">{{ say(processCopy.title) }}</a>
@@ -120,6 +126,18 @@ const visitPhotos = computed(() => [
       </div>
     </section>
     <PhotoViewer ref="visitViewer" :photos="visitPhotos" />
+    <section id="space" class="vision-detail-section studio-space">
+      <LiftTitle as="h2" :text="say(copyText.studio_environment_6f2a91)"/>
+      <ul class="studio-space-grid">
+        <li v-for="(photo, index) in spaceItems" :key="photo.image">
+          <button class="studio-space-photo" :aria-label="say(processCopy.photoLabel)+' · '+say([photo.zh,photo.en])" @click="spaceViewer?.open(index)">
+            <StudioImage :name="photo.image" :alt="say([photo.zh,photo.en])" sizes="(max-width:760px) 46vw, 260px" />
+            <span class="studio-space-caption">{{ say([photo.zh,photo.en]) }}</span>
+          </button>
+        </li>
+      </ul>
+      <PhotoViewer ref="spaceViewer" :photos="spaceItems" />
+    </section>
     <section id="services" class="vision-detail-section">
       <LiftTitle as="h2" :text="say(copyText.made_comfortable_made_yours_0c8904)"/>
       <div class="vision-service-grid">

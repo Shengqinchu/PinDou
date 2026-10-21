@@ -4,6 +4,11 @@
 
 # Studio 文案授权记录
 
+## 2026-10-21 / 首页轮播、详情页环境图、座位文案与流程合并
+
+来源：店主标注截图与 16 张店内照片：首页“小小工作坊”轮播“图片改成以下16图”；详情页停车与服务之间“这里加一个模块 拼豆铺环境（放上16张图ui美化以下图片布局）”；“座位与工具”正文“改成：舒适的老板椅、独立座位，一组客人一套拼豆，无需拼桌或共用豆子。正常配备常用221色豆子，店内还有全色系302色豆子。桌上配备全套拼豆工具，操作台的备用工具也可自行取用。”；流程 04/05“合并成一个模块，改成：04 选择烫法和手工制品 拼好后交给店主，选择喜欢的纹理烫。然后考虑一下做成什么东西吧！无论是挂件还是冰箱贴，所有手工制品都由店主免费制作，只有较为复杂的款式需额外收费。最后店主会认真把成品包装好交给你喔！”并“图片用这张”（店主随后发来的制品大全/烫法大全镜子照片）；首页“或者直接带回家”配图“改图”（随后发来的成品挂件墙照片）。
+变更：`pages-Details` 改 `a_comfortable_chair_an_individual_seat_and_f15251` 并新增 `studio_environment_6f2a91`“拼豆铺环境”；`components-BeadingProcess` 新增 `choicesTitle`、`choicesBody`、`choicesAlt`（旧 ironing/finishing/packaging 键保留供小程序旧版本读取，网站不再显示）；`carousel-labels` 与轮播数据换为 16 张新照片的图注（店主未提供图注，按照片内容简短描述，可在后台改）。均含英文。
+
 ## 2026-10-17 / 小程序图纸编辑、进度、文案精简与小店展示
 
 来源：店主试用体验版后反馈“生成图纸时候没有进度条 并且我们的编辑功能怎么也没做 图纸没法编辑 文案精简一下把二级小标题适当的去一下或者精简一下不然太乱”，并问“拼豆小店还没上啊？”。`miniapp`：删除 `pattern_label`、`pattern_size`、`pattern_size_hint`、`pattern_preview`、`pattern_colors`（去掉二级小标题与重复提示）；`pattern_intro`、`pattern_photo_note`、`pattern_total`、`pattern_brand_note` 精简；新增进度阶段 `pattern_stage_*`（沿用网站“整理照片/匹配豆色/生成图纸”）、编辑器 `pattern_edit`、`pattern_counts`、`pattern_tool_*`、`pattern_undo/redo`、`pattern_zoom_*`、`pattern_more_colors`、`pattern_pick_color`、`pattern_replace_*`、`pattern_save_edit`、`pattern_saving`、`pattern_unsaved`；新增小店展示 `shop_*`（标题与分区、价格待定、图片待补充、商品整理中、加载/重试、“起”沿用网站小店文字，另加仅展示说明 `shop_note` 与“复制店主微信”）。均含英文。

@@ -12,7 +12,7 @@ const words=(key:string)=>say(studioWords('details',key));
 const processWords=(key:string)=>say(studioWords('process',key));
 const contact=(key:string)=>say(studioWords('contacts',key));
 const scrollTo=ref('');
-const photoKeys=['arrival-entrance','parking-entrance','parking-location','process-pattern','process-tools','process-making','process-ironing','process-findings','process-finishes','process-packaging'] as const;
+const photoKeys=['arrival-entrance','parking-entrance','parking-location','process-pattern','process-tools','process-making','process-choices'] as const;
 type PhotoKey=typeof photoKeys[number];
 const photos=computed(()=>Object.fromEntries(photoKeys.map(key=>[key,studioMedia(key)])) as Record<PhotoKey,ReturnType<typeof studioMedia>>);
 const arrivalPhotos=[
@@ -36,8 +36,7 @@ const steps=[
  {title:'patternTitle',body:'patternIntro',extra:'patternDetail',photos:['pattern']},
  {title:'toolsTitle',body:'toolsBody',extra:'',photos:['tools']},
  {title:'makingTitle',body:'makingBody',extra:'',photos:['making']},
- {title:'ironingTitle',body:'ironingBody',extra:'',photos:['ironing']},
- {title:'finishingTitle',body:'finishingBody',extra:'packaging',photos:['findings','finishes','packaging']},
+ {title:'choicesTitle',body:'choicesBody',extra:'',photos:['choices']},
 ];
 const processPhoto=(key:string)=>photos.value[('process-'+key) as PhotoKey];
 function preview(key:PhotoKey){uni.previewImage({current:photos.value[key].src,urls:photoKeys.map(name=>photos.value[name].src)});}

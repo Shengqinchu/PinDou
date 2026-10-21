@@ -296,18 +296,22 @@
 
 | 键 | 中文 | English |
 |---|---|---|
-| space-01 | 走进拼豆小屋 | Step into the studio |
-| space-02 | 小狗作品墙 | The puppy art wall |
-| space-03 | 拼豆作品展示 | Beadwork on display |
-| space-04 | 靠墙的工作桌 | A worktable by the wall |
-| space-05 | 阳光下的拼豆座位 | Sunlit beadwork seats |
-| space-06 | 甜点与小狗作品 | Treats and puppies in beads |
-| space-07 | 颜色与工具 | Colours and tools |
-| space-08 | 准备好开始拼豆 | Ready to start creating |
-| space-09 | 窗边的作品展示 | The display by the window |
-| space-10 | 收纳角落 | The storage corner |
-| space-11 | 配件与装饰 | Findings and decorations |
-| space-12 | 客人的拼豆作品 | Our guests’ beadwork |
+| space-v5-01 | 窗外的汉密尔顿落日 | Sunset over Hamilton |
+| space-v5-02 | 门边挂满了小作品 | Little creations by the door |
+| space-v5-03 | 午后阳光洒满拼豆小屋 | Afternoon light across the studio |
+| space-v5-04 | 靠窗的拼豆座位 | A beading seat by the window |
+| space-v5-05 | 并排的拼豆桌 | Beading tables side by side |
+| space-v5-06 | 桌前的作品墙 | The art wall above the desk |
+| space-v5-07 | 窗边的烫豆台 | The ironing station by the window |
+| space-v5-08 | 拼豆小屋全景 | The whole studio |
+| space-v5-09 | 镜子上的制品大全与烫法大全 | Keepsake and ironing guides on the mirror |
+| space-v5-10 | 一面镜子看懂制品和烫法 | Keepsakes and finishes at a glance |
+| space-v5-11 | 挂满成品的作品墙 | A wall of finished charms |
+| space-v5-12 | 每组一套豆盘和工具 | Trays and tools for every group |
+| space-v5-13 | 分好色号的拼豆 | Beads sorted by colour code |
+| space-v5-14 | 店里的拼豆作品 | Creations from the studio |
+| space-v5-15 | 更多拼豆作品 | More creations |
+| space-v5-16 | 傍晚的拼豆小屋 | The studio at golden hour |
 
 ## commerce.json
 
@@ -833,6 +837,8 @@
 | toolsUrl | https://xhslink.com/o/5lTlu8xeZXD | https://xhslink.com/o/5lTlu8xeZXD |
 | makingTitle | 开始拼豆 | Start placing your beads |
 | makingBody | 咱们是一组客人一套拼豆，所以不用先找颜色，直接上手开始拼就好啦！<br>拼豆时先拼外框，可以理解为先描边；<br>再拼数量较少的颜色；<br>最后大面积铺色。 | Each group has its own set of beads, so you can start right away without gathering colours first!<br>Begin with the outline.<br>Then place the colours used in smaller quantities.<br>Fill the larger areas last. |
+| choicesTitle | 选择烫法和手工制品 | Choose a finish and a keepsake |
+| choicesBody | 拼好后交给店主，选择喜欢的纹理烫。<br>然后考虑一下做成什么东西吧！无论是挂件还是冰箱贴，所有手工制品都由店主免费制作，只有较为复杂的款式需额外收费。<br>最后店主会认真把成品包装好交给你喔！ | When you finish, hand your pegboard to the host and pick the ironing texture you like.<br>Then decide what to make! Whether a charm or a fridge magnet, the host makes every keepsake for free; only more complex designs cost extra.<br>Finally, the host will carefully package your creation for you! |
 | ironingTitle | 选择烫法 | Choose your finish |
 | ironingBody | 告知店主喜欢的纹理烫，将拼好的豆板交给店主即可！店主烫好后会还给你，来欣赏你的萌作吧！ | Tell the host which ironing texture you like and hand over your finished pegboard. The host will iron it for you—then it is time to admire your creation! |
 | finishingTitle | 做成手工制品 | Turn it into a keepsake |
@@ -845,6 +851,7 @@
 | patternAlt | 拼豆图纸示例及颜色用量 | Example bead pattern with colour counts |
 | toolsAlt | 一组客人使用的豆盘、豆板和工具 | A group’s bead trays, pegboard and tools |
 | makingAlt | 在豆板上逐颗拼出图案 | A pattern taking shape on the pegboard |
+| choicesAlt | 镜子上的制品大全与烫法大全 | Keepsake and ironing guides on the mirror |
 | ironingAlt | 烫好后的小狗拼豆挂件 | Finished puppy bead charms |
 | findingsAlt | 制作挂件和冰箱贴的配件 | Findings for charms and fridge magnets |
 | finishesAlt | 装配完成的小狗手工作品 | Assembled puppy keepsakes |
@@ -2301,7 +2308,7 @@
 | nearby_parking_options_1a311a | 附近也可以停车 | Nearby parking options |
 | made_comfortable_made_yours_0c8904 | 拼豆铺服务 | Made comfortable, made yours |
 | seats_and_tools_4b0a0a | 座位与工具 | Seats and tools |
-| a_comfortable_chair_an_individual_seat_and_f15251 | 舒适的老板椅、独立座位，一组客人一套拼豆，无需拼桌或共用豆子。桌上配齐工具，操作台的备用工具也可自行取用；补豆联系店主即可。 | A comfortable chair, an individual seat and a set of beads for your group. Tools are ready on the table, with spares at the workbench. Ask the host whenever you need more beads. |
+| a_comfortable_chair_an_individual_seat_and_f15251 | 舒适的老板椅、独立座位，一组客人一套拼豆，无需拼桌或共用豆子。正常配备常用221色豆子，店内还有全色系302色豆子。桌上配备全套拼豆工具，操作台的备用工具也可自行取用。 | A comfortable chair, an individual seat and a set of beads for your group, with no shared tables or beads. Each set holds the 221 everyday colours, and the studio stocks the full 302-colour range. A complete set of tools is ready on the table, with spares at the workbench. |
 | textures_and_finishing_touches_6d3e7b | 特殊烫与不同纹理 | Textures and finishing touches |
 | we_keep_exploring_different_ironing_techniques_small_659fdb | 店主持续研究不同烫法。中小图熨烫、小图特殊烫免费；超过 78 格的大图需额外收费。 | We keep exploring different ironing techniques. Small and medium pieces, including special finishes for small pieces, are ironed free. Larger pieces over 78 grid spaces carry an extra charge, discussed beforehand. |
 | little_things_to_take_with_you_a9cf30 | 把作品变成小物 | Little things to take with you |
@@ -2315,6 +2322,7 @@
 | place_beads_individually_rather_than_scattering_them_2535e2 | 采用正常逐颗拼豆的方式，不使用撒豆等非常规操作。撒落或混合的豆子需自行整理，或另付清洁费用。 | Place beads individually rather than scattering them. Please sort spilled or mixed beads yourself, or pay a cleaning fee. |
 | time_and_payment_a87618 | 计时与付款方式 | Time and payment |
 | time_is_measured_by_actual_making_time_8a7c82 | 计时以实际拼豆时长为准，超出 0.25 小时按 0.5 小时计。<br>付款方式为现金，emt，或微信支付宝。 | Time is measured by actual making time; more than 0.25 hours counts as 0.5 hours.<br>Payment is accepted by cash, EMT, WeChat Pay or Alipay. |
+| studio_environment_6f2a91 | 拼豆铺环境 | Around the studio |
 
 ## pages-Home.json
 

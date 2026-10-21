@@ -1,62 +1,82 @@
 [
   {
-    "image": "space-01",
-    "zh": "走进拼豆小屋",
-    "en": "Step into the studio"
+    "image": "space-v5-01",
+    "zh": "窗外的汉密尔顿落日",
+    "en": "Sunset over Hamilton"
   },
   {
-    "image": "space-05",
-    "zh": "阳光下的拼豆座位",
-    "en": "Sunlit beadwork seats"
+    "image": "space-v5-02",
+    "zh": "门边挂满了小作品",
+    "en": "Little creations by the door"
   },
   {
-    "image": "space-07",
-    "zh": "颜色与工具",
-    "en": "Colours and tools"
+    "image": "space-v5-03",
+    "zh": "午后阳光洒满拼豆小屋",
+    "en": "Afternoon light across the studio"
   },
   {
-    "image": "space-04",
-    "zh": "靠墙的工作桌",
-    "en": "A worktable by the wall"
+    "image": "space-v5-04",
+    "zh": "靠窗的拼豆座位",
+    "en": "A beading seat by the window"
   },
   {
-    "image": "space-08",
-    "zh": "准备好开始拼豆",
-    "en": "Ready to start creating"
+    "image": "space-v5-05",
+    "zh": "并排的拼豆桌",
+    "en": "Beading tables side by side"
   },
   {
-    "image": "space-02",
-    "zh": "小狗作品墙",
-    "en": "The puppy art wall"
+    "image": "space-v5-06",
+    "zh": "桌前的作品墙",
+    "en": "The art wall above the desk"
   },
   {
-    "image": "space-06",
-    "zh": "甜点与小狗作品",
-    "en": "Treats and puppies in beads"
+    "image": "space-v5-07",
+    "zh": "窗边的烫豆台",
+    "en": "The ironing station by the window"
   },
   {
-    "image": "space-09",
-    "zh": "窗边的作品展示",
-    "en": "The display by the window"
+    "image": "space-v5-08",
+    "zh": "拼豆小屋全景",
+    "en": "The whole studio"
   },
   {
-    "image": "space-11",
-    "zh": "配件与装饰",
-    "en": "Findings and decorations"
+    "image": "space-v5-09",
+    "zh": "镜子上的制品大全与烫法大全",
+    "en": "Keepsake and ironing guides on the mirror"
   },
   {
-    "image": "space-10",
-    "zh": "收纳角落",
-    "en": "The storage corner"
+    "image": "space-v5-10",
+    "zh": "一面镜子看懂制品和烫法",
+    "en": "Keepsakes and finishes at a glance"
   },
   {
-    "image": "space-03",
-    "zh": "拼豆作品展示",
-    "en": "Beadwork on display"
+    "image": "space-v5-11",
+    "zh": "挂满成品的作品墙",
+    "en": "A wall of finished charms"
   },
   {
-    "image": "space-12",
-    "zh": "客人的拼豆作品",
-    "en": "Our guests’ beadwork"
+    "image": "space-v5-12",
+    "zh": "每组一套豆盘和工具",
+    "en": "Trays and tools for every group"
+  },
+  {
+    "image": "space-v5-13",
+    "zh": "分好色号的拼豆",
+    "en": "Beads sorted by colour code"
+  },
+  {
+    "image": "space-v5-14",
+    "zh": "店里的拼豆作品",
+    "en": "Creations from the studio"
+  },
+  {
+    "image": "space-v5-15",
+    "zh": "更多拼豆作品",
+    "en": "More creations"
+  },
+  {
+    "image": "space-v5-16",
+    "zh": "傍晚的拼豆小屋",
+    "en": "The studio at golden hour"
   }
 ]
