@@ -24,10 +24,11 @@ import process from '../../../05_studio/src/content/components-BeadingProcess.js
 import contacts from '../../../05_studio/src/content/contact-fields.json';
 import patch from '../../../05_studio/src/content/patch-reservations.json';
 import promotion from '../../../05_studio/src/content/patch-promotion.json';
+import labels from '../../../05_studio/src/content/carousel-labels.json';
 import media from '../../../05_studio/src/media-assets.json';
 
-const defaults={home,visit,flow,calendar,receipt,cancellation,edit,booking,account,wallet,app,details,errors,generic,miniapp,profile,process,contacts,patch,promotion};
-const names:Record<keyof typeof defaults,string>={home:'pages-Home',visit:'pages-Visit',flow:'visit-flow',calendar:'components-ReservationCalendar',receipt:'pages-ReservationReceipt',cancellation:'reservation-cancellation',edit:'reservation-edit',booking:'booking-profile',account:'account',wallet:'wallet',app:'App',details:'pages-Details',errors:'data-commerce-messages',generic:'commerce',miniapp:'miniapp',profile:'profile',process:'components-BeadingProcess',contacts:'contact-fields',patch:'patch-reservations',promotion:'patch-promotion'};
+const defaults={home,visit,flow,calendar,receipt,cancellation,edit,booking,account,wallet,app,details,errors,generic,miniapp,profile,process,contacts,patch,promotion,labels};
+const names:Record<keyof typeof defaults,string>={home:'pages-Home',visit:'pages-Visit',flow:'visit-flow',calendar:'components-ReservationCalendar',receipt:'pages-ReservationReceipt',cancellation:'reservation-cancellation',edit:'reservation-edit',booking:'booking-profile',account:'account',wallet:'wallet',app:'App',details:'pages-Details',errors:'data-commerce-messages',generic:'commerce',miniapp:'miniapp',profile:'profile',process:'components-BeadingProcess',contacts:'contact-fields',patch:'patch-reservations',promotion:'patch-promotion',labels:'carousel-labels'};
 // The last published copy paints the first screen; a fresh copy replaces it once loaded.
 const published=shallowRef<Record<string,Record<string,unknown>>>(readPublic<Record<string,Record<string,unknown>>>('content',7*86400000)?.data||{});
 let pending:Promise<void>|undefined,updated=0;

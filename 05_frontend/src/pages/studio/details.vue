@@ -7,6 +7,7 @@ import StudioGlyph from '../../components/StudioGlyph.vue';
 import StudioDetailPhoto from '../../components/StudioDetailPhoto.vue';
 import {useStudioNative} from '../../utils/studio-native';
 import {refreshStudioContent,studioWords,studioMedia} from '../../utils/studio-content';
+import carouselPhotos from '../../../../05_studio/src/content/data-components-StudioCarousel-photos.json';
 const {language,keyboardOpen,shellStyle,say,changeLanguage}=useStudioNative();
 const words=(key:string)=>say(studioWords('details',key));
 const processWords=(key:string)=>say(studioWords('process',key));
@@ -20,7 +21,11 @@ const arrivalPhotos=[
  {key:'parking-entrance',alt:'visitor_parking_entrance_30c573'},
  {key:'parking-location',alt:'visitor_parking_location_c046e2'},
 ] as const;
-const sections=[{id:'arrival',key:'getting_here_1f608d'},{id:'parking',key:'parking_8188de'},{id:'services',key:'at_the_studio_0bc0c9'},{id:'notes',key:'good_to_know_fc4515'},{id:'process',key:''}];
+// Same twelve photographs, order and captions as the website's studio environment gallery.
+const spaceHidden=new Set(['space-v5-01','space-v5-09','space-v5-14','space-v5-15']);
+const spaceKeys=carouselPhotos.map(photo=>photo.image).filter(key=>!spaceHidden.has(key)) as Parameters<typeof studioMedia>[0][];
+const spacePhotos=computed(()=>spaceKeys.map(key=>{const full=studioMedia(key);return {key,full,thumb:{...full,src:full.src.replace(/-1200\.webp$/,'-640.webp')}};}));
+const sections=[{id:'arrival',key:'getting_here_1f608d'},{id:'parking',key:'parking_8188de'},{id:'space',key:'studio_environment_6f2a91'},{id:'services',key:'at_the_studio_0bc0c9'},{id:'notes',key:'good_to_know_fc4515'},{id:'process',key:''}];
 const services=[
  ['seats_and_tools_4b0a0a','a_comfortable_chair_an_individual_seat_and_f15251'],
  ['textures_and_finishing_touches_6d3e7b','we_keep_exploring_different_ironing_techniques_small_659fdb'],
@@ -41,6 +46,7 @@ const steps=[
 const processPhoto=(key:string)=>photos.value[('process-'+key) as PhotoKey];
 function preview(key:PhotoKey){uni.previewImage({current:photos.value[key].src,urls:photoKeys.map(name=>photos.value[name].src)});}
 function previewProcess(key:string){preview(('process-'+key) as PhotoKey);}
+function previewSpace(index:number){const urls=spacePhotos.value.map(photo=>photo.full.src);uni.previewImage({current:urls[index],urls});}
 function copyAddress(value=contact('address')){uni.setClipboardData({data:value});}
 function phone(){uni.makePhoneCall({phoneNumber:contact('phone').replace(/\s/g,'')});}
 function copyWechat(){uni.setClipboardData({data:contact('wechat')});}
@@ -66,6 +72,10 @@ onShow(()=>void refreshStudioContent());
     <StudioDetailPhoto v-for="photo in arrivalPhotos.slice(1)" :key="photo.key" :photo="photos[photo.key]" :alt="words(photo.alt)" :language="language" @open="preview(photo.key)"/>
     <text class="studio-plan-name">{{words('nearby_parking_options_1a311a')}}</text><button v-for="key in ['parking_1','parking_2']" :key="key" class="studio-native-secondary studio-address" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="copyAddress(contact(key))"><StudioGlyph name="pin" :size="18"/><text>{{contact(key)}}</text><StudioGlyph name="copy" :size="17"/></button>
    </view>
+   <view id="studio-detail-space" class="studio-native-section studio-detail-section">
+    <text class="studio-native-subtitle">{{words('studio_environment_6f2a91')}}</text>
+    <view class="studio-space-grid"><StudioDetailPhoto v-for="(photo,index) in spacePhotos" :key="photo.key" :photo="photo.thumb" :alt="say(studioWords('labels',photo.key))" :language="language" @open="previewSpace(index)"/></view>
+   </view>
    <view id="studio-detail-services" class="studio-native-section studio-detail-section"><text class="studio-native-subtitle">{{words('made_comfortable_made_yours_0c8904')}}</text><view v-for="item in services" :key="item[0]" class="studio-native-section studio-detail-article"><text class="studio-plan-name">{{words(item[0])}}</text><text class="studio-native-body">{{words(item[1])}}</text></view></view>
    <view id="studio-detail-notes" class="studio-native-section studio-detail-section"><text class="studio-native-subtitle">{{words('a_few_little_notes_7bbea4')}}</text><view v-for="item in notes" :key="item[0]" class="studio-native-section studio-detail-article"><text class="studio-plan-name">{{words(item[0])}}</text><text class="studio-native-body">{{words(item[1])}}</text></view></view>
    <view id="studio-detail-process" class="studio-native-section studio-detail-section">
@@ -88,4 +98,7 @@ onShow(()=>void refreshStudioContent());
 .studio-native .studio-detail-nav{display:flex;flex-wrap:wrap;gap:5px 9px}
 .studio-native .studio-detail-nav button{min-height:40px;font-size:12px;padding:7px 9px;background:#f2f7fa;border-radius:10px}
 .studio-native .studio-detail-tools{align-self:flex-start;text-align:left}
+/* Two columns with the second lowered, like the website gallery on a phone. */
+.studio-space-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px;padding-bottom:22px}
+.studio-space-grid>.studio-detail-photo:nth-child(2n){transform:translateY(22px)}
 </style>

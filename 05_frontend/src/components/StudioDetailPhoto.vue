@@ -12,7 +12,7 @@ function press(){if(failed.value){failed.value=false;loaded.value=false;attempt.
 <template>
  <view class="studio-detail-photo">
   <button class="studio-detail-photo-button" :data-photo="photo.src" :style="{paddingBottom:(photo.height/photo.width*100)+'%'}" :aria-label="failed?studioWords('miniapp','retry')[language==='en'?1:0]:label" hover-class="studio-native-pressed" :hover-stay-time="180" :hover-start-time="0" @tap="press">
-   <image v-if="!failed" :key="photo.src+attempt" :src="photo.src" mode="aspectFit" :lazy-load="!eager" :aria-label="alt" @load="loaded=true" @error="failed=true"/>
+   <image v-if="!failed" :key="photo.src+attempt" :src="photo.src" mode="aspectFit" :lazy-load="!eager" webp :aria-label="alt" @load="loaded=true" @error="failed=true"/>
    <view v-if="failed" class="studio-detail-photo-state"><text>{{studioWords('miniapp','retry')[language==='en'?1:0]}}</text></view>
    <view v-else-if="!loaded" class="studio-detail-photo-state" aria-hidden="true"><view class="studio-native-progress"/></view>
   </button>
