@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import asyncio
 import base64
 import binascii
 import logging
 from collections.abc import Callable
 from dataclasses import replace
 from datetime import timedelta
-from threading import Thread
+from threading import BoundedSemaphore, Thread
 from typing import Any
 
 from fastapi import APIRouter, Request
@@ -51,6 +52,9 @@ router = APIRouter(prefix="/generate", tags=["generate"])
 preview_router = APIRouter(prefix="/preview", tags=["generate"])
 LOGGER = logging.getLogger(__name__)
 SessionFactory = Callable[[], Session]
+# Building and exporting a sheet costs seconds of CPU. The service runs as one Uvicorn process,
+# so that work runs in worker threads, at most two at a time, and the event loop stays free.
+PATTERN_BUILD_SLOTS = BoundedSemaphore(2)
 
 
 @router.post("/script")
@@ -62,41 +66,64 @@ async def generate_script(request: Request, actor: CurrentActor, db: DbSession) 
     raw_image, original_path = await resolve_raw_image(payload, raw_upload)
     size = parse_size(payload.get("size_preset") or payload.get("size") or "26x26")
     auto_remove_white_bg = parse_bool_default_false(payload.get("auto_remove_white_bg", False))
+    return await asyncio.to_thread(
+        build_script_artwork,
+        db,
+        actor=actor,
+        payload=payload,
+        raw_image=raw_image,
+        original_path=original_path,
+        size=size,
+        auto_remove_white_bg=auto_remove_white_bg,
+    )
 
+
+def build_script_artwork(
+    db: Session,
+    *,
+    actor: Actor,
+    payload: dict[str, Any],
+    raw_image: bytes,
+    original_path: str | None,
+    size: SizePreset,
+    auto_remove_white_bg: bool,
+) -> dict:
+    """Build, save and export one script pattern. Runs in a worker thread."""
     # Normal (script) generation is free for everyone since 2026-10-17; only rate limits apply.
     script_quota_consumed = False
     try:
-        sheet = PatternBuilder().build(
-            size=size,
-            raw_image=raw_image,
-            brand=str(payload.get("brand") or "MARD"),
-            bead_diameter_mm=float(payload.get("bead_diameter_mm") or 5.0),
-            mode="script",
-            auto_remove_white_bg=auto_remove_white_bg,
-        )
+        with PATTERN_BUILD_SLOTS:
+            sheet = PatternBuilder().build(
+                size=size,
+                raw_image=raw_image,
+                brand=str(payload.get("brand") or "MARD"),
+                bead_diameter_mm=float(payload.get("bead_diameter_mm") or 5.0),
+                mode="script",
+                auto_remove_white_bg=auto_remove_white_bg,
+            )
 
-        if sheet.metadata.get("white_bg_detected"):
-            if actor.user is not None:
-                consume_white_bg_quota(db, actor.user)
+            if sheet.metadata.get("white_bg_detected"):
+                if actor.user is not None:
+                    consume_white_bg_quota(db, actor.user)
 
-        pattern_data = sheet.to_frontend_dict()
-        artwork = ArtworkService(db).save_artwork(
-            user_id=actor.user.user_id if actor.user else None,
-            owner_type=actor.owner_type,
-            owner_id=actor.owner_id,
-            original_path=str(original_path) if original_path else None,
-            preview_path="",
-            pattern_json=pattern_data,
-            style_preset="cartoon_fallback",
-            size_preset=size.value,
-            title=payload.get("title"),
-        )
-        pattern_url, _labeled_url = finalize_artwork_pattern_assets(
-            db,
-            artwork=artwork,
-            sheet=sheet,
-            pattern_data=pattern_data,
-        )
+            pattern_data = sheet.to_frontend_dict()
+            artwork = ArtworkService(db).save_artwork(
+                user_id=actor.user.user_id if actor.user else None,
+                owner_type=actor.owner_type,
+                owner_id=actor.owner_id,
+                original_path=str(original_path) if original_path else None,
+                preview_path="",
+                pattern_json=pattern_data,
+                style_preset="cartoon_fallback",
+                size_preset=size.value,
+                title=payload.get("title"),
+            )
+            pattern_url, _labeled_url = finalize_artwork_pattern_assets(
+                db,
+                artwork=artwork,
+                sheet=sheet,
+                pattern_data=pattern_data,
+            )
     except Exception as exc:  # noqa: BLE001 - API normalizes build/export failures and refunds consumed quota.
         refund_script_quota_for_actor(db, actor, consumed=script_quota_consumed)
         raise ApiException(500, ErrorCode.PATTERN_BUILD_FAILED, "图纸生成失败，请换一张照片再试。") from exc
@@ -506,19 +533,23 @@ async def parse_payload_or_upload(request: Request, *, upload_field: str) -> tup
 async def resolve_raw_image(payload: dict[str, Any], upload: UploadFile | None) -> tuple[bytes, str | None]:
     if upload is not None:
         data = await upload.read()
-        saved = save_uploaded_image(upload.filename or "upload.png", data, content_type=upload.content_type)
-        return load_uploaded_image(saved["image_id"])[0], saved["path"]
+        return await asyncio.to_thread(store_uploaded_image, upload.filename or "upload.png", data, upload.content_type)
     image_base64 = payload.get("image_base64") or payload.get("raw_image_base64")
     if image_base64:
         filename = str(payload.get("filename") or payload.get("image_filename") or "upload.png")
         data = decode_base64_image(str(image_base64))
-        saved = save_uploaded_image(filename, data)
-        return load_uploaded_image(saved["image_id"])[0], saved["path"]
+        return await asyncio.to_thread(store_uploaded_image, filename, data, None)
     image_id = str(payload.get("image_id") or "")
     if not image_id:
         raise ApiException(422, ErrorCode.IMAGE_NOT_FOUND, "缺少图片，请先上传照片。")
     data, path = load_uploaded_image(image_id)
     return data, str(path)
+
+
+def store_uploaded_image(filename: str, data: bytes, content_type: str | None) -> tuple[bytes, str]:
+    """Validate, normalize and save an upload, then reload the stored bytes. Runs in a worker thread."""
+    saved = save_uploaded_image(filename, data, content_type=content_type)
+    return load_uploaded_image(saved["image_id"])[0], saved["path"]
 
 
 def decode_base64_image(value: str) -> bytes:

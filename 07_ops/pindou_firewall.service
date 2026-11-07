@@ -1,0 +1,16 @@
+# /etc/systemd/system/pindou-firewall.service (installed 2026-11-07)
+[Unit]
+Description=PinDou inbound host firewall (SSH, ICMP, DHCP and replies only)
+DefaultDependencies=no
+After=local-fs.target
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/pindou-firewall
+ExecStop=/usr/local/sbin/pindou-firewall stop
+
+[Install]
+WantedBy=multi-user.target

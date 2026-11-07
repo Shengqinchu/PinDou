@@ -4,6 +4,7 @@ import io
 import base64
 import csv
 import json
+import threading
 import time
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
@@ -35,6 +36,7 @@ from pindou.db.models import (
     User,
 )
 from pindou.main import create_app
+from pindou.pattern.builder import PatternBuilder
 from pindou.providers.base import PreviewResult
 from pindou.services.hupijiao_service import sign_params
 from pindou.services.cdk_service import CDKService
@@ -685,6 +687,28 @@ def test_standard_generation_is_free_without_any_allowance(api_client) -> None:
     with session_factory() as session:
         user = session.scalar(select(User).where(User.openid == user_id))
         assert user is not None and user.free_credits_remaining == 0 and user.paid_credits == 0
+
+
+def test_script_generation_builds_off_the_event_loop(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+    client, _session_factory = api_client
+    headers = auth_headers(client)
+    threads: list[str] = []
+    original_build = PatternBuilder.build
+
+    def recording_build(self, *args, **kwargs):
+        threads.append(threading.current_thread().name)
+        return original_build(self, *args, **kwargs)
+
+    monkeypatch.setattr(PatternBuilder, "build", recording_build)
+    response = client.post(
+        "/api/v1/generate/script",
+        data={"size": "26x26", "mode": "script"},
+        files={"raw_image": ("sample.png", png_bytes((40, 120, 200)), "image/png")},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    # asyncio.to_thread uses the loop's default executor, whose threads are named "asyncio_N".
+    assert threads and threads[0].startswith("asyncio_")
 
 
 def test_save_artwork_pattern_rebuilds_counts_and_exports_png(api_client) -> None:

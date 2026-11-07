@@ -1,0 +1,35 @@
+# systemd units for the PinDou nightly backup (installed 2026-11-07).
+# Copy each block to the path in its header, then:
+#   systemctl daemon-reload && systemctl enable --now pindou-backup.timer
+
+### /etc/systemd/system/pindou-backup.service
+[Unit]
+Description=PinDou backup (databases, shared files, service configs)
+OnFailure=pindou-backup-alert.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/pindou-backup
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=30min
+
+### /etc/systemd/system/pindou-backup.timer
+[Unit]
+Description=Nightly PinDou backup at 03:30 Toronto time
+
+[Timer]
+OnCalendar=*-*-* 03:30 America/Toronto
+RandomizedDelaySec=10min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
+### /etc/systemd/system/pindou-backup-alert.service
+[Unit]
+Description=Tell the owner the PinDou backup failed
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/pindou-backup-alert

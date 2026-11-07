@@ -23,7 +23,7 @@
 ## 服务器健康（上海时间 2026-09-27 09:44 起，只读）
 
 - 正常：运行 8 天，负载 0.08/8 核；内存 15 GiB 可用 14 GiB，swap 未用；磁盘 46%（41 GB 余量），inode 15%。`pindou`、`pindou-studio`、`nginx`、`cloudflared` 均 active 且 enabled，无 failed unit，服务重启次数 0；应用只监听 127.0.0.1。近两日 nginx 无 5xx，Studio/生成器无 warning 以上日志，cloudflared 无错误，内核无 OOM / I/O 错误；NTP 同步。两库 `PRAGMA quick_check` 为 ok。通知队列无积压（顾客通知 accepted 24 / sent 10 / skipped 2；短信任务 sent 26 / delivered 3 / unknown 1）。Mac 短信桥约每 7.6 秒心跳。公网首页、小店、健康检查约 0.32 秒 200；边缘证书至 2026-10-28（Cloudflare 自动续期），源站证书至 2036-05-30。
-- 需处理（未擅自修改，待店主决定）：
+- 需处理（未擅自修改，待店主决定；第 1–4 项已于 2026-11-07 处理，见 [加固与备份记录](SERVER_HARDENING_BACKUP_20261107.md)）：
   1. SSH：`PasswordAuthentication yes`、`PermitRootLogin yes`，未装 fail2ban，ufw 未启用，24 小时约 1.5 万次失败登录尝试。建议确认云控制台可登录后改为仅密钥登录、root 仅密钥，并加 fail2ban 或安全组限制 22 端口来源。
   2. rpcbind 监听 0.0.0.0:111，业务不需要，建议关闭或由安全组屏蔽。
   3. 无定时数据备份：只有每次发布时的 `studio.sqlite3` 快照，生成器 `pindou.db` 自 2026-09-18 迁移后无新备份。建议加每日两库一致性备份并定期异地保存。
