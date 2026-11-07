@@ -29,6 +29,10 @@
 
 完整本机证据：`C:/Users/123/Desktop/应用中心/DCF/artifacts/mainland_test_20260929/配置与验收.md`，以及同目录 JSON、游戏截图和仅保留游戏相关连接的日志。
 
+## 2026-11-07 已收回
+
+大冲锋 10-18 停办。店主同意后（“线路收紧也同意”），按下文回退步骤操作：先核对 `/etc/ssh/sshd_config` 仍是上述改后哈希 `fbedbb52…`（期间无人改动），只把 Match 块中的 `PermitOpen any` 改回 `PermitOpen *:80 *:443 *:8080 *:8443`。改后哈希为 `29480d34…`，与本次游戏改动前的原文件一致。`sshd -t` 通过后 reload，并设 4 分钟自动撤回，确认 root、pindou 新登录正常后才取消。`sshd -T` 显示 cnproxy 为四个网页端口，运维账户仍为 `any`。用本机 Clash 私钥实测：baidu:443、bilibili:80 可连，22 和游戏 15000 端口被拒（Administratively prohibited）。改前备份 `/root/sshd_config.before-cnproxy-web-20261107`。
+
 ## 回退
 
 如需撤回本次服务器修改，应先比对当前配置与上述改后哈希。如果后续已有他人修改，只将 cnproxy 的 `PermitOpen any` 恢复为原四个网页端口，不能覆盖其他改动。完成 `sshd -t` 后 reload ssh，复核 cnproxy 和普通运维账户的生效配置。客户端关闭线路即可停用，无需改动业务服务。

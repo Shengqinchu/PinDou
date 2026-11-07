@@ -39,11 +39,13 @@
 3. 需要时用 `rsync -a` 从 `files/opt/pindou/...` 还原图片与 shared 文件。
 4. 启动服务，检查健康接口和公网页面。
 
-## 待店主决定
+## 店主决定（2026-11-06 晚）
 
-- **重启服务器**：启用内核 5.15.0-203 和已更新的库，约 1–2 分钟停机，建议闭店后。开机项已核对：`pindou`、`pindou-studio`、`nginx`、`cloudflared`、`cnproxy-guard`、`fail2ban`、`pindou-firewall` 均开机自启，`cnproxy-guard` 启动时重建限速和内网限制，GRUB 默认项为新内核。
-- **店主线路 `PermitOpen any`**：为大冲锋放开，游戏已停办；建议收回原四个网页端口，9 月实测这四个端口下常用国内网站都正常。
-- **定期离机备份**：本机定时拉取（电脑要开着），或云存储（需店主开通）。
+店主答复“可以 今晚23:30重启 线路收紧也同意”。
+
+- **重启服务器**：启用内核 5.15.0-203 和已更新的库，约 1–2 分钟停机。已设一次性定时器 `pindou-reboot-20261106`：2026-11-06 23:30 Toronto 先跑一次备份再重启。开机项已核对：`pindou`、`pindou-studio`、`nginx`、`cloudflared`、`cnproxy-guard`、`fail2ban`、`pindou-firewall` 均开机自启，`cnproxy-guard` 在 network-online 之后重建限速和内网限制，GRUB 默认项为新内核。重启结果见下文补记。
+- **店主线路**：`PermitOpen any` 已收回为 `*:80 *:443 *:8080 *:8443`，详见 [线路记录](CNPROXY_GAME_CONFIGURATION_20260929.md#2026-11-07-已收回)。
+- **定期离机备份**：尚未设定（本机定时拉取需电脑开着，或用云存储需店主开通）。首份离机副本（两库 + 277 MB 文件 `files.tar`，文件数与清单一致）已在本机。
 
 ## 未动
 

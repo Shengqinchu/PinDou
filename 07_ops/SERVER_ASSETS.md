@@ -20,7 +20,7 @@
 | 正式域名 | `pindoupuppy.com`；兼容 `www.pindoupuppy.com`、`staging.pindoupuppy.com` |
 | 生产切换 | 2026-09-18 16:20:35 UTC / 12:20:35 America/Toronto 公网验收完成 |
 | 正式服务 | `pindou.service`、`pindou-studio.service`、`nginx.service`、`cloudflared.service`（2026.10.7；旧版留在 `/usr/local/lib/cloudflared/`）；防护与备份：`pindou-firewall.service`、`fail2ban.service`、`pindou-backup.timer`；店主线路 `cnproxy-guard.service`。2026-11-07 复核均 active 且开机自启 |
-| 内核 | 运行 5.15.0-185；**5.15.0-203 已安装，等店主定时间重启**（约 1–2 分钟停机） |
+| 内核 | 运行 5.15.0-185；5.15.0-203 已安装。店主同意 **2026-11-06 23:30 Toronto** 重启（一次性定时器 `pindou-reboot-20261106`，重启前先跑一次备份，约 1–2 分钟停机） |
 
 ## 登录与密钥
 
@@ -56,7 +56,7 @@
 | 项目 | 值 |
 |---|---|
 | 服务器账户 | `cnproxy`（系统用户，shell `/usr/sbin/nologin`，家目录 `/var/lib/cnproxy`）；`authorized_keys` 带 `restrict,port-forwarding` |
-| sshd 限制 | `/etc/ssh/sshd_config` 末尾 `Match User cnproxy`：仅公钥、禁 TTY/Agent/X11/SSH 隧道设备、`ForceCommand /usr/sbin/nologin`、`AllowTcpForwarding local`、`PermitOpen any`；2026-09-29 经用户授权解除原网页端口白名单，保留 owner 防火墙内网限制。改前备份 `/root/sshd_config.before-cnproxy-game-20260930T045359`，仅 reload ssh；原始账户创建前备份 `/root/sshd_config.before-cnproxy-20260927` |
+| sshd 限制 | `/etc/ssh/sshd_config` 末尾 `Match User cnproxy`：仅公钥、禁 TTY/Agent/X11/SSH 隧道设备、`ForceCommand /usr/sbin/nologin`、`AllowTcpForwarding local`、`PermitOpen *:80 *:443 *:8080 *:8443`（2026-11-07 店主同意收回为网页端口，文件与 2026-09-27 原配置逐字一致；改前备份 `/root/sshd_config.before-cnproxy-web-20261107`）；2026-09-29 曾为大冲锋改为 `any`，保留 owner 防火墙内网限制。改前备份 `/root/sshd_config.before-cnproxy-game-20260930T045359`，仅 reload ssh；原始账户创建前备份 `/root/sshd_config.before-cnproxy-20260927` |
 | 防护与限速 | `cnproxy-guard.service` → `/usr/local/sbin/cnproxy-guard`：iptables owner 规则拒绝该账户访问 127/8、10/8、172.16/12、192.168/16、100.64/10、169.254/16 及全部 IPv6；eth0 HTB 将源端口 22 的出站限在 5 Mbit/s（保底 1 Mbit/s），其余流量不限 |
 | 本机私钥 | `C:/Users/123/.ssh/pindou_cnproxy_ed25519`，指纹 `SHA256:ZE/FO+37Dxec4uGYqTgO1RDdoMYXhfZNwCSojwoVu1s`；Clash 配置 `C:/Users/123/Documents/回国VPN/回国-上海.yaml` 内嵌同一私钥，不入 Git |
 | 手机私钥 | `C:/Users/123/.ssh/pindou_cnproxy_phone_ed25519`，指纹 `SHA256:8yww/AG/0nuJ13lSq7vlIpIx/fKn7mQeRQysZPK/YUM`；手机配置 `C:/Users/123/Documents/回国VPN/回国-上海-手机.yaml`（含 fake-ip DNS）。手机丢失时只从 `/var/lib/cnproxy/.ssh/authorized_keys` 删除注释为 `cnproxy-phone@pindou-prod 20260927` 的一行 |
@@ -67,7 +67,7 @@
 | 手机订阅 | nginx `pindou-staging` 中 `location = /cn-sub/<随机令牌>`（位于 studio_deploy.py 管理区块之后，发布不会覆盖），返回 `/etc/nginx/cnproxy-sub/profile.yaml`（手机配置，root:www-data 640），no-store / noindex，经 Cloudflare 不缓存；完整地址只保存在本机 `C:/Users/123/Documents/回国VPN/订阅地址.txt`。改前备份 `/root/pindou-staging.before-cnsub-20260927`。泄露时删除该 location 或换令牌，并作废手机密钥 |
 | 停用 | `systemctl disable --now cnproxy-guard`，删除 sshd 中的 `Match User cnproxy` 块后 `sshd -t && systemctl reload ssh`，`userdel -r cnproxy`；同时删除 `/cn-sub/` location 与 `/etc/nginx/cnproxy-sub` |
 
-仅限店主本人使用，不向他人提供。22 端口持续有暴力登录尝试（2026-11-06 一天约 4,900 次、273 个 IP），已由 fail2ban 封禁；该账户只用密钥，不受影响。`PermitOpen any` 是为大冲锋放开的，游戏已停办；是否收回原四个网页端口 `*:80 *:443 *:8080 *:8443` 待店主决定（会影响店主自己的线路）。
+仅限店主本人使用，不向他人提供。22 端口持续有暴力登录尝试（2026-11-06 一天约 4,900 次、273 个 IP），已由 fail2ban 封禁；该账户只用密钥，不受影响。2026-11-07 店主同意把转发收回到四个网页端口：用本机 Clash 私钥实测 baidu:443、bilibili:80 可连，22、15000 等端口被拒（Administratively prohibited）。以后某个国内应用需要别的端口时，在 `PermitOpen` 里单独加，不再放开为 `any`。
 
 ## 大冲锋附属物（2026-10-18 已全部清理）
 
