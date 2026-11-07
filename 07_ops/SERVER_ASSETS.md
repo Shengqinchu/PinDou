@@ -20,7 +20,7 @@
 | 正式域名 | `pindoupuppy.com`；兼容 `www.pindoupuppy.com`、`staging.pindoupuppy.com` |
 | 生产切换 | 2026-09-18 16:20:35 UTC / 12:20:35 America/Toronto 公网验收完成 |
 | 正式服务 | `pindou.service`、`pindou-studio.service`、`nginx.service`、`cloudflared.service`（2026.10.7；旧版留在 `/usr/local/lib/cloudflared/`）；防护与备份：`pindou-firewall.service`、`fail2ban.service`、`pindou-backup.timer`；店主线路 `cnproxy-guard.service`。2026-11-07 复核均 active 且开机自启 |
-| 内核 | 运行 5.15.0-185；5.15.0-203 已安装。店主同意 **2026-11-06 23:30 Toronto** 重启（一次性定时器 `pindou-reboot-20261106`，重启前先跑一次备份，约 1–2 分钟停机） |
+| 内核 | 5.15.0-203（2026-11-06 22:02 Toronto 按店主“直接重启呗”提前重启，SSH 约 61 秒恢复；重启前备份 `20261107-110150`） |
 
 ## 登录与密钥
 

@@ -43,7 +43,7 @@
 
 店主答复“可以 今晚23:30重启 线路收紧也同意”。
 
-- **重启服务器**：启用内核 5.15.0-203 和已更新的库，约 1–2 分钟停机。已设一次性定时器 `pindou-reboot-20261106`：2026-11-06 23:30 Toronto 先跑一次备份再重启。开机项已核对：`pindou`、`pindou-studio`、`nginx`、`cloudflared`、`cnproxy-guard`、`fail2ban`、`pindou-firewall` 均开机自启，`cnproxy-guard` 在 network-online 之后重建限速和内网限制，GRUB 默认项为新内核。重启结果见下文补记。
+- **重启服务器**：原定 23:30，店主随后说“直接重启呗？”，于是取消定时器，先跑一次备份（`20261107-110150`），22:01:56 Toronto 重启。机器 7 秒后断开、61 秒后 SSH 恢复。复核：内核 5.15.0-203、无需再重启；`pindou`、`pindou-studio`、`nginx`、`cloudflared`（4 条连接）、`cnproxy-guard`（6 条 owner 规则与限速）、`fail2ban`（封禁恢复）、`pindou-firewall`、chrony、两个定时器均 active，无 failed unit；两个健康检查正常，111 无监听；两个 Mac 短信桥重启后几秒内重新上线；公网首页、预约、日历、健康检查、钱包接口均 200。开机后的错误日志只有两条端口探测引起的 `kex_exchange_identification`。
 - **店主线路**：`PermitOpen any` 已收回为 `*:80 *:443 *:8080 *:8443`，详见 [线路记录](CNPROXY_GAME_CONFIGURATION_20260929.md#2026-11-07-已收回)。
 - **定期离机备份**：尚未设定（本机定时拉取需电脑开着，或用云存储需店主开通）。首份离机副本（两库 + 277 MB 文件 `files.tar`，文件数与清单一致）已在本机。
 
