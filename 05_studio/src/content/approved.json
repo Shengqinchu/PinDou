@@ -1,5 +1,5 @@
 {
-  "source": "2026-10-21 owner: home carousel order (sunset last); STUDIO_COPY_CHANGES.md",
+  "source": "2026-11-13 店主截图标注 至11.11→12.1：这里改一下时间",
   "metadata": {
     "title": "小狗拼豆铺 · 汉密尔顿拼豆手作体验",
     "description": "汉密尔顿小狗拼豆铺。选择未来两周的时间，预约一次属于自己的拼豆手作体验。"
@@ -86,7 +86,7 @@
     "studio-miniapp-legal.json": "7c6d9b49e5ebca0fd25bb9d34e575e89de08db26e87f9b5eefd48983a12b999b",
     "studio-profile.json": "fd7b5537fcdb34b57643288f7e16bb0d65c4906a8c622e4b03b7b65576256df3",
     "telegram-notifications.json": "b7fa03f044584ed03ba9867c1499d19328639f666dd9350a9a68b4b8356902c7",
-    "visit-flow.json": "d5585e4bef6f7650d5e2c01ad5aacd1e666dccf88821bdc0b3e61a0bc953cb49",
+    "visit-flow.json": "cb66ed770ed151427ffc543b94427959c13a3b86ea5fd90d541e89ae3b8ca027",
     "wallet.json": "0e8ce78f19b588a98752159ff7ff5936ed9001b75b4300d6e44c57dc746101bc",
     "wechat.json": "ec03e405ce841460edd8350968393173d7cc037bb950d6d552563366c8b043d5",
     "workbench.json": "5f247e49c6eb9e7bc477ce6f9b6cc09d660d88069426240ceb870025d84d027e"
