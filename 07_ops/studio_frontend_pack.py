@@ -44,6 +44,7 @@ copy_sources = {
     "owner-notification-copy.json": "owner-notifications.json",
     "owner-wechat-copy.json": "owner-wechat.json",
     "telegram-notification-copy.json": "telegram-notifications.json",
+    "studio-profile.json": "studio-profile.json",
 }
 service = {}
 for argument in sys.argv[2:]:

@@ -1045,7 +1045,7 @@
 
 | 键 | 中文 | English |
 |---|---|---|
-| address | 8 Hughson St N, Hamilton, ON L8R 0B1 | 8 Hughson St N, Hamilton, ON L8R 0B1 |
+| address | 8 Hughson St N, Hamilton, ON L8R 0A9 | 8 Hughson St N, Hamilton, ON L8R 0A9 |
 | wechat | xiaogoushuangji | xiaogoushuangji |
 | phone | +1 4373624360 | +1 4373624360 |
 | email | staywithcsq@outlook.com | staywithcsq@outlook.com |
@@ -3024,7 +3024,7 @@
 
 | 键 | 中文 | English |
 |---|---|---|
-| address | 8 Hughson St N, Hamilton, ON L8R 0B1 | |
+| address | 8 Hughson St N, Hamilton, ON L8R 0A9 | |
 | nearby_parking | 75 John St N, Hamilton, ON L8R 1H7 | 115 King William St, Hamilton, ON L8R 1H8 |
 | wechat | xiaogoushuangji | |
 | phone | +1 4373624360 | |

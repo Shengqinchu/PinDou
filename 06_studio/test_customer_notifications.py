@@ -130,7 +130,7 @@ def test_chinese_booking_sends_channel_specific_english_confirmation(setup):
         assert 'Local <Guest>, Pindou Puppy has confirmed your booking.' in body
         assert '2026-09-11 14:00-16:00 · 2 guests' in body
         assert 'Hamilton local time' in body
-        assert 'Address: 8 Hughson St N, Hamilton, ON L8R 0B1' in body
+        assert 'Address: 8 Hughson St N, Hamilton, ON L8R 0A9' in body
         assert 'View booking: https://pindoupuppy.com/reservation/'+ident in body
         assert 'Studio details: https://pindoupuppy.com/details' in body
         assert body.endswith('Pindou Puppy looks forward to welcoming you!')
@@ -157,7 +157,7 @@ def test_pending_email_and_sms_match_full_english_template_with_chinese_name(set
         assert 'It is waiting for the host to confirm.' in body
         assert '2026-09-11 14:00-16:00 · 1 guest' in body
         assert 'Hamilton local time' in body
-        assert 'Address: 8 Hughson St N, Hamilton, ON L8R 0B1' in body
+        assert 'Address: 8 Hughson St N, Hamilton, ON L8R 0A9' in body
         assert 'View booking: https://pindoupuppy.com/reservation/'+ident in body
         assert 'Studio details: https://pindoupuppy.com/details' in body
         assert 'We will notify you when the host confirms your booking.' in body
@@ -177,7 +177,7 @@ def test_all_booking_statuses_keep_chinese_names_out_of_english_delivery():
             body=payload['body']
             assert not re.search(r'[\u3400-\u9fff]',payload['title']+body)
             assert '2026-09-26 10:00-22:00 · 1 guest' in body
-            assert 'Address: 8 Hughson St N, Hamilton, ON L8R 0B1' in body
+            assert 'Address: 8 Hughson St N, Hamilton, ON L8R 0A9' in body
             assert body.count('https://pindoupuppy.com/reservation/VIS-TEST')==1
             assert body.count('https://pindoupuppy.com/details')==1
             if channel=='email':assert 'email staywithcsq@outlook.com' in body
